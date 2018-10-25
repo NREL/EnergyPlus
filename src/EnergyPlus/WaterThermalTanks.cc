@@ -979,7 +979,6 @@ namespace WaterThermalTanks {
         using BranchNodeConnections::TestCompSet;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataEnvironment::OutBaroPress;
         using DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed;
         using DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified;
@@ -1235,32 +1234,27 @@ namespace WaterThermalTanks {
                                             cAlphaFieldNames(4) + " not found = " + cAlphaArgs(4));
                             ErrorsFound = true;
                         } else {
-                            // Verify Curve Object, only legal type is Quadratic
-                            {
-                                auto const SELECT_CASE_var(GetCurveType(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp));
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
+                                                                        {2},                                                  // Valid dimensions
+                                                                        RoutineName,                                          // Routine name
+                                                                        cCurrentModuleObject,                                 // Object Type
+                                                                        WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
+                                                                        cAlphaFieldNames(4));                                 // Field Name
 
-                                if (SELECT_CASE_var == "BIQUADRATIC") {
-
-                                    if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
-                                        HEffFTemp = min(1.0,
-                                                        max(0.0,
-                                                            CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
-                                                                       WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
-                                                                       WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
-                                        if (std::abs(HEffFTemp - 1.0) > 0.05) {
-                                            ShowWarningError(cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name + "\":");
-                                            ShowContinueError("The " + cAlphaFieldNames(4) + " should be normalized ");
-                                            ShowContinueError(" to 1.0 at the rating point. Curve output at the rating point = " +
-                                                              TrimSigDigits(HEffFTemp, 3));
-                                            ShowContinueError(" The simulation continues using the user-specified curve.");
-                                        }
+                            if (!ErrorsFound) {
+                                if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
+                                    HEffFTemp = min(1.0,
+                                                    max(0.0,
+                                                        CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
+                                                                   WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
+                                                                   WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
+                                    if (std::abs(HEffFTemp - 1.0) > 0.05) {
+                                        ShowWarningError(cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name + "\":");
+                                        ShowContinueError("The " + cAlphaFieldNames(4) + " should be normalized ");
+                                        ShowContinueError(" to 1.0 at the rating point. Curve output at the rating point = " +
+                                                          TrimSigDigits(HEffFTemp, 3));
+                                        ShowContinueError(" The simulation continues using the user-specified curve.");
                                     }
-
-                                } else {
-                                    ShowSevereError(cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name + "\" illegal " +
-                                                    cAlphaFieldNames(4) +
-                                                    " type for this object = " + GetCurveType(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp));
-                                    ErrorsFound = true;
                                 }
                             }
                         }
@@ -2791,6 +2785,13 @@ namespace WaterThermalTanks {
                                     ":  Part Load Factor curve failed to evaluate to greater than zero for all numbers in the domain of 0 to 1");
                                 ErrorsFound = true;
                             }
+
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterThermalTank(WaterThermalTankNum).PLFCurve, // Curve index
+                                                                        {1},                                            // Valid dimensions
+                                                                        RoutineName,                                    // Routine name
+                                                                        cCurrentModuleObject,                           // Object Type
+                                                                        WaterThermalTank(WaterThermalTankNum).Name,     // Object Name
+                                                                        cAlphaFieldNames(5));                           // Field Name
                         }
                     }
 
@@ -5797,7 +5798,6 @@ namespace WaterThermalTanks {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using CurveManager::GetCurveType;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5808,19 +5808,6 @@ namespace WaterThermalTanks {
         // Check 0 and 1
         if (CurveValue(CurveIndex, 0.0) <= 0) IsValid = false;
         if (CurveValue(CurveIndex, 1.0) <= 0) IsValid = false;
-
-        if (IsValid) { // Check min/maxs
-
-            {
-                auto const SELECT_CASE_var(GetCurveType(CurveIndex));
-
-                if (SELECT_CASE_var == "QUADRATIC") {
-                    // Curve coeffs are not currently exposed so there's no good way to do this yet
-
-                } else if (SELECT_CASE_var == "CUBIC") {
-                }
-            }
-        }
     }
 
     void SetupStratifiedNodes(int const WaterThermalTankNum) // Water Heater being simulated
@@ -6111,7 +6098,6 @@ namespace WaterThermalTanks {
         using DataHVACGlobals::HPWHInletDBTemp;
         using DataHVACGlobals::HPWHInletWBTemp;
         using DataLoopNode::Node;
-        using DataSizing::AutoSize;
         using DataSizing::CurZoneEqNum;
         using DataSizing::DataNonZoneNonAirloopValue;
         using DataSizing::ZoneEqSizing;
@@ -8382,8 +8368,6 @@ namespace WaterThermalTanks {
             DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
             Real64 const HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
             Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
-        } else {
-            Tank.SourceInletTemp = Tank.SourceOutletTemp;
         }
         // Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
         if (NodeNum > 0) {
@@ -10970,24 +10954,6 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // looping
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataSizing::AutoSize;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PlantLoopNum; // Used for looking up plant info
         int LoopSideNum;  // Used for looking up plant info
@@ -11717,7 +11683,6 @@ namespace WaterThermalTanks {
         // BA benchmark report for residential design mode
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using namespace OutputReportPredefined;
@@ -12171,7 +12136,6 @@ namespace WaterThermalTanks {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using DataSurfaces::Surface;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;

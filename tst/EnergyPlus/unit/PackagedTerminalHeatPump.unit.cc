@@ -524,8 +524,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     SizeFan(1);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
-    EXPECT_EQ(Fan(1).MaxAirFlowRate,
-              max(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate));
+    Real64 maxCoilAirFlow = max(VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate);
+    EXPECT_EQ(Fan(1).MaxAirFlowRate, maxCoilAirFlow);
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(PTUnit(1).MaxCoolAirVolFlow, PTUnit(1).MaxHeatAirVolFlow));
 
     // Initialize the packaged terminal heat pump
@@ -537,13 +537,13 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
     Real64 expectedAirFlowRate = refAirflowRatio * PTUnit(1).MaxCoolAirVolFlow;
-    EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).CoolVolumeFlowRate(4), 0.00001);
-    EXPECT_NEAR(expectedAirFlowRate, 3.9343830134190632, 0.00001);
+    EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).CoolVolumeFlowRate(4), 0.00000001);
+    EXPECT_NEAR(expectedAirFlowRate, 3.939704195, 0.00000001);
 
     refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference heating data and full flow rate at speed 9
     expectedAirFlowRate = refAirflowRatio * PTUnit(1).MaxHeatAirVolFlow;
     EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).HeatVolumeFlowRate(4), 0.00001);
-    EXPECT_NEAR(expectedAirFlowRate, 3.0302392264439715, 0.00001);
+    EXPECT_NEAR(expectedAirFlowRate, 3.034337569, 0.00000001);
 
     // #6028 child components not sizing correctly on air flow rate
     // VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and

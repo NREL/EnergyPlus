@@ -1,5 +1,4 @@
-\section{Ground Heat Transfer Calculations using \\
-		Site:GroundDomain:Basement}\label{ground-heat-transfer-calculations-using-sitegrounddomainbasement}
+\section{Ground Heat Transfer Calculations using Site:GroundDomain:Basement}\label{ground-heat-transfer-calculations-using-sitegrounddomainbasement}
 
 Basement heat transfer calculations are performed by the same model used by Site:GroundDomain:Slab to simulate zone-ground coupled surfaces. To simulate basements, the previous model is extended to situations where surfaces are below ground.
 
@@ -13,7 +12,7 @@ Vertical basement depth below the ground surface of the domain is user specified
 
 Basement wall and floor surfaces are created normally using the BuildingSurface:Detailed objects, with the outside boundary condition being the OtherSideConditionsModel used for the walls and floor of the basement domain. The interface between the basement walls and floors occurs at the outside surface of the walls and floor. Outside underground insulation is simulated by the ground domain, and therefore should not be included in the basement wall and floor construction objects.
 
-\subsubsection{Boundary Conditions}\label{boundary-conditions}
+\subsubsection{Boundary Conditions}\label{boundary-conditions--sitebc}
 
 At the zone interface surfaces, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a boundary condition at the Surface/Domain interface cells. Far-field temperatures are applied as boundary temperature at the domain sides and lower surface. The ground temperature profile at the domain sides and lower surface are taken from Kusuda \& Achenbach 1965. The correlation requires annual ground surface temperature data. Ground surface temperature data can be determined by using the CalcSoilSurfTemp preprocessor; or, if the user has average monthly ground surface temperature data available, they can use the Site:GroundTemperature:Shallow object to provide the model monthly ground surface temperatures. From that, the model can then determine the ground temperature model parameters for the Kusuda \& Achenbach (1965) ground temperature model.
 
@@ -25,12 +24,14 @@ Once the basement model has run, the updated cells with zone surface boundary co
 
 The ground domain is updated at each zone timestep, or hourly as specified by the user. For situations when the ground domain is updated at each timestep, the domain is simulated by applying the surface heat flux boundary conditions from the previous timestep and calculating a new OthersideConditionsModel temperature. At this point, the surface heat balance algorithms can then take the new outside surface temperatures to update their surface heat fluxes. For situations when the user has elected to have the domain update on an hourly basis, the surface heat flux for each coupled surface is aggregated and passed to the domain as an average surface heat flux from the previous hour, which will then update the outside surface temperatures for the surface heat balance's next iteration.
 
-The basement floor and walls are simulated by standard surface heat balance models within EnergyPlus (CTF, finite difference). The horizontal and vertical insulation are simulated by the ground domain finite difference solver. This is shown in the \protect\hyperlink{BasementGHTFigure1}{Figure} below where the dotted red line defines the OtherSideConditionsModel interface separating the two solution domains. This methodology applies to the basement floor and walls.
+The basement floor and walls are simulated by standard surface heat balance models within EnergyPlus (CTF, finite difference). The horizontal and vertical insulation are simulated by the ground domain finite difference solver. This is shown in Figure~
+\ref{BasementGHTFigure1} below where the dotted red line defines the OtherSideConditionsModel interface separating the two solution domains. This methodology applies to the basement floor and walls.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image8000.png}
 \caption{Example surface construction.}
+\label{BasementGHTFigure1}
 \end{figure}
 
 References

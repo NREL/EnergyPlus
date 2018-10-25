@@ -131,8 +131,8 @@ namespace DataZoneEquipment {
     int const BBElectric_Num(27);
     int const RefrigerationAirChillerSet_Num(28);
     int const UserDefinedZoneHVACForcedAir_Num(29);
-    int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem configured as zone equipment
-    int const CoolingPanel_Num(31);
+    int const CoolingPanel_Num(30);
+    int const ZoneUnitarySys_Num(31); // AirloopHVAC:UnitarySystem configured as zone equipment
     int const TotalNumZoneEquipType(31);
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types

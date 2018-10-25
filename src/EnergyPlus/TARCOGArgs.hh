@@ -137,7 +137,8 @@ namespace TARCOGArgs {
                                Real64 const tind,
                                Real64 &trmin,
                                int const isky,
-                               Real64 const outir, // IR radiance of window's exterior/interior surround (W/m2)
+                               Real64 const outir,
+                               // IR radiance of window's exterior/interior surround (W/m2)
                                Real64 const tsky,
                                Real64 &esky,
                                Real64 const fclr,
@@ -179,7 +180,6 @@ namespace TARCOGArgs {
                                Real64 &Gin,
                                Array1A<Real64> rir,
                                Array1A<Real64> vfreevent,
-                               Array1A<Real64> Ah, // Front openness area for airflow caluclations [m2]
                                int &nperr,
                                std::string &ErrorMessage);
 

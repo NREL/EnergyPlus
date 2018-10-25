@@ -211,7 +211,7 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
 
 \subsection{SurfaceControl:MovableInsulation}\label{surfacecontrolmovableinsulation}
 
-Movable insulation can be used/scheduled on any surface regular surface (such as a wall, floor, roof, etc.) but not on a subsurface (such as a window, use WindowProperty:ShadingControl instead). With movable insulation, no reference is made in the surface that is using the insulation -- rather the movable insulation statement references the surface to which it is applied.
+Movable insulation can be used/scheduled on any surface regular surface (such as a wall, floor, roof, etc.) but not on a subsurface (such as a window, use WindowShadingControl instead). With movable insulation, no reference is made in the surface that is using the insulation -- rather the movable insulation statement references the surface to which it is applied.
 
 Exterior and interior movable insulation have undergone some testing and appears to producing expected results. The underlying principle has been implemented in EnergyPlus for both interior and exterior movable insulation with the possibility for exterior movable insulation to be transparent (transparent insulation material or TIM).
 
@@ -523,7 +523,8 @@ Limitations when using Foundation:Kiva objects include:
   However, multiple floors may exist in the same thermal zone so long as
   they reference separate Foundation:Kiva objects.
 \item
-  All foundation wall surfaces must be quadrilateral.
+  Foundation wall surfaces that are not triangular or quadrilateral may not
+  translate well into the two-dimensional finite difference context.
 \end{itemize}
 
 For each floor surface with ``Foundation'' set as the ``Outside Boundary Condition''
@@ -583,7 +584,7 @@ objects (see Figure \ref{fig:surf}).
 data\label{fig:surf}}
 \end{figure}
 
-The depth of the foundation is defined by the hight of the wall surfaces
+The depth of the foundation is defined by the height of the wall surfaces
 that reference the Foundation:Kiva boundary condition object. For
 slab-on-grade foundations, a depth of zero is implied by having no
 associated wall surfaces. Figure \ref{fig:ws} shows a slab-on-grade
@@ -604,7 +605,7 @@ data\label{fig:ws}}
 \end{figure}
 
 A walkout basement (with a variable grade along the sides; see Figure
-\ref{fig:wo-r}) must be modeled using discrete quadrilateral surfaces of
+\ref{fig:wo-r}) is best modeled using discrete quadrilateral surfaces of
 stepped height for the walls as shown in Figure \ref{fig:wo-s}.
 
 \begin{figure}

@@ -175,11 +175,10 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Finds correct envrionment for reading all weather data. Loops over all weather data in weather file
+    // Finds correct environment for reading all weather data. Loops over all weather data in weather file
     //	and data structure containing daily average of required weather data.
 
     // USE STATEMENTS:
-    using General::JulianDay;
     using WeatherManager::GetNextEnvironment;
     using WeatherManager::ManageWeather;
     using WeatherManager::ResetEnvironmentCounter;
@@ -231,9 +230,8 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     Environment(NumOfEnvrn).KindOfEnvrn = ksReadAllWeatherData;
     RPReadAllWeatherData = true;
     WeathSimReq = true;
-    RunPeriodInput(TotRunPers).StartDate = JulianDay(1, 1, 0);
-    RunPeriodInput(TotRunPers).EndDate = JulianDay(12, 31, 0);
-    RunPeriodInput(TotRunPers).MonWeekDay = 0;
+    // RunPeriod is initialized to be one year of simulation
+    //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
     SetupEnvironmentTypes();
 
@@ -260,7 +258,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
 
         annualAveAirTemp_num = 0.0;
 
-        while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+        while ((DayOfSim < NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
 
             ++DayOfSim;
 

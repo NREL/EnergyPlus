@@ -152,8 +152,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -568,7 +570,7 @@
 
   ZoneHVAC:EquipmentList,
     Main Zone Equipment List,!- Name
-	SequentialLoad,
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:HybridUnitaryHVAC,  !- Zone Equipment 1 Object Type
     MUNTERSEPX5000,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -577,9 +579,8 @@
     Main Zone Baseboard,     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1;                       !- Zone Equipment 2 Heating or No-Load Sequence
-	
-	
-ZoneHVAC:HybridUnitaryHVAC,
+
+  ZoneHVAC:HybridUnitaryHVAC,
     MUNTERSEPX5000,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Availability Manager List Name
@@ -589,655 +590,654 @@ ZoneHVAC:HybridUnitaryHVAC,
     MaxSupplyHR,             !- Maximum Supply Air Humidity Ratio Schedule Name
     AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction
     Main Return Air Node Name,  !- Return Air Node Name
-    Outside Air Inlet Node,  !- Outside Air Node Name
+    Outside Air Inlet Node,  !- Outdoor Air Node Name
     Main Zone Inlet Node,    !- Supply Air Node Name
     Main Relief Node,        !- Relief Node Name
-    2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}
+    2.51,                    !- System Maximum Supply Air Flow Rate {m3/s}
     ,                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}
     1,                       !- Scaling Factor
     6,                       !- Number of Operating Modes
     10,                      !- Minimum Time Between Mode Change {minutes}
-    Electricity,             !- First fuel type
-    NaturalGas,              !- Second fuel type
-    DistrictCooling,         !- Third fuel type
-    ,                        !- Objective Function Minimizes
+    Electricity,             !- First Fuel Type
+    NaturalGas,              !- Second Fuel Type
+    DistrictCooling,         !- Third Fuel Type
+    ,                        !- Objective Function to Minimize
     SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name
-    Mode0 Standby,           !- Mode0 Name
-    ,                        !- Mode0 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode0 Supply Air Humidity Ratio Lookup Table Name
-    Mode0_Power_lookup,      !- Mode0 System Electric Power Lookup Table Name
-    ,                        !- Mode0 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode0 External Static Pressure Lookup Table Name
-    ,                        !- Mode0 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode0 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode0 System Water Use Lookup Table Name
-    0,                       !- Mode0 Outside Air Fraction
-    0,                       !- Mode0 Supply Air Mass Flow Rate Ratio
-    Mode1_IEC,               !- Mode1 Name
-    Mode1_TSA_lookup,        !- Mode1 Supply Air Temperature Lookup Table Name
-    Mode1_wSA_lookup,        !- Mode1 Supply Air Humidity Ratio Lookup Table Name
-    Mode1_Power_lookup,      !- Mode1 System Electric Power Lookup Table Name
-    Mode1_FanPower_lookup,   !- Mode1 Supply Fan Electric Power Lookup Table Name
-    Mode1_ESP_lookup,        !- Mode1 External Static Pressure Lookup Table Name
-    ,                        !- Mode1 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode1 System Third Fuel Consumption Lookup Table Name
-    Mode1_water_lookup,      !- Mode1 System Water Use Lookup Table Name
-    -20,                     !- Mode1 Minimum Outside Air Temperature {C}
-    100,                     !- Mode1 Maximum Outside Air Temperature {C}
-    0,                       !- Mode1 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode1 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode1 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode1 Maximum Outside Air Relative Humidity {percent}
-    -20,                     !- Mode1 Minimum Return Air Temperature {C}
-    100,                     !- Mode1 Maximum Return Air Temperature {C}
-    0,                       !- Mode1 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode1 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode1 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode1 Maximum Return Air Relative Humidity {percent}
-    1,                       !- Mode1 Minimum Outside Air Fraction
-    1,                       !- Mode1 Maximum Outside Air Fraction
-    0.715,                   !- Mode1 Minimum Supply Air Mass Flow Rate Ratio
-    0.964,                   !- Mode1 Maximum Supply Air Mass Flow Rate Ratio
-    Mode2_IECandDX1,         !- Mode2 Name
-    Mode2_TSA_lookup,        !- Mode2 Supply Air Temperature Lookup Table Name
-    Mode2_wSA_lookup,        !- Mode2 Supply Air Humidity Ratio Lookup Table Name
-    Mode2_Power_lookup,      !- Mode2 System Electric Power Lookup Table Name
-    Mode2_FanPower_lookup,   !- Mode2 Supply Fan Electric Power Lookup Table Name
-    Mode2_ESP_lookup,        !- Mode2 External Static Pressure Lookup Table Name
-    ,                        !- Mode2 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode2 System Third Fuel Consumption Lookup Table Name
-    Mode2_water_lookup,      !- Mode2 System Water Use Lookup Table Name
-    -20,                     !- Mode2 Minimum Outside Air Temperature {C}
-    100,                     !- Mode2 Maximum Outside Air Temperature {C}
-    0,                       !- Mode2 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode2 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode2 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode2 Maximum Outside Air Relative Humidity {percent}
-    -20,                     !- Mode2 Minimum Return Air Temperature {C}
-    100,                     !- Mode2 Maximum Return Air Temperature {C}
-    0,                       !- Mode2 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode2 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode2 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode2 Maximum Return Air Relative Humidity {percent}
-    1,                       !- Mode2 Minimum Outside Air Fraction
-    1,                       !- Mode2 Maximum Outside Air Fraction
-    0.7428,                  !- Mode2 Minimum Supply Air Mass Flow Rate Ratio
-    0.8977,                  !- Mode2 Maximum Supply Air Mass Flow Rate Ratio
-    Mode3_IECandDX2,         !- Mode3 Name
-    Mode3_TSA_lookup,        !- Mode3 Supply Air Temperature Lookup Table Name
-    Mode3_wSA_lookup,        !- Mode3 Supply Air Humidity Ratio Lookup Table Name
-    Mode3_Power_lookup,      !- Mode3 System Electric Power Lookup Table Name
-    Mode3_FanPower_lookup,   !- Mode3 Supply Fan Electric Power Lookup Table Name
-    Mode3_ESP_lookup,        !- Mode3 External Static Pressure Lookup Table Name
-    ,                        !- Mode3 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode3 System Third Fuel Consumption Lookup Table Name
-    Mode3_water_lookup,      !- Mode3 System Water Use Lookup Table Name
-    -20,                     !- Mode3 Minimum Outside Air Temperature {C}
-    100,                     !- Mode3 Maximum Outside Air Temperature {C}
-    0,                       !- Mode3 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode3 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode3 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode3 Maximum Outside Air Relative Humidity {percent}
-    -20,                     !- Mode3 Minimum Return Air Temperature {C}
-    100,                     !- Mode3 Maximum Return Air Temperature {C}
-    0,                       !- Mode3 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode3 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode3 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode3 Maximum Return Air Relative Humidity {percent}
-    1,                       !- Mode3 Minimum Outside Air Fraction
-    1,                       !- Mode3 Maximum Outside Air Fraction
-    0.711,                   !- Mode3 Minimum Supply Air Mass Flow Rate Ratio
-    0.8915,                  !- Mode3 Maximum Supply Air Mass Flow Rate Ratio
-    Mode4_Ventilation,       !- Mode4 Name
-    Mode4_TSA_lookup,        !- Mode4 Supply Air Temperature Lookup Table Name
-    Mode4_wSA_lookup,        !- Mode4 Supply Air Humidity Ratio Lookup Table Name
-    Mode4_Power_lookup,      !- Mode4 System Electric Power Lookup Table Name
-    Mode4_FanPower_lookup,   !- Mode4 Supply Fan Electric Power Lookup Table Name
-    Mode4_ESP_lookup,        !- Mode4 External Static Pressure Lookup Table Name
-    ,                        !- Mode4 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode4 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode4 System Water Use Lookup Table Name
-    -20,                     !- Mode4 Minimum Outside Air Temperature {C}
-    100,                     !- Mode4 Maximum Outside Air Temperature {C}
-    0,                       !- Mode4 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode4 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode4 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode4 Maximum Outside Air Relative Humidity {percent}
-    -20,                     !- Mode4 Minimum Return Air Temperature {C}
-    100,                     !- Mode4 Maximum Return Air Temperature {C}
-    0,                       !- Mode4 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode4 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode4 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode4 Maximum Return Air Relative Humidity {percent}
-    1,                       !- Mode4 Minimum Outside Air Fraction
-    1,                       !- Mode4 Maximum Outside Air Fraction
-    0.7039,                  !- Mode4 Minimum Supply Air Mass Flow Rate Ratio
-    0.957,                   !- Mode4 Maximum Supply Air Mass Flow Rate Ratio
-    Mode5_Heat,              !- Mode5 Name
-    Mode5_TSA_lookup,        !- Mode5 Supply Air Temperature Lookup Table Name
-    Mode5_wSA_lookup,        !- Mode5 Supply Air Humidity Ratio Lookup Table Name
-    Mode5_Power_lookup,      !- Mode5 System Electric Power Lookup Table Name
-    Mode5_FanPower_lookup,   !- Mode5 Supply Fan Electric Power Lookup Table Name
-    Mode5_ESP_lookup,        !- Mode5 External Static Pressure Lookup Table Name
-    Mode5_2ndFuel_lookup,    !- Mode5 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode5 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode5 System Water Use Lookup Table Name
-    -30,                     !- Mode5 Minimum Outside Air Temperature {C}
-    100,                     !- Mode5 Maximum Outside Air Temperature {C}
-    0,                       !- Mode5 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode5 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode5 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode5 Maximum Outside Air Relative Humidity {percent}
-    -30,                     !- Mode5 Minimum Return Air Temperature {C}
-    100,                     !- Mode5 Maximum Return Air Temperature {C}
-    0,                       !- Mode5 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.03,                    !- Mode5 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0,                       !- Mode5 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode5 Maximum Return Air Relative Humidity {percent}
-    1,                       !- Mode5 Minimum Outside Air Fraction
-    1,                       !- Mode5 Maximum Outside Air Fraction
-    0.729,                   !- Mode5 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode5 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode6 Name
-    ,                        !- Mode6 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode6 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode6 System Electric Power Lookup Table Name
-    ,                        !- Mode6 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode6 External Static Pressure Lookup Table Name
-    ,                        !- Mode6 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode6 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode6 System Water Use Lookup Table Name
-    ,                        !- Mode6 Minimum Outside Air Temperature {C}
-    ,                        !- Mode6 Maximum Outside Air Temperature {C}
-    ,                        !- Mode6 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode6 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode6 Minimum Outside Air Relative Humidity {percent}
-    ,                        !- Mode6 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode6 Minimum Return Air Temperature {C}
-    ,                        !- Mode6 Maximum Return Air Temperature {C}
-    ,                        !- Mode6 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode6 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode6 Minimum Return Air Relative Humidity {percent}
-    ,                        !- Mode6 Maximum Return Air Relative Humidity {percent}
-    ,                        !- Mode6 Minimum Outside Air Fraction
-    ,                        !- Mode6 Maximum Outside Air Fraction
-    ,                        !- Mode6 Minimum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode6 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode7 Name
-    ,                        !- Mode7 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode7 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode7 System Electric Power Lookup Table Name
-    ,                        !- Mode7 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode7 External Static Pressure Lookup Table Name
-    ,                        !- Mode7 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode7 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode7 System Water Use Lookup Table Name
-    ,                        !- Mode7 Minimum Outside Air Temperature {C}
-    ,                        !- Mode7 Maximum Outside Air Temperature {C}
-    ,                        !- Mode7 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode7 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode7 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode7 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode7 Minimum Return Air Temperature {C}
-    ,                        !- Mode7 Maximum Return Air Temperature {C}
-    ,                        !- Mode7 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode7 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode7 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode7 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode7 Minimum Outside Air Fraction
-    1,                       !- Mode7 Maximum Outside Air Fraction
-    0.1,                     !- Mode7 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode7 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode8 Name
-    ,                        !- Mode8 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode8 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode8 System Electric Power Lookup Table Name
-    ,                        !- Mode8 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode8 External Static Pressure Lookup Table Name
-    ,                        !- Mode8 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode8 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode8 System Water Use Lookup Table Name
-    ,                        !- Mode8 Minimum Outside Air Temperature {C}
-    ,                        !- Mode8 Maximum Outside Air Temperature {C}
-    ,                        !- Mode8 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode8 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode8 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode8 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode8 Minimum Return Air Temperature {C}
-    ,                        !- Mode8 Maximum Return Air Temperature {C}
-    ,                        !- Mode8 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode8 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode8 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode8 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode8 Minimum Outside Air Fraction
-    1,                       !- Mode8 Maximum Outside Air Fraction
-    0.1,                     !- Mode8 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode8 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode9 Name
-    ,                        !- Mode9 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode9 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode9 System Electric Power Lookup Table Name
-    ,                        !- Mode9 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode9 External Static Pressure Lookup Table Name
-    ,                        !- Mode9 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode9 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode9 System Water Use Lookup Table Name
-    ,                        !- Mode9 Minimum Outside Air Temperature {C}
-    ,                        !- Mode9 Maximum Outside Air Temperature {C}
-    ,                        !- Mode9 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode9 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode9 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode9 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode9 Minimum Return Air Temperature {C}
-    ,                        !- Mode9 Maximum Return Air Temperature {C}
-    ,                        !- Mode9 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode9 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode9 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode9 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode9 Minimum Outside Air Fraction
-    1,                       !- Mode9 Maximum Outside Air Fraction
-    0.1,                     !- Mode9 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode9 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode10 Name
-    ,                        !- Mode10 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode10 System Electric Power Lookup Table Name
-    ,                        !- Mode10 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode10 External Static Pressure Lookup Table Name
-    ,                        !- Mode10 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode10 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode10 System Water Use Lookup Table Name
-    ,                        !- Mode10 Minimum Outside Air Temperature {C}
-    ,                        !- Mode10 Maximum Outside Air Temperature {C}
-    ,                        !- Mode10 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode10 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode10 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode10 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode10 Minimum Return Air Temperature {C}
-    ,                        !- Mode10 Maximum Return Air Temperature {C}
-    ,                        !- Mode10 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode10 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode10 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode10 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode10 Minimum Outside Air Fraction
-    1,                       !- Mode10 Maximum Outside Air Fraction
-    0.1,                     !- Mode10 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode10 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode11 Name
-    ,                        !- Mode11 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode11 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode11 System Electric Power Lookup Table Name
-    ,                        !- Mode11 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode11 External Static Pressure Lookup Table Name
-    ,                        !- Mode11 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode11 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode11 System Water Use Lookup Table Name
-    ,                        !- Mode11 Minimum Outside Air Temperature {C}
-    ,                        !- Mode11 Maximum Outside Air Temperature {C}
-    ,                        !- Mode11 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode11 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode11 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode11 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode11 Minimum Return Air Temperature {C}
-    ,                        !- Mode11 Maximum Return Air Temperature {C}
-    ,                        !- Mode11 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode11 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode11 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode11 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode11 Minimum Outside Air Fraction
-    1,                       !- Mode11 Maximum Outside Air Fraction
-    0.1,                     !- Mode11 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode11 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode12 Name
-    ,                        !- Mode12 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode12 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode12 System Electric Power Lookup Table Name
-    ,                        !- Mode12 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode12 External Static Pressure Lookup Table Name
-    ,                        !- Mode12 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode12 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode12 System Water Use Lookup Table Name
-    ,                        !- Mode12 Minimum Outside Air Temperature {C}
-    ,                        !- Mode12 Maximum Outside Air Temperature {C}
-    ,                        !- Mode12 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode12 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode12 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode12 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode12 Minimum Return Air Temperature {C}
-    ,                        !- Mode12 Maximum Return Air Temperature {C}
-    ,                        !- Mode12 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode12 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode12 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode12 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode12 Minimum Outside Air Fraction
-    1,                       !- Mode12 Maximum Outside Air Fraction
-    0.1,                     !- Mode12 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode12 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode13 Name
-    ,                        !- Mode13 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode13 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode13 System Electric Power Lookup Table Name
-    ,                        !- Mode13 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode13 External Static Pressure Lookup Table Name
-    ,                        !- Mode13 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode13 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode13 System Water Use Lookup Table Name
-    ,                        !- Mode13 Minimum Outside Air Temperature {C}
-    ,                        !- Mode13 Maximum Outside Air Temperature {C}
-    ,                        !- Mode13 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode13 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode13 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode13 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode13 Minimum Return Air Temperature {C}
-    ,                        !- Mode13 Maximum Return Air Temperature {C}
-    ,                        !- Mode13 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode13 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode13 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode13 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode13 Minimum Outside Air Fraction
-    1,                       !- Mode13 Maximum Outside Air Fraction
-    0.1,                     !- Mode13 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode13 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode14 Name
-    ,                        !- Mode14 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode14 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode14 System Electric Power Lookup Table Name
-    ,                        !- Mode14 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode14 External Static Pressure Lookup Table Name
-    ,                        !- Mode14 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode14 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode14 System Water Use Lookup Table Name
-    ,                        !- Mode14 Minimum Outside Air Temperature {C}
-    ,                        !- Mode14 Maximum Outside Air Temperature {C}
-    ,                        !- Mode14 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode14 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode14 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode14 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode14 Minimum Return Air Temperature {C}
-    ,                        !- Mode14 Maximum Return Air Temperature {C}
-    ,                        !- Mode14 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode14 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode14 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode14 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode14 Minimum Outside Air Fraction
-    1,                       !- Mode14 Maximum Outside Air Fraction
-    0.1,                     !- Mode14 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode14 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode15 Name
-    ,                        !- Mode15 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode15 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode15 System Electric Power Lookup Table Name
-    ,                        !- Mode15 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode15 External Static Pressure Lookup Table Name
-    ,                        !- Mode15 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode15 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode15 System Water Use Lookup Table Name
-    ,                        !- Mode15 Minimum Outside Air Temperature {C}
-    ,                        !- Mode15 Maximum Outside Air Temperature {C}
-    ,                        !- Mode15 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode15 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode15 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode15 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode15 Minimum Return Air Temperature {C}
-    ,                        !- Mode15 Maximum Return Air Temperature {C}
-    ,                        !- Mode15 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode15 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode15 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode15 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode15 Minimum Outside Air Fraction
-    1,                       !- Mode15 Maximum Outside Air Fraction
-    0.1,                     !- Mode15 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode15 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode16 Name
-    ,                        !- Mode16 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode16 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode16 System Electric Power Lookup Table Name
-    ,                        !- Mode16 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode16 External Static Pressure Lookup Table Name
-    ,                        !- Mode16 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode16 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode16 System Water Use Lookup Table Name
-    ,                        !- Mode16 Minimum Outside Air Temperature {C}
-    ,                        !- Mode16 Maximum Outside Air Temperature {C}
-    ,                        !- Mode16 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode16 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode16 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode16 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode16 Minimum Return Air Temperature {C}
-    ,                        !- Mode16 Maximum Return Air Temperature {C}
-    ,                        !- Mode16 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode16 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode16 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode16 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode16 Minimum Outside Air Fraction
-    1,                       !- Mode16 Maximum Outside Air Fraction
-    0.1,                     !- Mode16 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode16 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode17 Name
-    ,                        !- Mode17 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode17 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode17 System Electric Power Lookup Table Name
-    ,                        !- Mode17 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode17 External Static Pressure Lookup Table Name
-    ,                        !- Mode17 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode17 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode17 System Water Use Lookup Table Name
-    ,                        !- Mode17 Minimum Outside Air Temperature {C}
-    ,                        !- Mode17 Maximum Outside Air Temperature {C}
-    ,                        !- Mode17 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode17 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode17 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode17 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode17 Minimum Return Air Temperature {C}
-    ,                        !- Mode17 Maximum Return Air Temperature {C}
-    ,                        !- Mode17 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode17 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode17 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode17 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode17 Minimum Outside Air Fraction
-    1,                       !- Mode17 Maximum Outside Air Fraction
-    0.1,                     !- Mode17 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode17 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode18 Name
-    ,                        !- Mode18 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode18 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode18 System Electric Power Lookup Table Name
-    ,                        !- Mode18 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode18 External Static Pressure Lookup Table Name
-    ,                        !- Mode18 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode18 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode18 System Water Use Lookup Table Name
-    ,                        !- Mode18 Minimum Outside Air Temperature {C}
-    ,                        !- Mode18 Maximum Outside Air Temperature {C}
-    ,                        !- Mode18 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode18 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode18 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode18 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode18 Minimum Return Air Temperature {C}
-    ,                        !- Mode18 Maximum Return Air Temperature {C}
-    ,                        !- Mode18 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode18 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode18 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode18 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode18 Minimum Outside Air Fraction
-    1,                       !- Mode18 Maximum Outside Air Fraction
-    0.1,                     !- Mode18 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode18 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode19 Name
-    ,                        !- Mode19 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode19 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode19 System Electric Power Lookup Table Name
-    ,                        !- Mode19 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode19 External Static Pressure Lookup Table Name
-    ,                        !- Mode19 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode19 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode19 System Water Use Lookup Table Name
-    ,                        !- Mode19 Minimum Outside Air Temperature {C}
-    ,                        !- Mode19 Maximum Outside Air Temperature {C}
-    ,                        !- Mode19 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode19 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode19 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode19 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode19 Minimum Return Air Temperature {C}
-    ,                        !- Mode19 Maximum Return Air Temperature {C}
-    ,                        !- Mode19 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode19 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode19 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode19 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode19 Minimum Outside Air Fraction
-    1,                       !- Mode19 Maximum Outside Air Fraction
-    0.1,                     !- Mode19 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode19 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode20 Name
-    ,                        !- Mode20 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode20 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode20 System Electric Power Lookup Table Name
-    ,                        !- Mode20 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode20 External Static Pressure Lookup Table Name
-    ,                        !- Mode20 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode20 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode20 System Water Use Lookup Table Name
-    ,                        !- Mode20 Minimum Outside Air Temperature {C}
-    ,                        !- Mode20 Maximum Outside Air Temperature {C}
-    ,                        !- Mode20 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode20 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode20 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode20 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode20 Minimum Return Air Temperature {C}
-    ,                        !- Mode20 Maximum Return Air Temperature {C}
-    ,                        !- Mode20 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode20 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode20 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode20 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode20 Minimum Outside Air Fraction
-    1,                       !- Mode20 Maximum Outside Air Fraction
-    0.1,                     !- Mode20 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode20 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode21 Name
-    ,                        !- Mode21 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode21 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode21 System Electric Power Lookup Table Name
-    ,                        !- Mode21 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode21 External Static Pressure Lookup Table Name
-    ,                        !- Mode21 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode21 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode21 System Water Use Lookup Table Name
-    ,                        !- Mode21 Minimum Outside Air Temperature {C}
-    ,                        !- Mode21 Maximum Outside Air Temperature {C}
-    ,                        !- Mode21 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode21 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode21 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode21 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode21 Minimum Return Air Temperature {C}
-    ,                        !- Mode21 Maximum Return Air Temperature {C}
-    ,                        !- Mode21 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode21 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode21 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode21 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode21 Minimum Outside Air Fraction
-    1,                       !- Mode21 Maximum Outside Air Fraction
-    0.1,                     !- Mode21 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode21 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode22 Name
-    ,                        !- Mode22 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode22 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode22 System Electric Power Lookup Table Name
-    ,                        !- Mode22 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode22 External Static Pressure Lookup Table Name
-    ,                        !- Mode22 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode22 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode22 System Water Use Lookup Table Name
-    ,                        !- Mode22 Minimum Outside Air Temperature {C}
-    ,                        !- Mode22 Maximum Outside Air Temperature {C}
-    ,                        !- Mode22 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode22 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode22 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode22 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode22 Minimum Return Air Temperature {C}
-    ,                        !- Mode22 Maximum Return Air Temperature {C}
-    ,                        !- Mode22 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode22 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode22 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode22 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode22 Minimum Outside Air Fraction
-    1,                       !- Mode22 Maximum Outside Air Fraction
-    0.1,                     !- Mode22 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode22 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode23 Name
-    ,                        !- Mode23 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode23 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode23 System Electric Power Lookup Table Name
-    ,                        !- Mode23 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode23 External Static Pressure Lookup Table Name
-    ,                        !- Mode23 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode23 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode23 System Water Use Lookup Table Name
-    ,                        !- Mode23 Minimum Outside Air Temperature {C}
-    ,                        !- Mode23 Maximum Outside Air Temperature {C}
-    ,                        !- Mode23 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode23 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode23 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode23 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode23 Minimum Return Air Temperature {C}
-    ,                        !- Mode23 Maximum Return Air Temperature {C}
-    ,                        !- Mode23 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode23 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode23 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode23 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode23 Minimum Outside Air Fraction
-    1,                       !- Mode23 Maximum Outside Air Fraction
-    0.1,                     !- Mode23 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode23 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode24 Name
-    ,                        !- Mode24 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode24 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode24 System Electric Power Lookup Table Name
-    ,                        !- Mode24 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode24 External Static Pressure Lookup Table Name
-    ,                        !- Mode24 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode24 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode24 System Water Use Lookup Table Name
-    ,                        !- Mode24 Minimum Outside Air Temperature {C}
-    ,                        !- Mode24 Maximum Outside Air Temperature {C}
-    ,                        !- Mode24 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode24 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode24 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode24 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode24 Minimum Return Air Temperature {C}
-    ,                        !- Mode24 Maximum Return Air Temperature {C}
-    ,                        !- Mode24 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode24 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode24 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode24 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode24 Minimum Outside Air Fraction
-    1,                       !- Mode24 Maximum Outside Air Fraction
-    0.1,                     !- Mode24 Minimum Supply Air Mass Flow Rate Ratio
-    1,                       !- Mode24 Maximum Supply Air Mass Flow Rate Ratio
-    ,                        !- Mode25 Name
-    ,                        !- Mode25 Supply Air Temperature Lookup Table Name
-    ,                        !- Mode25 Supply Air Humidity Ratio Lookup Table Name
-    ,                        !- Mode25 System Electric Power Lookup Table Name
-    ,                        !- Mode25 Supply Fan Electric Power Lookup Table Name
-    ,                        !- Mode25 External Static Pressure Lookup Table Name
-    ,                        !- Mode25 System Second Fuel Consumption Lookup Table Name
-    ,                        !- Mode25 System Third Fuel Consumption Lookup Table Name
-    ,                        !- Mode25 System Water Use Lookup Table Name
-    ,                        !- Mode25 Minimum Outside Air Temperature {C}
-    ,                        !- Mode25 Maximum Outside Air Temperature {C}
-    ,                        !- Mode25 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode25 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode25 Minimum Outside Air Relative Humidity {percent}
-    100,                     !- Mode25 Maximum Outside Air Relative Humidity {percent}
-    ,                        !- Mode25 Minimum Return Air Temperature {C}
-    ,                        !- Mode25 Maximum Return Air Temperature {C}
-    ,                        !- Mode25 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
-    0.1,                     !- Mode25 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Mode25 Minimum Return Air Relative Humidity {percent}
-    100,                     !- Mode25 Maximum Return Air Relative Humidity {percent}
-    0.1,                     !- Mode25 Minimum Outside Air Fraction
-    1,                       !- Mode25 Maximum Outside Air Fraction
-    0.1,                     !- Mode25 Minimum Supply Air Mass Flow Rate Ratio
-    1;                       !- Mode25 Maximum Supply Air Mass Flow Rate Ratio
-
+    Mode0 Standby,           !- Mode 0 Name
+    ,                        !- Mode 0 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 0 Supply Air Humidity Ratio Lookup Table Name
+    Mode0_Power_lookup,      !- Mode 0 System Electric Power Lookup Table Name
+    ,                        !- Mode 0 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 0 External Static Pressure Lookup Table Name
+    ,                        !- Mode 0 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 0 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 0 System Water Use Lookup Table Name
+    0,                       !- Mode 0 Outdoor Air Fraction
+    0,                       !- Mode 0 Supply Air Mass Flow Rate Ratio
+    Mode1_IEC,               !- Mode 1 Name
+    Mode1_TSA_lookup,        !- Mode 1 Supply Air Temperature Lookup Table Name
+    Mode1_wSA_lookup,        !- Mode 1 Supply Air Humidity Ratio Lookup Table Name
+    Mode1_Power_lookup,      !- Mode 1 System Electric Power Lookup Table Name
+    Mode1_FanPower_lookup,   !- Mode 1 Supply Fan Electric Power Lookup Table Name
+    Mode1_ESP_lookup,        !- Mode 1 External Static Pressure Lookup Table Name
+    ,                        !- Mode 1 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 1 System Third Fuel Consumption Lookup Table Name
+    Mode1_water_lookup,      !- Mode 1 System Water Use Lookup Table Name
+    -20,                     !- Mode 1 Minimum Outdoor Air Temperature {C}
+    100,                     !- Mode 1 Maximum Outdoor Air Temperature {C}
+    0,                       !- Mode 1 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 1 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 1 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 1 Maximum Outdoor Air Relative Humidity {percent}
+    -20,                     !- Mode 1 Minimum Return Air Temperature {C}
+    100,                     !- Mode 1 Maximum Return Air Temperature {C}
+    0,                       !- Mode 1 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 1 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 1 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 1 Maximum Return Air Relative Humidity {percent}
+    1,                       !- Mode 1 Minimum Outdoor Air Fraction
+    1,                       !- Mode 1 Maximum Outdoor Air Fraction
+    0.715,                   !- Mode 1 Minimum Supply Air Mass Flow Rate Ratio
+    0.964,                   !- Mode 1 Maximum Supply Air Mass Flow Rate Ratio
+    Mode2_IECandDX1,         !- Mode 2 Name
+    Mode2_TSA_lookup,        !- Mode 2 Supply Air Temperature Lookup Table Name
+    Mode2_wSA_lookup,        !- Mode 2 Supply Air Humidity Ratio Lookup Table Name
+    Mode2_Power_lookup,      !- Mode 2 System Electric Power Lookup Table Name
+    Mode2_FanPower_lookup,   !- Mode 2 Supply Fan Electric Power Lookup Table Name
+    Mode2_ESP_lookup,        !- Mode 2 External Static Pressure Lookup Table Name
+    ,                        !- Mode 2 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 2 System Third Fuel Consumption Lookup Table Name
+    Mode2_water_lookup,      !- Mode 2 System Water Use Lookup Table Name
+    -20,                     !- Mode 2 Minimum Outdoor Air Temperature {C}
+    100,                     !- Mode 2 Maximum Outdoor Air Temperature {C}
+    0,                       !- Mode 2 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 2 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 2 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 2 Maximum Outdoor Air Relative Humidity {percent}
+    -20,                     !- Mode 2 Minimum Return Air Temperature {C}
+    100,                     !- Mode 2 Maximum Return Air Temperature {C}
+    0,                       !- Mode 2 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 2 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 2 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 2 Maximum Return Air Relative Humidity {percent}
+    1,                       !- Mode 2 Minimum Outdoor Air Fraction
+    1,                       !- Mode 2 Maximum Outdoor Air Fraction
+    0.7428,                  !- Mode 2 Minimum Supply Air Mass Flow Rate Ratio
+    0.8977,                  !- Mode 2 Maximum Supply Air Mass Flow Rate Ratio
+    Mode3_IECandDX2,         !- Mode 3 Name
+    Mode3_TSA_lookup,        !- Mode 3 Supply Air Temperature Lookup Table Name
+    Mode3_wSA_lookup,        !- Mode 3 Supply Air Humidity Ratio Lookup Table Name
+    Mode3_Power_lookup,      !- Mode 3 System Electric Power Lookup Table Name
+    Mode3_FanPower_lookup,   !- Mode 3 Supply Fan Electric Power Lookup Table Name
+    Mode3_ESP_lookup,        !- Mode 3 External Static Pressure Lookup Table Name
+    ,                        !- Mode 3 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 3 System Third Fuel Consumption Lookup Table Name
+    Mode3_water_lookup,      !- Mode 3 System Water Use Lookup Table Name
+    -20,                     !- Mode 3 Minimum Outdoor Air Temperature {C}
+    100,                     !- Mode 3 Maximum Outdoor Air Temperature {C}
+    0,                       !- Mode 3 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 3 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 3 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 3 Maximum Outdoor Air Relative Humidity {percent}
+    -20,                     !- Mode 3 Minimum Return Air Temperature {C}
+    100,                     !- Mode 3 Maximum Return Air Temperature {C}
+    0,                       !- Mode 3 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 3 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 3 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 3 Maximum Return Air Relative Humidity {percent}
+    1,                       !- Mode 3 Minimum Outdoor Air Fraction
+    1,                       !- Mode 3 Maximum Outdoor Air Fraction
+    0.711,                   !- Mode 3 Minimum Supply Air Mass Flow Rate Ratio
+    0.8915,                  !- Mode 3 Maximum Supply Air Mass Flow Rate Ratio
+    Mode4_Ventilation,       !- Mode 4 Name
+    Mode4_TSA_lookup,        !- Mode 4 Supply Air Temperature Lookup Table Name
+    Mode4_wSA_lookup,        !- Mode 4 Supply Air Humidity Ratio Lookup Table Name
+    Mode4_Power_lookup,      !- Mode 4 System Electric Power Lookup Table Name
+    Mode4_FanPower_lookup,   !- Mode 4 Supply Fan Electric Power Lookup Table Name
+    Mode4_ESP_lookup,        !- Mode 4 External Static Pressure Lookup Table Name
+    ,                        !- Mode 4 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 4 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 4 System Water Use Lookup Table Name
+    -20,                     !- Mode 4 Minimum Outdoor Air Temperature {C}
+    100,                     !- Mode 4 Maximum Outdoor Air Temperature {C}
+    0,                       !- Mode 4 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 4 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 4 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 4 Maximum Outdoor Air Relative Humidity {percent}
+    -20,                     !- Mode 4 Minimum Return Air Temperature {C}
+    100,                     !- Mode 4 Maximum Return Air Temperature {C}
+    0,                       !- Mode 4 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 4 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 4 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 4 Maximum Return Air Relative Humidity {percent}
+    1,                       !- Mode 4 Minimum Outdoor Air Fraction
+    1,                       !- Mode 4 Maximum Outdoor Air Fraction
+    0.7039,                  !- Mode 4 Minimum Supply Air Mass Flow Rate Ratio
+    0.957,                   !- Mode 4 Maximum Supply Air Mass Flow Rate Ratio
+    Mode5_Heat,              !- Mode 5 Name
+    Mode5_TSA_lookup,        !- Mode 5 Supply Air Temperature Lookup Table Name
+    Mode5_wSA_lookup,        !- Mode 5 Supply Air Humidity Ratio Lookup Table Name
+    Mode5_Power_lookup,      !- Mode 5 System Electric Power Lookup Table Name
+    Mode5_FanPower_lookup,   !- Mode 5 Supply Fan Electric Power Lookup Table Name
+    Mode5_ESP_lookup,        !- Mode 5 External Static Pressure Lookup Table Name
+    Mode5_2ndFuel_lookup,    !- Mode 5 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 5 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 5 System Water Use Lookup Table Name
+    -30,                     !- Mode 5 Minimum Outdoor Air Temperature {C}
+    100,                     !- Mode 5 Maximum Outdoor Air Temperature {C}
+    0,                       !- Mode 5 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 5 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 5 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 5 Maximum Outdoor Air Relative Humidity {percent}
+    -30,                     !- Mode 5 Minimum Return Air Temperature {C}
+    100,                     !- Mode 5 Maximum Return Air Temperature {C}
+    0,                       !- Mode 5 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.03,                    !- Mode 5 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0,                       !- Mode 5 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 5 Maximum Return Air Relative Humidity {percent}
+    1,                       !- Mode 5 Minimum Outdoor Air Fraction
+    1,                       !- Mode 5 Maximum Outdoor Air Fraction
+    0.729,                   !- Mode 5 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 5 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 6 Name
+    ,                        !- Mode 6 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 6 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 6 System Electric Power Lookup Table Name
+    ,                        !- Mode 6 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 6 External Static Pressure Lookup Table Name
+    ,                        !- Mode 6 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 6 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 6 System Water Use Lookup Table Name
+    ,                        !- Mode 6 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 6 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 6 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 6 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 6 Minimum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 6 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 6 Minimum Return Air Temperature {C}
+    ,                        !- Mode 6 Maximum Return Air Temperature {C}
+    ,                        !- Mode 6 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 6 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 6 Minimum Return Air Relative Humidity {percent}
+    ,                        !- Mode 6 Maximum Return Air Relative Humidity {percent}
+    ,                        !- Mode 6 Minimum Outdoor Air Fraction
+    ,                        !- Mode 6 Maximum Outdoor Air Fraction
+    ,                        !- Mode 6 Minimum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 6 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 7 Name
+    ,                        !- Mode 7 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 7 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 7 System Electric Power Lookup Table Name
+    ,                        !- Mode 7 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 7 External Static Pressure Lookup Table Name
+    ,                        !- Mode 7 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 7 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 7 System Water Use Lookup Table Name
+    ,                        !- Mode 7 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 7 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 7 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 7 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 7 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 7 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 7 Minimum Return Air Temperature {C}
+    ,                        !- Mode 7 Maximum Return Air Temperature {C}
+    ,                        !- Mode 7 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 7 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 7 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 7 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 7 Minimum Outdoor Air Fraction
+    1,                       !- Mode 7 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 7 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 7 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 8 Name
+    ,                        !- Mode 8 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 8 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 8 System Electric Power Lookup Table Name
+    ,                        !- Mode 8 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 8 External Static Pressure Lookup Table Name
+    ,                        !- Mode 8 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 8 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 8 System Water Use Lookup Table Name
+    ,                        !- Mode 8 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 8 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 8 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 8 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 8 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 8 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 8 Minimum Return Air Temperature {C}
+    ,                        !- Mode 8 Maximum Return Air Temperature {C}
+    ,                        !- Mode 8 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 8 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 8 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 8 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 8 Minimum Outdoor Air Fraction
+    1,                       !- Mode 8 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 8 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 8 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 9 Name
+    ,                        !- Mode 9 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 9 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 9 System Electric Power Lookup Table Name
+    ,                        !- Mode 9 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 9 External Static Pressure Lookup Table Name
+    ,                        !- Mode 9 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 9 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 9 System Water Use Lookup Table Name
+    ,                        !- Mode 9 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 9 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 9 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 9 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 9 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 9 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 9 Minimum Return Air Temperature {C}
+    ,                        !- Mode 9 Maximum Return Air Temperature {C}
+    ,                        !- Mode 9 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 9 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 9 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 9 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 9 Minimum Outdoor Air Fraction
+    1,                       !- Mode 9 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 9 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 9 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 10 Name
+    ,                        !- Mode 10 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 10 System Electric Power Lookup Table Name
+    ,                        !- Mode 10 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 10 External Static Pressure Lookup Table Name
+    ,                        !- Mode 10 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 10 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 10 System Water Use Lookup Table Name
+    ,                        !- Mode 10 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 10 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 10 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 10 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 10 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 10 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 10 Minimum Return Air Temperature {C}
+    ,                        !- Mode 10 Maximum Return Air Temperature {C}
+    ,                        !- Mode 10 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 10 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 10 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 10 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 10 Minimum Outdoor Air Fraction
+    1,                       !- Mode 10 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 10 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 10 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 11 Name
+    ,                        !- Mode 11 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 11 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 11 System Electric Power Lookup Table Name
+    ,                        !- Mode 11 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 11 External Static Pressure Lookup Table Name
+    ,                        !- Mode 11 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 11 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 11 System Water Use Lookup Table Name
+    ,                        !- Mode 11 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 11 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 11 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 11 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 11 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 11 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 11 Minimum Return Air Temperature {C}
+    ,                        !- Mode 11 Maximum Return Air Temperature {C}
+    ,                        !- Mode 11 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 11 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 11 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 11 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 11 Minimum Outdoor Air Fraction
+    1,                       !- Mode 11 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 11 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 11 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 12 Name
+    ,                        !- Mode 12 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 12 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 12 System Electric Power Lookup Table Name
+    ,                        !- Mode 12 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 12 External Static Pressure Lookup Table Name
+    ,                        !- Mode 12 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 12 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 12 System Water Use Lookup Table Name
+    ,                        !- Mode 12 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 12 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 12 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 12 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 12 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 12 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 12 Minimum Return Air Temperature {C}
+    ,                        !- Mode 12 Maximum Return Air Temperature {C}
+    ,                        !- Mode 12 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 12 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 12 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 12 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 12 Minimum Outdoor Air Fraction
+    1,                       !- Mode 12 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 12 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 12 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 13 Name
+    ,                        !- Mode 13 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 13 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 13 System Electric Power Lookup Table Name
+    ,                        !- Mode 13 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 13 External Static Pressure Lookup Table Name
+    ,                        !- Mode 13 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 13 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 13 System Water Use Lookup Table Name
+    ,                        !- Mode 13 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 13 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 13 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 13 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 13 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 13 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 13 Minimum Return Air Temperature {C}
+    ,                        !- Mode 13 Maximum Return Air Temperature {C}
+    ,                        !- Mode 13 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 13 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 13 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 13 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 13 Minimum Outdoor Air Fraction
+    1,                       !- Mode 13 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 13 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 13 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 14 Name
+    ,                        !- Mode 14 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 14 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 14 System Electric Power Lookup Table Name
+    ,                        !- Mode 14 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 14 External Static Pressure Lookup Table Name
+    ,                        !- Mode 14 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 14 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 14 System Water Use Lookup Table Name
+    ,                        !- Mode 14 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 14 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 14 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 14 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 14 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 14 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 14 Minimum Return Air Temperature {C}
+    ,                        !- Mode 14 Maximum Return Air Temperature {C}
+    ,                        !- Mode 14 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 14 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 14 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 14 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 14 Minimum Outdoor Air Fraction
+    1,                       !- Mode 14 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 14 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 14 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 15 Name
+    ,                        !- Mode 15 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 15 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 15 System Electric Power Lookup Table Name
+    ,                        !- Mode 15 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 15 External Static Pressure Lookup Table Name
+    ,                        !- Mode 15 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 15 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 15 System Water Use Lookup Table Name
+    ,                        !- Mode 15 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 15 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 15 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 15 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 15 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 15 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 15 Minimum Return Air Temperature {C}
+    ,                        !- Mode 15 Maximum Return Air Temperature {C}
+    ,                        !- Mode 15 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 15 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 15 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 15 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 15 Minimum Outdoor Air Fraction
+    1,                       !- Mode 15 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 15 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 15 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 16 Name
+    ,                        !- Mode 16 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 16 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 16 System Electric Power Lookup Table Name
+    ,                        !- Mode 16 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 16 External Static Pressure Lookup Table Name
+    ,                        !- Mode 16 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 16 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 16 System Water Use Lookup Table Name
+    ,                        !- Mode 16 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 16 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 16 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 16 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 16 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 16 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 16 Minimum Return Air Temperature {C}
+    ,                        !- Mode 16 Maximum Return Air Temperature {C}
+    ,                        !- Mode 16 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 16 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 16 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 16 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 16 Minimum Outdoor Air Fraction
+    1,                       !- Mode 16 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 16 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 16 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 17 Name
+    ,                        !- Mode 17 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 17 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 17 System Electric Power Lookup Table Name
+    ,                        !- Mode 17 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 17 External Static Pressure Lookup Table Name
+    ,                        !- Mode 17 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 17 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 17 System Water Use Lookup Table Name
+    ,                        !- Mode 17 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 17 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 17 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 17 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 17 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 17 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 17 Minimum Return Air Temperature {C}
+    ,                        !- Mode 17 Maximum Return Air Temperature {C}
+    ,                        !- Mode 17 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 17 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 17 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 17 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 17 Minimum Outdoor Air Fraction
+    1,                       !- Mode 17 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 17 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 17 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 18 Name
+    ,                        !- Mode 18 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 18 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 18 System Electric Power Lookup Table Name
+    ,                        !- Mode 18 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 18 External Static Pressure Lookup Table Name
+    ,                        !- Mode 18 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 18 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 18 System Water Use Lookup Table Name
+    ,                        !- Mode 18 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 18 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 18 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 18 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 18 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 18 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 18 Minimum Return Air Temperature {C}
+    ,                        !- Mode 18 Maximum Return Air Temperature {C}
+    ,                        !- Mode 18 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 18 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 18 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 18 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 18 Minimum Outdoor Air Fraction
+    1,                       !- Mode 18 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 18 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 18 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 19 Name
+    ,                        !- Mode 19 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 19 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 19 System Electric Power Lookup Table Name
+    ,                        !- Mode 19 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 19 External Static Pressure Lookup Table Name
+    ,                        !- Mode 19 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 19 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 19 System Water Use Lookup Table Name
+    ,                        !- Mode 19 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 19 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 19 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 19 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 19 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 19 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 19 Minimum Return Air Temperature {C}
+    ,                        !- Mode 19 Maximum Return Air Temperature {C}
+    ,                        !- Mode 19 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 19 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 19 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 19 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 19 Minimum Outdoor Air Fraction
+    1,                       !- Mode 19 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 19 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 19 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 20 Name
+    ,                        !- Mode 20 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 20 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 20 System Electric Power Lookup Table Name
+    ,                        !- Mode 20 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 20 External Static Pressure Lookup Table Name
+    ,                        !- Mode 20 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 20 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 20 System Water Use Lookup Table Name
+    ,                        !- Mode 20 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 20 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 20 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 20 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 20 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 20 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 20 Minimum Return Air Temperature {C}
+    ,                        !- Mode 20 Maximum Return Air Temperature {C}
+    ,                        !- Mode 20 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 20 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 20 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 20 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 20 Minimum Outdoor Air Fraction
+    1,                       !- Mode 20 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 20 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 20 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 21 Name
+    ,                        !- Mode 21 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 21 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 21 System Electric Power Lookup Table Name
+    ,                        !- Mode 21 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 21 External Static Pressure Lookup Table Name
+    ,                        !- Mode 21 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 21 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 21 System Water Use Lookup Table Name
+    ,                        !- Mode 21 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 21 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 21 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 21 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 21 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 21 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 21 Minimum Return Air Temperature {C}
+    ,                        !- Mode 21 Maximum Return Air Temperature {C}
+    ,                        !- Mode 21 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 21 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 21 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 21 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 21 Minimum Outdoor Air Fraction
+    1,                       !- Mode 21 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 21 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 21 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 22 Name
+    ,                        !- Mode 22 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 22 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 22 System Electric Power Lookup Table Name
+    ,                        !- Mode 22 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 22 External Static Pressure Lookup Table Name
+    ,                        !- Mode 22 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 22 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 22 System Water Use Lookup Table Name
+    ,                        !- Mode 22 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 22 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 22 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 22 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 22 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 22 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 22 Minimum Return Air Temperature {C}
+    ,                        !- Mode 22 Maximum Return Air Temperature {C}
+    ,                        !- Mode 22 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 22 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 22 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 22 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 22 Minimum Outdoor Air Fraction
+    1,                       !- Mode 22 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 22 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 22 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 23 Name
+    ,                        !- Mode 23 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 23 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 23 System Electric Power Lookup Table Name
+    ,                        !- Mode 23 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 23 External Static Pressure Lookup Table Name
+    ,                        !- Mode 23 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 23 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 23 System Water Use Lookup Table Name
+    ,                        !- Mode 23 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 23 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 23 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 23 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 23 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 23 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 23 Minimum Return Air Temperature {C}
+    ,                        !- Mode 23 Maximum Return Air Temperature {C}
+    ,                        !- Mode 23 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 23 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 23 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 23 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 23 Minimum Outdoor Air Fraction
+    1,                       !- Mode 23 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 23 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 23 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 24 Name
+    ,                        !- Mode 24 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 24 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 24 System Electric Power Lookup Table Name
+    ,                        !- Mode 24 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 24 External Static Pressure Lookup Table Name
+    ,                        !- Mode 24 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 24 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 24 System Water Use Lookup Table Name
+    ,                        !- Mode 24 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 24 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 24 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 24 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 24 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 24 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 24 Minimum Return Air Temperature {C}
+    ,                        !- Mode 24 Maximum Return Air Temperature {C}
+    ,                        !- Mode 24 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 24 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 24 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 24 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 24 Minimum Outdoor Air Fraction
+    1,                       !- Mode 24 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 24 Minimum Supply Air Mass Flow Rate Ratio
+    1,                       !- Mode 24 Maximum Supply Air Mass Flow Rate Ratio
+    ,                        !- Mode 25 Name
+    ,                        !- Mode 25 Supply Air Temperature Lookup Table Name
+    ,                        !- Mode 25 Supply Air Humidity Ratio Lookup Table Name
+    ,                        !- Mode 25 System Electric Power Lookup Table Name
+    ,                        !- Mode 25 Supply Fan Electric Power Lookup Table Name
+    ,                        !- Mode 25 External Static Pressure Lookup Table Name
+    ,                        !- Mode 25 System Second Fuel Consumption Lookup Table Name
+    ,                        !- Mode 25 System Third Fuel Consumption Lookup Table Name
+    ,                        !- Mode 25 System Water Use Lookup Table Name
+    ,                        !- Mode 25 Minimum Outdoor Air Temperature {C}
+    ,                        !- Mode 25 Maximum Outdoor Air Temperature {C}
+    ,                        !- Mode 25 Minimum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 25 Maximum Outdoor Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 25 Minimum Outdoor Air Relative Humidity {percent}
+    100,                     !- Mode 25 Maximum Outdoor Air Relative Humidity {percent}
+    ,                        !- Mode 25 Minimum Return Air Temperature {C}
+    ,                        !- Mode 25 Maximum Return Air Temperature {C}
+    ,                        !- Mode 25 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}
+    0.1,                     !- Mode 25 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Mode 25 Minimum Return Air Relative Humidity {percent}
+    100,                     !- Mode 25 Maximum Return Air Relative Humidity {percent}
+    0.1,                     !- Mode 25 Minimum Outdoor Air Fraction
+    1,                       !- Mode 25 Maximum Outdoor Air Fraction
+    0.1,                     !- Mode 25 Minimum Supply Air Mass Flow Rate Ratio
+    1;                       !- Mode 25 Maximum Supply Air Mass Flow Rate Ratio
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -1276,22 +1276,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    3,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    3,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     -100.000,                !- <none>
@@ -2386,22 +2386,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -3984,22 +3984,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -5582,22 +5582,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -7180,22 +7180,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -8778,22 +8778,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -10376,22 +10376,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     18.330,                  !- <none>
@@ -11974,22 +11974,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -13572,22 +13572,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -15170,22 +15170,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -16768,22 +16768,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -18366,22 +18366,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -19964,22 +19964,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    5,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    5,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     23.33300,                !- <none>
@@ -21562,22 +21562,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -22916,22 +22916,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -24270,22 +24270,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -25624,22 +25624,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -26978,22 +26978,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -28332,22 +28332,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    4,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    4,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     26.10000,                !- <none>
@@ -29686,22 +29686,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     14.08800,                !- <none>
@@ -31528,22 +31528,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     14.08800,                !- <none>
@@ -33370,22 +33370,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     14.08800,                !- <none>
@@ -35212,22 +35212,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     14.08800,                !- <none>
@@ -37054,22 +37054,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     14.08800,                !- <none>
@@ -38896,22 +38896,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>
@@ -40738,22 +40738,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>
@@ -42580,22 +42580,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>
@@ -44422,22 +44422,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>
@@ -46264,22 +46264,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>
@@ -48106,22 +48106,22 @@ ZoneHVAC:HybridUnitaryHVAC,
     0.03,                    !- Maximum Value of X4
     0,                       !- Minimum Value of X5
     1,                       !- Maximum Value of X5
-    0,                       !- Minimum Table Output
-    1,                       !- Maximum Table Output
-    -9999,                   !- Input Unit Type for X1
-    9999,                    !- Input Unit Type for X2
+    0,                       !- Minimum Value of X6
+    1,                       !- Maximum Value of X6
+    -9999,                   !- Minimum Table Output
+    9999,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X1
+    Dimensionless,           !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     Dimensionless,           !- Input Unit Type for X4
     Dimensionless,           !- Input Unit Type for X5
+    Dimensionless,           !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
-    Dimensionless,           !- Number of Independent Variables
-    Dimensionless,           !- Number of Values for Independent Variable X1
-    Dimensionless,           !- Field 1 Determined by the Number of Independent Variables
-    6,                       !- Field 2 Determined by the Number of Independent Variables
+    6,                       !- Number of Independent Variables
+    3,                       !- Number of Values for Independent Variable X1
+    6,                       !- Field 1 Determined by the Number of Independent Variables
+    3,                       !- Field 2 Determined by the Number of Independent Variables
     3,                       !- Field 3 Determined by the Number of Independent Variables
-    6,                       !- <none>
-    3,                       !- <none>
-    3,                       !- <none>
     3,                       !- <none>
     3,                       !- <none>
     12.11110,                !- <none>

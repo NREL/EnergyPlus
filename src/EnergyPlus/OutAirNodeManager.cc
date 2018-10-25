@@ -363,7 +363,6 @@ namespace OutAirNodeManager {
 
                 if (NumAlphas > 1) {
                     AnyLocalEnvironmentsInModel = true;
-                    Node(NodeNums(1)).IsLocalNode = true;
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
@@ -408,6 +407,9 @@ namespace OutAirNodeManager {
                     ErrorsFound = true;
                     continue;
                 }
+                if (Node(NodeNums(1)).OutAirDryBulbSchedNum > 0 || Node(NodeNums(1)).OutAirWetBulbSchedNum > 0) {
+                    Node(NodeNums(1)).IsLocalNode = true;
+                }
             }
             if (ErrorsFound) {
                 ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
@@ -433,25 +435,6 @@ namespace OutAirNodeManager {
         // set the outside air nodes to the outside conditions at the
         // start of every heat balance time step.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyWFnTdbTwbPb;
-        using ScheduleManager::GetCurrentScheduleValue;
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutsideAirNodeNum;
         int NodeNum;
@@ -459,51 +442,7 @@ namespace OutAirNodeManager {
         // Do the begin time step initialization
         for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
             NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
-            // Set node data to global values
-            if (Node(NodeNum).Height < 0.0) {
-                // Note -- this setting is different than the DataEnvironment "AT" settings.
-                Node(NodeNum).OutAirDryBulb = OutDryBulbTemp;
-                Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
-                Node(NodeNum).OutAirWindSpeed = WindSpeed;
-            } else {
-                Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(Node(NodeNum).Height);
-                Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(Node(NodeNum).Height);
-                Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
-            }
-            Node(NodeNum).OutAirWindDir = WindDir;
-
-            // Set node data to local air node values if defined
-            if (Node(NodeNum).OutAirDryBulbSchedNum != 0) {
-                Node(NodeNum).OutAirDryBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirDryBulbSchedNum);
-            }
-            if (Node(NodeNum).OutAirWetBulbSchedNum != 0) {
-                Node(NodeNum).OutAirWetBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirWetBulbSchedNum);
-            }
-            if (Node(NodeNum).OutAirWindSpeedSchedNum != 0) {
-                Node(NodeNum).OutAirWindSpeed = GetCurrentScheduleValue(Node(NodeNum).OutAirWindSpeedSchedNum);
-            }
-            if (Node(NodeNum).OutAirWindDirSchedNum != 0) {
-                Node(NodeNum).OutAirWindDir = GetCurrentScheduleValue(Node(NodeNum).OutAirWindDirSchedNum);
-            }
-
-            // Set node data to EMS overwritten values if defined
-            if (Node(NodeNum).EMSOverrideOutAirDryBulb) Node(NodeNum).OutAirDryBulb = Node(NodeNum).EMSValueForOutAirDryBulb;
-            if (Node(NodeNum).EMSOverrideOutAirWetBulb) Node(NodeNum).OutAirWetBulb = Node(NodeNum).EMSValueForOutAirWetBulb;
-            if (Node(NodeNum).EMSOverrideOutAirWindSpeed) Node(NodeNum).OutAirWindSpeed = Node(NodeNum).EMSValueForOutAirWindSpeed;
-            if (Node(NodeNum).EMSOverrideOutAirWindDir) Node(NodeNum).OutAirWindDir = Node(NodeNum).EMSValueForOutAirWindDir;
-
-            Node(NodeNum).Temp = Node(NodeNum).OutAirDryBulb;
-            if (Node(NodeNum).IsLocalNode) {
-                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
-            } else {
-                Node(NodeNum).HumRat = OutHumRat;
-            }
-            Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).OutAirDryBulb, Node(NodeNum).HumRat);
-            Node(NodeNum).Press = OutBaroPress;
-            Node(NodeNum).Quality = 0.0;
-            // Add contaminants
-            if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = OutdoorCO2;
-            if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = OutdoorGC;
+            SetOANodeValues(NodeNum, true);
         }
     }
 
@@ -584,7 +523,6 @@ namespace OutAirNodeManager {
         // na
 
         // Using/Aliasing
-        using Psychrometrics::PsyHFnTdbW;
         using namespace NodeInputManager;
 
         // Locals
@@ -639,30 +577,89 @@ namespace OutAirNodeManager {
                             NumOutsideAirNodes,
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
-                if (Node(NodeNumber).Height < 0.0) {
-                    Node(NodeNumber).OutAirDryBulb = OutDryBulbTemp;
-                    Node(NodeNumber).OutAirWetBulb = OutWetBulbTemp;
-                } else {
-                    Node(NodeNumber).OutAirDryBulb = OutDryBulbTempAt(Node(NodeNumber).Height);
-                    Node(NodeNumber).OutAirWetBulb = OutWetBulbTempAt(Node(NodeNumber).Height);
-                }
-                Node(NodeNumber).OutAirWindSpeed = WindSpeed;
-                Node(NodeNumber).OutAirWindDir = WindDir;
-
-                Node(NodeNumber).Temp = Node(NodeNumber).OutAirDryBulb;
-                if (Node(NodeNumber).IsLocalNode) {
-                    Node(NodeNumber).HumRat = PsyHFnTdbW(Node(NodeNumber).OutAirDryBulb, Node(NodeNumber).OutAirWetBulb);
-                } else {
-                    Node(NodeNumber).HumRat = OutHumRat;
-                }
-                Node(NodeNumber).Enthalpy = PsyHFnTdbW(Node(NodeNumber).OutAirDryBulb, Node(NodeNumber).HumRat);
-                Node(NodeNumber).Press = OutBaroPress;
-                Node(NodeNumber).Quality = 0.0;
-                // Add contaminants
-                if (Contaminant.CO2Simulation) Node(NodeNumber).CO2 = OutdoorCO2;
-                if (Contaminant.GenericContamSimulation) Node(NodeNumber).GenContam = OutdoorGC;
+                SetOANodeValues(NodeNumber, false);
             }
         }
+    }
+
+    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
+                         bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         L. Gu
+        //       DATE WRITTEN   July 2018
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Consolidate a block from both CheckAndAddAirNodeNumber and InitOutAirNodes to set 
+        // up outdoor node values
+
+        using Psychrometrics::PsyHFnTdbW;
+        using Psychrometrics::PsyWFnTdbTwbPb;
+        using Psychrometrics::PsyTwbFnTdbWPb;
+        using ScheduleManager::GetCurrentScheduleValue;
+
+        // Set node data to global values
+        if (Node(NodeNum).Height < 0.0) {
+            // Note -- this setting is different than the DataEnvironment "AT" settings.
+            Node(NodeNum).OutAirDryBulb = OutDryBulbTemp;
+            Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
+        } else {
+            Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(Node(NodeNum).Height);
+            Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(Node(NodeNum).Height);
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
+        }
+        if (!InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
+        Node(NodeNum).OutAirWindDir = WindDir;
+
+        if (InitCall) {
+            // Set node data to local air node values if defined
+            if (Node(NodeNum).OutAirDryBulbSchedNum != 0) {
+                Node(NodeNum).OutAirDryBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirDryBulbSchedNum);
+            }
+            if (Node(NodeNum).OutAirWetBulbSchedNum != 0) {
+                Node(NodeNum).OutAirWetBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirWetBulbSchedNum);
+            }
+            if (Node(NodeNum).OutAirWindSpeedSchedNum != 0) {
+                Node(NodeNum).OutAirWindSpeed = GetCurrentScheduleValue(Node(NodeNum).OutAirWindSpeedSchedNum);
+            }
+            if (Node(NodeNum).OutAirWindDirSchedNum != 0) {
+                Node(NodeNum).OutAirWindDir = GetCurrentScheduleValue(Node(NodeNum).OutAirWindDirSchedNum);
+            }
+
+            // Set node data to EMS overwritten values if defined
+            if (Node(NodeNum).EMSOverrideOutAirDryBulb) Node(NodeNum).OutAirDryBulb = Node(NodeNum).EMSValueForOutAirDryBulb;
+            if (Node(NodeNum).EMSOverrideOutAirWetBulb) Node(NodeNum).OutAirWetBulb = Node(NodeNum).EMSValueForOutAirWetBulb;
+            if (Node(NodeNum).EMSOverrideOutAirWindSpeed) Node(NodeNum).OutAirWindSpeed = Node(NodeNum).EMSValueForOutAirWindSpeed;
+            if (Node(NodeNum).EMSOverrideOutAirWindDir) Node(NodeNum).OutAirWindDir = Node(NodeNum).EMSValueForOutAirWindDir;
+        }
+
+        Node(NodeNum).Temp = Node(NodeNum).OutAirDryBulb;
+        if (Node(NodeNum).IsLocalNode) {
+            if (InitCall) {
+                if (Node(NodeNum).OutAirWetBulb > Node(NodeNum).OutAirDryBulb) {
+                    Node(NodeNum).OutAirWetBulb = Node(NodeNum).OutAirDryBulb;
+                }
+                if (Node(NodeNum).OutAirWetBulbSchedNum == 0 && !Node(NodeNum).EMSOverrideOutAirWetBulb && (Node(NodeNum).EMSOverrideOutAirDryBulb || Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
+                    Node(NodeNum).HumRat = OutHumRat;
+                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(Node(NodeNum).OutAirDryBulb, OutHumRat, OutBaroPress);
+                } else {
+                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                }
+            } else {
+                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+            }
+        } else {
+            Node(NodeNum).HumRat = OutHumRat;
+        }
+        Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).OutAirDryBulb, Node(NodeNum).HumRat);
+        Node(NodeNum).Press = OutBaroPress;
+        Node(NodeNum).Quality = 0.0;
+        // Add contaminants
+        if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = OutdoorCO2;
+        if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = OutdoorGC;
+
     }
 
 } // namespace OutAirNodeManager

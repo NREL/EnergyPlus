@@ -58,22 +58,43 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 // EnergyPlus Headers
+using namespace EnergyPlus::DataAirLoop;
+using namespace EnergyPlus::DataAirSystems;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACSingleDuctInduc;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::MixedAir;
+using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SingleDuct;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
+using namespace EnergyPlus::DataDefineEquip;
+using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DataHeatBalFanSys;
 
 namespace EnergyPlus {
 
@@ -518,4 +539,152 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     EXPECT_EQ("COIL:HEATING:WATER", Sys(1).ReheatComp);                              // Reheat Coil Type
     EXPECT_EQ("SPACE1-1 ZONE COIL", Sys(1).ReheatName);                              // Reheat Coil Name
 }
+
+TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,8.9;",
+
+        " AirTerminal:SingleDuct:VAV:Reheat,",
+        "    VAV Elec Rht,                          !- Name",
+        "    FanAndCoilAvailSched,                  !- Availability Schedule Name",
+        "    VAV Elec Rht Damper Outlet,            !- Damper Air Outlet Node Name",
+        "    Node 13,                               !- Air Inlet Node Name",
+        "    1.0,                                   !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                              !- Zone Minimum Air Flow Input Method",
+        "    0.2,                                   !- Constant Minimum Air Flow Fraction",
+        "    ,                                      !- Fixed Minimum Air Flow Rate {m3/s}",
+        "    ,                                      !- Minimum Air Flow Fraction Schedule Name",
+        "    Coil:Heating:Electric,                 !- Reheat Coil Object Type",
+        "    VAV Elec Rht Coil,                     !- Reheat Coil Name",
+        "    0,                                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "    0,                                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "    Node 6,                                !- Air Outlet Node Name",
+        "    0.001,                                 !- Convergence Tolerance",
+        "    Normal,                                !- Damper Heating Action",
+        "    Autocalculate,                         !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
+        "    Autocalculate,                         !- Maximum Flow Fraction During Reheat",
+        "    35;                                    !- Maximum Reheat Air Temperature {C}",
+
+        " Coil:Heating:Electric,",
+        "    VAV Elec Rht Coil,                     !- Name",
+        "    FanAndCoilAvailSched,                  !- Availability Schedule Name",
+        "    1,                                     !- Efficiency",
+        "    Autosize,                              !- Nominal Capacity {W}",
+        "    VAV Elec Rht Damper Outlet,            !- Air Inlet Node Name",
+        "    Node 6;                                !- Air Outlet Node Name",
+
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,                  !- Name",
+        "    Fraction,                              !- Schedule Type Limits Name",
+        "    Through: 12/31,                        !- Field 1",
+        "    For: AllDays,                          !- Field 2",
+        "    Until: 24:00,1.0;                      !- Field 3",
+
+        " ZoneHVAC:EquipmentConnections,",
+        "   Thermal Zone 1,                         !- Zone Name",
+        "   Thermal Zone 1 Equipment List,          !- Zone Conditioning Equipment List Name",
+        "   Thermal Zone 1 Inlet Node List,         !- Zone Air Inlet Node or NodeList Name",
+        "   ,                                       !- Zone Air Exhaust Node or NodeList Name",
+        "   Node 1,                                 !- Zone Air Node Name",
+        "   Node 12;                                !- Zone Return Air Node or NodeList Name",
+
+        " NodeList,",
+        "   Thermal Zone 1 Inlet Node List,         !- Name",
+        "   Node 6;                                 !- Node Name 1",
+
+        " ZoneHVAC:AirDistributionUnit,",
+        "   ADU VAV Elec Rht,                       !- Name",
+        "   Node 6,                                 !- Air Distribution Unit Outlet Node Name",
+        "   AirTerminal:SingleDuct:VAV:Reheat,      !- Air Terminal Object Type",
+        "   VAV Elec Rht;                           !- Air Terminal Name",
+
+        "  Zone,",
+        "    Thermal Zone 1,                        !- Name",
+        "    0,                                     !- Direction of Relative North {deg}",
+        "    0,                                     !- X Origin {m}",
+        "    0,                                     !- Y Origin {m}",
+        "    0,                                     !- Z Origin {m}",
+        "    1,                                     !- Type",
+        "    1,                                     !- Multiplier",
+        "    3.0,                                   !- Ceiling Height {m}",
+        "    250.0;                                 !- Volume {m3}",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Thermal Zone 1 Equipment List,         !- Name",
+        "    ,                                      !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,          !- Zone Equipment Object Type 1",
+        "    ADU VAV Elec Rht,                      !- Zone Equipment Name 1",
+        "    1,                                     !- Zone Equipment Cooling Sequence 1",
+        "    1;                                     !- Zone Equipment Heating or No-Load Sequence 1",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    NumOfTimeStepInHour = 1;
+    MinutesPerTimeStep = 60;
+    ProcessScheduleInput();
+    bool ErrorsFound(false);
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    GetZoneEquipmentData1();
+    GetZoneAirLoopEquipment();
+    GetSysInput();
+    SingleDuct::GetInputFlag = false;
+
+    auto &thisZoneEquip(ZoneEquipConfig(NumOfZones));
+
+    DataGlobals::SysSizingCalc = true;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataEnvironment::StdRhoAir = 1.0;
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    int const SysNum(1);
+    int const InletNode = Sys(SysNum).InletNodeNum;
+    int const OutletNode = Sys(SysNum).OutletNodeNum;
+    int const ZonePtr = Sys(SysNum).ActualZoneNum;
+    int const ZoneAirNodeNum = thisZoneEquip.ZoneNode;
+    Schedule(Sys(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+
+    // design maximum air mass flow rate
+    Real64 MassFlowRateMaxAvail = Sys(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    EXPECT_EQ(1.0, Sys(SysNum).MaxAirVolFlowRate);
+    EXPECT_EQ(1.0, MassFlowRateMaxAvail);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", Sys(SysNum).ReheatComp);
+    EXPECT_EQ(Normal, Sys(SysNum).DamperHeatingAction);
+    EXPECT_EQ(0.2, Sys(SysNum).ZoneMinAirFrac);
+
+    // set air inlet node properties
+    Node(InletNode).Temp = 15.0;
+    Node(InletNode).HumRat = 0.005;
+    Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat);
+    // set inlet mass flow rate to zero
+    Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+
+    // set zone air node properties
+    Node(ZoneAirNodeNum).Temp = 20.0;
+    Node(ZoneAirNodeNum).HumRat = 0.005;
+    Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
+
+    ZoneSysEnergyDemand.allocate(1);
+    ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+    TempControlType.allocate(1);
+    TempControlType(1) = 4;
+
+    // calc min air mass flow rate for Normal Damper Heating Action
+    Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
+    bool FirstHVACIteration = false;
+
+    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(ZonePtr));
+    // run SimulateSingleDuct() function
+    SimulateSingleDuct(thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
+    // check min, actual and max air mass flow rates during reheat with Normal Action
+    EXPECT_EQ(expectedMassFlowAirReheatMin, SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
+    EXPECT_EQ(1.0, Sys(SysNum).AirMassFlowRateMax);
+}
+
 } // namespace EnergyPlus

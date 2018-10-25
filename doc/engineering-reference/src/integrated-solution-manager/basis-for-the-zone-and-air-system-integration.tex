@@ -4,6 +4,7 @@ The basis for the zone and air system integration is to formulate energy and moi
 
 \begin{equation}
 {C_z}\frac{{d{T_z}}}{{dt}} = \sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right)\, + {\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right) + {\dot Q_{sys}}
+\label{eq:DiffEqZoneAirHeatBal}
 \end{equation}
 
 where:
@@ -32,52 +33,58 @@ If the air capacitance is neglected, the steady-state system output must be:
 
 \begin{equation}
 - {\dot Q_{sys}} = \sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right)\, + {\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)
+\label{eq:SteadyStateSystemOutput}
 \end{equation}
 
-Air systems provide hot or cold air to the zones to meet heating or cooling loads. The system energy provided to the zone, Qsys, can thus be formulated from the difference between the supply air enthalpy and the enthalpy of the air leaving the zone as in Equation :
+Air systems provide hot or cold air to the zones to meet heating or cooling loads. The system energy provided to the zone, Qsys, can thus be formulated from the difference between the supply air enthalpy and the enthalpy of the air leaving the zone as shown in Equation~\ref{eq:QsysFuncEnthalpyDiff}:
 
 \begin{equation}
 {\dot Q_{sys}} = {\dot m_{sys}}{C_p}\left( {{T_{\sup }} - {T_z}} \right)
+\label{eq:QsysFuncEnthalpyDiff}
 \end{equation}
 
-This equation assumes that the zone supply air mass flow rate is exactly equal to the sum of the air flow rates leaving the zone through the system return air plenum and being exhausted directly from the zone. Both air streams exit the zone at the zone mean air temperature. The result of substituting Equation for Qsys in the heat balance Equation is shown in Equation :
+This equation assumes that the zone supply air mass flow rate is exactly equal to the sum of the air flow rates leaving the zone through the system return air plenum and being exhausted directly from the zone. Both air streams exit the zone at the zone mean air temperature. The result of substituting Equation~\ref{eq:QsysFuncEnthalpyDiff} for Qsys in the heat balance Equation~\ref{eq:DiffEqZoneAirHeatBal} is shown in Equation~\ref{eq:DiffEqZoneAirHeatBalSubQsys}:
 
 \begin{equation}
 \begin{array}{ll}
     {C_z}\frac{{d{T_z}}}{{dt}} & = \sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right) \\
                                &+ {{\dot m}_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right) + {{\dot m}_{sys}}{C_p}\left( {{T_{\sup }} - {T_z}} \right)
   \end{array}
+\label{eq:DiffEqZoneAirHeatBalSubQsys}
 \end{equation}
 
 The sum of zone loads and air system output now equals the change in energy stored in the zone. Typically, the capacitance Cz would be that of the zone air only. However, thermal masses assumed to be in equilibrium with the zone air could be included in this term.
 
-EnergyPlus provides three different solution algorithms to solve the zone air energy and moisture balance equations. These are defined in the Algorithm field in the ZoneAirHeatBalanceAlgorithm object: 3rdOrderBackwardDifference, EulerMethod and AnalyticalSolution. The first two methods to solve Equation use the finite difference approximation while the third uses an analytical solution. A short description is given below.
+EnergyPlus provides three different solution algorithms to solve the zone air energy and moisture balance equations. These are defined in the Algorithm field in the ZoneAirHeatBalanceAlgorithm object: 3rdOrderBackwardDifference, EulerMethod and AnalyticalSolution. The first two methods to solve Equation~\ref{eq:DiffEqZoneAirHeatBalSubQsys} use the finite difference approximation while the third uses an analytical solution. A short description is given below.
 
 In order to calculate the derivative term with respect to time, a finite difference approximation may be used, such as:
 
 \begin{equation}
 \frac{{dT}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}\left( {{T_z}^t - {T_z}^{t - \delta t}} \right) + {\rm O}\left( {\delta t} \right)
+\label{eq:AirHeatBalFinDiffApprox}
 \end{equation}
 
-The use of numerical integration in a long time simulation is a cause for some concern due to the potential build-up of truncation error over many time steps. In this case, the finite difference approximation is of low order that further aggravates the problem. However, the cyclic nature of building energy simulations should cause truncation errors to cancel over each daily cycle so that no net accumulation of error occurs, even over many days of simulation (Walton, 1990). The Euler formula, Equation , was employed in Equation to replace the derivative term. All the terms containing the zone mean air temperature were then grouped on the left hand side of the equation. Since the remaining terms are not known at the current time, they were lagged by one time step and collected on the right hand side. This manipulation resulted in Equation , the formula for updating the zone mean air temperature:
+The use of numerical integration in a long time simulation is a cause for some concern due to the potential build-up of truncation error over many time steps. In this case, the finite difference approximation is of low order that further aggravates the problem. However, the cyclic nature of building energy simulations should cause truncation errors to cancel over each daily cycle so that no net accumulation of error occurs, even over many days of simulation (Walton, 1990). The Euler formula, Equation~\ref{eq:AirHeatBalFinDiffApprox}, was employed in Equation~\ref{eq:DiffEqZoneAirHeatBalSubQsys} to replace the derivative term. All the terms containing the zone mean air temperature were then grouped on the left hand side of the equation. Since the remaining terms are not known at the current time, they were lagged by one time step and collected on the right hand side. This manipulation resulted in Equation~\ref{eq:ZoneMeanAirTempUpdating}, the formula for updating the zone mean air temperature:
 
 \begin{equation}
 \begin{array}{l}{C_z}\frac{{T_z^t - T_z^{t - \delta t}}}{{dt}} + T_z^t\left( {\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}{C_p}} \right) = \\\sum\limits_{i = 1}^{{N_{sl}}} {\dot Q_i^t}  + {{\dot m}_{sys}}{C_p}T_{{\rm{supply}}}^t + {\left( {\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{T_{zi}} + {{\dot m}_{\inf }}{C_p}{T_\infty }} \right)^{t - \delta t}}\end{array}
+\label{eq:ZoneMeanAirTempUpdating}
 \end{equation}
 
 One final rearrangement was to move the lagged temperature in the derivative approximation to the right side of the equation. The explicit appearance of the zone air temperature was thus eliminated from one side of the equation. An energy balance equation that includes the effects of zone capacitance was then obtained by dividing both sides by the coefficient of Tz:
 
 \begin{equation}
 T_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {\dot Q_i^t}  + {{\dot m}_{sys}}{C_p}T_{{\rm{supply}}}^t + {{\left( {{C_z}\frac{{T_z^{}}}{{\delta t}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{T_{zi}} + {{\dot m}_{\inf }}{C_p}{T_\infty }} \right)}^{t - \delta t}}}}{{\frac{{{C_z}}}{{\delta t}} + \left( {\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}{C_p}} \right)}}
+\label{eq:TztFromZoneAirEnergyBalance}
 \end{equation}
 
-Equation could be used to estimate zone air temperatures, and is defined as the EulerMethod, one of the three solution algorithms provided in the ZoneAirHeatBalanceAlgorithm object. However, it can severely limit the time step size under some conditions. To improve on this, higher order expressions for the first derivative, with corresponding higher-order truncation errors, were developed. The goal of this approach was to allow for the use of larger time steps in the simulation than would be possible using the first order Euler form, without experiencing instabilities. Approximations from second through fifth order were tried as reported by Taylor, et al. (1990) with the conclusion that the third order finite difference approximation, shown below, gave the best results:
+Equation~\ref{eq:TztFromZoneAirEnergyBalance} could be used to estimate zone air temperatures and is defined as the EulerMethod, one of the three solution algorithms provided in the ZoneAirHeatBalanceAlgorithm object. However, it can severely limit the time step size under some conditions. To improve on this, higher order expressions for the first derivative, with corresponding higher-order truncation errors, were developed. The goal of this approach was to allow for the use of larger time steps in the simulation than would be possible using the first order Euler form, without experiencing instabilities. Approximations from second through fifth order were tried as reported by Taylor, et al. (1990) with the conclusion that the third order finite difference approximation, shown below, gave the best results:
 
 \begin{equation}
 {\left. {\frac{{d{T_z}}}{{dt}}} \right|_t} \approx {\left( {\delta t} \right)^{ - 1}}\left( {\frac{{11}}{6}T_z^t - 3T_z^{t - \delta t} + \frac{3}{2}T_z^{t - 2\delta t} - \frac{1}{3}T_z^{t - 3\delta t}} \right) + O\left( {\delta {t^3}} \right)
 \end{equation}
 
-When this form for the derivative is used, equation changes to:
+When this form for the derivative is used, Equation~\ref{eq:ZoneMeanAirTempUpdating} changes to:
 
 \begin{equation}
 \begin{array}{l}
@@ -95,13 +102,14 @@ and the zone temperature update equation becomes:
 \nulldelimiterspace=0pt
 \scriptspace=0pt
 T_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{T_{zi}}\, + {{\dot m}_{\inf }}{C_p}{T_\infty } + {{\dot m}_{sys}}{C_p}{T_{{\rm{supply}}}} - \left( {\frac{{{C_z}}}{{\delta t}}} \right)\left( { - 3T_z^{t - \delta t} + \frac{3}{2}T_z^{t - 2\delta t} - \frac{1}{3}T_z^{t - 3\delta t}} \right)}}{{\left( {\frac{{11}}{6}} \right)\frac{{{C_z}}}{{\delta t}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} A + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}C}}
+\label{eq:ZoneTemperatureUpdateEquation}
 \end{equation}
 
 This is the form historically used in EnergyPlus and is the current default referred to as 3rdOrderBackwardDifference in the ZoneAirHeatBalanceAlgorithm object. This algorithm requires zone air temperatures at three previous time steps and uses constant temperature coefficients. The assumption is that three previous time steps lengths are the same.
 
 The AnalyticalSolution algorithm is an integration approach. While the 3\(^{rd}\) order finite difference approximation provides stability without requiring a prohibitively small time step, the method still has truncation errors and requires a fixed time step length for the previous three simulation time steps. Therefore, different time step lengths for the previous three simulation time steps may make the temperature coefficients invalid.
 
-The AnalyticalSolution algorithm provides a possible way to obtain solutions without truncation errors and independent of time step length. In addition, the algorithm only requires the zone air temperature for one previous time step, instead of three previous time steps as required by the 3rdOrderBackwardDifference algorithm. The integrated (analytical) solution for Eq. (4) may be expressed as follows:
+The AnalyticalSolution algorithm provides a possible way to obtain solutions without truncation errors and independent of time step length. In addition, the algorithm only requires the zone air temperature for one previous time step, instead of three previous time steps as required by the 3rdOrderBackwardDifference algorithm. The integrated (analytical) solution for Equation~\ref{eq:ZoneTemperatureUpdateEquation} may be expressed as follows:
 
 \begin{equation}
 \begin{array}{l}T_z^t = \left( {T_z^{t - \delta t} - \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{T_{zi}} + {{\dot m}_{\inf }}{C_p}{T_\infty } + {{\dot m}_{sys}}{C_p}{T_{\sup }}}}{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}{C_p}}}} \right)\\\;\;\;\;\;\;\;*\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}{C_p}}}{{{C_z}}}\delta t} \right)\\\;\;\;\;\;\;\; + \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{T_{zi}} + {{\dot m}_{\inf }}{C_p}{T_\infty } + {{\dot m}_{sys}}{C_p}{T_{\sup }}}}{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p} + {{\dot m}_{\inf }}{C_p} + {{\dot m}_{sys}}{C_p}}}\end{array}

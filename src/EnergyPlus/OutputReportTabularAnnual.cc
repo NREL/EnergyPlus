@@ -127,6 +127,9 @@ namespace OutputReportTabularAnnual {
                 // the remaining fields are repeating in groups of three and need to be added to the data structure
                 for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                     curVarMtr = alphArray(jAlpha);
+                    if (curVarMtr.empty()) {
+                        ShowFatalError("Blank report name in Oputput:Table:Annual");
+                    }
                     if (jAlpha <= numAlphas) {
                         std::string aggregationString = alphArray(jAlpha + 1);
                         curAgg = stringToAggKind(aggregationString);

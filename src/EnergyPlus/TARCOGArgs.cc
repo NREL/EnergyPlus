@@ -422,24 +422,9 @@ namespace TARCOGArgs {
                 ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + a;
                 return ArgCheck;
             }
-            if ((i < nlayer) && (LayerType(i) == VENETBLIND) && (LayerType(i + 1) == VENETBLIND)) {
+            if ((i < nlayer) && IsShadingLayer(LayerType(i)) && IsShadingLayer(LayerType(i + 1))) {
                 ArgCheck = 37;
-                ErrorMessage = "Cannot handle two consecutive venetian blinds.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == WOVSHADE) && (LayerType(i + 1) == WOVSHADE)) {
-                ArgCheck = 43;
-                ErrorMessage = "Cannot handle two consecutive woven shades.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == VENETBLIND) && (LayerType(i + 1) == WOVSHADE)) {
-                ArgCheck = 44;
-                ErrorMessage = "Cannot handle consecutive venetian blind and woven shade.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == WOVSHADE) && (LayerType(i + 1) == VENETBLIND)) {
-                ArgCheck = 44;
-                ErrorMessage = "Cannot handle consecutive venetian blind and woven shade.";
+                ErrorMessage = "Cannot handle two consecutive shading layers.";
                 return ArgCheck;
             }
             // Deflection cannot be calculated with IGU containing shading layer. This error check is to be
@@ -505,7 +490,7 @@ namespace TARCOGArgs {
                 return ArgCheck;
             }
 
-            if (LayerType(i) == VENETBLIND) { // Venetian blind specific:
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // Venetian blind specific:
                 if (SlatThick(i) <= 0) {
                     ArgCheck = 31;
                     gio::write(a, fmtI3) << i;
@@ -577,7 +562,8 @@ namespace TARCOGArgs {
                                Real64 const tind,
                                Real64 &trmin,
                                int const isky,
-                               Real64 const outir, // IR radiance of window's exterior/interior surround (W/m2)
+                               Real64 const outir,
+                               // IR radiance of window's exterior/interior surround (W/m2)
                                Real64 const tsky,
                                Real64 &esky,
                                Real64 const fclr,
@@ -619,7 +605,6 @@ namespace TARCOGArgs {
                                Real64 &Gin,
                                Array1A<Real64> rir,
                                Array1A<Real64> vfreevent,
-                               Array1A<Real64> Ah, // Front openness area for airflow calculations [m2]
                                int &nperr,
                                std::string &ErrorMessage)
     {
@@ -690,7 +675,7 @@ namespace TARCOGArgs {
 
         // Adjust shading layer properties
         for (i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND) {
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
                 scon(i) = SlatCond(i);
                 if (ThermalMod == THERM_MOD_SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
@@ -702,10 +687,15 @@ namespace TARCOGArgs {
                     if (thick(i) < SlatThick(i)) thick(i) = SlatThick(i);
                 } else if ((ThermalMod == THERM_MOD_ISO15099) || (ThermalMod == THERM_MOD_CSM)) {
                     thick(i) = SlatThick(i);
-                    Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
-                    if (Ah(i) > 1e-8) {
-                        thick(i) = C4_VENET * (SlatWidth(i) * cos(slatAngRad));
+                    const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
+                    Real64 C4_VENET(0);
+                    if (LayerType(i) == VENETBLIND_HORIZ) {
+                        C4_VENET = C4_VENET_HORIZONTAL;
                     }
+                    if (LayerType(i) == VENETBLIND_VERT) {
+                        C4_VENET = C4_VENET_VERTICAL;
+                    }
+                    thick(i) = C4_VENET * (SlatWidth(i) * cos(slatAngRad) + thick(i) * sin(slatAngRad));
                 }
             } // Venetian
         }

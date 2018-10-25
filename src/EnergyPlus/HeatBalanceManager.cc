@@ -105,6 +105,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -345,6 +346,8 @@ namespace HeatBalanceManager {
 
             ManageHeatBalanceGetInputFlag = false;
         }
+
+        // Suggest new calling point here ManageEMS(emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan);
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
@@ -1216,6 +1219,8 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
+        WindowManager::initWindowModel();
+
         gio::write(OutputFileInits, Format_728);
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
             gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
@@ -1486,11 +1491,9 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using CurveManager::CurveType_TableTwoIV;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveObjectTypeNum;
         using CurveManager::LinearInterpolationOfTable;
         using CurveManager::PerfCurve;
         using CurveManager::SetSameIndeVariableValues;
@@ -2086,7 +2089,8 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngTransDataPtr) != CurveType_TableTwoIV) {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(5) +
@@ -2147,7 +2151,8 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngFRefleDataPtr) != CurveType_TableTwoIV) {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(6) +
@@ -2202,7 +2207,8 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngBRefleDataPtr) != CurveType_TableTwoIV) {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(7) +
@@ -5212,8 +5218,9 @@ namespace HeatBalanceManager {
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
-            InitGlassOpticalCalculations();          // Initialize the window optical properties
-            InitDaylightingDevices();                // Initialize any daylighting devices
+            // InitGlassOpticalCalculations(); // Initialize the window optical properties
+            InitWindowOpticalCalculations();
+            InitDaylightingDevices(); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
@@ -5245,6 +5252,11 @@ namespace HeatBalanceManager {
                 e.ThetaFace = 296.15;
                 e.EffInsSurfTemp = 23.0;
             }
+        }
+
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
         }
 
         if (TotStormWin > 0) {
@@ -8248,8 +8260,10 @@ namespace HeatBalanceManager {
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
                     ComplexShade(Loop).LayerType = csOtherShadingType;
-                } else if (SELECT_CASE_var == "VENETIAN") {
-                    ComplexShade(Loop).LayerType = csVenetian;
+                } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
+                    ComplexShade(Loop).LayerType = csVenetianHorizontal;
+                } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
+                    ComplexShade(Loop).LayerType = csVenetianVertical;
                 } else if (SELECT_CASE_var == "WOVEN") {
                     ComplexShade(Loop).LayerType = csWoven;
                 } else if (SELECT_CASE_var == "PERFORATED") {
@@ -8369,7 +8383,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(10) + " must be >=0 or <=1, entered value = " + RoundSigDigits(rNumericArgs(10), 2));
             }
 
-            if (ComplexShade(Loop).LayerType == csVenetian) {
+            if (ComplexShade(Loop).LayerType == csVenetianHorizontal || ComplexShade(Loop).LayerType == csVenetianVertical) {
                 if (rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
