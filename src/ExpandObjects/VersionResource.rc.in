@@ -1,0 +1,41 @@
+#define VER_FILEVERSION             {CMAKE_VERSION_MAJOR}.{CMAKE_VERSION_MINOR}.{CMAKE_VERSION_PATCH}
+#define VER_FILEVERSION_STR         "{CMAKE_VERSION_MAJOR}.{CMAKE_VERSION_MINOR}.{CMAKE_VERSION_PATCH}\0"
+
+#define VER_PRODUCTVERSION          {CMAKE_VERSION_MAJOR}.{CMAKE_VERSION_MINOR}.{CMAKE_VERSION_PATCH}
+#define VER_PRODUCTVERSION_STR      "{CMAKE_VERSION_MAJOR}.{CMAKE_VERSION_MINOR}.{CMAKE_VERSION_PATCH}\0"
+
+#ifndef DEBUG
+#define VER_DEBUG                   0
+#else
+#define VER_DEBUG                   VS_FF_DEBUG
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     VER_FILEVERSION
+PRODUCTVERSION  VER_PRODUCTVERSION
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       (VER_PRIVATEBUILD|VER_PRERELEASE|VER_DEBUG)
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_DLL
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "United States Department of Energy"
+            VALUE "FileDescription",  "A tool for creating HVAC systems from a templated approach in EnergyPlus"
+            VALUE "FileVersion",      VER_FILEVERSION_STR
+            VALUE "InternalName",     "ExpandObjects"
+            VALUE "LegalCopyright",   "Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All rights reserved."
+            VALUE "OriginalFilename", "ExpandObjects"
+            VALUE "ProductName",      "ExpandObjects"
+            VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
