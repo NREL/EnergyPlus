@@ -54,7 +54,6 @@ endif()
 
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
-option( BUILD_ALPINE "Build Alpine" OFF )
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
@@ -174,9 +173,6 @@ option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging onl
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
-if( BUILD_ALPINE )
-  ADD_SUBDIRECTORY(alpine)
-endif()
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
   message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
