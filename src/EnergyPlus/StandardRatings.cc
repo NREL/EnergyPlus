@@ -2576,14 +2576,21 @@ namespace StandardRatings {
                         << RoundSigDigits(TotElectricPowerRated(Num + 3), 1) << RoundSigDigits(NetCoolingCapRated(Num + 4), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 4), 1);
                     PreDefTableEntry(pdchDXCoolCoilType, CompNameNew, CompType);
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
+                    // Note JM 2018-10-25: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
+                    // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
+                    // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
+                    // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
+
+                    // These will stay in W, so it doesn't matter as much, so I'll leave it that way
                     PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 2), 1));
                     PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 3), 1));
                     PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 4), 1));
                     PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 4), 1));
+
                     addFootNoteSubTable(pdstDXCoolCoil2, "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
                 }
 
