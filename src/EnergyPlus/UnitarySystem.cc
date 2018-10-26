@@ -1561,9 +1561,9 @@ namespace UnitarySystems {
                         DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].getDXCoilCapFTCurveIndex();
                         DataSizing::DataIsDXCoil = true;
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                        this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                        this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                        this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                         DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(this->m_CoolingCoilIndex, ErrFound);
                         DataSizing::DataIsDXCoil = true;
                     }
@@ -1598,9 +1598,9 @@ namespace UnitarySystems {
                     DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].getDXCoilCapFTCurveIndex();
                     DataSizing::DataIsDXCoil = true;
                 } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(this->m_CoolingCoilIndex, ErrFound);
                     DataSizing::DataIsDXCoil = true;
                 }
@@ -1975,38 +1975,43 @@ namespace UnitarySystems {
                 }
             }
 
-            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(this->m_DehumidificationMode,
-                                                                                   this->m_CoolingPartLoadFrac,
-                                                                                   this->m_CoolingSpeedNum,
-                                                                                   this->m_CoolingSpeedRatio,
-                                                                                   this->m_FanOpMode);
+            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
+                this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
             //            UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex
             //            ).NumOfSpeeds;
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = coilCoolingDXs[this->m_CoolingCoilIndex];
             int const magicNominalModeNum = 0;
-            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum); 
+            if (this->m_NumOfSpeedCooling != newCoil.performance.modes[magicNominalModeNum].speeds.size()) {
+                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowContinueError("Number of cooling speeds does not match coil object.");
+                ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
+            }
+            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum);
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
+            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
-                this->m_CoolVolumeFlowRate[Iter] =
-                    newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
+                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
                 if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
                     //             UnitarySystem(UnitarySysNum)%CoolVolumeFlowRate(UnitarySystem(UnitarySysNum)%NumOfSpeedCooling)
-                    this->m_MSCoolingSpeedRatio[Iter] =
-                        this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 } else {
-                    this->m_MSCoolingSpeedRatio[Iter] =
-                        this->m_CoolVolumeFlowRate[Iter] /
-                        this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
                 }
             }
 
-            this->m_IdleVolumeAirRate = this->m_CoolVolumeFlowRate[1];
-            this->m_IdleMassFlowRate = this->m_CoolMassFlowRate[1];
-            this->m_IdleSpeedRatio = this->m_MSCoolingSpeedRatio[1];
+            if (MSHPIndex > 0) {
+                this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            } else if (this->m_CoolVolumeFlowRate.size() == 0) {
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            }
 
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
 
@@ -4310,42 +4315,66 @@ namespace UnitarySystems {
                             DXCoils::SetDXCoolingCoilData(thisSys.m_CoolingCoilIndex, errorsFound, HeatingCoilPLFCurveIndex);
                         }
 
-                } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    //                    // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(loc_m_CoolingCoilName);
-                    thisSys.m_CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
+                    } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                        ValidateComponent(loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                        if (isNotOK) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
 
-                    // mine data from coil object
-                    auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
-                    int const magicNominalModeNum = 0;
-                    thisSys.m_DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
-                    thisSys.m_MaxCoolAirVolFlow = newCoil.performance.modes[magicNominalModeNum].ratedEvapAirFlowRate;
-                    thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
-                    CoolingCoilInletNode = newCoil.evapInletNodeIndex;
-                    CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
-                    thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
-                    thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.modes[0].speeds.size();
-                    thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                        } else {
+                            //                    // call CoilCoolingDX constructor
+                            coilCoolingDXs.emplace_back(loc_m_CoolingCoilName);
+                            thisSys.m_CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
 
-                    // Push heating coil PLF curve index to DX coil
-                    //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
-                    //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
-                    //                        HeatingCoilPLFCurveIndex );
-                    //                    }
+                            // mine data from coil object
+                            auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
+                            int const magicNominalModeNum = 0;
+                            thisSys.m_DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
+                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.modes[magicNominalModeNum].ratedEvapAirFlowRate;
+                            thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
+                            CoolingCoilInletNode = newCoil.evapInletNodeIndex;
+                            CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
+                            thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
+                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.modes[0].speeds.size();
+                            thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
 
-                    // set variable speed coil flag as necessary
-                    thisSys.m_VarSpeedCoolingCoil = true;
+                            // Push heating coil PLF curve index to DX coil
+                            //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
+                            //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
+                            //                        HeatingCoilPLFCurveIndex );
+                            //                    }
 
-                    if (thisSys.m_HeatCoilExists) {
-                        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
-                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
-                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
-                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
-                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
-                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                            thisSys.m_HeatPump = true;
+                            // set variable speed coil flag as necessary
+                            thisSys.m_VarSpeedCoolingCoil = true;
+
+                            if (thisSys.m_HeatCoilExists) {
+                                if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                                    thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                                    thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
+                                    thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                                    thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                                    thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+                                    thisSys.m_HeatPump = true;
+                                }
+
+                                // set fan info for heating coils
+                                if (thisSys.m_FanExists) {
+                                    if (thisSys.m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                                        coilSelectionReportObj->setCoilSupplyFanInfo(thisSys.m_HeatingCoilName,
+                                                                                     thisSys.m_HeatingCoilTypeName,
+                                                                                     thisSys.m_FanName,
+                                                                                     DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                     thisSys.m_FanIndex);
+                                    } else {
+                                        coilSelectionReportObj->setCoilSupplyFanInfo(thisSys.m_HeatingCoilName,
+                                                                                     thisSys.m_HeatingCoilTypeName,
+                                                                                     thisSys.m_FanName,
+                                                                                     DataAirSystems::structArrayLegacyFanModels,
+                                                                                     thisSys.m_FanIndex);
+                                    }
+                                }
+                            }
                         }
-                    }
 
                     } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                         ValidateComponent(loc_coolingCoilType, loc_m_CoolingCoilName, isNotOK, cCurrentModuleObject);
@@ -5914,7 +5943,7 @@ namespace UnitarySystems {
                 }
 
                 if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_Cooling &&
-                	  thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
+                    thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
                     thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
                     thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -9810,11 +9839,8 @@ namespace UnitarySystems {
                 } else {
                     CoilPLR = 0.0;
                 }
-                coilCoolingDXs[this->m_CoolingCoilIndex].simulate(this->m_DehumidificationMode,
-                                                                                       CoilPLR,
-                                                                                       this->m_CoolingSpeedNum,
-                                                                                       this->m_CoolingSpeedRatio,
-                                                                                       this->m_FanOpMode);
+                coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
+                    this->m_DehumidificationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 if (this->m_CoolingSpeedNum > 1) {
                     this->m_CoolCompPartLoadRatio = 1.0;
                 } else {
