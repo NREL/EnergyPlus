@@ -3629,24 +3629,24 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
     test("Standard insulation_00.1");
     test("Standard insulation_0010");
 
-    // This fails
+    // This used to fail before fix in doj/alphanum.hpp
     test("Standard insulation_001");
 
 }
 
 TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
-    // 1
-    int comp1 = doj::alphanum_comp<std::string>("n_01", "n_0");
-    EXPECT_FALSE(true) << comp1;
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
 
-    // -9
-    int comp2 = doj::alphanum_comp<std::string>("n_01", "n_0010");
-    EXPECT_FALSE(true) << comp2;
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") < 0);
 
-    // 0 = thinks it's equal (sic!)
-    int comp3 = doj::alphanum_comp<std::string>("n_01", "n_001");
-    EXPECT_FALSE(true) << comp3;
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
 
 }
 
