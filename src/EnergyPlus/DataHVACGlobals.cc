@@ -186,7 +186,7 @@ namespace DataHVACGlobals {
     int const UnitarySys_HeatCool(4);
     int const UnitarySys_HeatPump_AirToAir(5);
     int const UnitarySys_HeatPump_WaterToAir(6);
-    int const UnitarySystem_AnyCoilType(7);
+    int const UnitarySys_AnyCoilType(7);
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",

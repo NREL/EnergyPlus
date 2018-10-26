@@ -184,9 +184,11 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -517,7 +519,6 @@
     Zn001:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -529,7 +530,6 @@
     Zn001:Wall001:Door001,   !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     14,                      !- Starting X Coordinate {m}
@@ -655,7 +655,6 @@
     Zn002:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -676,7 +675,6 @@
     Zn002:Wall001:Win002,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     10,                      !- Starting X Coordinate {m}
@@ -760,7 +758,6 @@
     Zn003:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn003:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}
@@ -879,7 +876,6 @@
     Zn004:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn004:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}

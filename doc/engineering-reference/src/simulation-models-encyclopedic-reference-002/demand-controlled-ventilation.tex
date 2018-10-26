@@ -28,21 +28,21 @@ For the i-th zone, first the breathing-zone outdoor air flow is calculated:
 {V_{bz,i}} = {R_{p,i}} \times {P_i} + {R_{a,i}} \times {A_i} \times {SchedFrac_i}
 \end{equation}
 
-Where:
+where:
 
-\({V_{bz,i}}\) = the breathing-zone outdoor air flow, m³/s
+\({V_{bz,i}}\) is the breathing-zone outdoor air flow (m\(^3\)/s)
 
-\({R_{p,i}}\) = the ventilation rate per person, m³/s-person
+\({R_{p,i}}\) is the ventilation rate per person (m\(^3\)/s-person)
 
-\({P_i}\) ~ = the number of occupants for the zone
+\({P_i}\) is the number of occupants for the zone
 
-\({R_{a,i}}\) = the ventilation rate per floor area, m³/s-m²
+\({R_{a,i}}\) is the ventilation rate per floor area (m\(^3\)/s-m\(^2\))
 
-\({A_i}\) ~ = the floor area of the zone, m²
+\({A_i}\) is the floor area of the zone (m\(^2\))
 
-\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
+\({SchedFrac_i}\) is the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
-\(i\) ~~~ = the index of the zone or zone list
+\(i\) is the index of the zone or zone list.
 
 Next, the i-th zone outdoor air flow is calculated:
 
@@ -52,9 +52,9 @@ Next, the i-th zone outdoor air flow is calculated:
 
 Where:
 
-\({V_{oz,i}}\) = the zone outdoor air flow, m³/s
+\({V_{oz,i}}\) is the zone outdoor air flow (m\(^3\)/s)
 
-\({E_i}\) = the zone air distribution effectiveness, see following figure for ASHRAE recommended values.
+\({E_i}\) is the zone air distribution effectiveness, see following figure for ASHRAE recommended values.
 
 \begin{figure}[hbtp] % fig 195
 \centering
@@ -66,75 +66,85 @@ Where:
 
 Occupant diversity, \emph{D}, is the expected peak system population, \emph{Ps}, divided by the sum of the design zone population for all the zones attached to the air system, \emph{Pzsum}. In EnergyPlus, \emph{D}, \emph{Ps}, and \emph{Pzsum} are determined by a side calculation, in the routine DetermineSystemPopulationDiversity.  This routine loops over each airloop in the model and processes the People descriptions in each zone attached to a given airloop.  The design level is summed and includes zone multipliers.  The concurrent system peak population is calculated by stepping through a full year of zone timesteps and multiplying the people schedules (input field Number of People Schedule Name) to the design level and summing up a total people concurrent at each timestep.  The largest value for the total concurrent people on a system is used for \emph{Pzsum}.  For single zone air systems, \emph{D} is forced to be 1.0 because there is no diversity that could come from serving multiple zones. 
 
-For single zone systems, the system outdoor air flow,
+For single zone systems, the system outdoor air flow:
 
 \begin{equation}
 {V_{ot}} = {V_{oz}}
 \end{equation}
 
-For 100\% outdoor air multi-zone systems, the system outdoor air flow,
+For 100\% outdoor air multi-zone systems, the system outdoor air flow:
 
 \begin{equation}
 {V_{ot}} = \mathop \sum \limits_{i = 1}^{allzones} {V_{oz,i}}
 \end{equation}
 
-For non 100\% outdoor air multi-zone systems, the system outdoor air flow,
+For non 100\% outdoor air multi-zone systems, the system outdoor air flow:
 
 \begin{equation}
 {V_{ot}} = {V_{ou}}/{E_v}
 \end{equation}
 
-Where:
+where:
 
-\({V_{ou}}\) ~the uncorrected system outdoor air flow, m³/s
+\({V_{ou}}\) is the uncorrected system outdoor air flow (m\(^3\)/s)
 
 \begin{equation}
 {V_{ou}} = \mathop \sum \limits_{i = 1}^{allzones} ({R_{p,i}} \times {P_i} \times {SchedFrac_i}) + \mathop \sum \limits_{i = 1}^{allzones} ({R_{a,i}} \times {A_i} \times {SchedFrac_i})
 \end{equation}
 
-\({X_s}\) ~ = the uncorrected system outdoor air fraction
+\({X_s}\) is the uncorrected system outdoor air fraction
 
 \begin{equation}
 {X_s} = {V_{ou}}/{V_{ps}}
 \end{equation}
 
-\({V_{ps}}\) = the system supply air flow, m³/s
+\({V_{ps}}\) is the system supply air flow (m\(^3\)/s)
 
-\({Z_{d,i}}\) ~ = the zone outdoor air fraction
+\({Z_{d,i}}\) is the zone outdoor air fraction
 
 \begin{equation}
 {Z_{d,i}} = {V_{oz,i}}/{V_{dz,i}}
 \end{equation}
 
-\({V_{dz,i}}\) ~ = the zone supply air flow, m³/s
+\({V_{dz,i}}\) is the zone supply air flow (m\(^3\)/s)
 
-\({E_v}\) = the system ventilation efficiency, determined as the minimum of the zone ventilation efficiency among all ventilation zones served by the air handler.
+\({E_v}\) is the system ventilation efficiency, determined as the minimum of the zone ventilation efficiency among all ventilation zones served by the air handler
 
-\emph{Ev} = minimum (\emph{Evz})
+\emph{Ev} is the minimum of (\emph{Evz})
 
-\emph{Evz}~ = the zone ventilation efficiency, determined differently for single-path and multi-path systems.
+\emph{Evz} is the zone ventilation efficiency, determined differently for single-path and multi-path systems.
 
-\textbf{\emph{For single-path systems,}}
+\textbf{\emph{For single-path systems:}}
 
-Evz = 1+ Xs-- Z\(_{d,i}\)
+\begin{equation}
+Evz = 1 + Xs - Z_{d,i}
+\end{equation}
 
-\textbf{\emph{For multi-path systems,}}
+\textbf{\emph{For multi-path systems:}}
 
-\emph{Evz =} \emph{(Fa+ Xs·Fb-- Z\(_{d,i}\)·Ep·Fc)/Fa}
+\begin{equation}
+Evz = (Fa + Xs·Fb - Z_{d,i}·Ep·Fc)/Fa
+\end{equation}
 
-where system air fractions \emph{Fa}, \emph{Fb}, and \emph{Fc}are determined as follows
+where system air fractions \emph{Fa}, \emph{Fb}, and \emph{Fc} are determined as follows:
 
-\emph{Fa = Ep+} \emph{(1 -- Ep) ·Er}
+\begin{equation}
+Fa = Ep + {(1 - Ep) · Er}
+\end{equation}
 
-\emph{Fb = Ep}
+\begin{equation}
+Fb = Ep
+\end{equation}
 
-\emph{Fc = 1 --} \emph{(1 -- Ez) · (1 -- Er) · (1 -- Ep)}
+\begin{equation}
+Fc = 1 - (1 - Ez) · (1 - Er) · (1 - Ep)
+\end{equation}
 
-\emph{Ep~~ =} the zone primary air fraction. For dual-fan dual-duct systems, the zone primary air is the air from the cold duct.
+where:
 
-\emph{Ep = Vpz/Vdz,i}
+\emph{Ep} is the zone primary air fraction. For dual-fan dual-duct systems, the zone primary air is the air from the cold duct.  This can be expressed as: \emph{Ep = Vpz/Vdz,i}
 
-\emph{Er} ~ = the zone secondary recirculation fraction
+\emph{Er} is the zone secondary recirculation fraction.
 
 Single-path systems are special cases of multi-path systems where \emph{Er} = 0, \emph{Ep} = 1, \emph{Fa} = \emph{Fb =} \emph{Fc} = 1.0
 
@@ -142,13 +152,15 @@ The zone secondary recirculation fraction Er is determined by the designer based
 
 The program then calculates the minimum outdoor air flow fraction based on the information provided in the object Controller:MechanicalVentilation and the maximum branch air flow rate as follows:
 
-MechVentOutsideAirMinFrac = \({V_{ot}}\) ~RhoStd / \(\dot m{_{maxbranch}}\) here:
+\begin{equation}
+MechVentOutsideAirMinFrac = {V_{ot}} {\rho_{std}} / {\dot m_{maxbranch}}
+\end{equation}
 
-MechVentOutsideAirMinFrac = outdoor air minimum fraction based on all zones specified in the Controller:MechanicalVentilation object
+where MechVentOutsideAirMinFrac is the outdoor air minimum fraction based on all zones specified in the Controller:MechanicalVentilation object.
 
 Controller:OutdoorAir controls the amount of outdoor ventilation air introduced via the mixed air box based on several user inputs. The user can define the minimum outdoor air flow rate as a percentage of the system's supply air flow rate (e.g., for a variable-air volume system) or a fixed minimum outdoor air flow rate (not as a percentage but a fixed value) (field MinimumLimit). DCV, using the Controller:MechanicalVentilation object in conjunction with the Controller:OutdoorAir object, allows a third option for setting the minimum outdoor air flow. Economizer operation can also be specified to increase the outdoor air flow above the minimum flow rate to provide free cooling when conditions permit (Controller:OutdoorAir, field Economizer Control Type).
 
-EnergyPlus uses the largest outdoor air flow rate calculated by the various methods described above when modeling system performance (as long this rate doesn't exceed the maximum flow rate specified for the main air loop branch or for the outdoor air controller itself).
+EnergyPlus uses the \emph{largest} outdoor air flow rate calculated by the various methods described above when modeling system performance (as long this rate doesn't exceed the maximum flow rate specified for the main air loop branch or for the outdoor air controller itself).
 
 The method used to calculate the outdoor ventilation air flow rate for each system simulation time step is described in more detail below. The figure below schematically illustrates air flow paths used in the calculation of outdoor air flow rate.
 
@@ -161,18 +173,18 @@ The method used to calculate the outdoor ventilation air flow rate for each syst
 The minimum outdoor air flow rate is first calculated based on the minimum outdoor air flow rate and the minimum outdoor air schedule value as defined by the user inputs for the object Controller:OutdoorAir:
 
 \begin{equation}
-\dot{m}_{minOA} = \dot{V}_{minOA} \cdot MinOAScheduleValue \cdot RhoStd
+\dot{m}_{minOA} = \dot{V}_{minOA} \cdot MinOAScheduleValue \cdot {\rho_{std}}
 \end{equation}
 
 where:
 
-\({\mathop m\limits^ \bullet_{_{\min OA}}}\) ~~~~~~ = minimum outdoor air flow rate for this time step, kg/s
+\({\dot{m}_{minOA}}\) is the minimum outdoor air flow rate for this time step (kg/s)
 
-\({\mathop V\limits^ \bullet_{_{\min OA}}}\) ~~~~~~~ = minimum outdoor air flow rate defined in Controller:OutdoorAir, m\(^{3}\)/s
+\({\dot{V}_{minOA}}\) is the minimum outdoor air flow rate defined in Controller:OutdoorAir (m\(^{3}\)/s)
 
-\emph{MinOAScheduleValue} = minimum outdoor air schedule value defined by the schedule identified in Controller:OutdoorAir
+\emph{MinOAScheduleValue} is the minimum outdoor air schedule value defined by the schedule identified in Controller:OutdoorAir
 
-\emph{RhoStd}~~~~~ = standard air density (1.204 kg/m\(^{3}\)) adjusted for the local barometric pressure (standard barometric pressure corrected for altitude, ASHRAE 1997 HOF pg. 6.1).
+\({\rho_{std}}\) is the standard air density (1.204 kg/m\(^{3}\)) adjusted for the local barometric pressure (standard barometric pressure corrected for altitude, ASHRAE 1997 HOF pg. 6.1).
 
 The outdoor air minimum fraction is then calculated as the ratio of the minimum outdoor air flow rate calculated above to the maximum air flow rate defined in the Branch statement for the main air loop (converted to mass flow rate).
 
@@ -180,26 +192,24 @@ The outdoor air minimum fraction is then calculated as the ratio of the minimum 
   OutAirMinFrac = \frac{\dot{m}_{minOA}}{\dot{m}_{max,branch}}
 \end{equation}
 
-where:
-
-\({\mathop m\limits^ \bullet_{\max branch}}\) ~~~ = Max branch air volume flow rate times \emph{RhoStd,} kg/s
+where \({\dot{m}_{minOA}}\) is the maximum branch air volume flow rate times \(\rho_{std}\) (kg/s).
 
 The program then calculates the minimum outdoor air flow fraction (\emph{MechVentOutsideAirMinFrac}) according to the VRP based on the information provided in the object Controller:MechanicalVentilation and the maximum branch air flow rate.
 
 The algorithm then uses the larger of these outdoor air minimum fractions in subsequent calculations, and also makes sure that the resulting fraction is between 0 and 1.
 
 \begin{equation}
-OutAirMinFrac = \,\,MAX\left( {OutAirMinFrac,MechVentOutsideAirMinFrac} \right)
+OutAirMinFrac = MAX\left( {OutAirMinFrac,MechVentOutsideAirMinFrac} \right)
 \end{equation}
 
 \begin{equation}
-OutAirMinFrac = \,\,MIN\left( {MAX\left( {OutAirMinFrac,0.0} \right),\,1.0} \right)
+OutAirMinFrac = MIN\left( {MAX\left( {OutAirMinFrac,0.0} \right),1.0} \right)
 \end{equation}
 
 The algorithm goes on to determine if economizer operation is possible based on the user inputs and the current conditions of the outdoor air and return air. If conditions permit economizer operation, the outdoor air flow fraction is increased beyond the minimum fraction to meet the mixed air setpoint temperature (setpoint temperature assigned to the node defined in field ``Control\_Node'' of Controller:OutdoorAir).
 
 \begin{equation}
-OAFrac = \,MAX\,(OutAirMinFrac,\,EconomizerOAFrac)
+OAFrac = MAX(OutAirMinFrac,EconomizerOAFrac)
 \end{equation}
 
 The mass flow rate of outdoor air is then calculated based on the outdoor air fraction determined above and the mixed (supply) air mass flow rate:
@@ -210,11 +220,11 @@ The mass flow rate of outdoor air is then calculated based on the outdoor air fr
 
 where:
 
-\({\dot m_{OA}}\) ~~~~~~~~~~ = mass flow rate of outdoor air, kg/s
+\({\dot m_{OA}}\) is the mass flow rate of outdoor air (kg/s)
 
-\(OAFrac\) ~~~ = fraction of outdoor air in the mixed (supply) air stream
+\(OAFrac\) is the fraction of outdoor air in the mixed (supply) air stream
 
-\({\mathop m\limits^ \bullet_{MixedAir}}\) ~~~~ = mass flow rate of the mixture of return air and outdoor ventilation air, kg/s
+\({\dot{m}_{MixedAir}}\) is the mass flow rate of the mixture of return air and outdoor ventilation air (kg/s).
 
 The algorithm checks to make sure the calculated outdoor air mass flow rate is greater than or equal to the air flow rate being exhausted.
 
@@ -240,14 +250,12 @@ The outdoor air mass flow rate should also be less than or equal to the maximum 
 {\dot m_{OA}} = MIN\left( {{{\dot m}_{OA}},{{\dot m}_{MaxOA}}} \right)
 \end{equation}
 
-where:
-
-\({\dot m_{MaxOA}}\) = maximum outdoor air mass flow rate, kg/s = maximum outdoor air volume flow rate from Controller:OutdoorAir times \emph{RhoStd}
+where \({\dot m_{MaxOA}}\) is the maximum outdoor air mass flow rate which is equal to the maximum outdoor air volume flow rate from Controller:OutdoorAir times \({\rho_{std}}\) (kg/s).
 
 Finally, the relief air flow rate is calculated as the difference between the outside and exhaust air mass flow rates.
 
 \begin{equation}
-{\dot m_{ReliefAir}} = MAX\left( {{{\dot m}_{OA}} - \,{{\dot m}_{ExhaustAir}}\,,0.0} \right)
+{\dot m_{ReliefAir}} = MAX\left( {{{\dot m}_{OA}} - {{\dot m}_{ExhaustAir}},0.0} \right)
 \end{equation}
 
 \subsection{Indoor Air Quality Procedure}\label{indoor-air-quality-procedure}
@@ -268,11 +276,11 @@ The outdoor air mass flow rate provided by the air loop is calculated as below:
 
 where:
 
-\({\dot m_{OA,z,i}}\) = outdoor air mass flow rate for the ith zone as calculated according to section Carbon Dioxide Prediction located elsewhere in this document.
+\({\dot m_{OA,z,i}}\) is the outdoor air mass flow rate for the ith zone as calculated according to section Carbon Dioxide Prediction located elsewhere in this document.
 
-\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
+\({SchedFrac_i}\) is the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
-N = number of zones served by the air loop, which is provided in the input for a Controller:MechanicalVentilation object
+N is the number of zones served by the air loop, which is provided in the input for a Controller:MechanicalVentilation object.
 
 \subsection{Proportional Control}\label{proportional-control}
 
@@ -286,90 +294,103 @@ The control has three choices: ProportionalControlBasedonOccupancySchedule,  Pro
 
 For the i-th zone, the outdoor air mass flow rate provided by the air loop is calculated as below:
 
-1)~~~The required intake flow of outdoor air for the design zone population, \emph{P\(_{z,i}\)}
+\begin{enumerate}
+\item The required intake flow of outdoor air for the design zone population, \emph{P\(_{z,i}\)}
+\end{enumerate}
+
 
 \begin{equation}
 {V_{ot - design,i}} = \frac{{\left( {{R_{p,i}}.{P_{z,i}} \times {SchedFrac_i}} \right) + ({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
-if ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
+If ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
 
- \begin{equation} {V_{ot - design,i}} = \frac{Design Outdoor Air Flow Rate_i} {E_i} \end{equation}
+\begin{equation}
+{V_{ot - design,i}} = \frac{Design Outdoor Air Flow Rate_i} {E_i}
+\end{equation}
 
 The Design Outdoor Air Flow Rate is determined in the DesignSpecification:OutdoorAir object. 
 
-2)~~~The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{z,i}\)} = 0
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{z,i}\)} = 0
+\end{enumerate}
 
 \begin{equation}
 {V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
-if ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
+If ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
 
- \begin{equation} {V_{ot - min,i}} = \frac{ {Design Outdoor Air Flow Rate_i} \times {SchedPropMin_i} } {E_i} \end{equation}
+\begin{equation}
+{V_{ot - min,i}} = \frac{ {Design Outdoor Air Flow Rate_i} \times {SchedPropMin_i} } {E_i}
+\end{equation}
 
-
-3)~~~The target indoor CO\(_{2}\) concentration at \({V_{ot - design,i}}\)
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item The target indoor CO\(_{2}\) concentration at \({V_{ot - design,i}}\)
+\end{enumerate}
 
 \begin{equation}
 {C_{s - design,i}} = {C_o} + \frac{N}{{\left( {{V_{ot - design,i}}/{P_{z,i}}} \right)}}
 \end{equation}
 
-When the field of Maximum Carbon Dioxide Concentration Schedule Name is entered, the schedule value is used for {C_{s - design,i}} instead of the calculated value. 
+When the field of Maximum Carbon Dioxide Concentration Schedule Name is entered, the schedule value is used for {$C_{s - design,i}$} instead of the calculated value. 
 
-4)~~~The target indoor CO\(_{2}\) concentration at \({V_{ot - min}}\) ~is either a user input in the object ZoneControl:ContaminantController or equal to the outdoor CO\(_{2}\) concentration. The default is outdoor CO\(_{2}\) concentration.
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item The target indoor CO\(_{2}\) concentration at \({V_{ot - min}}\) ~is either a user input in the object ZoneControl:ContaminantController or equal to the outdoor CO\(_{2}\) concentration. The default is outdoor CO\(_{2}\) concentration.
+\end{enumerate}
 
 \begin{equation}
 {C_{s - min,i}} = {C_o}
 \end{equation}
 
-When the indoor CO\(_{2}\) concentration equals \({C_{s - design,i}}\) , \({V_{ot}}\) ~should equal \({V_{ot - design,i}}\) . When the indoor CO\(_{2}\) concentration equals \({C_{s - min,i}}\) , \({V_{ot}}\) ~should equal \({V_{ot - min,i}}\) . When the indoor CO\(_{2}\) concentration is between \({C_{s - min,i}}\) ~and \({C_{s - design,i}}\) , a controller should adjust outdoor air intake flow \({V_{ot}}\) ~proportionally between \({V_{ot - min,i}}\) ~and \({V_{ot - design,i}}\) :
+When the indoor CO\(_{2}\) concentration equals \({C_{s - design,i}}\), \({V_{ot}}\) should equal \({V_{ot - design,i}}\). When the indoor CO\(_{2}\) concentration equals \({C_{s - min,i}}\), \({V_{ot}}\) should equal \({V_{ot - min,i}}\). When the indoor CO\(_{2}\) concentration is between \({C_{s - min,i}}\) and \({C_{s - design,i}}\), a controller should adjust outdoor air intake flow \({V_{ot}}\) proportionally between \({V_{ot - min,i}}\) and \({V_{ot - design,i}}\):
 
 \begin{equation}
 {V_{ot,i}} = {V_{ot - min,i}} + ({V_{ot - design,i}} - {V_{ot - min,i}})\frac{{({C_{s - actual,i}} - {C_{s - min,i}})}}{{({C_{s - design,i}} - {C_{s - min,i}})}}
 \end{equation}
 
-Where,
+where:
 
-\({R_{p,i}}\) ~ = Required outdoor air flow rate per person, (m\(^{3}\)/s)/person
+\({R_{p,i}}\) is the required outdoor air flow rate per person ((m\(^{3}\)/s)/person)
 
-\({R_{a,i}}\) ~ = Required outdoor air flow rate per unit area, (m\(^{3}\)/s)/m\(^{2}\)
+\({R_{a,i}}\) is the required outdoor air flow rate per unit area ((m\(^{3}\)/s)/m\(^{2}\))
 
-\({P_{z,i}}\) ~ = Design zone population, number of people
+\({P_{z,i}}\) is the design zone population (number of people)
 
-\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
+\({SchedFrac_i}\) is the outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
-\({SchedPropMin_i}\) ~ = the Proportional Control Minimum Outdoor Air Flow Rate Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
+\({SchedPropMin_i}\) is the Proportional Control Minimum Outdoor Air Flow Rate Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0).  When ProportionalControlBasedonDesignOccupancy is specified, number of people is equal to the design occupancy times the current schedule value.  When ProportionalControlBasedonDesignOccupancy is specified, the number of people equals the design occupancy.
 
-When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+\({A_{z,i}}\) is the zone floor area (m\(^{2}\))
 
-\({A_{z,i}}\) ~ = Zone floor area, m\(^{2}\)
+\({E_i}\) is the zone air distribution effectiveness
 
-\({E_i}\) ~ = The zone air distribution effectiveness
+\(N\) is the CO\(_{2}\) generation rate specified in the People object ((m\(^{3}\)/s)/person)
 
-\(N\) ~ = CO\(_{2}\) generation rate, (m\(^{3}\)/s)/person (Specified in the People object)
+\({C_o}\) is the CO\(_{2}\) concentration in the outdoor air (ppm)
 
-\({C_o}\) ~ = CO\(_{2}\) concentration in the outdoor air, ppm
+\({C_{s - design,i}}\) is the CO\(_{2}\) concentration in the space for the design conditions (ppm)
 
-\({C_{s - design,i}}\) ~ = CO\(_{2}\) concentration in the space for the design conditions, ppm
+\({C_{s - min,i}}\) is the minimum CO\(_{2}\) concentration in the space (ppm)
 
-\({C_{s - min,i}}\) ~ = Minimum CO\(_{2}\) concentration in the space, ppm
+\({C_{s - actual,i}}\) is the actual CO\(_{2}\) concentration in the space (ppm)
 
-\({C_{s - actual,i}}\) ~ = Actual CO\(_{2}\) concentration in the space, ppm
+\({V_{ot - design,i}}\) is the required intake of outdoor air flow rate at \({C_{s - design}}\) (m\(^{3}\)/s)
 
-\({V_{ot - design,i}}\) ~ = Required intake of outdoor air flow rate at \({C_{s - design}}\) , (m\(^{3}\)/s)
+\({V_{ot - min,i}}\) is the required intake of outdoor air flow rate at \({C_{s - min}}\) (m\(^{3}\)/s)
 
-\({V_{ot - min,i}}\) ~ = Required intake of outdoor air flow rate at \({C_{s - min}}\) , (m\(^{3}\)/s)
+\({V_{ot,i}}\) is the required intake of outdoor air flow rate at \({C_{s - actual}}\) (m\(^{3}\)/s)
 
-\({V_{ot,i}}\) ~ = Required intake of outdoor air flow rate at \({C_{s - actual}}\) , (m\(^{3}\)/s)
+Except for \({C_{s - min,i}}\) above, all other variables are already available in EnergyPlus (See Engineering Reference for ``Ventilation Rate Procedure'' above for further details). \({C_{s - min}}\) can be specified in the ZoneControl:ContaminantController object as a schedule. If \({C_{s - min}}\) is not specified in the ZoneControl:ContaminantController object, then outdoor air CO2 concentration will be used as the minimum. In order for ``ProportionalControl'' to be active, the following conditions must be met, otherwise default ``VentilationProcedure'' will be modeled and a warning will be issued during runtime:
 
-Except \({C_{s - min,i}}\) ~above, all other variables are already available in EnergyPlus (See Eng. Reference for ``Ventilation Rate Procedure'' above for further details). \({C_{s - min}}\) ~can be specified in the ZoneControl:ContaminantController object as a schedule. If~ \({C_{s - min}}\) ~is not specified in the ZoneControl:ContaminantController object, then outdoor air CO2 concentration will be used as the minimum. In order for ``ProportionalControl'' to be active, the following conditions must be met, otherwise default ``VentilationProcedure'' will be modeled and a warning will be issued during runtime:
-
-1)~~~``Carbon Dioxide Control Availability Schedule Name'' input field in the ZoneControl:ContaminantController object must be greater than zero.
-
-2)~~~CO2 gain from people in the zone must be greater than zero.
-
-3)~~~``Outdoor air flow per person'' and ``Outdoor air flow per zone floor area'' in the corresponding ``DesignSpecification:OutdoorAir'' object must be greater than zero.
+\begin{enumerate}
+\item ``Carbon Dioxide Control Availability Schedule Name'' input field in the ZoneControl:ContaminantController object must be greater than zero.
+\item CO2 gain from people in the zone must be greater than zero.
+\item ``Outdoor air flow per person'' and ``Outdoor air flow per zone floor area'' in the corresponding ``DesignSpecification:OutdoorAir'' object must be greater than zero.
+\end{enumerate}
 
 \subsection{References}\label{references-018}
 

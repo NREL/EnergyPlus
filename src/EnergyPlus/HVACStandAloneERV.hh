@@ -151,6 +151,7 @@ namespace HVACStandAloneERV {
         Real64 LatHeatingRate;    // rate of latent heating delivered to the zone [W]
         Real64 TotHeatingEnergy;  // total heating energy delivered by the ERV supply air to the zone [J]
         Real64 TotHeatingRate;    // rate of total heating delivered to the zone [W]
+        bool FirstPass;           // detects first time through for resetting sizing data
 
         // Default Constructor
         StandAloneERVData()
@@ -162,7 +163,7 @@ namespace HVACStandAloneERV {
               DesignEAFanMassFlowRate(0.0), AirVolFlowPerFloorArea(0.0), AirVolFlowPerOccupant(0.0), EconomizerOASchedPtr(0), FlowError(true),
               AvailStatus(0), ElecUseRate(0.0), ElecUseEnergy(0.0), SensCoolingEnergy(0.0), SensCoolingRate(0.0), LatCoolingEnergy(0.0),
               LatCoolingRate(0.0), TotCoolingEnergy(0.0), TotCoolingRate(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0), LatHeatingEnergy(0.0),
-              LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0)
+              LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
         {
         }
     };

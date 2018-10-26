@@ -37,7 +37,7 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 \item  The control type: \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly} \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly};
 
-\item  Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
+\item  Thermostat on/off tolerance \emph{T\(_{tol}\)} (\(^{\circ}\)C);
 
 \item  Cycling run time control type: \emph{FixedRunTime}, \emph{Thermostat}, or \emph{ThermostatWithMinimumRunTime};
 
@@ -55,7 +55,7 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 , \emph{AvailStatus = NoAction}.
 
-If the program is in warmup,the start time stop time are reset to the current time.
+If the program is in warmup, the start time stop time are reset to the current time.
 
 Otherwise:
 
@@ -88,29 +88,25 @@ Otherwise:
 
 The input object AvailabilityManager:NightVentilation is a manager that looks at indoor and outdoor conditions to see if night ventilation might be beneficial. In addition to being able to cycle the air system on, this manager can specify what the ventilation air flow rate should be.~ The inputs are:
 
-·~~~~~~~~A manager applicability schedule;
+\begin{itemize}
+\item A manager applicability schedule;
+\item The name of the fan schedule this manager will override;
+\item A ventilation temperature schedule;
+\item A ventilation delta T;
+\item A ventilation low limit temperature;
+\item The night ventilation flow fraction;
+\item The name of the control zone.
+\end{itemize}
 
-·~~~~~~~~The name of the fan schedule this manager will override;
-
-·~~~~~~~~A ventilation temperature schedule;
-
-·~~~~~~~~A ventilation delta T;
-
-·~~~~~~~~A ventilation low limit temperature;
-
-·~~~~~~~~The night ventilation flow fraction;
-
-·~~~~~~~~The name of the control zone.
-
-If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 or if the program is in warmup, \emph{AvailStatus = NoAction}.
+If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) 0 or if the program is in warmup, \emph{AvailStatus = NoAction}.
 
 Otherwise, the manager performs 3 limit checks.
 
-1)~~~~If for all the zones connected to the air loop the room temperature at the thermostat of any zone is greater than the ventilation temperature schedule value, this check is true.
-
-2)~~~~If for all the zones connected to the air loop the room temperature at the thermostat of any zone is less than the ventilation low limit temperature, this check is true.
-
-3)~~~~If the difference between the control zone room temperature at the thermostat and the outside temperature is greater than the specified night venting delta T, this check is true.
+\begin{enumerate}
+\item If for all the zones connected to the air loop the room temperature at the thermostat of any zone is greater than the ventilation temperature schedule value, this check is true.
+\item If for all the zones connected to the air loop the room temperature at the thermostat of any zone is less than the ventilation low limit temperature, this check is true.
+\item If the difference between the control zone room temperature at the thermostat and the outside temperature is greater than the specified night venting delta T, this check is true.
+\end{enumerate}
 
 If 1) and 3) are true and 2) is false, the status is set to \emph{CycleOn}; otherwise the status is \emph{NoAction}.~ If the status is \emph{CycleOn} this manager sets some additional values in the \emph{AirLoopControlInfo} data structure (a flag is set to indicate night ventilation is occurring and a flag is set to indicate that the air system flow rate has been specified by a manager) and in the \emph{~AirLoopFlow} data structure (the system flow fraction is specified). The night ventilation flag indicates to the fan that it should use alternate performance characteristics if they have been specified in a FanPerformance:NightVentilation object.
 
@@ -118,109 +114,129 @@ If 1) and 3) are true and 2) is false, the status is set to \emph{CycleOn}; othe
 
 The input object AvailabilityManager:DifferentialThermostat is a manager that overrides fan or pump schedules depending on the temperature difference between two nodes. A typical use would be for one node to be an outdoor air node and the other a zone node. The inputs are:
 
-·~~~~~~~~name of the hot node;
+\begin{itemize}
+\item name of the hot node;
+\item name of the cold node;
+\item temperature difference for turning the system on (\emph{DeltaT\(_{on}\)});
+\item temperature difference for turning the system off (\emph{DeltaT\(_{off}\)}).
+\end{itemize}
 
-·~~~~~~~~name of the cold node;
+As shown by the following pseudo code, there is no applicability schedule for this manager. Also, this manager always returns a status of \emph{CycleOn} or \emph{ForceOff}, never \emph{NoAction}.
 
-·~~~~~~~~temperature difference for turning the system on (\emph{DeltaT\(_{on}\)});
+\emph{DeltaT} = \emph{T\(_{hot~node}\)} -- \emph{T\(_{cold~node}\)}
 
-·~~~~~~~~temperature difference for turning the system off (\emph{DeltaT\(_{off}\)}).
+If \emph{DeltaT} \textgreater{} = \emph{DeltaT\(_{on}\)} then
 
-Note that there is no applicability schedule for this manager. Also, this manager always returns a status of \emph{CycleOn} or \emph{ForceOff}, never \emph{NoAction}.
+~~~~\emph{AvailStatus = CycleOn}
 
-\emph{DeltaT} = \emph{T\(_{hot\, node}\)} -- \emph{T\(_{cold\, node}\)}
+Else if \emph{DeltaT} \textless{} = \emph{DeltaT\(_{off}\)} then
 
-If \emph{DeltaT} \textgreater{} = \emph{DeltaT\(_{on}\)} ~then
-
-\emph{AvailStatus = CycleOn}
-
-~ ~~~~Else if \emph{DeltaT} \textless{} = \emph{DeltaT\(_{off}\)} ~then
-
-\emph{AvailStatus = ForceOff}
+~~~~\emph{AvailStatus = ForceOff}
 
 Else
 
-\emph{AvailStatus} remains in its previous state.
+~~~~\emph{AvailStatus} remains in its previous state.
+
+End If
 
 \subsection{High Temperature Turn Off}\label{high-temperature-turn-off}
 
 The input object AvailabilityManager:HighTemperatureTurnOff is used to turn off a central air system or a plant loop if a sensed node temperature exceeds a temperature limit. The inputs are:
 
-·~~~~~~~~name of the sensed node;
+\begin{itemize}
+\item name of the sensed node;
+\item limit temperature (\emph{T\(_{u}\)}).
+\end{itemize}
 
-·~~~~~~~~limit temperature (\emph{T\(_{u}\)}).
+In pseudo code:
 
-If \emph{T\(_{sensed\, node}\)} \textgreater{} = \emph{T\(_{u}\)} then
+If \emph{T\(_{sensed~node}\)} \textgreater{} = \emph{T\(_{u}\)} then
 
-\emph{AvailStatus} = \emph{ForceOff}
+~~~~\emph{AvailStatus} = \emph{ForceOff}
 
 Else
 
-\emph{AvailStatus} = \emph{NoAction}
+~~~~\emph{AvailStatus} = \emph{NoAction}
+
+End If
 
 \subsection{High Temperature Turn On}\label{high-temperature-turn-on}
 
 The input object AvailabilityManager:HighTemperatureTurnOn is used to turn on a central air system or a plant loop if a sensed node temperature exceeds a temperature limit. The inputs are:
 
-·~~~~~~~~name of the sensed node;
+\begin{itemize}
+\item name of the sensed node;
+\item limit temperature (\emph{T\(_{u}\)}).
+\end{itemize}
 
-·~~~~~~~~limit temperature (\emph{T\(_{u}\)}).
+In pseudo code:
 
-If \emph{T\(_{sensed\, node}\)} \textgreater{} = \emph{T\(_{u}\)} then
+If \emph{T\(_{sensed~node}\)} \textgreater{} = \emph{T\(_{u}\)} then
 
-\emph{AvailStatus} = \emph{CycleOn}
+~~~~\emph{AvailStatus} = \emph{CycleOn}
 
 Else
 
-\emph{AvailStatus} = \emph{NoAction}
+~~~~\emph{AvailStatus} = \emph{NoAction}
+
+End If
 
 \subsection{Low Temperature Turn Off}\label{low-temperature-turn-off}
 
 The input object AvailabilityManager:LowTemperatureTurnOff is used to turn off a central air system or a plant loop if a sensed node temperature is lower than a temperature limit. The inputs are:
 
-·~~~~~~~~name of the sensed node;
+\begin{itemize}
+\item name of the sensed node;
+\item limit temperature (\emph{T\(_{l}\)});
+\item applicability schedule name.
 
-·~~~~~~~~limit temperature (\emph{T\(_{l}\)});
-
-·~~~~~~~~applicability schedule name.
+\end{itemize}
 
 If the applicability schedule exists and has a current value of \textless{} = 0, the manager returns an availability status of \emph{NoAction}.
 
-Otherwise,
+Otherwise, as shown by the following pseudo code:
 
-If \emph{T\(_{sensed\, node}\)} \textless{} = \emph{T\(_{l}\)}~ then
+If \emph{T\(_{sensed~node}\)} \textless{} = \emph{T\(_{l}\)} then
 
-\emph{AvailStatus} = \emph{ForceOff}
+~~~~\emph{AvailStatus} = \emph{ForceOff}
 
 Else
 
-\emph{AvailStatus} = \emph{NoAction}
+~~~~\emph{AvailStatus} = \emph{NoAction}
+
+End If
 
 \subsection{Low Temperature Turn On}\label{low-temperature-turn-on}
 
 The input object AvailabilityManager:LowTemperatureTurnOn is used to turn on a central air system or a plant loop if a sensed node temperature is less than a temperature limit. The inputs are:
 
-·~~~~~~~~name of the sensed node;
+\begin{itemize}
+\item name of the sensed node;
+\item limit temperature (\emph{T\(_{l}\)}).
+\end{itemize}
 
-·~~~~~~~~limit temperature (\emph{T\(_{l}\)}).
+In pseudo code:
 
 If \emph{T\(_{sensed\, node}\)} \textless{} = \emph{T\(_{l}\)}~ then
 
-\emph{AvailStatus} = \emph{CycleOn}
+~~~~\emph{AvailStatus} = \emph{CycleOn}
 
 Else
 
-\emph{AvailStatus} = \emph{NoAction}
+~~~~\emph{AvailStatus} = \emph{NoAction}
+
+End If
 
 \subsection{Hybrid Ventilation Control}\label{hybrid-ventilation-control}
 
 The input object AvailabilityManager:HybridVentilation serves two purposes: 1) it prevents simultaneous natural ventilation and HVAC system operation, and 2) it allows users to examine various strategies to maximize natural ventilation in order to reduce heating/cooling loads. This availability manager works with either the AirflowNetwork model or the simple airflow objects to provide controlled natural ventilation. The controlled natural ventilation objects referred to here are either AirflowNetwork:Multizone:ComponentDetailedOpening and AirflowNetwork:Multizone:ComponentSimpleOpening objects, or ZoneVentilation and ZoneMixing objects. The simple airflow objects are not allowed to work with the AirflowNetwork objects simultaneously. If there is no air loop, this availability manager can still be applied to controlled zone specified in the object. In order to apply hybrid ventilation manager to the controlled zone not served by any air loop, the HVAC air loop name input field must be left blank. Currently, zone component objects such as unit heater, unit ventilator, packaged terminal air conditioner, packaged terminal heat pump, zone water source heat pump, window air conditioner, variable refrigerant flow, energy recovery ventilator, outdoor air unit, fan coil unit, and ventilated slab can individually use hybrid ventilation managers to make a decision regarding whether their fan should be on or off. Also, hybrid ventilation manager can be applied to zones served by the ideal load zone component to turn them off when natural ventilation is active. Currently, hybrid ventilation manager is restricted to one per zone. It can either be applied through the air loop or directly to the zone. If hybrid ventilation manager is applied to an air loop and one of the zones served by the air loop also has hybrid ventilation manager, then zone hybrid ventilation manager is disabled. This availability manager performs somewhat differently from the other availability managers:
 
-n~This availability manager is called before the program estimates (predicts) the cooling or heating load that needs to be met by the cooling/heating systems for the simulation time step. On the other hand, the other availability managers are called after the system cooling/heating load prediction. The main reason for calling AvailabilityManager:HybridVentilation early is that this manager determines whether natural ventilation is allowed or not, and the loads from natural ventilation are used to predict system loads.
+\begin{itemize}
+\item This availability manager is called before the program estimates (predicts) the cooling or heating load that needs to be met by the cooling/heating systems for the simulation time step. On the other hand, the other availability managers are called after the system cooling/heating load prediction. The main reason for calling AvailabilityManager:HybridVentilation early is that this manager determines whether natural ventilation is allowed or not, and the loads from natural ventilation are used to predict system loads.
+\item This availability manager has its own control schedule and does not work in tandem with \emph{AvailabilityManager:Scheduled}.
+\item AvailabilityManager:HybridVentilation works completely independent of the other system availability managers, so this manager is not a valid system availability manager type in the AvailabilityManagerAssignmentList object.
+\end{itemize}
 
-n~This availability manager has its own control schedule and does not work in tandem with \emph{AvailabilityManager:Scheduled}.
-
-n~AvailabilityManager:HybridVentilation works completely independent of the other system availability managers, so this manager is not a valid system availability manager type in the AvailabilityManagerAssignmentList object.
 
 \subsubsection{Control Logic}\label{control-logic-000}
 
@@ -302,11 +318,13 @@ After the hybrid ventilation control determines whether natural ventilation is a
 
 If \emph{Natural Ventilation} then
 
-\emph{AvailStatus} = \emph{CycleOn}
+~~~~\emph{AvailStatus} = \emph{CycleOn}
 
 Else
 
-\emph{AvailStatus = ForceOn}
+~~~~\emph{AvailStatus = ForceOn}
+
+End If
 
 \subsection{Optimum Start Controls}\label{optimum-start-controls}
 
@@ -342,48 +360,50 @@ Adaptive control is used to modify the temperature gradient depending on the tim
 
 The equations suggested in the ASHRAE Handbook are used in combination with a recursive linear least square method to determine the optimum start/recovery time empirically. Depending on heating or cooling operation the start time is categorized as preheating or precooling time. According to (Seem, Armstrong, \& Hancock, 1989) the preheating time is a strong function of outdoor temperature whereas precooling time is not strong function of outdoor temperature if space temperature is close or less than the setback temperature. Thus, two different equations are suggested for preheating and precooling time.
 
-n~Precooling time
+For precooling time:
 
 \begin{equation}
 {t_i} = {a_0} + {a_1}{T_{z,i}} + {a_2}T_{z,i}^2
 \end{equation}
 
-Preheating time
+For preheating time:
 
 \begin{equation}
 {t_i} = {a_0} + \left( {1 - {w_i}} \right)({a_1}{T_{z,i}} + {a_2}T_{z,i}^2) + {w_i}{a_3}{T_{o,i}}
 \end{equation}
 
-Where, on \emph{i}\(^{th}\) day
+where, on \emph{i}\(^{th}\) day:
 
-\emph{t\(_{i}\)} = start/recovery time,
+\(t_{i}\) is the start/recovery time
 
-\emph{T\(_{z,i}\)} = ~~~~~~~~~ zone temperature
+\(T_{z,i}\) is the zone temperature
 
-\emph{T\(_{o,i}\)} = ~~~~~~~~~~ outdoor temperature
+\(T_{o,i}\) is the outdoor temperature
 
-`\emph{w\(_{i}\)}' is a weighting factor which determines weighting given to outside and zone temperature.
+\(w_{i}\) is a weighting factor which determines weighting given to outside and zone temperature:
 
 \begin{equation}
 {w_i} = {1000^{ - \frac{{\left( {{T_{z,i}} - {T_{unocc}}} \right)}}{{\left( {{T_{occ}} - {T_{unocc}}} \right)}}}}
 \end{equation}
 
-\emph{T\(_{unocc}\)} and \emph{T\(_{occ}\)} are setpoint temperatures during unoccupied (setback) and occupied periods.
+where \(T_{unocc}\) and \(T_{occ}\) are setpoint temperatures during unoccupied (setback) and occupied periods, respectively.
 
 Coefficients \emph{a\(_{0}\), a\(_{1}\), a\(_{2}\)} (and \emph{a\(_{3}\)}) are separately calculated for heating and cooling operation and are updated from the optimum times from last three days thus; these coefficients carry history and adapt the trend from previous days.
 
-The optimum time for past days is determined using,
+The optimum time for past days is determined using:
 
 \begin{equation}
 {t_{opt,\left( {i - 1} \right)}} = {k_{\left( {i - 1} \right)}}\Delta t - \Delta t\left( {1 - \frac{{{q_{\left( {i - 1} \right)}}}}{{{q_{max}}}}} \right)
 \end{equation}
 
-\emph{k} = time steps required for recovery
+where:
 
-Δ\emph{t} = ~~~~~~~~~~~ time-step
+\emph{k} are the time steps required for recovery
 
-\emph{t\(_{opt,(i-1)}\)} = recovery time on (\emph{i}-1)\(^{th}\) day
+\({\Delta t}\) is the time-step
 
-\emph{q\(_{(i-1)}\)} = ~~~~~~~~~ energy extracted or added during last time step
+\(t_{opt,(i-1)}\) is the recovery time on (\emph{i}-1)\(^{th}\) day
 
-\emph{q\(_{max}\)} = ~~~~~~~~ maximum capacity of the equipments 
+\(q_{(i-1)}\) is the energy extracted or added during last time step
+
+\(q_{max}\) is the maximum capacity of the equipments.

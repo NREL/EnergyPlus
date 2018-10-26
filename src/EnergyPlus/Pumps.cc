@@ -300,7 +300,6 @@ namespace Pumps {
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveType;
         using DataHeatBalance::IntGainTypeOf_Pump_Cond;
         using DataHeatBalance::IntGainTypeOf_Pump_ConSpeed;
         using DataHeatBalance::IntGainTypeOf_Pump_VarSpeed;
@@ -454,16 +453,16 @@ namespace Pumps {
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    TempCurveType = GetCurveType(TempCurveIndex);
-                    {
-                        auto const SELECT_CASE_var(TempCurveType);
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "QUARTIC")) {
-                            PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
-                            GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
-                        } else {
-                            ErrorsFound = true;
-                        }
+                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                                                                {1},                     // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                PumpEquip(PumpNum).Name, // Object Name
+                                                                cAlphaFieldNames(6));    // Field Name
+
+                    if (!ErrorsFound) {
+                        PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
+                        GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
                     }
                 }
             }
@@ -643,16 +642,16 @@ namespace Pumps {
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    TempCurveType = GetCurveType(TempCurveIndex);
-                    {
-                        auto const SELECT_CASE_var(TempCurveType);
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "QUARTIC")) {
-                            PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
-                            GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
-                        } else {
-                            ErrorsFound = true;
-                        }
+                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                                                                {1},                     // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                PumpEquip(PumpNum).Name, // Object Name
+                                                                cAlphaFieldNames(6));    // Field Name
+
+                    if (!ErrorsFound) {
+                        PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
+                        GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
                     }
                 }
             }
@@ -1968,7 +1967,6 @@ namespace Pumps {
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToReport;
         using DataPlant::PlantLoop;
-        using DataSizing::AutoSize;
         using DataSizing::PlantSizData;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;

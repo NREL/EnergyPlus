@@ -269,6 +269,10 @@ namespace HVACManager {
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
         using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
+        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHeatBalFanSys::ZoneThermostatSetPointHiAver;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLoAver;
         using DataHeatBalFanSys::ZTAVComf;
         using DataSystemVariables::ReportDuringWarmup; // added for FMI
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
@@ -295,7 +299,7 @@ namespace HVACManager {
         using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
         using ZoneEquipmentManager::CalcAirFlowSimple;
         using ZoneEquipmentManager::UpdateZoneSizing;
-
+        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -348,6 +352,8 @@ namespace HVACManager {
         ZTAVComf = ZTAV;
         ZoneAirHumRatAvgComf = ZoneAirHumRatAvg;
         ZTAV = 0.0;
+        ZoneThermostatSetPointHiAver = 0.0;
+        ZoneThermostatSetPointLoAver = 0.0;
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
         if (Contaminant.CO2Simulation) {
@@ -495,6 +501,10 @@ namespace HVACManager {
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (NumOnOffCtrZone > 0) {
+                    ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
+                    ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
+                }
             }
 
             DetectOscillatingZoneTemp();
@@ -2463,7 +2473,6 @@ namespace HVACManager {
 
             // CR7751  second, calculate using indoor conditions for density property
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRatAvg(ZoneLoop), RoutineName3);
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(ZoneLoop), MAT(ZoneLoop));
             ZnAirRpt(ZoneLoop).InfilVolumeCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).InfilAirChangeRate = ZnAirRpt(ZoneLoop).InfilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
             ZnAirRpt(ZoneLoop).InfilVdotCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
