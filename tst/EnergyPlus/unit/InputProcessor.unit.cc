@@ -3594,6 +3594,30 @@ TEST_F(InputProcessorFixture, FalseDuplicates)
     ASSERT_TRUE(process_idf(idf));
 }
 
+TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
+{
+
+    json root;
+    std::string obj_name = "Material";
+    std::string name1 = "Standard insulation_0.1";
+    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
+    std::string name2 = "Standard insulation_0.01";
+    json mat2 = { {"name", name2}, {"Roughness", "Rough"}};
+
+    EXPECT_TRUE(mat1.is_object());
+
+    // Add the first material to it
+    root[obj_name][name1] = mat1;
+
+    // Second material shouldn't be found!
+    // Oh Oh, this fails
+    auto it = root[obj_name].find(name2);
+    EXPECT_TRUE( it == root[obj_name].end());
+
+    // THis works...
+    EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), name2) == root[obj_name].end());
+}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
