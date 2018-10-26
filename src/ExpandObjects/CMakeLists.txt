@@ -4,7 +4,7 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
-configure_file( VersionResource.rc.in "VersionResource.rc" )
+configure_file( VersionResource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/VersionResource.rc" )
 
 set(SRC epfilter.f90) 
 
@@ -47,7 +47,7 @@ set(SKIP_BUILD_RPATH TRUE)
 if (APPLE OR UNIX)
   add_executable( ExpandObjects ${SRC} )
 else()  # windows
-  add_executable( ExpandObjects ${SRC} VersionResource.rc )
+  add_executable( ExpandObjects ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/VersionResource.rc" )
 endif()
 
 install( TARGETS ExpandObjects DESTINATION "./" )
