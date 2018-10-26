@@ -55,7 +55,7 @@ public:
 
     Real64 TotalCapacity;
     int indexCapFT;
-    int typeCapFT;
+    int numDimsCapFT;
     int indexCapFFF;
     int indexEIRFT;
     int indexEIRFFF;

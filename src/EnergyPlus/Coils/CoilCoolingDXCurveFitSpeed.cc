@@ -33,7 +33,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
     if (input_data.total_cooling_capacity_function_of_temperature_curve_name != "") {
         this->indexCapFT = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_temperature_curve_name);
-        this->typeCapFT = CurveManager::GetCurveTypeNum(this->indexCapFT);
+        this->numDimsCapFT = CurveManager::PerfCurve(this->indexCapFT).NumDims;
     }
     if (input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name != "") {
         this->indexCapFFF = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name);
@@ -56,7 +56,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     :
 
       // model inputs
-      TotalCapacity(0.0), indexCapFT(0), typeCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
+      TotalCapacity(0.0), indexCapFT(0), numDimsCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
       indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
@@ -230,7 +230,7 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
 
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
-            if (typeCapFT == CurveManager::BiQuadratic) {
+            if (numDimsCapFT == 2) {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, inletWetBulb, CondInletTemp);
             } else {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, CondInletTemp);
