@@ -540,6 +540,23 @@ namespace UtilityRoutines {
     bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
     std::string IPTrimSigDigits(int const IntegerValue);
+
+
+
+    // Two structs for case insensitive containers.
+    // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
+    // (The default allocator for unordered_map is fine)
+    // For map, you'd only need the comparator
+    struct case_insensitive_hasher
+    {
+        size_t operator()(const std::string& key) const noexcept;
+    };
+
+    struct case_insensitive_comparator
+    {
+        bool operator()(const std::string& a, const std::string& b) const noexcept;
+    };
+
 } // namespace UtilityRoutines
 
 } // namespace EnergyPlus

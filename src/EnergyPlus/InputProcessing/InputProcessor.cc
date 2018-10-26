@@ -1892,8 +1892,8 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
         std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
-                           EnergyPlus::DataOutputs::case_insensitive_hasher,
-                           EnergyPlus::DataOutputs::case_insensitive_comparator> data;
+                           UtilityRoutines::case_insensitive_hasher,
+                           UtilityRoutines::case_insensitive_comparator> data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));
