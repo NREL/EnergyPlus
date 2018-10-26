@@ -34,6 +34,9 @@ freely, subject to the following restrictions:
 
 /* $Header: /code/doj/alphanum.hpp,v 1.3 2008/01/28 23:06:47 doj Exp $ */
 
+
+// MODIFIED: Julien Marrec, EffiBEM, on 2018-10-26 to avoids "n_001" being recognized as the same as "n_01"
+// https://github.com/NREL/EnergyPlus/issues/6720
 #include <cassert>
 #include <functional>
 #include <string>
@@ -103,6 +106,11 @@ namespace doj {
 						const bool l_digit = alphanum_isdigit( l_char ), r_digit = alphanum_isdigit( r_char );
 						// if both characters are digits, we continue in NUMBER mode
 						if ( l_digit && r_digit ) {
+              // If both are zero, continue forward
+              if ( l_char == '0' && r_char == '0' ) {
+                ++l; ++r;
+                continue;
+              }
 							mode = NUMBER;
 							break;
 						}
