@@ -5549,7 +5549,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     // Variable name without units
     std::string VarName = VariableName;
-    //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -5785,7 +5784,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     // Variable name without units
     std::string VarName = VariableName;
-    //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
