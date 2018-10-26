@@ -3599,56 +3599,56 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
 
     json root;
     std::string obj_name = "Material";
-    std::string name1 = "Standard insulation_0.1";
-    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
-    std::string name2 = "Standard insulation_0.01";
-    json mat2 = { {"name", name2}, {"Roughness", "Rough"}};
-
-    EXPECT_TRUE(mat1.is_object());
-
-    // Add the first material to it
-    root[obj_name][name1] = mat1;
-
-    // Second material shouldn't be found!
-    // Oh Oh, this fails
-    auto it = root[obj_name].find(name2);
-    EXPECT_TRUE( it == root[obj_name].end());
-    if (it != root[obj_name].end()) {
-        EXPECT_TRUE(false) << it.key();
-    }
-
-
-    // THis works...
-    EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), name2) == root[obj_name].end());
-}
-
-TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel_LettersOnly)
-{
-
-    json root;
-    std::string obj_name = "Material";
     std::string name1 = "Standard insulation_01";
     json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
-    std::string name2 = "Standard insulation_001";
-    json mat2 = { {"name", name2}, {"Roughness", "Rough"}};
 
     EXPECT_TRUE(mat1.is_object());
 
     // Add the first material to it
     root[obj_name][name1] = mat1;
 
-    // Second material shouldn't be found!
-    // Oh Oh, this fails
-    auto it = root[obj_name].find(name2);
-    EXPECT_TRUE( it == root[obj_name].end());
-    if (it != root[obj_name].end()) {
-        EXPECT_TRUE(false) << it.key();
-    }
+    auto test = [=](std::string search_name) {
+        // Second material shouldn't be found!
+        // Oh Oh, this fails
+        auto it = root[obj_name].find(search_name);
+        EXPECT_TRUE( it == root[obj_name].end());
+        if (it != root[obj_name].end()) {
+            EXPECT_TRUE(false) << it.key();
+        }
 
-    // THis works...
-    EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), name2) == root[obj_name].end());
+        // THis works...
+        EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), search_name) == root[obj_name].end());
+    };
+
+    // This all works just fine
+    test("Standard insulation");
+    test("Standard insulation_");
+    test("Standard insulation_0");
+    test("Standard insulation_0.");
+    test("Standard insulation_00");
+    test("Standard insulation_00.1");
+    test("Standard insulation_0010");
+
+    // This fails
+    test("Standard insulation_001");
+
 }
 
+TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
+
+    // 1
+    int comp1 = doj::alphanum_comp<std::string>("n_01", "n_0");
+    EXPECT_FALSE(true) << comp1;
+
+    // -9
+    int comp2 = doj::alphanum_comp<std::string>("n_01", "n_0010");
+    EXPECT_FALSE(true) << comp2;
+
+    // 0 = thinks it's equal (sic!)
+    int comp3 = doj::alphanum_comp<std::string>("n_01", "n_001");
+    EXPECT_FALSE(true) << comp3;
+
+}
 
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
