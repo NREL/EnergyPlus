@@ -420,10 +420,8 @@ namespace ReportSizingManager {
         Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
-        std::string DDNameFanPeak;
-        DDNameFanPeak = ""; // " test my Design Day";
-        std::string dateTimeFanPeak;
-        dateTimeFanPeak = ""; // " test 1/2 00:00:00 ";
+        std::string DDNameFanPeak;                 // Name of the design day that produced the Peak
+        std::string dateTimeFanPeak;               // A String representing the DateTime of the Peak
         Real64 DXFlowPerCapMinRatio(1.0);
         Real64 DXFlowPerCapMaxRatio(1.0);
 
@@ -645,6 +643,7 @@ namespace ReportSizingManager {
                                     if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
+                                            // This block of code is entered in Test ReportSizingManager.unit.cc::ReportSizingManager_FanPeak
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
                                             dateTimeFanPeak =
                                                 General::TrimSigDigits(
