@@ -3563,6 +3563,37 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     EXPECT_EQ(1, IOStatus);
 }
 
+// https://github.com/NREL/EnergyPlus/issues/6720
+TEST_F(InputProcessorFixture, FalseDuplicates)
+{
+    std::string const idf(delimited_string({
+        "Material,",
+        "  Standard insulation_0.1,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "  Standard insulation_0.01,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+    }));
+
+
+    ASSERT_TRUE(process_idf(idf));
+}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
