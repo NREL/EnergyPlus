@@ -819,7 +819,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak) {
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
 
-    // Setup the predefined tables, because that's what we'll test.
+    // Setup the predefined tables, because that's where the info is written.
     EnergyPlus::OutputReportPredefined::SetPredefinedTables();
 
     // If you wanted to check SQL, you also need this:
@@ -845,24 +845,13 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak) {
     CallingRoutine = "Size Fan: ";
     DataSizing::DataIsDXCoil = false;
 
-
-    //DataSizing::DataConstantUsedForSizing = 1.0;
-    //DataSizing::DataFractionUsedForSizing = 1.0;
-    //DataSizing::DataTotCapCurveIndex = 0;
-    //DataSizing::DataDesOutletAirTemp = 0.0;
-
     DataSizing::CurZoneEqNum = 1;
     DataSizing::CurOASysNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::FinalZoneSizing.allocate(1);
-    //DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.0;
-    //DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0085;
-    //DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 28.0;
-    //DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.0075;
-    //DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolOAFlowFrac = 0.2;
     DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.30;
     DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-     // Time of peak, should equal to 18:00:00
+    // Time of peak, should equal to 18:00:00
     DataSizing::FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 72;
 
     // Fake a design day
@@ -875,8 +864,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak) {
     DataEnvironment::TotDesDays = 1;
 
     DataSizing::ZoneSizingRunDone = true;
-    //DataEnvironment::StdBaroPress = 101325.0;
-    //Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in RequestSizing
     ZoneEqSizing.allocate(1);
@@ -893,6 +880,4 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak) {
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
     EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanPkTime, CompName));
-
-
 }
