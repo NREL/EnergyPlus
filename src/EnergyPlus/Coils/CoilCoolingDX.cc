@@ -188,7 +188,13 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
 int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
     auto & performance = this->performance;
     if (performance.modes.size() > 1u) {
-        assert(false); // need to implement this
+        // Per IDD note - Operating Mode 1 is always used as the base design operating mode
+        auto &mode = performance.modes[0];
+        if (mode.speeds.size()) {
+            auto &firstSpeed = mode.speeds[0];
+            return firstSpeed.indexCapFT;
+        }
+        return -1;
     } else {
         auto & mode = performance.modes[0];
         if (mode.speeds.size()) {
