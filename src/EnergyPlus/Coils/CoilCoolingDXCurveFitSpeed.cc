@@ -8,6 +8,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
@@ -210,6 +211,8 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
     if (RatedCBF > 0.0) {
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
+        // This is bad - results in CBF = 1.0 which results in divide by zero below: hADP = inletState.h - hDelta / (1.0 - CBF)
+        ShowFatalError(RoutineName + "Rated CBF=" + General::RoundSigDigits(RatedCBF, 6) + " is <= 0.0 for "+object_name + "=" + name);
         A0 = 0.0;
     }
     Real64 ADiff = -A0 / AirMassFlow;
@@ -307,6 +310,7 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
 Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &in)
 {
 
+    static std::string const RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF = 0.0;
 
@@ -321,6 +325,18 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
     out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
 
+        if (out.rh >= 1.0) {
+        Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(out.h, out.p, RoutineName);
+        if (out.tdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+            out.tdb = outletAirTempSat + 0.005;
+            out.w = Psychrometrics::PsyWFnTdbH(out.tdb, out.h, RoutineName);
+            Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(in.tdb, out.w) - out.h) / deltaH;
+            ShowWarningError( RoutineName + object_name + " \"" + name + "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
+            ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->gross_shr, 5));
+            ShowContinueError("Adjusted SHR = " + General::RoundSigDigits(adjustedSHR, 5));
+        }
+    }
+
     // ADP conditions
     Psychrometrics::PsychState adp;
     adp.tdb = Psychrometrics::PsyTdpFnWPb(out.w, out.p);
@@ -331,10 +347,10 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     Real64 errorLast = 100.0;
     Real64 deltaADPTemp = 5.0;
     Real64 tolerance = 1.0; // initial conditions for iteration
-    Real64 ADPHumRat = 0.0;
     Real64 slopeAtConds = 0.0;
     Real64 deltaT = in.tdb - out.tdb;
     Real64 deltaHumRat = in.w - out.w;
+    bool cbfErrors = false;
 
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
 
@@ -344,8 +360,8 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
         if (iter > 0) adp.tdb += deltaADPTemp;
         ++iter;
         //  Find new slope using guessed Tadp
-        ADPHumRat = min(out.w, Psychrometrics::PsyWFnTdpPb(adp.tdb, DataEnvironment::StdPressureSeaLevel));
-        Real64 slope = (in.w - ADPHumRat) / max(0.001, (in.tdb - adp.tdb));
+        adp.w = min(out.w, Psychrometrics::PsyWFnTdpPb(adp.tdb, DataEnvironment::StdPressureSeaLevel));
+        Real64 slope = (in.w - adp.w) / max(0.001, (in.tdb - adp.tdb));
         //  check for convergence (slopes are equal to within error tolerance)
         Real64 error = (slope - slopeAtConds) / slopeAtConds;
         if ((error > 0.0) && (errorLast < 0.0)) {
@@ -360,8 +376,32 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     }
 
     //   Calculate Bypass Factor from Enthalpies
-    Real64 ADPEnthalpy = Psychrometrics::PsyHFnTdbW(adp.tdb, ADPHumRat);
-    calcCBF = min(1.0, (out.h - ADPEnthalpy) / (in.h - ADPEnthalpy));
+    adp.h = Psychrometrics::PsyHFnTdbW(adp.tdb, adp.w);
+    calcCBF = min(1.0, (out.h - adp.h) / (in.h - adp.h));
 
+    if (iter > maxIter) {
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
+        ShowContinueError("The RatedSHR of [" + General::RoundSigDigits(this->gross_shr, 3) +
+                          "], entered by the user or autosized (see *.eio file),");
+        ShowContinueError("may be causing this. The line defined by the coil rated inlet air conditions");
+        ShowContinueError("(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
+        ShowContinueError("the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this");
+        ShowContinueError("intersection may not occur and the coil bypass factor calculation will not converge.");
+        ShowContinueError("If autosizing the SHR, recheck the design supply air humidity ratio and design supply air");
+        ShowContinueError("temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures");
+        ShowContinueError("and humidity ratios specified in these two objects should be the same for each system");
+        ShowContinueError("and the zones that it serves.");
+        ShowContinueErrorTimeStamp("");
+        cbfErrors = true; // Didn't converge within MaxIter iterations
+    }
+    if (calcCBF < 0.0) {
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
+        ShowContinueErrorTimeStamp("");
+        cbfErrors = true; // Negative CBF not valid
+    }
+    // Show fatal error for specific coil that caused a CBF error
+    if (cbfErrors) {
+        ShowFatalError(RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
+    }
     return calcCBF;
 }
