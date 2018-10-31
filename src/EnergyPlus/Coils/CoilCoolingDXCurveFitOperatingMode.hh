@@ -65,11 +65,13 @@ public:
     Real64 OpModePower;
     Real64 OpModeRTF;
 
-    enum ConenserType
+    enum CondenserType
     {
         AIRCOOLED,
         EVAPCOOLED
     };
+    CondenserType condenserType;
+
     Real64 nominalEvaporativePumpPower;
 
     enum CapControlMethod
@@ -78,7 +80,7 @@ public:
         VARIABLE,
         MULTISPEED
     };
-
+    CapControlMethod capControlMethod;
     int nominalSpeedNum;
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;

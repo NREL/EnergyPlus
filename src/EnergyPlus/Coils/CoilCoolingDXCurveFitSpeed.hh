@@ -53,7 +53,6 @@ public:
     CoilCoolingDXCurveFitOperatingMode *parentMode;
     std::string name;
 
-    Real64 TotalCapacity;
     int indexCapFT;
     int numDimsCapFT;
     int indexCapFFF;

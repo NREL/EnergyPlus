@@ -1986,8 +1986,7 @@ namespace UnitarySystems {
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
-                coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                    this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
@@ -4345,7 +4344,15 @@ namespace UnitarySystems {
                             //                    }
 
                             // set variable speed coil flag as necessary
-                            thisSys.m_VarSpeedCoolingCoil = true;
+                            if (thisSys.m_NumOfSpeedCooling > 1) {
+                                if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
+                                    CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                                    thisSys.m_MultiSpeedCoolingCoil = true;
+                                } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
+                                           CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                                    thisSys.m_VarSpeedCoolingCoil = true;
+                                }
+                            }
 
                             if (thisSys.m_HeatCoilExists) {
                                 if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
@@ -5117,7 +5124,7 @@ namespace UnitarySystems {
                     } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
                                thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         thisSys.m_VarSpeedCoolingCoil = true;
-                    }
+                    } // CoilDX_Cooling is set above
 
                     if (SetPointManager::NodeHasSPMCtrlVarType(thisSys.AirOutNode, SetPointManager::iCtrlVarType_Temp))
                         thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;

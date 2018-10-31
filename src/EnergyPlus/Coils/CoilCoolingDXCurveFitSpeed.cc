@@ -57,7 +57,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     :
 
       // model inputs
-      TotalCapacity(0.0), indexCapFT(0), numDimsCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
+      indexCapFT(0), numDimsCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
       indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
