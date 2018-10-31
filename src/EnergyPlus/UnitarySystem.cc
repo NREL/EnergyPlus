@@ -1975,23 +1975,19 @@ namespace UnitarySystems {
                 }
             }
 
-            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
-            //            UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex
-            //            ).NumOfSpeeds;
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = coilCoolingDXs[this->m_CoolingCoilIndex];
             int const magicNominalModeNum = 0;
-            if (this->m_NumOfSpeedCooling != newCoil.performance.modes[magicNominalModeNum].speeds.size()) {
+            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.modes[magicNominalModeNum].speeds.size()) {
                 ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of cooling speeds does not match coil object.");
                 ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
-            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum);
-            EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
-            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
+                // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
+                coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
+                    this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
@@ -2002,6 +1998,10 @@ namespace UnitarySystems {
                     this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
                 }
             }
+
+            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum);
+            EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
+            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
             if (MSHPIndex > 0) {
                 this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;

@@ -87,7 +87,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
       RatedInletWetBulbTemp(19.44),     // 19.44 or 67F
       RatedInletAirHumRat(0.01125),     // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
       RatedOutdoorAirTemp(35.0),        // 35 C or 95F
-      DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
+      DryCoilOutletHumRatioMin(0.00001), // dry coil outlet minimum hum ratio kgH2O/kgdry air
+      mySizeFlag(true)
 
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
@@ -155,7 +156,7 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
     int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
     std::string CompType = this->object_name;
     std::string CompName = this->name;
-    std::string SizingString = "Evaporator Air Flow Rate";
+    std::string SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
@@ -325,13 +326,14 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
     out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
 
-        if (out.rh >= 1.0) {
+    if (out.rh >= 1.0) {
         Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(out.h, out.p, RoutineName);
         if (out.tdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
             out.tdb = outletAirTempSat + 0.005;
             out.w = Psychrometrics::PsyWFnTdbH(out.tdb, out.h, RoutineName);
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(in.tdb, out.w) - out.h) / deltaH;
-            ShowWarningError( RoutineName + object_name + " \"" + name + "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
+            ShowWarningError(RoutineName + object_name + " \"" + name +
+                             "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
             ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->gross_shr, 5));
             ShowContinueError("Adjusted SHR = " + General::RoundSigDigits(adjustedSHR, 5));
         }

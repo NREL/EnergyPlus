@@ -18,6 +18,11 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
 }
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find)
+    :
+
+      crankcaseHeaterCap(0.0), minOutdoorDrybulb(0.0), maxOutdoorDrybulb(0.0), unitStatic(0.0), mySizeFlag(true), modeScheduleIndex(0),
+      evapCondBasinHeatCap(0.0), evapCondBasinHeatSetpoint(0.0), evapCondBasinHeatSchedulIndex(0), powerUse(0.0), RTF(0.0)
+
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -61,9 +66,6 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
 
     if (!found_it) {
         // error
-    } else { // input checking and initialization
-        // this->inputErrorChecking();
-        this->mySizeFlag = true;
     }
 }
 
