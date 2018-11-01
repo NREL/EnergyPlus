@@ -575,13 +575,13 @@ namespace ZoneEquipmentManager {
 
         // Using/Aliasing
         using DataEnvironment::StdBaroPress;
-        using DataHVACGlobals::SmallLoad;
-        using DataHVACGlobals::SmallTempDiff;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHVACGlobals::SmallLoad;
+        using DataHVACGlobals::SmallTempDiff;
         using DataLoopNode::Node;
         using DataZoneEnergyDemands::DeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
@@ -926,8 +926,8 @@ namespace ZoneEquipmentManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::OutputFileInits;
         using DataGlobals::isPulseZoneSizing;
+        using DataGlobals::OutputFileInits;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -2141,21 +2141,21 @@ namespace ZoneEquipmentManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginDay;
         using DataGlobals::DuringDay;
+        using DataGlobals::emsCallFromZoneSizing;
         using DataGlobals::EndDay;
         using DataGlobals::EndZoneSizingCalc;
         using DataGlobals::HourOfDay;
+        using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::OutputFileZoneSizing;
         using DataGlobals::TimeStep;
-        using DataGlobals::emsCallFromZoneSizing;
-        using DataGlobals::isPulseZoneSizing;
-        using DataHVACGlobals::FracTimeStepZone;
-        using DataHVACGlobals::SmallMassFlow;
-        using DataHVACGlobals::SmallTempDiff;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHVACGlobals::FracTimeStepZone;
+        using DataHVACGlobals::SmallMassFlow;
+        using DataHVACGlobals::SmallTempDiff;
         using EMSManager::ManageEMS;
         using General::MovingAvg;
         using General::RoundSigDigits;
@@ -3274,19 +3274,19 @@ namespace ZoneEquipmentManager {
         using DataAirflowNetwork::AirflowNetworkFanActivated;
         using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataGlobals::isPulseZoneSizing;
+        using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
-        using DataHeatBalance::ZoneAirMassFlow;
         using DirectAirManager::SimDirectAir;
         using ElectricBaseboardRadiator::SimElecBaseboard;
         using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
         using FanCoilUnits::SimFanCoilUnit;
+        using HeatRecovery::SimHeatRecovery;
+        using HighTempRadiantSystem::SimHighTempRadiantSystem;
         using HVACStandAloneERV::SimStandAloneERV;
         using HVACUnitarySystem::SimUnitarySystem;
         using HVACVariableRefrigerantFlow::SimulateVRF;
         using HWBaseboardRadiator::SimHWBaseboard;
-        using HeatRecovery::SimHeatRecovery;
-        using HighTempRadiantSystem::SimHighTempRadiantSystem;
         using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
         using LowTempRadiantSystem::SimLowTempRadiantSystem;
         using OutdoorAirUnit::SimOutdoorAirUnit;
@@ -4221,11 +4221,11 @@ namespace ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Needs description, as appropriate.
 
+        using DataHeatBalFanSys::TempControlType;
         using DataHVACGlobals::DualSetPointWithDeadBand;
         using DataHVACGlobals::SingleCoolingSetPoint;
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
-        using DataHeatBalFanSys::TempControlType;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::DeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
@@ -4414,17 +4414,9 @@ namespace ZoneEquipmentManager {
         using DataAirLoop::AirLoopFlow;
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
-        using DataAirSystems::PrimaryAirSystem;
         using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
+        using DataAirSystems::PrimaryAirSystem;
         using DataGlobals::isPulseZoneSizing;
-        using DataHVACGlobals::AirLoopsSimOnce;
-        using DataHVACGlobals::NumPrimaryAirSys;
-        using DataHVACGlobals::SmallMassFlow;
-        using DataHVACGlobals::ZoneMassBalanceHVACReSim;
-        using DataHeatBalFanSys::MixingMassFlowZone;
-        using DataHeatBalFanSys::ZoneInfiltrationFlag;
-        using DataHeatBalFanSys::ZoneMassBalanceFlag;
-        using DataHeatBalFanSys::ZoneReOrder;
         using DataHeatBalance::AddInfiltrationFlow;
         using DataHeatBalance::AdjustInfiltrationFlow;
         using DataHeatBalance::AllZones;
@@ -4433,6 +4425,14 @@ namespace ZoneEquipmentManager {
         using DataHeatBalance::NoInfiltrationFlow;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirMassFlow;
+        using DataHeatBalFanSys::MixingMassFlowZone;
+        using DataHeatBalFanSys::ZoneInfiltrationFlag;
+        using DataHeatBalFanSys::ZoneMassBalanceFlag;
+        using DataHeatBalFanSys::ZoneReOrder;
+        using DataHVACGlobals::AirLoopsSimOnce;
+        using DataHVACGlobals::NumPrimaryAirSys;
+        using DataHVACGlobals::SmallMassFlow;
+        using DataHVACGlobals::ZoneMassBalanceHVACReSim;
         using ScheduleManager::GetCurrentScheduleValue;
 
         int const IterMax(25);
@@ -4457,6 +4457,7 @@ namespace ZoneEquipmentManager {
         Real64 BuildingZoneMixingFlowOld;
         Real64 BuildingZoneMixingFlow;
         Real64 StdTotalReturnMassFlow;
+        Real64 ExcessZoneExhaustMassFlow;
         int Iteration;
         int ZoneNum1;
 
@@ -4464,6 +4465,7 @@ namespace ZoneEquipmentManager {
         Iteration = 0;
         BuildingZoneMixingFlow = 0.0;
         BuildingZoneMixingFlowOld = 0.0;
+        ExcessZoneExhaustMassFlow = 0.0;
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
         for (int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit) {
@@ -4555,6 +4557,19 @@ namespace ZoneEquipmentManager {
                                                                  MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
                     CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+                } else {
+                    int NumRetNodes = ZoneEquipConfig(ZoneNum).NumReturnNodes;
+                    Real64 OAInletReliefDiff = 0.0;
+                    for (int NodeNumHere = 1; NodeNumHere <= NumRetNodes; ++NodeNumHere) {
+                        int RetAirLoopIndex = ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(NodeNumHere);
+                        if (RetAirLoopIndex > 0 && ZoneEquipConfig(ZoneNum).ZoneExh > 0.0) {
+                            if (AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker < 0.0) {
+                                OAInletReliefDiff -= AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker;
+                                ExcessZoneExhaustMassFlow = min(OAInletReliefDiff, ZoneEquipConfig(ZoneNum).ZoneExh);
+                                AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker += ExcessZoneExhaustMassFlow;
+                            }
+                        }
+                    }
                 }
 
                 ZoneNode = ZoneEquipConfig(ZoneNum).ZoneNode;
@@ -4570,7 +4585,7 @@ namespace ZoneEquipmentManager {
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
-                        StdTotalReturnMassFlow = 0.0;
+                        StdTotalReturnMassFlow = ExcessZoneExhaustMassFlow;
                     } else {
                         ZoneEquipConfig(ZoneNum).ExcessZoneExh = 0.0;
                     }
@@ -4578,7 +4593,6 @@ namespace ZoneEquipmentManager {
                     ZoneEquipConfig(ZoneNum).ExcessZoneExh = 0.0;
                     StdTotalReturnMassFlow = max(0.0, StdTotalReturnMassFlow);
                 }
-
                 Real64 FinalTotalReturnMassFlow = 0;
                 CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
 
@@ -4887,12 +4901,12 @@ namespace ZoneEquipmentManager {
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using DataEnvironment::OutBaroPress;
-        using DataHVACGlobals::RetTempMax;
-        using DataHVACGlobals::RetTempMin;
-        using DataHeatBalFanSys::SysDepZoneLoads;
-        using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::SysDepZoneLoads;
+        using DataHeatBalFanSys::ZoneLatentGain;
+        using DataHVACGlobals::RetTempMax;
+        using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
         using DataRoomAirModel::AirPatternZoneInfo;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
@@ -5205,10 +5219,10 @@ namespace ZoneEquipmentManager {
         using DataGlobals::HourOfDay;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::SecInHour;
+        using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
         using DataHVACGlobals::TimeStepSys;
-        using DataHeatBalance::Ventilation;
         using DataRoomAirModel::ZTJET;
         using DataZoneEquipment::ZHumRat;
         using DataZoneEquipment::ZMAT;
@@ -6230,10 +6244,10 @@ namespace ZoneEquipmentManager {
         //
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MixingMassFlowZone;
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::TotMixing;
+        using DataHeatBalFanSys::MixingMassFlowZone;
         using DataZoneEquipment::ZoneEquipConfig;
 
         // Enforce explicit typing of all variables in this routine
@@ -6293,11 +6307,11 @@ namespace ZoneEquipmentManager {
         //
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MixingMassFlowZone;
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::TotMixing;
         using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::MixingMassFlowZone;
         using DataZoneEquipment::ZoneEquipConfig;
 
         // Enforce explicit typing of all variables in this routine

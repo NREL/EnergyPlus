@@ -558,6 +558,9 @@ namespace MixedAir {
         using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using HeatRecovery::SimHeatRecovery;
+        using Humidifiers::SimHumidifier;
         using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
@@ -566,9 +569,6 @@ namespace MixedAir {
         using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
         using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
         using HVACUnitarySystem::SimUnitarySystem;
-        using HeatRecovery::SimHeatRecovery;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using Humidifiers::SimHumidifier;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -3491,7 +3491,9 @@ namespace MixedAir {
 
         // Do not allow OA to be below Exh for controller:outside air
         if (this->ControllerType_Num == ControllerOutsideAir) {
-            this->OAMassFlow = max(this->ExhMassFlow, this->OAMassFlow);
+            if (this->ExhMassFlow > this->OAMassFlow) {
+                this->OAMassFlow = max(this->ExhMassFlow, this->OAMassFlow);
+            }
         }
 
         // if fixed minimum, don't let go below min OA
@@ -3536,6 +3538,10 @@ namespace MixedAir {
         // Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
         this->OAMassFlow = min(this->OAMassFlow, this->MixMassFlow);
 
+        // Set the relief air flow rate (must be done last to account for changes in OAMassFlow
+        this->RelMassFlow = max(this->OAMassFlow - this->ExhMassFlow, 0.0);
+        this->ExcessExhaust = min(this->OAMassFlow - this->ExhMassFlow, 0.0);
+
         // save the min outside air flow fraction and max outside air mass flow rate
         if (AirLoopNum > 0) {
             auto &curAirLoopControlInfo(AirLoopControlInfo(AirLoopNum));
@@ -3543,6 +3549,10 @@ namespace MixedAir {
 
             curAirLoopFlow.OAMinFrac = OutAirMinFrac;
             curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            curAirLoopFlow.OAInletMassFlow = this->OAMassFlow;
+            if (FirstHVACIteration) curAirLoopFlow.OAExcessExhaustMassFlow = 0.0;
+            if (this->ExcessExhaust < (-SmallMassFlow * 0.1)) curAirLoopFlow.OAExcessExhaustMassFlow = this->ExcessExhaust;
+            curAirLoopFlow.OAExhaustMassFlowTracker = curAirLoopFlow.OAExcessExhaustMassFlow;
             if (this->MixMassFlow > 0.0) {
                 curAirLoopFlow.OAFrac = this->OAMassFlow / this->MixMassFlow;
             } else {
@@ -3581,10 +3591,6 @@ namespace MixedAir {
             }
 
         } // if (AirLoopNum > 0)
-
-        // Set the relief air flow rate (must be done last to account for changes in OAMassFlow
-        this->RelMassFlow = max(this->OAMassFlow - this->ExhMassFlow, 0.0);
-        this->ExcessExhaust = min(this->OAMassFlow - this->ExhMassFlow, 0.0);
 
         // Save OA fraction for reporting
         if (this->MixMassFlow > 0) {
@@ -4565,7 +4571,6 @@ namespace MixedAir {
 
         // Define a recirculation mass flow rate
         RecircMassFlowRate = OAMixer(OAMixerNum).RetMassFlowRate - OAMixer(OAMixerNum).RelMassFlowRate;
-        if (OAMixer(OAMixerNum).OAControllerIndex > 0) RecircMassFlowRate -= OAController(OAMixer(OAMixerNum).OAControllerIndex).ExcessExhaust;
         // In certain low flow conditions the return air mass flow rate can be below the outside air value established
         //  by the user.  This check will ensure that this condition does not result in unphysical air properties.
         if (RecircMassFlowRate < 0.0) {

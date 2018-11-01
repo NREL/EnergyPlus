@@ -220,30 +220,34 @@ namespace DataAirLoop {
     struct AirLoopFlowData // Derived type for air loop flow information
     {
         // Members
-        Real64 DesSupply;             // design supply air mass flow rate for loop [kg/s]
-        Real64 DesReturnFrac;         // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
-        Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
-        Real64 ReqSupplyFrac;         // required flow (as a fraction of DesSupply) set by a manager
-        Real64 MinOutAir;             // minimum outside air mass flow rate [kg/s]
-        Real64 MaxOutAir;             // maximum outside air mass flow rate [kg/s]
-        Real64 OAMinFrac;             // minimum outside air flow fraction this time step
-        Real64 Previous;              // Previous mass air flow rate for this loop [kg/s]
-        Real64 SupFlow;               // supply air flow rate (includes LeakFlow) [kg/s]
-        Real64 ZoneRetFlow;           // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
-        Real64 ZoneRetFlowRatio;      // ratio for adjusting zone return flows for excess zone exhaust
-        Real64 SysRetFlow;            // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
-        Real64 RecircFlow;            // sum of zone plenum recirculated flows [kg/s]
-        Real64 LeakFlow;              // sum of air distribution leak flows to return plenum [kg/s]
-        Real64 ExcessZoneExhFlow;     // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
-        Real64 FanPLR;                // Operating PLR of air loop fan
-        Real64 OAFrac;                // fraction of outside air to mixed air mass flow rate
-        bool FlowError;               // error flag for flow error message
+        Real64 DesSupply;                // design supply air mass flow rate for loop [kg/s]
+        Real64 DesReturnFrac;            // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
+        Real64 SysToZoneDesFlowRatio;    // System design flow divided by the sum of the zone design flows
+        Real64 ReqSupplyFrac;            // required flow (as a fraction of DesSupply) set by a manager
+        Real64 MinOutAir;                // minimum outside air mass flow rate [kg/s]
+        Real64 MaxOutAir;                // maximum outside air mass flow rate [kg/s]
+        Real64 OAMinFrac;                // minimum outside air flow fraction this time step
+        Real64 Previous;                 // Previous mass air flow rate for this loop [kg/s]
+        Real64 SupFlow;                  // supply air flow rate (includes LeakFlow) [kg/s]
+        Real64 ZoneRetFlow;              // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
+        Real64 ZoneRetFlowRatio;         // ratio for adjusting zone return flows for excess zone exhaust
+        Real64 SysRetFlow;               // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
+        Real64 RecircFlow;               // sum of zone plenum recirculated flows [kg/s]
+        Real64 LeakFlow;                 // sum of air distribution leak flows to return plenum [kg/s]
+        Real64 ExcessZoneExhFlow;        // excess zone exhaust flows made up by reduced return flow in other zones on same airloop [kg/s]
+        Real64 FanPLR;                   // Operating PLR of air loop fan
+        Real64 OAFrac;                   // fraction of outside air to mixed air mass flow rate
+        bool FlowError;                  // error flag for flow error message
+        Real64 OAInletMassFlow;          // air loop actual OA inlet mass flow rate [kg/s]
+        Real64 OAExcessExhaustMassFlow;  // air loop excess exhaust mass flow rate NOT accounted for by OA inlet mass flow [kg/s]
+        Real64 OAExhaustMassFlowTracker; // decrements OAExcessExhaustMassFlow each time alloacted to return node [kg/s]
 
         // Default Constructor
         AirLoopFlowData()
             : DesSupply(0.0), DesReturnFrac(1.0), SysToZoneDesFlowRatio(0.0), ReqSupplyFrac(1.0), MinOutAir(0.0), MaxOutAir(0.0), OAMinFrac(0.0),
               Previous(0.0), SupFlow(0.0), ZoneRetFlow(0.0), ZoneRetFlowRatio(1.0), SysRetFlow(0.0), RecircFlow(0.0), LeakFlow(0.0),
-              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), FlowError(false)
+              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), FlowError(false), OAInletMassFlow(0.0), OAExcessExhaustMassFlow(0.0),
+              OAExhaustMassFlowTracker(0.0)
         {
         }
     };

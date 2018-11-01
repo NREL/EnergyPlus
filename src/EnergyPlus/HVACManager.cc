@@ -139,9 +139,16 @@ namespace HVACManager {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DuringDay;
+    using DataGlobals::emsCallFromAfterHVACManagers;
+    using DataGlobals::emsCallFromBeforeHVACManagers;
+    using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
+    using DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
+    using DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
+    using DataGlobals::emsCallFromHVACIterationLoop;
     using DataGlobals::EndHourFlag;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::HourOfDay;
+    using DataGlobals::HVACTSReporting;
+    using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
@@ -155,26 +162,19 @@ namespace HVACManager {
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataGlobals::ZoneSizingCalc;
-    using DataGlobals::emsCallFromAfterHVACManagers;
-    using DataGlobals::emsCallFromBeforeHVACManagers;
-    using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
-    using DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
-    using DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
-    using DataGlobals::emsCallFromHVACIterationLoop;
-    using DataGlobals::isPulseZoneSizing;
     using namespace DataEnvironment;
 
-    using DataHeatBalFanSys::MAT;
-    using DataHeatBalFanSys::ZT;
-    using DataHeatBalFanSys::ZTAV;
-    using DataHeatBalFanSys::ZoneAirHumRat;
-    using DataHeatBalFanSys::ZoneAirHumRatAvg;
     using DataHeatBalFanSys::iCorrectStep;
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
     using DataHeatBalFanSys::iPushSystemTimestepHistories;
     using DataHeatBalFanSys::iPushZoneTimestepHistories;
     using DataHeatBalFanSys::iRevertZoneTimestepHistories;
+    using DataHeatBalFanSys::MAT;
+    using DataHeatBalFanSys::ZoneAirHumRat;
+    using DataHeatBalFanSys::ZoneAirHumRatAvg;
+    using DataHeatBalFanSys::ZT;
+    using DataHeatBalFanSys::ZTAV;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using namespace DataAirLoop;
@@ -268,8 +268,8 @@ namespace HVACManager {
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
-        using DataHeatBalFanSys::ZTAVComf;
         using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
+        using DataHeatBalFanSys::ZTAVComf;
         using DataSystemVariables::ReportDuringWarmup; // added for FMI
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using DemandManager::ManageDemand;
@@ -669,11 +669,11 @@ namespace HVACManager {
         using DataPlant::PlantLoop;
         using DataPlant::PlantManageHalfLoopCalls;
         using DataPlant::PlantManageSubIterations;
-        using DataPlant::SupplySide;
-        using DataPlant::TotNumLoops;
         using DataPlant::square_sum_ConvergenceHistoryARR;
         using DataPlant::sum_ConvergenceHistoryARR;
         using DataPlant::sum_square_ConvergenceHistoryARR;
+        using DataPlant::SupplySide;
+        using DataPlant::TotNumLoops;
         using EMSManager::ManageEMS;
         using General::CreateSysTimeIntervalString;
         using General::RoundSigDigits;
@@ -1967,6 +1967,9 @@ namespace HVACManager {
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
+                    // adjust supply outlet mass flow rate set point by amount of zone exhaust air not accounted for by air loop outdoor air
+                    if (Node(SupplyNode).MassFlowRateSetPoint != Node(SupplyNode).MassFlowRate)
+                        Node(SupplyNode).MassFlowRateSetPoint += AirLoopFlow(AirLoopIndex).OAExhaustMassFlowTracker;
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) > HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
@@ -2295,12 +2298,6 @@ namespace HVACManager {
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::SecInHour;
-        using DataHVACGlobals::CycleOn;
-        using DataHVACGlobals::CycleOnZoneFansOnly;
-        using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
-        using DataHeatBalFanSys::MCPV;
-        using DataHeatBalFanSys::MDotCPOA;
-        using DataHeatBalFanSys::MDotOA;
         using DataHeatBalance::AirBalanceQuadrature;
         using DataHeatBalance::CrossMixing;
         using DataHeatBalance::Mixing;
@@ -2314,6 +2311,12 @@ namespace HVACManager {
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirBalance;
+        using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
+        using DataHeatBalFanSys::MCPV;
+        using DataHeatBalFanSys::MDotCPOA;
+        using DataHeatBalFanSys::MDotOA;
+        using DataHVACGlobals::CycleOn;
+        using DataHVACGlobals::CycleOnZoneFansOnly;
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -2755,10 +2758,10 @@ namespace HVACManager {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
         using DataHeatBalance::Lights;
         using DataHeatBalance::TotLights;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::NumPrimaryAirSys;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;

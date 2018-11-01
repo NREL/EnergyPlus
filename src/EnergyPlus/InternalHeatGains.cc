@@ -4881,9 +4881,9 @@ namespace InternalHeatGains {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
+        using DataHeatBalance::Zone;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
-        using DataHeatBalance::Zone;
         using DataLoopNode::Node;
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
@@ -4917,7 +4917,7 @@ namespace InternalHeatGains {
         Real64 OperSchedFrac;                             // Operating schedule fraction
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
-        Real64 TSupply;                                   // Supply air temperature [C]
+        Real64 TSupply(0.0);                              // Supply air temperature [C]
         Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
@@ -5114,7 +5114,7 @@ namespace InternalHeatGains {
                 TAirOut = TAirIn;
             }
 
-            if (abs(TAirOut - TSupply) < SmallTempDiff) {
+            if ((SupplyNodeNum != 0) && abs(TAirOut - TSupply) < SmallTempDiff) {
                 TAirOut = TSupply;
             }
 
@@ -6427,8 +6427,8 @@ namespace InternalHeatGains {
         // Using/Aliasing
         using namespace DataHeatBalance;
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::isPulseZoneSizing;
+        using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using OutputReportTabular::equipInstantSeq;
         using OutputReportTabular::equipLatentSeq;
