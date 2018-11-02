@@ -43,6 +43,8 @@ private: // Friends
 
 	template< typename > friend class Vector2;
 
+	using ElemPtr = T Vector2< T >::* const;
+
 public: // Types
 
 	typedef  TypeTraits< T >  Traits;
@@ -485,7 +487,7 @@ public: // Subscript
 	operator []( size_type const i ) const
 	{
 		assert( i <= 1 );
-		return ( i == 0 ? x : y );
+		return this->*vec_[ i ];
 	}
 
 	// Vector2[ i ]: 0-Based Index
@@ -493,7 +495,7 @@ public: // Subscript
 	operator []( size_type const i )
 	{
 		assert( i <= 1 );
-		return ( i == 0 ? x : y );
+		return this->*vec_[ i ];
 	}
 
 	// Vector2( i ) const: 1-Based Index
@@ -501,7 +503,7 @@ public: // Subscript
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 2 ) );
-		return ( i == 1 ? x : y );
+		return this->*vec_[ i - 1 ];
 	}
 
 	// Vector2( i ): 1-Based Index
@@ -509,7 +511,7 @@ public: // Subscript
 	operator ()( size_type const i )
 	{
 		assert( ( 1 <= i ) && ( i <= 2 ) );
-		return ( i == 1 ? x : y );
+		return this->*vec_[ i - 1 ];
 	}
 
 public: // Properties: Predicates
@@ -982,11 +984,22 @@ public: // Static Methods
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
 	}
 
+private: // Static Data
+
+	static ElemPtr const vec_[ 2 ]; // Array accessor2
+
 public: // Data
 
 	T x, y; // Elements
 
 }; // Vector2
+
+// Static Data Member Definitions
+template< typename T >
+typename Vector2< T >::ElemPtr const Vector2< T >::vec_[ 2 ] = {
+ &Vector2< T >::x,
+ &Vector2< T >::y
+};
 
 // Length
 template< typename T >

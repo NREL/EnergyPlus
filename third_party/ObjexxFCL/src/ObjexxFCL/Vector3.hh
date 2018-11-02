@@ -43,6 +43,8 @@ private: // Friends
 
 	template< typename > friend class Vector3;
 
+	using ElemPtr = T Vector3< T >::* const;
+
 public: // Types
 
 	typedef  TypeTraits< T >  Traits;
@@ -533,7 +535,7 @@ public: // Subscript
 	operator []( size_type const i ) const
 	{
 		assert( i <= 2 );
-		return ( i == 0 ? x : ( i == 1 ? y : z ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector3[ i ]: 0-Based Index
@@ -541,7 +543,7 @@ public: // Subscript
 	operator []( size_type const i )
 	{
 		assert( i <= 2 );
-		return ( i == 0 ? x : ( i == 1 ? y : z ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector3( i ) const: 1-Based Index
@@ -549,7 +551,7 @@ public: // Subscript
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 3 ) );
-		return ( i == 1 ? x : ( i == 2 ? y : z ) );
+		return this->*vec_[ i - 1 ];
 	}
 
 	// Vector3( i ): 1-Based Index
@@ -557,7 +559,7 @@ public: // Subscript
 	operator ()( size_type const i )
 	{
 		assert( ( 1 <= i ) && ( i <= 3 ) );
-		return ( i == 1 ? x : ( i == 2 ? y : z ) );
+		return this->*vec_[ i - 1 ];
 	}
 
 public: // Properties: Predicates
@@ -1105,12 +1107,23 @@ public: // Static Methods
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
 	}
 
+private: // Static Data
+
+	static ElemPtr const vec_[ 3 ]; // Array accessor
+
 public: // Data
 
 	T x, y, z; // Elements
 
 }; // Vector3
 
+// Static Data Member Definitions
+template< typename T >
+typename Vector3< T >::ElemPtr const Vector3< T >::vec_[ 3 ] = {
+ &Vector3< T >::x,
+ &Vector3< T >::y,
+ &Vector3< T >::z
+};
 // Length
 template< typename T >
 inline

@@ -43,6 +43,8 @@ private: // Friends
 
 	template< typename > friend class Vector4;
 
+	using ElemPtr = T Vector4< T >::* const;
+
 public: // Types
 
 	typedef  TypeTraits< T >  Traits;
@@ -581,7 +583,7 @@ public: // Subscript
 	operator []( size_type const i ) const
 	{
 		assert( i <= 3 );
-		return ( i < 2 ? ( i == 0 ? x : y ) : ( i == 2 ? z : w ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector4[ i ]: 0-Based Index
@@ -589,7 +591,7 @@ public: // Subscript
 	operator []( size_type const i )
 	{
 		assert( i <= 3 );
-		return ( i < 2 ? ( i == 0 ? x : y ) : ( i == 2 ? z : w ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector4( i ) const: 1-Based Index
@@ -597,7 +599,7 @@ public: // Subscript
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 4 ) );
-		return ( i <= 2 ? ( i == 1 ? x : y ) : ( i == 3 ? z : w ) );
+		return this->*vec_[ i - 1 ];
 	}
 
 	// Vector4( i ): 1-Based Index
@@ -605,7 +607,7 @@ public: // Subscript
 	operator ()( size_type const i )
 	{
 		assert( ( 1 <= i ) && ( i <= 4 ) );
-		return ( i <= 2 ? ( i == 1 ? x : y ) : ( i == 3 ? z : w ) );
+		return this->*vec_[ i - 1 ];
 	}
 
 public: // Properties: Predicates
@@ -1200,11 +1202,24 @@ public: // Static Methods
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
 	}
 
+private: // Static Data
+
+	static ElemPtr const vec_[ 4 ]; // Array accessor
+
 public: // Data
 
 	T x, y, z, w; // Elements
 
 }; // Vector4
+
+// Static Data Member Definitions
+template< typename T >
+typename Vector4< T >::ElemPtr const Vector4< T >::vec_[ 4 ] = {
+ &Vector4< T >::x,
+ &Vector4< T >::y,
+ &Vector4< T >::z,
+ &Vector4< T >::w
+};
 
 // Length
 template< typename T >
