@@ -445,12 +445,17 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name; // Name of standard conditions component
-        Real64 StandardT; // Standard temperature for crack data
-        Real64 StandardP; // Standard barometric pressure for crack data
-        Real64 StandardW; // Standard humidity ratio for crack data
+        Real64 temperature;   // Standard temperature for crack data
+        Real64 pressure;      // Standard barometric pressure for crack data
+        Real64 humidityRatio; // Standard humidity ratio for crack data
 
-        // Default Constructor
-        ReferenceConditions() : StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
+            : Name(name), temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
+        {
+        }
+
+        ReferenceConditions(Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
+            : temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
         {
         }
     };
