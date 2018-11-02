@@ -4457,7 +4457,6 @@ namespace ZoneEquipmentManager {
         Real64 BuildingZoneMixingFlowOld;
         Real64 BuildingZoneMixingFlow;
         Real64 StdTotalReturnMassFlow;
-        Real64 ExcessZoneExhaustMassFlow;
         int Iteration;
         int ZoneNum1;
 
@@ -4465,7 +4464,6 @@ namespace ZoneEquipmentManager {
         Iteration = 0;
         BuildingZoneMixingFlow = 0.0;
         BuildingZoneMixingFlowOld = 0.0;
-        ExcessZoneExhaustMassFlow = 0.0;
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
         for (int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit) {
@@ -4557,19 +4555,6 @@ namespace ZoneEquipmentManager {
                                                                  MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
                     CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
-                } else {
-                    int NumRetNodes = ZoneEquipConfig(ZoneNum).NumReturnNodes;
-                    Real64 OAInletReliefDiff = 0.0;
-                    for (int NodeNumHere = 1; NodeNumHere <= NumRetNodes; ++NodeNumHere) {
-                        int RetAirLoopIndex = ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(NodeNumHere);
-                        if (RetAirLoopIndex > 0 && ZoneEquipConfig(ZoneNum).ZoneExh > 0.0) {
-                            if (AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker < 0.0) {
-                                OAInletReliefDiff -= AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker;
-                                ExcessZoneExhaustMassFlow = min(OAInletReliefDiff, ZoneEquipConfig(ZoneNum).ZoneExh);
-                                AirLoopFlow(RetAirLoopIndex).OAExhaustMassFlowTracker += ExcessZoneExhaustMassFlow;
-                            }
-                        }
-                    }
                 }
 
                 ZoneNode = ZoneEquipConfig(ZoneNum).ZoneNode;
@@ -4585,7 +4570,7 @@ namespace ZoneEquipmentManager {
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
-                        StdTotalReturnMassFlow = ExcessZoneExhaustMassFlow;
+                        StdTotalReturnMassFlow = 0.0;
                     } else {
                         ZoneEquipConfig(ZoneNum).ExcessZoneExh = 0.0;
                     }

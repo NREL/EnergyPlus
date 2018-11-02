@@ -5114,7 +5114,7 @@ namespace InternalHeatGains {
                 TAirOut = TAirIn;
             }
 
-            if ((SupplyNodeNum != 0) && abs(TAirOut - TSupply) < SmallTempDiff) {
+            if (SupplyNodeNum != 0 && abs(TAirOut - TSupply) < SmallTempDiff) {
                 TAirOut = TSupply;
             }
 

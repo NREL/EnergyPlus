@@ -275,7 +275,6 @@ namespace MixedAir {
         bool CoolCoilFreezeCheck;          // if true, cooling coil freezing is prevented by recalculating the amount of OA
         bool EconoActive;                  // if true economizer is active
         bool HighHumCtrlActive;            // if true high humidity control is active
-        Real64 ExcessExhaust;              // saves excess exhaust when total zone exhaust exceeds amount of outdoor air
 
         // Default Constructor
         OAControllerProps()
@@ -288,7 +287,7 @@ namespace MixedAir {
               MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0),
               HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
               EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
-              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false), ExcessExhaust(0.0)
+              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false)
         {
         }
 
@@ -388,14 +387,13 @@ namespace MixedAir {
         Real64 RetEnthalpy;
         Real64 RetPressure;
         Real64 RetMassFlowRate;
-        int OAControllerIndex;
 
         // Default Constructor
         OAMixerProps()
             : MixerIndex(0), MixNode(0), InletNode(0), RelNode(0), RetNode(0), MixTemp(0.0), MixHumRat(0.0), MixEnthalpy(0.0), MixPressure(0.0),
               MixMassFlowRate(0.0), OATemp(0.0), OAHumRat(0.0), OAEnthalpy(0.0), OAPressure(0.0), OAMassFlowRate(0.0), RelTemp(0.0), RelHumRat(0.0),
               RelEnthalpy(0.0), RelPressure(0.0), RelMassFlowRate(0.0), RetTemp(0.0), RetHumRat(0.0), RetEnthalpy(0.0), RetPressure(0.0),
-              RetMassFlowRate(0.0), OAControllerIndex(0)
+              RetMassFlowRate(0.0)
         {
         }
     };

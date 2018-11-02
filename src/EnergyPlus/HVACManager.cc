@@ -1967,9 +1967,6 @@ namespace HVACManager {
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
-                    // adjust supply outlet mass flow rate set point by amount of zone exhaust air not accounted for by air loop outdoor air
-                    if (Node(SupplyNode).MassFlowRateSetPoint != Node(SupplyNode).MassFlowRate)
-                        Node(SupplyNode).MassFlowRateSetPoint += AirLoopFlow(AirLoopIndex).OAExhaustMassFlowTracker;
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) > HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
