@@ -1,8 +1,8 @@
 
 1 RT_MANIFEST "${CMAKE_CURRENT_SOURCE_DIR}/ExpandObjects.exe.manifest"
 1 VERSIONINFO
-FILEVERSION ${CMAKE_VERSION_MAJOR},${CMAKE_VERSION_MINOR},${CMAKE_VERSION_PATCH}
-PRODUCTVERSION ${CMAKE_VERSION_MAJOR},${CMAKE_VERSION_MINOR},${CMAKE_VERSION_PATCH}
+FILEVERSION 9,0,1
+PRODUCTVERSION 9,0,1
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -16,7 +16,7 @@ BEGIN
             VALUE "LegalTrademarks",  "INSERT TRADEMARK HERE\0"
             VALUE "OriginalFilename", "ExpandObjects.exe\0"
             VALUE "ProductName",      "ExpandObjects\0"
-            VALUE "ProductVersion",   "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}\0"
+            VALUE "ProductVersion",   "9,0,1\0"
         END
     END
     BLOCK "VarFileInfo"
