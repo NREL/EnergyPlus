@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, AdvancedAFNTest_Test1)
 
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 21.2;
     PerfCurve(CurveNum).Coeff2 = 0.09;
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, AdvancedAFNTest_Test1)
 
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 18.8;
     PerfCurve(CurveNum).Coeff2 = 0.33;

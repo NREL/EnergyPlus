@@ -26,10 +26,11 @@ where total illuminance will be calculated as a superposition of these three par
 For any case, illuminace at a window element can be calculated by using the following general approach:
 
 \begin{equation}
-dE{W_{at_window}} = Lu{m_{el}}({\theta_{el}},{\phi_{el}}) \cdot cos({\beta_{el}}) \cdot \cos ({\phi_{el}}) \cdot d{\theta_{el}} \cdot d{\phi_{el}}
+dE{W_{at\_window}} = Lu{m_{el}}({\theta_{el}},{\phi_{el}}) \cdot cos({\beta_{el}}) \cdot \cos ({\phi_{el}}) \cdot d{\theta_{el}} \cdot d{\phi_{el}}
+\label{eq:IlluminanceAtWindowElement}
 \end{equation}
 
-where \(dE{W_{at_window}}\) ~is the illuminance at a window element, \(Lu{m_{el}}({\theta_{el}},{\phi_{el}})\) ~represents the function of horizontal luminance from the exterior element in the direction \(({\theta_{el}},{\phi_{el}})\) , \({\beta_{el}}\) ~represents the angle at which the ray hits the surface of the window and \(({\theta_{el}},{\phi_{el}})\) ~represents the exterior element azimuth and altitude relative to the window (see Figure~\ref{fig:exterior-luminance-element}).
+where \(dE{W_{at\_window}}\)~is the illuminance at a window element, \(Lu{m_{el}}({\theta_{el}},{\phi_{el}})\)~represents the function of horizontal luminance from the exterior element in the direction \(({\theta_{el}},{\phi_{el}})\) , \({\beta_{el}}\) ~represents the angle at which the ray hits the surface of the window and \(({\theta_{el}},{\phi_{el}})\) ~represents the exterior element azimuth and altitude relative to the window (see Figure~\ref{fig:exterior-luminance-element}).
 
 \begin{figure}[hbtp] % fig 63
 \centering
@@ -40,12 +41,12 @@ where \(dE{W_{at_window}}\) ~is the illuminance at a window element, \(Lu{m_{el}
 This will produce luminous flux at the interior side of the window:
 
 \begin{equation}
-d\phi {W_{inside}} = dE{W_{at_window}} \cdot \tau ({\beta_{el}}) \cdot dA
+d\phi {W_{inside}} = dE{W_{at\_window}} \cdot \tau ({\beta_{el}}) \cdot dA
 \end{equation}
 
-where \(dE{W_{at_window}}\) ~is given by equation , \(\tau ({\beta_{el}})\) ~is the window transmittance at the incoming angle \({\beta_{el}}\) ~and \(dA\) ~is infinitesimal window element surface area.
+where \(dE{W_{at\_window}}\)~is given by Equation~\ref{eq:IlluminanceAtWindowElement}, \(\tau ({\beta_{el}})\)~is the window transmittance at the incoming angle \({\beta_{el}}\)~and \(dA\)~is infinitesimal window element surface area.
 
-Integrating luminous flux given by equation over entire window area will give luminous flux on the interior side of the window.
+Integrating luminous flux given by Equation~\ref{eq:IlluminanceAtWindowElement} over entire window area will give luminous flux on the interior side of the window.
 
 To calculate the interan average reflected illumiance from the window, a simillar approch will be used as described in the chapter ``Internally-Reflected Component of Interior Daylight Illuminance'', which gives the flux balance equation:
 
@@ -61,13 +62,13 @@ where \({F_1}\) represents first reflected flux which in the case of non-CFS is 
 \caption{Complex Fenestration System Light Patches \protect \label{fig:complex-fenestration-system-light-patches}}
 \end{figure}
 
-Considering the total flux passing through the window at the outgoing direction ``k'', the first reflect flux (\({F_{1,k}}\) ) can be calculated as:
+Considering the total flux passing through the window at the outgoing direction ``k'', the first reflect flux (\({F_{1,k}}\)) can be calculated as:
 
 \begin{equation}
 {F_{1,k}} = {\phi_k} \cdot \frac{{\sum\limits_{a = 1}^N {({A_{overlap,k,a}} \cdot {\rho_{vis,k,a}})} }}{{\sum\limits_{a = 1}^N {{A_{overlap,k,a}}} }}
 \end{equation}
 
-where \({\phi_k}\) ~is the total flux entering the zone at the BSDF outgoing direction ``k'' and is calculated by integrating equation over the entire window area for a given outgoing direction ``k'', N is the number of interior surfaces hit by the BSDF outgoing direction ``k'' (see Figure~\ref{fig:complex-fenestration-system-light-patches}), \({A_{overlap,k,a}}\) ~is the surface (patch) area which the window from the BSDF outgoing direction ``k'' makes at surface ``a'' and \({\rho_{vis,k,a}}\) ~is the visible reflectance from surface ``a''.
+where \({\phi_k}\) ~is the total flux entering the zone at the BSDF outgoing direction ``k'' and is calculated by integrating Equation~\ref{eq:IlluminanceAtWindowElement} over the entire window area for a given outgoing direction ``k'', N is the number of interior surfaces hit by the BSDF outgoing direction ``k'' (see Figure~\ref{fig:complex-fenestration-system-light-patches}), \({A_{overlap,k,a}}\) ~is the surface (patch) area which the window from the BSDF outgoing direction ``k'' makes at surface ``a'' and \({\rho_{vis,k,a}}\) ~is the visible reflectance from surface ``a''.
 
 Summing all the outgoing directions will result in total first reflected flux:
 
@@ -77,13 +78,13 @@ Summing all the outgoing directions will result in total first reflected flux:
 
 \subsection{Luminance from Exterior Elements}\label{luminance-from-exterior-elements}
 
-The case of CFS luminance from exterior elements can be calculated by using BSDF incoming directions defined for a given CFS.~ Applying equation for a certain incoming BSDF direction will give:
+The case of CFS luminance from exterior elements can be calculated by using BSDF incoming directions defined for a given CFS.~ Applying Equation~\ref{eq:IlluminanceAtWindowElement} for a certain incoming BSDF direction will give:
 
 \begin{equation}
 \Delta E{W_{el,i}} = Lum({\theta_i},{\psi_i}) \cdot \cos ({\beta_i}) \cdot \cos ({\phi_i}) \cdot \Delta {\theta_i} \cdot \Delta {\psi_i}
 \end{equation}
 
-This equation can be translated in the BSDF coordinate system where instead of standard azimuth and altitude angles, the equation will be transformed into the BSDF coordinate system.~ In that case, equation becomes:
+This equation can be translated in the BSDF coordinate system where, instead of standard azimuth and altitude angles, the equation will be transformed into the BSDF coordinate system.~ In that case, Equation~\ref{eq:IlluminanceAtWindowElement} becomes:
 
 \begin{equation}
 \Delta E{W_{el,i}} = Lum({\theta_i},{\psi_i}) \cdot {\Lambda_i}
@@ -125,13 +126,13 @@ where \(E{D_o}\) ~is the direct illuminance at the BSDF outgoing direction ``o''
 
 \subsection{Handling Exterior Obstructions}\label{handling-exterior-obstructions}
 
-Exterior obstructions are handled for two different cases.~ The first case is to handle obstructions between the luminous element (sky/ground/sun) and the CFS window element. In that case, the direct illuminance at the window element is modified for the product of all the obstruction transmittances between the luminous and window elements, and equation is modified as:
+Exterior obstructions are handled for two different cases.~ The first case is to handle obstructions between the luminous element (sky/ground/sun) and the CFS window element. In that case, the direct illuminance at the window element is modified for the product of all the obstruction transmittances between the luminous and window elements, and Equation~\ref{eq:IlluminanceAtWindowElement} is modified as:
 
 \begin{equation}
 \Delta E{W_{el,i}} = Lum({\theta_i},{\psi_i}) \cdot {\Lambda_i} \cdot \prod\limits_{p = 1}^{{N_o}} {{\tau_{obs,p}}}
 \end{equation}
 
-where \({N_o}\) ~~is the number of exterior obstructions and \({\tau_{obs,p}}\) ~is the visible transmittance of obstruction ``p''.
+where \({N_o}\)~is the number of exterior obstructions and \({\tau_{obs,p}}\)~is the visible transmittance of obstruction ``p''.
 
 The second case is to handle all obstructions between the luminous elements and the ground element.~ The luminance from the ground element is calculated as:
 
@@ -139,13 +140,13 @@ The second case is to handle all obstructions between the luminous elements and 
 Lu{m_{gnd}} = \frac{{{E_h}}}{\pi } \cdot {\rho_{gnd}}
 \end{equation}
 
-where \({E_h}\) ~is the horizontal illuminance and \({\rho_{gnd}}\) ~is the ground reflectance.~ Horizontal illuminance is obtained by the integration over sky/sun elements and it is of interest to examine if all elements are visible from a certain ground point.~ The integration examines if the ray between the sky and the ground element is hitting an obstruction.~ It does not take into account whether or not the obstruction is transparent, it simply counts the number of hits.~ The sky obstruction multiplier is calculated as:
+where \({E_h}\)~is the horizontal illuminance and \({\rho_{gnd}}\)~is the ground reflectance.~ Horizontal illuminance is obtained by the integration over sky/sun elements and it is of interest to examine if all elements are visible from a certain ground point.~ The integration examines if the ray between the sky and the ground element is hitting an obstruction.~ It does not take into account whether or not the obstruction is transparent, it simply counts the number of hits.~ The sky obstruction multiplier is calculated as:
 
 \begin{equation}
 SOM = \frac{{NumberOfUnobstructedRays}}{{NumberOfRays}}
 \end{equation}
 
-and in case the incoming element is from the ground, the illuminance at the window element (equation ) will be additionally modified from the sky obstruction multiplier:
+and in case the incoming element is from the ground, the illuminance at the window element (Equation~\ref{eq:IlluminanceAtWindowElement}) will be additionally modified from the sky obstruction multiplier:
 
 \begin{equation}
 \Delta E{W_{el,i}} = Lum({\theta_i},{\psi_i}) \cdot {\Lambda_i} \cdot SOM \cdot \prod\limits_{p = 1}^{{N_o}} {{\tau_{obs,p}}}

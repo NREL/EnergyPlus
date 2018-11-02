@@ -177,8 +177,8 @@ namespace ExternalInterface {
 
         // Using/Aliasing
         using DataGlobals::KindOfSim;
-        using DataGlobals::WarmupFlag;
         using DataGlobals::ksRunPeriodWeather;
+        using DataGlobals::WarmupFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool GetInputFlag(true); // First time, input is "gotten"
@@ -248,8 +248,8 @@ namespace ExternalInterface {
         NumExternalInterfaces = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         for (Loop = 1; Loop <= NumExternalInterfaces; ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(
+                cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
                 ++NumExternalInterfacesBCVTB;
             } else if (UtilityRoutines::SameString(cAlphaArgs(1),
@@ -556,11 +556,27 @@ namespace ExternalInterface {
 
                 // now make the library call
                 if (haveExternalInterfaceBCVTB) {
-                    retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys,
-                                            &xmlStrInArr[0], &nInpVar, inpVarTypes.data(), &lenXmlStr);
+                    retVal = getepvariables(simCfgFilNam.c_str(),
+                                            &xmlStrOutTypArr[0],
+                                            &xmlStrOutArr[0],
+                                            &nOutVal,
+                                            xmlStrInKey.c_str(),
+                                            &nInKeys,
+                                            &xmlStrInArr[0],
+                                            &nInpVar,
+                                            inpVarTypes.data(),
+                                            &lenXmlStr);
                 } else if (haveExternalInterfaceFMUExport) {
-                    retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys,
-                                               &xmlStrInArr[0], &nInpVar, inpVarTypes.data(), &lenXmlStr);
+                    retVal = getepvariablesFMU(simCfgFilNam.c_str(),
+                                               &xmlStrOutTypArr[0],
+                                               &xmlStrOutArr[0],
+                                               &nOutVal,
+                                               xmlStrInKey.c_str(),
+                                               &nInKeys,
+                                               &xmlStrInArr[0],
+                                               &nInpVar,
+                                               inpVarTypes.data(),
+                                               &lenXmlStr);
                 } else {
                     // there should be no else condition at this point, however we'll still assign the error value for completeness
                     retVal = -1;
@@ -680,10 +696,10 @@ namespace ExternalInterface {
         // This routine gets, sets and does the time integration in FMUs.
 
         // Using/Aliasing
-        using DataGlobals::KindOfSim;
-        using DataGlobals::WarmupFlag;
         using DataGlobals::emsCallFromExternalInterface;
+        using DataGlobals::KindOfSim;
         using DataGlobals::ksRunPeriodWeather;
+        using DataGlobals::WarmupFlag;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -731,8 +747,11 @@ namespace ExternalInterface {
                         }
 
                         // pass in the vectors as pointers to the first member of the vector
-                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent, &valueReferenceVec[0], &realVarValueVec[0],
-                                                                       &FMU(i).Instance(j).NumOutputVariablesSchedule, &FMU(i).Instance(j).Index);
+                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                       &valueReferenceVec[0],
+                                                                       &realVarValueVec[0],
+                                                                       &FMU(i).Instance(j).NumOutputVariablesSchedule,
+                                                                       &FMU(i).Instance(j).Index);
 
                         for (unsigned long x = 1; x <= size(FMU(i).Instance(j).fmuOutputVariableSchedule); ++x) {
                             FMU(i).Instance(j).fmuOutputVariableSchedule(x).ValueReference = valueReferenceVec[x - 1];
@@ -759,8 +778,11 @@ namespace ExternalInterface {
                         }
 
                         // pass in the vectors as pointers to the first member of the vector
-                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0],
-                                                                       &FMU(i).Instance(j).NumOutputVariablesVariable, &FMU(i).Instance(j).Index);
+                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                       &valueReferenceVec2[0],
+                                                                       &realVarValueVec2[0],
+                                                                       &FMU(i).Instance(j).NumOutputVariablesVariable,
+                                                                       &FMU(i).Instance(j).Index);
 
                         for (unsigned long x = 1; x <= size(FMU(i).Instance(j).fmuOutputVariableVariable); ++x) {
                             FMU(i).Instance(j).fmuOutputVariableVariable(x).ValueReference = valueReferenceVec2[x - 1];
@@ -787,8 +809,11 @@ namespace ExternalInterface {
                         }
 
                         // pass in the vectors as pointers to the first member of the vector
-                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0],
-                                                                       &FMU(i).Instance(j).NumOutputVariablesActuator, &FMU(i).Instance(j).Index);
+                        FMU(i).Instance(j).fmistatus = fmiEPlusGetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                       &valueReferenceVec3[0],
+                                                                       &realVarValueVec3[0],
+                                                                       &FMU(i).Instance(j).NumOutputVariablesActuator,
+                                                                       &FMU(i).Instance(j).Index);
 
                         for (unsigned long x = 1; x <= size(FMU(i).Instance(j).fmuOutputVariableActuator); ++x) {
                             FMU(i).Instance(j).fmuOutputVariableActuator(x).ValueReference = valueReferenceVec3[x - 1];
@@ -852,8 +877,11 @@ namespace ExternalInterface {
                         rtsValueVec4.push_back(FMU(i).Instance(j).eplusOutputVariable(x).RTSValue);
                     }
 
-                    FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent, &valueReferenceVec4[0], &rtsValueVec4[0],
-                                                                   &FMU(i).Instance(j).NumInputVariablesInIDF, &FMU(i).Instance(j).Index);
+                    FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                   &valueReferenceVec4[0],
+                                                                   &rtsValueVec4[0],
+                                                                   &FMU(i).Instance(j).NumInputVariablesInIDF,
+                                                                   &FMU(i).Instance(j).Index);
 
                     if (FMU(i).Instance(j).fmistatus != fmiOK) {
                         ShowSevereError("ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs");
@@ -907,9 +935,13 @@ namespace ExternalInterface {
         // Instantiate FMUs
         for (i = 1; i <= NumFMUObjects; ++i) {
             for (j = 1; j <= FMU(i).NumInstances; ++j) {
-                FMU(i).Instance(j).fmicomponent =
-                    fmiEPlusInstantiateSlave((char *)FMU(i).Instance(j).WorkingFolder.c_str(), &FMU(i).Instance(j).LenWorkingFolder, &FMU(i).TimeOut,
-                                             &FMU(i).Visible, &FMU(i).Interactive, &FMU(i).LoggingOn, &FMU(i).Instance(j).Index);
+                FMU(i).Instance(j).fmicomponent = fmiEPlusInstantiateSlave((char *)FMU(i).Instance(j).WorkingFolder.c_str(),
+                                                                           &FMU(i).Instance(j).LenWorkingFolder,
+                                                                           &FMU(i).TimeOut,
+                                                                           &FMU(i).Visible,
+                                                                           &FMU(i).Interactive,
+                                                                           &FMU(i).LoggingOn,
+                                                                           &FMU(i).Instance(j).Index);
                 // TODO: This is doing a null pointer check; OK?
                 if (!FMU(i).Instance(j).fmicomponent) {
                     ShowSevereError("ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to instantiate");
@@ -1021,8 +1053,8 @@ namespace ExternalInterface {
         using DataIPShortCuts::cCurrentModuleObject;
         using DataIPShortCuts::cNumericFieldNames;
         using DataIPShortCuts::rNumericArgs;
-        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::altpathChar;
+        using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
         using General::TrimSigDigits;
@@ -1073,8 +1105,17 @@ namespace ExternalInterface {
             fullFileName.allocate(NumFMUObjects);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             for (Loop = 1; Loop <= NumFMUObjects; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              _,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
                 CheckForActualFileName(cAlphaArgs(1), fileExist, tempFullFileName);
@@ -1138,8 +1179,17 @@ namespace ExternalInterface {
                 FMU(i).Instance.allocate(NumFMUInputVariables);
                 checkInstanceName.allocate(NumFMUInputVariables);
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  l,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  _,
+                                                  _,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), FMU(i).Name)) {
                         Name_NEW = cAlphaArgs(4);
                         if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
@@ -1212,9 +1262,11 @@ namespace ExternalInterface {
                         auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder));
 
                         // make the library call
-                        FMU(i).Instance(j).Index =
-                            model_ID_GUID((char *)FMU(i).Instance(j).Name.c_str(), &workingFolderArr[0], &FMU(i).Instance(j).LenWorkingFolder,
-                                          &FMU(i).Instance(j).NumInputVariablesInFMU, &FMU(i).Instance(j).NumOutputVariablesInFMU);
+                        FMU(i).Instance(j).Index = model_ID_GUID((char *)FMU(i).Instance(j).Name.c_str(),
+                                                                 &workingFolderArr[0],
+                                                                 &FMU(i).Instance(j).LenWorkingFolder,
+                                                                 &FMU(i).Instance(j).NumInputVariablesInFMU,
+                                                                 &FMU(i).Instance(j).NumOutputVariablesInFMU);
 
                         if (FMU(i).Instance(j).Index < 0) {
                             ShowSevereError("ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to");
@@ -1236,8 +1288,8 @@ namespace ExternalInterface {
                         auto workingFolderWithLibArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder_wLib));
 
                         // make the library call
-                        retValfmiPathLib = addLibPathCurrentWorkingFolder(&workingFolderWithLibArr[0], &workingFolderArr[0],
-                                                                          &FMU(i).Instance(j).LenWorkingFolder, &FMU(i).Instance(j).Index);
+                        retValfmiPathLib = addLibPathCurrentWorkingFolder(
+                            &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU(i).Instance(j).LenWorkingFolder, &FMU(i).Instance(j).Index);
 
                         // post process args in case they are used later
                         FMU(i).Instance(j).WorkingFolder_wLib = trim(getStringFromCharArray(workingFolderWithLibArr));
@@ -1263,8 +1315,8 @@ namespace ExternalInterface {
                             getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
                         // make the library call
-                        retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib,
-                                                              &VersionNumArr[0], &FMU(i).Instance(j).Index);
+                        retValfmiVersion = getfmiEPlusVersion(
+                            &workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
 
                         // post process in case args are used later
                         FMU(i).Instance(j).fmiVersionNumber = getStringFromCharArray(VersionNumArr);
@@ -1303,17 +1355,30 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusOutputVariable.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      l,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNumbers,
+                                                      IOStatus,
+                                                      _,
+                                                      _,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         if (UtilityRoutines::SameString(cAlphaArgs(3), FMU(i).Name) &&
                             UtilityRoutines::SameString(cAlphaArgs(4), FMU(i).Instance(j).Name)) {
                             FMU(i).Instance(j).fmuInputVariable(k).Name = cAlphaArgs(5);
                             FMU(i).Instance(j).eplusOutputVariable(k).VarKey = cAlphaArgs(1);
                             FMU(i).Instance(j).eplusOutputVariable(k).Name = cAlphaArgs(2);
                             // verify whether we have duplicate FMU input variables in the idf
-                            GlobalNames::VerifyUniqueInterObjectName(UniqueFMUInputVarNames, FMU(i).Instance(j).fmuInputVariable(k).Name,
-                                                                     cCurrentModuleObject, FMU(i).Instance(j).Name, ErrorsFound);
-                            //							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k
+                            GlobalNames::VerifyUniqueInterObjectName(UniqueFMUInputVarNames,
+                                                                     FMU(i).Instance(j).fmuInputVariable(k).Name,
+                                                                     cCurrentModuleObject,
+                                                                     FMU(i).Instance(j).Name,
+                                                                     ErrorsFound);
+                            //							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable(
+                            //k
                             //).Name,  FMU(
                             // i
                             //).Instance(
@@ -1419,8 +1484,17 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  k,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  _,
+                                                  _,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), FMU(i).Name)) {
                         FMU(i).TotNumOutputVariablesSchedule = j;
                         ++j;
@@ -1434,8 +1508,17 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableSchedule.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      l,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNumbers,
+                                                      IOStatus,
+                                                      _,
+                                                      _,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         if (UtilityRoutines::SameString(cAlphaArgs(3), FMU(i).Name) &&
                             UtilityRoutines::SameString(cAlphaArgs(4), FMU(i).Instance(j).Name)) {
                             FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name = cAlphaArgs(5);
@@ -1503,8 +1586,17 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  k,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  _,
+                                                  _,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if (UtilityRoutines::SameString(cAlphaArgs(2), FMU(i).Name)) {
                         FMU(i).TotNumOutputVariablesVariable = j;
                         ++j;
@@ -1518,8 +1610,17 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableVariable.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      l,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNumbers,
+                                                      IOStatus,
+                                                      _,
+                                                      _,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         if (UtilityRoutines::SameString(cAlphaArgs(2), FMU(i).Name) &&
                             UtilityRoutines::SameString(cAlphaArgs(3), FMU(i).Instance(j).Name)) {
                             FMU(i).Instance(j).fmuOutputVariableVariable(k).Name = cAlphaArgs(4);
@@ -1582,8 +1683,17 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  k,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  _,
+                                                  _,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if (UtilityRoutines::SameString(cAlphaArgs(5), FMU(i).Name)) {
                         FMU(i).TotNumOutputVariablesActuator = j;
                         ++j;
@@ -1597,8 +1707,17 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableActuator.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      l,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNumbers,
+                                                      IOStatus,
+                                                      _,
+                                                      _,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         if (UtilityRoutines::SameString(cAlphaArgs(5), FMU(i).Name) &&
                             UtilityRoutines::SameString(cAlphaArgs(6), FMU(i).Instance(j).Name)) {
                             FMU(i).Instance(j).fmuOutputVariableActuator(k).Name = cAlphaArgs(7);
@@ -1822,13 +1941,13 @@ namespace ExternalInterface {
         // This subroutine organizes the data exchange between FMU and EnergyPlus.
 
         // Using/Aliasing
-        using DataEnvironment::TotDesDays;
         using DataEnvironment::TotalOverallSimDays;
+        using DataEnvironment::TotDesDays;
+        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::KindOfSim;
+        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::ksRunPeriodWeather;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
@@ -1955,8 +2074,11 @@ namespace ExternalInterface {
                             }
 
                             // make the library call
-                            FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent, &valRefVec[0], &rtsValVec[0],
-                                                                           &FMUTemp(i).Instance(j).NumInputVariablesInIDF, &FMU(i).Instance(j).Index);
+                            FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                           &valRefVec[0],
+                                                                           &rtsValVec[0],
+                                                                           &FMUTemp(i).Instance(j).NumInputVariablesInIDF,
+                                                                           &FMU(i).Instance(j).Index);
 
                             if (FMU(i).Instance(j).fmistatus != fmiOK) {
                                 ShowSevereError(
@@ -2010,8 +2132,11 @@ namespace ExternalInterface {
                         }
 
                         // make the library call
-                        FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent, &valRefVec[0], &rtsValVec[0],
-                                                                       &FMUTemp(i).Instance(j).NumInputVariablesInIDF, &FMU(i).Instance(j).Index);
+                        FMU(i).Instance(j).fmistatus = fmiEPlusSetReal(&FMU(i).Instance(j).fmicomponent,
+                                                                       &valRefVec[0],
+                                                                       &rtsValVec[0],
+                                                                       &FMUTemp(i).Instance(j).NumInputVariablesInIDF,
+                                                                       &FMU(i).Instance(j).Index);
 
                         if (FMU(i).Instance(j).fmistatus != fmiOK) {
                             ShowSevereError("ExternalInterface/CalcExternalInterfaceFMUImport: ");
@@ -2106,8 +2231,8 @@ namespace ExternalInterface {
         cCurrentModuleObject = "SimulationControl";
         int const NumRunControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumRunControl > 0) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames,
-                                          cNumericFieldNames);
+            inputProcessor->getObjectItem(
+                cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (cAlphaArgs(5) == "NO") { // This run does not have a weather file simulation.
                 ShowSevereError("ExternalInterface: Error in idf file, section SimulationControl:");
                 ShowContinueError("When using the ExternalInterface, a run period from the weather file must be specified");
@@ -2127,9 +2252,9 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
+        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::SimTimeSteps;
-        using DataGlobals::emsCallFromExternalInterface;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -2199,11 +2324,11 @@ namespace ExternalInterface {
             retVal = 0;
             flaRea = 0;
             if (haveExternalInterfaceBCVTB) {
-                retVal = exchangedoubleswithsocket(&socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim,
-                                                   dblValRea.data());
+                retVal = exchangedoubleswithsocket(
+                    &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim, dblValRea.data());
             } else if (haveExternalInterfaceFMUExport) {
-                retVal = exchangedoubleswithsocketFMU(&socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim,
-                                                      dblValRea.data(), &FMUExportActivate);
+                retVal = exchangedoubleswithsocketFMU(
+                    &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim, dblValRea.data(), &FMUExportActivate);
             }
             continueSimulation = true;
 
@@ -2362,8 +2487,8 @@ namespace ExternalInterface {
         int IOStatus(0);   // Used in GetObjectItem
 
         cCurrentModuleObject = "ExternalInterface";
-        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames,
-                                      cNumericFieldNames);
+        inputProcessor->getObjectItem(
+            cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
         if ((!UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) &&
             (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
             (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitExport"))) {

@@ -269,6 +269,10 @@ namespace HVACManager {
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
         using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
+        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHeatBalFanSys::ZoneThermostatSetPointHiAver;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLoAver;
         using DataHeatBalFanSys::ZTAVComf;
         using DataSystemVariables::ReportDuringWarmup; // added for FMI
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
@@ -295,7 +299,7 @@ namespace HVACManager {
         using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
         using ZoneEquipmentManager::CalcAirFlowSimple;
         using ZoneEquipmentManager::UpdateZoneSizing;
-
+        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -348,6 +352,8 @@ namespace HVACManager {
         ZTAVComf = ZTAV;
         ZoneAirHumRatAvgComf = ZoneAirHumRatAvg;
         ZTAV = 0.0;
+        ZoneThermostatSetPointHiAver = 0.0;
+        ZoneThermostatSetPointLoAver = 0.0;
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
         if (Contaminant.CO2Simulation) {
@@ -495,6 +501,10 @@ namespace HVACManager {
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (NumOnOffCtrZone > 0) {
+                    ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
+                    ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
+                }
             }
 
             DetectOscillatingZoneTemp();
@@ -789,10 +799,10 @@ namespace HVACManager {
             }
 
             if (TotNumLoops > 0) {
-                SetupOutputVariable("Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum",
-                                    "SimHVAC");
-                SetupOutputVariable("Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum",
-                                    "SimHVAC");
+                SetupOutputVariable(
+                    "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC");
+                SetupOutputVariable(
+                    "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC");
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     // init plant sizing numbers in main plant data structure
                     InitOneTimePlantSizingInfo(LoopNum);
@@ -835,8 +845,13 @@ namespace HVACManager {
         // first explicitly call each system type with FirstHVACIteration,
 
         // Manages the various component simulations
-        SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                             FirstHVACIteration, SimWithPlantFlowUnlocked);
+        SimSelectedEquipment(SimAirLoopsFlag,
+                             SimZoneEquipmentFlag,
+                             SimNonZoneEquipmentFlag,
+                             SimPlantLoopsFlag,
+                             SimElecCircuitsFlag,
+                             FirstHVACIteration,
+                             SimWithPlantFlowUnlocked);
 
         // Eventually, when all of the flags are set to false, the
         // simulation has converged for this system time step.
@@ -856,8 +871,13 @@ namespace HVACManager {
             ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
-            SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                                 FirstHVACIteration, SimWithPlantFlowUnlocked);
+            SimSelectedEquipment(SimAirLoopsFlag,
+                                 SimZoneEquipmentFlag,
+                                 SimNonZoneEquipmentFlag,
+                                 SimPlantLoopsFlag,
+                                 SimElecCircuitsFlag,
+                                 FirstHVACIteration,
+                                 SimWithPlantFlowUnlocked);
 
             // Eventually, when all of the flags are set to false, the
             // simulation has converged for this system time step.
@@ -885,16 +905,26 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                                     FirstHVACIteration, SimWithPlantFlowUnlocked);
+                SimSelectedEquipment(SimAirLoopsFlag,
+                                     SimZoneEquipmentFlag,
+                                     SimNonZoneEquipmentFlag,
+                                     SimPlantLoopsFlag,
+                                     SimElecCircuitsFlag,
+                                     FirstHVACIteration,
+                                     SimWithPlantFlowUnlocked);
                 // now call for all non-plant simulation, but with plant flow lock on
                 SimAirLoopsFlag = true;
                 SimZoneEquipmentFlag = true;
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                                     FirstHVACIteration, SimWithPlantFlowLocked);
+                SimSelectedEquipment(SimAirLoopsFlag,
+                                     SimZoneEquipmentFlag,
+                                     SimNonZoneEquipmentFlag,
+                                     SimPlantLoopsFlag,
+                                     SimElecCircuitsFlag,
+                                     FirstHVACIteration,
+                                     SimWithPlantFlowLocked);
                 UpdateZoneInletConvergenceLog();
                 // now call for a last plant simulation
                 SimAirLoopsFlag = false;
@@ -902,16 +932,26 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                                     FirstHVACIteration, SimWithPlantFlowUnlocked);
+                SimSelectedEquipment(SimAirLoopsFlag,
+                                     SimZoneEquipmentFlag,
+                                     SimNonZoneEquipmentFlag,
+                                     SimPlantLoopsFlag,
+                                     SimElecCircuitsFlag,
+                                     FirstHVACIteration,
+                                     SimWithPlantFlowUnlocked);
                 // now call for a last all non-plant simulation, but with plant flow lock on
                 SimAirLoopsFlag = true;
                 SimZoneEquipmentFlag = true;
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag,
-                                     FirstHVACIteration, SimWithPlantFlowLocked);
+                SimSelectedEquipment(SimAirLoopsFlag,
+                                     SimZoneEquipmentFlag,
+                                     SimNonZoneEquipmentFlag,
+                                     SimPlantLoopsFlag,
+                                     SimElecCircuitsFlag,
+                                     FirstHVACIteration,
+                                     SimWithPlantFlowLocked);
                 UpdateZoneInletConvergenceLog();
             }
         }
@@ -2433,7 +2473,6 @@ namespace HVACManager {
 
             // CR7751  second, calculate using indoor conditions for density property
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRatAvg(ZoneLoop), RoutineName3);
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(ZoneLoop), MAT(ZoneLoop));
             ZnAirRpt(ZoneLoop).InfilVolumeCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).InfilAirChangeRate = ZnAirRpt(ZoneLoop).InfilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
             ZnAirRpt(ZoneLoop).InfilVdotCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
@@ -2529,8 +2568,10 @@ namespace HVACManager {
                     //        H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop))
                     //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //           and to recalculate the report variable using end of time step temps and humrats
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (MAT(ZoneLoop) + MAT(Mixing(MixNum).FromZone)) / 2.0,
-                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0, BlankString);
+                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                   (MAT(ZoneLoop) + MAT(Mixing(MixNum).FromZone)) / 2.0,
+                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
+                                                   BlankString);
                     CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
                                            (MAT(ZoneLoop) + MAT(Mixing(MixNum).FromZone)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += Mixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2553,8 +2594,10 @@ namespace HVACManager {
                     //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(CrossMixing(MixNum)%FromZone)
                     //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //           and to recalculate the report variable using end of time step temps and humrats
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).FromZone)) / 2.0,
-                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0, BlankString);
+                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                   (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).FromZone)) / 2.0,
+                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
+                                                   BlankString);
                     CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
                                            (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).FromZone)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2572,8 +2615,10 @@ namespace HVACManager {
                                             (ZoneAirHumRat(ZoneLoop) - ZoneAirHumRat(CrossMixing(MixNum).FromZone)) * H2OHtOfVap;
                 }
                 if ((CrossMixing(MixNum).FromZone == ZoneLoop) && CrossMixingReportFlag(MixNum)) {
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0,
-                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0, BlankString);
+                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                   (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0,
+                                                   (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
+                                                   BlankString);
                     CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
                                            (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2602,8 +2647,10 @@ namespace HVACManager {
                             //    that is, the zone of a pair with the lower zone number
                             if (RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) > 0.0) {
                                 ZoneB = RefDoorMixing(ZoneLoop).MateZonePtr(j);
-                                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0,
-                                                               (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0, BlankString);
+                                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                               (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0,
+                                                               (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0,
+                                                               BlankString);
                                 CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0, (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0);
                                 H2OHtOfVap =
                                     PsyHgAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0, (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0);
@@ -2629,8 +2676,10 @@ namespace HVACManager {
                             for (j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
                                 if (RefDoorMixing(ZoneA).MateZonePtr(j) == ZoneLoop) {
                                     if (RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) > 0.0) {
-                                        AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0,
-                                                                       (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0, BlankString);
+                                        AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                                       (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0,
+                                                                       (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,
+                                                                       BlankString);
                                         CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,
                                                                (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0);
                                         H2OHtOfVap = PsyHgAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,

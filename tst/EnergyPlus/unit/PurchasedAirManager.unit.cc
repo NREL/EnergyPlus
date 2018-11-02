@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
     ZoneHVACSizing.allocate(1);
@@ -158,9 +158,10 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
     ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = 1.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 30.0;
+    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = 0.01;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
 
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
     ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = 2.0;
@@ -168,7 +169,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = 0.0103747425;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
 
     PurchAir.allocate(10);
     PurchAirNumericFields.allocate(10);
@@ -195,9 +196,9 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
 
     SizePurchasedAir(PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
-    EXPECT_NEAR(509.856, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
+    EXPECT_NEAR(50985.58, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
-    EXPECT_NEAR(160.0, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1);
+    EXPECT_NEAR(30844.14, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1);
 
     ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
     ZoneEqSizing.deallocate();

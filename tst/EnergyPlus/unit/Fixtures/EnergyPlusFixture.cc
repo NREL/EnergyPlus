@@ -104,6 +104,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
@@ -136,7 +137,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -205,6 +205,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -336,6 +337,7 @@ void EnergyPlusFixture::clear_all_states()
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
+    DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DirectAirManager::clear_state();
@@ -377,7 +379,6 @@ void EnergyPlusFixture::clear_all_states()
     HVACSingleDuctInduc::clear_state();
     HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
-    HVACUnitarySystem::clear_state();
     HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
@@ -432,6 +433,7 @@ void EnergyPlusFixture::clear_all_states()
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
     ThermalComfort::clear_state();
+    UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
     VariableSpeedCoils::clear_state();

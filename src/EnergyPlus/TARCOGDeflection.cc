@@ -142,8 +142,20 @@ namespace TARCOGDeflection {
             if (SELECT_CASE_var == NO_DEFLECTION_CALCULATION) {
                 return;
             } else if (SELECT_CASE_var == DEFLECTION_CALC_TEMPERATURE) {
-                DeflectionTemperatures(nlayer, W, H, Pa, Pini, Tini, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, PanelTemps,
-                                       DCoeff, LayerDeflection, nperr, ErrorMessage);
+                DeflectionTemperatures(nlayer,
+                                       W,
+                                       H,
+                                       Pa,
+                                       Pini,
+                                       Tini,
+                                       NonDeflectedGapWidth,
+                                       DeflectedGapWidthMax,
+                                       DeflectedGapWidthMean,
+                                       PanelTemps,
+                                       DCoeff,
+                                       LayerDeflection,
+                                       nperr,
+                                       ErrorMessage);
             } else if (SELECT_CASE_var == DEFLECTION_CALC_GAP_WIDTHS) {
                 DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
             } else {

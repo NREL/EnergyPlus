@@ -271,7 +271,6 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankSupplyComponent;
 
@@ -282,10 +281,6 @@ namespace ZoneDehumidifier {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
-        // Curve Types
-        int const Quadratic(1);
-        int const BiQuadratic(2);
-        int const Cubic(3);
         Real64 const RatedInletAirTemp(26.7);
         Real64 const RatedInletAirRH(60.0);
 
@@ -326,8 +321,17 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          ZoneDehumidIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
 
             // A1,  \field Name
@@ -348,12 +352,12 @@ namespace ZoneDehumidifier {
             }
 
             // A3 , \field Air Inlet Node Name
-            ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                                              NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
-            ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                                               NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
             ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval = Numbers(1);
@@ -395,23 +399,20 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex));
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveType = BiQuadratic;
-                        CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
-                        if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(cAlphaFields(5) + " output is not equal to 1.0");
-                            ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                        }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex,   // Curve index
+                    {2},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(5));  // Field Name
 
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(5) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
+                if (!ErrorsFound) {
+                    CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    if (CurveVal > 1.10 || CurveVal < 0.90) {
+                        ShowWarningError(cAlphaFields(5) + " output is not equal to 1.0");
+                        ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
+                        ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                     }
                 }
             }
@@ -429,23 +430,20 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex));
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveType = BiQuadratic;
-                        CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
-                        if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(cAlphaFields(6) + " output is not equal to 1.0");
-                            ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                        }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex,   // Curve index
+                    {2},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(6));  // Field Name
 
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(6) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
+                if (!ErrorsFound) {
+                    CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    if (CurveVal > 1.10 || CurveVal < 0.90) {
+                        ShowWarningError(cAlphaFields(6) + " output is not equal to 1.0");
+                        ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
+                        ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                     }
                 }
             }
@@ -463,22 +461,13 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex));
-                    if (SELECT_CASE_var == "QUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).PartLoadCurveType = Quadratic;
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        ZoneDehumid(ZoneDehumidIndex).PartLoadCurveType = Cubic;
-
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(7) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(7));  // Field Name
             }
 
             // N4,  \field Minimum Dry-Bulb Temperature for Dehumidifier Operation
@@ -510,8 +499,11 @@ namespace ZoneDehumidifier {
                 ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = CondensateDiscarded;
             } else {
                 ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(ZoneDehumid(ZoneDehumidIndex).Name, CurrentModuleObject, ZoneDehumid(ZoneDehumidIndex).CondensateCollectName,
-                                         ErrorsFound, ZoneDehumid(ZoneDehumidIndex).CondensateTankID,
+                SetupTankSupplyComponent(ZoneDehumid(ZoneDehumidIndex).Name,
+                                         CurrentModuleObject,
+                                         ZoneDehumid(ZoneDehumidIndex).CondensateCollectName,
+                                         ErrorsFound,
+                                         ZoneDehumid(ZoneDehumidIndex).CondensateTankID,
                                          ZoneDehumid(ZoneDehumidIndex).CondensateTankSupplyARRID);
             }
 
@@ -530,34 +522,96 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
             // Set up report variables for the dehumidifiers
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate", OutputProcessor::Unit::W, ZoneDehumid(ZoneDehumidIndex).SensHeatingRate,
-                                "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Energy", OutputProcessor::Unit::J,
-                                ZoneDehumid(ZoneDehumidIndex).SensHeatingEnergy, "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ZoneDehumid(ZoneDehumidIndex).WaterRemovalRate, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, ZoneDehumid(ZoneDehumidIndex).WaterRemoved,
-                                "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Power", OutputProcessor::Unit::W, ZoneDehumid(ZoneDehumidIndex).ElecPower, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Energy", OutputProcessor::Unit::J, ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
-                                "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name, _, "Electric", "COOLING", _, "System");
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W,
-                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Energy", OutputProcessor::Unit::J,
-                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, ZoneDehumid(ZoneDehumidIndex).DehumidPLR, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Runtime Fraction", OutputProcessor::Unit::None, ZoneDehumid(ZoneDehumidIndex).DehumidRTF, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Outlet Air Temperature", OutputProcessor::Unit::C, ZoneDehumid(ZoneDehumidIndex).OutletAirTemp,
-                                "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).SensHeatingRate,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).SensHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Removed Water Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneDehumid(ZoneDehumidIndex).WaterRemovalRate,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Removed Water Mass",
+                                OutputProcessor::Unit::kg,
+                                ZoneDehumid(ZoneDehumidIndex).WaterRemoved,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).ElecPower,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name,
+                                _,
+                                "Electric",
+                                "COOLING",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                ZoneDehumid(ZoneDehumidIndex).DehumidPLR,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                ZoneDehumid(ZoneDehumidIndex).DehumidRTF,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Outlet Air Temperature",
+                                OutputProcessor::Unit::C,
+                                ZoneDehumid(ZoneDehumidIndex).OutletAirTemp,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
 
             if (ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode == CondensateToTank) {
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume", OutputProcessor::Unit::m3, ZoneDehumid(ZoneDehumidIndex).DehumidCondVol,
-                                    "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name, _, "OnSiteWater", "Condensate", _, "System");
+                SetupOutputVariable("Zone Dehumidifier Condensate Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVolFlowRate,
+                                    "System",
+                                    "Average",
+                                    ZoneDehumid(ZoneDehumidIndex).Name);
+                SetupOutputVariable("Zone Dehumidifier Condensate Volume",
+                                    OutputProcessor::Unit::m3,
+                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVol,
+                                    "System",
+                                    "Sum",
+                                    ZoneDehumid(ZoneDehumidIndex).Name,
+                                    _,
+                                    "OnSiteWater",
+                                    "Condensate",
+                                    _,
+                                    "System");
             }
         }
     }
@@ -737,8 +791,8 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using Psychrometrics::PsyCpAirFnWTdb;
-        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyHfgAirFnWTdb;
+        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::RhoH2O;
 
@@ -812,7 +866,8 @@ namespace ZoneDehumidifier {
                 } else {
                     ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Water Removal Rate Curve output is <= 0.0 warning continues...",
-                                                   ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor,
+                                                   ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorIndex,
+                                                   WaterRemovalRateFactor,
                                                    WaterRemovalRateFactor);
                 }
                 WaterRemovalRateFactor = 0.0;
@@ -845,7 +900,8 @@ namespace ZoneDehumidifier {
                 } else {
                     ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Energy Factor Curve output is <= 0.0 warning continues...",
-                                                   ZoneDehumid(ZoneDehumNum).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor,
+                                                   ZoneDehumid(ZoneDehumNum).EnergyFactorCurveErrorIndex,
+                                                   EnergyFactorAdjFactor,
                                                    EnergyFactorAdjFactor);
                 }
                 ElectricPowerAvg = 0.0;
@@ -871,7 +927,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output < 0.7 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).LowPLFErrorIndex, PLF, PLF);
+                                                       ZoneDehumid(ZoneDehumNum).LowPLFErrorIndex,
+                                                       PLF,
+                                                       PLF);
                     }
                     PLF = 0.7;
                 }
@@ -886,7 +944,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output > 1.0 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).HighPLFErrorIndex, PLF, PLF);
+                                                       ZoneDehumid(ZoneDehumNum).HighPLFErrorIndex,
+                                                       PLF,
+                                                       PLF);
                     }
                     PLF = 1.0;
                 }
@@ -920,7 +980,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction);
+                                                       ZoneDehumid(ZoneDehumNum).HighRTFErrorIndex,
+                                                       RunTimeFraction,
+                                                       RunTimeFraction);
                     }
                     RunTimeFraction = 1.0;
                 }

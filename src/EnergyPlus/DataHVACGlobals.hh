@@ -182,7 +182,7 @@ namespace DataHVACGlobals {
     extern int const UnitarySys_HeatCool;
     extern int const UnitarySys_HeatPump_AirToAir;
     extern int const UnitarySys_HeatPump_WaterToAir;
-    extern int const UnitarySystem_AnyCoilType;
+    extern int const UnitarySys_AnyCoilType;
     extern Array1D_string const cFurnaceTypes;
 
     // parameters describing coil types
@@ -500,11 +500,10 @@ namespace DataHVACGlobals {
     struct HVACSystemRootFindingAlgorithm
     {
         // Members
-        std::string Algorithm; // Choice of algorithm
-        int NumOfIter;         // Number of Iteration Before Algorith Switch
-        HVACSystemRootSolverAlgorithm
-            HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
-                                  // Default Constructor
+        std::string Algorithm;                              // Choice of algorithm
+        int NumOfIter;                                      // Number of Iteration Before Algorith Switch
+        HVACSystemRootSolverAlgorithm HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5
+                                                            // Alternation Default Constructor
         HVACSystemRootFindingAlgorithm() : NumOfIter(5), HVACSystemRootSolver(HVACSystemRootSolverAlgorithm::RegulaFalsi)
         {
         }

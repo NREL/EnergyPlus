@@ -246,8 +246,37 @@ namespace TarcogShading {
                     Tgap = Tgaps(2);
 
                     // bi......use Tout as temp of the air at inlet
-                    shadingedge(iprop1, frct1, press1, nmix1, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, Atops, Abots, Als, Ars, Ahs, s,
-                                height, width, angle, vvent(2), hc, Tout, Tav, Tgap, hcvs, qvs, nperr, ErrorMessage, speed);
+                    shadingedge(iprop1,
+                                frct1,
+                                press1,
+                                nmix1,
+                                iprop2,
+                                frct2,
+                                press2,
+                                nmix2,
+                                xwght,
+                                xgcon,
+                                xgvis,
+                                xgcp,
+                                Atops,
+                                Abots,
+                                Als,
+                                Ars,
+                                Ahs,
+                                s,
+                                height,
+                                width,
+                                angle,
+                                vvent(2),
+                                hc,
+                                Tout,
+                                Tav,
+                                Tgap,
+                                hcvs,
+                                qvs,
+                                nperr,
+                                ErrorMessage,
+                                speed);
 
                     // exit on error
                     if ((nperr > 0) && (nperr < 1000)) return;
@@ -280,8 +309,37 @@ namespace TarcogShading {
                     Tgap = Tgaps(nlayer);
 
                     // bi.........use Tin as temp of the air at inlet
-                    shadingedge(iprop2, frct2, press2, nmix2, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, Atops, Abots, Als, Ars, Ahs, s,
-                                height, width, angle, vvent(nlayer), hc, Tin, Tav, Tgap, hcvs, qvs, nperr, ErrorMessage, speed);
+                    shadingedge(iprop2,
+                                frct2,
+                                press2,
+                                nmix2,
+                                iprop1,
+                                frct1,
+                                press1,
+                                nmix1,
+                                xwght,
+                                xgcon,
+                                xgvis,
+                                xgcp,
+                                Atops,
+                                Abots,
+                                Als,
+                                Ars,
+                                Ahs,
+                                s,
+                                height,
+                                width,
+                                angle,
+                                vvent(nlayer),
+                                hc,
+                                Tin,
+                                Tav,
+                                Tgap,
+                                hcvs,
+                                qvs,
+                                nperr,
+                                ErrorMessage,
+                                speed);
 
                     // exit on error
                     if ((nperr > 0) && (nperr < 1000)) return;
@@ -313,13 +371,80 @@ namespace TarcogShading {
                     // speed2 = vvent(i+1)
 
                     if ((CalcForcedVentilation != 0) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
-                        forcedventilation(iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, s1, height, hc1, vvent(i), tvent(i), Temp, Tav1,
-                                          hcv1, qv1, nperr, ErrorMessage);
-                        forcedventilation(iprop2, frct2, press2, nmix1, xwght, xgcon, xgvis, xgcp, s2, height, hc1, vvent(i + 1), tvent(i + 1), Temp,
-                                          Tav2, hcv2, qv2, nperr, ErrorMessage);
+                        forcedventilation(iprop1,
+                                          frct1,
+                                          press1,
+                                          nmix1,
+                                          xwght,
+                                          xgcon,
+                                          xgvis,
+                                          xgcp,
+                                          s1,
+                                          height,
+                                          hc1,
+                                          vvent(i),
+                                          tvent(i),
+                                          Temp,
+                                          Tav1,
+                                          hcv1,
+                                          qv1,
+                                          nperr,
+                                          ErrorMessage);
+                        forcedventilation(iprop2,
+                                          frct2,
+                                          press2,
+                                          nmix1,
+                                          xwght,
+                                          xgcon,
+                                          xgvis,
+                                          xgcp,
+                                          s2,
+                                          height,
+                                          hc1,
+                                          vvent(i + 1),
+                                          tvent(i + 1),
+                                          Temp,
+                                          Tav2,
+                                          hcv2,
+                                          qv2,
+                                          nperr,
+                                          ErrorMessage);
                     } else {
-                        shadingin(iprop1, frct1, press1, nmix1, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, Atops, Abots, Als, Ars, Ahs,
-                                  s1, s2, height, width, angle, hc1, hc2, speed1, speed2, Tgap1, Tgap2, Tav1, Tav2, hcv1, hcv2, qv1, qv2, nperr,
+                        shadingin(iprop1,
+                                  frct1,
+                                  press1,
+                                  nmix1,
+                                  iprop2,
+                                  frct2,
+                                  press2,
+                                  nmix2,
+                                  xwght,
+                                  xgcon,
+                                  xgvis,
+                                  xgcp,
+                                  Atops,
+                                  Abots,
+                                  Als,
+                                  Ars,
+                                  Ahs,
+                                  s1,
+                                  s2,
+                                  height,
+                                  width,
+                                  angle,
+                                  hc1,
+                                  hc2,
+                                  speed1,
+                                  speed2,
+                                  Tgap1,
+                                  Tgap2,
+                                  Tav1,
+                                  Tav2,
+                                  hcv1,
+                                  hcv2,
+                                  qv1,
+                                  qv2,
+                                  nperr,
                                   ErrorMessage);
                     }
 
@@ -956,8 +1081,22 @@ namespace TarcogShading {
     )
     {
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND) {
-                double slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+                const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
+                Real64 C1_VENET(0);
+                Real64 C2_VENET(0);
+                Real64 C3_VENET(0);
+
+                if (LayerType(i) == VENETBLIND_HORIZ) {
+                    C1_VENET = C1_VENET_HORIZONTAL;
+                    C2_VENET = C2_VENET_HORIZONTAL;
+                    C3_VENET = C3_VENET_HORIZONTAL;
+                }
+                if (LayerType(i) == VENETBLIND_VERT) {
+                    C1_VENET = C1_VENET_VERTICAL;
+                    C2_VENET = C2_VENET_VERTICAL;
+                    C3_VENET = C3_VENET_VERTICAL;
+                }
                 Ah_eff(i) = width * height * C1_VENET * pow((Ah(i) / (width * height)) * pow(cos(slatAngRad), C2_VENET), C3_VENET);
                 Al_eff(i) = 0.0;
                 Ar_eff(i) = 0.0;

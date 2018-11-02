@@ -4,7 +4,7 @@ if(${KIVA_3D})
   add_definitions(-D KIVA_3D )
 endif()
 
-include(${CMAKE_SOURCE_DIR}/cmake/TargetArch.cmake)
+include(TargetArch)
 target_architecture(TARGET_ARCH)
 
 if(${TARGET_ARCH} MATCHES "x86_64" OR ${TARGET_ARCH} MATCHES "ia64" OR ${TARGET_ARCH} MATCHES "ppc64")
@@ -23,45 +23,83 @@ set(KIVA_BUILD_CONFIG ${TARGET_OS}-${CMAKE_CXX_COMPILER_ID}-${BIT})
 string(TOLOWER ${KIVA_BUILD_CONFIG} KIVA_BUILD_CONFIG)
 set(KIVA_BUILD_CONFIG ${KIVA_BUILD_CONFIG} PARENT_SCOPE)
 
-if(KIVA_EXE_BUILD)
+# Default version number
+set( libkiva_VERSION_MAJOR 0 )
+set( libkiva_VERSION_MINOR 5 )
+set( libkiva_VERSION_PATCH 0 )
+
+if(EXISTS "${kiva_SOURCE_DIR}/.git")
   file(WRITE ${CMAKE_BINARY_DIR}/arch.txt ${KIVA_BUILD_CONFIG})
 
   string(TOLOWER "${TARGET_OS}-${BIT}" KIVA_PACKAGE_CONFIG)
   set(KIVA_PACKAGE_CONFIG ${KIVA_PACKAGE_CONFIG} PARENT_SCOPE)
 
-  execute_process(COMMAND git describe --tags --long
-                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                  RESULT_VARIABLE git_exit_status
-                  OUTPUT_VARIABLE git_version
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-else()
-  set(git_exit_status "1")
-endif()
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${kiva_SOURCE_DIR}
+    RESULT_VARIABLE git_branch_exit_status
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 
-if(${git_exit_status} MATCHES "0")
+  if (NOT ${git_branch_exit_status} MATCHES "0")
+    set(GIT_BRANCH "unknown-branch")
+  endif()
 
-  # TODO: Should be "v([0-9]+)\\.([0-9]+)\\.([0-9]+)-?([a-z]*[0-9]*)-[0-9]+-([a-z,0-9])+"
-  #       for v<major>.<minor>.<patch>-<build>-n-<sha>
-  string( REGEX REPLACE "v([0-9]+)\\.[0-9]+\\.[0-9]+-[0-9]+-[a-z,0-9]+" "\\1" libkiva_VERSION_MAJOR "${git_version}" )
-  string( REGEX REPLACE "v[0-9]+\\.([0-9]+)\\.[0-9]+-[0-9]+-[a-z,0-9]+" "\\1" libkiva_VERSION_MINOR "${git_version}" )
-  string( REGEX REPLACE "v[0-9]+\\.[0-9]+\\.([0-9]+)-[0-9]+-[a-z,0-9]+" "\\1" libkiva_VERSION_PATCH "${git_version}" )
-  string( REGEX REPLACE "v[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-([a-z,0-9]+)" "\\1" libkiva_VERSION_BUILD "${git_version}" )
+  execute_process(
+    COMMAND git rev-parse --verify --short HEAD
+    WORKING_DIRECTORY ${kiva_SOURCE_DIR}
+    RESULT_VARIABLE git_sha_exit_status
+    OUTPUT_VARIABLE GIT_SHA
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 
-  set(CPACK_PACKAGE_VERSION_MAJOR "${libkiva_VERSION_MAJOR}" PARENT_SCOPE)
-  set(CPACK_PACKAGE_VERSION_MINOR "${libkiva_VERSION_MINOR}" PARENT_SCOPE)
-  set(CPACK_PACKAGE_VERSION_PATCH "${libkiva_VERSION_PATCH}" PARENT_SCOPE)
-  set(CPACK_PACKAGE_VERSION_BUILD "${libkiva_VERSION_BUILD}" PARENT_SCOPE)
-else()
-  set( libkiva_VERSION_MAJOR 0 )
-  set( libkiva_VERSION_MINOR 4 )
-  set( libkiva_VERSION_PATCH 0 )
-  set( libkiva_VERSION_BUILD "unknown-commit" )
-  if(KIVA_EXE_BUILD)
+  if (NOT ${git_sha_exit_status} MATCHES "0")
+    set(GIT_SHA "unknown-commit")
+  endif()
+
+  execute_process(
+    COMMAND git describe --tags --abbrev=0
+    WORKING_DIRECTORY ${kiva_SOURCE_DIR}
+    RESULT_VARIABLE git_tag_exit_status
+    OUTPUT_VARIABLE GIT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  if (NOT ${git_tag_exit_status} MATCHES "0")
+    set(GIT_TAG "unknown-tag")
     message("Cannot determine version number.")
   endif()
+
+  if (GIT_TAG MATCHES "^v[0-9]+\\.[0-9]+\\.[0-9]+$")
+    string( REGEX REPLACE "^v([0-9]+)\\.[0-9]+\\.[0-9]+$" "\\1" libkiva_VERSION_MAJOR "${GIT_TAG}" )
+    string( REGEX REPLACE "^v[0-9]+\\.([0-9]+)\\.[0-9]+$" "\\1" libkiva_VERSION_MINOR "${GIT_TAG}" )
+    string( REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+)$" "\\1" libkiva_VERSION_PATCH "${GIT_TAG}" )
+  endif()
+
+  execute_process(
+    COMMAND git rev-list --count HEAD ^${GIT_TAG}
+    WORKING_DIRECTORY ${kiva_SOURCE_DIR}
+    RESULT_VARIABLE git_build_exit_status
+    OUTPUT_VARIABLE GIT_BUILD
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  if (NOT ${git_build_exit_status} MATCHES "0")
+    set(GIT_BUILD "unknown-build-number")
+  endif()
+
+  if(NOT ${GIT_BUILD} MATCHES "^0$")
+    set(libkiva_VERSION_BUILD "+${GIT_BRANCH}.${GIT_SHA}.${GIT_BUILD}")
+  else()
+    set(libkiva_VERSION_BUILD "")
+  endif()
+
+else()
+  set( libkiva_VERSION_BUILD "+no-build-info" )
 endif()
 
-set(kiva_version "v${libkiva_VERSION_MAJOR}.${libkiva_VERSION_MINOR}.${libkiva_VERSION_PATCH}-${libkiva_VERSION_BUILD}")
+set(kiva_version "v${libkiva_VERSION_MAJOR}.${libkiva_VERSION_MINOR}.${libkiva_VERSION_PATCH}${libkiva_VERSION_BUILD}")
 
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Release" )
   set (kiva_version "${kiva_version}")
@@ -85,6 +123,8 @@ configure_file (
 set(kiva_src Algorithms.cpp
              Algorithms.hpp
              BoundaryConditions.hpp
+             Cell.cpp
+             Cell.hpp
              Domain.cpp
              Domain.hpp
              Errors.cpp
@@ -102,7 +142,7 @@ set(kiva_src Algorithms.cpp
              Mesher.hpp
              Version.hpp )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories("${kiva_BINARY_DIR}/src/libkiva")
 
 option( KIVA_STATIC_LIB "Make libkiva a static library" ON )
 

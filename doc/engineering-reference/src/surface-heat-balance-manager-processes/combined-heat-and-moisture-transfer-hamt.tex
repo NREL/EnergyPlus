@@ -57,16 +57,18 @@ i,j & --- & Cell indices \tabularnewline
 
 \subsection{HAMT Model Description}\label{hamt-model-description}
 
-Equations and are derived from heat and moisture balance equations and are taken from {[}Künzel, H.M. (1995){]}. They describe a theoretical model for the transfer of heat and moisture through a material.
+Equations~\ref{eq:HAMTHeatBalanceEquation} and~\ref{eq:HAMTMoistureBalanceEquation} are derived from heat and moisture balance equations and are taken from {[}Künzel, H.M. (1995){]}. They describe a theoretical model for the transfer of heat and moisture through a material.
 
 \begin{equation}
 \frac{{\partial H}}{{\partial T}}\frac{{\partial T}}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{k^w}\frac{{\partial T}}{{\partial x}}} \right) + {h_v}\frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)
+\label{eq:HAMTHeatBalanceEquation}
 \end{equation}
 
-The three terms in equation describe the storage, transport and generation of heat respectively.
+The three terms in Equation~\ref{eq:HAMTHeatBalanceEquation} describe the storage, transport and generation of heat respectively.
 
 \begin{equation}
 \frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)
+\label{eq:HAMTMoistureBalanceEquation}
 \end{equation}
 
 The three terms in equation describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (\(\delta\)) used in the third term of both equations, is also taken from Künzel,
@@ -91,7 +93,7 @@ The following sections describe how the above equations are used within the HAMT
 
 \subsubsection{Heat Transfer}\label{heat-transfer}
 
-Equation 1 can be re-written and used to describe the heat storage and transfer through the i\(^{th}\) cell in a surface.
+Equation~\ref{eq:HAMTHeatBalanceEquation} can be re-written and used to describe the heat storage and transfer through the i\(^{th}\) cell in a surface.
 
 \begin{equation}
 \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\frac{{T_i^{p + 1} - T_i^p}}{{\Delta \tau }} = \sum\limits_j {k_{ij}^w{A_{ij}}\frac{{T_j^{p + 1} - T_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
@@ -103,10 +105,11 @@ In the one dimensional case there are only two adjacent cells each labelled j. T
 q_i^v = \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
 \end{equation}
 
-Rearranging equation and including other sources of heat (\(q_i^{adds}\)) such as radiation from other surfaces in the calculation gives the temperature in a cell in the next time step as,
+Rearranging Equation~\ref{eq:HAMTHeatBalanceEquation} and including other sources of heat (\(q_i^{adds}\)) such as radiation from other surfaces in the calculation gives the temperature in a cell in the next time step as,
 
 \begin{equation}
 T_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{T_j^{p + 1}}}{{R_{ij}^h}}}  + q_i^v + q_i^{adds} + C_i^h\frac{{T_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^h}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^h}}} }}
+\label{eq:TemperatureIthCell}
 \end{equation}
 
 where \(C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\) is thermal heat capacitance of cell i and \(R_{ij}^h = \frac{x_{ij}}{k_{ij}A_{ij}}\) ~is the thermal resistance between cells i and j.
@@ -127,20 +130,22 @@ The thermal conductivity (k\(^{w}\)) of the cell is determined by interpolating 
 
 \subsubsection{Moisture Dependant Moisture Diffusion Coefficient μ}\label{moisture-dependant-moisture-diffusion-coefficient-ux3bc}
 
-This is used in the third term of equation to describe the heat transfer due to vapor movement. It is determined by interpolating between data points of moisture diffusion coefficient versus the moisture content of the material, entered into EnergyPlus via the MaterialProperty:HeatAndMoistureTransfer:Diffusion object. A simple linear interpolation is used to obtain the conductivity between measured points.
+This is used in the third term of Equation~\ref{eq:HAMTHeatBalanceEquation} to describe the heat transfer due to vapor movement. It is determined by interpolating between data points of moisture diffusion coefficient versus the moisture content of the material, entered into EnergyPlus via the MaterialProperty:HeatAndMoistureTransfer:Diffusion object. A simple linear interpolation is used to obtain the conductivity between measured points.
 
 \subsubsection{Moisture Transfer}\label{moisture-transfer}
 
-Moisture, as well as heat, is transported through materials as either liquid (w) or vapor (p). There are two different potentials that control the movement though the material. Liquid transfer is driven by differences in relative humidity whereas vapor transfer is driven by differences in vapor pressure. Materials also have a capacity to store moisture. Equation can be re-written for a discrete cell in a continuous material.
+Moisture, as well as heat, is transported through materials as either liquid (w) or vapor (p). There are two different potentials that control the movement though the material. Liquid transfer is driven by differences in relative humidity whereas vapor transfer is driven by differences in vapor pressure. Materials also have a capacity to store moisture. Equation~\ref{eq:HAMTMoistureBalanceEquation} can be re-written for a discrete cell in a continuous material.
 
 \begin{equation}
 \frac{{dw}}{{d{\phi_i}}}\Delta {V_i}\frac{{\phi_i^{p + 1} - \phi_i^p}}{{\Delta \tau }} = \sum\limits_j {{k_{ij}}{A_{ij}}\frac{{\phi_j^{p + 1} - \phi_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
+\label{eq:HAMTMoistureBalanceEquationDiscreteCell}
 \end{equation}
 
-Equation can be rearranged to provide the relative humidity of the i\(^{th}\) cell in the next time step.
+Equation~\ref{eq:HAMTMoistureBalanceEquationDiscreteCell} can be rearranged to provide the relative humidity of the i\(^{th}\) cell in the next time step.
 
 \begin{equation}
 \phi_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{\phi_j^{p + 1}}}{{R_{ij}^w}}}  + \sum\nolimits_j {\frac{{p_i^{p + 1}}}{{R_{ij}^v}}}  + C_i^w\frac{{\phi_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^w}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^w}} + \sum\nolimits_j {\frac{{p_i^{sat}}}{{R_{ij}^v}}} } }}
+\label{eq:RelativeHumidityIthCell}
 \end{equation}
 
 where \(C_i^w = \frac{dw}{d\phi_{i}}\Delta {V_i}\) ~is the ``Moisture Capacitance'' of cell i,
@@ -151,7 +156,7 @@ R_{ij}^w = \frac{{{x_{ij}}}}{{{A_{ij}}D_{ij}^w\frac{{dw}}{{d\phi }}}}
 
 is the moisture resistance between cells i and j and \(R_{ij}^v = \frac{\mu_{ij}x_{ij}}{A_{ij}\delta_{ij}}\) ~is the vapor resistance~between cells i and j.
 
-Equation can be used together with the heat equation in an alternate step by step fashion to calculate the new temperature and relative humidity profiles for each cell for the next time step.
+Equation~\ref{eq:RelativeHumidityIthCell} can be used together with the heat equation~\ref{eq:TemperatureIthCell} in an alternate step by step fashion to calculate the new temperature and relative humidity profiles for each cell for the next time step.
 
 Surfaces with Ground exterior boundary condition assumes saturated air ({100\%} relative humidity) condition to calculate the exterior mass transfer coefficient, which is used to model mass transport through a ground contact surfaces. 
 

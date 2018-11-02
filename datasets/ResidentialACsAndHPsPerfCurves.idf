@@ -51,7 +51,7 @@
 !   ACCoolingPLFFPLR;        !- Part Load Fraction Correlation Curve Name
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   Curve:Biquadratic,
     ACCoolingCAPFTemp,       !- Name

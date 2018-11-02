@@ -12,7 +12,7 @@
 ! System:   None.
 ! Plant:    A chain of 3 plant loops that connect a LoadProfile:Plant to DistrictCooling by heat exchangers
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -102,8 +102,10 @@
     Annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
