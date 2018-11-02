@@ -70,8 +70,11 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
     BranchNodeConnections::TestCompSet(
         CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
+    }
 
-    // setup output variables, should probably be done elsewhere
+void CoilCoolingDX::onetimeinit(){
+
+    // setup output variables, needs to be done after object is instantiated and emplaced
     SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
     SetupOutputVariable("Cooling Coil Total Cooling Energy",
                         OutputProcessor::Unit::J,
@@ -105,6 +108,13 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
+    : myOneTimeInitFlag(true), evapInletNodeIndex(0), evapOutletNodeIndex(0), availScheduleIndex(0), condZoneIndex(0),
+      condInletNodeIndex(0), condOutletNodeIndex(0), condensateTankIndex(0), evaporativeCondSupplyTankIndex(0),
+
+      // report variables
+      totalCoolingEnergyRate(0.0), totalCoolingEnergy(0.0), sensCoolingEnergyRate(0.0), sensCoolingEnergy(0.0), latCoolingEnergyRate(0.0),
+      latCoolingEnergy(0.0), elecCoolingPower(0.0), elecCoolingConsumption(0.0), coolingCoilRuntimeFraction(0.0)
+
 {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(CoilCoolingDX::object_name);
     if (numCoolingCoilDXs <= 0) {
@@ -134,6 +144,7 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
         input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
 
         this->instantiateFromInputSpec(input_specs);
+        if (found_it) break;
     }
 
     if (!found_it) {
@@ -143,6 +154,11 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
 
 void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
 {
+
+    if (this->myOneTimeInitFlag) {
+        onetimeinit();
+        this->myOneTimeInitFlag = false;
+    }
 
     // get inlet conditions from inlet node
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);

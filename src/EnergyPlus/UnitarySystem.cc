@@ -1984,6 +1984,15 @@ namespace UnitarySystems {
                 ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
 
+            // Use multispeed/variablespeed control algorithm regardless of number of speeds
+            if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                this->m_MultiSpeedCoolingCoil = true;
+            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                this->m_VarSpeedCoolingCoil = true;
+            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
+                // not sure what to do here
+            }
+
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
                 newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
@@ -4118,7 +4127,7 @@ namespace UnitarySystems {
                 } else if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
                            thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
                     thisSys.m_VarSpeedHeatingCoil = true;
-                }
+                } // CoilDX_Cooling sets these above
 
                 // coil outlet node set point has priority, IF not exist, then use system outlet node
                 if (SetPointManager::NodeHasSPMCtrlVarType(thisSys.AirOutNode, SetPointManager::iCtrlVarType_Temp))
@@ -6745,7 +6754,7 @@ namespace UnitarySystems {
                                             "System",
                                             "Average",
                                             unitarySys[sysNum].Name);
-                    } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                    } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling || (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling)) {
                         SetupOutputVariable("Unitary System Cooling Ancillary Electric Energy",
                                             OutputProcessor::Unit::J,
                                             unitarySys[sysNum].m_CoolingAuxElecConsumption,
@@ -6802,6 +6811,7 @@ namespace UnitarySystems {
                                                 unitarySys[sysNum].Name);
                         }
                     } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
+                               (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
@@ -6841,6 +6851,7 @@ namespace UnitarySystems {
                 }
 
                 if (unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                    unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling ||
                     unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
                     unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                     unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
@@ -9837,10 +9848,10 @@ namespace UnitarySystems {
 
                 if (CoolingLoad) {
                     if (this->m_CoolingSpeedNum > 1) {
-                        CoilPLR = 1.0;
-                        this->m_CoolingSpeedRatio = PartLoadRatio;
+                        CoilPLR = 1.0 * double(CompOn);
+                        this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
                     } else {
-                        CoilPLR = PartLoadRatio;
+                        CoilPLR = PartLoadRatio * double(CompOn);
                         //                UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0; // isn't this handled somewhere else?
                     }
                 } else {
@@ -12650,6 +12661,25 @@ namespace UnitarySystems {
                 }
             }
             DXCoils::SimDXCoilMultiSpeed(CompName, 0.0, PartLoadFrac, CompIndex, SpeedNum, this->m_FanOpMode, 1, this->m_SingleMode);
+
+        } else if (CoilTypeNum == DataHVACGlobals::CoilDX_Cooling) {
+
+            if (CoilType == DataHVACGlobals::Cooling) {
+                if (this->m_CoolingSpeedNum <= 1.0) {
+                    SpeedRatio = 0.0;
+                    CycRatio = PartLoadFrac;
+                } else {
+                    if (this->m_SingleMode == 0) {
+                        SpeedRatio = PartLoadFrac;
+                        CycRatio = 0.0;
+                    } else {
+                        SpeedRatio = 1.0;
+                        CycRatio = PartLoadFrac;
+                    }
+                }
+            }
+            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
+                this->m_DehumidificationMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
 
         } else if (CoilTypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
 

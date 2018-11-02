@@ -132,6 +132,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
     Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
 
+	// Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
     thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
@@ -150,7 +151,13 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
         thisspeed.AirFF = 0.0;
     }
 
-    auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode);
+    // If multispeed, evaluate high speed first using speedRatio as PLR
+    Real64 plr1 = PLR;
+    if (speedNum > 1) {
+        plr1 = speedRatio;
+    }
+
+    auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, plr1, fanOpMode);
 
     Psychrometrics::PsychState finalOutletConditions;
 
@@ -163,25 +170,20 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
     }
     finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(finalOutletConditions.h, finalOutletConditions.w);
 
-    if (speedNum > 1) {
-        OpModeRTF = thisspeed.RTF;
-        OpModePower = thisspeed.FullLoadPower;
-    } else {
-        OpModeRTF = thisspeed.RTF;
-        OpModePower = thisspeed.FullLoadPower * OpModeRTF;
-    }
+    OpModeRTF = thisspeed.RTF;
+    OpModePower = thisspeed.FullLoadPower * thisspeed.RTF;
 
     if (speedNum > 1) {
 
-        auto &thisspeed(this->speeds[speedNum - 1]);
+        // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
+        auto &lowerspeed(this->speeds[max(speedNum - 2,0)]);
 
-        auto out = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode);
+        auto out = lowerspeed.CalcSpeedOutput(inletState, PLR, fanOpMode);
 
         finalOutletConditions.w = outSpeed1.w * speedRatio + (1.0 - speedRatio) * out.w;
         finalOutletConditions.h = outSpeed1.h * speedRatio + (1.0 - speedRatio) * out.h;
         finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(finalOutletConditions.h, finalOutletConditions.w);
-        OpModeRTF = thisspeed.RTF;
-        OpModePower = OpModePower + thisspeed.FullLoadPower * OpModeRTF;
+        OpModePower = OpModePower + lowerspeed.FullLoadPower;
     }
 
     return finalOutletConditions;

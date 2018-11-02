@@ -181,7 +181,7 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
 }
 
 Psychrometrics::PsychState
-CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletState, Real64 &PLR, Real64 &speedRatio, int &fanOpMode)
+CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletState, Real64 &PLR, int &fanOpMode)
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -246,6 +246,7 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
         }
 
         TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
+        hDelta = TotCap / AirMassFlow;
 
         SHR = 0.0;
         if (indexSHRFT > 0) {
@@ -253,7 +254,6 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
             break;
         } else {
             // Calculate apparatus dew point conditions using TotCap and CBF
-            hDelta = TotCap / AirMassFlow;
             Real64 hADP = inletState.h - hDelta / (1.0 - CBF);
             Real64 tADP = Psychrometrics::PsyTsatFnHPb(hADP, ambPressure, RoutineName);
             Real64 wADP = Psychrometrics::PsyWFnTdbH(tADP, hADP, RoutineName);
@@ -300,7 +300,7 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
     RTF = PLR / PLF;
     FullLoadPower = TotCap * EIR;
 
-    outletState.h = inletState.h - (TotCap / AirMassFlow);
+    outletState.h = inletState.h - hDelta;
     Real64 hTinwout = inletState.h - ((1.0 - SHR) * hDelta);
     outletState.w = Psychrometrics::PsyWFnTdbH(inletState.tdb, hTinwout);
     outletState.tdb = Psychrometrics::PsyTdbFnHW(outletState.h, outletState.w);
