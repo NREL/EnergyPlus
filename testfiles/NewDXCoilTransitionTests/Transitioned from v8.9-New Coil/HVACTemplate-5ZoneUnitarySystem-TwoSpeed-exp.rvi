@@ -1,0 +1,81 @@
+eplusout.eso
+eplusout.csv
+Environment,Site Outdoor Air Drybulb Temperature 
+PLENUM-1,Zone Mean Radiant Temperature 
+SPACE1-1,Zone Mean Radiant Temperature 
+SPACE2-1,Zone Mean Radiant Temperature 
+SPACE3-1,Zone Mean Radiant Temperature 
+SPACE4-1,Zone Mean Radiant Temperature 
+SPACE5-1,Zone Mean Radiant Temperature 
+PLENUM-1,Zone Operative Temperature 
+SPACE1-1,Zone Operative Temperature 
+SPACE2-1,Zone Operative Temperature 
+SPACE3-1,Zone Operative Temperature 
+SPACE4-1,Zone Operative Temperature 
+SPACE5-1,Zone Operative Temperature 
+PLENUM-1,Zone Air System Sensible Heating Rate 
+PLENUM-1,Zone Air System Sensible Cooling Rate 
+PLENUM-1,Zone Air Temperature 
+PLENUM-1,Zone Air Humidity Ratio 
+PLENUM-1,Zone Air Relative Humidity 
+SPACE1-1,Zone Air System Sensible Heating Rate 
+SPACE1-1,Zone Air System Sensible Cooling Rate 
+SPACE1-1,Zone Air Temperature 
+SPACE1-1,Zone Air Humidity Ratio 
+SPACE1-1,Zone Air Relative Humidity 
+SPACE2-1,Zone Air System Sensible Heating Rate 
+SPACE2-1,Zone Air System Sensible Cooling Rate 
+SPACE2-1,Zone Air Temperature 
+SPACE2-1,Zone Air Humidity Ratio 
+SPACE2-1,Zone Air Relative Humidity 
+SPACE3-1,Zone Air System Sensible Heating Rate 
+SPACE3-1,Zone Air System Sensible Cooling Rate 
+SPACE3-1,Zone Air Temperature 
+SPACE3-1,Zone Air Humidity Ratio 
+SPACE3-1,Zone Air Relative Humidity 
+SPACE4-1,Zone Air System Sensible Heating Rate 
+SPACE4-1,Zone Air System Sensible Cooling Rate 
+SPACE4-1,Zone Air Temperature 
+SPACE4-1,Zone Air Humidity Ratio 
+SPACE4-1,Zone Air Relative Humidity 
+SPACE5-1,Zone Air System Sensible Heating Rate 
+SPACE5-1,Zone Air System Sensible Cooling Rate 
+SPACE5-1,Zone Air Temperature 
+SPACE5-1,Zone Air Humidity Ratio 
+SPACE5-1,Zone Air Relative Humidity 
+PLENUM-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+SPACE1-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+SPACE2-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+SPACE3-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+SPACE4-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+SPACE5-1,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time 
+PLENUM-1,Zone Heating Setpoint Not Met While Occupied Time 
+PLENUM-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SPACE1-1,Zone Heating Setpoint Not Met While Occupied Time 
+SPACE1-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SPACE2-1,Zone Heating Setpoint Not Met While Occupied Time 
+SPACE2-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SPACE3-1,Zone Heating Setpoint Not Met While Occupied Time 
+SPACE3-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SPACE4-1,Zone Heating Setpoint Not Met While Occupied Time 
+SPACE4-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SPACE5-1,Zone Heating Setpoint Not Met While Occupied Time 
+SPACE5-1,Zone Cooling Setpoint Not Met While Occupied Time 
+SYS 2 FURNACE DX COOL HEATING COIL,Heating Coil Heating Rate 
+SYS 3 HEAT PUMP AIR SOURCE SUPP HEAT OR REHEAT COIL,Heating Coil Heating Rate 
+SYS 4 HEAT PUMP AIR SOURCE SUPP HEAT OR REHEAT COIL,Heating Coil Heating Rate 
+SYS 1 FURNACE DX COOL HEATING COIL,Heating Coil Heating Rate 
+SYS 5 FURNACE DX COOL HEATING COIL,Heating Coil Heating Rate 
+SYS 3 HEAT PUMP AIR SOURCE HEATING COIL,Heating Coil Heating Rate 
+SYS 4 HEAT PUMP AIR SOURCE HEATING COIL,Heating Coil Heating Rate 
+SYS 1 FURNACE DX COOL COOLING COIL,Cooling Coil Total Cooling Rate 
+SYS 1 FURNACE DX COOL COOLING COIL,Cooling Coil Sensible Cooling Rate 
+SYS 2 FURNACE DX COOL COOLING COIL,Cooling Coil Total Cooling Rate 
+SYS 2 FURNACE DX COOL COOLING COIL,Cooling Coil Sensible Cooling Rate 
+SYS 3 HEAT PUMP AIR SOURCE COOLING COIL,Cooling Coil Total Cooling Rate 
+SYS 3 HEAT PUMP AIR SOURCE COOLING COIL,Cooling Coil Sensible Cooling Rate 
+SYS 4 HEAT PUMP AIR SOURCE COOLING COIL,Cooling Coil Total Cooling Rate 
+SYS 4 HEAT PUMP AIR SOURCE COOLING COIL,Cooling Coil Sensible Cooling Rate 
+SYS 5 FURNACE DX COOL COOLING COIL,Cooling Coil Total Cooling Rate 
+SYS 5 FURNACE DX COOL COOLING COIL,Cooling Coil Sensible Cooling Rate  
+0

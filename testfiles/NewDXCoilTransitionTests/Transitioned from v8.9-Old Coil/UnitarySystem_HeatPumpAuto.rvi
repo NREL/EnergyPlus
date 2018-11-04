@@ -1,0 +1,39 @@
+eplusout.eso
+eplusout.csv
+WEST ZONE,Zone Air System Sensible Heating Energy 
+WEST ZONE,Zone Air System Sensible Cooling Energy 
+WEST ZONE,Zone Air Temperature 
+WEST ZONE,Zone Air Humidity Ratio 
+WEST ZONE,Zone Air Relative Humidity 
+EAST ZONE,Zone Air System Sensible Heating Energy 
+EAST ZONE,Zone Air System Sensible Cooling Energy 
+EAST ZONE,Zone Air Temperature 
+EAST ZONE,Zone Air Humidity Ratio 
+EAST ZONE,Zone Air Relative Humidity 
+NORTH ZONE,Zone Air System Sensible Heating Energy 
+NORTH ZONE,Zone Air System Sensible Cooling Energy 
+NORTH ZONE,Zone Air Temperature 
+NORTH ZONE,Zone Air Humidity Ratio 
+NORTH ZONE,Zone Air Relative Humidity 
+SUPPLY FAN 1,Fan Electric Power 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Total Cooling Rate 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Total Cooling Energy 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Sensible Cooling Rate 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Sensible Cooling Energy 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Latent Cooling Rate 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Latent Cooling Energy 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Electric Power 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Electric Energy 
+HEAT PUMP ACDXCOIL 1,Cooling Coil Runtime Fraction 
+HEAT PUMP DX HEATING COIL 1,Heating Coil Heating Rate 
+HEAT PUMP DX HEATING COIL 1,Heating Coil Heating Energy 
+HEAT PUMP DX HEATING COIL 1,Heating Coil Electric Power 
+HEAT PUMP DX HEATING COIL 1,Heating Coil Defrost Electric Power 
+HEAT PUMP DX HEATING COIL 1,Heating Coil Defrost Electric Energy 
+HEAT PUMP DX SUPP HEATING COIL 1,Heating Coil Heating Energy 
+HEAT PUMP DX SUPP HEATING COIL 1,Heating Coil Heating Rate 
+HEAT PUMP DX SUPP HEATING COIL 1,Heating Coil Gas Rate 
+HEAT PUMP DX SUPP HEATING COIL 1,Heating Coil Electric Power 
+DXAC HEAT PUMP 1,Unitary System Fan Part Load Ratio 
+DXAC HEAT PUMP 1,Unitary System Compressor Part Load Ratio  
+0
