@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdlib>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -7918,7 +7920,22 @@ namespace WaterThermalTanks {
         return PartLoadFactor;
     }
 
-    void CalcWaterThermalTankStratified(int const WaterThermalTankNum) // Water Heater being simulated
+    void CalcWaterThermalTankStratified(int const WaterThermalTankNum)
+    {
+        const static char* env_p{ std::getenv("NEWTANKMODEL") };
+        static bool useNewModel{ false };
+        if (env_p) {
+            if ( env_p[0] == '1' )
+                useNewModel = true;
+        }
+        if (useNewModel) {
+            CalcWaterThermalTankStratifiedNew(WaterThermalTankNum);
+        } else {
+            CalcWaterThermalTankStratifiedOld(WaterThermalTankNum);
+        }
+    }
+
+    void CalcWaterThermalTankStratifiedOld(int const WaterThermalTankNum) // Water Heater being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -8408,6 +8425,26 @@ namespace WaterThermalTanks {
 
         // Add water heater skin losses and venting losses to ambient zone, if specified
         if (Tank.AmbientTempZone > 0) WaterThermalTank(WaterThermalTankNum).AmbientZoneGain = -Qlosszone - Qvent;
+    }
+
+    void CalcWaterThermalTankStratifiedNew(int const WaterThermalTankNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Noel Merket, Peter Graham Ellis
+        //       DATE WRITTEN   January 2007
+        //       MODIFIED       Nov 2011, BAN; modified the use and source outlet temperature calculation
+        //       RE-ENGINEERED  Noel Merket, November 2018
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Simulates a stratified, multi-node water heater tank with up to two heating elements.
+
+        // METHODOLOGY EMPLOYED:
+        // This model uses a numerical calculation based on an analytical solution of the ODE dT/dt = a*T + b.
+        // A heat balance is calculated for each node at a sub time step interval of one second.
+        // Temperatures and energies change dynamically over the system time step.
+        // Final node temperatures are reported as final instantaneous values as well as averages over the
+        // time step.  Heat transfer rates are averages over the time step.
+
     }
 
     void CalcNodeMassFlows(int const WaterThermalTankNum, // Water Heater being simulated
