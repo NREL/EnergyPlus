@@ -84,16 +84,22 @@ that is coupled with an error definition in a JSON-formatted file:
     "prefix": "AFN",
     "number": "003"
    },
-   "name": "Too Many Fans on AirLoop",
-   "message": [
-     "{RoutineName}: An AirLoop branch, {BranchName}, has two or more fans: {Fans}",
-     "The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make changes in the input file accordingly."
-   ]
-   "documentation": "The specified opening factor is larger than 1, which is not allowed."
+   "name": {
+     "en" : Too Many Fans on AirLoop"
+   },
+   "message": { 
+     "en" : [
+       "{RoutineName}: An AirLoop branch, {BranchName}, has two or more fans: {Fans}",
+       "The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make changes in the input file accordingly."
+     ]
+   },
+   "documentation": { 
+     "en" : "The specified opening factor is larger than 1, which is not allowed."
+   }
 }
 ```
 
-The JSON file is used to generate the necessary C++ code to allow for the above call signature. The information is converted from the JSON form into an element of an array inside the tracker object:
+The JSON file is used to generate the necessary C++ code to allow for the above call signature. The format anticipates the inclusion of internationalized messages, but such a  capability will not be implemented at this time. The information is converted from the JSON form into an element of an array inside the tracker object:
 
 ```
 Event(Event::Type::Error, "EAFN001", {
@@ -113,21 +119,30 @@ Recurring errors are handled slightly differently. A recurring error handle is c
     "prefix": "AFN",
     "number": "002"
   },
-  "name": "Opening Factor Too Large",
-  "message": [
-    "AirflowNetwork: The window or door opening factor is greater than 1.0 for Multizone:Surface \"{SurfaceName}\"",
-    "The window or door opening factor is {OpeningFactor}"
-  ],
+  "name": {
+    "en" : "Opening Factor Too Large"
+  }
+  "message": {
+    "en" : [
+      "AirflowNetwork: The window or door opening factor is greater than 1.0 for Multizone:Surface \"{SurfaceName}\"",
+      "The window or door opening factor is {OpeningFactor}"
+    ]
+  },
   "recurring": {
-    "message": [
-      "AirflowNetwork: The window or door opening factor is greater than 1.0 for Multizone:Surface \"{SurfaceName}\", continues"
-    ],
+    "message": {
+      "en" : [
+        "AirflowNetwork: The window or door opening factor is greater than 1.0 for Multizone:Surface \"{SurfaceName}\", continues"
+      ]
+    },
     "tracking": [
       {
         "parameter": "OpeningFactor",
         "type": "minmax"
       }
     ]
+  },
+  "documentation" : {
+    "en" : "A window or door opening factor is out of range and will be truncated to 1.0"
   }
 }
 ```
@@ -139,7 +154,7 @@ RecurringHandle handle = tracker.create_recurring(RecurringCode::AFNA0A, 2,
     epfmt::arg("SurfaceName", "Srf-001"));
 ```
 
-The integer `2` in the call determines the number of times the error will be displaced. After creation the error can be repeatedly used:
+The integer `2` in the call determines the number of times the error will be displayed. After creation, the error can be repeatedly used:
 
 ```
  tracker.recurring(handle, __FILE__, __LINE__, epfmt::arg("SurfaceName", "Srf-001"),
