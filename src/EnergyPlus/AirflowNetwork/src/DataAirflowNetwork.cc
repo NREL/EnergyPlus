@@ -201,7 +201,7 @@ namespace AirflowNetwork {
     Array1D<DetailedOpening> MultizoneCompDetOpeningData;
     Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
     Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
+    //Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
     Array1D<SurfaceEffectiveLeakageArea> MultizoneSurfaceELAData;
     Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
@@ -270,7 +270,7 @@ namespace AirflowNetwork {
         MultizoneCompDetOpeningData.deallocate();
         MultizoneCompSimpleOpeningData.deallocate();
         MultizoneCompHorOpeningData.deallocate();
-        MultizoneSurfaceStdConditionsCrackData.deallocate();
+        //MultizoneSurfaceStdConditionsCrackData.deallocate();
         MultizoneSurfaceCrackData.deallocate();
         MultizoneSurfaceELAData.deallocate();
         MultizoneExternalNodeData.deallocate();

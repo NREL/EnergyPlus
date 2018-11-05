@@ -1455,7 +1455,7 @@ namespace AirflowNetwork {
     extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
     extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
     extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
+    //extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
     extern Array1D<SurfaceEffectiveLeakageArea> MultizoneSurfaceELAData;
     extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;

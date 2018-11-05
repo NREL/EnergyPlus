@@ -93,7 +93,6 @@ namespace AirflowNetworkBalanceManager {
     extern int AirflowNetworkNumOfDetOpenings;
     extern int AirflowNetworkNumOfSimOpenings;
     extern int AirflowNetworkNumOfHorOpenings;
-    extern int AirflowNetworkNumOfStdCndns;
     extern int AirflowNetworkNumOfSurCracks;
     extern int AirflowNetworkNumOfSurELA;
     extern int AirflowNetworkNumOfExtNode;

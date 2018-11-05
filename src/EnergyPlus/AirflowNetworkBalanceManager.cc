@@ -248,7 +248,6 @@ namespace AirflowNetworkBalanceManager {
     int AirflowNetworkNumOfDetOpenings(0);
     int AirflowNetworkNumOfSimOpenings(0);
     int AirflowNetworkNumOfHorOpenings(0);
-    int AirflowNetworkNumOfStdCndns(0);
     int AirflowNetworkNumOfSurCracks(0);
     int AirflowNetworkNumOfSurELA(0);
     int AirflowNetworkNumOfExtNode(0);
@@ -307,11 +306,12 @@ namespace AirflowNetworkBalanceManager {
     // Temporary globals
     std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
     ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
-    bool conditionsAreDefaulted(true);                                        // Conditions are defaulted?
+    bool conditionsAreDefaulted{true};                                        // Conditions are defaulted?
 
     void clear_state()
     {
         referenceConditions.clear();
+        conditionsAreDefaulted = true;
         PZ.deallocate();
         MA.deallocate();
         MV.deallocate();
@@ -324,7 +324,6 @@ namespace AirflowNetworkBalanceManager {
         AirflowNetworkNumOfDetOpenings = 0;
         AirflowNetworkNumOfSimOpenings = 0;
         AirflowNetworkNumOfHorOpenings = 0;
-        AirflowNetworkNumOfStdCndns = 0;
         AirflowNetworkNumOfSurCracks = 0;
         AirflowNetworkNumOfSurELA = 0;
         AirflowNetworkNumOfExtNode = 0;
@@ -535,11 +534,11 @@ namespace AirflowNetworkBalanceManager {
 
         static std::string const RoutineName{"GetAirflowElementInput"};
         std::string CurrentModuleObject;
-        bool ErrorsFound;
+        bool ErrorsFound{false};
 
         // *** Read AirflowNetwork simulation reference crack conditions
-        // std::unordered_map<std::string, ReferenceConditions> rcc; // Map for lookups
-        // ReferenceConditions defaultRCC;                           // Defaulted conditions
+        // std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
+        // ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
         // bool conditionsAreDefaulted(true);                        // Conditions are defaulted?
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
         auto instances = inputProcessor->epJSON.find(CurrentModuleObject);
@@ -567,8 +566,8 @@ namespace AirflowNetworkBalanceManager {
                 }
                 Real64 humidity{fields.at("reference_humidity_ratio")};
                 // globalSolverObject.referenceConditions.emplace_back(thisObjectName, temperature, pressure, humidity);
-                referenceConditions.emplace(std::piecewise_construct, std::forward_as_tuple(thisObjectName),
-                    std::forward_as_tuple(temperature, pressure, humidity));
+                referenceConditions.emplace(
+                    std::piecewise_construct, std::forward_as_tuple(thisObjectName), std::forward_as_tuple(temperature, pressure, humidity));
             }
             // Check that there is more than one
             if (referenceConditions.size() == 1) {
@@ -577,6 +576,7 @@ namespace AirflowNetworkBalanceManager {
                 conditionsAreDefaulted = false;
             }
         }
+        return ErrorsFound;
     }
 
     void GetAirflowNetworkInput()
@@ -1487,6 +1487,9 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
+        // *** Read AirflowNetwork element data
+        ErrorsFound |= GetAirflowElementInput();
+
         // *** Read AirflowNetwork simulation surface data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
         AirflowNetworkNumOfSurfaces = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -2380,6 +2383,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork simulation reference crack conditions
+        /*
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
         AirflowNetworkNumOfStdCndns = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (AirflowNetworkNumOfStdCndns > 0) {
@@ -2423,6 +2427,7 @@ namespace AirflowNetworkBalanceManager {
             MultizoneSurfaceStdConditionsCrackData(0).pressure = 101325.0;
             MultizoneSurfaceStdConditionsCrackData(0).humidityRatio = 0.0;
         }
+        */
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
@@ -2445,27 +2450,21 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneSurfaceCrackData(i).Name = Alphas(1);      // Name of surface crack component
                 MultizoneSurfaceCrackData(i).FlowCoef = Numbers(1); // Air Mass Flow Coefficient
                 MultizoneSurfaceCrackData(i).FlowExpo = Numbers(2); // Air Mass Flow exponent
+
                 if (lAlphaBlanks(2)) {
-                    if (AirflowNetworkNumOfStdCndns == 1) {
-                        MultizoneSurfaceCrackData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(1).temperature;
-                        MultizoneSurfaceCrackData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(1).pressure;
-                        MultizoneSurfaceCrackData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(1).humidityRatio;
-                    } else {
-                        MultizoneSurfaceCrackData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(0).temperature;
-                        MultizoneSurfaceCrackData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(0).pressure;
-                        MultizoneSurfaceCrackData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(0).humidityRatio;
-                    }
+                    MultizoneSurfaceCrackData(i).StandardT = defaultReferenceConditions.temperature;
+                    MultizoneSurfaceCrackData(i).StandardP = defaultReferenceConditions.pressure;
+                    MultizoneSurfaceCrackData(i).StandardW = defaultReferenceConditions.humidityRatio;
                 } else {
-                    j = UtilityRoutines::FindItemInList(
-                        Alphas(2), MultizoneSurfaceStdConditionsCrackData({1, AirflowNetworkNumOfStdCndns}), AirflowNetworkNumOfStdCndns);
-                    if (j == 0) {
+                    auto iter = referenceConditions.find(Alphas(2));
+                    if (iter == referenceConditions.end()) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(2) + " = " + Alphas(2) +
                                         " not found.");
                         ErrorsFound = true;
                     } else {
-                        MultizoneSurfaceCrackData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(j).temperature;
-                        MultizoneSurfaceCrackData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(j).pressure;
-                        MultizoneSurfaceCrackData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(j).humidityRatio;
+                        MultizoneSurfaceCrackData(i).StandardT = iter->second.temperature;
+                        MultizoneSurfaceCrackData(i).StandardP = iter->second.pressure;
+                        MultizoneSurfaceCrackData(i).StandardW = iter->second.humidityRatio;
                     }
                 }
             }
@@ -2538,26 +2537,19 @@ namespace AirflowNetworkBalanceManager {
                     ErrorsFound = true;
                 }
                 if (lAlphaBlanks(2)) {
-                    if (AirflowNetworkNumOfStdCndns == 1) {
-                        MultizoneCompExhaustFanData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(1).temperature;
-                        MultizoneCompExhaustFanData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(1).pressure;
-                        MultizoneCompExhaustFanData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(1).humidityRatio;
-                    } else {
-                        MultizoneCompExhaustFanData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(0).temperature;
-                        MultizoneCompExhaustFanData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(0).pressure;
-                        MultizoneCompExhaustFanData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(0).humidityRatio;
-                    }
+                    MultizoneCompExhaustFanData(i).StandardT = defaultReferenceConditions.temperature;
+                    MultizoneCompExhaustFanData(i).StandardP = defaultReferenceConditions.pressure;
+                    MultizoneCompExhaustFanData(i).StandardW = defaultReferenceConditions.humidityRatio;
                 } else {
-                    j = UtilityRoutines::FindItemInList(
-                        Alphas(2), MultizoneSurfaceStdConditionsCrackData({1, AirflowNetworkNumOfStdCndns}), AirflowNetworkNumOfStdCndns);
-                    if (j == 0) {
+                    auto iter = referenceConditions.find(Alphas(2));
+                    if (iter == referenceConditions.end()) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(2) + " = " + Alphas(2) +
                                         " not found.");
                         ErrorsFound = true;
                     } else {
-                        MultizoneCompExhaustFanData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(j).temperature;
-                        MultizoneCompExhaustFanData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(j).pressure;
-                        MultizoneCompExhaustFanData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(j).humidityRatio;
+                        MultizoneCompExhaustFanData(i).StandardT = iter->second.temperature;
+                        MultizoneCompExhaustFanData(i).StandardP = iter->second.pressure;
+                        MultizoneCompExhaustFanData(i).StandardW = iter->second.humidityRatio;
                     }
                 }
             }
@@ -3571,26 +3563,19 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (lAlphaBlanks(3)) {
-                    if (AirflowNetworkNumOfStdCndns == 1) {
-                        DisSysCompOutdoorAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(1).temperature;
-                        DisSysCompOutdoorAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(1).pressure;
-                        DisSysCompOutdoorAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(1).humidityRatio;
-                    } else {
-                        DisSysCompOutdoorAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(0).temperature;
-                        DisSysCompOutdoorAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(0).pressure;
-                        DisSysCompOutdoorAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(0).humidityRatio;
-                    }
+                    DisSysCompOutdoorAirData(i).StandardT = defaultReferenceConditions.temperature;
+                    DisSysCompOutdoorAirData(i).StandardP = defaultReferenceConditions.pressure;
+                    DisSysCompOutdoorAirData(i).StandardW = defaultReferenceConditions.humidityRatio;
                 } else {
-                    j = UtilityRoutines::FindItemInList(
-                        Alphas(3), MultizoneSurfaceStdConditionsCrackData({1, AirflowNetworkNumOfStdCndns}), AirflowNetworkNumOfStdCndns);
-                    if (j == 0) {
+                    auto iter = referenceConditions.find(Alphas(3));
+                    if (iter == referenceConditions.end()) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(3) + " = " + Alphas(3) +
                                         " not found.");
                         ErrorsFound = true;
                     } else {
-                        DisSysCompOutdoorAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(j).temperature;
-                        DisSysCompOutdoorAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(j).pressure;
-                        DisSysCompOutdoorAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(j).humidityRatio;
+                        DisSysCompOutdoorAirData(i).StandardT = iter->second.temperature;
+                        DisSysCompOutdoorAirData(i).StandardP = iter->second.pressure;
+                        DisSysCompOutdoorAirData(i).StandardW = iter->second.humidityRatio;
                     }
                 }
             }
@@ -3627,26 +3612,19 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (lAlphaBlanks(3)) {
-                    if (AirflowNetworkNumOfStdCndns == 1) {
-                        DisSysCompReliefAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(1).temperature;
-                        DisSysCompReliefAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(1).pressure;
-                        DisSysCompReliefAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(1).humidityRatio;
-                    } else {
-                        DisSysCompReliefAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(0).temperature;
-                        DisSysCompReliefAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(0).pressure;
-                        DisSysCompReliefAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(0).humidityRatio;
-                    }
+                    DisSysCompReliefAirData(i).StandardT = defaultReferenceConditions.temperature;
+                    DisSysCompReliefAirData(i).StandardP = defaultReferenceConditions.pressure;
+                    DisSysCompReliefAirData(i).StandardW = defaultReferenceConditions.humidityRatio;
                 } else {
-                    j = UtilityRoutines::FindItemInList(
-                        Alphas(3), MultizoneSurfaceStdConditionsCrackData({1, AirflowNetworkNumOfStdCndns}), AirflowNetworkNumOfStdCndns);
-                    if (j == 0) {
+                    auto iter = referenceConditions.find(Alphas(3));
+                    if (iter == referenceConditions.end()) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(3) + " = " + Alphas(3) +
                                         " not found.");
                         ErrorsFound = true;
                     } else {
-                        DisSysCompReliefAirData(i).StandardT = MultizoneSurfaceStdConditionsCrackData(j).temperature;
-                        DisSysCompReliefAirData(i).StandardP = MultizoneSurfaceStdConditionsCrackData(j).pressure;
-                        DisSysCompReliefAirData(i).StandardW = MultizoneSurfaceStdConditionsCrackData(j).humidityRatio;
+                        DisSysCompReliefAirData(i).StandardT = iter->second.temperature;
+                        DisSysCompReliefAirData(i).StandardP = iter->second.pressure;
+                        DisSysCompReliefAirData(i).StandardW = iter->second.humidityRatio;
                     }
                 }
             }

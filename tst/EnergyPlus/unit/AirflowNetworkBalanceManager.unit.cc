@@ -5666,7 +5666,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -6341,7 +6340,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -6979,7 +6977,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -7634,7 +7631,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -8271,7 +8267,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -8976,7 +8971,6 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
     EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
@@ -9448,7 +9442,6 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     EXPECT_EQ(3u, AirflowNetwork::MultizoneSurfaceData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
     EXPECT_EQ(1u, AirflowNetwork::MultizoneCompDetOpeningData.size());
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
     EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
     EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
