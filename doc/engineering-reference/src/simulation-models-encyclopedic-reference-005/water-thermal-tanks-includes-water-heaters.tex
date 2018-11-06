@@ -1,6 +1,6 @@
 \section{Water Thermal Tanks (includes Water Heaters) }\label{water-thermal-tanks-includes-water-heaters}
 
-Water thermal tanks are devices for storing thermal energy in water.~ The most common types are water heaters. devices for storing and heating water.~ Typical water heater applications are for domestic hot water heating, low-temperature radiant space heating, and energy storage for solar hot water systems or waste heat recovery.~ In EnergyPlus, water heater objects can be coupled to a plant loop simulation or used stand-alone.~ There are also chilled water storage tanks that can be used to hold cold water
+Water thermal tanks are devices for storing thermal energy in water.~ The most common types are water heaters. devices for storing and heating water.~ Typical water heater applications are for domestic hot water heating, low-temperature radiant space heating, and energy storage for solar hot water systems or waste heat recovery.~ In EnergyPlus, water heater objects can be coupled to a plant loop simulation or used stand-alone.~ There are also chilled water storage tanks that can be used to hold cold water.
 
 \subsection{Mixed Water Thermal Tank}\label{mixed-water-thermal-tank}
 
@@ -14,19 +14,19 @@ The well-mixed assumption implies that all water in the tank is at the same temp
 \rho V{c_p}\frac{{dT}}{{dt}} = {q_{net}}
 \end{equation}
 
-where
+where:
 
-\emph{r} = density of water
+\emph{\(\rho\)} is the density of water
 
-\emph{V} = volume of the tank
+\emph{V} is the volume of the tank
 
-\emph{c\(_{p}\)} = specific heat of water
+\emph{c\(_{p}\)} is the specific heat of water
 
-\emph{T} = temperature of the tank water
+\emph{T} is the temperature of the tank water
 
-\emph{t} = time
+\emph{t} is the time
 
-\emph{q\(_{net}\)} = net heat transfer rate to the tank water
+\emph{q\(_{net}\)} is the net heat transfer rate to the tank water.
 
 The density and volume can be replaced with the total mass \emph{m} of water in the tank to get:
 
@@ -40,23 +40,23 @@ The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due
 {q_{net}} = {q_{heater}} + {q_{oncycpara}} + {q_{offcycpara}} + {q_{oncycloss}} + {q_{offcycloss}} + {q_{use}} + {q_{source}}
 \end{equation}
 
-where
+where:
 
-\emph{q\(_{heater}\)} = heat added by the heating element or burner
+\(q_{heater}\) is the heat added by the heating element or burner
 
-\emph{q\(_{oncycpara}\)} = heat added due to on-cycle parasitic loads (zero when off)
+\(q_{oncycpara}\) is the heat added due to on-cycle parasitic loads (zero when off)
 
-\emph{q\(_{offcycpara}\)} = heat added due to off-cycle parasitic loads (zero when on)
+\(q_{offcycpara}\) is the heat added due to off-cycle parasitic loads (zero when on)
 
-\emph{q\(_{oncycloss}\)} = heat transfer to/from the ambient environment (zero when off)
+\(q_{oncycloss}\) is the heat transfer to/from the ambient environment (zero when off)
 
-\emph{q\(_{offcycloss}\)} = heat transfer to/from the ambient environment (zero when on)
+\(q_{offcycloss}\) is the heat transfer to/from the ambient environment (zero when on)
 
-\emph{q\(_{use}\)} = heat transfer to/from the use side plant connections
+\(q_{use}\) is the heat transfer to/from the use side plant connections
 
-\emph{q\(_{source}\)} = heat transfer to/from the source side plant connections
+\(q_{source}\) is the heat transfer to/from the source side plant connections
 
-\emph{q\(_{oncycloss}\)} and \emph{q\(_{offcycloss}\)} are defined as:
+\(q_{oncycloss}\) and \(q_{offcycloss}\) are defined as:
 
 \begin{equation}
 {q_{oncycloss}} = U{A_{oncyc}}\left( {{T_{amb}} - T} \right)
@@ -66,15 +66,15 @@ where
 {q_{offcycloss}} = U{A_{offcyc}}\left( {{T_{amb}} - T} \right)
 \end{equation}
 
-where
+where:
 
-\emph{UA\(_{oncyc}\)} = on-cycle loss coefficient to ambient environment (zero when off)
+\(UA_{oncyc}\) is the on-cycle loss coefficient to ambient environment (zero when off)
 
-\emph{UA\(_{offcyc}\)} = off-cycle loss coefficient to ambient environment (zero when on)
+\(UA_{offcyc}\) is the off-cycle loss coefficient to ambient environment (zero when on)
 
-\emph{T\(_{amb}\)} = temperature of ambient environment
+\(T_{amb}\) is the temperature of ambient environment
 
-\emph{q\(_{use}\)}, and \emph{q\(_{source}\)} are defined as:
+\(q_{use}\) and \(q_{source}\) are defined as:
 
 \begin{equation}
 {q_{use}} = {\varepsilon_{use}}{\dot m_{use}}{c_p}\left( {{T_{use}} - T} \right)
@@ -84,25 +84,25 @@ where
 {q_{source}} = {\varepsilon_{source}}{\dot m_{source}}{c_p}\left( {{T_{source}} - T} \right)
 \end{equation}
 
-where
+where:
 
-\emph{e\(_{use}\)} = heat exchanger effectiveness for the use side plant connections
+\({\varepsilon_{use}}\) is the heat exchanger effectiveness for the use side plant connections
 
-\({\dot m_{use}}\) = mass flow rate for the use side plant connections
+\({\dot m_{use}}\) is the mass flow rate for the use side plant connections
 
-\emph{T\(_{use}\)} = inlet fluid temperature of the use side plant connections
+\(T_{use}\) is the inlet fluid temperature of the use side plant connections
 
-\emph{e\(_{source}\)} = heat exchanger effectiveness for the source side plant connections
+\({\varepsilon_{source}}\) is the heat exchanger effectiveness for the source side plant connections
 
-\({\dot m_{source}}\) = mass flow rate for the source side plant connections
+\({\dot m_{source}}\) is the mass flow rate for the source side plant connections
 
-\emph{T\(_{source}\)} = inlet fluid temperature of the use side plant connections
+\(T_{source}\) is the inlet fluid temperature of the use side plant connections.
 
-Incorporating all of these equations into the original differential equation,
+Incorporating all of these equations into the original differential equation:
 
 \begin{equation}
-  \begin{array}{ll}
-    mC_p\frac{dT}{dt} &= q_{heater} + q_{oncyc} + q_{offcyc} + UA_{oncyc} \PB{T_{amb} - T} + UA_{offcyc} \PB{T_{amb} - T} \\ 
+  \begin{array}{rl}
+    mC_p\frac{dT}{dt} =& q_{heater} + q_{oncyc} + q_{offcyc} + UA_{oncyc} \PB{T_{amb} - T} + UA_{offcyc} \PB{T_{amb} - T} \\ 
                       &+ \varepsilon_{use}\dot{m}_{use}C_p \PB{T_{use} - T} + \varepsilon_{source}\dot{m}_{source}C_p \PB{T_{source} - T}
   \end{array}
 \end{equation}
@@ -110,8 +110,8 @@ Incorporating all of these equations into the original differential equation,
 Associating terms not dependent on temperature \emph{T} and terms dependent on temperature \emph{T} yields:
 
 \begin{equation}
-  \begin{array}{ll}
-    \frac{dT}{dt} &= \RB{\frac{1}{mC_p}\PB{\begin{array}{c}
+  \begin{array}{rl}
+    \frac{dT}{dt} =& \RB{\frac{1}{mC_p}\PB{\begin{array}{c}
                                              q_{heater}+q_{oncyc}+q_{offcyc}+UA_{oncyc}T_{amb}+UA_{offcyc}T_{amb} \\
                                              + \varepsilon_{use}\dot{m}_{use}C_pT_{use} + \varepsilon_{source}\dot{m}_{source}C_pT_{source}
                                            \end{array}}} \\
@@ -119,13 +119,13 @@ Associating terms not dependent on temperature \emph{T} and terms dependent on t
   \end{array}
 \end{equation}
 
-The differential equation now has the form
+The differential equation now has the form:
 
 \begin{equation}
 \frac{{dT}}{{dt}} = a + bT
 \end{equation}
 
-where
+where:
 
 \begin{equation}
 a = \frac{1}{{m{c_p}}}\left( \begin{array}{l}{q_{heater}} + {q_{oncyc}} + {q_{offcyc}} + U{A_{oncyc}}{T_{amb}} + U{A_{offcyc}}{T_{amb}}\\ + {\varepsilon_{use}}{{\dot m}_{use}}{c_p}{T_{use}} + {\varepsilon_{source}}{{\dot m}_{source}}{c_p}{T_{source}}\end{array} \right)
@@ -159,17 +159,15 @@ Since the control algorithm must sometimes calculate the time needed to reach a 
 t = \frac{1}{b}\ln \left( {\frac{{{\raise0.7ex\hbox{a} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{b}} + {T_f}}}{{{\raise0.7ex\hbox{a} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{b}} + {T_i}}}} \right)
 \end{equation}
 
-or, if \emph{b} = 0,
+or, if \emph{b} = 0:
 
 \begin{equation}
 t = \frac{{{T_f} - {T_i}}}{a}
 \end{equation}
 
-where
+where \(T_{f}\) is the final temperature of the tank water at time t.
 
-\emph{T\(_{f}\)} = final temperature of the tank water at time t.
-
-In the special case where \emph{b} = 0 and \emph{a} = 0, and \emph{T\(_{f}\)} \textless{}\textgreater{} \emph{T\(_{i}\)}, the time \emph{t} is infinity.
+In the special case where \emph{b} = 0 and \emph{a} = 0, and \emph{T\(_{f}\)} \(\neq\) \emph{T\(_{i}\)}, the time \emph{t} is infinity.
 
 \subsubsection{Water Heater Control Algorithm}\label{water-heater-control-algorithm}
 
@@ -179,7 +177,7 @@ When modulating, the heater power varies between the maximum and minimum heater 
 
 Within a time step, the differential equation is solved separately for when the heater element or burner is ``on'' (on-cycle) and when it is ``off'' (off-cycle).~ This approach allows ambient losses and parasitic loads to be divided into on-cycle and off-cycle effects and accounted for in detail.
 
-An illustration of how the control algorithm cycles on and off is shown below.~ Ambient losses cool the tank temperature until the bottom of the deadband is reached (50 C) at which point the heater cycles on and reheats the tank back to the setpoint (60 C).~ A water draw causes hot water to be replaced with cold water from the water mains.~ The incoming cold water rapidly cools the tank.~ In this example the heater cannot keep up with the water draw and the tank temperature continues to drop until the water draw ends.
+An illustration of how the control algorithm cycles on and off is shown below.~ Ambient losses cool the tank temperature until the bottom of the deadband is reached (50\(^{\circ}\)C) at which point the heater cycles on and reheats the tank back to the setpoint (60\(^{\circ}\)C).~ A water draw causes hot water to be replaced with cold water from the water mains.~ The incoming cold water rapidly cools the tank.~ In this example the heater cannot keep up with the water draw and the tank temperature continues to drop until the water draw ends.
 
 Although the instantaneous tank water temperature may vary considerably within a timestep (due to cycling, etc.), only the average temperature over the timestep is reported.~ The model calculates the average by piece-wise integration of the area under the instantaneous temperature curve for each unique set of conditions.~ The instantaneous temperature is preserved internally by the program and is propogated from the end of one timestep to the beginning of the next.
 
@@ -197,13 +195,12 @@ The input objects ThermalStorage:ChilledWater:Mixed and ThermalStorage:ChilledWa
 
 For water heaters, the industry standard ratings of Recovery Efficiency and Energy Factor are calculated according to the 10CFR430 test procedure.~ To emulate the test procedure, a 24-hour simulation of the water heater is performed internally using the specified test conditions:
 
-n~Setpoint Temperature = 57.2 C (135 F)
-
-n~Ambient Temperature = 19.7 C (67.5 F)
-
-n~Ambient Relative Humidity = 50\% (used for heat pump water heaters)
-
-n~Inlet Temperature (Water Mains) = 14.4 C (58 F)
+\begin{itemize}
+\item Setpoint Temperature = 57.2\(^{\circ}\)C (135\(^{\circ}\)F)
+\item Ambient Temperature = 19.7\(^{\circ}\)C (67.5\(^{\circ}\)F)
+\item Ambient Relative Humidity = 50\% (used for heat pump water heaters)
+\item Inlet Temperature (Water Mains) = 14.4\(^{\circ}\)C (58\(^{\circ}\)F)
+\end{itemize}
 
 For heat pump water heaters, the water heater tank's heating element and water heater tank parasitic loads are disabled and the user-defined water heating capacity, energy use, and parasitic loads for the heat pump are used to calculate Recovery Efficiency and Energy Factor.
 
@@ -215,13 +212,13 @@ The Recovery Efficiency is calculated when the water heater recovers to the setp
 RE = \frac{{{m_1}{c_p}\left( {57.2 - 14.4} \right)}}{{{E_1}}}
 \end{equation}
 
-where
+where:
 
-\emph{m\(_{1}\)} = water mass of the first draw
+\(m_{1}\) is the water mass of the first draw
 
-\emph{c\(_{p}\)} = specific heat of water
+\(c_{p}\) is the specific heat of water
 
-\emph{E\(_{1}\)} = fuel energy consumed until the setpoint is recovered (including parasitics)
+\(E_{1}\) is the fuel energy consumed until the setpoint is recovered (including parasitics).
 
 Note: When the standards rating for a heat pump water heater is calculated, the fuel energy consumed refers to the total energy consumed by the heat pump compressor, evaporator fan, condenser pump, and parasitic loads. It is assumed that the parasitic loads for a heat pump water heater do not contribute to heating the water (ref. Heat Pump Water Heater).
 
@@ -231,13 +228,13 @@ The Energy Factor is calculated at the end of the 24-hour simulation period.
 EF = \frac{{{m_{total}}{c_p}\left( {57.2 - 14.4} \right)}}{{{E_{total}}}}
 \end{equation}
 
-where
+where:
 
-\emph{m\(_{total}\)} = total water mass of all six draws
+\(m_{total}\) is the total water mass of all six draws
 
-\emph{c\(_{p}\)} = specific heat of water
+\(c_{p}\) is the specific heat of water
 
-\emph{E\(_{total}\)} = total fuel energy consumed over 24 hours (including parasitics)
+\(E_{total}\) is the total fuel energy consumed over 24 hours (including parasitics).
 
 Under certain input parameters, the rating method will not succeed and a warning message will be generated.~ Problems occur when inputs do not allow the tank to recover to the setpoint temperature within the test period.~ This can occur if the maximum heater capacity is undersized, or if the deadband temperature difference is large enough that the first draw of the test does not trigger the heater to come on.~ In either case, the Recovery Efficiency test will not compute properly because recovery to the setpoint was not achieved.
 
@@ -249,22 +246,21 @@ Under certain input parameters, the rating method will not succeed and a warning
 
 \subsubsection{Overview}\label{overview-029}
 
-The input objects \lstinline!WaterHeater:HeatPump:*! provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., \lstinline!WaterHeater:Mixed! or \lstinline!WaterHeater:Stratified!), a direct expansion (DX) ``coil'' (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+The input objects WaterHeater:HeatPump:* provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) ``coil'' (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
 
 There are two types of heat pump water heater models available:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
-\item
-  \lstinline!WaterHeater:HeatPump:PumpedCondenser!: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature.
-\item
-  \lstinline!WaterHeater:HeatPump:WrappedCondenser!: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
+\item WaterHeater:HeatPump:PumpedCondenser: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature.
+\item WaterHeater:HeatPump:WrappedCondenser: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
 \end{enumerate}
 
-Each type of \lstinline!WaterHeater:HeatPump:*! object is compatible with certain \lstinline!Coil:WaterHeating:AirToWaterHeatPump:*! objects as shown in the following table:
+Each type of WaterHeater:HeatPump:* object is compatible with certain Coil:WaterHeating:AirToWaterHeatPump:* objects as shown in Table~\ref{table:compatibility-of-water-heater-objects}.
 
 \begin{longtable}[c]{@{}ll@{}}
+\caption{Compatibility of Water Heater Objects \label{table:compatibility-of-water-heater-objects}} \tabularnewline
 \toprule 
 WaterHeater:HeatPump:* & WaterHeater:* \tabularnewline
 \midrule
@@ -281,9 +277,10 @@ WrappedCondenser & Wrapped \tabularnewline
 \bottomrule
 \end{longtable}
 
-Additionally the \lstinline!WaterHeater:HeatPump:WrappedCondenser! object is only compatible with stratified tanks. Therefore \lstinline!WaterHeater:HeatPump:*! has the following tank compatibility matrix:
+Additionally the WaterHeater:HeatPump:WrappedCondenser object is only compatible with stratified tanks. Therefore, WaterHeater:HeatPump:* has the tank compatibility as shown in Table~\ref{table:compatibility-of-water-heaters-with-tank-types}.
 
 \begin{longtable}[c]{@{}lll@{}}
+\caption{Compatibility of Water Heaters with Tank Types \label{table:compatibility-of-water-heaters-with-tank-types}} \tabularnewline
 \toprule
 WaterHeater:HeatPump:* & \multicolumn{2}{c}{WaterHeater:*} \tabularnewline
 \cmidrule{2-3}
@@ -323,16 +320,16 @@ Note: The water heater tank location shown in the figures above is completely in
 The heat pump water heater input requires a compressor setpoint temperature schedule and dead band temperature difference, which are independent from the setpoint temperature schedule and dead band temperature difference for the heater (element or burner) associated with the water heater tank. The cut-in temperature for the heat pump compressor is defined as the heat pump compressor's setpoint temperature minus its dead band temperature difference.
 
 \begin{equation}
-{T_{HP,\,cut - in}}\,\, = \,\,{T_{HP,set\,point}}\,\, - \,\,{T_{HP,dead\,band}}
+{T_{HP,\,cut - in}} = {T_{HP,set\,point}} - {T_{HP,dead\,band}}
 \end{equation}
 
 where:
 
-\({T_{HP,\,cut - in}}\) ~~~~ = Cut-in temperature for the heat pump compressor (°C)
+\({T_{HP,\,cut - in}}\) is the cut-in temperature for the heat pump compressor (\(^{\circ}\)C)
 
-\({T_{HP,set\,point}}\) ~~ = Heat pump compressor setpoint temperature (°C)
+\({T_{HP,set\,point}}\) is the heat pump compressor setpoint temperature (\(^{\circ}\)C)
 
-\({T_{HP,dead\,band}}\) = Heat pump compressor dead band temperature difference (°C)
+\({T_{HP,dead\,band}}\) is the heat pump compressor dead band temperature difference (\(^{\circ}\)C).
 
 In this model, the heat pump water heater's DX compression system is considered the primary heat source and the water tank's heater (element or burner) provides supplemental heat as necessary. Therefore, the cut-in temperature for the heat pump compressor (setpoint minus dead band temperature difference) is usually higher than the setpoint temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank setpoint temperature is greater than the cut-in temperature of the heat pump compressor, the heat pump compressor is disabled and the tank's heater is used to heat the water.
 
@@ -352,19 +349,19 @@ Frac = GetScheduleValue(MixerInletAirSchedule)
 
 where:
 
-\(Frac\) ~ = current value of the inlet air mixer schedule (fraction of outdoor air, 0-1)
+\(Frac\) is the current value of the inlet air mixer schedule (fraction of outdoor air, 0-1)
 
-\({T_{inlet}}\) ~ = inlet air dry-bulb temperature to the HPWH evaporator/fan assembly (°C)
+\({T_{inlet}}\) is the inlet air dry-bulb temperature to the HPWH evaporator/fan assembly (\(^{\circ}\)C)
 
-\({T_{outdoor}}\) ~ = outdoor air dry-bulb temperature (°C)
+\({T_{outdoor}}\) is the outdoor air dry-bulb temperature (\(^{\circ}\)C)
 
-\({T_{zone}}\) ~ = zone (exhaust) air dry-bulb temperature (°C)
+\({T_{zone}}\) is the zone (exhaust) air dry-bulb temperature (\(^{\circ}\)C)
 
-\({\omega_{inlet}}\) ~ = inlet air humidity ratio to the HPWH evaporator/fan assembly (kg/kg)
+\({\omega_{inlet}}\) is the inlet air humidity ratio to the HPWH evaporator/fan assembly (kg/kg)
 
-\({\omega_{outdoor}}\) = outdoor air humidity ratio (kg/kg)
+\({\omega_{outdoor}}\) is the outdoor air humidity ratio (kg/kg)
 
-\({\omega_{zone}}\) ~ = zone (exhaust) air humidity ratio (kg/kg)
+\({\omega_{zone}}\) is the zone (exhaust) air humidity ratio (kg/kg).
 
 When the heat pump water heater draws its inlet air solely from the zone (i.e., Inlet Air Configuration = Zone Air Only), the inlet air conditions to the evaporator/fan assembly are simply set equal to the zone (exhaust) air conditions. If the heat pump water heater draws its inlet air solely from outdoors (i.e., Inlet Air Configuration = Outdoor Air Only), the inlet air conditions to the evaporator/fan assembly are simply set equal to the outdoor air conditions. When the inlet air to the heat pump water heater evaporator and fan assembly is scheduled (i.e., Inlet Air Configuration = Schedule), the inlet air conditions are determined directly from the user-supplied schedules as follows.
 
@@ -373,7 +370,7 @@ When the heat pump water heater draws its inlet air solely from the zone (i.e., 
 \end{equation}
 
 \begin{equation}
-RHinlet = GetScheduleValue(InletAirHumiditySchedule)
+{RH_{inlet}} = GetScheduleValue(InletAirHumiditySchedule)
 \end{equation}
 
 \begin{equation}
@@ -382,21 +379,20 @@ RHinlet = GetScheduleValue(InletAirHumiditySchedule)
 
 where:
 
-\(R{H_{inlet}}\) = inlet air relative humidity to heat pump water heater evaporator/fan assembly (0-1)
+\(R{H_{inlet}}\) is the inlet air relative humidity to heat pump water heater evaporator/fan assembly (0-1)
 
-\(PsyWFnTdbRhPb\) = psychrometric function returning air humidity ratio given dry-bulb temperature, relative humidity, and barometric pressure
+\(PsyWFnTdbRhPb\) is a psychrometric function returning air humidity ratio given dry-bulb temperature, relative humidity, and barometric pressure
 
-\(OutBaroPress\) = outdoor barometric pressure (Pa)
+\(OutBaroPress\) is the outdoor barometric pressure (Pa).
 
 For each simulation time step, the heat pump water heating capacity, energy use, and air-side/water-side mass flow rates are set to zero and the water heater tank is simulated with the heat pump compressor disabled when any of the following conditions apply:
 
-·~~~~~~~~the HPWH is scheduled off by its availability schedule,
-
-·~~~~~~~~the water heater tank setpoint temperature is greater than or equal to the heat pump compressor cut-in temperature,
-
-·~~~~~~~~the inlet air dry-bulb temperature to the evaporator/fan assembly is less than the Minimum Inlet Air Temperature for Heat Pump Compressor Operation (as specified by the user in the HPWH input object), or
-
-·~~~~~~~~the HPWH setpoint temperature is greater than or equal to the Maximum Temperature Limit (specified in the Water Heater:Mixed object).
+\begin{itemize}
+\item the HPWH is scheduled off by its availability schedule,
+\item the water heater tank setpoint temperature is greater than or equal to the heat pump compressor cut-in temperature,
+\item the inlet air dry-bulb temperature to the evaporator/fan assembly is less than the Minimum Inlet Air Temperature for Heat Pump Compressor Operation (as specified by the user in the HPWH input object), or
+\item the HPWH setpoint temperature is greater than or equal to the Maximum Temperature Limit (specified in the Water Heater:Mixed object).
+\end{itemize}
 
 Otherwise, simulation of the heat pump water heater is based on its current mode of operation. This mode of operation is either floating (heat pump compressor is off and tank water temperature has not fallen below the heat pump compressor cut-in temperature) or heating (tank water temperature dropped below the compressor cut-in temperature on a previous time step but was unable to reach the compressor setpoint temperature). Each mode is handled differently and they will be discussed separately.
 
@@ -412,35 +408,35 @@ PLR = MIN\left( {1.0,\,\,MAX\left( {0.0,\,\,\left( {\frac{{{T_{HP,\,cut - in}} -
 
 where:
 
-\(PLR\) ~~~~~~~~ = part-load ratio of the heat pump water heater compressor
+\(PLR\) is the part-load ratio of the heat pump water heater compressor
 
-\(Ttank,float\) ~~~ = tank temperature in float mode when heating capacity is set to zero(°C)
+\({T_{tank,float}}\) is the tank temperature in float mode when heating capacity is set to zero (\(^{\circ}\)C)
 
-\({T_{tank,initial}}\) ~~~ = tank temperature at the beginning of the simulation time step (°C)
+\({T_{tank,initial}}\) is the tank temperature at the beginning of the simulation time step (\(^{\circ}\)C).
 
 Since the pump and fan are assumed to cycle on and off with the heat pump compressor, the average condenser water (for pumped condensers only) and evaporator air mass flow rates for the simulation time step are calculated based on the PLR calculated above:
 
 \begin{equation}
-{\dot m_{water,avg}} = \dot Vwater\left( {{\rho_{water}}} \right)\left( {PLR} \right)
+{\dot m_{water,avg}} = {\dot V_{water}}\left( {{\rho_{water}}} \right)\left( {PLR} \right)
 \end{equation}
 
 \begin{equation}
-\dot mair,avg = \dot Vair\left( {{\rho_{air}}} \right)\left( {PLR} \right)
+\dot m_{air,avg} = {\dot V_{air}}\left( {{\rho_{air}}} \right)\left( {PLR} \right)
 \end{equation}
 
 where:
 
-\(\dot mwater,avg\) ~~~~~~ = average condenser water mass flow rate for the time step (kg/s)
+\({\dot m_{water,avg}}\) is the average condenser water mass flow rate for the time step (kg/s)
 
-\(\dot Vwater\) ~~~~~~~~~~~ = condenser water volumetric flow rate, user input (m\(^{3}\)/s)
+\({\dot V_{water}}\) is the condenser water volumetric flow rate, user input (m\(^{3}\)/s)
 
-\({\rho_{water}}\) ~~~~~~~~~~~ = density of condenser inlet water (kg/m\(^{3}\))
+\({\rho_{water}}\) is the density of condenser inlet water (kg/m\(^{3}\))
 
-\(\dot mair,avg\) ~~~~~~~~ = average evaporator/fan air mass flow rate for the time step (kg/s)
+\({\dot m_{air,avg}}\) is the average evaporator/fan air mass flow rate for the time step (kg/s)
 
-\(\dot Vair\) ~~~~~~~~~~~~~~ = evaporator/fan air volumetric flow rate, user input (m\(^{3}\)/s)
+\({\dot V_{air}}\) is the evaporator/fan air volumetric flow rate, user input (m\(^{3}\)/s)
 
-\({\rho_{air}}\) ~~~~~~~~~~~~~ = density of evaporator/fan inlet air (kg/m\(^{3}\))
+\({\rho_{air}}\) is the density of evaporator/fan inlet air (kg/m\(^{3}\)).
 
 The water tank temperature is then calculated based on heat pump operation at the part-load ratio estimated above and with the water tank's heating element enabled. If the resulting water tank temperature is above the heat pump compressor's setpoint (cut-out) temperature, then the part-load ratio is reduced and the water heater tank is simulated again. The process is performed iteratively until the part-load ratio of the heat pump compressor achieves the desired setpoint temperature (to the extent possible).
 
@@ -453,7 +449,7 @@ When the HPWH is in heating mode at the end of the previous simulation time step
 \end{equation}
 
 \begin{equation}
-\dot mair,avg = \dot Vair\left( {\rho air} \right)
+{\dot m_{air,avg}} = {\dot V_{air}}\left( {\rho air} \right)
 \end{equation}
 
 If the resulting tank temperature is above the heat pump compressor's setpoint (cut-out) temperature, the part-load ratio of the heat pump compressor is reduced and the water heater tank is simulated again. The process is performed iteratively until the part-load ratio of the heat pump compressor achieves the desired setpoint temperature (to the extent possible).
@@ -465,38 +461,38 @@ The air-side outlet conditions of the HPWH are calculated through simulation of 
 After completing the float mode or heating mode calculations and the final part-load ratio has been determined, the output (report) variables are calculated as follows:
 
 \begin{equation}
-Heat\,Pump\,Water\,Heater\,Compressor\,Part{\rm{ - }}Load\,Ratio = PLR\,\,
+Heat~Pump~Water~Heater~Compressor~Part{\rm{ - }}Load~Ratio = PLR
 \end{equation}
 
 \begin{equation}
-Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)
+Heat~Pump~Water~Heater~On{\rm{ - }}Cycle~Parasitic~Electric~Power~(W) = {P_{parasitic,on}}\left( {PLR} \right)
 \end{equation}
 
 \begin{equation}
 \begin{split}
-Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}
+Heat~Pump~Water~Heater~On{\rm{ - }}Cycle~Parasitic~Electric~Consumption~(J) = \\{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}
 \end{split}
 \end{equation}
 
 \begin{equation}
 \begin{split}
-Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \\{P_{parasitic,off}}\left( {1 - PLR} \right)
+Heat~Pump~Water~Heater~Off{\rm{ - }}Cycle~Parasitic~Electric~Power~(W) = \\{P_{parasitic,off}}\left( {1 - PLR} \right)
 \end{split}
 \end{equation}
 
 \begin{equation}
 \begin{split}
-Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)
+Heat~Pump~Water~Heater~Off{\rm{ - }}Cycle~Parasitic~Electric~Consumption~(J) = \\{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)
 \end{split}
 \end{equation}
 
 where:
 
-\({P_{parasitic,on}}\) ~~ = on-cycle parasitic electric load, user input (W)
+\({P_{parasitic,on}}\) is the on-cycle parasitic electric load, user input (W)
 
-\({P_{parasitic,off}}\) ~ = off-cycle parasitic electric load, user input (W)
+\({P_{parasitic,off}}\) is the off-cycle parasitic electric load, user input (W)
 
-\({t_{sys}}\) ~~~~~~~~~~~~ = HVAC system simulation time step (hours)
+\({t_{sys}}\) is the HVAC system simulation time step (hours).
 
 Note: All heat pump water heater output variables, including off-cycle ancillary electric power and consumption, equal 0 when the heat pump water heater availability schedule equals 0 (i.e., the heat pump water heater is scheduled OFF).
 
@@ -512,17 +508,17 @@ Similar to the well-mixed model, the stratified model solves the same fundamenta
 m{c_p}\frac{{dT}}{{dt}} = {q_{net}}
 \end{equation}
 
-where
+where:
 
-\emph{m} = mass of water
+\emph{m} is the mass of water
 
-\emph{c\(_{p}\)} = specific heat of water
+\emph{c\(_{p}\)} is the specific heat of water
 
-\emph{T} = temperature of water
+\emph{T} is the temperature of water
 
-\emph{t} = time
+\emph{t} is the time
 
-\emph{q\(_{net}\)} = net heat transfer rate
+\emph{q\(_{net}\)} is the net heat transfer rate.
 
 The difference for the stratified model is that it must solve the energy balance on \emph{n} number of nodes simultaneously.~ Node 1 is at the top of the water tank and node \emph{n} is at the bottom of the water tank.
 
@@ -530,17 +526,17 @@ The difference for the stratified model is that it must solve the energy balance
 {m_n}{c_p}\frac{{d{T_n}}}{{dt}} = {q_{net,n}}
 \end{equation}
 
-where
+where:
 
-\emph{m\(_{n}\)} = mass of water for node \emph{n}
+\emph{m\(_{n}\)} is the mass of water for node \emph{n}
 
-\emph{c\(_{p}\)} = specific heat of water
+\emph{c\(_{p}\)} is the specific heat of water
 
-\emph{T\(_{n}\)} = temperature of water for node \emph{n}
+\emph{T\(_{n}\)} is the temperature of water for node \emph{n}
 
-\emph{t} = time
+\emph{t} is the time
 
-\emph{q\(_{net,n}\)} = net heat transfer rate for node \emph{n}
+\emph{q\(_{net,n}\)} is the net heat transfer rate for node \emph{n}.
 
 The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due to multiple heat transfer pathways.
 
@@ -551,47 +547,47 @@ The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due
   \end{array}
 \end{equation}
 
-where
+where:
 
-\emph{q\(_{heater,n}\)} = heat added by Heater 1 or Heater 2
+\emph{q\(_{heater,n}\)} is the heat added by Heater 1 or Heater 2
 
-\emph{q\(_{oncycpara,n}\)} = heat added due to on-cycle parasitic loads (zero when off)
+\emph{q\(_{oncycpara,n}\)} is the heat added due to on-cycle parasitic loads (zero when off)
 
-\emph{q\(_{offcycpara,n}\)} = heat added due to off-cycle parasitic loads (zero when on)
+\emph{q\(_{offcycpara,n}\)} is the heat added due to off-cycle parasitic loads (zero when on)
 
-\emph{q\(_{oncycloss,n}\)} = heat transfer to/from the ambient environment (zero when off)
+\emph{q\(_{oncycloss,n}\)} is the heat transfer to/from the ambient environment (zero when off)
 
-\emph{q\(_{offcycloss,n}\)} = heat transfer to/from the ambient environment (zero when on)
+\emph{q\(_{offcycloss,n}\)} is the heat transfer to/from the ambient environment (zero when on)
 
-\emph{q\(_{cond,n}\)} = heat transfer due to conduction between the node above and below
+\emph{q\(_{cond,n}\)} is the heat transfer due to conduction between the node above and below
 
-\emph{q\(_{use,n}\)} = heat transfer to/from the use side plant connections
+\emph{q\(_{use,n}\)} is the heat transfer to/from the use side plant connections
 
-\emph{q\(_{source,n}\)} = heat transfer to/from the source side plant connections
+\emph{q\(_{source,n}\)} is the heat transfer to/from the source side plant connections
 
-\emph{q\(_{flow,n}\)} = heat transfer due to fluid flow from the node above and below
+\emph{q\(_{flow,n}\)} is the heat transfer due to fluid flow from the node above and below
 
-\emph{q\(_{invmix,n}\)} = heat transfer due to inversion mixing from the node above and below
+\emph{q\(_{invmix,n}\)} is the heat transfer due to inversion mixing from the node above and below.
 
 \emph{q\(_{oncycloss,n}\)} and \emph{q\(_{offcycloss,n}\)} are defined as:
 
 \begin{equation}
-{q_{oncycloss,n}} = ({UA_{tank}} + UA_add,n)({T_{amb}} - {T_n})
+{q_{oncycloss,n}} = ({UA_{tank}} + {UA_{add,n}})({T_{amb}} - {T_n})
 \end{equation}
 
 \begin{equation}
 {q_{offcycloss,n}} = ({UA_{tank} + UA_{flue}})({T_{amb}} - {T_n})
 \end{equation}
 
-where
+where:
 
-\emph{UA\(_{tank}\)} = loss coefficient to ambient environment for the tank
+\emph{UA\(_{tank}\)} is the loss coefficient to ambient environment for the tank
 
-\emph{UA\(_{add,n}\)} = additional node loss coefficient
+\emph{UA\(_{add,n}\)} is the additional node loss coefficient
 
-\emph{UA\(_{flue}\)} = additional off-cycle flue loss coefficient to ambient environment (zero when on)
+\emph{UA\(_{flue}\)} is the additional off-cycle flue loss coefficient to ambient environment (zero when on)
 
-\emph{T\(_{amb}\)} = temperature of ambient environment
+\emph{T\(_{amb}\)} is the temperature of ambient environment.
 
 \emph{q\(_{cond,n}\)} is defined as:
 
@@ -599,21 +595,21 @@ where
 {q_{cond,n}} = \frac{{k{A_{n + 1}}}}{{{L_{n + 1}}}}({T_{n + 1}} - {T_n}) + \frac{{k{A_{n - 1}}}}{{{L_{n - 1}}}}({T_{n - 1}} - {T_n})
 \end{equation}
 
-where
+where:
 
-\emph{k} = fluid thermal conductivity of water, 0.6 W/m-K
+\emph{k} is the fluid thermal conductivity of water (0.6 W/m-K)
 
-\emph{A\(_{n+1}\)} = shared surface area between node \emph{n} and node \emph{n+1}
+\emph{A\(_{n+1}\)} is the shared surface area between node \emph{n} and node \emph{n+1}
 
-\emph{L\(_{n+1}\)} = distance between the center of mass of node \emph{n} and n\emph{+1}
+\emph{L\(_{n+1}\)} is the distance between the center of mass of node \emph{n} and n\emph{+1}
 
-\emph{T\(_{n+1}\)} = temperature of node \emph{n+1}
+\emph{T\(_{n+1}\)} is the temperature of node \emph{n+1}
 
-\emph{A\(_{n-1}\)} = shared surface area between node \emph{n} and node \emph{n-1}
+\emph{A\(_{n-1}\)} is the shared surface area between node \emph{n} and node \emph{n-1}
 
-\emph{L\(_{n-1}\)} = distance between the center of mass of node \emph{n} and n\emph{-1}
+\emph{L\(_{n-1}\)} is the distance between the center of mass of node \emph{n} and n\emph{-1}
 
-\emph{T\(_{n-1}\)} = temperature of node \emph{n-1}
+\emph{T\(_{n-1}\)} is the temperature of node \emph{n-1}.
 
 \emph{q\(_{use,n}\)}, and \emph{q\(_{source,n}\)} are defined as:
 
@@ -625,31 +621,31 @@ where
 {q_{source}} = {\varepsilon_{source}}{\dot m_{source}}{c_p}\left( {{T_{source}} - T} \right)
 \end{equation}
 
-where
+where:
 
-\emph{e\(_{use}\)} = heat exchanger effectiveness for the use side plant connections
+\({\varepsilon_{use}}\) is the heat exchanger effectiveness for the use side plant connections
 
-\({\dot m_{use}}\) = mass flow rate for the use side plant connections
+\({\dot m_{use}}\) is the mass flow rate for the use side plant connections
 
-\emph{T\(_{use}\)} = inlet fluid temperature of the use side plant connections
+\(T_{use}\) is the inlet fluid temperature of the use side plant connections
 
-\emph{e\(_{source}\)} = heat exchanger effectiveness for the source side plant connections
+\({\varepsilon_{source}}\) is the heat exchanger effectiveness for the source side plant connections
 
-\({\dot m_{source}}\) = mass flow rate for the source side plant connections
+\({\dot m_{source}}\) is the mass flow rate for the source side plant connections
 
-\emph{T\(_{source}\)} = inlet fluid temperature of the source side plant connections
+\(T_{source}\) is the inlet fluid temperature of the source side plant connections.
 
-\emph{q\(_{flow,n}\)} is defined as:
+\(q_{flow,n}\) is defined as:
 
 \begin{equation}
 {q_{flow,n}} = {\dot m_{n + 1}}{c_p}({T_{n + 1}} - {T_n}) + {\dot m_{n - 1}}{c_p}({T_{n - 1}} - {T_n})
 \end{equation}
 
-where
+where:
 
-\({\dot m_{n + 1}}\) = mass flow rate from node \emph{n+1}
+\({\dot m_{n + 1}}\) is the mass flow rate from node \emph{n+1}
 
-\({\dot m_{n - 1}}\) = mass flow rate from node \emph{n-1}
+\({\dot m_{n - 1}}\) is the mass flow rate from node \emph{n-1}.
 
 \emph{q\(_{invmix,n}\)} is defined as:
 
@@ -657,11 +653,11 @@ where
 {q_{invmix,n}} = {\dot m_{invmix,n + 1}}{c_p}({T_{n + 1}} - {T_n}) + {\dot m_{invmix,n - 1}}{c_p}({T_{n - 1}} - {T_n})
 \end{equation}
 
-where
+where:
 
-\({\dot m_{invmix,n + 1}}\) = mass flow rate from node \emph{n+1} due to temperature inversion mixing
+\({\dot m_{invmix,n + 1}}\) is the mass flow rate from node \emph{n+1} due to temperature inversion mixing
 
-\({\dot m_{invmix,n - 1}}\) = mass flow rate from node \emph{n-1} due to temperature inversion mixing
+\({\dot m_{invmix,n - 1}}\) is the mass flow rate from node \emph{n-1} due to temperature inversion mixing.
 
 Inversion mixing occurs when the node below is warmer than the node above.~ The difference in temperatures drives a difference in density that causes the nodes to mix.~ Usually inversion mixing occurs very rapidly.~ In this algorithm, the inversion mixing rate is selected to be the maximum value that will provide a stable solution given the node mass and the substep interval:
 
@@ -669,25 +665,25 @@ Inversion mixing occurs when the node below is warmer than the node above.~ The 
 {\dot m_{invmix}} = 0.5*{m_n}/\Delta t
 \end{equation}
 
-where
+where:
 
-\emph{Dt} = the substep time interval.
+\(\Delta t\) is the substep time interval.
 
 The use and source fluid steam outlet temperatures calculation procedure depends on the values of the effectiveness.~ If the effectiveness is 1.0, then complete mixing of these fluid steam and the tank water is assumed.~ In this case the outlet temperatures for the use and source streams will be simply the tank water temperatures at point of the outlet nodes. When the effectiveness is less than 1.0, an indirect heat exchange is assumed between the use or source stream and the water in the stratified thermal storage tank.~ When the effectiveness is less than 1.0, the use and source outlet temperatures are calculated using \emph{Q\(_{use}\)} and \emph{Q\(_{source}\)}, and energy balance equations as follows:
 
 \begin{equation}
-{T_{use\;out,\,n}} = {T_{use,\,n}} + \frac{{{q_{use,n}}}}{{{{\dot m}_{use}}{c_p}}}
+{T_{use~out,n}} = {T_{use,n}} + \frac{{{q_{use,n}}}}{{{{\dot m}_{use}}{c_p}}}
 \end{equation}
 
 \begin{equation}
-{T_{source\;out,\,n}} = {T_{source,\,n}} - \frac{{{q_{source,n}}}}{{{{\dot m}_{source}}{c_p}}}
+{T_{source~out,n}} = {T_{source,n}} - \frac{{{q_{source,n}}}}{{{{\dot m}_{source}}{c_p}}}
 \end{equation}
 
-~where,
+where:
 
-\emph{T\(_{use\, out}\)} = outlet fluid temperature of the use side plant connections
+\(T_{use~out}\) is the outlet fluid temperature of the use side plant connections
 
-\emph{T\(_{source\, out}\)} = outlet fluid temperature of the source side plant connections
+\(T_{source~out}\) is the outlet fluid temperature of the source side plant connections.
 
 \subsubsection{Numerical Solution}\label{numerical-solution}
 
@@ -701,17 +697,18 @@ All node temperatures for \emph{q\(_{net,n}\)} are the old temperatures from the
 
 Before each system time step is calculated the following evaluations are made:
 
-§~Use and source inlet flow rates are applied to the inlet nodes
-
-§~Internode flow is determined and net flow rates are determined
+\begin{itemize}
+\item Use and source inlet flow rates are applied to the inlet nodes
+\item Internode flow is determined and net flow rates are determined
+\end{itemize}
 
 Before each substep is calculated, the following evaluations are made:
 
-1)~~~Thermostatic controls for heater 1 and heater 2 are evaluated to determine if the heater elements should turn on or off
-
-2)~~~Node 1 temperature is compared against the maximum limit to determine if venting is necessary
-
-3)~~~Adjoining node temperatures are compared to determine if there are any temperature inversions for which the inversion mixing rate should be used.
+\begin{enumerate}
+\item Thermostatic controls for heater 1 and heater 2 are evaluated to determine if the heater elements should turn on or off
+\item Node 1 temperature is compared against the maximum limit to determine if venting is necessary
+\item Adjoining node temperatures are compared to determine if there are any temperature inversions for which the inversion mixing rate should be used.
+\end{enumerate}
 
 The solution continues looping through all substeps until the system time step is completed.
 
@@ -730,9 +727,9 @@ Some inputs for water heaters can be autosized using the input object WaterHeate
 The volume a water heater can be sized in the following ways depending on the design method chosen by the user.
 
 \begin{itemize}
-  \item Peak Draw. The volume is determined from the loop design flow rate.~ The water heater is positioned on the supply side of a plant loop.~ After the plant sizing routines have run, the model~ obtains the design flow rate for all components on the demand side.~ The tank volume is then: \(V = {\dot V_{loop.des}}*{t_{draw}}\) ,
+  \item Peak Draw. The volume is determined from the loop design flow rate.~ The water heater is positioned on the supply side of a plant loop.~ After the plant sizing routines have run, the model~ obtains the design flow rate for all components on the demand side.~ The tank volume is then: \(V = {\dot V_{loop.des}}*{t_{draw}}\)
 
-  \item Residential HUD-FHA Minimum. The volume is determined from a set of rules defined by the table below.~ This is from Chapter 48 of 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used in the Building America Benchmark).
+  \item Residential HUD-FHA Minimum. The volume is determined from a set of rules defined in Table~\ref{table:residential-hud-fha-minimum}.~ This is from Chapter 48 of 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used in the Building America Benchmark).
 \end{itemize}
 
 % table 85
@@ -776,73 +773,80 @@ Electric &  &  &  &  &  &  &  &  &  &  &  &  \tabularnewline
 The heater capacity can be sized in the following ways depending on the design method chosen by the user.
 
 \begin{itemize}
-  \item Peak Draw. The heater capacity is determined from the tank volume, assumed start and finish temperatures and a user defined time for recovery.~ The heater capacity is then
+  \item Peak Draw. The heater capacity is determined from the tank volume, assumed start and finish temperatures and a user defined time for recovery.~ The heater capacity is then:
 \end{itemize}
 
 \begin{equation}
   q_{heat} = V\rho C_p \PB{T_{finish} - T_{start}}
 \end{equation}
 
-where,
+where:
 
 \begin{equation}
-{T_{finish}} = 57.2C
+{T_{finish}} = 57.2^{\circ}C
 \end{equation}
 
 \begin{equation}
-{T_{start}} = 14.4C
+{T_{start}} = 14.4^{\circ}C
 \end{equation}
 
-·~~~~~~~~Residential HUD-FHA Minimum.~ The heater capacity is determined from a set of rules defined by the table above.~ This is from 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used the Building America Benchmark).
-
-·~~~~~~~~Per Person.~ The heater capacity is determined by summing the design level of people in the model and using a user-entered factor for recovery capacity per person.~ The heater capacity is then:
+\begin{itemize}
+\item Residential HUD-FHA Minimum.~ The heater capacity is determined from a set of rules defined by the table above.~ This is from 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used the Building America Benchmark).
+\item Per Person.~ The heater capacity is determined by summing the design level of people in the model and using a user-entered factor for recovery capacity per person.~ The heater capacity is then:
+\end{itemize}
 
 \begin{equation}
-{q_{heat}} = \frac{{{N_{people}}{f_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} eryPerPerson}}({T_{finish}} - {T_{start}})\rho \,{c_p}}}{{3600}}
+{q_{heat}} = \frac{{{N_{people}}{f_{RecoveryPerPerson}}({T_{finish}} - {T_{start}}) \rho {c_p}}}{{3600}}
 \end{equation}
 
-·~~~~~~~~Per Floor Area.~ The heater capacity is determined by summing the floor area in all the zones in the model and using a user-entered factor for recovery capacity per floor area.~ The heater capacity is then:
+\begin{itemize}
+\item Per Floor Area.~ The heater capacity is determined by summing the floor area in all the zones in the model and using a user-entered factor for recovery capacity per floor area.~ The heater capacity is then:
+\end{itemize}
 
 \begin{equation}
   q_{heat} = \frac{A_{floors}f_{RecoveryPerFloorArea}\PB{T_{finish} - T_{start}}\rho C_p}{3600}
 \end{equation}
 
-·~~~~~~~~Per Unit.~ The heater capacity is determined from a user-entered Recovery Capacity per unit and a user-entered number of units.~ The heater capacity is then:
+\begin{itemize}
+\item Per Unit.~ The heater capacity is determined from a user-entered Recovery Capacity per unit and a user-entered number of units.~ The heater capacity is then:
+\end{itemize}
 
 \begin{equation}
-{q_{heat}} = \frac{{{N_{units}}{f_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} eryPerUnit}}({T_{finish}} - {T_{start}})\rho \,{c_p}}}{{3600}}
+{q_{heat}} = \frac{{{N_{units}}{f_{RecoveryPerUnit}}({T_{finish}} - {T_{start}})\rho {c_p}}}{{3600}}
 \end{equation}
 
-·~~~~~~~~Per Solar Collector Area. The water heater is assumed to be used for solar hot water storage and the heater capacity is set to zero.
+\begin{itemize}
+\item Per Solar Collector Area. The water heater is assumed to be used for solar hot water storage and the heater capacity is set to zero.
+\end{itemize}
 
 \subsubsection{Autosizing Tank Height}\label{autosizing-tank-height}
 
 If the water heater is Stratified, then the geometry is important and the height of the tank can be scaled with changes in volume.~ For tank shapes of Vertical Cylinder, the user defined height aspect ratio, \emph{AR},~ is used to calculate a tank height, \emph{H}, using
 
 \begin{equation}
-H = {\left( {\frac{{4\,V\;A{R^2}}}{\pi }} \right)^{1/3}}
+H = {\left( {\frac{{4~V~A{R^2}}}{\pi }} \right)^{1/3}}
 \end{equation}
 
 \subsubsection{Autosizing Plant Connection Flow Rates}\label{autosizing-plant-connection-flow-rates}
 
-When the water thermal tank is connected to a plant loop, it is convient to autosize the design volume flow rates through the plant connections.~ When the water thermal tank is connected to the supply side of plant loop and flow rates are autosized, the flow rate is the sum of the flow requests of all the various components on the demand side of that plant loop.~ When the water thermal tank is connected on the demand side of a plant loop (e.g.~as for indirect water heating with a boiler) and flow rates are autosized, the design flow rates are calculated with the following equation,
+When the water thermal tank is connected to a plant loop, it is convient to autosize the design volume flow rates through the plant connections.~ When the water thermal tank is connected to the supply side of plant loop and flow rates are autosized, the flow rate is the sum of the flow requests of all the various components on the demand side of that plant loop.~ When the water thermal tank is connected on the demand side of a plant loop (e.g.~as for indirect water heating with a boiler) and flow rates are autosized, the design flow rates are calculated with the following equation:
 
 \begin{equation}
-\dot V =  - \left( {\frac{V}{{{t_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} er}} * 3600 * \varepsilon }}} \right) * Ln\left[ {\frac{{\left( {{T_{PlantDesign}} - {T_{Setpo{\mathop{\rm int}} }}} \right)}}{{\left( {{T_{PlantDesign}} - {T_{start}}} \right)}}} \right]
+\dot V =  - \left( \frac{V}{t_{Recover} * 3600 * \varepsilon } \right) * Ln\left( \frac{T_{PlantDesign} - T_{Setpoint}}{T_{PlantDesign} - T_{start}}  \right)
 \end{equation}
 
-where
+where:
 
-\emph{V} = volume of the tank
+\emph{V} is the volume of the tank
 
-\({t_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} er}}\) ~ = User parameter for the time it takes for the tank to recover from assumed starting temperature to an assumed setpoint temperature.~ For water heaters, the starting temperature is 14.4ºC and the final assumed setpoint temperature is 57.2ºC.~ For chilled water tanks, the starting temperature is 14.4 ºC and the final temperature is 9.0ºC.
+\({t_{Recover}}\) is the user parameter for the time it takes for the tank to recover from assumed starting temperature to an assumed setpoint temperature.~ For water heaters, the starting temperature is 14.4\(^{\circ}\)C and the final assumed setpoint temperature is 57.2\(^{\circ}\)C.~ For chilled water tanks, the starting temperature is 14.4\(^{\circ}\)C and the final temperature is 9.0\(^{\circ}\)C.
 
-\(\varepsilon\) ~ = \emph{e\(_{use}\)} ~~or \emph{e\(_{source}\)}
+\(\varepsilon\) is \({\varepsilon_{use}}\)~or~\({\varepsilon_{source}}\)
 
-\({T_{PlantDesign}}\) = the exit temperature specified in the Plant Sizing object
+\({T_{PlantDesign}}\) is the exit temperature specified in the Plant Sizing object
 
-\({T_{setpo{\mathop{\rm int}} }}\) ~ = ~ the final tank temperature of 57.2ºC for heaters and 9.0ºC for chilled water tanks.
+\({T_{setpoint}}\) is the final tank temperature of 57.2\(^{\circ}\)C for heaters and 9.0\(^{\circ}\)C for chilled water tanks
 
-\({T_{start}}\) ~ = the initial tank temperature of 14.4ºC
+\({T_{start}}\) is the initial tank temperature of 14.4\(^{\circ}\)C.
 
 If the demand side connections are autosized and a water heater's tank volume is autosized, then the problem cannot be readily solved in EnergyPlus because the demand side connection flows need to be reported earlier in the simulation and the tank volume is not yet available.~ This situation is resolved by using an interim, nominal tank volume for sizing the connections and the actual volume is calculated later in the simulation.

@@ -10,7 +10,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 9 )
 set( CMAKE_VERSION_MINOR 0 )
-set( CMAKE_VERSION_PATCH 0 )
+set( CMAKE_VERSION_PATCH 1 )
 
 set( PREV_RELEASE_SHA "40101ea" )
 
@@ -201,6 +201,7 @@ configure_file( "workflows/calc_soil_surface_temp.py" "${CMAKE_RUNTIME_OUTPUT_DI
 configure_file( "workflows/coeff_check.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" )
 configure_file( "workflows/coeff_conv.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" )
 configure_file( "workflows/energyplus.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" )
+configure_file( "workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" )
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)

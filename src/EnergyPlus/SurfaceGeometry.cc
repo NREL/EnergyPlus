@@ -7270,6 +7270,7 @@ namespace SurfaceGeometry {
                         ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                     }
                     --SurfaceTmp(SurfNum).Sides;
+                    SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                 } else {
                     if (DisplayExtraWarnings) {
                         ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7303,6 +7304,7 @@ namespace SurfaceGeometry {
                                 ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7323,6 +7325,7 @@ namespace SurfaceGeometry {
                                 SurfaceTmp(SurfNum).Vertex(n).z = SurfaceTmp(SurfNum).Vertex(n + 1).z;
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +

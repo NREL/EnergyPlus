@@ -421,9 +421,9 @@ namespace ReportSizingManager {
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
         std::string DDNameFanPeak;
-        DDNameFanPeak = " test my Design Day";
+        DDNameFanPeak = ""; // " test my Design Day";
         std::string dateTimeFanPeak;
-        dateTimeFanPeak = " test 1/2 00:00:00 ";
+        dateTimeFanPeak = ""; // " test 1/2 00:00:00 ";
         Real64 DXFlowPerCapMinRatio(1.0);
         Real64 DXFlowPerCapMaxRatio(1.0);
 
@@ -3430,8 +3430,12 @@ namespace ReportSizingManager {
             } else {
                 if (DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag &&
                     !(DataScalableSizingON || DataScalableCapSizingON)) {
-                    ReportSizingOutput(
-                        CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
+                    if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
+                        ReportSizingOutput(
+                            CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
+                    } else {
+                        ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, AutosizeUser);
+                    }
                     if (DisplayExtraWarnings) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);

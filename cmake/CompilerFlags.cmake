@@ -99,6 +99,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
+      ADD_CXX_DEFINITIONS("-Wno-aggressive-loop-optimizations")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()

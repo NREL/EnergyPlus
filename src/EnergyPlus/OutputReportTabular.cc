@@ -868,6 +868,9 @@ namespace OutputReportTabular {
             // add to the data structure
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
+                if (AlphArray(jField).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:Monthly");
+                }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
                 if (UtilityRoutines::SameString(curAggString, "SumOrAverage")) {
@@ -1985,7 +1988,9 @@ namespace OutputReportTabular {
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
-                if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
+                if (AlphArray(iReport).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
