@@ -2645,7 +2645,7 @@ class lexer
         for (auto range = ranges.begin(); range != ranges.end(); ++range)
         {
             get();
-            if (JSON_LIKELY(*range <= current and current <= *(range + 1)))
+            if (JSON_LIKELY(*range <= current and current <= *(++range)))
             {
                 add(current);
             }
