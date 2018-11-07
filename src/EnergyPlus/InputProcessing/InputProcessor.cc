@@ -261,7 +261,7 @@ void InputProcessor::processInput()
             //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
             //			}
             if (DataGlobals::outputEpJSONConversion) {
-                input_file = epJSON.dump(4, ' ', true, json::error_handler_t::replace);
+                input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
                 FileSystem::makeNativePath(convertedIDF);
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
