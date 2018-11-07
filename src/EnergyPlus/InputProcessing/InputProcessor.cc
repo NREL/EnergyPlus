@@ -252,26 +252,31 @@ void InputProcessor::processInput()
         return;
     }
 
-    if (!DataGlobals::isEpJSON) {
-        bool success = true;
-        epJSON = idf_parser->decode(input_file, schema, success);
-        //			bool hasErrors = processErrors();
-        //			if ( !success || hasErrors ) {
-        //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-        //			}
-        if (DataGlobals::outputEpJSONConversion) {
-            input_file = epJSON.dump(4);
-            std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
-            FileSystem::makeNativePath(convertedIDF);
-            std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-            convertedFS << input_file << std::endl;
+    try {
+        if (!DataGlobals::isEpJSON) {
+            bool success = true;
+            epJSON = idf_parser->decode(input_file, schema, success);
+            //			bool hasErrors = processErrors();
+            //			if ( !success || hasErrors ) {
+            //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+            //			}
+            if (DataGlobals::outputEpJSONConversion) {
+                input_file = epJSON.dump(4, ' ', true, json::error_handler_t::replace);
+                std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
+                FileSystem::makeNativePath(convertedIDF);
+                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
+                convertedFS << input_file << std::endl;
+            }
+        } else if (DataGlobals::isCBOR) {
+            epJSON = json::from_cbor(input_file);
+        } else if (DataGlobals::isMsgPack) {
+            epJSON = json::from_msgpack(input_file);
+        } else {
+            epJSON = json::parse(input_file);
         }
-    } else if (DataGlobals::isCBOR) {
-        epJSON = json::from_cbor(input_file);
-    } else if (DataGlobals::isMsgPack) {
-        epJSON = json::from_msgpack(input_file);
-    } else {
-        epJSON = json::parse(input_file);
+    } catch (const std::exception &e) {
+        ShowSevereError(e.what());
+        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
