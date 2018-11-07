@@ -303,15 +303,8 @@ namespace AirflowNetworkBalanceManager {
     Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
     // Functions
 
-    // Temporary globals
-    std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
-    ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
-    bool conditionsAreDefaulted{true};                                        // Conditions are defaulted?
-
     void clear_state()
     {
-        referenceConditions.clear();
-        conditionsAreDefaulted = true;
         PZ.deallocate();
         MA.deallocate();
         MV.deallocate();
@@ -515,7 +508,7 @@ namespace AirflowNetworkBalanceManager {
         UpdateAirflowNetwork(FirstHVACIteration);
     }
 
-    static bool GetAirflowElementInput()
+    static bool getAirflowElementInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
@@ -534,12 +527,12 @@ namespace AirflowNetworkBalanceManager {
 
         static std::string const RoutineName{"GetAirflowElementInput"};
         std::string CurrentModuleObject;
-        bool ErrorsFound{false};
+        bool success{true};
 
         // *** Read AirflowNetwork simulation reference crack conditions
-        // std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
-        // ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
-        // bool conditionsAreDefaulted(true);                        // Conditions are defaulted?
+        std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
+        ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
+        bool conditionsAreDefaulted(true);                        // Conditions are defaulted?
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
         auto instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
@@ -561,7 +554,7 @@ namespace AirflowNetworkBalanceManager {
                     if (pressure <= 31000.0) {
                         ShowSevereError(RoutineName + ": " + CurrentModuleObject + ": " + thisObjectName +
                                         ". Reference Barometric Pressure must be greater than 31000 Pa.");
-                        ErrorsFound = true;
+                        success = false;
                     }
                 }
                 Real64 humidity{fields.at("reference_humidity_ratio")};
@@ -576,7 +569,256 @@ namespace AirflowNetworkBalanceManager {
                 conditionsAreDefaulted = false;
             }
         }
-        return ErrorsFound;
+        if (!success) {
+            return false;
+        }
+
+        // *** Read AirflowNetwork simulation surface crack component
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
+        AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                        // Temporary workaround
+            MultizoneSurfaceCrackData.allocate(AirflowNetworkNumOfSurCracks); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient_at_reference_conditions")}; // Required field
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent") != fields.end()) { // not required field, has default value
+                    expnt = fields.at("air_mass_flow_exponent");
+                }
+                Real64 refT = defaultReferenceConditions.temperature;
+                Real64 refP = defaultReferenceConditions.pressure;
+                Real64 refW = defaultReferenceConditions.humidityRatio;
+                if (!conditionsAreDefaulted) {
+                    if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        if (result == referenceConditions.end()) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                            success = false;
+                        } else {
+                            refT = result->second.temperature;
+                            refP = result->second.pressure;
+                            refW = result->second.humidityRatio;
+                        }
+                    }
+                }
+                // globalSolverObject.cracks[thisObjectName] = SurfaceCrack(coeff, expnt, refT, refP, refW);
+                MultizoneSurfaceCrackData(i).Name = thisObjectName; // Name of surface crack component
+                MultizoneSurfaceCrackData(i).FlowCoef = coeff;      // Air Mass Flow Coefficient
+                MultizoneSurfaceCrackData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+                MultizoneSurfaceCrackData(i).StandardT = refT;
+                MultizoneSurfaceCrackData(i).StandardP = refP;
+                MultizoneSurfaceCrackData(i).StandardW = refW;
+                ++i;
+            }
+        }
+
+        // *** Read AirflowNetwork simulation zone exhaust fan component
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
+        AirflowNetworkNumOfExhFan = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        NumOfExhaustFans = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");            // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                       // Temporary workaround
+            MultizoneCompExhaustFanData.allocate(AirflowNetworkNumOfExhFan); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_the_zone_exhaust_fan_is_off_at_reference_conditions")}; // Required field
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_the_zone_exhaust_fan_is_off") != fields.end()) { // not required field, has default value
+                    expnt = fields.at("air_mass_flow_exponent_when_the_zone_exhaust_fan_is_off");
+                }
+
+                // This breaks the component model, need to fix
+                bool fanErrorFound = false;
+                int fanIndex;
+                GetFanIndex(thisObjectName, fanIndex, fanErrorFound);
+                if (fanErrorFound) {
+                    ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName + " is not found in Fan:ZoneExhaust objects.");
+                    success = false;
+                }
+                Real64 flowRate;
+
+                GetFanVolFlow(fanIndex, flowRate);
+                flowRate *= StdRhoAir;
+                bool nodeErrorsFound{false};
+                int inletNode = GetFanInletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int outletNode = GetFanOutletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                if (nodeErrorsFound) {
+                    success = false;
+                }
+                int fanType_Num;
+                GetFanType(thisObjectName, fanType_Num, fanErrorFound);
+                if (fanType_Num != FanType_ZoneExhaust) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
+                                    " is not found as a valid Fan:ZoneExhaust object.");
+                    success = false;
+                }
+
+                Real64 refT = defaultReferenceConditions.temperature;
+                Real64 refP = defaultReferenceConditions.pressure;
+                Real64 refW = defaultReferenceConditions.humidityRatio;
+                if (!conditionsAreDefaulted) {
+                    if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        if (result == referenceConditions.end()) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                            success = false;
+                        } else {
+                            refT = result->second.temperature;
+                            refP = result->second.pressure;
+                            refW = result->second.humidityRatio;
+                        }
+                    }
+                }
+                // auto fanpair = globalSolverObject.zoneExhaustFans.emplace(
+                //    std::piecewise_construct, std::forward_as_tuple(thisObjectName), std::forward_as_tuple(coeff, expnt, refT, refP, refW));
+                // if (!fanpair.second) {
+                // Duplicate name, which can't really happen since the fan name is the key
+                //}
+                // fanpair.first->second.FlowRate = flowRate;
+                // fanpair.first->second.InletNode = inletNode;
+                // fanpair.first->second.OutletNode = outletNode;
+
+                MultizoneCompExhaustFanData(i).Name = thisObjectName; // Name of zone exhaust fan component
+                MultizoneCompExhaustFanData(i).FlowCoef = coeff;      // flow coefficient
+                MultizoneCompExhaustFanData(i).FlowExpo = expnt;      // Flow exponent
+
+                MultizoneCompExhaustFanData(i).FlowRate = flowRate;
+                MultizoneCompExhaustFanData(i).InletNode = inletNode;
+                MultizoneCompExhaustFanData(i).OutletNode = outletNode;
+
+                MultizoneCompExhaustFanData(i).StandardT = refT;
+                MultizoneCompExhaustFanData(i).StandardP = refP;
+                MultizoneCompExhaustFanData(i).StandardW = refW;
+                ++i;
+            }
+        }
+
+        // Read Outdoor Airflow object
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
+        NumOfOAFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                      // Temporary workaround
+            DisSysCompOutdoorAirData.allocate(NumOfOAFans); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
+                }
+
+                int OAMixerNum = MixedAir::GetOAMixerNumber(mixer_name);
+                if (OAMixerNum == 0) {
+                    ShowSevereError(RoutineName + ": " + CurrentModuleObject + " object " + thisObjectName + ". Invalid " + "Outdoor Air Mixer Name" +
+                                    " \"" + mixer_name + "\" given.");
+                    success = false;
+                }
+
+                Real64 refT = defaultReferenceConditions.temperature;
+                Real64 refP = defaultReferenceConditions.pressure;
+                Real64 refW = defaultReferenceConditions.humidityRatio;
+                if (!conditionsAreDefaulted) {
+                    if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        if (result == referenceConditions.end()) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                            success = false;
+                        } else {
+                            refT = result->second.temperature;
+                            refP = result->second.pressure;
+                            refW = result->second.humidityRatio;
+                        }
+                    }
+                }
+
+                DisSysCompOutdoorAirData(i).Name = thisObjectName; // Name of zone exhaust fan component
+                DisSysCompOutdoorAirData(i).FlowCoef = coeff;      // flow coefficient
+                DisSysCompOutdoorAirData(i).FlowExpo = expnt;      // Flow exponent
+
+                DisSysCompOutdoorAirData(i).OAMixerNum = OAMixerNum;
+
+                DisSysCompOutdoorAirData(i).StandardT = refT;
+                DisSysCompOutdoorAirData(i).StandardP = refP;
+                DisSysCompOutdoorAirData(i).StandardW = refW;
+                ++i;
+            }
+        }
+
+        // Read Relief Airflow object
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
+        NumOfReliefFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                         // Temporary workaround
+            DisSysCompReliefAirData.allocate(NumOfReliefFans); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
+                }
+
+                int OAMixerNum{MixedAir::GetOAMixerNumber(mixer_name)};
+                if (OAMixerNum == 0) {
+                    ShowSevereError(RoutineName + ": " + CurrentModuleObject + " object " + thisObjectName + ". Invalid " + "Outdoor Air Mixer Name" +
+                                    " \"" + mixer_name + "\" given.");
+                    success = false;
+                }
+
+                Real64 refT = defaultReferenceConditions.temperature;
+                Real64 refP = defaultReferenceConditions.pressure;
+                Real64 refW = defaultReferenceConditions.humidityRatio;
+                if (!conditionsAreDefaulted) {
+                    if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        if (result == referenceConditions.end()) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                            success = false;
+                        } else {
+                            refT = result->second.temperature;
+                            refP = result->second.pressure;
+                            refW = result->second.humidityRatio;
+                        }
+                    }
+                }
+
+                DisSysCompReliefAirData(i).Name = thisObjectName; // Name of zone exhaust fan component
+                DisSysCompReliefAirData(i).FlowCoef = coeff;      // flow coefficient
+                DisSysCompReliefAirData(i).FlowExpo = expnt;      // Flow exponent
+
+                DisSysCompReliefAirData(i).OAMixerNum = OAMixerNum;
+
+                DisSysCompReliefAirData(i).StandardT = refT;
+                DisSysCompReliefAirData(i).StandardP = refP;
+                DisSysCompReliefAirData(i).StandardW = refW;
+                ++i;
+            }
+        }
+
+        return success;
     }
 
     void GetAirflowNetworkInput()
@@ -692,9 +934,9 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -704,9 +946,9 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ExternalNode", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -758,12 +1000,12 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        //inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers);
+        //MaxNums = max(MaxNums, NumNumbers);
+        //MaxAlphas = max(MaxAlphas, NumAlphas);
 
         Alphas.allocate(MaxAlphas);
         cAlphaFields.allocate(MaxAlphas);
@@ -1488,7 +1730,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork element data
-        ErrorsFound |= GetAirflowElementInput();
+        ErrorsFound = ErrorsFound || !getAirflowElementInput();
 
         // *** Read AirflowNetwork simulation surface data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
@@ -2383,53 +2625,11 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork simulation reference crack conditions
-        /*
-        CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
-        AirflowNetworkNumOfStdCndns = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfStdCndns > 0) {
-            MultizoneSurfaceStdConditionsCrackData.allocate({0, AirflowNetworkNumOfStdCndns});
-            for (i = 1; i <= AirflowNetworkNumOfStdCndns; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound)) {
-                    continue;
-                }
-                MultizoneSurfaceStdConditionsCrackData(i).Name = Alphas(1);
-                MultizoneSurfaceStdConditionsCrackData(i).temperature = Numbers(1); // Reference temperature for crack data
-                MultizoneSurfaceStdConditionsCrackData(i).pressure = Numbers(2);    // Reference barometric pressure for crack data
-                if (std::abs((MultizoneSurfaceStdConditionsCrackData(i).pressure - StdBaroPress) / StdBaroPress) > 0.1) { // 10% off
-                    ShowWarningError(RoutineName + CurrentModuleObject +
-                                     ": Pressure = " + RoundSigDigits(MultizoneSurfaceStdConditionsCrackData(i).pressure, 0) +
-                                     " differs by more than 10% from Standard Barometric Pressure = " + RoundSigDigits(StdBaroPress, 0) + '.');
-                    ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                }
-                if (MultizoneSurfaceStdConditionsCrackData(i).pressure <= 31000.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": " + Alphas(1) + ". " + cNumericFields(2) +
-                                    " must be greater than 31000 Pa.");
-                    ErrorsFound = true;
-                }
-                MultizoneSurfaceStdConditionsCrackData(i).humidityRatio = Numbers(3); // Reference humidity ratio for crack data
-            }
-        } else {
-            AirflowNetworkNumOfStdCndns = 0;
-            MultizoneSurfaceStdConditionsCrackData.allocate({0, 1});
-            MultizoneSurfaceStdConditionsCrackData(0).Name = "*";
-            MultizoneSurfaceStdConditionsCrackData(0).temperature = 20.0;
-            MultizoneSurfaceStdConditionsCrackData(0).pressure = 101325.0;
-            MultizoneSurfaceStdConditionsCrackData(0).humidityRatio = 0.0;
-        }
-        */
+        // Moved into getAirflowElementInput
 
         // *** Read AirflowNetwork simulation surface crack component
+        // Moved into getAirflowElementInput
+        /*
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
         AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (AirflowNetworkNumOfSurCracks > 0) {
@@ -2469,6 +2669,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
+        */
 
         // *** Read AirflowNetwork simulation surface effective leakage area component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
@@ -2499,6 +2700,8 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork simulation zone exhaust fan component
+        // Moved into getAirflowElementInput
+        /*
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
         AirflowNetworkNumOfExhFan = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         NumOfExhaustFans = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");
@@ -2554,6 +2757,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
+        */
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
@@ -3533,102 +3737,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Read Outdoor Airflow object
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
-        NumOfOAFans = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (NumOfOAFans > 0) {
-            DisSysCompOutdoorAirData.allocate(NumOfOAFans);
-            for (i = 1; i <= NumOfOAFans; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompOutdoorAirData(i).Name = Alphas(1);      // Name of zone exhaust fan component
-                DisSysCompOutdoorAirData(i).FlowCoef = Numbers(1); // flow coefficient
-                DisSysCompOutdoorAirData(i).FlowExpo = Numbers(2); // Flow exponent
-                FanErrorFound = false;
-
-                DisSysCompOutdoorAirData(i).OAMixerNum = GetOAMixerNumber(Alphas(2));
-                if (DisSysCompOutdoorAirData(i).OAMixerNum == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields(2) + " given.");
-                    ShowContinueError("..invalid " + cAlphaFields(2) + " = \"" + DisSysCompOutdoorAirData(i).Name + "\"");
-                    ErrorsFound = true;
-                }
-
-                if (lAlphaBlanks(3)) {
-                    DisSysCompOutdoorAirData(i).StandardT = defaultReferenceConditions.temperature;
-                    DisSysCompOutdoorAirData(i).StandardP = defaultReferenceConditions.pressure;
-                    DisSysCompOutdoorAirData(i).StandardW = defaultReferenceConditions.humidityRatio;
-                } else {
-                    auto iter = referenceConditions.find(Alphas(3));
-                    if (iter == referenceConditions.end()) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(3) + " = " + Alphas(3) +
-                                        " not found.");
-                        ErrorsFound = true;
-                    } else {
-                        DisSysCompOutdoorAirData(i).StandardT = iter->second.temperature;
-                        DisSysCompOutdoorAirData(i).StandardP = iter->second.pressure;
-                        DisSysCompOutdoorAirData(i).StandardW = iter->second.humidityRatio;
-                    }
-                }
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read Relief Airflow object
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
-        NumOfReliefFans = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (NumOfReliefFans > 0) {
-            DisSysCompReliefAirData.allocate(NumOfReliefFans);
-            for (i = 1; i <= NumOfReliefFans; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompReliefAirData(i).Name = Alphas(1);      // Name of zone exhaust fan component
-                DisSysCompReliefAirData(i).FlowCoef = Numbers(1); // flow coefficient
-                DisSysCompReliefAirData(i).FlowExpo = Numbers(2); // Flow exponent
-                FanErrorFound = false;
-
-                DisSysCompReliefAirData(i).OAMixerNum = GetOAMixerNumber(Alphas(2));
-                if (DisSysCompReliefAirData(i).OAMixerNum == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields(2) + " given.");
-                    ShowContinueError("..invalid " + cAlphaFields(2) + " = \"" + DisSysCompReliefAirData(i).Name + "\"");
-                    ErrorsFound = true;
-                }
-
-                if (lAlphaBlanks(3)) {
-                    DisSysCompReliefAirData(i).StandardT = defaultReferenceConditions.temperature;
-                    DisSysCompReliefAirData(i).StandardP = defaultReferenceConditions.pressure;
-                    DisSysCompReliefAirData(i).StandardW = defaultReferenceConditions.humidityRatio;
-                } else {
-                    auto iter = referenceConditions.find(Alphas(3));
-                    if (iter == referenceConditions.end()) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(3) + " = " + Alphas(3) +
-                                        " not found.");
-                        ErrorsFound = true;
-                    } else {
-                        DisSysCompReliefAirData(i).StandardT = iter->second.temperature;
-                        DisSysCompReliefAirData(i).StandardP = iter->second.pressure;
-                        DisSysCompReliefAirData(i).StandardW = iter->second.humidityRatio;
-                    }
-                }
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read PressureController
         CurrentModuleObject = "AirflowNetwork:ZoneControl:PressureController";
