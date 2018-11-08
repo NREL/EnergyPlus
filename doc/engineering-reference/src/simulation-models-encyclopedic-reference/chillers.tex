@@ -1273,17 +1273,21 @@ The chiller model uses user-supplied performance information at reference condit
 
 The cooling capacity function of temperature curve is a biquadratic performance curve with two independent variables: the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the reference capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
+Note: The curve is evaluated at the leaving chilled water (=evaporator outlet) \emph{setpoint} temperature, not the \emph{actual} leaving chilled water temperature.
+
 \begin{equation}
-ChillerCapFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)
+ChillerCapFTemp = a + b\left( {{T_{cw,ls}}} \right) + c{\left( {{T_{cw,ls}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,ls}}} \right)\left( {{T_{cond,e}}} \right)
 \end{equation}
 
 where:
 
 \emph{ChillerCapFTemp} is the cooling capacity factor, equal to 1 at reference conditions
 
-\emph{T\(_{cw,l}\)} is the leaving chilled water temperature (\(^{\circ}\)C)
+\emph{T\(_{cw,ls}\)} is the leaving chilled water \emph{setpoint} temperature (\(^{\circ}\)C)
 
 \emph{T\(_{cond,e}\)} is the entering condenser fluid temperature (\(^{\circ}\)C). For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
+
+\bigskip
 
 The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
@@ -1298,6 +1302,8 @@ where:
 \emph{T\(_{cw,l}\)} is the leaving chilled water temperature (\(^{\circ}\)C)
 
 \emph{T\(_{cond,e}\)} is the entering condenser fluid temperature (\(^{\circ}\)C). For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+
+\bigskip
 
 The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve \textit{ChillerEIRFPLR} is multiplied by the reference EIR (inverse of the reference COP), chiller capacity as a function of temperature curve \textit{ChillerCapFTemp} and the Energy Input to Cooling Output Ratio Function of Temperature Curve \textit{ChillerEIRFTemp} to give the normalized power input at the specific temperature and part-load ratio at which the chiller is operating. Normalized power input is the ratio of chiller power input at a given operating condition to the chiller power input at reference condition. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
