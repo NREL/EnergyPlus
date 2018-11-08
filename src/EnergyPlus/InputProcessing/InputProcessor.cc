@@ -279,20 +279,24 @@ void InputProcessor::processInput()
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
-    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
-        std::string const encoded = idf_parser->encode(epJSON, schema);
-        std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
-        FileSystem::makeNativePath(convertedEpJSON);
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-        convertedFS << encoded << std::endl;
-    }
-
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors();
+    bool versionMatch = checkVersionMatch();
 
     if (!is_valid || hasErrors) {
-        checkVersionMatch();
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+    }
+
+    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
+        if (versionMatch) {
+            std::string const encoded = idf_parser->encode(epJSON, schema);
+            std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
+            FileSystem::makeNativePath(convertedEpJSON);
+            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
+            convertedFS << encoded << std::endl;
+        } else {
+            ShowWarningError("Skipping conversion of epJSON to IDF due to mismatched Version.");
+        }
     }
 
     initializeMaps();
@@ -310,7 +314,7 @@ void InputProcessor::processInput()
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 }
 
-void InputProcessor::checkVersionMatch()
+bool InputProcessor::checkVersionMatch()
 {
     using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
@@ -329,10 +333,12 @@ void InputProcessor::checkVersionMatch()
                 }
                 if (Which != 0) {
                     ShowWarningError("Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    return false;
                 }
             }
         }
     }
+    return true;
 }
 
 bool InputProcessor::processErrors()

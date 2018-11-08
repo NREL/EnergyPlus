@@ -550,6 +550,7 @@ int RunEnergyPlus(std::string const & filepath)
         }
 
     } catch (const std::exception &e) {
+        ShowSevereError(e.what());
         return AbortEnergyPlus();
     }
 

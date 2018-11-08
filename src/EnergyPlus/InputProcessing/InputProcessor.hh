@@ -213,7 +213,7 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    void checkVersionMatch();
+    bool checkVersionMatch();
 
     bool processErrors();
 
