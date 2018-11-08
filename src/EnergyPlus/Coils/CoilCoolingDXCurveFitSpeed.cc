@@ -34,7 +34,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
     if (input_data.total_cooling_capacity_function_of_temperature_curve_name != "") {
         this->indexCapFT = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_temperature_curve_name);
-        this->numDimsCapFT = CurveManager::PerfCurve(this->indexCapFT).NumDims;
+        if (this->indexCapFT > 0) this->numDimsCapFT = CurveManager::PerfCurve(this->indexCapFT).NumDims;
     }
     if (input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name != "") {
         this->indexCapFFF = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name);

@@ -113,7 +113,39 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 		" 0.6,              ",
 		" WasteHeatFunctionCurve,                 ",
 		" SHRFT,                ",
-		" SHRFF;                "
+		" SHRFF;                ",
+        "Curve:Biquadratic,              ",
+        " CapFT,                         ",
+        " 1, 0, 0, 0, 0, 0,              ",
+        " 0, 1, 0, 1;                    ",
+        "Curve:Linear,                   ",
+        " CapFF,                         ",
+        " 1, 0,                          ",
+        " 0, 1;                          ",
+        "Curve:Biquadratic,              ",
+        " EIRFT,                         ",
+        " 1, 0, 0, 0, 0, 0,              ",
+        " 0, 1, 0, 1;                    ",
+        "Curve:Linear,                   ",
+        " EIRFF,                         ",
+        " 1, 0,                          ",
+        " 0, 1;                          ",
+        "Curve:Linear,                   ",
+        " PLFCurveName,                  ",
+        " 0.85, 0.15,                    ",
+        " 0, 1;                          ",
+        "Curve:Biquadratic,              ",
+        " WasteHeatFunctionCurve,        ",
+        " 1, 0, 0, 0, 0, 0,              ",
+        " 0, 1, 0, 1;                    ",
+        "Curve:Biquadratic,              ",
+        " SHRFT,                         ",
+        " 1, 0, 0, 0, 0, 0,              ",
+        " 0, 1, 0, 1;                    ",
+        "Curve:Linear,                   ",
+        " SHRFF,                         ",
+        " 1, 0,                          ",
+        " 0, 1;                          "
 	} );
 
 	bool ok = !process_idf( idf_objects, false );
@@ -139,7 +171,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.AirMassFlow = 1.0;
 	int fanOpMode = 0;
 
-	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, thisSpeed.PLR, thisSpeed.speedRatio, fanOpMode );
+	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, thisSpeed.PLR, fanOpMode );
 
 	EXPECT_NEAR( outletConditions.tdb, 17.057, 0.001 );
 	EXPECT_NEAR( outletConditions.w, 0.0078, 0.0001 );
