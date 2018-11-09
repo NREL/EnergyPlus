@@ -121,3 +121,50 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     MultizoneSurfaceData.deallocate();
     AirflowNetworkCompData.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_Coil)
+{
+
+    int NF;
+    Array1D<Real64> F;
+    Array1D<Real64> DF;
+
+    AirflowNetworkCompData.allocate(1);
+    AirflowNetworkCompData[0].TypeNum = 1;
+
+    DisSysCompCoilData.allocate(1);
+    DisSysCompCoilData[0].D = 1.0;
+    DisSysCompCoilData[0].L = 1.0;
+
+    RHOZ.allocate(2);
+    RHOZ[0] = 1.2;
+    RHOZ[1] = 1.2;
+
+    VISCZ.allocate(2);
+    VISCZ[0] = 1.0e-5;
+    VISCZ[1] = 1.0e-5;
+
+    F.allocate(2);
+    DF.allocate(2);
+    F[1] = DF[1] = 0.0;
+
+
+    AFECOI(1, 1, 0.05, 1, 1, 2, F, DF, NF);
+    EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
+    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    AFECOI(1, 1, -0.05, 1, 1, 2, F, DF, NF);
+    EXPECT_NEAR( 294.5243112740431, F[0], 0.00001);
+    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    DF.deallocate();
+    F.deallocate();
+    RHOZ.deallocate();
+    VISCZ.deallocate();
+    DisSysCompCoilData.deallocate();
+    AirflowNetworkCompData.deallocate();
+}

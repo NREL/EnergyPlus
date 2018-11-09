@@ -323,7 +323,15 @@ The determination of demand can vary by utility. Some utilities use the peak ins
   Week
 \end{itemize}
 
-If no value is entered, QuarterHour is assumed. The choice may be overridden based on the value of Timestep so that they are consistent. If the Timestep is 6, i.e.~10 minute timesteps, then QuarterHour is not used and instead HalfHour is used instead. If Timestep is 3, i.e.~20 minute timesteps, then QuarterHour and HalfHour are not used and instead FullHour is used instead. Day and Week are primarily used by fuel utilities.
+If no value is entered, QuarterHour is assumed. The choice may be overridden based on the value of Timestep so that they are consistent:
+\begin{itemize}
+\item
+    If the Timestep is 6, i.e.~10 minute timesteps, then QuarterHour is not used and HalfHour is used instead.
+\item
+    If Timestep is 3, i.e.~20 minute timesteps, then QuarterHour and HalfHour are not used and FullHour is used instead.
+\end{itemize}
+
+Day and Week are primarily used by fuel utilities.
 
 \paragraph{Field: Monthly Charge or Variable Name}\label{field-monthly-charge-or-variable-name}
 
