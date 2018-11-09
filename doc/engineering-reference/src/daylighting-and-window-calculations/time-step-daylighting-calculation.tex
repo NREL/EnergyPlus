@@ -2,7 +2,15 @@
 
 \subsection{Overview}\label{overview-027}
 
-A daylighting calculation is performed each time step that the sun is up for each zone that has one or two daylighting reference points specified. The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file. The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then, for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and, for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step. By summation, the net illuminance and glare due to all of the windows in a zone are found. If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare. Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation to determine the electric lighting power required to meet the illuminance setpoint at each reference point.
+A daylighting calculation is performed each time step that the sun is up for each zone that has one or more daylighting reference points specified.
+The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file.
+The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then,
+for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and,
+for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step.
+By summation, the net illuminance and glare due to all of the windows in a zone are found. 
+If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare.
+Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation
+to determine the electric lighting power required to meet the illuminance setpoint at each reference point.
 
 % table 27
 \begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
