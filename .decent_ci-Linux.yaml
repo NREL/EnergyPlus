@@ -21,7 +21,7 @@ compilers:
     cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
 
   - name: cppcheck
-    compiler_extra_flags: --suppress="*:*third_party*" --suppress="uninitvar:*"
+    compiler_extra_flags: --suppress="*:*third_party*" --suppress="uninitvar:*" --suppress="syntaxError:*"
 
   - name: "gcc"
     version: "7.3"
