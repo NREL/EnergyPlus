@@ -152,6 +152,10 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
+  # TODO: Get rid of profile stuff but set timeout appropriately here
+  # TODO: On one hand it would be nice to increase runtime here to allow tests to pass,
+  # TODO: it would also be nice to just shrink it down since the two failing tests run vastly longer than any other
+  # TODO: That could reduce the overall CI runtime quite a bit for the integration test coverage runs
   if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
   endif()
