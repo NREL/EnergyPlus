@@ -64,7 +64,7 @@ This field specifies the winding material used by the transformer. There are two
 
 \paragraph{Field: Full Load Temperature Rise}\label{field-full-load-temperature-rise}
 
-This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of 65 \textdegreeC. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and 150 \textdegreeC. This field accepts any value between the minimum (50 \textdegreeC) and the maximum (180 \textdegreeC). The default is 150 \textdegreeC.
+This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of \SI{65}{\celsius}. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and \SI{150}{\celsius}. This field accepts any value between the minimum (\SI{50}{\celsius}) and the maximum (\SI{180}{\celsius}). The default is \SI{150}{\celsius}.
 
 \paragraph{Field: Fraction of Eddy Current Losses}\label{field-fraction-of-eddy-current-losses}
 
@@ -92,7 +92,7 @@ This field defines the percentage of the rated capacity at which the nameplate e
 
 \paragraph{Field: Reference Temperature for Nameplate Efficiency}\label{field-reference-temperature-for-nameplate-efficiency}
 
-This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of 75 \textdegreeC for dry-type distribution transformers and it takes the value of 55 \textdegreeC for liquid-filled distribution transformers. The default is 75 \textdegreeC.
+This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of \SI{75}{\celsius} for dry-type distribution transformers and it takes the value of \SI{55}{\celsius} for liquid-filled distribution transformers. The default is \SI{75}{\celsius}.
 
 \paragraph{Field: Per Unit Load for Maximum Efficiency}\label{field-per-unit-load-for-maximum-efficiency}
 
@@ -2016,7 +2016,7 @@ This numeric field contains the electrical efficiency of the generator at refere
 
 \paragraph{Field: Reference Combustion Air Inlet Temperature}\label{field-reference-combustion-air-inlet-temperature}
 
-This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of 15 \textdegreeC will be used.
+This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of \SI{15}{\celsius} will be used.
 
 \paragraph{Field: Reference Combustion Air Inlet Humidity Ratio}\label{field-reference-combustion-air-inlet-humidity-ratio}
 
@@ -2474,7 +2474,7 @@ This is the minimum flow rate of cooling water that must be available for the un
 
 \paragraph{Field: Maximum Cooling Water Temperature}\label{field-maximum-cooling-water-temperature}
 
-This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} \textdegreeC{]}.
+This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} \SI{}{\celsius}{]}.
 
 \paragraph{Field: Electrical Efficiency Curve Name}\label{field-electrical-efficiency-curve-name}
 
@@ -2556,7 +2556,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 \paragraph{Field: Nominal Engine Operating Temperature}\label{field-nominal-engine-operating-temperature}
 
-This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} \textdegreeC{]}.
+This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} \SI{}{\celsius}{]}.
 
 \paragraph{Field: Warm Up Power Coefficient}\label{field-warm-up-power-coefficient}
 
@@ -3051,7 +3051,7 @@ This variable provides the results for \({\dot N_{air}}\) , the flow rate of air
 
 \paragraph{Generator Power Module Entering Air Enthalpy {[}W{]}}\label{generator-power-module-entering-air-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Blower Electric Power {[}W{]}}\label{generator-blower-electric-power-w}
 
@@ -3079,7 +3079,7 @@ This variable provides the results for \({\dot N_{fuel}}\) , which is the flow r
 
 \paragraph{Generator Power Module Entering Fuel Enthalpy {[}W{]}}\label{generator-power-module-entering-fuel-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Fuel Compressor Electric Power {[}W{]}}\label{generator-fuel-compressor-electric-power-w}
 
@@ -3115,7 +3115,7 @@ This variable provides the results for energy used by the water pump. It is also
 
 \paragraph{Generator Power Module Entering Reforming Water Enthalpy {[}W{]}}\label{generator-power-module-entering-reforming-water-enthalpy-w}
 
-This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Product Gas Temperature {[}C{]}}\label{generator-product-gas-temperature-c}
 
@@ -3123,7 +3123,7 @@ This variable provides the results for the temperature of the product gas stream
 
 \paragraph{Generator Product Gas Enthalpy {[}W{]}}\label{generator-product-gas-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Product Gas Molar Flow Rate {[}kmol/s{]}}\label{generator-product-gas-molar-flow-rate-kmols}
 
@@ -4300,7 +4300,7 @@ This output variable is the resulting efficiency of the PV array .
 
 The two more detailed PV models also have the following output variables.
 
-\paragraph{Generator PV Cell Temperature {[} \textdegreeC{]}}\label{generator-pv-cell-temperature-c}
+\paragraph{Generator PV Cell Temperature {[} \SI{}{\celsius}{]}}\label{generator-pv-cell-temperature-c}
 
 This output variable represents the temperature of the solar cell used in the calculation of cell performance.
 
@@ -4856,25 +4856,25 @@ One of:
 
 The tilt angle is the angle from horizontal of the photovoltaic modules
 in the array. For a fixed array, the tilt angle is the angle from
-horizontal of the array where 0\textdegree = horizontal, and 90\textdegree = vertical. For
+horizontal of the array where \SI{0}{\degree} = horizontal, and \SI{90}{\degree} = vertical. For
 arrays with one-axis tracking, the tilt angle is the angle from
 horizontal of the tracking axis. The tilt angle does not apply to arrays
 with two-axis tracking.
 
-Default: 20\textdegree
+Default: \SI{20}{\degree}
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
 
 For a fixed array, the azimuth angle is the angle clockwise from true
 north describing the direction that the array faces. An azimuth angle of
-180\textdegree is for a south-facing array, and an azimuth angle of 0\textdegree
+\SI{180}{\degree} is for a south-facing array, and an azimuth angle of \SI{0}{\degree}
 is for a north-facing array.
 
 For an array with one-axis tracking, the azimuth angle is the angle
 clockwise from true north of the axis of rotation. The azimuth angle
 does not apply to arrays with two-axis tracking.
 
-Default: 180\textdegree
+Default: \SI{180}{\degree}
 
 \paragraph{Field: Surface Name}\label{field-surface-name}
 
