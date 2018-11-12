@@ -254,7 +254,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction;
+            double exposedFraction = -1;  // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };

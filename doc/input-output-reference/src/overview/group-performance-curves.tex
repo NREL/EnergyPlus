@@ -1061,7 +1061,7 @@ Curve:CubicLinear,
   Dimensionless,            !- Output Unit Type
 \end{lstlisting}
 
-\subsection{Curve:ChillerPartLoadCustom}\label{curvechillerpartloadcustom}
+\subsection{Curve:ChillerPartLoadWithLift}\label{curvechillerpartloadwithlift}
 
 A custom chiller part-load performance curve is a function of three independent variables, i.e., x, y, and z. Input consists of the curve name, the twelve coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve.
 
@@ -1187,32 +1187,32 @@ Below is an example input:
 
 \begin{lstlisting}
 
-Curve:ChillerPartLoadCustom,
-  EIRFPLR,        !- Name  
-  0.093291598,        !- Coefficient1 Constant
-  -0.234322952,       !- Coefficient2 x
-  0.426950368,        !- Coefficient3 x**2
-  0.188624721,        !- Coefficient4 y
-  -0.608010978,       !- Coefficient5 y**2
-  0.992031248,        !- Coefficient6 x*y
-  0.000000E+00,       !- Coefficient7 x**3
-  0.502338322,        !- Coefficient8 y**3
-  0.000000E+00,       !- Coefficient9 x**2*y
-  0.000000E+00,       !- Coefficient 10 x*y**2
-  -0.360902326,       !- Coefficient 11 x**2*y**2
-  -0.097978985,       !- Coefficient 12 z*y**3 
-  0.2562,             !- Minimum Value of x
-  1.0365,             !- Maximum Value of x
-  0.1,                !- Minimum Value of y
-  1,                  !- Maximum Value of y
-  -0.035,             !- Minimum Value of z
-  0.3144,             !- Maximum Value of z
-  ,                   !- Minimum Curve Output
-  ,                   !- Maximum Curve Output
-  Dimensionless,      !- Input Unit Type for x
-  Dimensionless,      !- Input Unit Type for y
-  Dimensionless,      !- Input Unit Type for z
-  Dimensionless;      !- Output Unit Type
+Curve:ChillerPartLoadWithLift,
+  EIRFPLR Custom Curve,  !- Name
+  0.093291598,       !- Coefficient1 C1
+  -0.234322952,      !- Coefficient2 C2
+  0.426950368,       !- Coefficient3 C3
+  0.188624721,       !- Coefficient4 C4
+  -0.608010978,      !- Coefficient5 C5
+  0.992031248,       !- Coefficient6 C6
+  0.000000E+00,      !- Coefficient7 C7
+  0.502338322,       !- Coefficient8 C8
+  0.000000E+00,      !- Coefficient9 C9
+  0.000000E+00,      !- Coefficient10 C10
+  -0.360902326,      !- Coefficient11 C11
+  -0.097978985,      !- Coefficient12 C12
+  0.2562,          !- Minimum Value of x
+  1.0365,          !- Maximum Value of x
+  0.1,           !- Minimum Value of y
+  1,             !- Maximum Value of y
+  -0.035,          !- Minimum Value of z
+  0.3144,          !- Maximum Value of z
+  ,            !- Minimum Curve Output
+  ,            !- Maximum Curve Output
+  Dimensionless,       !- Input Unit Type for x
+  Dimensionless,       !- Input Unit Type for y
+  Dimensionless,       !- Input Unit Type for z
+  Dimensionless;       !- Output Unit Type
 \end{lstlisting}
 
 \subsection{Curve:QuadraticLinear}\label{curvequadraticlinear}

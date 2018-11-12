@@ -16,5 +16,5 @@ execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAM
 execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
 execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
 file( RENAME "${INNAME}.pdf" "../${OUTNAME}.pdf" )
-file( COPY "../${OUTNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/doc-pdf/${OUTNAME}.pdf" )
+file( COPY "../${OUTNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/doc-pdf/" )
 
