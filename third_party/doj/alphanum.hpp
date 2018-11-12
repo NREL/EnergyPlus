@@ -125,8 +125,8 @@ namespace doj {
           else // mode==NUMBER
           {
             // In case we have no diffs, we need to check the len, because you could have a different numbers of leading zeros
-          unsigned long l_len = 0;
-          unsigned long r_len = 0;
+            unsigned int l_len = 0;
+            unsigned int r_len = 0;
 
 #ifdef ALPHANUM_LOCALE
             // get the left number
@@ -145,8 +145,8 @@ namespace doj {
             while ( *l && alphanum_isdigit( *l ) ) {
               // TODO: this can overflow
               l_int = l_int * 10 + *l - '0';
-            ++l;; ++r_len;
-          }
+              ++l;
+              ++l_len;
             }
 
             // get the right number
@@ -154,8 +154,8 @@ namespace doj {
             while ( *r && alphanum_isdigit( *r ) ) {
               // TODO: this can overflow
               r_int = r_int * 10 + *r - '0';
-            ++r; ++r_len;
-          }
+              ++r;
+              ++r_len;
             }
 #endif
 
