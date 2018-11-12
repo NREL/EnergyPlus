@@ -3616,7 +3616,7 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
             EXPECT_TRUE(false) << it.key();
         }
 
-        // THis works...
+        // This works...
         EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), search_name) == root[obj_name].end());
     };
 
@@ -3638,13 +3638,13 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
 
-    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") < 0);
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0") > 0);
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
-
-    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
 

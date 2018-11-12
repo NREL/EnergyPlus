@@ -140,6 +140,8 @@ namespace doj {
             r_len = end - r;
             r=end;
 #else
+            // Here, as soon as we find something that's isn't zero, everything will start
+            // to get shifted, eg "0012" will give 12
             // get the left number
             unsigned long l_int = 0;
             while ( *l && alphanum_isdigit( *l ) ) {
@@ -165,10 +167,12 @@ namespace doj {
               return diff;
             }
 
+            // If we get here, whoever is the longest has more leading zeros
+            // and I assume we want "01" to be returned as less than "1"
             // if left character length is greater than right, we have a result
-            if ( l_len < r_len ) return -1;
+            if ( l_len < r_len ) return +1;
             // if right character length is greater than left, we have a result
-            if ( l_len > r_len ) return +1;
+            if ( l_len > r_len ) return -1;
 
             // otherwise we process the next substring in STRING mode
             mode = STRING;
