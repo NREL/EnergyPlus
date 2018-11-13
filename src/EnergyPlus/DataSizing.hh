@@ -515,7 +515,7 @@ namespace DataSizing {
         int TimeStepNumAtHeatMax;     // time step number (in day) at Heating peak
         int TimeStepNumAtCoolMax;     // time step number (in day) at cooling peak
         int HeatDDNum;                // design day index of design day causing heating peak
-        int CoolDDNum;                // design day index of design day causing heating peak
+        int CoolDDNum;                // design day index of design day causing cooling peak
         std::string cHeatDDDate;      // date of design day causing heating peak
         std::string cCoolDDDate;      // date of design day causing cooling peak
         Real64 MinOA;                 // design minimum outside air in m3/s

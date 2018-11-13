@@ -2517,7 +2517,7 @@ namespace AirflowNetworkSolver {
         // FLOW:
         // Get component properties
         CompNum = AirflowNetworkCompData(j).TypeNum;
-        ed = Rough / DisSysCompDuctData(CompNum).D;
+        ed = Rough / DisSysCompCoilData(CompNum).D;
         area = pow_2(DisSysCompCoilData(CompNum).D) * Pi;
         ld = DisSysCompCoilData(CompNum).L / DisSysCompCoilData(CompNum).D;
         g = 1.14 - 0.868589 * std::log(ed);

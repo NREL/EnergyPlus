@@ -5,6 +5,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build)
 
 # in addition, let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-pdf)
+file(COPY ${CMAKE_SOURCE_DIR}/doc/index.html DESTINATION ${CMAKE_BINARY_DIR}/doc-pdf)
 
 # add a configure rule to the header file though
 configure_file(${CMAKE_SOURCE_DIR}/doc/header.tex ${CMAKE_BINARY_DIR}/doc-build/header.tex COPYONLY)

@@ -840,7 +840,14 @@ This name references an existing design period (i.e., SizingPeriod:DesignDay, Si
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
-Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}. In each case the following field must specify a valid schedule name. \textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature. \textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are used as a difference to the drybulb temperature value (+values would then be greater than the drybulb temperature, -values would then be less than the drybulb temperature) for the resulting sky temperature value. \textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are used as a difference to the dewpoint temperature value (+values would then be greater than the dewpoint temperature, -values would then be less than the dewpoint temperature) for the resulting sky temperature value.
+Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
+In each case the following field must specify a valid schedule name.
+
+\textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature.
+
+\textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are \emph{subtracted} from the drybulb temperature value (+values would then be less than the drybulb temperature, -values would then be greater than the drybulb temperature) for the resulting sky temperature value.
+
+\textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are \emph{subtracted} from the dewpoint temperature value (+values would then be less than the dewpoint temperature, -values would then be greater than the dewpoint temperature) for the resulting sky temperature value.
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
