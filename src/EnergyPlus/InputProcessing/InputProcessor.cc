@@ -205,8 +205,7 @@ void InputProcessor::initializeMaps()
         objectCache.inputObjectIterators.reserve(objects.size());
         for (auto epJSON_obj_iter = objects.begin(); epJSON_obj_iter != objects.end(); ++epJSON_obj_iter) {
             objectCache.inputObjectIterators.emplace_back(epJSON_obj_iter);
-            auto const *const obj_ptr = epJSON_obj_iter.value().get_ptr<const json::object_t *const>();
-            unusedInputs.emplace(obj_ptr, ObjectInfo(objectType, epJSON_obj_iter.key()));
+            unusedInputs.emplace(objectType, epJSON_obj_iter.key());
         }
         auto const schema_iter = schema_properties.find(objectType);
         objectCache.schemaIterator = schema_iter;
@@ -503,15 +502,18 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
     int adjustedNumber = getJSONObjNum(Object, Number); // if incoming input is idf, then use idf object order
 
-    auto find_iterators = objectCacheMap.find(Object);
+    auto objectInfo = ObjectInfo();
+    objectInfo.objectType = Object;
     // auto sorted_iterators = find_iterators;
 
+    auto find_iterators = objectCacheMap.find(Object);
     if (find_iterators == objectCacheMap.end()) {
         auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return;
         }
-        find_iterators = objectCacheMap.find(tmp_umit->second);
+        objectInfo.objectType = tmp_umit->second;
+        find_iterators = objectCacheMap.find(objectInfo.objectType);
     }
 
     NumAlphas = 0;
@@ -525,12 +527,6 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &epJSON_it = find_iterators->second.inputObjectIterators.at(adjustedNumber - 1);
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-
-    auto const *const obj_ptr = epJSON_it.value().get_ptr<const json::object_t *const>();
-    auto const find_unused = unusedInputs.find(obj_ptr);
-    if (find_unused != unusedInputs.end()) {
-        unusedInputs.erase(find_unused);
-    }
 
     // Locations in JSON schema relating to normal fields
     auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
@@ -565,6 +561,13 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &obj = epJSON_it;
     auto const &obj_val = obj.value();
 
+    objectInfo.objectName = obj.key();
+
+    auto const find_unused = unusedInputs.find(objectInfo);
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
+    }
+
     size_t idf_max_fields = 0;
     auto found_idf_max_fields = obj_val.find("idf_max_fields");
     if (found_idf_max_fields != obj_val.end()) {
@@ -591,11 +594,11 @@ void InputProcessor::getObjectItem(std::string const &Object,
         if (field == "name" && schema_name_field != epJSON_schema_it_val.end()) {
             auto const &name_iter = schema_name_field.value();
             if (name_iter.find("retaincase") != name_iter.end()) {
-                Alphas(alpha_index) = obj.key();
+                Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(obj.key());
+                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(objectInfo.objectName);
             }
-            if (is_AlphaBlank) AlphaBlank()(alpha_index) = obj.key().empty();
+            if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
                 AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
             }
@@ -1172,8 +1175,8 @@ void InputProcessor::reportOrphanRecordObjects()
 
     bool first_iteration = true;
     for (auto it = unusedInputs.begin(); it != unusedInputs.end(); ++it) {
-        auto const &object_type = it->second.objectType;
-        auto const &name = it->second.objectName;
+        auto const &object_type = it->objectType;
+        auto const &name = it->objectName;
 
         // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
         // !DisplayAllWarnings
