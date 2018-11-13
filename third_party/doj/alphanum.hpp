@@ -34,9 +34,6 @@
 
 /* $Header: /code/doj/alphanum.hpp,v 1.3 2008/01/28 23:06:47 doj Exp $ */
 
-
-// MODIFIED: Julien Marrec, EffiBEM, on 2018-10-26 to avoids "n_001" being recognized as the same as "n_01"
-// https://github.com/NREL/EnergyPlus/issues/6720
 #include <cassert>
 #include <functional>
 #include <string>
