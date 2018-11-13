@@ -3563,6 +3563,93 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     EXPECT_EQ(1, IOStatus);
 }
 
+// https://github.com/NREL/EnergyPlus/issues/6720
+TEST_F(InputProcessorFixture, FalseDuplicates)
+{
+    std::string const idf(delimited_string({
+        "Material,",
+        "  Standard insulation_0.1,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "  Standard insulation_0.01,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+    }));
+
+
+    ASSERT_TRUE(process_idf(idf));
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
+{
+
+    json root;
+    std::string obj_name = "Material";
+    std::string name1 = "Standard insulation_01";
+    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
+
+    EXPECT_TRUE(mat1.is_object());
+
+    // Add the first material to it
+    root[obj_name][name1] = mat1;
+
+    auto test = [=](std::string search_name) {
+        // Second material shouldn't be found!
+        // Oh Oh, this fails
+        auto it = root[obj_name].find(search_name);
+        EXPECT_TRUE( it == root[obj_name].end());
+        if (it != root[obj_name].end()) {
+            EXPECT_TRUE(false) << it.key();
+        }
+
+        // This works...
+        EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), search_name) == root[obj_name].end());
+    };
+
+    // This all works just fine
+    test("Standard insulation");
+    test("Standard insulation_");
+    test("Standard insulation_0");
+    test("Standard insulation_0.");
+    test("Standard insulation_00");
+    test("Standard insulation_00.1");
+    test("Standard insulation_0010");
+
+    // This used to fail before fix in doj/alphanum.hpp
+    test("Standard insulation_001");
+
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
+
+}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
