@@ -4665,7 +4665,7 @@ namespace MixedAir {
             if (AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked) {
                 this->OAMassFlow = AirLoopFlow(AirLoopNum).MinOutAir;
                 AirLoopFlow(AirLoopNum).OAFrac = this->OAMassFlow / this->MixMassFlow;
-                AirLoopFlow(AirLoopNum).OAFlow - this->OAMassFlow;
+                AirLoopFlow(AirLoopNum).OAFlow = this->OAMassFlow;
             }
 
             // Check heat exchanger bypass control
