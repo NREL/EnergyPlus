@@ -587,14 +587,14 @@ namespace MixedAir {
         using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using HeatRecovery::SimHeatRecovery;
-        using Humidifiers::SimHumidifier;
         using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+        using HeatRecovery::SimHeatRecovery;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using Humidifiers::SimHumidifier;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -3575,6 +3575,7 @@ namespace MixedAir {
                 curAirLoopFlow.OAFrac = 0.0;                      // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.OAMinFrac = 0.0;                   // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.MinOutAir = 0.0;
+                curAirLoopFlow.OAFlow - 0.0;
             }
 
             return;
@@ -3721,8 +3722,10 @@ namespace MixedAir {
             }
             if (this->MixMassFlow > 0.0) {
                 curAirLoopFlow.OAFrac = this->OAMassFlow / this->MixMassFlow;
+                curAirLoopFlow.OAFlow = this->OAMassFlow;
             } else {
                 curAirLoopFlow.OAFrac = 0.0;
+                curAirLoopFlow.OAFlow = 0.0;
             }
             this->MinOAFracLimit = OutAirMinFrac;
             if (HighHumidityOperationFlag && OASignal > 1.0) {
@@ -4662,6 +4665,7 @@ namespace MixedAir {
             if (AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked) {
                 this->OAMassFlow = AirLoopFlow(AirLoopNum).MinOutAir;
                 AirLoopFlow(AirLoopNum).OAFrac = this->OAMassFlow / this->MixMassFlow;
+                AirLoopFlow(AirLoopNum).OAFlow - this->OAMassFlow;
             }
 
             // Check heat exchanger bypass control
