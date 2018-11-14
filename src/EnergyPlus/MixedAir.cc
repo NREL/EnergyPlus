@@ -3575,7 +3575,7 @@ namespace MixedAir {
                 curAirLoopFlow.OAFrac = 0.0;                      // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.OAMinFrac = 0.0;                   // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.MinOutAir = 0.0;
-                curAirLoopFlow.OAFlow - 0.0;
+                curAirLoopFlow.OAFlow = 0.0;
             }
 
             return;
