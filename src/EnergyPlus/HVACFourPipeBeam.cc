@@ -422,6 +422,7 @@ namespace FourPipeBeam {
         for (aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex) {
             if (thisBeam->airOutNodeNum == AirDistUnit(aDUIndex).OutletNodeNum) {
                 thisBeam->aDUNum = aDUIndex;
+                AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
             }
         }
         // assumes if there isn't one assigned, it's an error

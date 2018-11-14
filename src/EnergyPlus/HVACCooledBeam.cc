@@ -447,6 +447,7 @@ namespace HVACCooledBeam {
             for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                 if (CoolBeam(CBNum).AirOutNode == AirDistUnit(ADUNum).OutletNodeNum) {
                     CoolBeam(CBNum).ADUNum = ADUNum;
+                    AirDistUnit(ADUNum).InletNodeNum = CoolBeam(CBNum).AirInNode;
                 }
             }
             // one assumes if there isn't one assigned, it's an error?
