@@ -15,10 +15,10 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
@@ -638,11 +638,11 @@ endif()
 add_custom_target( GenerateEmbeddedEpJSONSchema
                    COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
                            -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
+                           -D "EnergyPlus_BINARY_DIR:PATH=${PROJECT_BINARY_DIR}"
                            -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
                            -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
-                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
-                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                           -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
+                   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )
 
 

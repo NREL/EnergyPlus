@@ -7,7 +7,7 @@ set(KIVA_3D OFF CACHE BOOL "" FORCE)
 set(KIVA_GROUND_PLOT ${BUILD_GROUND_PLOT} CACHE BOOL "" FORCE)
 set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/kiva-ep/")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/kiva-ep/")
 
 include_directories("${kiva_SOURCE_DIR}/src")
 include_directories("${kiva_SOURCE_DIR}/src/libkiva")
