@@ -89,15 +89,17 @@
     Annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    ;                        !- Treat Weather as Actual
 
 ! ***HOLIDAYS & DAYLIGHT SAVINGS***
 
@@ -248,7 +250,7 @@
     -6.00,                   !- Time Zone {hr}
     190;                     !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -278,7 +280,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
+ ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -388,6 +390,14 @@
     ;                        !- Visible Transmittance
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
+
+  Construction,
+    DropCeiling,             !- Name
+    Std AC02;                !- Outside Layer
+
+  Construction,
+    AIR-WALL,                !- Name
+    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -1338,7 +1348,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1354,7 +1363,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1370,7 +1378,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1386,7 +1393,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1402,7 +1408,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1418,7 +1423,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1434,7 +1438,6 @@
     Perimeter_ZN_1_wall_south,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1450,7 +1453,6 @@
     Perimeter_ZN_2_wall_east,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1466,7 +1468,6 @@
     Perimeter_ZN_2_wall_east,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1482,7 +1483,6 @@
     Perimeter_ZN_2_wall_east,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1498,7 +1498,6 @@
     Perimeter_ZN_2_wall_east,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1514,7 +1513,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1530,7 +1528,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1546,7 +1543,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1562,7 +1558,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1578,7 +1573,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1594,7 +1588,6 @@
     Perimeter_ZN_3_wall_north,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1610,7 +1603,6 @@
     Perimeter_ZN_4_wall_west,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1626,7 +1618,6 @@
     Perimeter_ZN_4_wall_west,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1642,7 +1633,6 @@
     Perimeter_ZN_4_wall_west,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1658,7 +1648,6 @@
     Perimeter_ZN_4_wall_west,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2325,7 +2314,8 @@
     ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
     Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
     ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
+    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
     PSZ-AC:2_CoolC DXCoil,   !- Name
@@ -2341,7 +2331,8 @@
     ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
     Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
     ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
+    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
     PSZ-AC:3_CoolC DXCoil,   !- Name
@@ -2357,7 +2348,8 @@
     ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
     Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
     ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
+    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
     PSZ-AC:4_CoolC DXCoil,   !- Name
@@ -2373,7 +2365,8 @@
     ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
     Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
     ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
+    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
     PSZ-AC:5_CoolC DXCoil,   !- Name
@@ -2389,7 +2382,8 @@
     ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
     Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
     ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
+    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   ZoneHVAC:EquipmentList,
     Core_ZN Equipment,       !- Name
