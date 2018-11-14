@@ -374,6 +374,186 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
     }
 }
 
+TEST_F(InputProcessorFixture, parse_utf_8)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    试验,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                    !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    , !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;",
+    }));
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_utf_8_json)
+{
+    auto parsed = json::parse("{ \"Building\": { \"试验\": { \"temperature_convergence_tolerance_value\": 0.2000,"
+                              "\"maximum_number_of_warmup_days\": 25, \"minimum_number_of_warmup_days\": 6 } } }");
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+    EXPECT_EQ( expected, parsed );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xED\xA0\x80\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    EXPECT_ANY_THROW(epJSON.dump(-1, ' ', false, json::error_handler_t::strict));
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::ignore);
+
+    EXPECT_EQ( expected, input_file );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
+
+    EXPECT_EQ( expected, input_file );
+}
+
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
 {
     std::string const idf(delimited_string({
@@ -1669,7 +1849,7 @@ TEST_F(InputProcessorFixture, look_ahead)
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
@@ -1697,8 +1877,8 @@ TEST_F(InputProcessorFixture, next_token)
     EXPECT_EQ(9ul, index);
     EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
     token = next_token(test_input, index);
-    EXPECT_EQ(10ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(11ul, index);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);

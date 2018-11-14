@@ -3577,6 +3577,7 @@ namespace OutputReportTabular {
                                << '\n';
                     tbl_stream << " - EnergyPlus</title>\n";
                     tbl_stream << "</head>\n";
+                    tbl_stream << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
                     tbl_stream << "<body>\n";
                     tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                     tbl_stream << "<a name=top></a>\n";
