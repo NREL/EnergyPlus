@@ -1197,15 +1197,18 @@ namespace ResultsFramework {
         root["TabularReports"] = TabularReportsCollection.getJSON();
 
         if (outputJSON && DataGlobals::jsonOutputStreams.json_stream) {
-            *(DataGlobals::jsonOutputStreams.json_stream) << std::setw(4) << root << std::endl;
+            auto const dumped_json = root.dump(4, ' ', false, json::error_handler_t::replace);
+            std::copy(dumped_json.begin(), dumped_json.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.json_stream));
         }
         if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_stream) {
-            std::vector<uint8_t> v_cbor = json::to_cbor(root);
-            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_stream));
+            json::to_cbor(root, *DataGlobals::jsonOutputStreams.cbor_stream);
+//            std::vector<uint8_t> v_cbor = json::to_cbor(root);
+//            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_stream));
         }
         if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_stream) {
-            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_stream));
+            json::to_msgpack(root, *DataGlobals::jsonOutputStreams.msgpack_stream);
+//            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
+//            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_stream));
         }
     }
 

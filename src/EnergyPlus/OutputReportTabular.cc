@@ -219,8 +219,6 @@ namespace OutputReportTabular {
     static std::string const validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
     static std::string const BlankString;
 
-    static std::string const degChar("°"); // Â°
-
     // MODULE VARIABLE DECLARATIONS:
 
     // The Binned table type is different and only references one variable and its structure is very
@@ -5858,7 +5856,12 @@ namespace OutputReportTabular {
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
@@ -5885,7 +5888,12 @@ namespace OutputReportTabular {
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
@@ -5912,7 +5920,12 @@ namespace OutputReportTabular {
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
@@ -5939,7 +5952,12 @@ namespace OutputReportTabular {
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
