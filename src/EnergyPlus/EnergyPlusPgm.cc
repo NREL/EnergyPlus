@@ -556,7 +556,10 @@ int RunEnergyPlus(std::string const & filepath)
             moveFile("readvars.audit", outputRvauditFileName);
         }
 
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus();
     } catch (const std::exception &e) {
+        ShowSevereError(e.what());
         return AbortEnergyPlus();
     }
 

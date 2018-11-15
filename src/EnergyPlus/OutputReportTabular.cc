@@ -3580,6 +3580,7 @@ namespace OutputReportTabular {
                                << '\n';
                     tbl_stream << " - EnergyPlus</title>\n";
                     tbl_stream << "</head>\n";
+                    tbl_stream << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
                     tbl_stream << "<body>\n";
                     tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                     tbl_stream << "<a name=top></a>\n";
@@ -15518,7 +15519,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 115;
+        UnitConvSize = 116;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "\u00B0C";
@@ -15635,6 +15636,7 @@ namespace OutputReportTabular {
         UnitConv(113).siName = "REV/MIN";
         UnitConv(114).siName = "NM";
         UnitConv(115).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(116).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -15751,6 +15753,7 @@ namespace OutputReportTabular {
         UnitConv(113).ipName = "rev/min";
         UnitConv(114).ipName = "lbf-ft";
         UnitConv(115).ipName = "Btu/W-h";
+        UnitConv(116).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -15867,6 +15870,7 @@ namespace OutputReportTabular {
         UnitConv(113).mult = 1.0;
         UnitConv(114).mult = 0.737562149277;
         UnitConv(115).mult = 1.0;
+        UnitConv(116).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;

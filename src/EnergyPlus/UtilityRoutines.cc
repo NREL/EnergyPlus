@@ -1270,7 +1270,7 @@ void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Opti
         sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
         if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
     }
-    throw std::runtime_error(ErrorMessage);
+    throw FatalError(ErrorMessage);
 }
 
 void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
