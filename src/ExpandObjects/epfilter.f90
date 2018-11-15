@@ -31446,10 +31446,12 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Run on Sensible Load','Yes')
       ! CR8813 - MJW - Delete isHumidifierNone IF (.NOT. isDehumidifyNone .OR. .NOT. isHumidifierNone) THEN
       IF (.NOT. isDehumidifyNone) THEN
-        CALL AddToObjStr('Run on Latent Load','Yes',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','Yes')
       ELSE
-        CALL AddToObjStr('Run on Latent Load','No',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','No')
       END IF
+      CALL AddToObjStr('Use Outdoor Air DX Cooling Coil','Yes')
+      CALL AddToObjStr('Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature','2.0', .TRUE.)
       !***Coil:Cooling:DX:TwoSpeed
       CALL CreateNewObj('Coil:Cooling:DX:TwoSpeed')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil')
@@ -31592,10 +31594,12 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Run on Sensible Load','Yes')
       ! CR8813 - MJW - Delete isHumidifierNone IF (.NOT. isDehumidifyNone .OR. .NOT. isHumidifierNone) THEN
       IF (.NOT. isDehumidifyNone) THEN
-        CALL AddToObjStr('Run on Latent Load','Yes',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','Yes')
       ELSE
-        CALL AddToObjStr('Run on Latent Load','No',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','No')
       END IF
+      CALL AddToObjStr('Use Outdoor Air DX Cooling Coil','Yes')
+      CALL AddToObjStr('Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature','2.0', .TRUE.)
       !***Coil:Cooling:DX:TwoStageWithHumidityControlMode
       CALL CreateNewObj('Coil:Cooling:DX:TwoStageWithHumidityControlMode')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil')
@@ -31905,10 +31909,12 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Run on Sensible Load','Yes')
       ! CR8813 - MJW - Delete isHumidifierNone IF (.NOT. isDehumidifyNone .OR. .NOT. isHumidifierNone) THEN
       IF (.NOT. isDehumidifyNone) THEN
-        CALL AddToObjStr('Run on Latent Load','Yes',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','Yes')
       ELSE
-        CALL AddToObjStr('Run on Latent Load','No',.TRUE.)
+        CALL AddToObjStr('Run on Latent Load','No')
       END IF
+      CALL AddToObjStr('Use Outdoor Air DX Cooling Coil','Yes')
+      CALL AddToObjStr('Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature','2.0', .TRUE.)
       !***CoilSystem:Cooling:DX:HeatExchangerAssisted
       CALL CreateNewObj('CoilSystem:Cooling:DX:HeatExchangerAssisted')
       CALL AddToObjFld('Name', base + doasNameOff,' Heat Exchanger Assisted Cooling Coil')
