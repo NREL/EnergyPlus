@@ -4675,6 +4675,14 @@ namespace ZoneEquipmentManager {
             }
         }
 
+        // Set OA flow and frac for systems which are all OA (no OASys)
+        for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
+            if (PrimaryAirSystem(airLoop).isAllOA) {
+                DataAirLoop::AirLoopFlow(airLoop).OAFlow = DataAirLoop::AirLoopFlow(airLoop).SupFlow;
+                DataAirLoop::AirLoopFlow(airLoop).OAFrac = 1.0;
+            }
+        }
+
         do {
             if (ZoneAirMassFlow.EnforceZoneMassBalance) {
                 // These are also reset in ZoneEquipmentManager::InitZoneEquipment, reset again here for each zone mass balance iteration
