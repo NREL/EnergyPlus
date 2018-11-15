@@ -565,11 +565,6 @@ namespace ResultsFramework {
                     // do this once only
                     RowHeaders.push_back(rowLabels[iRow]);
                 }
-                auto found = body[k].find("\xC2\xB0");
-                if (found != std::string::npos) {
-                    std::string testing = body[k];
-                    std::string test = "";
-                }
                 col.push_back(trim(body[k]));
                 ++k;
             }
