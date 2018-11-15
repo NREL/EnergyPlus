@@ -19971,7 +19971,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjFld('Economizer Minimum Limit Dry-Bulb Temperature {C}', base + cvsEconoLowLimitOff,' ')
   CALL AddToObjStr('Lockout Type', 'NoLockout')
   CALL AddToObjStr('Minimum Limit Type','ProportionalMinimum')
-  CALL AddToObjStr('Minimum Outdoor Air Schedule Name',' ')
+  CALL AddToObjFld('Minimum Outdoor Air Schedule Name', base + cvsMinOutFlowSchedNameOff,' ')
   CALL AddToObjStr('Minimum Fraction of Outdoor Air Schedule Name',' ')
   CALL AddToObjStr('Maximum Fraction of Outdoor Air Schedule Name',' ')
   CALL AddToObjStr('Mechanical Ventilation Controller Name','',.TRUE.)
