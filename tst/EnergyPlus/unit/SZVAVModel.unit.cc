@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
@@ -86,7 +85,6 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::HVACUnitarySystem;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PackagedTerminalHeatPump;
 using namespace EnergyPlus::Psychrometrics;
@@ -266,13 +264,13 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool ErrorsFound = false;
     // set zone condition
     NodeInputManager::GetOnlySingleNode("ZoneNode",
-                                                       ErrorsFound,
-                                                       "PTUnit",
-                                                       "PTUnit",
-                                                       DataLoopNode::NodeType_Air,
-                                                       DataLoopNode::NodeConnectionType_Inlet,
-                                                       1,
-                                                       DataLoopNode::ObjectIsNotParent);
+                                        ErrorsFound,
+                                        "PTUnit",
+                                        "PTUnit",
+                                        DataLoopNode::NodeType_Air,
+                                        DataLoopNode::NodeConnectionType_Inlet,
+                                        1,
+                                        DataLoopNode::ObjectIsNotParent);
 
     DataLoopNode::Node(5).Temp = 24.0;
     DataLoopNode::Node(5).HumRat = 0.011;

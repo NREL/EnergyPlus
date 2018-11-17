@@ -104,7 +104,6 @@ using namespace EnergyPlus::WaterCoils;
 using DataHeatBalFanSys::TempControlType;
 using DataZoneEnergyDemands::CurDeadBandOrSetback;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-using General::JulianDay;
 using General::TrimSigDigits;
 using MixedAir::OAMixer;
 
@@ -401,7 +400,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     CalcMultiStage4PipeFanCoil(FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -716,7 +715,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     CalcMultiStage4PipeFanCoil(FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -1052,7 +1051,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     // Normal heating simulation for fan coil with constant fan, variable water flow
@@ -1406,7 +1405,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     // Normal heating simulation for fan coil with constant fan, electric heating
@@ -1752,7 +1751,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
     // normal cooling simulation for constant fan variable flow fan coil
     Sim4PipeFanCoil(FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -2087,7 +2086,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     ZoneEqSizing.allocate(1);
@@ -2108,7 +2107,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     StdRhoAir = 1.2;
 
     BeginEnvrnFlag = true;
-    InitFanCoilUnits(FanCoilNum, ZoneNum);
+    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
     // expect full flow and meet capacity
@@ -2794,7 +2793,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     UpdateScheduleValues();
 
     ZoneEqSizing.allocate(1);
@@ -2815,7 +2814,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     StdRhoAir = 1.2;
 
     BeginEnvrnFlag = true;
-    InitFanCoilUnits(FanCoilNum, ZoneNum);
+    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, FanCoil(1).SpeedFanSel);

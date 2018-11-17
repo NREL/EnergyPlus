@@ -261,8 +261,7 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  Counterclockwise,",
                                           "  Relative,",
                                           "  Relative,",
-                                          "  Relative;"
-                                          "",
+                                          "  Relative;",
                                           "",
                                           "Zone,",
                                           "  Core_mid,",
@@ -279,6 +278,57 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  ,",
                                           "  Yes;",
                                           ""}));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
+TEST_F(InputProcessorFixture, decode_encode_3)
+{
+    auto const idf(delimited_string({
+      "Schedule:File,",
+      "  Test Schedule File,      !- Name",
+      "  Any Number,              !- Schedule Type Limits Name",
+      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,  !- File Name)",
+      "  2,                       !- Column Number",
+      "  1,                       !- Rows to Skip at Top",
+      "  8760,                    !- Number of Hours of Data",
+      "  Comma,                   !- Column Separator",
+      "  ,                        !- Interpolate to Timestep",
+      "  10;                      !- Minutes per Item",
+    }));
+
+    auto const expected(delimited_string({
+      "Building,",
+      "  Bldg,",
+      "  0.0,",
+      "  Suburbs,",
+      "  0.04,",
+      "  0.4,",
+      "  FullExterior,",
+      "  25.0,",
+      "  6.0;",
+      "",
+      "GlobalGeometryRules,",
+      "  UpperLeftCorner,",
+      "  Counterclockwise,",
+      "  Relative,",
+      "  Relative,",
+      "  Relative;",
+      "",
+      "Schedule:File,",
+      "  Test Schedule File,",
+      "  Any Number,",
+      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,)",
+      "  2.0,",
+      "  1.0,",
+      "  8760.0,",
+      "  Comma,",
+      "  ,",
+      "  10.0;",
+      ""
+    }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -324,6 +374,186 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
     }
 }
 
+TEST_F(InputProcessorFixture, parse_utf_8)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    试验,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                    !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    , !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;",
+    }));
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_utf_8_json)
+{
+    auto parsed = json::parse("{ \"Building\": { \"试验\": { \"temperature_convergence_tolerance_value\": 0.2000,"
+                              "\"maximum_number_of_warmup_days\": 25, \"minimum_number_of_warmup_days\": 6 } } }");
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+    EXPECT_EQ( expected, parsed );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xED\xA0\x80\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    EXPECT_ANY_THROW(epJSON.dump(-1, ' ', false, json::error_handler_t::strict));
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::ignore);
+
+    EXPECT_EQ( expected, input_file );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
+
+    EXPECT_EQ( expected, input_file );
+}
+
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
 {
     std::string const idf(delimited_string({
@@ -331,9 +561,11 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    31,                      !- End Day of Month",
-        "    Tuesday,                 !- Day of Week for Start Day",
+        "    ,                        !- End Year",
+        "    Sunday,                  !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
         "    No,                      !- Apply Weekend Holiday Rule",
@@ -344,9 +576,11 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    ,                        !- Name",
         "    7,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    7,                       !- End Month",
         "    31,                      !- End Day of Month",
-        "    Tuesday,                 !- Day of Week for Start Day",
+        "    ,                        !- End Year",
+        "    Sunday,                  !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
         "    No,                      !- Apply Weekend Holiday Rule",
@@ -354,34 +588,29 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    Yes;                     !- Use Weather File Snow Indicators",
     }));
 
-    json expected = {
-      {"RunPeriod", {
-        {"RunPeriod 1", {
-          {"apply_weekend_holiday_rule", "No"},
-          {"begin_day_of_month", 1},
-          {"begin_month", 1},
-          {"day_of_week_for_start_day", "Tuesday"},
-          {"end_day_of_month", 31},
-          {"end_month", 1},
-          {"use_weather_file_daylight_saving_period", "Yes"},
-          {"use_weather_file_holidays_and_special_days", "Yes"},
-          {"use_weather_file_rain_indicators", "Yes"},
-          {"use_weather_file_snow_indicators", "Yes"}
-        }},
-        {"RunPeriod 2", {
-          {"apply_weekend_holiday_rule", "No"},
-          {"begin_day_of_month", 1},
-          {"begin_month", 7},
-          {"day_of_week_for_start_day", "Tuesday"},
-          {"end_day_of_month", 31},
-          {"end_month", 7},
-          {"use_weather_file_daylight_saving_period", "Yes"},
-          {"use_weather_file_holidays_and_special_days", "Yes"},
-          {"use_weather_file_rain_indicators", "Yes"},
-          {"use_weather_file_snow_indicators", "Yes"}
-        }}
-      }}
-    };
+    json expected = {{"RunPeriod",
+                      {{"RunPeriod 1",
+                        {{"apply_weekend_holiday_rule", "No"},
+                         {"begin_day_of_month", 1},
+                         {"begin_month", 1},
+                         {"day_of_week_for_start_day", "Sunday"},
+                         {"end_day_of_month", 31},
+                         {"end_month", 1},
+                         {"use_weather_file_daylight_saving_period", "Yes"},
+                         {"use_weather_file_holidays_and_special_days", "Yes"},
+                         {"use_weather_file_rain_indicators", "Yes"},
+                         {"use_weather_file_snow_indicators", "Yes"}}},
+                       {"RunPeriod 2",
+                        {{"apply_weekend_holiday_rule", "No"},
+                         {"begin_day_of_month", 1},
+                         {"begin_month", 7},
+                         {"day_of_week_for_start_day", "Sunday"},
+                         {"end_day_of_month", 31},
+                         {"end_month", 7},
+                         {"use_weather_file_daylight_saving_period", "Yes"},
+                         {"use_weather_file_holidays_and_special_days", "Yes"},
+                         {"use_weather_file_rain_indicators", "Yes"},
+                         {"use_weather_file_snow_indicators", "Yes"}}}}}};
 
     ASSERT_TRUE(process_idf(idf));
     json &epJSON = getEpJSON();
@@ -471,80 +700,66 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
 TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
 {
 
-    std::string const idf(delimited_string(
-        {"EnergyManagementSystem:Program,",
-          "    ER_Main,                 !- Name",
-          "    IF ER_Humidifier_Status > 0,  !- Program Line 1",
-          "    SET ER_ExtraElecHeatC_Status = 1,  !- Program Line 2",
-          "    SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,  !- <none>",
-          "    ELSE,                    !- <none>",
-          "    SET ER_ExtraElecHeatC_Status = 0,  !- <none>",
-          "    SET ER_ExtraElecHeatC_SP = NULL,  !- <none>",
-          "    ENDIF,                   !- <none>",
-          "    IF T_OA < 10,            !- <none>",
-          "    ,                        !- <none>",
-          "    SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,  !- <none>",
-          "    SET FlowRate = (ER_FanMassFlow/1.2)*2118,  !- <none>",
-          "    SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),  !- <none>",
-          "    SET ER_ExtraWaterHeatC_Status = 1,  !- <none>",
-          "    SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,  !- <none>",
-          "    ELSE,                    !- <none>",
-          "    SET ER_ExtraWaterHeatC_Status = 0,  !- <none>",
-          "    SET ER_ExtraWaterHeatC_SP = NULL,  !- <none>",
-          "    ENDIF;                   !- <none>"}));
+    std::string const idf(delimited_string({"EnergyManagementSystem:Program,",
+                                            "    ER_Main,                 !- Name",
+                                            "    IF ER_Humidifier_Status > 0,  !- Program Line 1",
+                                            "    SET ER_ExtraElecHeatC_Status = 1,  !- Program Line 2",
+                                            "    SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,  !- <none>",
+                                            "    ELSE,                    !- <none>",
+                                            "    SET ER_ExtraElecHeatC_Status = 0,  !- <none>",
+                                            "    SET ER_ExtraElecHeatC_SP = NULL,  !- <none>",
+                                            "    ENDIF,                   !- <none>",
+                                            "    IF T_OA < 10,            !- <none>",
+                                            "    ,                        !- <none>",
+                                            "    SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,  !- <none>",
+                                            "    SET FlowRate = (ER_FanMassFlow/1.2)*2118,  !- <none>",
+                                            "    SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),  !- <none>",
+                                            "    SET ER_ExtraWaterHeatC_Status = 1,  !- <none>",
+                                            "    SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,  !- <none>",
+                                            "    ELSE,                    !- <none>",
+                                            "    SET ER_ExtraWaterHeatC_Status = 0,  !- <none>",
+                                            "    SET ER_ExtraWaterHeatC_SP = NULL,  !- <none>",
+                                            "    ENDIF;                   !- <none>"}));
 
-    json expected = {
-      {"EnergyManagementSystem:Program",
-       {{"ER_Main",
-          {{"lines",
-            {
-              {{"program_line", "IF ER_Humidifier_Status > 0"}},
-              {{"program_line", "SET ER_ExtraElecHeatC_Status = 1"}},
-              {{"program_line", "SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4"}},
-              {{"program_line", "ELSE"}},
-              {{"program_line", "SET ER_ExtraElecHeatC_Status = 0"}},
-              {{"program_line", "SET ER_ExtraElecHeatC_SP = NULL"}},
-              {{"program_line", "ENDIF"}},
-              {{"program_line", "IF T_OA < 10"}},
-              {{}},
-              {{"program_line", "SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118"}},
-              {{"program_line", "SET FlowRate = (ER_FanMassFlow/1.2)*2118"}},
-              {{"program_line", "SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001))"}},
-              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 1"}},
-              {{"program_line", "SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT"}},
-              {{"program_line", "ELSE"}},
-              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 0"}},
-              {{"program_line", "SET ER_ExtraWaterHeatC_SP = NULL"}},
-              {{"program_line", "ENDIF"}},
-            }
-          }}
-        }}
-      },
-      {"GlobalGeometryRules",
-        {{"",
-          {
-            {"starting_vertex_position", "UpperLeftCorner"},
-            {"vertex_entry_direction", "Counterclockwise"},
-            {"coordinate_system", "Relative"},
-            {"daylighting_reference_point_coordinate_system", "Relative"},
-            {"rectangular_surface_coordinate_system", "Relative"}
-          }
-        }}
-      },
-      {"Building",
-        {{"Bldg",
-          {
-            {"north_axis", 0.0},
-            {"terrain", "Suburbs"},
-            {"loads_convergence_tolerance_value", 0.04},
-            {"temperature_convergence_tolerance_value", 0.4000},
-            {"solar_distribution", "FullExterior"},
-            {"maximum_number_of_warmup_days", 25},
-            {"minimum_number_of_warmup_days", 6}
-          }
-        }}
-      }
-    };
+    json expected = {{"EnergyManagementSystem:Program",
+                      {{"ER_Main",
+                        {{"lines",
+                          {
+                              {{"program_line", "IF ER_Humidifier_Status > 0"}},
+                              {{"program_line", "SET ER_ExtraElecHeatC_Status = 1"}},
+                              {{"program_line", "SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4"}},
+                              {{"program_line", "ELSE"}},
+                              {{"program_line", "SET ER_ExtraElecHeatC_Status = 0"}},
+                              {{"program_line", "SET ER_ExtraElecHeatC_SP = NULL"}},
+                              {{"program_line", "ENDIF"}},
+                              {{"program_line", "IF T_OA < 10"}},
+                              {{}},
+                              {{"program_line", "SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118"}},
+                              {{"program_line", "SET FlowRate = (ER_FanMassFlow/1.2)*2118"}},
+                              {{"program_line", "SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001))"}},
+                              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 1"}},
+                              {{"program_line", "SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT"}},
+                              {{"program_line", "ELSE"}},
+                              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 0"}},
+                              {{"program_line", "SET ER_ExtraWaterHeatC_SP = NULL"}},
+                              {{"program_line", "ENDIF"}},
+                          }}}}}},
+                     {"GlobalGeometryRules",
+                      {{"",
+                        {{"starting_vertex_position", "UpperLeftCorner"},
+                         {"vertex_entry_direction", "Counterclockwise"},
+                         {"coordinate_system", "Relative"},
+                         {"daylighting_reference_point_coordinate_system", "Relative"},
+                         {"rectangular_surface_coordinate_system", "Relative"}}}}},
+                     {"Building",
+                      {{"Bldg",
+                        {{"north_axis", 0.0},
+                         {"terrain", "Suburbs"},
+                         {"loads_convergence_tolerance_value", 0.04},
+                         {"temperature_convergence_tolerance_value", 0.4000},
+                         {"solar_distribution", "FullExterior"},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
 
     auto const expected_idf(delimited_string({"Building,",
                                               "  Bldg,",
@@ -602,14 +817,14 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                     EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
-                      for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-                          if (it_ext.value().empty()) {
-                            EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
-                            continue;
-                          }
-                          ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                          EXPECT_EQ(tmp.dump(), it_ext.value().dump());
-                      }
+                        for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+                            if (it_ext.value().empty()) {
+                                EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
+                                continue;
+                            }
+                            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                        }
                     }
                 }
             }
@@ -620,9 +835,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
 TEST_F(InputProcessorFixture, parse_idf_EMSProgram_required_prop_extensible)
 {
 
-    std::string const idf(delimited_string(
-        {"EnergyManagementSystem:Program,",
-          "    ER_Main;                 !- Name"}));
+    std::string const idf(delimited_string({"EnergyManagementSystem:Program,", "    ER_Main;                 !- Name"}));
 
     EXPECT_FALSE(process_idf(idf, false));
 
@@ -631,24 +844,29 @@ TEST_F(InputProcessorFixture, parse_idf_EMSProgram_required_prop_extensible)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }
 
 TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fields)
 {
 
-    std::string const idf(delimited_string(
-        {"BuildingSurface:Detailed,", "Zn009:Flr001,            !- Name", "    Floor,                   !- Surface Type",
-         "    FLOOR38,                 !- Construction Name", "    SCWINDOW,                !- Zone Name",
-         "    Surface,                 !- Outside Boundary Condition", "    Zn009:Flr001,            !- Outside Boundary Condition Object",
-         "    NoSun,                   !- Sun Exposure", "    NoWind,                  !- Wind Exposure",
-         "    1.000000,                !- View Factor to Ground", "    4,                       !- Number of Vertices",
-         "    "
-         ",10,0,  !- X,Y,Z ==> Vertex 1 {m}",
-         "    0.000000,,0,  !- X,Y,Z ==> Vertex 2 {m}", "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-         "    "
-         ",10.00000,"
-         ";  !- X,Y,Z ==> Vertex 4 {m}"}));
+    std::string const idf(delimited_string({"BuildingSurface:Detailed,",
+                                            "Zn009:Flr001,            !- Name",
+                                            "    Floor,                   !- Surface Type",
+                                            "    FLOOR38,                 !- Construction Name",
+                                            "    SCWINDOW,                !- Zone Name",
+                                            "    Surface,                 !- Outside Boundary Condition",
+                                            "    Zn009:Flr001,            !- Outside Boundary Condition Object",
+                                            "    NoSun,                   !- Sun Exposure",
+                                            "    NoWind,                  !- Wind Exposure",
+                                            "    1.000000,                !- View Factor to Ground",
+                                            "    4,                       !- Number of Vertices",
+                                            "    "
+                                            ",10,0,  !- X,Y,Z ==> Vertex 1 {m}",
+                                            "    0.000000,,0,  !- X,Y,Z ==> Vertex 2 {m}",
+                                            "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+                                            "    "
+                                            ",10.00000,"
+                                            ";  !- X,Y,Z ==> Vertex 4 {m}"}));
 
     json expected = {
         {"BuildingSurface:Detailed",
@@ -720,14 +938,21 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
 {
     bool success = true;
 
-    std::string const idf(delimited_string(
-        {"BuildingSurface:Detailed,", "Zn009:Flr001,            !- Name", "    Floor,                   !- Surface Type",
-         "    FLOOR38,                 !- Construction Name", "    SCWINDOW,                !- Zone Name",
-         "    Surface,                 !- Outside Boundary Condition", "    Zn009:Flr001,            !- Outside Boundary Condition Object",
-         "    NoSun,                   !- Sun Exposure", "    NoWind,                  !- Wind Exposure",
-         "    1.000000,                !- View Factor to Ground", "    4,                       !- Number of Vertices",
-         "    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}", "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-         "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}", "    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"}));
+    std::string const idf(delimited_string({"BuildingSurface:Detailed,",
+                                            "Zn009:Flr001,            !- Name",
+                                            "    Floor,                   !- Surface Type",
+                                            "    FLOOR38,                 !- Construction Name",
+                                            "    SCWINDOW,                !- Zone Name",
+                                            "    Surface,                 !- Outside Boundary Condition",
+                                            "    Zn009:Flr001,            !- Outside Boundary Condition Object",
+                                            "    NoSun,                   !- Sun Exposure",
+                                            "    NoWind,                  !- Wind Exposure",
+                                            "    1.000000,                !- View Factor to Ground",
+                                            "    4,                       !- Number of Vertices",
+                                            "    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+                                            "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+                                            "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+                                            "    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"}));
 
     json expected = {{"BuildingSurface:Detailed",
                       {{"Zn009:Flr001",
@@ -1041,14 +1266,21 @@ TEST_F(InputProcessorFixture, parse_idf_two_objects)
 
 TEST_F(InputProcessorFixture, parse_idf_extensibles)
 {
-    std::string const idf(delimited_string(
-        {"BuildingSurface:Detailed,", "Zn009:Flr001,            !- Name", "    Floor,                   !- Surface Type",
-         "    FLOOR38,                 !- Construction Name", "    SCWINDOW,                !- Zone Name",
-         "    Surface,                 !- Outside Boundary Condition", "    Zn009:Flr001,            !- Outside Boundary Condition Object",
-         "    NoSun,                   !- Sun Exposure", "    NoWind,                  !- Wind Exposure",
-         "    1.000000,                !- View Factor to Ground", "    4,                       !- Number of Vertices",
-         "    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}", "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-         "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}", "    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"}));
+    std::string const idf(delimited_string({"BuildingSurface:Detailed,",
+                                            "Zn009:Flr001,            !- Name",
+                                            "    Floor,                   !- Surface Type",
+                                            "    FLOOR38,                 !- Construction Name",
+                                            "    SCWINDOW,                !- Zone Name",
+                                            "    Surface,                 !- Outside Boundary Condition",
+                                            "    Zn009:Flr001,            !- Outside Boundary Condition Object",
+                                            "    NoSun,                   !- Sun Exposure",
+                                            "    NoWind,                  !- Wind Exposure",
+                                            "    1.000000,                !- View Factor to Ground",
+                                            "    4,                       !- Number of Vertices",
+                                            "    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+                                            "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+                                            "    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+                                            "    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"}));
 
     json expected = {{"BuildingSurface:Detailed",
                       {{"Zn009:Flr001",
@@ -1183,16 +1415,23 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
 
 TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
 {
-    std::string const idf(delimited_string(
-        {"Parametric:Logic,", "Main,                    !- Name", "PARAMETER $bldgArea,     !- Parametric Logic Line 1",
-         "PARAMETER $depth,        !- Parametric Logic Line 2", "PARAMETER $width,        !- Parametric Logic Line 3",
-         "PARAMETER $height,       !- Parametric Logic Line 4", "$bldgArea = 300.0,       !- Parametric Logic Line 5",
-         "$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6", "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
-         "$height = 4.0;           !- Parametric Logic Line 8"
-         "",
-         "HVACTemplate:Thermostat,", "All Zones,               !- Name", "Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
-         ",                        !- Constant Heating Setpoint {C}", "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
-         ";                        !- Constant Cooling Setpoint {C}"}));
+    std::string const idf(delimited_string({"Parametric:Logic,",
+                                            "Main,                    !- Name",
+                                            "PARAMETER $bldgArea,     !- Parametric Logic Line 1",
+                                            "PARAMETER $depth,        !- Parametric Logic Line 2",
+                                            "PARAMETER $width,        !- Parametric Logic Line 3",
+                                            "PARAMETER $height,       !- Parametric Logic Line 4",
+                                            "$bldgArea = 300.0,       !- Parametric Logic Line 5",
+                                            "$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
+                                            "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
+                                            "$height = 4.0;           !- Parametric Logic Line 8"
+                                            "",
+                                            "HVACTemplate:Thermostat,",
+                                            "All Zones,               !- Name",
+                                            "Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
+                                            ",                        !- Constant Heating Setpoint {C}",
+                                            "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
+                                            ";                        !- Constant Cooling Setpoint {C}"}));
     EXPECT_FALSE(process_idf(idf, false));
     std::string const error_string = delimited_string({
         "   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
@@ -1404,16 +1643,16 @@ TEST_F(InputProcessorFixture, parse_string)
     index = 0;
     success = true;
     output_string = parse_string(R"(\b\t/\\\";)", index, success);
-    EXPECT_EQ("\b\t/\\\"", output_string);
+    EXPECT_EQ(R"(\b\t/\\\")", output_string);
     EXPECT_EQ(9ul, index);
     EXPECT_TRUE(success);
 
     index = 0;
     success = true;
     output_string = parse_string(R"(test \n string)", index, success);
-    EXPECT_EQ("", output_string);
-    EXPECT_EQ(7ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_EQ(R"(test \n string)", output_string);
+    EXPECT_EQ(14ul, index);
+    EXPECT_TRUE(success);
 
     index = 0;
     success = true;
@@ -1610,7 +1849,7 @@ TEST_F(InputProcessorFixture, look_ahead)
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
@@ -1638,8 +1877,8 @@ TEST_F(InputProcessorFixture, next_token)
     EXPECT_EQ(9ul, index);
     EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
     token = next_token(test_input, index);
-    EXPECT_EQ(10ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(11ul, index);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
@@ -1673,8 +1912,8 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type"}), cAlphaFields));
@@ -1722,16 +1961,29 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    inputProcessor->getObjectItem(CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  NumGasSteamHums,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", ""}),
         Alphas));
-    EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name",
-                                  "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option"}),
-        cAlphaFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
+                                                             "Availability Schedule Name",
+                                                             "Thermal Efficiency Modifier Curve Name",
+                                                             "Air Inlet Node Name",
+                                                             "Air Outlet Node Name",
+                                                             "Water Storage Tank Name",
+                                                             "Inlet Water Temperature Option"}),
+                                   cAlphaFields));
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power"}),
         cNumericFields));
@@ -1783,8 +2035,17 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    inputProcessor->getObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  numBuildingSurfaceDetailed,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
@@ -1807,7 +2068,6 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
         "123456E,           !- Building Surface Name",
         ",                        !- Outside Boundary Condition Object",
         "0.5000000,               !- View Factor to Ground",
-        ",                        !- Shading Control Name",
         ",                        !- Frame and Divider Name",
         "1.0,                     !- Multiplier",
         "4,                       !- Number of Vertices",
@@ -1837,12 +2097,21 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
-                                  lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_curve_biquadratic_objects,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
-    EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", "", ""}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
+    EXPECT_EQ(6, NumAlphas);
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(15, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5000000, 1.0, 4, 0.548000, 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5, 5.548, 0, 2.5}), Numbers));
@@ -1863,7 +2132,6 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
         "E123,           !- Building Surface Name",
         ",                        !- Outside Boundary Condition Object",
         "0.5000000,               !- View Factor to Ground",
-        ",                        !- Shading Control Name",
         ",                        !- Frame and Divider Name",
         "1.0,                     !- Multiplier",
         "4,                       !- Number of Vertices",
@@ -1893,12 +2161,21 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
-                                  lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_curve_biquadratic_objects,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
-    EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", "", ""}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
+    EXPECT_EQ(6, NumAlphas);
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(15, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5000000, 1.0, 4, 0.548000, 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5, 5.548, 0, 2.5}), Numbers));
@@ -1956,8 +2233,17 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
-                                  lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_curve_biquadratic_objects,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({
@@ -1977,11 +2263,19 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, false, false}), lAlphaBlanks));
 
     EXPECT_EQ(12, NumNumbers);
-    EXPECT_TRUE(
-        compare_containers(std::vector<std::string>({"Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y",
-                                                     "Coefficient5 y**2", "Coefficient6 x*y", "Minimum Value of x", "Maximum Value of x",
-                                                     "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output"}),
-                           cNumericFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Coefficient1 Constant",
+                                                             "Coefficient2 x",
+                                                             "Coefficient3 x**2",
+                                                             "Coefficient4 y",
+                                                             "Coefficient5 y**2",
+                                                             "Coefficient6 x*y",
+                                                             "Minimum Value of x",
+                                                             "Maximum Value of x",
+                                                             "Minimum Value of y",
+                                                             "Maximum Value of y",
+                                                             "Minimum Curve Output",
+                                                             "Maximum Curve Output"}),
+                                   cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<Real64>({
                                        0.632475E+00,
                                        -0.121321E-01,
@@ -2045,8 +2339,17 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
-                                  lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_curve_biquadratic_objects,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "", "", ""}), Alphas));
@@ -2060,14 +2363,23 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(10, NumNumbers);
-    EXPECT_TRUE(
-        compare_containers(std::vector<std::string>({"Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y",
-                                                     "Coefficient5 y**2", "Coefficient6 x*y", "Minimum Value of x", "Maximum Value of x",
-                                                     "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output"}),
-                           cNumericFields));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0.632475E+00, -0.121321E-01, 0.507773E-03, 0.155377E-01, 0.272840E-03, -0.679201E-03,
-                                                        12.77778, 23.88889, 23.88889, 46.11111, 0, 0}),
-                                   Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Coefficient1 Constant",
+                                                             "Coefficient2 x",
+                                                             "Coefficient3 x**2",
+                                                             "Coefficient4 y",
+                                                             "Coefficient5 y**2",
+                                                             "Coefficient6 x*y",
+                                                             "Minimum Value of x",
+                                                             "Maximum Value of x",
+                                                             "Minimum Value of y",
+                                                             "Maximum Value of y",
+                                                             "Minimum Curve Output",
+                                                             "Maximum Curve Output"}),
+                                   cNumericFields));
+    EXPECT_TRUE(compare_containers(
+        std::vector<Real64>(
+            {0.632475E+00, -0.121321E-01, 0.507773E-03, 0.155377E-01, 0.272840E-03, -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0}),
+        Numbers));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true}), lNumericBlanks));
 
@@ -2129,12 +2441,30 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, NumSizingSystem, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  NumSizingSystem,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(11, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"WEST ZONE AIR SYSTEM", "SENSIBLE", "NONCOINCIDENT", "YES", "NO", "DESIGNDAY",
-                                                             "DESIGNDAY", "ZONESUM", "COOLINGDESIGNCAPACITY", "HEATINGDESIGNCAPACITY", "ONOFF"}),
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"WEST ZONE AIR SYSTEM",
+                                                             "SENSIBLE",
+                                                             "NONCOINCIDENT",
+                                                             "YES",
+                                                             "NO",
+                                                             "DESIGNDAY",
+                                                             "DESIGNDAY",
+                                                             "ZONESUM",
+                                                             "COOLINGDESIGNCAPACITY",
+                                                             "HEATINGDESIGNCAPACITY",
+                                                             "ONOFF"}),
                                    Alphas));
     // The commented out compare containers is what the original input processor said that alpha blanks should be, even though the last 3 alpha fields
     // are filled in with defaults. We think the last three fields really should be considered blank, i.e. true
@@ -2196,17 +2526,35 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  NumGasSteamHums,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1",
-                                                             "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE"}),
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER",
+                                                             "",
+                                                             "THERMALEFFICIENCYFPLR",
+                                                             "MIXED AIR NODE 1",
+                                                             "MAIN HUMIDIFIER OUTLET NODE",
+                                                             "",
+                                                             "FIXEDINLETWATERTEMPERATURE"}),
                                    Alphas));
-    EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name",
-                                  "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option"}),
-        cAlphaFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
+                                                             "Availability Schedule Name",
+                                                             "Thermal Efficiency Modifier Curve Name",
+                                                             "Air Inlet Node Name",
+                                                             "Air Outlet Node Name",
+                                                             "Water Storage Tank Name",
+                                                             "Inlet Water Temperature Option"}),
+                                   cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(5, NumNumbers);
@@ -2252,15 +2600,28 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  NumGasSteamHums,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(2, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", ""}), Alphas));
-    EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name",
-                                  "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option"}),
-        cAlphaFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
+                                                             "Availability Schedule Name",
+                                                             "Thermal Efficiency Modifier Curve Name",
+                                                             "Air Inlet Node Name",
+                                                             "Air Outlet Node Name",
+                                                             "Water Storage Tank Name",
+                                                             "Inlet Water Temperature Option"}),
+                                   cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(1, NumNumbers);
@@ -2338,8 +2699,17 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_unitary_systems, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_unitary_systems,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(22, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
@@ -2417,8 +2787,17 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_eq_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_eq_connections,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -2467,8 +2846,8 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", ""}), Alphas));
@@ -2521,13 +2900,23 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_equipment_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_equipment_connections,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE", "ZONE 2 NODE",
-                                                             "ZONE 2 OUTLET NODE", "", ""}),
-                                   Alphas));
+    EXPECT_TRUE(compare_containers(
+        std::vector<std::string>(
+            {"EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE", "ZONE 2 NODE", "ZONE 2 OUTLET NODE", "", ""}),
+        Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(0, NumNumbers);
@@ -2552,8 +2941,17 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2,
-                                  lAlphaBlanks2, cAlphaFields2, cNumericFields2);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_equipment_lists,
+                                  Alphas2,
+                                  NumAlphas2,
+                                  Numbers2,
+                                  NumNumbers2,
+                                  IOStatus,
+                                  lNumericBlanks2,
+                                  lAlphaBlanks2,
+                                  cAlphaFields2,
+                                  cNumericFields2);
 
     EXPECT_EQ(4, NumAlphas2);
     EXPECT_TRUE(compare_containers(
@@ -2617,13 +3015,14 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME",
-                                                             "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
-                                   Alphas));
+    EXPECT_TRUE(compare_containers(
+        std::vector<std::string>(
+            {"NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
+        Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks));
 
     EXPECT_EQ(4, NumNumbers);
@@ -2643,13 +3042,14 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2,
-                                  cAlphaFields2, cNumericFields2);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2",
-                                                             "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
-                                   Alphas2));
+    EXPECT_TRUE(compare_containers(
+        std::vector<std::string>(
+            {"THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
+        Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks2));
 
     EXPECT_EQ(4, NumNumbers);
@@ -2701,8 +3101,17 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_schedule_type_limits, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_schedule_type_limits,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", ""}), Alphas));
@@ -2730,8 +3139,8 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cAlphaFields2(NumAlphas);
     Array1D_string cNumericFields2(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2,
-                                  cAlphaFields2, cNumericFields2);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     // Container size is 4500 here!
     EXPECT_EQ(6, NumAlphas);
@@ -2783,8 +3192,8 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -2847,8 +3256,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "", ""}), Alphas));
@@ -2871,8 +3280,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2,
-                                  cAlphaFields2, cNumericFields2);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "", ""}), Alphas2));
@@ -2895,8 +3304,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields3(NumAlphas3);
     Array1D_string cNumericFields3(NumNumbers3);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3,
-                                  cAlphaFields3, cNumericFields3);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "", ""}), Alphas3));
@@ -3056,8 +3465,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(49, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"FURNACE ACDXCOIL 1",
@@ -3222,17 +3631,18 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                                  cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFT", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks));
 
     EXPECT_EQ(12, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0.942587793, 0.009543347, 0.000683770, -0.011042676, 0.000005249, -0.000009720, 12.77778,
-                                                        23.88889, 18.0, 46.11111, 0, 0}),
-                                   Numbers));
+    EXPECT_TRUE(compare_containers(
+        std::vector<Real64>(
+            {0.942587793, 0.009543347, 0.000683770, -0.011042676, 0.000005249, -0.000009720, 12.77778, 23.88889, 18.0, 46.11111, 0, 0}),
+        Numbers));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true}), lNumericBlanks));
 
@@ -3249,17 +3659,18 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2,
-                                  cAlphaFields2, cNumericFields2);
+    inputProcessor->getObjectItem(
+        CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(4, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFT", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
 
     EXPECT_EQ(12, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0.342414409, 0.034885008, -0.000623700, 0.004977216, 0.000437951, -0.000728028, 12.77778,
-                                                        23.88889, 18.0, 46.11111, 0, 0}),
-                                   Numbers2));
+    EXPECT_TRUE(compare_containers(
+        std::vector<Real64>(
+            {0.342414409, 0.034885008, -0.000623700, 0.004977216, 0.000437951, -0.000728028, 12.77778, 23.88889, 18.0, 46.11111, 0, 0}),
+        Numbers2));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true}), lNumericBlanks2));
 
@@ -3309,8 +3720,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquad, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  num_curve_biquad,
+                                  Alphas,
+                                  NumAlphas,
+                                  Numbers,
+                                  NumNumbers,
+                                  IOStatus,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas));
@@ -3321,6 +3741,93 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true}), lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
+}
+
+// https://github.com/NREL/EnergyPlus/issues/6720
+TEST_F(InputProcessorFixture, FalseDuplicates)
+{
+    std::string const idf(delimited_string({
+        "Material,",
+        "  Standard insulation_0.1,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "  Standard insulation_0.01,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+    }));
+
+
+    ASSERT_TRUE(process_idf(idf));
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
+{
+
+    json root;
+    std::string obj_name = "Material";
+    std::string name1 = "Standard insulation_01";
+    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
+
+    EXPECT_TRUE(mat1.is_object());
+
+    // Add the first material to it
+    root[obj_name][name1] = mat1;
+
+    auto test = [=](std::string search_name) {
+        // Second material shouldn't be found!
+        // Oh Oh, this fails
+        auto it = root[obj_name].find(search_name);
+        EXPECT_TRUE( it == root[obj_name].end());
+        if (it != root[obj_name].end()) {
+            EXPECT_TRUE(false) << it.key();
+        }
+
+        // This works...
+        EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), search_name) == root[obj_name].end());
+    };
+
+    // This all works just fine
+    test("Standard insulation");
+    test("Standard insulation_");
+    test("Standard insulation_0");
+    test("Standard insulation_0.");
+    test("Standard insulation_00");
+    test("Standard insulation_00.1");
+    test("Standard insulation_0010");
+
+    // This used to fail before fix in doj/alphanum.hpp
+    test("Standard insulation_001");
+
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
+
 }
 
 /*

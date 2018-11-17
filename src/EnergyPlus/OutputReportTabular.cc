@@ -868,6 +868,9 @@ namespace OutputReportTabular {
             // add to the data structure
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
+                if (AlphArray(jField).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:Monthly");
+                }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
                 if (UtilityRoutines::SameString(curAggString, "SumOrAverage")) {
@@ -1985,7 +1988,9 @@ namespace OutputReportTabular {
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
-                if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
+                if (AlphArray(iReport).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2437,6 +2442,13 @@ namespace OutputReportTabular {
         }
         isCompLoadRepReq = isFound; // return true if either report was found
         return isCompLoadRepReq;
+    }
+
+    bool hasSizingPeriodsDays()
+    {
+        int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
+        return ((sizePerDesDays + sizePerWeathFileDays) > 0);
     }
 
     void InitializePredefinedMonthlyTitles()
@@ -3565,6 +3577,7 @@ namespace OutputReportTabular {
                                << '\n';
                     tbl_stream << " - EnergyPlus</title>\n";
                     tbl_stream << "</head>\n";
+                    tbl_stream << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
                     tbl_stream << "<body>\n";
                     tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                     tbl_stream << "<a name=top></a>\n";
@@ -12958,9 +12971,13 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
@@ -13007,9 +13024,13 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
@@ -15331,7 +15352,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 115;
+        UnitConvSize = 116;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15448,6 +15469,7 @@ namespace OutputReportTabular {
         UnitConv(113).siName = "REV/MIN";
         UnitConv(114).siName = "NM";
         UnitConv(115).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(116).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -15564,6 +15586,7 @@ namespace OutputReportTabular {
         UnitConv(113).ipName = "rev/min";
         UnitConv(114).ipName = "lbf-ft";
         UnitConv(115).ipName = "Btu/W-h";
+        UnitConv(116).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -15680,6 +15703,7 @@ namespace OutputReportTabular {
         UnitConv(113).mult = 1.0;
         UnitConv(114).mult = 0.737562149277;
         UnitConv(115).mult = 1.0;
+        UnitConv(116).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;

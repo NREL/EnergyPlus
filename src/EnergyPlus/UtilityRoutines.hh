@@ -60,13 +60,13 @@
 
 namespace EnergyPlus {
 
-void AbortEnergyPlus();
+int AbortEnergyPlus();
 
 void CloseMiscOpenFiles();
 
 void CloseOutOpenFiles();
 
-void EndEnergyPlus();
+int EndEnergyPlus();
 
 int GetNewUnitNumber();
 
@@ -121,6 +121,14 @@ template <typename T> inline T pow7(T const &x)
 }
 
 bool env_var_on(std::string const &env_var_str);
+
+class FatalError : public std::runtime_error
+{
+public:
+    FatalError(std::string const& msg):
+    runtime_error(msg)
+    {}
+};
 
 void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
 

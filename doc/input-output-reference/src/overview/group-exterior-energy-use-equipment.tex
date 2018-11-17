@@ -118,7 +118,16 @@ Allows you to specify a user-defined end-use subcategory, e.g., ``Landscaping'',
 
 IDF Example:
 
-Exterior:WaterEquipment,OutsideWaterEq,Water,ON,10000;
+\begin{lstlisting}
+
+Exterior:WaterEquipment,
+    OutsideWaterEq,      !- Name
+    Water,               !- Fuel Use Type
+    ON,                  !- Schedule Name
+    1000.0,              !- Design Level
+    General;             !- End-Use Subcategory
+\end{lstlisting}
+
 
 \subsubsection{Outputs}\label{outputs-1-010}
 
@@ -173,4 +182,6 @@ These are the fuel consumption rate and energy for the exterior equipment.
 
 These are the water consumption rate and volume for the exterior equipment.
 
-Exterior Equipment Mains Water Volume {[}m3{]}This is the water volume drawn for the mains water service to serve the exterior equipment.
+\paragraph{Exterior Equipment Mains Water Volume {[}m3{]})\label{exterior-equipment-mains-water-volume-m3} 
+
+This is the water volume drawn for the mains water service to serve the exterior equipment.

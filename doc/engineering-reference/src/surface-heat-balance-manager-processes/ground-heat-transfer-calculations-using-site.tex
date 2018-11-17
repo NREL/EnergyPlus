@@ -1,5 +1,4 @@
-\section{Ground Heat Transfer Calculations using \\
-		Site:GroundDomain:Slab}\label{ground-heat-transfer-calculations-using-sitegrounddomainslab}
+\section{Ground Heat Transfer Calculations using Site:GroundDomain:Slab}\label{ground-heat-transfer-calculations-using-sitegrounddomainslab}
 
 In order to simulate heat transfer with horizontal building surfaces in contact with the ground, a general finite difference ground model has been implemented. The model simulates heat transfer with the horizontal building surfaces through the ground domain. The domain can simulate heat transfer for slab-in-grade or slab-on-grade scenarios. In all scenarios, the ground domain must interact with the zone through an OthersideConditionsModel as the horizontal surface's outside boundary condition.
 
@@ -9,7 +8,7 @@ This model is generalized to be able to handle a number of different slab and in
 
 Multiple horizontal surfaces can be coupled to each ground domain object. The model determines which surfaces are coupled to the ground domain and creates a surface of equivalent surface area within the ground domain as a representation of the horizontal surfaces coupled to the ground domain. This surface then interacts with the ground providing updated other side conditions model temperatures to the coupled surfaces for use in their surface heat balance calculations.
 
-\subsubsection{Boudary Conditions}\label{boudary-conditions}
+\subsubsection{Boundary Conditions}\label{boundary-conditions}
 
 At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Heat flux to each cell is weighted as was recommended by Pinel \& Beausoleil-Morrison 2012 which is shown in Equation \ref{eq:Pinel-Beausoleil-Morrison}.
 

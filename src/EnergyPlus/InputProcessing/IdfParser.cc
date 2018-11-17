@@ -206,6 +206,13 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
         } else if (token == Token::NONE) {
             success = false;
             return root;
+        } else if (token == Token::SEMICOLON) {
+            next_token(idf, index);
+            continue;
+        } else if (token == Token::COMMA) {
+            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Extraneous comma found.");
+            success = false;
+            return root;
         } else if (token == Token::EXCLAMATION) {
             eat_comment(idf, index);
         } else {
@@ -565,30 +572,6 @@ std::string IdfParser::parse_string(std::string const &idf, size_t &index, bool 
             complete = true;
             decrement_both_index(index, index_into_cur_line);
             break;
-        } else if (c == '\\') {
-            if (index == idf.size()) break;
-            char next_c = idf[index];
-            increment_both_index(index, index_into_cur_line);
-            if (next_c == '"') {
-                s += '"';
-            } else if (next_c == '\\') {
-                s += '\\';
-            } else if (next_c == '/') {
-                s += '/';
-            } else if (next_c == 'b') {
-                s += '\b';
-            } else if (next_c == 't') {
-                s += '\t';
-            } else if (next_c == 'n') {
-                complete = false;
-                break;
-            } else if (next_c == 'r') {
-                complete = false;
-                break;
-            } else {
-                s += c;
-                s += next_c;
-            }
         } else {
             s += c;
         }
@@ -676,14 +659,11 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
     case ';':
         return Token::SEMICOLON;
     default:
-        static std::string const search_chars("-:.#/\\[]{}_@$%^&*()|+=<>?'\"~");
         static std::string const numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
             return Token::NUMBER;
-        } else if (isalnum(c) || (std::string::npos != search_chars.find_first_of(c))) {
-            return Token::STRING;
         }
-        break;
+        return Token::STRING;
     }
     decrement_both_index(index, index_into_cur_line);
     return Token::NONE;

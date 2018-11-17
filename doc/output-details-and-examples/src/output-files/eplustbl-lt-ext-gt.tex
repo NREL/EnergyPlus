@@ -3294,7 +3294,13 @@ Maximum of Months & 0.120671E+10 & 2453.23 & ~ & 31.70 & 23.35 & 0.00 & 0.00 & ~
 
 \subsection{UtilityCost:Tariff}\label{utilitycosttariff}
 
-The use of UtilityCost:Tariff objects automatically generates two reports related to the calculation of annual utility costs. The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below. After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file~ (some columns may be truncated due to page size).
+Two output reports -- EconomicResultSummary and TariffReport -- are related to the use of \textbf{UtilityCost:Tariff} for the calculation of annual utility costs.
+Since EnergyPlus 8.6, these reports are no longer generated and need to be specifically requested.
+To get the reports individually use \emph{EconomicResultSummary} and \emph{TariffReport} in the \textbf{Output:Table:SummaryReports} object.
+These are also available when using any of the \textbf{AllSummary} options.
+
+The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below.
+After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file (some columns may be truncated due to page size).
 
 Report: Economics Results Summary Report
 

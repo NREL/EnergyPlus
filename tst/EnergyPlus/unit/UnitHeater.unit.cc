@@ -149,8 +149,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1134,21 +1136,27 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     InitUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(CoilNum, FirstHVACIteration); // init hot water heating coil
 
-    PltSizHeatNum =
-        PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum,
-                                           WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum, ErrorsFound);
+    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
+                                                       UnitHeat(UnitHeatNum).HCoilName,
+                                                       WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum,
+                                                       WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum,
+                                                       ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HWMaxVolFlowRate = WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate;
-    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
-    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
+    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "xxx");
+    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "xxx");
     HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
     HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
     EXPECT_NEAR(HWCoilDesignCapacity, WaterCoils::WaterCoil(CoilNum).DesWaterHeatingCoilRate, 1.0);
-    EXPECT_NEAR(188.51, WaterCoils::WaterCoil(CoilNum).UACoil, 0.02);
+    EXPECT_NEAR(189.06, WaterCoils::WaterCoil(CoilNum).UACoil, 0.02);
 }
 
 TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
@@ -1366,8 +1374,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_NEAR(UHHeatingRate, UnitHeat(UnitHeatNum).HeatPower, ConvTol);
     // verify the heat rate delivered by the hot water heating coil
     HWMassFlowRate = WaterCoils::WaterCoil(CoilNum).InletWaterMassFlowRate;
-    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
-                                 "UnitTest");
+    CpHW = GetSpecificHeatGlycol(
+        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
     HWCoilHeatingRate = HWMassFlowRate * CpHW * (Node(WCWaterInletNode).Temp - Node(WCWaterOutletNode).Temp);
     EXPECT_NEAR(HWCoilHeatingRate, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, ConvTol);
 }

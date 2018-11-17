@@ -241,7 +241,7 @@ namespace DataPlant {
     extern int const TypeOf_FluidToFluidPlantHtExchg;
     extern int const TypeOf_WaterSource;
     extern int const TypeOf_CentralGroundSourceHeatPump;
-    extern int const TypeOf_UnitarySystemRecovery;
+    extern int const TypeOf_UnitarySysRecovery;
     extern int const TypeOf_PackagedTESCoolingCoil;
     extern int const TypeOf_CoolingTower_VarSpdMerkel;
     extern int const TypeOf_SwimmingPool_Indoor;

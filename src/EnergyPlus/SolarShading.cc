@@ -1486,7 +1486,7 @@ namespace SolarShading {
 
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
-                    if (Surface(SurfLoop).WindowShadingControlPtr > 0) {
+                    if (Surface(SurfLoop).HasShadeControl) {
                         if (WindowShadingControl(Surface(SurfLoop).WindowShadingControlPtr).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
@@ -8781,7 +8781,11 @@ namespace SolarShading {
                 //  Calculate average Equation of Time, Declination Angle for this period
 
                 if (!WarmupFlag) {
-                    DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                    } else {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                    }
                     DisplayPerfSimulationFlag = true;
                 }
 
@@ -9461,9 +9465,7 @@ namespace SolarShading {
         for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
             SurfaceWindow(ISurf).ExtIntShadePrevTS = SurfaceWindow(ISurf).ShadingFlag;
 
-            // Avoid update of NoShade flag to BSDF window type. That flag is set only once in case of
-            // BSDF window type (during reading input file) (Simon)
-            if (SurfaceWindow(ISurf).WindowModelType != WindowBSDFModel) SurfaceWindow(ISurf).ShadingFlag = NoShade;
+            SurfaceWindow(ISurf).ShadingFlag = NoShade;
             SurfaceWindow(ISurf).FracTimeShadingDeviceOn = 0.0;
             if (SurfaceWindow(ISurf).WindowModelType == WindowEQLModel) {
                 int EQLNum = Construct(Surface(ISurf).Construction).EQLConsPtr;
@@ -9475,9 +9477,43 @@ namespace SolarShading {
                     }
                 }
             }
+
+            // Initialization of complex fenestration shading device
+            if (SurfaceWindow(ISurf).WindowModelType == WindowBSDFModel) {
+                auto &construction(Construct(Surface(ISurf).Construction));
+                auto &surface_window(SurfaceWindow(ISurf));
+                int TotLayers = construction.TotLayers;
+                for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
+                    const int LayPtr = construction.LayerPoint(Lay);
+                    auto &material(Material(LayPtr));
+                    const bool isShading = material.Group == ComplexWindowShade;
+                    if (isShading && Lay == 1) surface_window.ShadingFlag = ExtShadeOn;
+                    if (isShading && Lay == TotLayers) surface_window.ShadingFlag = IntShadeOn;
+                }
+                if (surface_window.ShadingFlag == IntShadeOn) {
+                    auto &construction(Construct(Surface(ISurf).Construction));
+                    const int TotLay = construction.TotLayers;
+                    int ShadingLayerPtr = construction.LayerPoint(TotLay);
+                    ShadingLayerPtr = Material(ShadingLayerPtr).ComplexShadePtr;
+                    auto &complexShade = ComplexShade(ShadingLayerPtr);
+                    auto TauShadeIR = complexShade.IRTransmittance;
+                    auto EpsShadeIR = complexShade.BackEmissivity;
+                    auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
+                    // Get properties of glass next to inside shading layer
+                    int GlassLayPtr = construction.LayerPoint(TotLay - 2);
+                    auto EpsGlassIR = Material(GlassLayPtr).AbsorpThermalBack;
+                    auto RhoGlassIR = 1 - EpsGlassIR;
+
+                    auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
+                    surface_window.EffShBlindEmiss[0] = EffShBlEmiss;
+                    auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
+                    surface_window.EffGlassEmiss[0] = EffGlEmiss;
+                }
+            }
+
             if (Surface(ISurf).Class != SurfaceClass_Window) continue;
             if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(ISurf).WindowShadingControlPtr == 0) continue;
+            if (!Surface(ISurf).HasShadeControl) continue;
 
             // Initialize switching factor (applicable only to switchable glazing) to unswitched
             SurfaceWindow(ISurf).SwitchingFactor = 0.0;
@@ -11256,7 +11292,7 @@ namespace SolarShading {
         //  removed that is absorbed
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).WindowShadingControlPtr > 0) {
+            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
                 WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr;
                 if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||

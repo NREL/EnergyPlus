@@ -217,6 +217,8 @@ SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
         sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
         sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
         sqliteExecuteCommand("PRAGMA synchronous = OFF;");
+        sqliteExecuteCommand("PRAGMA encoding=\"UTF-8\";");
+
         // Turn this to ON for Foreign Key constraints.
         // This must be turned ON for every connection
         // Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in

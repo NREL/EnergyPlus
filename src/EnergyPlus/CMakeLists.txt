@@ -3,12 +3,9 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 
-# Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
-if(NOT PROFILE_USE)
-  configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
-  configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
-  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
-endif()
+configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
+file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
@@ -277,8 +274,6 @@ SET( SRC
   HVACStandAloneERV.hh
   HVACUnitaryBypassVAV.cc
   HVACUnitaryBypassVAV.hh
-  HVACUnitarySystem.cc
-  HVACUnitarySystem.hh
   HVACVariableRefrigerantFlow.cc
   HVACVariableRefrigerantFlow.hh
   HWBaseboardRadiator.cc
@@ -565,6 +560,8 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc
@@ -675,9 +672,6 @@ install( TARGETS energyplusapi
 if (MINGW)
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
-elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( energyplus energypluslib )
 else()
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )

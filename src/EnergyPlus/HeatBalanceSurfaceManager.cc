@@ -528,10 +528,6 @@ namespace HeatBalanceSurfaceManager {
         // There are no daily initializations done in this portion of the surface heat balance
 
         // There are no hourly initializations done in this portion of the surface heat balance
-        if (AnyEnergyManagementSystemInModel) {
-            InitEMSControlledConstructions();
-            InitEMSControlledSurfaceProperties();
-        }
 
         // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
         // complex fenestration needs to be initialized for additional states
@@ -1109,7 +1105,7 @@ namespace HeatBalanceSurfaceManager {
                             vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
                         }
                         // shading
-                        if (curWSC != 0) {
+                        if (Surface(iSurf).HasShadeControl) {
                             PreDefTableEntry(pdchFenSwitchable, surfName, "Yes");
                             // shading report
                             PreDefTableEntry(pdchWscName, surfName, WindowShadingControl(curWSC).Name);
@@ -3621,7 +3617,7 @@ namespace HeatBalanceSurfaceManager {
                         TotGlassLayers = Construct(ConstrNum).TotGlassLayers;
                     }
                     ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
-                    if (ShadeFlag <= 0) { // No window shading
+                    if (ShadeFlag <= 0 || SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) { // No window shading
                         for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                             InitialDifSolInAbsReport(SurfNum) += InitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
@@ -6117,7 +6113,19 @@ namespace HeatBalanceSurfaceManager {
 
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                }
+            }
+
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
+
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                    TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
+                }
+            }
 
             // Every 30 iterations, recalculate the inside convection coefficients in case
             // there has been a significant drift in the surface temperatures predicted.
@@ -6400,7 +6408,9 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.getTemp(SurfNum);
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;
                             }

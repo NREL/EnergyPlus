@@ -2428,7 +2428,7 @@ namespace DataHeatBalance {
 
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(loopSurfNum).WindowShadingControlPtr == 0) continue;
+            if (!Surface(loopSurfNum).HasShadeControl) continue;
             if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
 
             ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;

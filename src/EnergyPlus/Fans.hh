@@ -211,6 +211,8 @@ namespace Fans {
         int BalancedFractSchedNum; // schedule index portion recirculated
         Real64 UnbalancedOutletMassFlowRate;
         Real64 BalancedOutletMassFlowRate;
+        int AirLoopNum; // Airloop number
+        Real64 DesignPointFEI; // Fan Energy Index for the fan at the design operating point
 
         // Default Constructor
         FanEquipConditions()
@@ -231,7 +233,7 @@ namespace Fans {
               VFDEffCurveIndex(0), DeltaPressTot(0.0), FanAirPower(0.0), FanSpd(0.0), FanTrq(0.0), FanWheelEff(0.0), FanShaftPower(0.0),
               BeltMaxEff(0.0), BeltEff(0.0), BeltInputPower(0.0), MotorMaxEff(0.0), MotorInputPower(0.0), VFDEff(0.0), VFDInputPower(0.0),
               MaxFanPowerEncountered(0.0), FlowFractSchedNum(0), AvailManagerMode(0), MinTempLimitSchedNum(0), BalancedFractSchedNum(0),
-              UnbalancedOutletMassFlowRate(0.0), BalancedOutletMassFlowRate(0.0)
+              UnbalancedOutletMassFlowRate(0.0), BalancedOutletMassFlowRate(0.0), AirLoopNum(0), DesignPointFEI(0.0)
         {
         }
     };
@@ -398,6 +400,8 @@ namespace Fans {
     Real64 FanDesHeatGain(int const FanNum,       // index of fan in Fan array
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
+
+    void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum);
 
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.

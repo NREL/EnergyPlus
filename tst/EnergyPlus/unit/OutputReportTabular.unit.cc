@@ -358,7 +358,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
                                       "[W/m2-C]",
                                       "[W/m2-K]",
                                       "[W/W]",
-                                      "[W]"};
+                                      "[W]",
+                                      "[person/m2]",
+    };
 
     for (auto u : units) {
         LookupSItoIP(u, indexUnitConv, curUnits);
@@ -4094,7 +4096,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn001:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn001:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    4,                       !- Starting X Coordinate {m}                                          ",
@@ -4106,7 +4107,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn001:Wall001:Door001,   !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn001:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    14,                      !- Starting X Coordinate {m}                                          ",
@@ -4232,7 +4232,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn002:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn002:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    4,                       !- Starting X Coordinate {m}                                          ",
@@ -4253,7 +4252,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn002:Wall001:Win002,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn002:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    10,                      !- Starting X Coordinate {m}                                          ",
@@ -4337,7 +4335,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn003:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn003:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    8,                       !- Starting X Coordinate {m}                                          ",
@@ -4456,7 +4453,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn004:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn004:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    8,                       !- Starting X Coordinate {m}                                          ",
@@ -5609,7 +5605,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Attic Roof,       !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5625,7 +5620,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Ceiling,          !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5652,7 +5646,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Attic Roof,       !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5668,7 +5661,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Ceiling,          !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -6545,3 +6537,77 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EXPECT_EQ(76ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:DesignDay,",
+  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+  "  1,                       !- Month",
+  "  21,                      !- Day of Month",
+  "  WinterDesignDay,         !- Day Type",
+  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+  "  Wetbulb,                 !- Humidity Condition Type",
+  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+  "  ,                        !- Humidity Condition Day Schedule Name",
+  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+  "  99063.,                  !- Barometric Pressure {Pa}",
+  "  4.9,                     !- Wind Speed {m/s}",
+  "  270,                     !- Wind Direction {deg}",
+  "  No,                      !- Rain Indicator",
+  "  No,                      !- Snow Indicator",
+  "  No,                      !- Daylight Saving Time Indicator",
+  "  ASHRAEClearSky,          !- Solar Model Indicator",
+  "  ,                        !- Beam Solar Day Schedule Name",
+  "  ,                        !- Diffuse Solar Day Schedule Name",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+  "  0.0;                     !- Sky Clearness",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays());
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileDays,",
+  "  Summer including Extreme Summer days,  !- Name",
+  "  7,                       !- Begin Month",
+  "  18,                      !- Begin Day of Month",
+  "  7,                       !- End Month",
+  "  25,                      !- End Day of Month",
+  "  SummerDesignDay,         !- Day of Week for Start Day",
+  "  No,                      !- Use Weather File Daylight Saving Period",
+  "  No;                      !- Use Weather File Rain and Snow Indicators",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays());
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileConditionType)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileConditionType,",
+  "  Hot,                     !- Name",
+  "  SummerExtreme,           !- Period Selection",
+  "  Monday,                  !- Day of Week for Start Day",
+  "  Yes,                     !- Use Weather File Daylight Saving Period",
+  "  Yes;                     !- Use Weather File Rain and Snow Indicators",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // this test should show a false since this type of sizing period is not compatible with the component loads calculations
+    EXPECT_FALSE(hasSizingPeriodsDays());
+}
+

@@ -47,7 +47,7 @@ Since this default temperature profile may not be applicable to all locations, t
 EnergyPlus calculates the Horizontal Infrared Radiation Intensity in Wh/m\(^{2,}\) if it is missing on the weather file or for design days, from the Opaque Sky Cover field as shown in the following explanation.
 
 \begin{equation}
-Horizontal_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4
+Horizontal\_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4
 \end{equation}
 
 where
@@ -78,14 +78,14 @@ Sky\(_{emissivity}\) = 0.787 + 0.764*0.036 = 0.815
 
 Horizontal\_IR = 0.815*5.6697e-8*(293**4) = 340.6 W/m\(^{2}\)
 
-References for these calculations are contained in the references section at the end of this list of fields. (Walton, 1983) (Clark and Allen, 1978).
+References for these calculations are contained in the references subsection at the end of this  section and include Walton (1983) and Clark and Allen (1978).
 
 \subsection{EnergyPlus Sky Temperature Calculation}\label{energyplus-sky-temperature-calculation}
 
 The default calculation for sky temperature is:
 
 \begin{equation}
-Sk{y_{Temperature}} = {\left( {\frac{{Horizontal_IR}}{{Sigma}}} \right)^{.25}} - Temperatur{e_{Kelvin}}
+Sk{y_{Temperature}} = {\left( {\frac{{Horizontal\_IR}}{{Sigma}}} \right)^{.25}} - Temperatur{e_{Kelvin}}
 \end{equation}
 
 Where
@@ -96,7 +96,7 @@ Horiizontal\_IR = Horizontal Infrared Radiation Intensity as described in the pr
 
 Temperature\(_{Kelvin}\) = Temperature conversion from Kelvin to C, i.e.~273.15
 
-The Sky Temperature can also be set by the user from several options using the \textbf{WeatherProperty:SkyTemperature} object.
+The Sky Temperature can also be set by the user from several options using the~\textbf{WeatherProperty:SkyTemperature} object.
 
 \subsection{EnergyPlus Design Day Solar Radiation Calculations}\label{energyplus-design-day-solar-radiation-calculations}
 
@@ -110,6 +110,7 @@ At the earth's surface on a clear day, direct normal irradiation is represented 
 
 \begin{equation}
 Direct\;Normal\;Irradiation = \frac{A}{exp\left( \frac{B}{\sin \beta } \right)}
+\label{eq:DirectNormalIrradiation}
 \end{equation}
 
 where
@@ -118,7 +119,7 @@ where
 
 B = atmospheric extinction coefficient Table~\ref{table:extraterrestrial-solar-irradiance-and-related})
 
-Values of A and B vary during the year because of seasonal changes in the dust and water vapor content of the atmosphere and because of the changing earth-sun distance. Equation does not give the maximum value of direct normal irradiation that can occur in each month but yields values that are representative of conditions on cloudless days for a relatively dry and clear atmosphere. For very clear atmospheres, direct normal irradiation can be 15\% higher than indicated by Equation , using values of A and B in Table~\ref{table:extraterrestrial-solar-irradiance-and-related} below.
+Values of A and B vary during the year because of seasonal changes in the dust and water vapor content of the atmosphere and because of the changing earth-sun distance. Equation~\ref{eq:DirectNormalIrradiation} does not give the maximum value of direct normal irradiation that can occur in each month but yields values that are representative of conditions on cloudless days for a relatively dry and clear atmosphere. For very clear atmospheres, direct normal irradiation can be 15\% higher than indicated by Equation~\ref{eq:DirectNormalIrradiation}, using values of A and B in Table~\ref{table:extraterrestrial-solar-irradiance-and-related} below.
 
 % table 20
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
@@ -149,7 +150,7 @@ Dec & 1417 & 1.6 & -23.45 & 1204 & 0.141 & 0.103 \tabularnewline
 \bottomrule
 \end{longtable}
 
-For locations where clear, dry skies predominate (e.g., at high elevations) or, conversely, where hazy and humid conditions are frequent, values found by using Equation and Table~\ref{table:extraterrestrial-solar-irradiance-and-related} should be multiplied by the clearness numbers in Threlkeld and Jordan (1958), reproduced as Figure \# 5 in Chapter 33 of the 2007 ASHRAE Handbook---HVAC Applications.
+For locations where clear, dry skies predominate (e.g., at high elevations) or, conversely, where hazy and humid conditions are frequent, values found by using Equation~\ref{eq:DirectNormalIrradiation} and Table~\ref{table:extraterrestrial-solar-irradiance-and-related} should be multiplied by the clearness numbers in Threlkeld and Jordan (1958), reproduced as Figure 5 in Chapter 33 of the 2007 ASHRAE Handbook---HVAC Applications.
 
 The Clear Sky model usually over estimates the amount of solar radiation available to the building.
 
@@ -157,13 +158,13 @@ The Clear Sky model usually over estimates the amount of solar radiation availab
 
 The ASHRAE 2009 HOF introduced a revised clear sky model based on location-specific optical depths for direct and diffuse radiation.~ These values are tabulated by month for all 5564 locations in the ASHRAE design data that accompanies the 2009 HOF.
 
-The model requires air mass, m, calculated as follows --
+The model requires relative air mass, m, calculated as follows:
 
 \begin{equation}
 m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}
 \end{equation}
 
-where \(\beta\) ~ = solar altitude, degrees.
+where \(\beta\) = solar altitude, degrees.
 
 Direct and diffuse irradiance are determined with the following relationships,
 
@@ -183,7 +184,7 @@ where:
 
 \({E_o}\) ~ = extraterrestrial normal irradiance,
 
-\emph{\(m\)}~ = air mass
+\emph{\(m\)}~ = relative air mass
 
 $\tau$\(_{b}\) and $\tau$\(_{d}\) = beam and diffuse optical depths (from ASHRAE climatic design data)
 
@@ -191,7 +192,7 @@ $\tau$\(_{b}\) and $\tau$\(_{d}\) = beam and diffuse optical depths (from ASHRAE
 
 Values of $\tau$\(_{b}\) and $\tau$\(_{d}\) are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
 
-The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships:
+The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships. If solar model indicator selected is ASHRAETau, then the $\tau$\(_{b}\) and $\tau$\(_{d}\) values and the empirical equations coefficients should be based on the 2009 ASHRAE HOF as shown below:
 
 \begin{equation}
 ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}
@@ -200,6 +201,18 @@ ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} 
 \begin{equation}
 ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}
 \end{equation}
+
+Else if solar model indicator selected is ASHRAETau2017, then the $\tau$\(_{b}\) and $\tau$\(_{d}\) values and the empirical equations coefficients should be based on the 2017 ASHRAE HOF as shown below:
+
+\begin{equation}
+ab = 1.454 - 0.406 \cdot {\tau_b} - 0.268 \cdot {\tau_d} + 0.021 \cdot {\tau_b} \cdot {\tau_d}
+\end{equation}
+
+\begin{equation}
+ad = 0.507 + 0.205 \cdot {\tau_b} - 0.080 \cdot {\tau_d} - 0.190 \cdot {\tau_b} \cdot {\tau_d}
+\end{equation}
+
+The empirical equations coefficients of the 2017 ASHRAE HOF are also valid for the 2013 ASHRAE HOF hence the $\tau$\(_{b}\) and $\tau$\(_{d}\) values from the 2013 ASHRAE HOF can be used with ASHRAETau2017 solar model indicator if needed. 
 
 Studies done as part of ASHRAE research projects show that the revised tau model produces more physically plausible irradiance values than does the traditional clear sky model.~ In particular, diffuse irradiance values are more realistic.
 
@@ -233,15 +246,15 @@ The constants were determined by analysis from measured data and are as follows:
 
 c\(_{0}\) = .5598, c\(_{1}\) = .4982, c\(_{2}\) = -.6762, c\(_{3}\) = .02842, c\(_{4}\) = -.00317, c\(_{5}\) = .014, d = -17.853, k = .843.
 
-This is the same model used to estimate the global solar radiation value (when it is absent from the source data) in the Weather Converter. References given in the reference section (Watanabe, Urano, Hayashi, 1983) (Zhang, Huang, 2002).
+This is the same model used to estimate the global solar radiation value (when it is absent from the source data) in the Weather Converter. References given in the reference section for this model include Watanabe, Urano and Hayashi(1983) and Zhang and Huang (2002).
 
 \subsection{Perez Direct/Diffuse Splitting Model}\label{perez-directdiffuse-splitting-model}
 
-Splitting from global calculated (EnergyPlus) or entered values (WeatherConverter) into direct normal and diffuse horizontal components are done using the Perez direct/diffuse split. References shown in the reference section (Perez et al, 1992) (Perez et al, 1990)
+Splitting from global calculated (EnergyPlus) or entered values (WeatherConverter) into direct normal and diffuse horizontal components are done using the Perez direct/diffuse split. References shown in the reference section include Perez et al. (1990 and 1992).
 
 \subsection{Weather File Solar Interpolation}\label{weather-file-solar-interpolation}
 
-The solar values on the weather file are average values over the hour. For interpolation of hourly weather data (i.e., when the specified timestep is greater than 1), the average value is assumed to be the value at the midpoint of the hour.~ The reported values in the output are totals for each reporting period. So, hourly reported values will not match the original values in the weather file, but the total solar for a day should agree. Reference (Ellis, Liesen, Pedersen, 2003)
+The solar values on the weather file are average values over the hour. For interpolation of hourly weather data (i.e., when the specified timestep is greater than 1), the average value is assumed to be the value at the midpoint of the hour.~ The reported values in the output are totals for each reporting period. So, hourly reported values will not match the original values in the weather file, but the total solar for a day should agree. A reference for this model is Ellis, Liesen and Pedersen (2003).
 
 \subsection{Variable Location and Orientation}\label{variable-location-orientation}
 
