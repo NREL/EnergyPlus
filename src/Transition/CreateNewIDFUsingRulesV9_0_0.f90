@@ -336,6 +336,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
  
           ! Loop through all objects that might have a window shading control assigned and make a list
           TotObjsWithShadeCtrl = 0
+          CALL DisplayString('Processing IDF -- WindowShadingControl preprocessing . . .')
           DO surfNum=1,GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED')
             CALL GetObjectItem('FENESTRATIONSURFACE:DETAILED',surfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
             IF (Alphas(6) .NE. Blank) THEN
@@ -364,120 +365,89 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDIF
           ENDDO
       
-          ! Loop through all objects with a window shading control assigned and find out which zone they are in
-          DO surfNum=1,TotObjsWithShadeCtrl
-            baseSurfFound = .false.
-            ! Loop through all possible base surfaces until match is found
-            DO baseSurfNum=1,GetNumObjectsFound('BUILDINGSURFACE:DETAILED')
-              CALL GetObjectItem('BUILDINGSURFACE:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(4))
-              EXIT
+          ! Loop through all possible base surfaces then loop through all objects with a window shading control assigned and find out which zone they are in
+          DO baseSurfNum=1,GetNumObjectsFound('BUILDINGSURFACE:DETAILED')
+            CALL GetObjectItem('BUILDINGSURFACE:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(4))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('WALL:DETAILED')
-              CALL GetObjectItem('WALL:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('WALL:DETAILED')
+            CALL GetObjectItem('WALL:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('ROOFCEILING:DETAILED')
-              CALL GetObjectItem('ROOFCEILING:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('ROOFCEILING:DETAILED')
+            CALL GetObjectItem('ROOFCEILING:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:DETAILED')
-              CALL GetObjectItem('FLOOR:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('FLOOR:DETAILED')
+            CALL GetObjectItem('FLOOR:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('WALL:EXTERIOR')
-              CALL GetObjectItem('WALL:EXTERIOR',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('WALL:EXTERIOR')
+            CALL GetObjectItem('WALL:EXTERIOR',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('WALL:ADIABATIC')
-              CALL GetObjectItem('WALL:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('WALL:ADIABATIC')
+            CALL GetObjectItem('WALL:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('WALL:UNDERGROUND')
-              CALL GetObjectItem('WALL:UNDERGROUND',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('WALL:UNDERGROUND')
+            CALL GetObjectItem('WALL:UNDERGROUND',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('WALL:INTERZONE')
-              CALL GetObjectItem('WALL:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('WALL:INTERZONE')
+            CALL GetObjectItem('WALL:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('ROOF')
-              CALL GetObjectItem('ROOF',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('ROOF')
+            CALL GetObjectItem('ROOF',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('CEILING:ADIABATIC')
-              CALL GetObjectItem('CEILING:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('CEILING:ADIABATIC')
+            CALL GetObjectItem('CEILING:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('CEILING:INTERZONE')
-              CALL GetObjectItem('CEILING:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('CEILING:INTERZONE')
+            CALL GetObjectItem('CEILING:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:GROUNDCONTACT')
-              CALL GetObjectItem('FLOOR:GROUNDCONTACT',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('FLOOR:GROUNDCONTACT')
+            CALL GetObjectItem('FLOOR:GROUNDCONTACT',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:ADIABATIC')
-              CALL GetObjectItem('FLOOR:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('FLOOR:ADIABATIC')
+            CALL GetObjectItem('FLOOR:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
-            IF (baseSurfFound) CYCLE
-            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:INTERZONE')
-              CALL GetObjectItem('FLOOR:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
-              baseSurfFound=.true.
-              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
-              EXIT
+          ENDDO
+          DO baseSurfNum=1,GetNumObjectsFound('FLOOR:INTERZONE')
+            CALL GetObjectItem('FLOOR:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO surfNum=1,TotObjsWithShadeCtrl
+              IF (SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
             ENDDO
           ENDDO
  
@@ -518,8 +488,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ENDDO
             ENDDO
           ENDDO
+          CALL DisplayString('Processing IDF -- WindowShadingControl preprocessing complete.')
      ! End Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
 
+          CALL DisplayString('Processing IDF -- Processing idf objects . . .')
           DO Num=1,NumIDFRecords
 
             IF (DeleteThisRecord(Num)) CYCLE
@@ -1398,6 +1370,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
           ENDDO  ! IDFRecords
 
+          CALL DisplayString('Processing IDF -- Processing idf objects complete.')
           IF (IDFRecords(NumIDFRecords)%CommtE /= CurComment) THEN
             DO xcount=IDFRecords(NumIDFRecords)%CommtE+1,CurComment
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
