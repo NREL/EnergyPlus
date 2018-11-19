@@ -4,6 +4,7 @@ Enhanced Load Aggregation Method for Ground Heat Exchangers
 **Matt Mitchell, OSU**
 
 - Original Date: 2018-10-03
+- Revised Date: 2018-10-24
 
 ## Justification for New Feature ##
 
@@ -37,7 +38,7 @@ This project proposes to test the currently available methods and implement the 
 
 ## E-mail and Conference Call Conclusions
 
-N/A
+- Mike Witte asked for additional clarification regarding which parameters were varied during the parametric study. He also suggested we check how variations in soil parameters affect the results. These clarifications and results have been incorporated into the NFP.
 
 ## Overview
 
@@ -113,7 +114,7 @@ This method is labeled as "Dynamic" in the subsequent plots.
 
 ## Testing/Validation
 
-The methods were tested by performing a parametric study which swept a wide range of variations for for the input parameters. The two primary methods being tested are the dynamic and static method. Any other methods listed are subsets of the static method.
+The methods were tested by performing a parametric study which swept a wide range of variations for the input parameters. The input parameters which are varied can be described using two questions: how much time should each bin represent, and how many bins a given aggregation period should be used. The two primary methods being tested are the dynamic and static method. The Liu (2015), Bernier et al. (2004), and Yavuzturk & Spitler (1999) methods are subsets of the static method.
 
 EnergyPlus was used to generate two sets of annual loads. One load set consists of balanced heating and cooling loads, and the other set consists of imbalanced heating and cooling loads.  The simulations were also ran for 1 and 5 years for each of the load cases, resulting in a total of four simulations for each variation of the parametric study.
 
