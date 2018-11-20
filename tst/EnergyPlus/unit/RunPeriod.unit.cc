@@ -312,13 +312,13 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         EXPECT_FALSE(ErrorsFound);
 
         std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=Jan, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
 
     }
 
-    // Case 2: doesn't have a name, should default to "RunPeriod #1"
+    // Case 2: doesn't have a name, should default to "RUNPERIOD 1" via InputProcessor
     {
 
         std::string const idf_objects = delimited_string({
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         EXPECT_FALSE(ErrorsFound);
 
         std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=RunPeriod #1, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+            delimited_string({"   ** Warning ** RunPeriod: object=RUNPERIOD 1, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
 
