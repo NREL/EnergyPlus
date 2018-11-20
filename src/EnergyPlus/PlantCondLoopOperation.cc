@@ -2227,6 +2227,7 @@ namespace PlantCondLoopOperation {
 
         // load local variables
         NumCompsOnList = this_equiplist.NumComps;
+        int numAvail = 0;
 
         // Allocate array once
         accrued_load_plr_values.reserve(NumCompsOnList);
@@ -2359,8 +2360,23 @@ namespace PlantCondLoopOperation {
             // UNIFORMLOAD DISTRIBUTION SCHEME
             case UniformLoading:
 
-                // step 1: distribute load equally to all machines
-                UniformLoad = std::abs(RemLoopDemand) / NumCompsOnList;
+                // step 1: distribute load equally to all available machines
+                for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
+
+                    BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
+                    CompNum = this_equiplist.Comp(CompIndex).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto &this_component(this_loopside.Branch(BranchNum).Comp(CompNum));
+
+                    if (this_component.Available) ++numAvail;
+                }
+                if (numAvail > 0) {
+                    UniformLoad = std::abs(RemLoopDemand) / numAvail;
+                }
+                else {
+                    UniformLoad = 0.0;
+                }
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                     BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
