@@ -6469,7 +6469,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
                 RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
                 ErrorsFound = true;
             }
 
@@ -6480,7 +6480,7 @@ namespace WeatherManager {
                 RunPeriodDesignInput(Count).useRain = false;
                 RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
@@ -6522,6 +6522,8 @@ namespace WeatherManager {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+
+            // Increment count
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs(2);
@@ -6590,7 +6592,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
                 RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
@@ -6601,7 +6603,7 @@ namespace WeatherManager {
                 RunPeriodDesignInput(Count).useRain = false;
                 RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
                 ErrorsFound = true;
             }
             RunPeriodDesignInput(1).monWeekDay = 0;
