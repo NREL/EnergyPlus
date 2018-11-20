@@ -252,6 +252,8 @@ namespace AirflowNetworkBalanceManager {
 
     Real64 GetZoneInfilAirChangeRate(int const ZoneNum); // hybrid ventilation system controlled zone number
 
+    int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
+
     Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
                                Array1<Real64> const &Par); // Residual function using Regula Falsi
 

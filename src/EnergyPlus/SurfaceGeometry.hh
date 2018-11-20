@@ -254,7 +254,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction;
+            double exposedFraction = -1;  // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };
@@ -277,6 +277,10 @@ namespace SurfaceGeometry {
     void MakeMirrorSurface(int &SurfNum); // In=>Surface to Mirror, Out=>new Surface index
 
     void GetWindowShadingControlData(bool &ErrorsFound); // If errors found in input
+
+    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum);
+
+    void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
 
     void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 

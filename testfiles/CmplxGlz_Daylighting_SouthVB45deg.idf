@@ -139,9 +139,11 @@
     datarun,                 !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     Yes,                     !- Apply Weekend Holiday Rule
@@ -353,7 +355,7 @@
   WindowMaterial:Glazing,
     Glass_103_Layer,         !- Name
     BSDF,                    !- Optical Data Type
-    Glass_103_Layer_SpecDat, !- Window Glass Spectral Data Set Name
+    ,                        !- Window Glass Spectral Data Set Name
     0.005715,                !- Thickness {m}
     ,                        !- Solar Transmittance at Normal Incidence
     ,                        !- Front Side Solar Reflectance at Normal Incidence
@@ -376,7 +378,7 @@
 
   WindowMaterial:ComplexShade,
     Shade_14_Layer,          !- Name
-    Venetian,                !- Layer Type
+    VenetianHorizontal,      !- Layer Type
     1.016000e-003,           !- Thickness {m}
     1.592276e+002,           !- Conductivity {W/m-K}
     0.000000e+000,           !- IR Transmittance
@@ -85377,7 +85379,6 @@
     ExtWall,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     Win_421_Frame,           !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

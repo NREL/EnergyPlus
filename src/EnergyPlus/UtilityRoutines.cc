@@ -429,7 +429,7 @@ namespace UtilityRoutines {
     }
 } // namespace UtilityRoutines
 
-void AbortEnergyPlus()
+int AbortEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -597,7 +597,7 @@ void AbortEnergyPlus()
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
     // indicating that E+ terminated with an error.
     if (NumExternalInterfaces > 0) CloseSocket(-1);
-    std::exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 void CloseMiscOpenFiles()
@@ -709,6 +709,11 @@ void CloseOutOpenFiles()
 
     bool exists;
     bool opened;
+    std::string name;
+    const std::string stdin_name("stdin");
+    const std::string stdout_name("stdout");
+    const std::string stderr_name("stderr");
+    bool not_special(false);
     int UnitNumber;
     int ios;
 
@@ -719,12 +724,18 @@ void CloseOutOpenFiles()
             exists = flags.exists();
             opened = flags.open();
             ios = flags.ios();
+            name = flags.name();
         }
-        if (exists && opened && ios == 0) gio::close(UnitNumber);
+        if (exists && opened && ios == 0) {
+            not_special = name.compare(stdin_name) != 0;
+            not_special = not_special && (name.compare(stdout_name) != 0);
+            not_special = not_special && (name.compare(stderr_name) != 0);
+            if (not_special) gio::close(UnitNumber);
+        }
     }
 }
 
-void EndEnergyPlus()
+int EndEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -844,7 +855,7 @@ void EndEnergyPlus()
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
-    std::exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 int GetNewUnitNumber()
@@ -996,6 +1007,10 @@ int FindUnitNumber(std::string const &FileName) // File name to be searched.
         std::string::size_type TestFileLength;
         std::string::size_type Pos; // Position pointer
         for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
+            // Skip preassigned units - gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams constructor
+            if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) || (UnitNumber == 102)) {
+                continue;
+            }
             {
                 IOFlags flags;
                 gio::inquire(UnitNumber, flags);
@@ -1220,7 +1235,7 @@ void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Opti
         sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
         if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
     }
-    throw std::runtime_error(ErrorMessage);
+    throw FatalError(ErrorMessage);
 }
 
 void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
@@ -1551,8 +1566,6 @@ void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine puts ErrorMessage with a Warning designation on
@@ -1563,28 +1576,11 @@ void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, 
     // METHODOLOGY EMPLOYED:
     // Calls ShowErrorMessage utility routine.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataStringGlobals;
     using namespace DataErrorTracking;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
     }
 
@@ -1608,8 +1604,6 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Severe designation
@@ -1619,32 +1613,31 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataStringGlobals;
     using namespace DataErrorTracking;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
     // INTERFACE BLOCK SPECIFICATIONS
-    //  Use for recurring "warning" error messages shown once at end of simulation
+    //  Use for recurring "severe" error messages shown once at end of simulation
     //  with count of occurences and optional max, min, sum
 
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch(Loop))) {
+            ++MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
     }
 
     ++TotalSevereErrors;
@@ -1666,8 +1659,6 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Warning designation
@@ -1677,32 +1668,31 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataStringGlobals;
     using namespace DataErrorTracking;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "warning" error messages shown once at end of simulation
     //  with count of occurences and optional max, min, sum
 
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch(Loop))) {
+            ++MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
     }
 
     ++TotalWarningErrors;
@@ -1724,8 +1714,6 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a continue designation
@@ -1735,32 +1723,31 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataStringGlobals;
     using namespace DataErrorTracking;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
     // INTERFACE BLOCK SPECIFICATIONS
-    //  Use for recurring "warning" error messages shown once at end of simulation
+    //  Use for recurring "continue" error messages shown once at end of simulation
     //  with count of occurences and optional max, min, sum
 
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(Message, MessageSearch(Loop))) {
+            ++MatchCounts(Loop);
+            break;
+        }
+    }
+    bool bNewMessageFound = true;
+    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
+            bNewMessageFound = false;
+            MsgIndex = Loop;
+            break;
+        }
+    }
+    if (bNewMessageFound) {
+        MsgIndex = 0;
     }
 
     StoreRecurringErrorMessage(
@@ -1782,18 +1769,11 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2004
     //       MODIFIED       September 2005;LKL;Added Units
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with
     // for output at the end of the simulation with automatic tracking of number
     // of occurences and optional tracking of associated min, max, and sum values
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
@@ -1801,20 +1781,6 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     using namespace DataErrorTracking;
     using DataGlobals::DoingSizing;
     using DataGlobals::WarmupFlag;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // If Index is zero, then assign next available index and reallocate array
     if (ErrorMsgIndex == 0) {

@@ -141,8 +141,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     4,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     11,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -154,8 +156,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     10,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     17,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -766,7 +770,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

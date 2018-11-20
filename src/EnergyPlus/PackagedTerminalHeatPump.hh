@@ -263,7 +263,7 @@ namespace PackagedTerminalHeatPump {
         std::string UnitType;            // type of unit
         int MaxIterIndex;                // used in PLR calculations for sensible load
         int NodeNumOfControlledZone;     // node number of control zone
-        int RegulaFalsIFailedIndex;      // used in PLR calculations for sensible load
+        int RegulaFalsiFailedIndex;      // used in PLR calculations for sensible load
         Real64 FanPartLoadRatio;         // fan part-load ratio for time step
         Real64 CoolCoilWaterFlowRatio;   // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
         Real64 HeatCoilWaterFlowRatio;   // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
@@ -322,7 +322,7 @@ namespace PackagedTerminalHeatPump {
               MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0),
               ErrIndexVar(0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true), HeatCoilWaterFlowRate(0.0), ControlZoneMassFlowFrac(1.0),
               // variables used in SZVAV model:
-              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsIFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
+              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
               MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
@@ -531,8 +531,12 @@ namespace PackagedTerminalHeatPump {
                              bool &ErrorsFound                       // GetInput logical that errors were found
     );
 
-    Real64 CalcPTUnitWaterFlowResidual(Real64 const PartLoadRatio, // water mass flow rate [kg/s]
+    Real64 CalcPTUnitWaterFlowResidual(Real64 const PartLoadRatio, // coil PLR
                                        Array1<Real64> const &Par   // Function parameters
+    );
+
+    Real64 CalcPTUnitAirAndWaterFlowResidual(Real64 const PartLoadRatio, // coil PLR
+                                             Array1<Real64> const &Par   // Function parameters
     );
 
 } // namespace PackagedTerminalHeatPump

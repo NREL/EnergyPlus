@@ -583,6 +583,97 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     // Deallocate everything - should all be taken care of in clear_states
 }
 
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
+{
+
+    std::string const idf_objects = delimited_string({
+        " Version,9.0;",
+
+        "Zone,",
+        "  Space;                   !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " Space,                    !- Zone Name",
+        " Space Equipment,          !- Zone Conditioning Equipment List Name",
+        " Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+        " Space Exh Nodes,          !- Zone Air Exhaust Node or NodeList Name",
+        " Space Node,               !- Zone Air Node Name",
+        " Space Ret Node,           !- Zone Return Air Node Name",
+        ",                          !- Zone Return Air Node 1 Flow Rate Fraction Schedule Name",
+        " ReturnFlowBasisNodes;     !- Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name",
+
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " SequentialLoad,           !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+        " Exhaust Fan,              !- Zone Equipment 1 Name",
+        " 1,                        !- Zone Equipment 1 Cooling Sequence",
+        " 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "Fan:ZoneExhaust,",
+        "Exhaust Fan,               !- Name",
+        ",                          !- Availability Schedule Name",
+        "0.338,                     !- Fan Total Efficiency",
+        "125.0000,                  !- Pressure Rise{Pa}",
+        "0.3000,                    !- Maximum Flow Rate{m3/s}",
+        "Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+        "Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+        "Zone Exhaust Fans;         !- End - Use Subcategory",
+
+        "NodeList,",
+        "  Space Exh Nodes,  !- Name",
+        "  Space ZoneHVAC Exh Node, !- Node 1 Name",
+        "  Exhaust Fan Inlet Node; !- Node 1 Name",
+
+        "NodeList,",
+        "  ReturnFlowBasisNodes,  !- Name",
+        "  Basis Node 1,          !- Node 1 Name",
+        "  Basis Node 2,          !- Node 2 Name",
+        "  Basis Node 3;          !- Node 3 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    bool ErrorsFound = false;
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
+    ZoneEquipInputsFilled = true;
+    GetSimpleAirModelInputs(ErrorsFound);
+    int ZoneNum = 1;
+    int NodeNum;
+    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+        Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+    }
+
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirLoop::AirLoopFlow.allocate(1);
+
+    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    DataGlobals::DoingSizing = false;
+    DataGlobals::isPulseZoneSizing = false;
+
+    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
+    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
+    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
+
+    // Set return node basis node flows to zero, return flow should be zero
+    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
+        Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
+    }
+    CalcZoneMassBalance();
+    EXPECT_EQ(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
+
+    // Set return node basis node flows to non-zero values, return flow should be the sum
+    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
+    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
+    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
+    CalcZoneMassBalance();
+    EXPECT_NEAR(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
+}
+
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 {
 

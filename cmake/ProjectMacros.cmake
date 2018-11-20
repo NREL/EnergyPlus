@@ -83,8 +83,7 @@ function( ADD_SIMULATION_TEST )
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-
+  
   if( DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
   elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION  )
@@ -100,11 +99,6 @@ function( ADD_SIMULATION_TEST )
   endif()
 
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
-
-  if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
-    message("Setting ANNUAL_SIMULATION to true for ${IDF_NAME} for the purpose of PGO training")
-    set(ANNUAL_SIMULATION true)
-  endif()
 
   if (ADD_SIM_TEST_PERFORMANCE)
     set(TEST_CATEGORY "performance")
@@ -152,11 +146,6 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
-
-  if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
-    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
-  endif()
-
 
   if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
@@ -218,5 +207,4 @@ function(install_target_prereqs TARGET_NAME INSTALL_PATH)
     fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
   ")
 endfunction()
-
 

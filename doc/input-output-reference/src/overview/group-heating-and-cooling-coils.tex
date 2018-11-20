@@ -78,7 +78,7 @@ The coil has two modes of operation, termed as \textbf{SimpleAnalysis} and \text
 
 \paragraph{Field: Heat Exchanger Configuration}\label{field-heat-exchanger-configuration-000}
 
-The coil is operable in two modes, Cross Flow for general A/C applications and Counter Flow mode. Air-conditioning systems generally use cross flow heat exchangers. The default is set to Counter Flow mode.
+The coil is operable in two configurations: \textit{CounterFlow} or \textit{CrossFlow}. Chilled water coils are generally built as counter-flow. The default is CounterFlow..
 
 \paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name}
 
@@ -3661,7 +3661,7 @@ Up to 6 curves are required depending on the defrost strategy selected.
 \item
   The part load fraction correlation (function of part load ratio) is a quadratic or cubic curve with the independent variable being part load ratio (sensible heating load / steady-state heating capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction correlation accounts for efficiency losses due to compressor cycling.
 \item
-  The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
+  The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: the heating coil entering air wet-bulb temperature (variable x) and the outdoor air dry-bulb temperature (variable y). The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
 \end{enumerate}
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (ref. Performance Curves).
@@ -3742,7 +3742,7 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
@@ -3910,7 +3910,7 @@ The coil operates to meet the sensible capacity being requested. When this reque
 
 The next input defines the minimum outdoor dry-bulb temperature where the compressor will operate. The followed two inputs are related to crankcase heater operation: capacity and maximum outdoor dry-bulb temperature for crankcase heater operation. The next six inputs cover defrost operation: defrost EIR modifier curve, the maximum outdoor dry-bulb temperature for defrost operation, the type of defrost strategy (reverse-cycle or resistive), defrost control (timed or on-demand), the fractional defrost time period (timed defrost control only), and the resistive defrost heater capacity if a resistive defrost strategy is selected. The activation of defrost is dependent on outdoor conditions. The capacity reduction and energy use modification are independent of speed. The defrost EIR modifier is described below:
 
-The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
+The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: the heating coil entering air wet-bulb temperature (variable x) and the outdoor air dry-bulb temperature (variable y). The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
 
 The next input allows the user to choose whether to apply the part load fraction correlation to speeds greater than 1 or not. The following input is the type of fuel.
 
@@ -3966,7 +3966,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name-1}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation-1}
 
@@ -4310,7 +4310,7 @@ This alpha field defines the name of a quadratic or cubic performance curve (Ref
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name-2}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity at the maximum speed level, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity at the maximum speed level, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-2}
 
@@ -4953,13 +4953,20 @@ CoilSystem:Cooling:DX,
   HVAC,Average,Coil System Frost Control Status
 \end{itemize}
 
-\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode}}
+\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode \& Coil:Cooling:DX:VariableSpeed}}
 
 \begin{itemize}
 \item
   HVAC,Average,Coil System Cycling Ratio
 \item
   HVAC,Average,Coil System Compressor Speed Ratio
+\end{itemize}
+
+\textbf{\emph{Coil:Cooling:DX:VariableSpeed}}
+
+\begin{itemize}
+\item
+  HVAC,Average,Coil System Compressor Speed Number
 \end{itemize}
 
 \textbf{\emph{Coil types = Coil:Cooling:DX:SingleSpeed \& CoilSystem:Cooling:DX:HeatExchangerAssisted}}
@@ -4972,15 +4979,19 @@ CoilSystem:Cooling:DX,
 
 \paragraph{Coil System Cycling Ratio}\label{coil-system-cycling-ratio}
 
-The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off).
+The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off). For Coil:Cooling:VariableSpeed this description is true when compressor speed = 1. At higher compressor speeds Coil System Cycling Ratio = 1.
 
 \paragraph{Coil System Compressor Speed Ratio}\label{coil-system-compressor-speed-ratio}
 
-This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep.
+This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Neighboring Speed Levels Ratio.
+
+\paragraph{Coil System Compressor Speed Number}\label{coil-system-compressor-speed-ratio}
+
+This is the stage number that the compressor is operating at in a system timestep. The compressor speed number (from 1 to number of speeds) is reported and averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Upper Speed Level.
 
 \paragraph{Coil System Part Load Ratio}\label{coil-system-part-load-ratio}
 
-The DX system can operate with a cycling compressor or a varying speed compressor, This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
+The DX system can operate with a cycling compressor or a varying speed compressor. This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
 
 \paragraph{Coil System Frost Control Status}\label{coil-system-frost-control-status}
 
@@ -5194,11 +5205,11 @@ This alpha field defines the space heating (SH) mode in the ASIHP, which must be
 
 \paragraph{Field: Water Heating Mode Coil Name}\label{Field-Water-Heating-Mode-Coil-Name-ASIHP}
 
-This alpha field defines the dedicated water heating (DWH) mode in the ASIHP, which must be given. The DWH mode refers to the name of a Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with outdoor air source. 
+This alpha field defines the dedicated water heating (DWH) mode in the ASIHP, which must be given. The DWH mode refers to the name of a Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with outdoor air source. 
 
 \paragraph{Field: SCWH Mode Coil Name}\label{Field-SCWH-Mode-Coil-Name-ASIHP}
 
-This alpha field defines the combined space cooling and water heating with full condensing (SCWH) in an ASIHP, which must be given. The SCWH mode refers to the name of a Coil:WaterHeating:--AirToWaterHeatPump:VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with an indoor air source. The SCWH mode is connected to the same WaterHeater:HeatPump:--PumpedCondenser as the DWH mode, and the same air side node connections as the SC mode. 
+This alpha field defines the combined space cooling and water heating with full condensing (SCWH) in an ASIHP, which must be given. The SCWH mode refers to the name of a Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with an indoor air source. The SCWH mode is connected to the same WaterHeater:HeatPump:PumpedCondenser as the DWH mode, and the same air side node connections as the SC mode. 
 
 \paragraph{Field: SCDWH Mode Cooling Coil Name}\label{Field-SCDWH-Mode-Cooling-Coil-Name-ASIHP}
 
@@ -5206,7 +5217,7 @@ This alpha field defines the cooling operation in the combined space cooling and
 
 \paragraph{Field: SCDWH Mode Water Heating Coil Name}\label{Field-SCDWH-Mode-Water-Heating-Coil-Name-ASIHP}
 
-This alpha field defines the water heating operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
+This alpha field defines the water heating operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
 
 \paragraph{Field: SHDWH Mode Heating Coil Name}\label{Field-SHDWH-Mode-Heating-Coil-Name-ASIHP}
 
@@ -5214,7 +5225,7 @@ This alpha field defines the heating operation in the combined space heating and
 
 \paragraph{Field: SHDWH Mode Water Heating Coil Name}\label{Field-SHDWH-Mode-Water-Heating-Coil-Name-ASIHP}
 
-This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
+This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
 
 \paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow  Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
 
@@ -6010,6 +6021,577 @@ This output field is the average electricity consumption rate of the DX coil com
 \paragraph{Cooling Coil Water Heating Electric Energy {[}J{]}}\label{cooling-coil-water-heating-electric-energy-j-1}
 
 This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+
+
+\subsection{Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed}\label{coil-waterheating-airtowaterheatpump-variablespeed}
+
+\lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object described here models an air-to-water DX compression system to determine its air-side and water-side performance.
+Unlike the \lstinline!WaterHeater:HeatPump:PumpedCondenser! it has multiple, and up to 10, speeds.
+
+It can be used in \lstinline!CoilSystem:IntegratedHeatPump:AirSource! or \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! which are defined elsewhere in this document.
+
+This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
+
+The heat pump water heater DX coil model performs the following major functions:
+
+\begin{itemize}
+\item
+  calculates the electric consumption of the DX compressor and water pump
+\item
+  calculates the amount of heat delivered to the water tank
+\item
+  calculates the electric consumption of the compressor's crankcase heater
+\item
+  calculates the air-side performance of the DX coil
+\end{itemize}
+
+The input fields for this object are described below in detail:
+
+
+\paragraph{Field: Name}\label{vshpwhheating-name}
+
+This alpha field defines a unique user-assigned name for an instance of a heat pump water heater Variable Speed DX coil.
+Any reference to this coil by another object (e.g., \lstinline!WaterHeater:HeatPump:PumpedCondenser! or \lstinline!CoilSystem:IntegratedHeatPump:AirSource!) will use this name.
+
+
+\paragraph{Field: Number of Speeds}\label{vshpwhheating-number-of-speeds}
+
+This numeric field contains the maximum number of speed levels that the module uses.
+The number of speeds, for which the user input the performance data and curves, should be equal or higher than the maximum number.
+The performance inputs at higher speed levels are ignored. This must be greater or equal to 1, and lesser or equal to 10.
+
+
+\paragraph{Field: Nominal Speed Level}\label{vshpwhheating-nominal-speed-level}
+
+This numeric field defines the nominal speed level, at which the rated capacity, rated air and water volumetric flow rates are correlated.
+
+
+\paragraph{Field: Rated Water Heating Capacity}\label{vshpwhheating-rated-water-heating-capacity}
+
+This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature,
+rated evaporator air flow rate, and rated condenser water flow rate specified below.
+Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity below).
+
+
+\paragraph{Field: Rated Evaporator Inlet Air Dry-Bulb Temperature}\label{vshpwhheating-rated-evaporator-inlet-air-dry-bulb-temperature}
+
+This numeric field defines the evaporator inlet air dry-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR).
+Values must be greater than \SI{5}{\celsius}. If this field is left blank, the default value is \SI{19.7}{\celsius}.
+
+
+\paragraph{Field: Rated Evaporator Inlet Air Wet-Bulb Temperature}\label{vshpwhheating-rated-evaporator-inlet-air-wet-bulb-temperature}
+
+This numeric field defines the evaporator inlet air wet-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR).
+Values must be greater than \SI{5}{\celsius}. If this field is left blank, the default value is \SI{13.5}{\celsius}.
+
+
+\paragraph{Field: Rated Condenser Inlet Water Temperature}\label{vshpwhheating-rated-condenser-inlet-water-temperature}
+
+This numeric field defines the condenser inlet water temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR).
+Values must be greater than \SI{25}{\celsius}. If this field is left blank, the default value is \SI{57.5}{\celsius}.
+
+
+\paragraph{Field: Rated Evaporator Air Flow Rate}\label{vshpwhheating-rated-evaporator-air-flow-rate}
+
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0.
+If this field is left blank or autocalculated (field value = \lstinline!autocalculate!),
+the default value is \SI{5.035E-5}{\volumeFlowRateperWatt} (\IP{31.25}{\CFM\per\MBH}) multiplied by the Rated Heating Capacity specified above.
+When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+
+
+\paragraph{Field: Rated Condenser Water Flow Rate}\label{vshpwhheating-rated-condenser-water-flow-rate}
+
+This numeric field defines the condenser water volumetric flow rate in cubic meters per second at rated conditions. Values must be greater than 0.
+If this field is left blank or autocalculated (field value = \lstinline!autocalculate!), the default value is \SI{4.487E-8}{\volumeFlowRateperWatt} (\IP{0.208}{\gpm\per\MBH}) multiplied by the Rated Heating Capacity specified above.
+When autocalculating the rated condenser water volumetric flow rate, a zone sizing object is not required.
+A warning message will be issued if the ratio of Rated Condenser Water Volumetric Flow Rate to Rated Heating Capacity is less
+than \SI{1.79405E-8}{\volumeFlowRateperWatt} (\IP{0.083}{\gpm\per\MBH})
+or greater than \SI{8.97024E-8}{\volumeFlowRateperWatt} (\IP{0.417}{\gpm\per\MBH}), but the simulation will continue.
+
+
+\paragraph{Field: Evaporator Fan Power Included in Rated COP}\label{vshpwhheating-evaporator-fan-power-included-in-rated-cop}
+
+This choice field specifies if evaporator fan power is included in the rated COP defined above.
+This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep.
+\begin{itemize}
+\item
+    If \textbf{Yes} is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity.
+\item
+    If \textbf{No} is selected, it is assumed that the total heating power does not include evaporator fan power.
+\end{itemize}
+If this field is left blank, the default is \textbf{Yes}. See the Engineering Reference section for \lstinline!Coil:WaterHeating:AirToWaterHeatPump:\*! for further details.
+
+
+\paragraph{Field: Condenser Pump Power Included in Rated COP}\label{vshpwhheating-condenser-pump-power-included-in-rated-cop}
+
+This choice field specifies if condenser pump power is included in the rated COP defined above.
+This input impacts the calculation of compressor electric power which then impacts the total air cooling provided by the evaporator for each simulation timestep.
+
+\begin{itemize}
+\item
+    If \textbf{Yes} is selected, the condenser pump power is subtracted from the total electric heating power when calculating total evaporator cooling capacity.
+\item
+    If \textbf{No} is selected, it is assumed that the total heating power does not include the condenser pump.
+\end{itemize}
+
+If this field is left blank, the default is \textbf{No}. See Engineering Reference section for \lstinline!Coil:WaterHeating:AirToWaterHeatPump:\*! for further details.
+
+
+\paragraph{Field: Condenser Pump Heat Included in Rated Heating Capacity and Rated COP}\label{vshpwhheating-condenser-pump-heat-included-in-rated-heating-capacity-and-rated-cop}
+
+This choice field specifies if condenser pump heat is included in the rated heating capacity and rated COP defined above.
+This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep.
+\begin{itemize}
+\item
+    If \textbf{Yes} is selected, the condenser pump heat is already included in the rated heating capacity and rated COP.
+\item
+    If \textbf{No} is selected, it is assumed that the rated heating capacity and rated COP do not include the condenser pump heat,
+    and pump heat is added to the total water heating capacity based on the Condenser Water Pump Power and Fraction of Condenser Pump Heat to Water fields below.
+\end{itemize}
+
+If this field is left blank, the default is \textbf{No}. See Engineering Reference section for \lstinline!Coil:WaterHeating:AirToWaterHeatPump:\*! for further details.
+
+
+\paragraph{Field: Fraction of Condenser Pump Heat to Water}\label{vshpwhheating-fraction-of-condenser-pump-heat-to-water}
+
+This numeric field defines the fraction of condenser pump heat that is transferred to the condenser water.
+The pump is assumed to be downstream of the condenser water coil, and this field is used to determine the water temperature at the condenser outlet node
+when the field Condenser Pump Power Included in Rated Heating Capacity is set to No.
+Values must be greater than or equal to 0 and less than or equal to 1. If this field is left blank, the default value is 0.2.
+
+
+\paragraph{Field: Evaporator Air Inlet Node Name}\label{vshpwhheating-evaporator-air-inlet-node-name}
+
+This alpha field defines the name of the air node from which the evaporator coil draws its inlet air.
+
+
+\paragraph{Field: Evaporator Air Outlet Node Name}\label{vshpwhheating-evaporator-air-outlet-node-name}
+
+This alpha field defines the name of the air node to which the evaporator coil sends its outlet air.
+
+
+\paragraph{Field: Condenser Water Inlet Node Name}\label{vshpwhheating-condenser-water-inlet-node-name}
+
+This alpha field defines the name of the node from which the DX coil condenser draws its inlet water. This node name must also match the source side outlet node name for the water heater tank connected to this DX coil (ref: Water Heaters).
+
+
+\paragraph{Field: Condenser Water Outlet Node Name}\label{vshpwhheating-condenser-water-outlet-node-name}
+
+This alpha field defines the name of the node to which the heat pump condenser sends it outlet water. This node name must also match the source side inlet node name for the water heater tank connected to this DX coil (ref: Water Heaters).
+
+
+\paragraph{Field: Crankcase Heater Capacity}\label{vshpwhheating-crankcase-heater-capacity}
+
+This numeric field defines the compressor's crankcase heater capacity in Watts.
+The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
+
+
+\paragraph{Field: Maximum Ambient Temperature for Crankcase Heater Operation}\label{vshpwhheating-maximum-ambient-temperature-for-crankcase-heater-operation}
+
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius.
+The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off.
+The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+The default is \SI{10}{\celsius}.
+
+\paragraph{Field: Evaporator Air Temperature Type for Curve Objects}\label{vshpwhheating-evaporator-air-temperature-type-for-curve-objects}
+
+This choice field specifies the air temperature type used for the heating capacity and COP modifier curve objects below (for each speed).
+The valid selections are Dry-bulb Temperature and Wet-bulb Temperature.
+If dry-bulb temperature is selected, the inlet air dry-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects.
+If wet-bulb temperature is selected, the inlet air wet-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects.
+If this field is left blank and the following curve names are defined, the default value is \textbf{WetBulbTemperature}.
+%If the following curve names are not defined, this field is not used.
+
+
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{vshpwhheating-part-load-fraction-correlation-curve-name}
+
+This alpha field defines the name of a \textbf{quadratic} or \textbf{cubic} performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity).
+The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep.
+The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+
+The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
+Use a \lstinline!Curve:Quadratic! with coefficients of \{1, 0, 0\} (constant curve) or leave this field blank when neglecting performance impacts due to variations in part load ratio.
+
+\paragraph{Field Group: rated specification, performance curves}\label{field-group-rated-specification-performance-curves-and-waste-heat-data-x}
+
+The performance for each speed must be specified as shown below.
+All inputs for Speed 1 are required, followed by the optional inputs for other speeds.
+
+\textbf{Speeds should be ordered from lower capacity to higher capacity/airflow rate, or a Fatal error will be thrown.}
+
+
+\paragraph{Field: Rated Water Heating Capacity at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-capacity-at-speed-x}
+
+This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature, rated evaporator air flow rate, and rated condenser water flow rate specified below for this speed.
+
+Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity above).
+
+
+\paragraph{Field: Rated Water Heating COP at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-cop-at-speed-x}
+
+This numeric field defines the DX coil's water heating coefficient of performance (COP = water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below).
+This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator.
+The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
+
+
+\paragraph{Field: Rated Sensible Heat Ratio at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-sensible-heat-ratio-at-speed-x}
+
+This numeric field defines the gross air-side sensible heat ratio (SHR = gross sensible cooling capacity divided by gross total cooling capacity) of the DX coil at rated conditions (rated inlet temperatures and flow rates specified below). This value should not include the effect of evaporator fan heat, only sensible cooling and dehumidification by the coil alone.
+Values must be greater than or equal to 0.5, and less than or equal to 1.0. The default value is 0.85.
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{vshpwhheating-speed-x-reference-unit-rated-air-flow-rate}
+This numeric field contains the reference volumetric air flow rate on the evaporator at this specific speed level in \si{\volumeFlowRate}. Values must be greater than or equal to 0.
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Water Flow Rate}\label{vshpwhheating-speed-x-reference-unit-rated-water-flow-rate}
+This numeric field contains the reference volumetric water flow rate on the condenser at this specific speed level in \si{\volumeFlowRate}. Values must be greater than or equal to 0.
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Water Pump Input Power At Rated Conditions}\label{vshpwhheating-speed-x-reference-unit-water-pump-input-power-at-rated-conditions}
+
+This numeric field defines the DX coil's condenser pump power in Watts. This is the operating pump power at this specific speed's reference conditions.
+Values must be greater than or equal to 0.
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Total WH Capacity Function of Temperature Curve Name}\label{vshpwhheating-speed-x-total-wh-capacity-function-of-temperature-curve-name}
+
+This alpha field specifies the name of a \textbf{biquadratic} performance curve object (ref: Performance Curves) (or any Bivariate function such as !\lstinline!Table:TwoIndependentVariables!) that defines the variation in DX coil heating capacity as a function of inlet fluid (air and water) temperatures.
+The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables.
+The output of this curve is multiplied by the rated heating capacity at this speed to give the heating capacity at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures.
+If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all conditions).
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Total WH Capacity Function of Air Flow Fraction Curve Name}\label{vshpwhheating-speed-x-total-wh-capacity-function-of-air-flow-fraction-curve-name}
+
+This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate.
+The output of this curve is multiplied by the rated heating capacity at this specific speed and the heating capacity modifier curve (function of temperature) to give the DX coil heating capacity at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0).
+If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Total WH Capacity Function of Water Flow Fraction Curve Name}\label{vshpwhheating-speed-x-total-wh-capacity-function-of-water-flow-fraction-curve-name}
+
+This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate.
+The output of this curve is multiplied by the rated heating capacity at this specific speed and the output from the two other heating capacity modifier curves (function of temperature and function of air flow fraction) to give the DX coil heating capacity at the specific inlet fluid temperatures and flow rates at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated condenser water flow rate (water flow fraction of 1.0). If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all water flow rates).
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} COP Function of Temperature Curve Name}\label{vshpwhheating-speed-x-cop-function-of-temperature-curve-name}
+
+This alpha field specifies the name of a \textbf{biquadratic} performance curve object (ref: Performance Curves) (or any Bivariate function such as \lstinline!Table:TwoIndependentVariables!) that defines the variation in DX coil heating COP as a function of inlet fluid (air and water) temperatures.
+The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables.
+The output of this curve is multiplied by the rated COP at this specific speed to give the heating COP at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures. If this field is left blank, the COP remains constant (curve value assumed to be 1.0 for all conditions).
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} COP Function of Air Flow Fraction Curve Name}\label{vshpwhheating-speed-x-cop-function-of-air-flow-fraction-curve-name}
+
+This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate.
+The output of this curve is multiplied by the rated COP at this specific speed and the heating COP modifier curve (function of temperature) to give the heating COP at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+
+\paragraph{Field: Speed \textless{}x\textgreater{} COP Function of Water Flow Fraction Curve Name}\label{vshpwhheating-speed-x-cop-function-of-water-flow-fraction-curve-name}
+
+This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate.
+The output of this curve is multiplied by the rated COP at this specific speed and the output from the two other heating COP modifier curves (function of temperature and function of air flow fraction) to give the DX coil heating COP at the specific inlet fluid temperatures and flow rates at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated condenser water flow rate (water flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all water flow rates).
+
+Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object:
+
+\begin{lstlisting}
+
+Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
+  HPWHPlantDXCoilVS,       !- Name
+  10,                      !- Number of Speeds {dimensionless}
+  10,                      !- Nominal Speed Level {dimensionless}
+  25000.0,                 !- Rated Water Heating Capacity {W}
+  29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+  22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+  55.72,                   !- Rated Condenser Inlet Water Temperature {C}
+  1.00695,                 !- Rated Evaporator Air Flow Rate {m3/s}
+  0.00115525,              !- Rated Condenser Water Flow Rate {m3/s}
+  No,                      !- Evaporator Fan Power Included in Rated COP
+  No,                      !- Condenser Pump Power Included in Rated COP
+  No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
+  0.1,                     !- Fraction of Condenser Pump Heat to Water
+  HPPlantFanAirOutletNode, !- Evaporator Air Inlet Node Name
+  HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
+  HPPlantWaterInletNode,   !- Condenser Water Inlet Node Name
+  HPPlantWaterOutletNode,  !- Condenser Water Outlet Node Name
+  100.0,                   !- Crankcase Heater Capacity {W}
+  5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+  HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+  400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
+  5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
+  0.80,                    !- Rated Sensible Heat Ratio at Speed 1
+  0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 1 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 1 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 1 COP Function of Water Flow Fraction Curve Name
+  800.00,                  !- Rated Water Heating Capacity at Speed 2 {W}
+  4.8,                     !- Rated Water Heating COP at Speed 2 {W/W}
+  0.79,                    !- Rated Sensible Heat Ratio at Speed 2
+  0.040280,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000036,                !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 2 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 2 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 2 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 2 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 2 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 2 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 2 COP Function of Water Flow Fraction Curve Name
+  1200.00,                 !- Rated Water Heating Capacity at speed 3 {W}
+  4.4,                     !- Rated Water Heating COP at Speed 3 {W/W}
+  0.78,                    !- Rated Sensible Heat Ratio at Speed 3
+  0.060420,                !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000054,                !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 3 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 3 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 3 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 3 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 3 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 3 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 3 COP Function of Water Flow Fraction Curve Name
+  1600.00,                 !- Rated Water Heating Capacity at Speed 4 {W}
+  4.0,                     !- Rated Water Heating COP at Speed 4 {W/W}
+  0.77,                    !- Rated Sensible Heat Ratio at Speed 4
+  0.080560,                !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000072,                !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 4 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 4 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 4 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 4 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 4 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 4 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 4 COP Function of Water Flow Fraction Curve Name
+  2000.00,                 !- Rated Water Heating Capacity at Speed 5 {W}
+  3.8,                     !- Rated Water Heating COP at Speed 5 {W/W}
+  0.76,                    !- Rated Sensible Heat Ratio at Speed 5
+  0.100700,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000090,                !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 5 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 5 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 5 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 5 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 5 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 5 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 5 COP Function of Water Flow Fraction Curve Name
+  2400.00,                 !- Rated Water Heating Capacity at Speed 6 {W}
+  3.4,                     !- Rated Water Heating COP at Speed 6 {W/W}
+  0.75,                    !- Rated Sensible Heat Ratio at Speed 6
+  0.120840,                !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000108,                !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 6 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 6 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 6 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 6 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 6 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 6 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 6 COP Function of Water Flow Fraction Curve Name
+  2800.00,                 !- Rated Water Heating Capacity at Speed 7 {W}
+  3.0,                     !- Rated Water Heating COP at Speed 7 {W/W}
+  0.74,                    !- Rated Sensible Heat Ratio at Speed 7
+  0.140980,                !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000126,                !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 7 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 7 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 7 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 7 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 7 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 7 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 7 COP Function of Water Flow Fraction Curve Name
+  3200.00,                 !- Rated Water Heating Capacity at Speed 8 {W}
+  2.6,                     !- Rated Water Heating COP at Speed 8 {W/W}
+  0.73,                    !- Rated Sensible Heat Ratio at Speed 8
+  0.161120,                !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000144,                !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 8 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 8 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 8 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 8 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 8 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 8 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 8 COP Function of Water Flow Fraction Curve Name
+  3600.00,                 !- Rated Water Heating Capacity at Speed 9 {W}
+  2.3,                     !- Rated Water Heating COP at Speed 9 {W/W}
+  0.72,                    !- Rated Sensible Heat Ratio at Speed 9
+  0.181260,                !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000162,                !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 9 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 9 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 9 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 9 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 9 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 9 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 9 COP Function of Water Flow Fraction Curve Name
+  4000.00,                 !- Rated Water Heating Capacity at Speed 10 {W}
+  2.0,                     !- Rated Water Heating COP at Speed 10 {W/W}
+  0.70,                    !- Rated Sensible Heat Ratio at Speed 10
+  0.201400,                !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  0.000179,                !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
+  10.0,                    !- Speed 10 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+  HPWHHeatingCapFTemp,     !- Speed 10 Total WH Capacity Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 10 Total WH Capacity Function of Air Flow Fraction Curve Name
+  ConstantCubic,           !- Speed 10 Total WH Capacity Function of Water Flow Fraction Curve Name
+  HPWHHeatingCOPFTemp,     !- Speed 10 COP Function of Temperature Curve Name
+  ConstantCubic,           !- Speed 10 COP Function of Air Flow Fraction Curve Name
+  ConstantCubic;           !- Speed 10 COP Function of Water Flow Fraction Curve Name
+\end{lstlisting}
+
+
+\subsubsection{Outputs}\label{vshpwhheating-outputs}
+
+\begin{itemize}
+\item
+  HVAC,Sum,Cooling Coil Electric Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Water Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Water Heating Electric Power {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Part Load Ratio {[}{]}
+\item
+  HVAC,Average,Cooling Coil Runtime Fraction {[}{]}
+\item
+  HVAC,Average,Cooling Coil Air Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Cooling Coil Air Inlet Temperature {[}C{]}
+\item
+  HVAC,Average,Cooling Coil Air Inlet Humidity Ratio {[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Cooling Coil Air Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Cooling Coil Air Outlet Humidity Ratio {[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Cooling Coil Water Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Cooling Coil Water Inlet Temperature {[}C{]}
+\item
+  HVAC,Average,Cooling Coil Water Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Cooling Coil Crankcase Heater Electric Power {[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Upper Speed Level {[}{]}
+\item
+  HVAC,Average,Cooling Coil Neighboring Speed Levels Ratio {[}{]}
+\item
+  HVAC,Average,Cooling Coil Water Heating Pump Electric Power {[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Water Heating Pump Electric Energy {[}J{]}
+\end{itemize}
+
+
+\paragraph{HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}}\label{vshpwhheating-output-cooling-coil-total-cooling-rate}
+This output field is the average total (sensible and latent) cooling rate output of the DX coil in Watts for the timestep being reported.
+This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Sum,Cooling Coil Cooling Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-cooling-energy}
+This output field is the total (sensible plus latent) cooling output of the DX coil in Joules for the timestep being reported.
+This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}}\label{vshpwhheating-output-cooling-coil-sensible-cooling-rate}
+This output field is the average moist air sensible cooling rate output of the DX coil in Watts for the timestep being reported.
+This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-sensible-cooling-energy}
+This output field is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported.
+This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}}\label{vshpwhheating-output-cooling-coil-latent-cooling-rate}
+This output field is the average latent cooling rate output of the DX coil in Watts for the timestep being reported.
+This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-latent-cooling-energy}
+This output field is the latent cooling output of the DX coil in Joules for the timestep being reported.
+This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{HVAC,Average,Cooling Coil Runtime Fraction {[}{]}}\label{vshpwhheating-output-cooling-coil-runtime-fraction}
+This output field is the average runtime fraction of the DX coil compressor for the timestep being reported.
+This also represents the runtime fraction of the condenser water pump.
+
+\paragraph{HVAC,Average,Cooling Coil Crankcase Heater Electric Power {[}W{]}}\label{vshpwhheating-output-cooling-coil-crankcase-heater-electric-power}
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported.
+The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+
+\paragraph{HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-crankcase-heater-electric-energy}
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported.
+This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+\paragraph{HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}}\label{vshpwhheating-output-cooling-coil-total-water-heating-rate}
+This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported.
+This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
+
+\paragraph{HVAC,Sum,Cooling Coil Water Side Heat Transfer Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-water-side-heat-transfer-energy}
+This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
+This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
+
+\paragraph{HVAC,Average,Cooling Coil Water Heating Electric Power {[}W{]}}\label{vshpwhheating-output-cooling-coil-water-heating-electric-power}
+This output field is the average electricity consumption rate of the DX coil compressor and condenser pump in Watts for the timestep being reported.
+
+\paragraph{HVAC,Sum,Cooling Coil Electric Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-electric-energy}
+This output field is the electricity consumption of the DX coil compressor and condenser pump in Joules for the timestep being reported.
+nThis output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+\paragraph{HVAC,Average,Cooling Coil Part Load Ratio {[}{]}}\label{vshpwhheating-output-cooling-coil-part-load-ratio}
+This output variable is the ratio of the part-load capacity to the steady state capacity of the DX coil.
+
+\paragraph{HVAC,Average,Cooling Coil Air Mass Flow Rate {[}kg/s{]}}\label{vshpwhheating-output-cooling-coil-air-mass-flow-rate}
+The output variable is the average air mass flow rate going through the evporator over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Air Inlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-air-inlet-temperature}
+The output variable is the average entering air dry-bulb temperature over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Air Inlet Humidity Ratio {[}kgWater/kgDryAir{]}}\label{vshpwhheating-output-cooling-coil-air-inlet-humidity-ratio}
+The output variable is the average entering air dry humidity ratio over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Air Outlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-air-outlet-temperature}
+The output variable is the average leaving air dry-bulb temperature over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Air Outlet Humidity Ratio {[}kgWater/kgDryAir{]}}\label{vshpwhheating-output-cooling-coil-air-outlet-humidity-ratio}
+The output variable is the average leaving air dry humidity ratio over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Water Mass Flow Rate {[}kg/s{]}}\label{vshpwhheating-output-cooling-coil-water-mass-flow-rate}
+The output variable is the average water mass flow rate going through the condenser over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Water Inlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-water-inlet-temperature}
+The output variable is the average entering water temperature over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Water Outlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-water-outlet-temperature}
+The output variable is the average leaving water temperature over the timestep being reported.
+
+\paragraph{HVAC,Average,Cooling Coil Upper Speed Level {[}{]}}\label{vshpwhheating-output-cooling-coil-upper-speed-level}
+The output variable is the average upper speed level, for interpolating performances between two neighboring speed levels.
+
+\paragraph{HVAC,Average,Cooling Coil Neighboring Speed Levels Ratio {[}{]}}\label{vshpwhheating-output-cooling-coil-neighboring-speed-levels-ratio}
+The output variable is the average speed ratio, for interpolating performances between two neighboring speed levels.
+
+\paragraph{HVAC,Average,Cooling Coil Water Heating Pump Electric Power {[}W{]}}\label{vshpwhheating-output-cooling-coil-water-heating-pump-electric-power}
+This output field is the average electricity consumption rate of the DX coil condenser water circulation pump in Watts for the timestep being reported.
+
+\paragraph{HVAC,Sum,Cooling Coil Water Heating Pump Electric Energy {[}J{]}}\label{vshpwhheating-output-cooling-coil-water-heating-pump-electric-energy}
+This output field is the electricity consumption of the DX coil condenser water circulation pump in Joules for the timestep being reported.
+
+
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}\label{coilcoolingwatertoairheatpumpparameterestimation}
 

@@ -17,48 +17,54 @@ The water pump is quite simply the component that drives the flow in plant and c
   Pumps can run continuously or intermittently.
 \item
   Single boiler/chiller with NO bypass, use Pump:ConstantSpeed
+  \begin{itemize}
 \item
   Boiler/chiller should be constant flow
 \item
   Pump should be intermittent
+  \end{itemize}
 \item
   Single boiler/chiller with NO bypass, Pump:VariableSpeed
+  \begin{itemize}
 \item
   Boiler/chiller should be variable flow, regardless of whether pump is intermittent or continuous (runs at the minimum if demand is less than minimum, this includes zero.)
+  \end{itemize}
 \item
   Single boiler/chiller with bypass, Pump:ConstantSpeed
+  \begin{itemize}
 \item
   Boiler/chiller can be constant or variable flow
 \item
   Pump may be intermittent or continuous as long as the bypass can handle the entire pump volume when the boiler is not operating
+  \end{itemize}
 \end{itemize}
 
 Multiple branches add more complexity, but it is nothing more than continuity. If the pump is putting out flow then it has to have a branch to flow down whether it is a chiller or a bypass. It can be safer to add the bypass for a simulation. If the active machines require the flow the bypass will be dry. If performing a pressure simulation, and the flow goes through a machine which is off, the pressure drop will be accounted for, but no heat transfer through the machine will be calculated.
 
 If the user designates a pump that is operating continuously, the pump will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump operates intermittently, the pump will run at its capacity if a load is sensed and will shut off if there is no load on the loop. If the pump is scheduled, the schedule modifies the Rated Volumetric Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements.
 
-Shown below is the calculation of the total efficiency of the pump and the actual pumping efficiency when the motor efficiency is accounted for either the variable or constant volume pumps.
+Shown below is pseudo code for the calculation of the total efficiency of the pump and the actual pumping efficiency when the motor efficiency is accounted for either variable or constant volume pumps.
 
-!~ Total\_Efficiency \% = Rated\_Volume\_Flow\_Rate * Rated\_Pump\_Head / Rated\_Power\_Use
+~~~~!~ Total~Efficiency \% = Rated~Volume~Flow~Rate * Rated~Pump~Head / Rated~Power~Use
 
-~TotalEffic = ~~ PumpEquip(PumpNum)\%NomVolFlowRate *
+~~~~TotalEffic = PumpEquip(PumpNum)\%NomVolFlowRate *~~~\&
 
-~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%NomPumpHead /
+~~~~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%NomPumpHead /~\&
 
-~~~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%NomPowerUse
+~~~~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%NomPowerUse
 
-!~~~~ Calculated Pump\_Efficiency \% = Total\_Efficiency \% / Motor\_Efficiency \%
+~~~~!~ Calculated~Pump~Efficiency \% = Total~Efficiency \% / Motor~Efficiency \%
 
-~~~~~ PumpEquip(PumpNum)\%PumpEffic = ~ TotalEffic /
+~~~~PumpEquip(PumpNum)\%PumpEffic = TotalEffic /
 
-~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%MotorEffic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PumpEquip(PumpNum)\%MotorEffic
 
 \subsection{Dynamic Pump Pressure Head}\label{dynamic-pump-pressure-head}
 
 There is an option when performing plant/condenser loop simulations to account for dynamically changing loop pressure drop. For the current implementation, the loop pressure drop is calculated based on pressure drop data on each branch of the loop, then this total pressure drop is set as the pump pressure head. There is no pump curve implemented yet, so it is assumed that the pump can always handle this pressure value. This is a first approximation to actually having the pump ride a curve, and this initial implementation allows the user to enter minimal data, and yet get a more dynamic output for pump power, which is calculated based on current pressure drop and flow rate. The equation for pump power is now:
 
 \begin{equation}
-Pump\;Electric\;Power = Pump\;Volume\;Flow\;Rate*\frac{{Pump\;Head}}{{Total\;Efficiency}}
+Pump~Electric~Power = Pump~Volume~Flow~Rate*\frac{{Pump~Head}}{{Total~Efficiency}}
 \end{equation}
 
 Without the pressure simulation, the pump power is based on the rated value entered with the pump object. For further information, see the input-output reference for Branch objects, and PlantLoop/CondenserLoop objects; as well as the Plant/Condenser loop section of this engineering reference.
@@ -73,35 +79,37 @@ All of the pump rules and efficiency and power calculations are applicable from 
 FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}
 \end{equation}
 
-where C\(_{1}\),C\(_{2}\),C\(_{3}\),and C\(_{4}\) are Coefficients 1 -- 4 and PLR is the Part Load Ratio. In the pseudo code below the FracFullLoadPower modifies the NomPowerUse for the total pump ``Power'' and shows the ``ShaftPower'' and the ``PumpHeattoFluid''.
+where C\(_{1}\),C\(_{2}\),C\(_{3}\),and C\(_{4}\) are Coefficients 1 -- 4 and PLR is the Part Load Ratio. In the pseudo code below, the FracFullLoadPower modifies the NomPowerUse for the total pump ``Power'' and shows the ``ShaftPower'' and the ``PumpHeattoFluid''.
 
-VolFlowRate = PumpMassFlowRate / LoopDensity
+~~~~VolFlowRate = PumpMassFlowRate / LoopDensity
 
-~ PartLoadRatio = VolFlowRate / PumpEquip(PumpNum)\%NomVolFlowRate
+~~~~PartLoadRatio = VolFlowRate / PumpEquip(PumpNum)\%NomVolFlowRate
 
-~ FracFullLoadPower = ~~ PumpEquip(PumpNum)\%PartLoadCoef(1)~~~~~~~~~~~~~~~~~~~~ \&
+~~~~FracFullLoadPower = PumpEquip(PumpNum)\%PartLoadCoef(1)~~~~~~~~~~~~~~~~~~~~ \&
 
 ~~~~~~~~~~~~~~~~~~~~~ + PumpEquip(PumpNum)\%PartLoadCoef(2) * PartLoadRatio~~~~ \&
 
-~~~~~~~~~~~~~~~~~~~~~ + PumpEquip(PumpNum)\%PartLoadCoef(3) * PartLoadRatio**2~ \&
+~~~~~~~~~~~~~~~~~~~~~ + PumpEquip(PumpNum)\%PartLoadCoef(3) * PartLoadRatio**2 \&
 
 ~~~~~~~~~~~~~~~~~~~~~ + PumpEquip(PumpNum)\%PartLoadCoef(4) * PartLoadRatio**3
 
-~ Power = FracFullLoadPower * PumpEquip(PumpNum)\%NomPowerUse
+~~~~Power = FracFullLoadPower * PumpEquip(PumpNum)\%NomPowerUse
 
-~ ShaftPower = Power * PumpEquip(PumpNum)\%MotorEffic
+~~~~ShaftPower = Power * PumpEquip(PumpNum)\%MotorEffic
 
-! This adds the pump heat based on User input for the pump
+~~~~! This adds the pump heat based on User input for the pump
 
-! We assume that all of the heat ends up in the fluid eventually since this is a closed loop
+~~~~! We assume that all of the heat ends up in the fluid eventually since this is a closed loop
 
-!~ PumpHeattoFluid = ShaftPower*(1-PumpEquip(PumpNum)\%PumpEffic)~ \&
+~~~~!~ PumpHeattoFluid = ShaftPower*(1-PumpEquip(PumpNum)\%PumpEffic)
 
-~ PumpHeattoFluid = ShaftPower + (Power - ShaftPower)*PumpEquip(PumpNum)\%FracMotorLossToFluid
+~~~~PumpHeattoFluid = ShaftPower + (Power - ShaftPower) \& \par
+\hspace{5cm} *PumpEquip(PumpNum)\%FracMotorLossToFluid
 
-~ Node(OutletNode)\%Temp = Node(InletNode)\%Temp+PumpHeattoFluid/(PumpMassFlowRate * LoopCp)
+~~~~Node(OutletNode)\%Temp = Node(InletNode)\%Temp \& \par
+\hspace{6cm} + PumpHeattoFluid/(PumpMassFlowRate * LoopCp)
 
-~ PumpEquip(PumpNum)\%Power = Power
+~~~~PumpEquip(PumpNum)\%Power = Power
 
 \subsection{Pressure-based Flow for Variable Speed Pumps}\label{pressure-based-flow-for-variable-speed-pumps}
 
@@ -111,7 +119,7 @@ In manual VFD control mode the specified schedule will determine the current pum
 
 Differential pressure based control will maintain the differential pressure within the specified range. The pressure drop corresponding to the mass flow request will be calculated using the effective pressure constant of the system. This pressure drop will be checked against the pressure set point range. If the pressure drop is within the user specified range, then the mass flow rate will be checked against mass flow rates of operating points corresponding to maximum and minimum rotational speeds. Maximum and minimum differential pressure and rotational speeds are schedule inputs and can be entered as constant schedule.
 
-The allowable mass flow rate range for the Differential pressure control is explained in the figure below:
+The allowable mass flow rate range for the Differential pressure control is explained in the Figure~\ref{fig:allowable-mass-flow-rate-range-for}.
 
 \begin{figure}[hbtp] % fig 265
 \centering
@@ -121,29 +129,31 @@ The allowable mass flow rate range for the Differential pressure control is expl
 
 \subsection{Constant Speed Pump}\label{constant-speed-pump}
 
-The operation of a constant speed pump (object name: Pump:ConstantSpeed) is fairly straightforward. The user designates a maximum flow rate and when this pumpo operates it will run at that capacity. The main difference between the constant speed pump and the variable speed pump is that the fraction of full load power is always = 1. In the pseudo code below the FracFullLoadPower is = 1.0, therefore the Power is always the full power.
+The operation of a constant speed pump (object name: Pump:ConstantSpeed) is fairly straightforward. The user designates a maximum flow rate and when this pumpo operates it will run at that capacity. The main difference between the constant speed pump and the variable speed pump is that the fraction of full load power is always = 1. In the pseudo code below, the FracFullLoadPower is = 1.0, therefore the Power is always the full power.
 
-VolFlowRate = PumpMassFlowRate / LoopDensity
+~~~~VolFlowRate = PumpMassFlowRate / LoopDensity
 
-~ PartLoadRatio = VolFlowRate / PumpEquip(PumpNum)\%NomVolFlowRate
+~~~~PartLoadRatio = VolFlowRate / PumpEquip(PumpNum)\%NomVolFlowRate
 
-~ FracFullLoadPower = 1.0
+~~~~FracFullLoadPower = 1.0
 
-~ Power = FracFullLoadPower * PumpEquip(PumpNum)\%NomPowerUse
+~~~~Power = FracFullLoadPower * PumpEquip(PumpNum)\%NomPowerUse
 
-~ ShaftPower = Power * PumpEquip(PumpNum)\%MotorEffic
+~~~~ShaftPower = Power * PumpEquip(PumpNum)\%MotorEffic
 
-! This adds the pump heat based on User input for the pump
+~~~~! This adds the pump heat based on User input for the pump
 
-! We assume that all of the heat ends up in the fluid eventually since this is a closed loop
+~~~~! We assume that all of the heat ends up in the fluid eventually since this is a closed loop
 
-! ~PumpHeattoFluid = ShaftPower*(1-PumpEquip(PumpNum)\%PumpEffic)~ \&
+~~~~! PumpHeattoFluid = ShaftPower*(1-PumpEquip(PumpNum)\%PumpEffic)~ \&
 
-~ PumpHeattoFluid = ShaftPower + (Power - ShaftPower)*PumpEquip(PumpNum)\%FracMotorLossToFluid
+~~~~PumpHeattoFluid = ShaftPower + (Power - ShaftPower)~\& \par
+\hspace{5cm} * PumpEquip(PumpNum)\%FracMotorLossToFluid
 
-~ Node(OutletNode)\%Temp = Node(InletNode)\%Temp+PumpHeattoFluid/(PumpMassFlowRate * LoopCp)
+~~~~Node(OutletNode)\%Temp = Node(InletNode)\%Temp \& \par
+\hspace{6cm} + PumpHeattoFluid/(PumpMassFlowRate * LoopCp)
 
-~ PumpEquip(PumpNum)\%Power = Power
+~~~~PumpEquip(PumpNum)\%Power = Power
 
 \subsection{Pressure-based Flow for Constant Speed Pumps}\label{pressure-based-flow-for-constant-speed-pumps}
 
@@ -163,11 +173,11 @@ PumpHeatToFluid = ShaftPower + \left( {PumpPower - ShaftPower} \right) * FracMot
 
 where the pump motor efficiency is defined by the user input and the FracMotorLossToFluid is the amount of heat generated by the pump motor that is added to the fluid loop (as opposed to being lost to the environment where the pump is located). FracMotorLossToFluid is also a user input.
 
-Note that the shaft power relates to the increase in head through the pump. Since all of this head is lost through the piping network due to frictional heat, this represents a heat gain by the fluid throughout the network. For simplicity, this heat is added along with the heat resulting from the pump motor. The difference between the pump power and the shaft power is the inefficiency of the pump---or the amount of energy input into the pump that the motor converts to heat rather than mechanical energy. Some of this heat is added to the fluid being pumped. These two terms are shown in the PumpHeatToFluid equation shown above. As of version 7, this heat is added to the loop capacitance tank(s) rather than at the pump's outlet and so the outlet temperatue is equal to the inlet temperaure.
+Note that the shaft power relates to the increase in head through the pump. Since all of this head is lost through the piping network due to frictional heat, this represents a heat gain by the fluid throughout the network. For simplicity, this heat is added along with the heat resulting from the pump motor. The difference between the pump power and the shaft power is the inefficiency of the pump---or the amount of energy input into the pump that the motor converts to heat rather than mechanical energy. Some of this heat is added to the fluid being pumped. These two terms are shown in the PumpHeatToFluid equation shown above. Since EnergyPlus Version 7, this heat is added to the loop capacitance tank(s) rather than at the pump's outlet and so the outlet temperatue is equal to the inlet temperaure.
 
 \subsection{Pump Heat Addition to Surrounding Zone}\label{pump-heat-addition-to-surrounding-zone}
 
-If the user input includes naming a Zone that surrounds the pump, then the pump becomes a source of internal heat gain to that zone.~ The amount of heat transmitted to the surrounding zone is simply the difference between power input and the rate of heat transferred to the fluid. The user can also input a fraction,\({f_{rad}}\) ~, that controls the overall split between thermal radiation and sensible convection.~ The pump's sensible zone gains are determined using the following equations:
+If the user input includes naming a Zone that surrounds the pump, then the pump becomes a source of internal heat gain to that zone.~ The amount of heat transmitted to the surrounding zone is simply the difference between power input and the rate of heat transferred to the fluid. The user can also input a fraction, \({f_{rad}}\), that controls the overall split between thermal radiation and sensible convection.~ The pump's sensible zone gains are determined using the following equations:
 
 \begin{equation}
 TotalZoneGain = PumpPower - PumpHeatToFluid
@@ -195,21 +205,21 @@ The simulation starts by turning ON all pumps in the group. The pumps are then t
 Power = (P{R_{FL}}{\rm{*N}}{}_{{\rm{FL}}} + {\rm{P}}{{\rm{R}}_{{\rm{PL}}}}{\rm{*}}{{\rm{N}}_{{\rm{PL}}}}{\rm{)*}}{{\rm{P}}_{{\rm{Nom}}}}{\rm{  }}
 \end{equation}
 
-Where;
+where:
 
-\emph{Power} = Power consumed by the pump bank
+\emph{Power} is the power consumed by the pump bank
 
-\emph{PR\(_{FL}\)} = Power ratio at full load (Generally equal to 1)
+\emph{PR\(_{FL}\)} is the power ratio at full load (generally equal to 1)
 
-\emph{N\(_{FL}\)} = Number of pumps running at full load
+\emph{N\(_{FL}\)} is the number of pumps running at full load
 
-\emph{PR\(_{PL}\)} = Power ratio at part load
+\emph{PR\(_{PL}\)} is the power ratio at part load
 
-\emph{N\(_{PL}\)} = Number of pumps running at part load
+\emph{N\(_{PL}\)} is the number of pumps running at part load
 
-\emph{P\(_{Nom}\)} = Nominal power consumption of individual pumps
+\emph{P\(_{Nom}\)} is the nominal power consumption of individual pumps.
 
-For a constant speed headered pump \emph{N\(_{PL}\)} is zero. For a variable speed headered pump \emph{N\(_{PL}\)} is equal to one.
+For a constant speed headered pump, \emph{N\(_{PL}\)} is zero. For a variable speed headered pump, \emph{N\(_{PL}\)} is equal to one.
 
 \subsection{Condensate Pumps}\label{condensate-pumps}
 

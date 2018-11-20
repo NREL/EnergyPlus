@@ -121,22 +121,21 @@ Once all of the branches have set their flow rates and constraints, the splitter
 
 Once the flow has been resolved at the splitter, the branch flow rates and constraints between the splitter and mixer can be adjusted, if necessary. In some cases, this will be mandatory to maintain a mass balance at the splitter. When the flow rate coming out of the splitter does not match the active branch requests, individual branch flow rates must be adjusted to provide for the extra flow or the ``flow deficit''. When there is extra flow, the excess flow is sent through any bypass branch first and then is sent to passive branches in reverse order of their appearance in the splitter outlet list. When all of these branches have been exhausted and there is still excess flow, flow will be increased to the active branches, also in reverse order. The reverse order guarantees that the branch appearing first has the highest priority to receive the flow rate it has requested.
 
-if there is not enough flow to meet all active branch requests (i.e., a ``flow deficit''), then the flow rates through the bypass and passive branches are set to zero. The flow rates through the active branches will then be decreased in reverse order until the splitter outlet flow rate matches the available flow at the splitter inlet. For a plant loop flow deficit, the bypass and passive branch flows are also set to zero, and flow rates for each active branch are calculated as follows:
+If there is not enough flow to meet all active branch requests (i.e., a ``flow deficit''), then the flow rates through the bypass and passive branches are set to zero. The flow rates through the active branches will then be decreased in reverse order until the splitter outlet flow rate matches the available flow at the splitter inlet. For a plant loop flow deficit, the bypass and passive branch flows are also set to zero, and flow rates for each active branch are calculated as follows:
 
 \begin{equation}
-{\dot m_{br}} = \frac{{{{\dot m}_{br_request}}}}{{{{\dot m}_{tot_request}}}}*{\dot m_{tot_available}}
+{\dot m_{br}} = \frac{{{{\dot m}_{br\_request}}}}{{{{\dot m}_{tot\_request}}}}*{\dot m_{tot\_available}}
 \end{equation}
 
 where:
 
-\begin{equation}
-  \begin{array}{rl}
-    \dot m_{br} & = \rm{ final resolved branch flow rate} \\
-    \dot m_{br_request} & = \rm{ requested branch flow rate } \\
-    \dot m_{tot_request} & = \rm{ total loop mass flow rate request} \\
-    \dot m_{tot_available} & = \rm{ total loop mass flow rate available}
-  \end{array}
-\end{equation}
+\( \dot m_{br} \) = \rm{ final~resolved~branch~flow~rate}
+
+\( \dot m_{br\_request} \) = \rm{ requested~branch~flow~rate }
+
+\( \dot m_{tot\_request} \) = \rm{ total~loop~mass~flow~rate~request}
+
+\( \dot m_{tot\_available} \) = \rm{ total~loop~mass~flow~rate~available}
 
 It is also necessary to monitor the flow constraints at the branches and components since once the flow rates are changed, the components must be resimulated by the controlling loop (air loop, zone equipment, or plant supply side). The controllers for these components must know if the constraints have been modified so that the simulation does not toggle between a component requesting a flow that the pump cannot meet and the pump then resetting the flow to what it can provide. Note that once a flow rate for any component has changed that this signals the need to resimulate any sub-loop to which it might have an indirect connection. Currently, this means that if a flow rate on the plant demand side changes, the simulation must recalculate the conditions on both the air loop and zone equipment sub-loops since coils and other equipment could be on either side of the main air loop. Similarly, if the condenser demand side simulation results in a change in flow rate through a chiller condenser, then the plant supply side must be triggered to perform its calculations again. Care has been taken to avoid cases where the various half-loops might simply keep triggering the resimulation of their indirect connections in an infinite loop.
 
@@ -161,7 +160,7 @@ The total plant loop volume is separated into two tanks, on on each half-loop in
 The tank temperature is modeled by drawing a control volume and energy balance around the tank and solving for the temperature.~ The temperature of each tank is recalculated whenever the two half-loops are interfaced together. The tank temperature history is stored at the end of the simulation timestep.~ The model equation for tank (and outlet temperature) is formulated as follows:
 
 \begin{equation}
-{T_{tank,new}} = \frac{{\dot m{c_p}{T_{inlet}} + \frac{{{M_{tank}}{c_p}{T_{tank,old}}}}{{{t_{sys}}3600}} + {{\dot Q}_{pumpheat}}}}{{\mathop {m{c_P} + }\limits^ \frac{{{M_{tank}}{c_p}}}{{{t_{sys}}3600}}}}
+{T_{tank,new}} = \frac{{\dot m{c_p}{T_{inlet}} + \frac{{{M_{tank}}{c_p}{T_{tank,old}}}}{{{t_{sys}}3600}} + {{\dot Q}_{pumpheat}}}}{{m{c_P}} + \frac{{{M_{tank}}{c_p}}}{{{t_{sys}}3600}}}
 \end{equation}
 
 The tank temperature at the end of the simulation timestep is solved by the analytical approach and expressed as
@@ -172,23 +171,23 @@ T_{tank}^t = \left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {
 
 where:
 
-\(T_{tank}^{t - \delta t}\) ~~~~~~~~~ = Previous system time-step tank temperature {[}°C{]}
+\(T_{tank}^{t - \delta t}\) is the previous system time-step tank temperature {[}°C{]}
 
-\(T_{tank}^t\) ~~~~~~~~~~ = Current tank and tank outlet temperature {[}°C{]}
+\(T_{tank}^t\) is the current tank and tank outlet temperature {[}°C{]}
 
-\(\dot m\) ~ ~~~~~~~~~~~ = Current fluid mass flow rate through the tank {[}kg/s{]}
+\(\dot m\) is the current fluid mass flow rate through the tank {[}kg/s{]}
 
-\(\delta t\) ~~~~~~~~~~~~ = Duration of system time step {[}second{]}
+\(\delta t\) is the duration of system time step {[}second{]}
 
-\({c_P}\) ~ ~~~~~~~~~~ = Heat capacity of fluid {[}J/kg{]}
+\({c_P}\) is the heat capacity of fluid {[}J/kg{]}
 
-\({M_{tank}}\) ~ ~~~~~~ = Mass of the water in the tank {[}kg{]}
+\({M_{tank}}\) is the mass of the water in the tank {[}kg{]}
 
-\({\dot Q_{pumpheat}}\) ~ ~ = Heat generated by a pump in the tank {[}W{]}
+\({\dot Q_{pumpheat}}\) is the heat generated by a pump in the tank {[}W{]}
 
 When modeling plants using one of the common pipe modes for plant loops, the same tank model is used but the tanks are situated differently and account for extra connections.~ For common pipe situation, the tanks are located on the outlet of a half loop with common pipe interactions downstream of the tank.
 
-The average temperature is reported as the tank temperature. The average temperature is defined as the value of an integral function of tank temperature on an interval {[}\emph{0},\emph{δt}{]}
+The average temperature is reported as the tank temperature. The average temperature is defined as the value of an integral function of tank temperature on an interval {[}\emph{0},\emph{\(\delta\)t}{]}.
 
 \begin{equation}
 \begin{split}
@@ -207,13 +206,291 @@ The Branch definition is input in simulation and connection order for all of the
 
 Five load distribution schemes are employed in EnergyPlus. The figure below illustrates the plant load distribution algorithm. The total loop demand is calculated and used in the \textbf{ManagePlantLoopOperation} routine to determine which equipment is available based on the supervisory control scheme specified by the user. Once all available components have been identified the loop demand is distributed to the available components based on the user specified load distribution scheme.
 
-~\includegraphics{media/image1974.png}
 
-Figure 124. Load Distribution Scheme
+\begin{figure}[hbtp] % fig 124
+\centering
+\includegraphics{media/image1974.png}\caption{Loop Capacitance Tank Models \protect \label{loop-capacitance-tank-models}}
+\end{figure}
 
-The OPTIMAL scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components. The UNIFORMLOAD scheme first divides the load evenly among all available components. If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components. The SEQUENTIALLOAD scheme loads each component one at a time to capacity until the loop demand is met. The components are loaded up in the order that they appear in the equipment list specified in input. The UNIFORMPLR scheme loads all equipment uniformly by maintaining uniform part load ratios across all equipment on the equipment list. If the load is below the load required by the plant to operate at the largest component minimum part load ratio, the last item is removed from each equipment list. This process is repeated until the plant can operate above the largest component minimum part load ratio. The SEQUENTIALUNIFORMPLR scheme loads all equipment in the order specified on the equipment list to capacity while operating all operational equipment at uniform part load ratios.
+\begin{itemize}
+\item
+    The \textbf{OPTIMAL} scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components.
+\item
+    The \textbf{UNIFORMLOAD} scheme first divides the load evenly among all available components.
+    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components.
+\item
+    The \textbf{SEQUENTIALLOAD} scheme loads each component one at a time to capacity until the loop demand is met.
+    The components are loaded up in the order that they appear in the equipment list specified in input.
+\item
+    The \textbf{UNIFORMPLR} scheme loads all equipment uniformly by maintaining uniform part load ratios across all equipment on the equipment list.
+    If the load is below the load required by the plant to operate at the largest component minimum part load ratio, the last item is removed from each equipment list.
+    This process is repeated until the plant can operate above the largest component minimum part load ratio.
+\item
+    The \textbf{SEQUENTIALUNIFORMPLR} scheme loads all equipment in the order specified on the equipment list to capacity while operating all operational equipment at uniform part load ratios.
+\end{itemize}
 
-\emph{Note:} For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
+\textbf{Note}: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
+
+Examples of application of each Load Distribution schemes can be found in the following tables.
+Each example assume that we have two pieces of equipment, with Equipment A being first in line in the \lstinline!PlantEquipmentList!, and having the following characteristics:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Equipment description}
+    \label{tab:example-load-distribution-eq}
+\begin{tabular}{|l|l|l|}
+\hline
+Equipment   & A   & B   \\ \hline
+Priority    & 1   & 2   \\ \hline
+Min PLR     & 0.2 & 0.15 \\ \hline
+Max PLR     & 1   & 1   \\ \hline
+Optimum PLR & 0.6 & 0.4 \\ \hline
+Capacity    & 40  & 100 \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Note}: In the examples below:
+
+\begin{itemize}
+\item
+    "*" Means it will false load or cycle
+\item
+    "**" Means it is capped by maximum PLR
+\end{itemize}
+
+
+\subsubsection{OptimalLoad}%
+\label{ssub:optimalload}
+
+The \textbf{OptimalLoad} Load Distribution occurs in three steps:
+
+\begin{enumerate}
+    \def\labelenumi{Step \arabic{enumi}:}
+\item
+    Sequentially load each equipment to the Minimum of Optimal Load (= Load corresponding to optimal Part Load Ratio) and Loop Demand
+\item
+    Evenly distribute the remaining loop demand, without exceeding the maximum Part Load Ratio of each equipment
+\item
+    It there is still some remaining demand, look for any equipment that is not yet at maximum Part Load Ratio and load it (up to its maximum Part Load Ratio)
+\end{enumerate}
+
+\begin{longtable}[c]{|l|l|l|l|l|}
+    \caption{Optimal Load Distribution Scheme - Step 1}
+    \label{tab:optimal-load-step-1}\\
+
+\hline
+Plant Load & Initial Loading A & Remaining Load & Initial Loading B & Remaining Load \\ \hline
+\endfirsthead
+
+\hline
+Plant Load & Initial Loading A & Remaining Load & Initial Loading B & Remaining Load \\ \hline
+\endhead
+
+5 & 5 & 0 & 0 & 0 \\ \hline
+25 & 24 & 1 & 1 & 0 \\ \hline
+50 & 24 & 26 & 26 & 0 \\ \hline
+100 & 24 & 76 & 40 & 36 \\ \hline
+150 & 24 & 126 & 40 & 86 \\ \hline
+200 & 24 & 176 & 40 & 136 \\ \hline
+\end{longtable}
+
+\begin{longtable}[c]{|l|l|l|l|}
+    \caption{Optimal Load Distribution Scheme - Step 2}
+    \label{tab:optimal-load-step-2}\\
+
+\hline
+Plant Load & Interim Loading A & Interim Loading B & Remaining Load \\ \hline
+\endfirsthead
+
+\hline
+Plant Load & Interim Loading A & Interim Loading B & Remaining Load \\ \hline
+\endhead
+
+5 & 5 & 0 & 0 \\ \hline
+25 & 24 & 1 & 0 \\ \hline
+50 & 24 & 26 & 0 \\ \hline
+100 & 40 & 58 & 2 \\ \hline
+150 & 40 & 83 & 27 \\ \hline
+200 & 40 & 100 & 60 \\ \hline
+\end{longtable}
+
+
+
+\begin{longtable}[c]{|l|l|l|l|l|l|}
+    \caption{Optimal Load Distribution Scheme - Step 3}
+    \label{tab:optimal-load-step-3}\\
+\hline
+Plant Load & Final Loading A & Final Loading B & Final PLR A & Final PLR B & Load Not Met \\ \hline
+\endfirsthead
+
+\hline
+Plant Load & Final Loading A & Final Loading B & Final PLR A & Final PLR B & Load Not Met \\ \hline
+\endhead
+
+5 & 5 & 0 & 0.2 * & - & 0 \\ \hline
+25 & 24 & 1 & 0.6 & 0.15 * & 0 \\ \hline
+50 & 24 & 26 & 0.6 & 0.26 & 0 \\ \hline
+100 & 40 & 60 & 1 ** & 0.6 & 0 \\ \hline
+150 & 40 & 100 & 1 ** & 1 ** & 10 \\ \hline
+200 & 40 & 100 & 1 ** & 1 ** & 60 \\ \hline
+\end{longtable}
+
+
+
+
+\subsubsection{UniformLoad}%
+\label{ssub:uniformload}
+
+The \textbf{UniformLoad} Load Distribution occurs in two steps:
+
+\begin{enumerate}
+    \def\labelenumi{Step \arabic{enumi}:}
+\item
+    Distribute the load equally to all machines, without exceeding the maximum PLR of the equipment
+\item
+    If there is a remaining loop demand, sequentially distribute it to all machines, without exceeding the maximum Part Load Ratio.
+\end{enumerate}
+
+
+\begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
+    \caption{Overview of the UniformLoad Load Distribution Scheme}
+    \label{tab:uniform-load-overview}\\
+\hline
+\textbf{UniformLoad} & \multicolumn{2}{l|}{Initial Loading} & \multicolumn{2}{l|}{Final Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{Final PLR} \\ \cline{1-5} \cline{7-8}
+Plant Load           & A                 & B                & A                & B               &                               & A              & B             \\ \hline
+\endfirsthead
+\hline
+\textbf{UniformLoad} & \multicolumn{2}{l|}{Initial Loading} & \multicolumn{2}{l|}{Final Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{Final PLR} \\ \cline{1-5} \cline{7-8}
+Plant Load           & A                 & B                & A                & B               &                               & A              & B             \\ \hline
+\endhead
+
+10          & 5                 & 5                & 5            & 5           & 0                      & 0.2 *      & 0.15 *      \\ \hline
+25          & 12.5              & 12.5             & 12.5         & 12.5        & 0                      & 0.31       & 0.15 *      \\ \hline
+50          & 25                & 25               & 25           & 25          & 0                      & 0.63       & 0.25        \\ \hline
+100         & 50                & 50               & 40           & 60          & 0                      & 1 **       & 0.60        \\ \hline
+150         & 75                & 75               & 40           & 100         & 10                     & 1 **       & 1 **        \\ \hline
+200         & 100               & 100              & 40           & 100         & 60                     & 1 **       & 1 **        \\ \hline
+
+\end{longtable}
+
+
+
+\subsubsection{SequentialLoad}%
+\label{ssub:sequentialload}
+
+The \textbf{SequentialLoad} simply loads all machine sequentially up to their maximum Part Load Ratio.
+
+\begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
+    \caption{Overview of the Sequential Load Distribution Scheme}
+    \label{tab:sequantial-load-overview}\\
+\hline
+
+\textbf{SequentialLoad} & \multicolumn{2}{l|}{Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{PLR} \\ \cline{1-3} \cline{5-6}
+Plant Load      & A             & B            &                               & A          & B           \\ \hline
+\endfirsthead
+\hline
+\textbf{SequentialLoad} & \multicolumn{2}{l|}{Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{PLR} \\ \cline{1-3} \cline{5-6}
+Plant Load      & A             & B            &                               & A          & B           \\ \hline
+\endhead
+
+5               & 5             & 0            & 0                             & 0.2 *      & -           \\ \hline
+25              & 25            & 0            & 0                             & 0.625      & -           \\ \hline
+50              & 40            & 10           & 0                             & 1 **       & 0.15 *      \\ \hline
+100             & 40            & 60           & 0                             & 1 **       & 0.6         \\ \hline
+150             & 40           & 100           & 0                             & 1 **       & 1 **        \\ \hline
+200             & 40           & 100           & 50                            & 1 **       & 1 **        \\ \hline
+\end{longtable}
+
+
+\subsubsection{UniformPLR}%
+\label{ssub:uniformplr}
+
+The \textbf{UniformPLR} Load Distribution occurs in three steps:
+
+\begin{enumerate}
+    \def\labelenumi{Step \arabic{enumi}:}
+\item
+    Determine PlantCapacity and LargestMinCompPLR for each successive equipment being turned on.
+    PlantCapacity is the capacity of all equipment that is turned on and considered.
+    LargestMinCompPLR is the max of minimum Part Load Ratio for each equipment considered.
+\item
+    While the load to be met is below the LargestMinCompPLR equipment still in consideration, remove the last equipment in the Plant Equipment List. Always keep one equipment.
+\item
+    Divide the Plant Load accross the remaining equipment
+\end{enumerate}
+
+
+\begin{table}[htbp]
+    \centering
+    \caption{UniformPLR Load Distribution Scheme - Step 1}
+    \label{tab:uniformplr-load-overview}
+\begin{tabular}{|l|l|l|}
+\hline
+Equipment Considered: & A & A \& B \\ \hline
+PlantCapacity & 40 & 140 \\ \hline
+LargestMinCompPLR & 0.2 & 0.15 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{longtable}[c]{|l|l|l|l|l|l|l|l|}
+    \caption{UniformPLR Load Distribution Scheme - Step 2 and 3}
+    \label{tab:uniformplr-load-overview-step23}\\
+\hline
+\textbf{UniformPLR} & A\&B in Consideration & \multicolumn{2}{l|}{A only} & \multicolumn{2}{l|}{Final Loading} & \multicolumn{2}{l|}{Final PLR} \\ \hline
+Plant Load & Plant PLR             & B         & Plant PLR       & A               & B                & A              & B             \\ \hline
+\endfirsthead
+\hline
+\textbf{UniformPLR} & A\&B in Consideration & \multicolumn{2}{l|}{A only} & \multicolumn{2}{l|}{Final Loading} & \multicolumn{2}{l|}{Final PLR} \\ \hline
+Plant Load & Plant PLR             & B         & Plant PLR       & A               & B                & A              & B             \\ \hline
+\endhead
+
+5          & 0.04                  & OFF       & 0.125           & 0.125           & -                & 0.2 *          & -             \\ \hline
+10         & 0.07                  & OFF       & 0.25            & 0.25            & -                & 0.2 *          & -             \\ \hline
+25         & 0.18                  & ON        & N/A             & 7.14            & 17.86            & 0.2 *          & 0.18          \\ \hline
+50         & 0.36                  & ON        & N/A             & 14.29           & 35.71            & 0.36           & 0.36          \\ \hline
+100        & 0.71                  & ON        & N/A             & 28.57           & 71.43            & 0.71           & 0.71          \\ \hline
+150        & 1.07                  & ON        & N/A             & 40.00           & 100.00           & 1 **           & 1 **          \\ \hline
+
+\end{longtable}
+
+
+
+
+\subsubsection{SequentialUniformPLR}%
+\label{ssub:sequentialuniformplr}
+
+The \textbf{SequentialUniformPLR} Load Distribution occurs in two steps:
+
+\begin{enumerate}
+    \def\labelenumi{Step \arabic{enumi}:}
+\item
+    Turn on each equipment sequentially to have enough capacity to meet the loop demand.
+\item
+    Operate the resulting equipment at uniform part load ratio
+\end{enumerate}
+
+\begin{longtable}[c]{|l|l|l|l|l|l|l|l|l|}
+    \caption{Overview of the SequentialUniformPLR Load Distribution Scheme}
+    \label{tab:sequentialuniformplr-load-overview}\\
+\hline
+ & \multicolumn{4}{l|}{Sequential Loading} & \multicolumn{2}{l|}{Final Loading} & \multicolumn{2}{l|}{Final} \\ \hline
+Plant Load & A & B & PlantCapacity & Plant PLR & A & B & A & B \\ \hline
+\endfirsthead
+
+\hline
+ & \multicolumn{4}{l|}{Sequential Loading} & \multicolumn{2}{l|}{Final Loading} & \multicolumn{2}{l|}{Final} \\ \hline
+Plant Load & A & B & PlantCapacity & Plant PLR & A & B & A & B \\ \hline
+\endhead
+
+5 & ON & OFF & 40 & 0.13 & 5.0 & - & 0.2 * & - \\ \hline
+10 & ON & OFF & 40 & 0.25 & 10.0 & - & 0.25 & - \\ \hline
+25 & ON & OFF & 40 & 0.63 & 25.0 & - & 0.63 & - \\ \hline
+50 & ON & ON & 140 & 0.36 & 14.3 & 35.71 & 0.36 & 0.36 \\ \hline
+100 & ON & ON & 140 & 0.71 & 28.6 & 71.43 & 0.71 & 0.71 \\ \hline
+150 & ON & ON & 140 & 1.07 & 40.0 & 100.00 & 1 ** & 1 ** \\ \hline
+\end{longtable}
+
+
 
 \subsection{Summary of Plant Loop Demand Calculation Schemes}\label{summary-of-plant-loop-demand-calculation-schemes}
 
@@ -309,7 +586,7 @@ The method to simulate a primary-secondary system in EnergyPlus is termed Common
 
 \subsubsection{Common Pipe}\label{common-pipe}
 
-Common pipe feature eliminates the need of specifying two different EnergyPlus loops each for Primary and Secondary half loops. Instead the user can set up the system as it is used in real life applications. A common pipe simulation requires that pumps be placed on both Demand (Secondary) and Supply (Primary) sides of the loop. A typical Common Pipe layout as used in EnergyPlus is shown in Figure~\ref{fig:transmitted-radiation-in-three-directions-for}. The major assumptions in the common pipe implementation are as follows:
+Common pipe feature eliminates the need of specifying two different EnergyPlus loops each for Primary and Secondary half loops. Instead the user can set up the system as it is used in real life applications. A common pipe simulation requires that pumps be placed on both Demand (Secondary) and Supply (Primary) sides of the loop. A typical Common Pipe layout as used in EnergyPlus is shown in Figure~\ref{fig:common-pipe-layout-schematic}. The major assumptions in the common pipe implementation are as follows:
 
 \begin{itemize}
 \item
@@ -390,9 +667,11 @@ Figure~\ref{fig:schematic-of-a-two-way-common-pipe-used-in} shows a schematic of
 
 Heat Recovery is accomplished by specifying another set of supply and demand loops. Each of the heat recovery components, i.e.~engine driven and combustion turbine chillers, and internal combustion and combustion turbine generators is designed to use the existing component/loop/solution structure to facilitate the simulation with the existing demand side manager and the supply side manager. Heat recovery normally contains components that produce heat that can be recovered, and the ability to store or use that heat elsewhere in the system. The component that can store the excess heat and allow it to be used elsewhere in the system or for domestic hot water is the Water Heater:Simple and is defined in the Input/Output Reference.
 
+\begin{figure}[hbtp] % fig 126
+\centering
 \includegraphics{media/image1977.png}.
-
-Figure 127. Example of a Heat Recovery Loop Simulation
+\caption{Example of a Heat Recovery Loop Simulation. \protect \label{fig:example-heat-recovery-loop-simulation}}
+\end{figure}
 
 In the example above there is a chilled water Loop with chilled water supplied by a diesel engine driven chiller. There is a hot water Loop that is being supplied by the water heater: simple. There is also scheduled domestic hot water usage on the water heater which excess demand can be met by a number of user-specified heating sources. Then on the demand side of the heat recovery loop there is the engine driven chiller, internal combustion, and combustion turbine electric generators with specified mass flows to recover the heat. This hot water is pump on the supply side by the heat recovery pump and provides the heat to the water heater to meet the water heater setpoint. This is probably one of the more complex configurations and interactions that would take place in heat recovery, but using the Plant supply and demand side configurations this can be extended to meet most user configurations. The plant water heater can also be used to just meet scheduled domestic hot water use, provide a hot water source for PlantLoop equipment, or provide a hot water storage tank for heat recovery as a single function. Or any combination of the above can be configured. Example files of some of these configurations are provided with the installation.
 
@@ -524,9 +803,9 @@ C\(_{1-4}\) are curve coefficients with last mandatory non-zero constant term C\
 
 The nondimensional variables in the previous equation are defined in terms of the following expressions:
 
-Ψ -- Non-dimensional pressure rise:~ \(\psi = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}\)
+$\psi$ -- Non-dimensional pressure rise:~ \(\psi = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}\)
 
-φ - Non-dimensional flow:~ \(\varphi = \frac{{\dot m}}{{\rho N{D^3}}}\)
+$\varphi$ - Non-dimensional flow:~ \(\varphi = \frac{{\dot m}}{{\rho N{D^3}}}\)
 
 The user preprocesses mass flow and pressure values into these nondimensional forms in order to generate the curve fit.~ The program then resolves the nondimensional forms into actual values based on the pump speed, diameter, and fluid density.~ This gives the proper pressure-flow relationship for the simulation.
 

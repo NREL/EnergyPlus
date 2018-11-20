@@ -133,15 +133,16 @@
     Run Period1,             !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 !  RunPeriod,
 !     Run Period2,              !- Name
@@ -149,7 +150,7 @@
 !    1,                       !- Begin Day of Month
 !   7,                      !- End Month
 !   15,                      !- End Day of Month
-!     UseWeatherFile,          !- Day of Week for Start Day
+!     ,                        !- Day of Week for Start Day
 !     Yes,                     !- Use Weather File Holidays and Special Days
 !     Yes,                     !- Use Weather File Daylight Saving Period
 !     No,                      !- Apply Weekend Holiday Rule
@@ -663,7 +664,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

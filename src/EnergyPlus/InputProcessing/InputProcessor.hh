@@ -52,6 +52,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -183,6 +184,15 @@ private:
         {
         }
 
+        bool operator<(const ObjectInfo& rhs) const
+        {
+            int cmp = this->objectType.compare(rhs.objectType);
+            if(cmp == 0) {
+                return this->objectName < rhs.objectName;
+            }
+            return cmp < 0;
+        }
+
         std::string objectType = "";
         std::string objectName = "";
     };
@@ -213,7 +223,7 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    void checkVersionMatch();
+    bool checkVersionMatch();
 
     bool processErrors();
 
@@ -235,16 +245,18 @@ private:
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
-    using UnorderedUnusedObjectMap = std::map<const json::object_t *const, ObjectInfo>;
+    using UnusedObjectSet = std::set<ObjectInfo>;
 
     std::unique_ptr<IdfParser> idf_parser;
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
+    public:
     json epJSON;
+    private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
-    UnorderedUnusedObjectMap unusedInputs;
+    UnusedObjectSet unusedInputs;
     char s[129] = {0};
 
 }; // InputProcessor
