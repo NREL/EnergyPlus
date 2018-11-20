@@ -217,7 +217,7 @@ Five load distribution schemes are employed in EnergyPlus. The figure below illu
     The \textbf{OPTIMAL} scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components.
 \item
     The \textbf{UNIFORMLOAD} scheme first divides the load evenly among all available components.
-    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components.
+    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is distributed sequentially to the other available components.
 \item
     The \textbf{SEQUENTIALLOAD} scheme loads each component one at a time to capacity until the loop demand is met.
     The components are loaded up in the order that they appear in the equipment list specified in input.
@@ -397,8 +397,8 @@ Plant Load      & A             & B            &                               &
 25              & 25            & 0            & 0                             & 0.625      & -           \\ \hline
 50              & 40            & 10           & 0                             & 1 **       & 0.15 *      \\ \hline
 100             & 40            & 60           & 0                             & 1 **       & 0.6         \\ \hline
-150             & 40           & 100           & 0                             & 1 **       & 1 **        \\ \hline
-200             & 40           & 100           & 50                            & 1 **       & 1 **        \\ \hline
+150             & 40           & 100           & 10                            & 1 **       & 1 **        \\ \hline
+200             & 40           & 100           & 60                            & 1 **       & 1 **        \\ \hline
 \end{longtable}
 
 

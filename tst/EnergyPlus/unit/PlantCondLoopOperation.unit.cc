@@ -315,6 +315,90 @@ TEST_F(EnergyPlusFixture, DistributePlantLoad_Sequential)
     EXPECT_EQ(thisComp12.MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    thisComp3.MyLoad = 0.0;
+    thisComp4.MyLoad = 0.0;
+    thisComp5.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+    thisComp2.Available = true;
+
+    //Duplicate tests from engineering reference examples for Sequential
+    thisEquipList.NumComps = 2;
+    thisComp1.MaxLoad = 40.0;
+    thisComp1.MinLoad = 0.2 * 40.0;
+    thisComp1.OptLoad = 0.6 * 40.0;
+    thisComp2.MaxLoad = 100.0;
+    thisComp2.MinLoad = 0.15 * 100.0;
+    thisComp2.OptLoad = 0.4 * 100.0;
+
+    // 5W
+    loopDemand = 5.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 5.0);
+    EXPECT_EQ(thisComp2.MyLoad, 0.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 25W
+    loopDemand = 25.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 25.0);
+    EXPECT_EQ(thisComp2.MyLoad, 0.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 50W
+    loopDemand = 50.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 10.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 100W
+    loopDemand = 100.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 60.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 150W
+    loopDemand = 150.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(remainingLoopDemand, 10.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 200W
+    loopDemand = 200.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(remainingLoopDemand, 60.0);
 }
 
 TEST_F(EnergyPlusFixture, DistributePlantLoad_Uniform)
@@ -438,5 +522,92 @@ TEST_F(EnergyPlusFixture, DistributePlantLoad_Uniform)
     EXPECT_EQ(thisComp4.MyLoad, 50.0);
     EXPECT_EQ(thisComp5.MyLoad, 80.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    thisComp3.MyLoad = 0.0;
+    thisComp4.MyLoad = 0.0;
+    thisComp5.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    //Duplicate tests from engineering reference examples
+    thisEquipList.NumComps = 2;
+    thisComp1.MaxLoad = 40.0;
+    thisComp1.MinLoad = 0.2 * 40.0;
+    thisComp1.OptLoad = 0.6 * 40.0;
+    thisComp2.MaxLoad = 100.0;
+    thisComp2.MinLoad = 0.15 * 100.0;
+    thisComp2.OptLoad = 0.4 * 100.0;
+
+    // 10W
+    loopDemand = 10.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 5.0);
+    EXPECT_EQ(thisComp2.MyLoad, 5.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 25W
+    loopDemand = 25.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 12.5);
+    EXPECT_EQ(thisComp2.MyLoad, 12.5);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 50W
+    loopDemand = 50.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 25.0);
+    EXPECT_EQ(thisComp2.MyLoad, 25.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 100W
+    loopDemand = 100.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 60.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 150W
+    loopDemand = 150.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(remainingLoopDemand, 10.0);
+
+    // reset loads
+    thisComp1.MyLoad = 0.0;
+    thisComp2.MyLoad = 0.0;
+    remainingLoopDemand = 0.0;
+
+    // 200W
+    loopDemand = 200.0;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisComp1.MyLoad, 40.0);
+    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(remainingLoopDemand, 60.0);
+
+
+
 
 }
