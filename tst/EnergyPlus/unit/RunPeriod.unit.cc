@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
     EXPECT_TRUE(errors_in_input);
 }
 
-// This just tests that whenever the RunPeriod has a name, it should be used in the error warnings
+// Test for #6937: this tests that whenever the RunPeriod has a name, it should be used in the error warnings
 TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 {
 
@@ -394,4 +394,41 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
     }
 
 
+}
+
+// Side issue discovered in #6937: The parsing of SizingPeriod:WeatherFileDays and WeatherFileConditionType references RunPeriod array
+// when it hits a warning/severe to create the error message
+// This test should not throw!
+TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
+{
+
+    // Case 1: bad start day/month combination
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "SizingPeriod:WeatherFileDays,",
+            "  Weather File Sizing Period,  !- Name",
+            "  4,                       !- Begin Month",
+            "  31,                      !- Begin Day of Month",
+            "  7,                       !- End Month",
+            "  25,                      !- End Day of Month",
+            "  SummerDesignDay,         !- Day of Week for Start Day",
+            "  No,                      !- Use Weather File Daylight Saving Period",
+            "  No;                      !- Use Weather File Rain and Snow Indicators",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        WeatherManager::GetRunPeriodDesignData(ErrorsFound);
+        // This should just issue a severe
+        EXPECT_TRUE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
 }
