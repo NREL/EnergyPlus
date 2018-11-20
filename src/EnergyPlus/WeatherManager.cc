@@ -6026,10 +6026,10 @@ namespace WeatherManager {
         cCurrentModuleObject = "RunPeriod";
         Count = 0;
         // if ( ! WFAllowsLeapYears ) {
-        //	LocalLeapYearAdd = 0;
-        //} else {
-        //	LocalLeapYearAdd = 1;
-        //}
+        //   LocalLeapYearAdd = 0;
+        // } else {
+        //  LocalLeapYearAdd = 1;
+        // }
         for (Loop = 1; Loop <= TotRunPers; ++Loop) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           Loop,
@@ -6051,6 +6051,8 @@ namespace WeatherManager {
 
             ++Count;
             // Loop = RP + Ptr;
+            // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "RUNPERIOD 1" anyways
+            // which is fine for our reporting below
             RunPeriodInput(Loop).title = cAlphaArgs(1);
 
             // set the start and end day of month from user input
@@ -6078,18 +6080,18 @@ namespace WeatherManager {
             // Validate year inputs
             if (RunPeriodInput(Loop).startYear == 0) {
                 if (RunPeriodInput(Loop).endYear != 0) { // Have to have an input start year to input an end year
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) +
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title +
                                     ", end year cannot be specified if the start year is not.");
                     ErrorsFound = true;
                 }
             } else if (RunPeriodInput(Loop).startYear < 1583) { // Bail on the proleptic Gregorian calendar
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start year (" +
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
                                 std::to_string(RunPeriodInput(Loop).startYear) + ") is too early, please choose a date after 1582.");
                 ErrorsFound = true;
             }
 
             if (RunPeriodInput(Loop).endYear != 0 && RunPeriodInput(Loop).startYear > RunPeriodInput(Loop).endYear) {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start year (" +
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
                                 std::to_string(RunPeriodInput(Loop).startYear) + ") is after the end year (" +
                                 std::to_string(RunPeriodInput(Loop).endYear) + ").");
                 ErrorsFound = true;
@@ -6100,7 +6102,7 @@ namespace WeatherManager {
             if (!lAlphaFieldBlanks(2)) { // Have input
                 auto result = weekDayLookUp.find(cAlphaArgs(2));
                 if (result == weekDayLookUp.end()) {
-                    ShowWarningError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
+                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
                                      cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
                     RunPeriodInput(Loop).startWeekDay = WeekDay::Sunday;
                 } else {
@@ -6126,7 +6128,7 @@ namespace WeatherManager {
                     }
                 } else {                                               // Have an input start year
                     if (!isLeapYear(RunPeriodInput(Loop).startYear)) { // Start year is not a leap year
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start year (" +
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
                                         std::to_string(RunPeriodInput(Loop).startYear) +
                                         ") is not a leap year but the requested start date is 2/29.");
                         ErrorsFound = true;
@@ -6135,7 +6137,7 @@ namespace WeatherManager {
                             calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != RunPeriodInput(Loop).startWeekDay) {
-                                ShowWarningError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start weekday (" + cAlphaArgs(2) +
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
                                                  ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
                                                  "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
                                 RunPeriodInput(Loop).startWeekDay = weekday;
@@ -6148,7 +6150,7 @@ namespace WeatherManager {
             } else {
                 // Non leap-day start date
                 if (!validMonthDay(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay)) {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", Invalid input start month/day (" +
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", Invalid input start month/day (" +
                                     TrimSigDigits(RunPeriodInput(Loop).startMonth) + '/' + TrimSigDigits(RunPeriodInput(Loop).startDay) + ')');
                     ErrorsFound = true;
                 } else {                                       // Month/day is valid
@@ -6167,7 +6169,7 @@ namespace WeatherManager {
                             calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != RunPeriodInput(Loop).startWeekDay) {
-                                ShowWarningError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start weekday (" + cAlphaArgs(2) +
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
                                                  ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
                                                  "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
                                 RunPeriodInput(Loop).startWeekDay = weekday;
@@ -6201,14 +6203,14 @@ namespace WeatherManager {
                     }
                 } else {                                             // Have an input end year
                     if (!isLeapYear(RunPeriodInput(Loop).endYear)) { // End year is not a leap year
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", end year (" +
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", end year (" +
                                         std::to_string(RunPeriodInput(Loop).startYear) + ") is not a leap year but the requested end date is 2/29.");
                         ErrorsFound = true;
                     } else {
                         RunPeriodInput(Loop).endJulianDate =
                             computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
                         if (RunPeriodInput(Loop).startJulianDate > RunPeriodInput(Loop).endJulianDate) {
-                            ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start Julian date (" +
+                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start Julian date (" +
                                             std::to_string(RunPeriodInput(Loop).startJulianDate) + ") is after the end Julian date (" +
                                             std::to_string(RunPeriodInput(Loop).endJulianDate) + ").");
                             ErrorsFound = true;
@@ -6218,7 +6220,7 @@ namespace WeatherManager {
             } else {
                 // Non leap-day end date
                 if (!validMonthDay(RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay)) {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", Invalid input end month/day (" +
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", Invalid input end month/day (" +
                                     TrimSigDigits(RunPeriodInput(Loop).startMonth) + '/' + TrimSigDigits(RunPeriodInput(Loop).startDay) + ')');
                     ErrorsFound = true;
                 } else {                                     // Month/day is valid
@@ -6235,7 +6237,7 @@ namespace WeatherManager {
                         RunPeriodInput(Loop).endJulianDate =
                             computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
                         if (RunPeriodInput(Loop).startJulianDate > RunPeriodInput(Loop).endJulianDate) {
-                            ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start Julian date (" +
+                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start Julian date (" +
                                             std::to_string(RunPeriodInput(Loop).startJulianDate) + ") is after the end Julian date (" +
                                             std::to_string(RunPeriodInput(Loop).endJulianDate) + ").");
                             ErrorsFound = true;
@@ -6257,7 +6259,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
                 RunPeriodInput(Loop).useHolidays = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
                 ErrorsFound = true;
             }
 
@@ -6267,7 +6269,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
                 RunPeriodInput(Loop).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
@@ -6277,7 +6279,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
                 RunPeriodInput(Loop).applyWeekendRule = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
                 ErrorsFound = true;
             }
 
@@ -6287,7 +6289,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), "NO")) {
                 RunPeriodInput(Loop).useRain = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
                 ErrorsFound = true;
             }
 
@@ -6297,7 +6299,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
                 RunPeriodInput(Loop).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
                 ErrorsFound = true;
             }
 
@@ -6307,7 +6309,7 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(8), "YES")) {
                 RunPeriodInput(Loop).actualWeather = true;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) + ']');
                 ErrorsFound = true;
             }
 
