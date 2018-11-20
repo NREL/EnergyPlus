@@ -281,7 +281,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 {
 
-    // Case 1: has a name
+    // Case 1: has a name, but mistmatched start day and year
     {
 
         std::string const idf_objects = delimited_string({
@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 
     }
 
-    // Case 2: doesn't have a name, should default to "RUNPERIOD 1" via InputProcessor
+    // Case 2: doesn't have a name, should default to "RUNPERIOD 1" via InputProcessor, and mistmatched start day and year
     {
 
         std::string const idf_objects = delimited_string({
@@ -354,5 +354,44 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         EXPECT_TRUE(compare_err_stream(error_string, true));
 
     }
+
+
+    // Case 3: has a name, but starts on 2/29 on a non-leap year.
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "RunPeriod,",
+            "  NotLeap,                 !- Name",
+            "  2,                       !- Begin Month",
+            "  29,                      !- Begin Day of Month",
+            "  2005,                    !- Begin Year",
+            "  12,                      !- End Month",
+            "  31,                      !- End Day of Month",
+            "  ,                        !- End Year",
+            "  Tuesday,                 !- Day of Week for Start Day",
+            "  Yes,                     !- Use Weather File Holidays and Special Days",
+            "  Yes,                     !- Use Weather File Daylight Saving Period",
+            "  No,                      !- Apply Weekend Holiday Rule",
+            "  Yes,                     !- Use Weather File Rain Indicators",
+            "  Yes;                     !- Use Weather File Snow Indicators",
+
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        int totalrps(1);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
+        // This should issue a severe
+        EXPECT_TRUE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start year (2005) is not a leap year but the requested start date is 2/29."});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
+
 
 }
