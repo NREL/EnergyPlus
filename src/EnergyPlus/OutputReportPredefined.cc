@@ -1874,7 +1874,7 @@ namespace OutputReportPredefined {
         pdchFanPwrPerFlow = newPreDefColumn(pdstFan, "Rated Power Per Max Air Flow Rate [W-s/m3]");
         pdchFanMotorIn = newPreDefColumn(pdstFan, "Motor Heat In Air Fraction");
         pdchFanEnergyIndex = newPreDefColumn(pdstFan, "Fan Energy Index");
-        pdchFanEndUse = newPreDefColumn(pdstFan, "End Use");
+        pdchFanEndUse = newPreDefColumn(pdstFan, "End Use Subcategory");
         pdchFanDesDay = newPreDefColumn(pdstFan, "Design Day Name for Fan Sizing Peak");
         pdchFanPkTime = newPreDefColumn(pdstFan, "Date/Time for Fan Sizing Peak");
 
