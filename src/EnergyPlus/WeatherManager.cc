@@ -6412,6 +6412,8 @@ namespace WeatherManager {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+
+            // Increment Count
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -6429,24 +6431,24 @@ namespace WeatherManager {
                     (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
                     if (RunPeriodDesignInput(Count).startDay > 31) {
                         ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).startDay) + ']');
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
                     if (RunPeriodDesignInput(Count).startDay > 30) {
                         ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).startDay) + ']');
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == 2) {
                     if (RunPeriodDesignInput(Count).startDay > 28 + LeapYearAdd) {
                         ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).startDay) + ']');
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else {
                     ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(1) +
-                                    " invalid (Month) [" + TrimSigDigits(RunPeriodInput(Loop).startMonth) + ']');
+                                    " invalid (Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startMonth) + ']');
                     ErrorsFound = true;
                 }
             }
