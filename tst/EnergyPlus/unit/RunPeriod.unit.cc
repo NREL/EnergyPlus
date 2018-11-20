@@ -387,7 +387,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         EXPECT_TRUE(ErrorsFound);
 
         std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start year (2005) is not a leap year but the requested start date is 2/29."});
+            delimited_string({"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
 
