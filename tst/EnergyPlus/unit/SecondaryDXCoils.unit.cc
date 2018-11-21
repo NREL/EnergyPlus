@@ -60,8 +60,8 @@
 // EnergyPlus Headers
 #include <DXCoils.hh>
 #include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataLoopNode.hh>
 #include <Psychrometrics.hh>
 
@@ -70,207 +70,199 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataLoopNode::Node;
 using DataEnvironment::OutBaroPress;
+using DataHeatBalFanSys::ZT;
+using DataHeatBalFanSys::ZoneAirHumRat;
+using DataLoopNode::Node;
+using Psychrometrics::InitializePsychRoutines;
+using Psychrometrics::PsyHFnTdbW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
 using Psychrometrics::PsyTwbFnTdbWPb;
-using Psychrometrics::PsyHFnTdbW;
-using Psychrometrics::InitializePsychRoutines;
-using DataHeatBalFanSys::ZoneAirHumRat;
-using DataHeatBalFanSys::ZT;
 
-TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilSingleSpeed_Test1 ) {
-	// tests secondary DX coil calculation of single speed DX system or heat pump
-	int DXCoilNum;
+TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilSingleSpeed_Test1)
+{
+    // tests secondary DX coil calculation of single speed DX system or heat pump
+    int DXCoilNum;
 
-	NumDXCoils = 1;
-	DXCoilNum = 1;
-	DXCoil.allocate( NumDXCoils );
-	DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
-	DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
-	DXCoil( DXCoilNum ).TotalCoolingEnergyRate = 5000.0;
-	DXCoil( DXCoilNum ).ElecCoolingPower = 500.0;
-	DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = 0.0;
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
+    DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
+    DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
+    DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
+    DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-	CalcSecondaryDXCoils( DXCoilNum );
-	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+    CalcSecondaryDXCoils(DXCoilNum);
+    EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
-	// cleanup
-	DXCoil.deallocate();
+    // cleanup
+    DXCoil.deallocate();
 }
-TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilTwoSpeed_Test2 ) {
+TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilTwoSpeed_Test2)
+{
 
-	// tests secondary DX coil calculation of two speed DX cooling system
-	int DXCoilNum;
+    // tests secondary DX coil calculation of two speed DX cooling system
+    int DXCoilNum;
 
-	NumDXCoils = 1;
-	DXCoilNum = 1;
-	DXCoil.allocate( NumDXCoils );
-	DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
-	DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_CoolingTwoSpeed;
-	DXCoil( DXCoilNum ).TotalCoolingEnergyRate = 5000.0;
-	DXCoil( DXCoilNum ).ElecCoolingPower = 500.0;
-	DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = 0.0;
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
+    DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoSpeed;
+    DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
+    DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
+    DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-	CalcSecondaryDXCoils( DXCoilNum );
-	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+    CalcSecondaryDXCoils(DXCoilNum);
+    EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
-	// cleanup
-	DXCoil.deallocate();
+    // cleanup
+    DXCoil.deallocate();
 }
-TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilMultiSpeed_Test3 ) {
+TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilMultiSpeed_Test3)
+{
 
-	// tests secondary DX coil calculation of multi speed heat pump
-	int DXCoilNum;
+    // tests secondary DX coil calculation of multi speed heat pump
+    int DXCoilNum;
 
-	NumDXCoils = 1;
-	DXCoilNum = 1;
-	DXCoil.allocate( NumDXCoils );
-	DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
-	DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_MultiSpeedCooling;
-	DXCoil( DXCoilNum ).TotalCoolingEnergyRate = 5000.0;
-	DXCoil( DXCoilNum ).ElecCoolingPower = 500.0;
-	DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = 0.0;
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
+    DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+    DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
+    DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
+    DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-	CalcSecondaryDXCoils( DXCoilNum );
-	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+    CalcSecondaryDXCoils(DXCoilNum);
+    EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
-	// cleanup
-	DXCoil.deallocate();
-
+    // cleanup
+    DXCoil.deallocate();
 }
-TEST_F( EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4 ) {
-	// tests secondary DX coil calculation of single speed heat pump
-	int DXCoilNum;
+TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
+{
+    // tests secondary DX coil calculation of single speed heat pump
+    int DXCoilNum;
 
-	NumDXCoils = 1;
-	DXCoilNum = 1;
-	DXCoil.allocate( NumDXCoils );
-	DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
-	DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_HeatingEmpirical;
-	DXCoil( DXCoilNum ).MinOATCompressor = -5.0;
-	DXCoil( DXCoilNum ).TotalHeatingEnergyRate = 5500.0;
-	DXCoil( DXCoilNum ).ElecHeatingPower = 500.0;
-	DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
-	DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
-	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
+    DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_HeatingEmpirical;
+    DXCoil(DXCoilNum).MinOATCompressor = -5.0;
+    DXCoil(DXCoilNum).TotalHeatingEnergyRate = 5500.0;
+    DXCoil(DXCoilNum).ElecHeatingPower = 500.0;
+    DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate = 0.0;
+    DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate = 0.0;
+    DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
-	DXCoil( DXCoilNum ).SecZonePtr = 1;
-	Node.allocate( 2 );
-	ZT.allocate( 1 );
-	ZoneAirHumRat.allocate( 1 );
-	ZT( 1 ) = 10.0;
-	ZoneAirHumRat( 1 ) = 0.003;
-	DXCoil( DXCoilNum ).SecCoilAirFlow = 1.0;
-	DXCoil( DXCoilNum ).CompressorPartLoadRatio = 1.0;
-	DXCoil( DXCoilNum ).SecCoilRatedSHR = 1.0;
+    DXCoil(DXCoilNum).SecZonePtr = 1;
+    Node.allocate(2);
+    ZT.allocate(1);
+    ZoneAirHumRat.allocate(1);
+    ZT(1) = 10.0;
+    ZoneAirHumRat(1) = 0.003;
+    DXCoil(DXCoilNum).SecCoilAirFlow = 1.0;
+    DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
+    DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
 
-	OutBaroPress = 101325.0;
-	DXCoil( DXCoilNum ).AirInNode = 2;
-	Node( DXCoil( DXCoilNum ).AirInNode ).Temp = 20.0;
-	InitializePsychRoutines();
+    OutBaroPress = 101325.0;
+    DXCoil(DXCoilNum).AirInNode = 2;
+    Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    InitializePsychRoutines();
 
-	CalcSecondaryDXCoils( DXCoilNum );
-	EXPECT_DOUBLE_EQ( -5000.0, DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate );
-	EXPECT_DOUBLE_EQ( 1.0, DXCoil( DXCoilNum ).SecCoilSHR );
+    CalcSecondaryDXCoils(DXCoilNum);
+    EXPECT_DOUBLE_EQ(-5000.0, DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
+    EXPECT_DOUBLE_EQ(1.0, DXCoil(DXCoilNum).SecCoilSHR);
 
+    //// set up arguments
+    Real64 const EvapAirMassFlow = 1.2;
+    Real64 const TotalHeatRemovalRate = 5500.0;
+    Real64 const PartLoadRatio = 1.0;
+    Real64 const SecCoilRatedSHR = 1.0;
+    Real64 const EvapInletDryBulb = 10.0;
+    Real64 const EvapInletHumRat = 0.003;
+    Real64 const EvapInletWetBulb = 4.5;
+    Real64 const EvapInletEnthalpy = 17607.0;
+    Real64 const CondInletDryBulb = 20.0;
+    Real64 const SecCoilFlowFraction = 1.0;
+    int const SecCoilSHRFT = 0;
+    int const SecCoilSHRFF = 0;
 
-	//// set up arguments
-	Real64 const EvapAirMassFlow = 1.2;
-	Real64 const TotalHeatRemovalRate = 5500.0;
-	Real64 const PartLoadRatio = 1.0;
-	Real64 const SecCoilRatedSHR = 1.0;
-	Real64 const EvapInletDryBulb = 10.0;
-	Real64 const EvapInletHumRat = 0.003;
-	Real64 const EvapInletWetBulb = 4.5;
-	Real64 const EvapInletEnthalpy = 17607.0;
-	Real64 const CondInletDryBulb = 20.0;
-	Real64 const SecCoilFlowFraction = 1.0;
-	int const SecCoilSHRFT = 0;
-	int const SecCoilSHRFF = 0;
+    // output variable
+    Real64 SHRTest;
 
-	// output variable
-	Real64 SHRTest;
+    // make the call
+    SHRTest =
+        CalcSecondaryDXCoilsSHR(DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
+                                EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
 
-	// make the call
-	SHRTest = CalcSecondaryDXCoilsSHR(
-	DXCoilNum,
-	EvapAirMassFlow,
-	TotalHeatRemovalRate,
-	PartLoadRatio,
-	SecCoilRatedSHR,
-	EvapInletDryBulb,
-	EvapInletHumRat,
-	EvapInletWetBulb,
-	EvapInletEnthalpy,
-	CondInletDryBulb,
-	SecCoilFlowFraction,
-	SecCoilSHRFT,
-	SecCoilSHRFF );
+    EXPECT_DOUBLE_EQ(1.0, SHRTest);
 
-	EXPECT_DOUBLE_EQ( 1.0, SHRTest );
-
-	// cleanup
-	DXCoil.deallocate();
-	Node.deallocate();
+    // cleanup
+    DXCoil.deallocate();
+    Node.deallocate();
 }
-TEST_F( EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5 ) {
+TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
+{
 
-	// tests secondary DX coil calculation of multi speed heat pump
-	int DXCoilNum;
+    // tests secondary DX coil calculation of multi speed heat pump
+    int DXCoilNum;
 
-	NumDXCoils = 1;
-	DXCoilNum = 1;
-	DXCoil.allocate( NumDXCoils );
-	DXCoil( DXCoilNum ).NumOfSpeeds = 2;
-	DXCoil( DXCoilNum ).MSSecCoilAirFlow.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-	DXCoil( DXCoilNum ).MSSecCoilRatedSHR.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-	DXCoil( DXCoilNum ).MSSecCoilSHRFT.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-	DXCoil( DXCoilNum ).MSSecCoilSHRFF.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(DXCoilNum).NumOfSpeeds = 2;
+    DXCoil(DXCoilNum).MSSecCoilAirFlow.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+    DXCoil(DXCoilNum).MSSecCoilRatedSHR.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+    DXCoil(DXCoilNum).MSSecCoilSHRFT.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+    DXCoil(DXCoilNum).MSSecCoilSHRFF.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
 
-	DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
-	DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_MultiSpeedHeating;
-	DXCoil( DXCoilNum ).MinOATCompressor = -5.0;
-	DXCoil( DXCoilNum ).TotalHeatingEnergyRate = 5500.0;
-	DXCoil( DXCoilNum ).ElecHeatingPower = 500.0;
-	DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
-	DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
-	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+    DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
+    DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+    DXCoil(DXCoilNum).MinOATCompressor = -5.0;
+    DXCoil(DXCoilNum).TotalHeatingEnergyRate = 5500.0;
+    DXCoil(DXCoilNum).ElecHeatingPower = 500.0;
+    DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate = 0.0;
+    DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate = 0.0;
+    DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
-	DXCoil( DXCoilNum ).SecZonePtr = 1;
-	Node.allocate( 2 );
-	ZT.allocate( 1 );
-	ZoneAirHumRat.allocate( 1 );
-	ZT( 1 ) = 10.0;
-	ZoneAirHumRat( 1 ) = 0.003;
-	DXCoil( DXCoilNum ).MSSecCoilAirFlow( 1 ) = 1.0;
-	DXCoil( DXCoilNum ).MSSecCoilAirFlow( 2 ) = 1.0;
-	DXCoil( DXCoilNum ).MSSecCoilSHRFT( 1 ) = 0;
-	DXCoil( DXCoilNum ).MSSecCoilSHRFF( 1 ) = 0;
-	DXCoil( DXCoilNum ).MSSecCoilSHRFT( 2 ) = 0;
-	DXCoil( DXCoilNum ).MSSecCoilSHRFF( 2 ) = 0;
-	DXCoil( DXCoilNum ).MSSecCoilRatedSHR( 1 ) = 1.0;
-	DXCoil( DXCoilNum ).MSSecCoilRatedSHR( 2 ) = 1.0;
+    DXCoil(DXCoilNum).SecZonePtr = 1;
+    Node.allocate(2);
+    ZT.allocate(1);
+    ZoneAirHumRat.allocate(1);
+    ZT(1) = 10.0;
+    ZoneAirHumRat(1) = 0.003;
+    DXCoil(DXCoilNum).MSSecCoilAirFlow(1) = 1.0;
+    DXCoil(DXCoilNum).MSSecCoilAirFlow(2) = 1.0;
+    DXCoil(DXCoilNum).MSSecCoilSHRFT(1) = 0;
+    DXCoil(DXCoilNum).MSSecCoilSHRFF(1) = 0;
+    DXCoil(DXCoilNum).MSSecCoilSHRFT(2) = 0;
+    DXCoil(DXCoilNum).MSSecCoilSHRFF(2) = 0;
+    DXCoil(DXCoilNum).MSSecCoilRatedSHR(1) = 1.0;
+    DXCoil(DXCoilNum).MSSecCoilRatedSHR(2) = 1.0;
 
-	DXCoil( DXCoilNum ).MSSpeedRatio = 0;
-	DXCoil( DXCoilNum ).MSCycRatio = 1;
-	DXCoil( DXCoilNum ).MSSpeedNumHS = 1;
-	DXCoil( DXCoilNum ).MSSpeedNumLS = 1;
+    DXCoil(DXCoilNum).MSSpeedRatio = 0;
+    DXCoil(DXCoilNum).MSCycRatio = 1;
+    DXCoil(DXCoilNum).MSSpeedNumHS = 1;
+    DXCoil(DXCoilNum).MSSpeedNumLS = 1;
 
-	OutBaroPress = 101325.0;
-	DXCoil( DXCoilNum ).AirInNode = 2;
-	Node( DXCoil( DXCoilNum ).AirInNode ).Temp = 20.0;
-	InitializePsychRoutines();
+    OutBaroPress = 101325.0;
+    DXCoil(DXCoilNum).AirInNode = 2;
+    Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    InitializePsychRoutines();
 
-	CalcSecondaryDXCoils( DXCoilNum );
-	EXPECT_DOUBLE_EQ( -5000.0, DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate );
-	EXPECT_DOUBLE_EQ( 1.0, DXCoil( DXCoilNum ).SecCoilSHR );
+    CalcSecondaryDXCoils(DXCoilNum);
+    EXPECT_DOUBLE_EQ(-5000.0, DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
+    EXPECT_DOUBLE_EQ(1.0, DXCoil(DXCoilNum).SecCoilSHR);
 
-	// cleanup
-	DXCoil( DXCoilNum ).MSSecCoilAirFlow.deallocate();
-	DXCoil( DXCoilNum ).MSSecCoilRatedSHR.deallocate();
-	DXCoil( DXCoilNum ).MSSecCoilSHRFT.deallocate();
-	DXCoil( DXCoilNum ).MSSecCoilSHRFF.deallocate();
-	DXCoil.deallocate();
-	Node.deallocate();
+    // cleanup
+    DXCoil(DXCoilNum).MSSecCoilAirFlow.deallocate();
+    DXCoil(DXCoilNum).MSSecCoilRatedSHR.deallocate();
+    DXCoil(DXCoilNum).MSSecCoilSHRFT.deallocate();
+    DXCoil(DXCoilNum).MSSecCoilSHRFF.deallocate();
+    DXCoil.deallocate();
+    Node.deallocate();
 }

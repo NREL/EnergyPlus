@@ -185,7 +185,7 @@
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   Chiller:Electric:EIR,
     ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes,  !- Name
@@ -2320,16 +2320,16 @@
 !
 
   Chiller:Electric:EIR,
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD,  !- Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD_2,  !- Name
     1125300,                 !- Reference Capacity {W}
     7.92,                    !- Reference COP {W/W}
     6.11,                    !- Reference Leaving Chilled Water Temperature {C}
     12.78,                   !- Reference Entering Condenser Fluid Temperature {C}
     0.03243,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.05173,                 !- Reference Condenser Fluid Flow Rate {m3/s}
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -2352,7 +2352,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD CAPFT_2,  !- Name
     1.034212E-01,            !- Coefficient1 Constant
     2.327078E-03,            !- Coefficient2 x
     -9.117035E-04,           !- Coefficient3 x**2
@@ -2369,7 +2369,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFT_2,  !- Name
     6.542286E-01,            !- Coefficient1 Constant
     -2.451604E-02,           !- Coefficient2 x
     1.253508E-03,            !- Coefficient3 x**2
@@ -2386,7 +2386,7 @@
 ! x = Part Load Ratio (load/capacity)
 
   Curve:Quadratic,
-    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Name
+    ElectricEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR_2,  !- Name
     1.147453E-01,            !- Coefficient1 Constant
     4.231235E-02,            !- Coefficient2 x
     8.419681E-01,            !- Coefficient3 x**2
@@ -7240,16 +7240,16 @@
 !
 
   Chiller:Electric:EIR,
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes,  !- Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes_2,  !- Name
     1881400,                 !- Reference Capacity {W}
     6.53,                    !- Reference COP {W/W}
     8.89,                    !- Reference Leaving Chilled Water Temperature {C}
     26.67,                   !- Reference Entering Condenser Fluid Temperature {C}
     0.04397,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.1041,                  !- Reference Condenser Fluid Flow Rate {m3/s}
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -7272,7 +7272,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT_2,  !- Name
     8.561286E-01,            !- Coefficient1 Constant
     4.130164E-02,            !- Coefficient2 x
     -7.109335E-04,           !- Coefficient3 x**2
@@ -7289,7 +7289,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT_2,  !- Name
     4.434989E-01,            !- Coefficient1 Constant
     4.361264E-02,            !- Coefficient2 x
     -1.733337E-03,           !- Coefficient3 x**2
@@ -7306,7 +7306,7 @@
 ! x = Part Load Ratio (load/capacity)
 
   Curve:Quadratic,
-    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Name
+    ElectricEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR_2,  !- Name
     5.272116E-02,            !- Coefficient1 Constant
     4.176382E-01,            !- Coefficient2 x
     5.310870E-01,            !- Coefficient3 x**2
@@ -8470,16 +8470,16 @@
 !
 
   Chiller:Electric:EIR,
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD,  !- Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD_2,  !- Name
     2233000,                 !- Reference Capacity {W}
     9.54,                    !- Reference COP {W/W}
     5.56,                    !- Reference Leaving Chilled Water Temperature {C}
     12.78,                   !- Reference Entering Condenser Fluid Temperature {C}
     0.06107,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.11451,                 !- Reference Condenser Fluid Flow Rate {m3/s}
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -8502,7 +8502,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD CAPFT_2,  !- Name
     7.585741E-01,            !- Coefficient1 Constant
     -5.127829E-02,           !- Coefficient2 x
     5.848602E-03,            !- Coefficient3 x**2
@@ -8519,7 +8519,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFT_2,  !- Name
     7.563409E-01,            !- Coefficient1 Constant
     -1.966623E-02,           !- Coefficient2 x
     -3.927494E-04,           !- Coefficient3 x**2
@@ -8536,7 +8536,7 @@
 ! x = Part Load Ratio (load/capacity)
 
   Curve:Quadratic,
-    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Name
+    ElectricEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR_2,  !- Name
     6.917141E-02,            !- Coefficient1 Constant
     1.743339E-01,            !- Coefficient2 x
     7.524059E-01,            !- Coefficient3 x**2
@@ -8716,16 +8716,16 @@
 !
 
   Chiller:Electric:EIR,
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes,  !- Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes_2,  !- Name
     2275200,                 !- Reference Capacity {W}
     6.32,                    !- Reference COP {W/W}
     6.67,                    !- Reference Leaving Chilled Water Temperature {C}
     26.11,                   !- Reference Entering Condenser Fluid Temperature {C}
     0.07571,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.11356,                 !- Reference Condenser Fluid Flow Rate {m3/s}
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.13,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -8748,7 +8748,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT_2,  !- Name
     1.034673E+00,            !- Coefficient1 Constant
     -1.091064E-02,           !- Coefficient2 x
     9.019479E-04,            !- Coefficient3 x**2
@@ -8765,7 +8765,7 @@
 ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
 
   Curve:Biquadratic,
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT_2,  !- Name
     8.326094E-01,            !- Coefficient1 Constant
     -6.056615E-03,           !- Coefficient2 x
     -3.016626E-04,           !- Coefficient3 x**2
@@ -8782,7 +8782,7 @@
 ! x = Part Load Ratio (load/capacity)
 
   Curve:Quadratic,
-    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Name
+    ElectricEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR_2,  !- Name
     2.735485E-01,            !- Coefficient1 Constant
     2.163041E-01,            !- Coefficient2 x
     5.099054E-01,            !- Coefficient3 x**2
@@ -15984,17 +15984,17 @@
 !
 
   Chiller:Electric:ReformulatedEIR,
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD,  !- Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD_2,  !- Name
     1125300,                 !- Reference Capacity {W}
     7.92,                    !- Reference COP {W/W}
     6.11,                    !- Reference Leaving Chilled Water Temperature {C}
     18.64,                   !- Reference Leaving Condenser Water Temperature {C}
     0.03243,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.05173,                 !- Reference Condenser Water Flow Rate {m3/s}
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
     LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -16015,7 +16015,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT_2,  !- Name
     -1.825851E-01,           !- Coefficient1 Constant
     -1.890742E-02,           !- Coefficient2 x
     -1.452495E-03,           !- Coefficient3 x**2
@@ -16032,7 +16032,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT_2,  !- Name
     6.772525E-01,            !- Coefficient1 Constant
     -1.573620E-02,           !- Coefficient2 x
     1.805356E-03,            !- Coefficient3 x**2
@@ -16049,7 +16049,7 @@
 ! x = Leaving Condenser Water Temperature and y = Part Load Ratio (load/capacity)
 
   Curve:Bicubic,
-    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Name
+    ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR_2,  !- Name
     3.110875E-01,            !- Coefficient1 Constant
     -5.972965E-03,           !- Coefficient2 x
     -8.888194E-05,           !- Coefficient3 x**2
@@ -21384,17 +21384,17 @@
 !
 
   Chiller:Electric:ReformulatedEIR,
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes,  !- Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes_2,  !- Name
     1881400,                 !- Reference Capacity {W}
     6.53,                    !- Reference COP {W/W}
     8.89,                    !- Reference Leaving Chilled Water Temperature {C}
     31.65,                   !- Reference Leaving Condenser Water Temperature {C}
     0.04397,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.1041,                  !- Reference Condenser Water Flow Rate {m3/s}
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
     LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -21415,7 +21415,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT_2,  !- Name
     8.031671E-01,            !- Coefficient1 Constant
     3.618657E-02,            !- Coefficient2 x
     -1.027472E-03,           !- Coefficient3 x**2
@@ -21432,7 +21432,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT_2,  !- Name
     4.262865E-01,            !- Coefficient1 Constant
     4.727402E-02,            !- Coefficient2 x
     -1.347198E-03,           !- Coefficient3 x**2
@@ -21449,7 +21449,7 @@
 ! x = Leaving Condenser Water Temperature and y = Part Load Ratio (load/capacity)
 
   Curve:Bicubic,
-    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Name
+    ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR_2,  !- Name
     2.470999E-01,            !- Coefficient1 Constant
     -4.530708E-03,           !- Coefficient2 x
     2.522038E-05,            !- Coefficient3 x**2
@@ -22734,17 +22734,17 @@
 !
 
   Chiller:Electric:ReformulatedEIR,
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD,  !- Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD_2,  !- Name
     2233000,                 !- Reference Capacity {W}
     9.54,                    !- Reference COP {W/W}
     5.56,                    !- Reference Leaving Chilled Water Temperature {C}
     17.93,                   !- Reference Leaving Condenser Water Temperature {C}
     0.06107,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.11451,                 !- Reference Condenser Water Flow Rate {m3/s}
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
     LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -22765,7 +22765,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT_2,  !- Name
     4.939632E-01,            !- Coefficient1 Constant
     -9.743766E-02,           !- Coefficient2 x
     6.782771E-03,            !- Coefficient3 x**2
@@ -22782,7 +22782,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT_2,  !- Name
     7.177745E-01,            !- Coefficient1 Constant
     -9.460212E-04,           !- Coefficient2 x
     -1.451469E-03,           !- Coefficient3 x**2
@@ -22799,7 +22799,7 @@
 ! x = Leaving Condenser Water Temperature and y = Part Load Ratio (load/capacity)
 
   Curve:Bicubic,
-    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Name
+    ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR_2,  !- Name
     4.637900E-01,            !- Coefficient1 Constant
     -3.344690E-02,           !- Coefficient2 x
     2.768776E-04,            !- Coefficient3 x**2
@@ -23004,17 +23004,17 @@
 !
 
   Chiller:Electric:ReformulatedEIR,
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes,  !- Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes_2,  !- Name
     2275200,                 !- Reference Capacity {W}
     6.32,                    !- Reference COP {W/W}
     6.67,                    !- Reference Leaving Chilled Water Temperature {C}
     31.66,                   !- Reference Leaving Condenser Water Temperature {C}
     0.07571,                 !- Reference Chilled Water Flow Rate {m3/s}
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT_2,  !- Cooling Capacity Function of Temperature Curve Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT_2,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
     LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR_2,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.13,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
     1.0,                     !- Optimum Part Load Ratio
@@ -23035,7 +23035,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT_2,  !- Name
     9.227391E-01,            !- Coefficient1 Constant
     -3.381914E-02,           !- Coefficient2 x
     4.402874E-04,            !- Coefficient3 x**2
@@ -23052,7 +23052,7 @@
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT_2,  !- Name
     8.910758E-01,            !- Coefficient1 Constant
     4.115735E-03,            !- Coefficient2 x
     -2.403988E-04,           !- Coefficient3 x**2
@@ -23069,7 +23069,7 @@
 ! x = Leaving Condenser Water Temperature and y = Part Load Ratio (load/capacity)
 
   Curve:Bicubic,
-    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Name
+    ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR_2,  !- Name
     2.464807E-01,            !- Coefficient1 Constant
     6.198472E-03,            !- Coefficient2 x
     -2.091245E-05,           !- Coefficient3 x**2

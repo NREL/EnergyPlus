@@ -26,7 +26,7 @@ This numeric field contains the pump's design maximum volume flow rate in cubic 
 
 \paragraph{Field: Design Pump Head}\label{field-design-pump-head}
 
-This numeric field contains the pump's rated head pressure in Pascals. The default is 179352 Pa, or 60 ftH20, and is for a fairly large building.
+This numeric field contains the pump's design head pressure in Pascals. The default is 179352 Pa, or 60 ftH20, and is for a fairly large building.
 
 \paragraph{Field: Design Power Consumption}\label{field-design-power-consumption}
 
@@ -34,11 +34,11 @@ This numeric field contains the pump's design power consumption in Watts. If the
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-000}
 
-This numeric field contains the pump's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
 
 \paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream}
 
-This numeric field contains the pump's fraction of power loss to the fluid.
+This numeric field contains the pump motor's fraction of power loss to the fluid.
 
 \paragraph{Field: Coefficient 1 of the Part Load Performance Curve}\label{field-coefficient-1-of-the-part-load-performance-curve}
 
@@ -259,15 +259,15 @@ This numeric field contains the pump's design head pressure in Pascals. The defa
 
 \paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-1}
 
-This numeric field contains the pump's rated power consumption in Watts. If the user is performing a pressure simulation on the loop in which this pump is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+This numeric field contains the pump's design power consumption in Watts. If the user is performing a pressure simulation on the loop in which this pump is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-1-000}
 
-This numeric field contains the pump's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
 
 \paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-1}
 
-This numeric field contains the pump's fraction of power loss to the fluid.
+This numeric field contains the pump motor's fraction of power loss to the fluid.
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-1-000}
 
@@ -450,11 +450,11 @@ This numeric field contains the pump's rated power consumption in Watts. If the 
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-2-000}
 
-This numeric field contains the pump's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
 
 \paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-2}
 
-This numeric field contains the pump's fraction of power loss to the fluid.
+This numeric field contains the pump motor's fraction of power loss to the fluid.
 
 \paragraph{Field: Coefficient 1 of the Part Load Performance Curve}\label{field-coefficient-1-of-the-part-load-performance-curve-1}
 
@@ -631,19 +631,19 @@ The alpha field specifies the scheme for sequencing flow. Currently the only cho
 
 \paragraph{Field: Design Pump Head}\label{field-design-pump-head-3}
 
-This numeric field contains the pump s rated head pressure in Pascals.
+This numeric field contains the pump's design head pressure in Pascals.
 
 \paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-3}
 
-This numeric field contains the pump bank s total power consumption in Watts. This field is equal to the product of number of pumps and the rated power consumption of each individual pump. If the user is performing a pressure simulation on the loop in which this pump bank is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+This numeric field contains the pump bank's total power consumption in Watts. This field is equal to the product of number of pumps and the rated power consumption of each individual pump. If the user is performing a pressure simulation on the loop in which this pump bank is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-3-000}
 
-This numeric field contains the pump s efficiency in decimal form (0 = 0\%, 1 = 100\%).
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
 
 \paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-3}
 
-This numeric field contains the pump s fraction of power loss to the fluid.
+This numeric field contains the pump motor's fraction of power loss to the fluid.
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-2-000}
 
@@ -793,7 +793,7 @@ The alpha field specifies the scheme for sequencing flow. Currently the only cho
 
 \paragraph{Field: Design Pump Head}\label{field-design-pump-head-4}
 
-This numeric field contains the pump s rated head in Pascals.
+This numeric field contains the pump's design head in Pascals.
 
 \paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-4}
 
@@ -801,7 +801,7 @@ This numeric field contains the pump bank's total power consumption in Watts. Th
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-4}
 
-This numeric field contains the efficiency of the individual pump (which will be equivalent to pump bank efficiency) in decimal form (0 = 0\%, 1 = 100\%).
+This numeric field contains the motor's efficiency of the individual pump (which will be equivalent to pump bank efficiency) in decimal form (0 = 0\%, 1 = 100\%).
 
 \paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-4}
 

@@ -37,6 +37,7 @@ Fan:SystemModel added for version 8.7 is contained in the \emph{HVACFan.cc} and
 \emph{HVACFan.hh} files.
 
 \subsubsection{Inputs and Data}\label{inputs-and-data-000}
+
 For the Fan:SystemModel model (added for version 8.7), the user describes the fan by entering values for the design pressure rise across the fan, the design volume flow rate, the design electric power consumption, and the fan motor efficiency. The user also needs to specify the fraction of the fan motor's waste heat that will enter the air stream (usually 0 or 1). If the fan is indoors, the name of a Zone and a fraction for the split between thermal radiation and convection can be entered so that the portion of fan motor waste heat that does not enter the air stream can be added to the thermal zone surrounding the fan. The user enters a choice for fan speed control method to be either Continuous (for VAV) or Discrete (for constant volume, on-off, two-speed, or multi-speed).  A performance curve or lookup table defined separately can be referenced by the fan to describe the variation in fan power as a function of flow rate. This curve is required for continuous speed control. However, for discrete speed control the user has the option of directly entering a power modification factor for each discrete speed and a curve is not necessary. For two- or multi-speed fans, the number of speeds is entered and pairs of values for the flow fraction and power fraction at each speed level are entered in increasing order. The design electric power consumption can be autosized using input values for one of three available scaling factors: fan total efficiency, electric power per unit flow rate, or electric power per unit flow rate per unit pressure.  Except for these sizing and control features, the fan (system) model itself is based on the original fan models (Fan:VariableVolume, Fan:OnOff, and Fan:ConstantVolume) and uses the same basic mathematical formulation.
 
 For the Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff models, the user describes the fan by entering values for the design pressure rise across the fan, the design volume flow rate, the fan total efficiency, and the fan motor efficiency. The user also needs to specify the fraction of the fan waste heat that will enter the air stream (usually 0 or 1). For the Fan:VariableVolume model, the user must also enter the coefficients of a 4\(^{th}\) order polynomial that relates the fan mass flow rate to the fan power consumption.The independent variable is the volumetric flow fraction; the dependent variable is the fan power part load ratio. For multi-speed fans, the user must enter a fan power ratio as a function of speed ratio performance curve name. Multi-speed fans can only be simulated in a parent object which allows multiple fan speeds (e.g., AirLoopHVAC:Unitary:Furnace:HeatCool, ZoneHVAC:PackagedTerminalAirConditioner, etc.). An optional efficiency curve may also be used when simulating multi-speed fans to adjust the fan total efficiency as the fan speed changes.
@@ -56,13 +57,13 @@ For multi-speed fans, the parent object determines the fan speed ratio (i.e., th
 For the \emph{Fan:SystemModel} model based on design electric power consumption, the fan's total efficiency is determined at the beginning of the simulation using:
 
 \begin{equation}
-{e_{tot,max}} = \frac{({\dot V_{design,max} \cdot \Delta P  } )}{{ \dot Q_{tot, design}}}
+{\varepsilon_{tot,max}} = \frac{({\dot V_{design,max} \cdot \Delta P  } )}{{ \dot Q_{tot, design}}}
 \end{equation}
 
 For a fan with discrete speed control with more than one speed and input data for Speed \emph{x} Electric Power Fraction, the fan's total efficiency at each speed \emph{x} is determined and stored using:
 
 \begin{equation}
-{e_{tot,x}} = \frac {({f_{flow,x}} \cdot {\dot V_{design,max} \cdot \Delta P  } )}{( {f_{power,x}} \cdot { \dot Q_{tot, design}})}
+{e\varepsilon_{tot,x}} = \frac {({f_{flow,x}} \cdot {\dot V_{design,max} \cdot \Delta P  } )}{( {f_{power,x}} \cdot { \dot Q_{tot, design}})}
 \end{equation}
 
 For a fan with discrete speed control and no data for the power fraction at a speed, the power performance curve (or table) is evaluated first using the flow fraction for the speed:
@@ -82,17 +83,17 @@ For a fan with discrete speed control with more than one speed, the design mass 
 \begin{equation}
 {\dot m_{design,x}} = {f_{flow,x}} \cdot {\dot V_{design,max}}
 \end{equation}
-\\
-Simple (Single Speed) Fan Model
+
+\emph{\textbf{Simple (Single Speed) Fan Model}}
 
 The following equations define the model for this fan:
 
 \begin{equation}
-{\dot Q_{tot}} = \dot m\cdot \Delta P/({e_{tot,max}}\cdot {\rho_{air}})
+{\dot Q_{tot}} = \dot m\cdot \Delta P/({\varepsilon_{tot,max}}\cdot {\rho_{air}})
 \end{equation}
 
 \begin{equation}
-{\dot Q_{shaft}} = {e_{motor}}\cdot {\dot Q_{tot}}
+{\dot Q_{shaft}} = {\varepsilon_{motor}}\cdot {\dot Q_{tot}}
 \end{equation}
 
 \begin{equation}
@@ -111,7 +112,7 @@ The following equations define the model for this fan:
 {T_{out}} = PsyTdbFnHW({h_{out}},{w_{out}})
 \end{equation}
 
-Fan Model for Changing Flow Rates
+\emph{\textbf{Fan Model for Changing Flow Rates}}
 
 The fan will operate at a flow fraction that is determined by other HVAC equipment in the air system.  A parent object will control the air flow rates and the fan flow fraction is defined as the ratio of the current mass flow rate divided by the design mass flow rate.
 
@@ -121,7 +122,7 @@ The fan will operate at a flow fraction that is determined by other HVAC equipme
 
 The determination of electric power consumed at a flow fraction depends on if the speed control method is discrete or continuous.
 
-Discrete Speed Control 
+\emph{\textbf{Discrete Speed Control}}
 
 For the \emph{Fan:SystemModel} using discrete speed control, with the number of fan speeds set at 1, and the flow fraction is less than one, then the fan will be modeled as cycling between "off" and "on" over the timestep.  The time fraction is equal to the flow fraction so that:
  
@@ -130,7 +131,7 @@ For the \emph{Fan:SystemModel} using discrete speed control, with the number of 
 \end{equation}
 
 \begin{equation}
-{\dot Q_{tot,elec}} = {RTF_{On}} \cdot \left( \frac{\dot m\cdot \Delta P}{{e_{tot}}\cdot {\rho_{air}}}\right)
+{\dot Q_{tot,elec}} = {RTF_{On}} \cdot \left( \frac{\dot m\cdot \Delta P}{{\varepsilon_{tot}}\cdot {\rho_{air}}}\right)
 \end{equation}
 
 Similarly, for two-speed and multi-speed fans, the current flow fraction will be used to find the run time fraction for each of the adjacent speed levels *x* and *x+1* that bracket the flow fraction such that
@@ -152,12 +153,12 @@ The runtime fraction spent at each speed is determined using
 The electric power consumption is calculated using the design mass flow rates and the total efficiency stored for each speed and combined using the runtime fraction at each speed.
 
 \begin{equation}
-{\dot Q_{tot,elec}} = {RTF_{x}} \cdot \left( \frac{\dot m_{design,x}\cdot \Delta P}{{e_{tot,x}}\cdot {\rho_{air}}}\right)  +  {RTF_{x+1}} \cdot \left( \frac{\dot m_{design,x+1}\cdot \Delta P}{{e_{tot,x+1}}\cdot {\rho_{air}}}\right)
+{\dot Q_{tot,elec}} = {RTF_{x}} \cdot \left( \frac{\dot m_{design,x}\cdot \Delta P}{{e_{tot,x}}\cdot {\rho_{air}}}\right)  +  {RTF_{x+1}} \cdot \left( \frac{\dot m_{design,x+1}\cdot \Delta P}{{\varepsilon_{tot,x+1}}\cdot {\rho_{air}}}\right)
 \end{equation}
 
 The temperature of the air stream leaving the fan is calculated as above using this result for total power. 
 
-Continuous Speed Control
+\emph{\textbf{Continuous Speed Control}}
 
 For the \emph{Fan:SystemModel} using Continuous speed control the flow fraction is used to evaluate the power performance modification factor which is defined in a separate curve or table.  
 
@@ -166,12 +167,10 @@ For the \emph{Fan:SystemModel} using Continuous speed control the flow fraction 
 \end{equation}
 
 \begin{equation}
-{e_{tot,cur}} = \frac {( { \dot m_{cur} \cdot \Delta P  } )}{( {f_{power,cur}} \cdot { \dot Q_{tot, design} \cdot \rho_{air}})}
+{\varepsilon_{tot,cur}} = \frac {( { \dot m_{cur} \cdot \Delta P  } )}{( {f_{power,cur}} \cdot { \dot Q_{tot, design} \cdot \rho_{air}})}
 \end{equation}
 
-
-Fan:OnOff Fan Model
-
+\emph{\textbf{Fan:OnOff Fan Model}}
 
 The on/off fan model is similar to the simple fan model with the exception that the on/off fan may cycle on and off during a simulation time step. The cycling rate of the fan is known as the run time fraction. The calculation of run time fraction accounts for the part-load losses of other equipment used in the HVAC system. A part-load factor (a.k.a. part-load ratio) is first calculated for the fan as the ratio of the actual operating mass flow rate to the maximum fan mass flow rate. The run time fraction is then calculated as the part-load factor divided by the part-load fraction. The part-load fraction is determined by other HVAC equipment in the simulation (Ref. DX coil) for use by this specific fan model.
 
@@ -186,12 +185,12 @@ The on/off fan model is similar to the simple fan model with the exception that 
 The total fan power is then calculated as the maximum fan power multipled by the run time fraction.
 
 \begin{equation}
-{\mathop Q\limits^\cdot_{tot}} = RTF\left[ {\mathop m\limits^\cdot  \cdot \Delta P/\left( {{e_{tot}}\cdot {\rho_{air}}} \right)} \right]
+{\dot{Q}_{tot}} = RTF\left[ {\dot{m} \cdot \Delta P/\left( {{\varepsilon_{tot}}\cdot {\rho_{air}}} \right)} \right]
 \end{equation}
 
 The remaining calculations are the same as those described in the simple single-speed fan mode.
 
-Multi-Speed Fan Model
+\emph{\textbf{Multi-Speed Fan Model}}
 
 The model used to simulate a multi-speed fan relies on the general fan laws to correct for speed changes in the fan's motor and the corresponding change in fan power and fan total efficiency. Two performance curves are used to define the change in power and efficiency as shown below. The power ratio curve must be used to simulate a multi-speed fan. The power ratio curve modifies the fan power based on a change in fan speed according to the cubic fan law. Exponents other than 3 are allowed. The efficiency ratio curve is used to correct for changes in nominal efficiency at alternate fan speeds. If either or both of these curves are not provided, the ratio is assumed to be 1.
 
@@ -226,12 +225,12 @@ RTF = \frac{RTF}{N_{ratio}}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{tot}} = RTF\left[ {\frac{{\mathop m\limits^ \bullet  \Delta P}}{{{e_{tot}}{\rho_{air}}}}} \right]\left( {\frac{{PowerRatio}}{{EfficiencyRatio}}} \right)
+{\dot{Q}_{tot}} = RTF\left[ {\frac{{\dot{m} \Delta P}}{{{\varepsilon_{tot}}{\rho_{air}}}}} \right]\left( {\frac{{PowerRatio}}{{EfficiencyRatio}}} \right)
 \end{equation}
 
 Each of the performance curves described above may be used to model the performance of a multi-speed fan motor, however, the power ratio curve must be used to envoke the multi-speed simulation. These curves are used when the fan is used in an HVAC system having multiple flow rates (i.e., different flow rates in cooling and heating mode). If an HVAC system operates at the same speed in either cooling or heating mode, these curves are not required. When these curves are not used, the associated ratio term in the equation above is assumed to be 1. The remaining calculations are identical to the simple single-speed fan model described above.
 
-Variable Speed Fan Model
+\emph{\textbf{Variable Speed Fan Model}}
 
 The model for the variable speed fan is similar to the simple single-speed fan model except for a part load factor that multiplies the fan power consumption.
 
@@ -244,54 +243,56 @@ The model for the variable speed fan is similar to the simple single-speed fan m
 \end{equation}
 
 \begin{equation}
-{\dot Q_{tot}} = {f_{pl}}\cdot {\dot m_{design}}\cdot \Delta P/\left( {{e_{tot}}\cdot {\rho_{air}}} \right)
+{\dot Q_{tot}} = {f_{pl}}\cdot {\dot m_{design}}\cdot \Delta P/\left( {{\varepsilon_{tot}}\cdot {\rho_{air}}} \right)
 \end{equation}
 
 The rest of the calculation is the same as for the simple fan.
 
-\subsubsection{Nomenclature for Simple Models}\label{nomenclature-for-simple-models}
+The nomenclature for all of the simple models is as follows:
 
-\({\dot Q_{tot}}\) ~is the fan power in watts;
+\({\dot Q_{tot}}\) is the fan power (W)
 
-\(\dot m\) is the air mass flow in kg/s;
+\(\dot m\) is the air mass flow (kg/s)
 
-\({\dot m_{design,max}}\) is the design (maximum) air flow in kg/s;
+\({\dot m_{design,max}}\) is the design (maximum) air flow (kg/s)
 
-\(\Delta P\) is the fan design pressure increase in Pascals;
+\(\Delta P\) is the fan design pressure increase (Pa)
 
-\({e_{tot}}\) ~is the fan total efficiency;
+\({\varepsilon_{tot}}\) is the fan total efficiency
 
-\({\rho_{air}}\) is the air density at standard conditions in kg/m\(^{3}\);
+\({\rho_{air}}\) is the air density at standard conditions (kg/m\(^{3}\))
 
-\({e_{motor}}\) ~is the motor efficiency;
+\({\varepsilon_{motor}}\) is the motor efficiency
 
-\({\dot Q_{shaft}}\) is the fan shaft power in watts;
+\({\dot Q_{shaft}}\) is the fan shaft power (W)
 
-\({\dot Q_{toair}}\) is the power entering the air in watts;
+\({\dot Q_{toair}}\) is the power entering the air (W)
 
 \({N_{ratio}}\) is the ratio of actual fan flow rate (or speed) to maximum fan flow rate (or speed)
 
-\({h_{in}},{h_{out}}\) ~are the inlet and outlet air stream specific enthalpies in J/kg;
+\({h_{in}},{h_{out}}\) are the inlet and outlet air stream specific enthalpies (J/kg)
 
-\({w_{in}},{w_{out}}\) ~are the inlet and outlet air stream humidity ratios;
+\({w_{in}},{w_{out}}\) are the inlet and outlet air stream humidity ratios
 
-\({T_{out}}\) ~is the outlet air temperature in degrees C;
+\({T_{out}}\) is the outlet air temperature (\(^{\circ}\)C)
 
-\(PsyTdbFnHW\) is the EnergyPlus psychrometric routine relating enthalpy and humidity ratio to temperature;
+\(PsyTdbFnHW\) is an EnergyPlus psychrometric routine relating enthalpy and humidity ratio to temperature
 
-\({f_{flow}}\) is the flow fraction or part-load ratio;
+\({f_{flow}}\) is the flow fraction or part-load ratio
 
-\({f_{pl}}\) ~is the part load factor.
+\({f_{pl}}\) is the part load factor.
 
-Component Fan Model
+\emph{\textbf{Component Fan Model}}
 
 The Fan:ComponentModel object is based upon combining: modified forms of fan, belt, motor, and variable-frequency-drive (VFD) element models (Stein and Hydeman 2004); a simplified fan pressure rise model with distribution system leakage, duct static pressure, and conditioned space pressure control effects included (Sherman and Wray 2010); and a diagnostic-based simplified duct static-pressure reset (SPR) scheme for air-handling systems (Federspiel 2004, 2005).
 
 Fan \emph{electric} power depends on fan \emph{air} power (product of the airflow through and pressure rise across the fan), mechanical efficiencies (fan and belt), and electrical efficiencies (motor and drive). For systems with variable flows, none of these parameters is constant and all are interrelated. For example, Figure~\ref{fig:example-fan-performance-maps-manufacturers} shows that fan efficiency strongly depends on fan flow \emph{as well as} pressure rise, although this is not obvious from the manufacturer's power and speed performance map (top left). Fan efficiency maps can be derived from the manufacturer's performance map using a commercially-available software-based data extraction tool such as DigitizeIt and by applying the following equation to the extracted data:
 
-\({\eta_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{H_{fan}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{H_{fan}}}}
+\end{equation}
 
-where \textbf{Δ}\emph{P\(_{fan}\)}is the fan pressure rise (Pa); \emph{Q\(_{fan}\)} is the fan flow at standard conditions (m\(^{3}\)/s); and \emph{H\(_{fan}\)} is the fan shaft power (W). Fan speed values also can be derived from the manufacturer's performance map using a similar software-based data extraction tool.
+where \(\Delta P_{fan}\) is the fan pressure rise (Pa), \(Q_{fan}\) is the fan flow at standard conditions (m\(^{3}\)/s), and \(H_{fan}\) is the fan shaft power (W). Fan speed values also can be derived from the manufacturer's performance map using a similar software-based data extraction tool.
 
 Fan pressure rise must be sufficient to overcome the air-handling system pressure drop, which depends on duct static pressure, on duct and equipment leakage, and on pressure drops across duct and duct-like elements (e.g., dampers, fittings), coils, and filters that are connected to the fan. Duct and duct-like pressure drops increase approximately as the square of the flow through them. However, pressure drops across coils and filters behave differently: they are proportional to the flow raised to a power n, which can approach one for high-efficiency filters and wet coils (Liu et al. 2003, Trane 1999).
 
@@ -305,17 +306,22 @@ The relation between system pressure drop and flow defines what is commonly call
 
 \emph{Fan Pressure Rise Model}: To calculate fan pressure rise based on flow through the fan, Sherman and Wray (2010) have developed a simple physics-based data-driven four parameter duct system model for the purpose of simulating its system curve. The embodiment of the model for a fixed outdoor air fraction that can be applied to constant- or variable-volume central air-handling systems is:
 
-\(\Delta {P_{fan,tot}} = {A_{fpr}}Q_{fan}^2 + {B_{fpr}}Q_{fan}^{} + {C_{fpr}}Q_{fan}^{}\sqrt {{P_{sm}} - {P_o}} + {D_{fpr}}\left( {{P_{sm}} - {P_o}} \right)\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\Delta {P_{fan,tot}} = {A_{fpr}}Q_{fan}^2 + {B_{fpr}}Q_{fan}^{} + {C_{fpr}}Q_{fan}^{}\sqrt {{P_{sm}} - {P_o}} + {D_{fpr}}\left( {{P_{sm}} - {P_o}} \right)
+\label{eq:DeltaPfantot531}
+\end{equation}
 
-where \textbf{Δ}\emph{P\(_{fan,tot}\)} is the fan total pressure rise (Pa); \emph{Q\(_{fan}\)} is the fan flow at standard conditions (m\(^{3}\)/s); \emph{P\(_{sm}\)} is the duct static pressure set point (Pa); \emph{P\(_{o}\)} is the static pressure of the spaces surrounding the ducts (Pa); and \emph{A\(_{fpr}\)}, \emph{B\(_{fpr}\)}, \emph{C\(_{fpr}\)}, and \emph{D\(_{fpr}\)} are constant coefficients that represent different aspects of the fan pressure rise model as described below.
+where \(\Delta P_{fan,tot}\) is the fan total pressure rise (Pa), \(Q_{fan}\) is the fan flow at standard conditions (m\(^{3}\)/s), \(P_{sm}\) is the duct static pressure set point (Pa), \(P_{o}\) is the static pressure of the spaces surrounding the ducts (Pa), and \(A_{fpr}\), \(B_{fpr}\), \(C_{fpr}\), and \(D_{fpr}\) are constant coefficients that represent different aspects of the fan pressure rise model as described below.
 
 Fan static pressure rise is determined from the total pressure rise by subtracting the outlet velocity pressure:
 
-\(\Delta {P_{fan}} = \Delta {P_{fan,tot}} - \frac{\rho }{2}{\left( {\frac{{{Q_{fan}}}}{{{A_{fan,out}}}}} \right)^2}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\Delta {P_{fan}} = \Delta {P_{fan,tot}} - \frac{\rho }{2}{\left( {\frac{{{Q_{fan}}}}{{{A_{fan,out}}}}} \right)^2}
+\end{equation}
 
-where \emph{A\(_{fan,out}\)} is the fan outlet area (m\(^{2}\)) and \emph{ρ} is the air density at the fan inlet (kg/m\(^{3}\)).
+where \(A_{fan,out}\) is the fan outlet area (m\(^{2}\)) and \(\rho\) is the air density at the fan inlet (kg/m\(^{3}\)).
 
-The first term in Equation looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially ``leaks'' into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
+The first term in Equation~\ref{eq:DeltaPfantot531} looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially ``leaks'' into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
 
 The second term accounts for significant flow resistances in the system where the pressure difference is linearly proportional to the flow. Some filters and coils in the return may need this term to be adequately described. This term could be ignored if there are no linear components or if their pressure drops are very small compared to the other terms.
 
@@ -325,21 +331,33 @@ The last term also accounts in part for leakage from the supply system when damp
 
 In principle, especially for research applications of Energy Plus, the four individual fan pressure rise coefficients can be determined using duct design calculation tools for the entire system (e.g., Right-CommDuct, UNI-DUCT, Ductsize, Varitrane Duct Designer, T-Duct). In practice, however, especially for existing buildings, the necessary details may not be known sufficiently. In that case, one can make active measurements at different combinations of fan flows, outside air fractions, damper positions (if they are variable), and duct static pressures and then use non-linear system identification techniques to fit the data and determine the coefficients. If passive measurements can be made over a sufficiently long time so that a wide range of outside air settings, damper positions, and fan flows is obtained, one could instead regress the data to find all of the parameters in the equation. Unfortunately, there are no standardized test procedures available to draw upon, even though some standards appear to be related (e.g., ASHRAE 1999, 2008). Consequently, field test protocols need to be developed to determine the parameters for the new duct system model. These protocols then need to be integrated into standardized data collection and analysis tools such as Pacific Gas and Electric's ``Universal Translator'' tool. The California Energy Commission is funding such a project; data, procedures, and tools from this project will support the EnergyPlus implementation of the fan and duct system models described here.
 
-\emph{SPR Model}: The model for duct-static-pressure reset (SPR) is based on a simple diagnostic procedure and a linear correlation between duct static pressure and supply fan airflow (Federspiel 2004, 2005). The diagnostic method involves measuring the static pressure at the duct static pressure sensor and the velocity pressure at the fan inlet (represents the fan flow) at multiple points over the fan's operating range, while the VAV box dampers attempt to control flow in response to a constant thermostat setpoint. The goal of the test is to define the lowest duct static pressure where all VAV boxes are still in control (dampers modulating). In the model, the correlation between \emph{P\(_{sm}\)} and \emph{Q\(_{fan}\)} is as follows for \emph{Q\(_{fan,min}\)} ≤ \emph{Q\(_{fan}\)} ≤ \emph{Q\(_{fan,max}\)}:
+\emph{SPR Model}: The model for duct-static-pressure reset (SPR) is based on a simple diagnostic procedure and a linear correlation between duct static pressure and supply fan airflow (Federspiel 2004, 2005). The diagnostic method involves measuring the static pressure at the duct static pressure sensor and the velocity pressure at the fan inlet (represents the fan flow) at multiple points over the fan's operating range, while the VAV box dampers attempt to control flow in response to a constant thermostat setpoint. The goal of the test is to define the lowest duct static pressure where all VAV boxes are still in control (dampers modulating). In the model, the correlation between \emph{P\(_{sm}\)} and \emph{Q\(_{fan}\)} is as follows for \({Q_{fan,min}} \leq {Q_{fan}} \leq {Q_{fan,max}}\):
 
-\({P_{sm}} = {P_{sm,\min }} + \left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}\) ~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{P_{sm}} = {P_{sm,min }} + \left( {{P_{sm,max }} - {P_{sm,min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,min }}} \right)}}{{\left( {{Q_{fan,max }} - {Q_{fan,min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}
+\label{eq:Psm533}
+\end{equation}
 
-Where
+where:
 
-~\({C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}\) ~and \({C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{C_1} = {P_{sm,min }} - {C_2}*{Q_{fan,min }}
+\end{equation}
 
-For \emph{Q\(_{fan}\)} \textless{} \emph{Q\(_{fan,min}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,min}\)};for\emph{Q\(_{fan}\)} \textgreater{} \emph{Q\(_{fan,max}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,max}\)}
+\begin{equation}
+{C_2} = \frac{{\left( {{P_{sm,max }} - {P_{sm,min }}} \right)}}{{\left( {{Q_{fan,max }} - {Q_{fan,min }}} \right)}}
+\end{equation}
+
+For \emph{Q\(_{fan}\)} \textless{} \emph{Q\(_{fan,min}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,min}\)}; for\emph{Q\(_{fan}\)} \textgreater{} \emph{Q\(_{fan,max}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,max}\)}.
 
 \emph{Fan Efficiency and Shaft Input Power Model}: A dimensionless parameter in the form of an Euler number can be used to simplify the description of fan static efficiency variations:
 
-\(Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho * Q_{fan}^2} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho * Q_{fan}^2} \right)}}
+\label{eq:Eu535}
+\end{equation}
 
-where \textbf{Δ}\emph{P\(_{fan}\)} is the fan static pressure rise (Pa), \emph{D\(_{fan}\)} is the fan wheel outer diameter (m), \emph{ρ} is the air density at the fan inlet (kg/m\(^{3}\)), and \emph{Q\(_{fan}\)} is the fan flow at standard conditions (m\(^{3}\)/s). \emph{Eu} is nominally the ratio of pressure forces across the fan to inertial forces at the fan wheel exit.
+where \(\Delta {P_{fan}}\) is the fan static pressure rise (Pa), \({D_{fan}}\) is the fan wheel outer diameter (m), \(\rho\) is the air density at the fan inlet (kg/m\(^{3}\)), and \({Q_{fan}}\) is the fan flow at standard conditions (m\(^{3}\)/s). \emph{Eu} is nominally the ratio of pressure forces across the fan to inertial forces at the fan wheel exit.
 
 By plotting the normalized fan static efficiency (\emph{static efficiency / maximum static efficiency}) versus the logarithm base 10 of the normalized Euler number (\emph{Eu} \emph{/} \emph{Eu} \emph{at maximum static efficiency}), the dimensionless performance of various fan sizes is very similar (as one might expect from the ``fan laws''), but so also is the dimensionless performance of different \emph{types} of fans (e.g., single-inlet plenum fans, double-inlet housed centrifugal fans, mixed flow fans, vane axial fans, fans with backward or forward curved blades). An example of this correlation for the ``normal operation'' (non-stall) and stall regions of eight fans is shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}.
 
@@ -349,25 +367,52 @@ By plotting the normalized fan static efficiency (\emph{static efficiency / maxi
 \caption{Normalized Efficiency Curves for Eight Fans in Dimensionless Space *(BC = backward curved, FC = forward curved; SI = single inlet, DI = double inlet)* \protect \label{fig:normalized-efficiency-curves-for-eight-fans}}
 \end{figure}
 
-This model uses a continuous function to represent the normalized fan efficiency (\emph{η\(_{fan}\)}) variation. The normalized exponential-conditioned skew-normal functional relationship is:
+This model uses a continuous function to represent the normalized fan efficiency (\(\eta_{fan}\)) variation. The normalized exponential-conditioned skew-normal functional relationship is:
 
 \begin{equation}
 \frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
+\label{eq:etafanoveretafanmax}
 \end{equation}
 
-where
+where:
 
-x\(_{fan}\) = log\(_{10}\)(Eu / Eu\(_{max}\))
+\begin{equation}
+x_{fan} = log_{10}(Eu / Eu_{max})
+\end{equation}
 
-Z\(_{1}\) = (x\(_{fan}\) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{2}\) = ((e\(^{(c}\)fan\(^{*x}\)fan\(^{)}\)*d\(_{fan}\)*x\(_{fan}\)) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{3}\) = -a\(_{fan}\) / b\(_{fan}\)
+\begin{equation}
+Z_{1} = (x_{fan} - a_{fan}) / b_{fan}
+\end{equation}
 
-For conceptual design when only rough estimates are needed, a generic curve (also shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}) can be used and then one only needs to know the maximum efficiency (\emph{η\(_{fan,max}\)}) and \emph{Eu} at that maximum (\emph{Eu\(_{max}\)}) to entirely model the fan efficiency and hence fan power. The dimensionless coefficients for the generic normalized fan efficiency curve are as follows:
+\begin{equation}
+Z_{2} = ((e^{(c_{fan}*{x_{fan}})}*d_{fan}*x_{fan}) - a_{fan}) / b_{fan}
+\end{equation}
 
-\emph{a\(_{fan}\)} = -2.732094, \emph{b\(_{fan}\)} = 2.273014,\emph{c\(_{fan}\)} = 0.196344, \emph{d\(_{fan}\)} = 5.267518
+\begin{equation}
+Z_{3} = -a_{fan} / b_{fan}
+\end{equation}
+
+For conceptual design when only rough estimates are needed, a generic curve (also shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}) can be used and then one only needs to know the maximum efficiency (\(\eta_{fan,max}\)) and \emph{Eu} at that maximum (\(Eu_{max}\)) to entirely model the fan efficiency and hence fan power. The dimensionless coefficients for the generic normalized fan efficiency curve are as follows:
+
+\begin{equation}
+{a_{fan}} = -2.732094
+\end{equation}
+
+\begin{equation}
+{b_{fan}} = 2.273014
+\end{equation}
+
+\begin{equation}
+{c_{fan}} = 0.196344
+\end{equation}
+
+\begin{equation}
+{d_{fan}} = 5.267518
+\end{equation}
 
 In this case, the coefficient of determination R\(^{2}\) is 0.994. Also, the average and RMS differences between the efficiency values based on extracted data and the fitted generic curve are, respectively, about 0.5\% and 1.4\%; maximum differences are about ±9\%.
 
-If more accuracy is needed for a specific fan, a similarly shaped curve can be developed for that fan (using extracted data, Equation , and least-squares regression techniques), segmented into normal operation and stall regions with specific coefficients fitted for each region. Figure~\ref{fig:example-normalized-efficiency-data-for-one} shows an example, using the data from Figure~\ref{fig:example-fan-performance-maps-manufacturers}.
+If more accuracy is needed for a specific fan, a similarly shaped curve can be developed for that fan (using extracted data, Equation~\ref{eq:etafanoveretafanmax}, and least-squares regression techniques), segmented into normal operation and stall regions with specific coefficients fitted for each region. Figure~\ref{fig:example-normalized-efficiency-data-for-one} shows an example, using the data from Figure~\ref{fig:example-fan-performance-maps-manufacturers}.
 
 \begin{figure}[hbtp] % fig 210
 \centering
@@ -398,25 +443,31 @@ Stall & -2.354091 & 2.117493 & 0 & 2.753264 \tabularnewline
 
 In this case, the average and RMS differences between the efficiency values based on extracted data and fitted specific curve (R\(^{2}\) is 0.999) are, respectively, about -0.1\% and 0.3\%; maximum differences are about ±0.7\%. Field tests are especially needed to determine the coefficients for installed fans because fans are susceptible to ``system effects'' (e.g., inlet obstructions) that are not included in the manufacturer test data (AMCA 1990a).
 
-To determine fan efficiency and fan shaft power at a particular time step, first calculate the fan pressure rise (\textbf{Δ}\emph{P\(_{fan}\)}) using the time step fan flow (\emph{Q\(_{fan}\)}) and Equation (and also using Equations and if there is SPR). Next, calculate \emph{Eu} using Equation and then \emph{x\(_{fan}\)} (log\(_{10}\) normalized \emph{Eu}), which is based on \emph{Eu} and the specified \emph{Eu\(_{max}\)} (\emph{Eu} at maximum efficiency) for the fan. The corresponding normalized efficiency (\emph{η\(_{fan}\)}(\emph{x\(_{fan}\)}) \emph{/ η\(_{fan,max}\)}) is obtained using Equation . The fan efficiency (\emph{η\(_{fan}\)}(\emph{x\(_{fan}\)})) therefore is:
+To determine fan efficiency and fan shaft power at a particular time step, first calculate the fan pressure rise (\(\Delta P_{fan}\)) using the time step fan flow (\emph{Q\(_{fan}\)}) and Equation~\ref{eq:DeltaPfantot531} (and also using Equation~\ref{eq:Psm533} if there is SPR). Next, calculate \emph{Eu} using Equation~\ref{eq:Eu535} and then \emph{x\(_{fan}\)} (log\(_{10}\) normalized \emph{Eu}), which is based on \emph{Eu} and the specified \emph{Eu\(_{max}\)} (\emph{Eu} at maximum efficiency) for the fan. The corresponding normalized efficiency (\(\eta_{fan}(x_{fan})/eta_{fan,max}\)) is obtained using Equation~\ref{eq:etafanoveretafanmax}. The fan efficiency (\(\eta_{fan}(x_{fan})\)) therefore is:
 
-\({\eta_{fan}}\left( {{x_{fan}}} \right) = {\eta_{fan,\max }}\left[ {\frac{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}{{{\eta_{fan,\max }}}}} \right]\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{fan}}\left( {{x_{fan}}} \right) = {\eta_{fan,max }}\left[ {\frac{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}{{{\eta_{fan,max }}}}} \right]
+\end{equation}
 
 The fan shaft input power (mechanical, W) is:
 
-\({H_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{H_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}
+\end{equation}
 
-\emph{Fan Shaft Speed and Torque Modeling}: For rotating elements, power (\emph{H}) is the product of torque (\emph{τ}) and rotational speed (ω), or conversely, torque is power divided by rotational speed (\emph{τ = H / ω}).
+\emph{Fan Shaft Speed and Torque Modeling}: For rotating elements, power (\emph{H}) is the product of torque \(\tau\) and rotational speed \(\omega\), or conversely, torque is power divided by rotational speed \(\tau = H / \omega\).
 
-The Stein and Hydeman variable-frequency-drive (VFD) component model correlates VFD efficiency as a linear function of VFD fractional output power (i.e., motor input power). Available data for about 50 drives from Saftronics were apparently used to develop their model, but those data represent VFD efficiency as a function of motor fractional speed (\emph{ω\(_{motor}\) / ω\(_{motor,max}\)}, or nominally, drive output frequency divided by maximum output frequency, if motor slip is ignored).
+The Stein and Hydeman variable-frequency-drive (VFD) component model correlates VFD efficiency as a linear function of VFD fractional output power (i.e., motor input power). Available data for about 50 drives from Saftronics were apparently used to develop their model, but those data represent VFD efficiency as a function of motor fractional speed (\(\omega_{motor} / \omega_{motor,max}\), or nominally, drive output frequency divided by maximum output frequency, if motor slip is ignored).
 
-To make use of the available data, the Stein and Hydeman linear correlation must intrinsically make an assumption that motor speed and torque have some fixed relationship. Although not documented, their assumption might be the common belief that fractional torque (τ/ τ\(_{max}\)) for a motor is simply the square of its fractional speed. For fans serving duct systems with components such as filters and coils, with relatively low pressure drops elsewhere in the system, and for systems that have a non-zero controlled duct static pressure, this assumption may be inappropriate. Consequently, to make use of the available data and to avoid such assumptions, one needs to know the fraction of full speed at which fan components operate.
+To make use of the available data, the Stein and Hydeman linear correlation must intrinsically make an assumption that motor speed and torque have some fixed relationship. Although not documented, their assumption might be the common belief that fractional torque (\(\tau / \tau_{max}\)) for a motor is simply the square of its fractional speed. For fans serving duct systems with components such as filters and coils, with relatively low pressure drops elsewhere in the system, and for systems that have a non-zero controlled duct static pressure, this assumption may be inappropriate. Consequently, to make use of the available data and to avoid such assumptions, one needs to know the fraction of full speed at which fan components operate.
 
-For the fan, dimensionless flow (\emph{φ}) can be defined as (ASHRAE 1993):
+For the fan, dimensionless flow (\(\varphi\)) can be defined as (ASHRAE 1993):
 
-\(\varphi = \frac{{{Q_{fan}}}}{{{\omega_{fan}} \cdot D_{fan}^3}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\varphi = \frac{{{Q_{fan}}}}{{{\omega_{fan}} \cdot D_{fan}^3}} 
+\end{equation}
 
-where \emph{ω\(_{fan}\)} is the fan speed (rad/s). This parameter can be calculated for each operating point on the fan manufacturer's performance map that represents fan speed as a function of flow and fan pressure rise. To simplify the data representation to a single curve (as we have done for fan efficiency), one can plot normalized dimensionless flow (dimensionless flow divided by maximum dimensionless flow, (\emph{φ}(\emph{x\(_{fan}\)}) \emph{/} \emph{φ\(_{max}\)}) as a function of the log base 10 of the normalized Euler (\emph{Eu}) parameter (\emph{x\(_{fan}\)}). Figure~\ref{fig:example-normalized-dimensionless-flow-data} shows an example plot derived from the manufacturer's data in Figure~\ref{fig:example-fan-performance-maps-manufacturers}.
+where \(\omega_{fan}\) is the fan speed (rad/s). This parameter can be calculated for each operating point on the fan manufacturer's performance map that represents fan speed as a function of flow and fan pressure rise. To simplify the data representation to a single curve (as we have done for fan efficiency), one can plot normalized dimensionless flow (dimensionless flow divided by maximum dimensionless flow, (\(\varphi({x_{fan}}) / varphi_{max}\)) as a function of the log base 10 of the normalized Euler (\emph{Eu}) parameter (\emph{x\(_{fan}\)}). Figure~\ref{fig:example-normalized-dimensionless-flow-data} shows an example plot derived from the manufacturer's data in Figure~\ref{fig:example-fan-performance-maps-manufacturers}.
 
 \begin{figure}[hbtp] % fig 211
 \centering
@@ -424,9 +475,11 @@ where \emph{ω\(_{fan}\)} is the fan speed (rad/s). This parameter can be calcul
 \caption{Example Normalized Dimensionless Flow Data for One Fan \protect \label{fig:example-normalized-dimensionless-flow-data}}
 \end{figure}
 
-Equation describes the sigmoidal functional form for normalized \emph{φ}:
+The following equation describes the sigmoidal functional form for normalized \(\varphi\):
 
-\(\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}} = ({A_{spd}} + {B_{spd}}/({(1 + {e^{\left[ {{{({C_{spd}} - {x_{spd}})} \mathord{\left/ {\vphantom {{({C_{spd}} - {x_{spd}})} {{D_{spd}}}}} \right. } {{D_{spd}}}}} \right]}})^{{E_{spd}}}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}} = ({A_{spd}} + {B_{spd}}/({(1 + {e^{\left[ {{{({C_{spd}} - {x_{spd}})} \mathord{\left/ {\vphantom {{({C_{spd}} - {x_{spd}})} {{D_{spd}}}}} \right. } {{D_{spd}}}}} \right]}})^{{E_{spd}}}})
+\end{equation}
 
 where \emph{A\(_{spd}\)}, \emph{B\(_{spd}\)}, \emph{C\(_{spd}\)}, \emph{D\(_{spd}\)}, and \emph{E\(_{spd}\)} are coefficients for the fan. Separate sets of coefficients for the normal operation and stall regions can be specified. For the curve shown in Figure~\ref{fig:example-normalized-dimensionless-flow-data}, these coefficients are:
 
@@ -434,13 +487,13 @@ where \emph{A\(_{spd}\)}, \emph{B\(_{spd}\)}, \emph{C\(_{spd}\)}, \emph{D\(_{spd
 \begin{longtable}[c]{@{}llllll@{}}
 \caption{Dimensionless Flow Coefficients – Specific Backward-Curved Fan \label{table:dimensionless-flow-coefficients-specific}} \tabularnewline
 \toprule 
-Operating Region & A & B & C & D & E \tabularnewline
+Operating Region & A\(_{spd}\) & B\(_{spd}\) & C\(_{spd}\) & D\(_{spd}\) & E\(_{spd}\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Dimensionless Flow Coefficients – Specific Backward-Curved Fan} \tabularnewline
 \toprule 
-Operating Region & A & B & C & D & E \tabularnewline
+Operating Region & A\(_{spd}\) & B\(_{spd}\) & C\(_{spd}\) & D\(_{spd}\) & E\(_{spd}\) \tabularnewline
 \midrule
 \endhead
 
@@ -455,13 +508,13 @@ For a generic centrifugal fan with backward-curved blades, the coefficients are:
 \begin{longtable}[c]{@{}llllll@{}}
 \caption{Dimensionless Flow Coefficients – Generic Backward-Curved Fan \label{table:dimensionless-flow-coefficients-generic}} \tabularnewline
 \toprule 
-Operating Region & A & B & C & D & E \tabularnewline
+Operating Region & A\(_{spd}\) & B\(_{spd}\) & C\(_{spd}\) & D\(_{spd}\) & E\(_{spd}\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Dimensionless Flow Coefficients – Generic Backward-Curved Fan} \tabularnewline
 \toprule 
-Operating Region & A & B & C & D & E \tabularnewline
+Operating Region & A\(_{spd}\) & B\(_{spd}\) & C\(_{spd}\) & D\(_{spd}\) & E\(_{spd}\) \tabularnewline
 \midrule
 \endhead
 
@@ -470,33 +523,45 @@ Stall & 0.000608 & 0.586366 & 0.021775 & -0.063218 & 0.072827 \tabularnewline
 \bottomrule
 \end{longtable}
 
-For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\textbf{Δ}\emph{P\(_{fan}\)}), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\emph{φ}(\emph{x\(_{fan}\)}) \emph{/} \emph{φ\(_{max}\)}) from the sigmoidal dimensionless flow function (Equation ). With \emph{φ}(\emph{x\(_{fan}\)}) \emph{/} \emph{φ\(_{max}\)} determined and knowing \emph{φ\(_{max}\)} for the fan, the dimensionless flow is:
+For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\(\Delta {P_{fan}}\)), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\(\varphi {x_{fan}} / \varphi_{max}\)) from the sigmoidal dimensionless flow function (Equation ). With \(\varphi {x_{fan}} / \varphi_{max}\) determined and knowing \(\varphi_{max}\) for the fan, the dimensionless flow is:
 
-\(\varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]
+\end{equation}
 
-With \emph{φ}(\emph{x\(_{fan}\)}) determined, the fan rotational speed (rad/s) is:
+With \(\varphi {x_{fan}}\) determined, the fan rotational speed (rad/s) is:
 
-\({\omega_{fan}} = \frac{{{Q_{fan}}}}{{\left( {\varphi ({x_{fan}}) * D_{fan}^3} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\omega_{fan}} = \frac{{{Q_{fan}}}}{{\left( {\varphi ({x_{fan}}) * D_{fan}^3} \right)}}
+\end{equation}
 
 Fan shaft torque (N∙m), which the belt drive must supply to the fan shaft, is then:
 
-\({\tau_{fan}} = \frac{{{H_{fan}}}}{{{\omega_{fan}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\tau_{fan}} = \frac{{{H_{fan}}}}{{{\omega_{fan}}}} 
+\end{equation}
 
-The fraction of full-load driven torque for the belt (\emph{τ\(_{fan}\) / τ\(_{belt,max}\)}), which is typically called ``belt load'', is thus \emph{τ\(_{fan}\)} divided by the belt torque capacity (\emph{τ\(_{belt,max}\)}). For a particular belt type and cross-section, belt torque capacity can be determined from manufacturer's information such as a shaft speed versus power chart.
+The fraction of full-load driven torque for the belt (\(\tau_{fan} / \tau_{belt,max}\)), which is typically called ``belt load'', is thus \emph{\(\tau_{fan}\)} divided by the belt torque capacity (\(\tau_{belt,max}\)). For a particular belt type and cross-section, belt torque capacity can be determined from manufacturer's information such as a shaft speed versus power chart.
 
-Ignoring belt slip, motor shaft speed (\emph{ω\(_{motor}\)}, rad/s) can then be determined using the fan speed (\emph{ω\(_{fan}\)}) and the motor/fan pulley diameter ratio (\emph{D\(_{pulley,motor}\) / D\(_{pulley,fan}\)}), which is typically called the ``drive'' ratio:
+Ignoring belt slip, motor shaft speed (\(\omega_{motor}\), rad/s) can then be determined using the fan speed (\(\omega_{fan}\)) and the motor/fan pulley diameter ratio (\emph{D\(_{pulley,motor}\) / D\(_{pulley,fan}\)}), which is typically called the ``drive'' ratio:
 
-\({\omega_{motor}} = \frac{{{\omega_{fan}}}}{{\left( {\frac{{{D_{pulley,motor}}}}{{{D_{pulley,fan}}}}} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\omega_{motor}} = \frac{{{\omega_{fan}}}}{{\left( {\frac{{{D_{pulley,motor}}}}{{{D_{pulley,fan}}}}} \right)}}
+\end{equation}
 
 \emph{Belt, Motor, and Variable-Frequency-Drive Efficiency and Input Power Models -- Overview}: The models for belt drives, motors, and VFDs that Stein and Hydeman included in their air-handling system model represent maximum efficiency as a function of power input to the adjacent downstream component (e.g., the power input to a fan shaft by a belt drive), but they do not include part-load models. The part-load models are needed, because part-load efficiency for these components can fall off rapidly at low load (e.g., to zero at zero load) and many systems operate occasionally (and some much of the time) at low loads, in part because of current practices that result in substantial oversizing of components.
 
-\emph{Belt Efficiency and Input Power Model:} Figure~\ref{fig:belt-maximum-efficiency-vs.-fan-shaft-power} shows three maximum efficiency (\emph{η\(_{belt,max}\)}) curves for belts (low, medium, and high) as a function of maximum fan shaft torque. This set of efficiency curves is based on belt drive loss data from AMCA Publication 203 (1990b), which reportedly is an aggregation of data from over 400 tests.
+\emph{Belt Efficiency and Input Power Model:} Figure~\ref{fig:belt-maximum-efficiency-vs.-fan-shaft-power} shows three maximum efficiency (\(\eta_{belt,max}\)) curves for belts (low, medium, and high) as a function of maximum fan shaft torque. This set of efficiency curves is based on belt drive loss data from AMCA Publication 203 (1990b), which reportedly is an aggregation of data from over 400 tests.
 
-To determine \emph{η\(_{belt,max}\)} if data for a specific belt are not available, first use the maximum fan shaft input power (\emph{H\(_{fan,max}\)}) for the load spectrum to calculate the natural logarithm of belt power capacity:
+To determine \(\eta_{belt,max}\) if data for a specific belt are not available, first use the maximum fan shaft input power (\emph{H\(_{fan,max}\)}) for the load spectrum to calculate the natural logarithm of belt power capacity:
 
-\emph{x\(_{belt,max}\) =}ln(\emph{H\(_{fan,max}\)}) with \emph{H\(_{fan,max}\)} expressed in terms of hp~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+x_{belt,max} = ln({H_{fan,max}})
+\end{equation}
 
-Then, use Equations and , along with a choice of low, medium, or high efficiency coefficients from Table~\ref{table:belt-maximum-efficiency-curve-coefficients}, to calculate \emph{η\(_{belt,max}\)}.
+where \emph{H\(_{fan,max}\)} is expressed in terms of hp.
+
+Then, use the next two equations along with a choice of low, medium, or high efficiency coefficients from Table~\ref{table:belt-maximum-efficiency-curve-coefficients}, to calculate \(\eta_{belt,max}\).
 
 \begin{figure}[hbtp] % fig 212
 \centering
@@ -504,21 +569,23 @@ Then, use Equations and , along with a choice of low, medium, or high efficiency
 \caption{Belt Maximum Efficiency vs. Fan Shaft Power Input \protect \label{fig:belt-maximum-efficiency-vs.-fan-shaft-power}}
 \end{figure}
 
-The quartic polynomial curves in Figure~\ref{fig:belt-maximum-efficiency-vs.-fan-shaft-power} and their coefficients are as follows:
+The quardratic polynomial curves in Figure~\ref{fig:belt-maximum-efficiency-vs.-fan-shaft-power} and their coefficients are as follows:
 
-\({\eta_{belt,\max ,\ln }} = {c_1} + {c_2} \cdot {x_{belt,\max }} + {c_3} \cdot x_{_{belt,\max }}^2 + {c_4} \cdot x_{_{belt,\max }}^3 + {c_5} \cdot x_{_{belt,\max }}^4\) ~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{belt,max,ln}} = {c_1} + {c_2} \cdot {x_{belt,max}} + {c_3} \cdot x_{belt,max}^2 + {c_4} \cdot x_{belt,max}^3 + {c_5} \cdot x_{belt,max }^4
+\end{equation}
 
 % table 68
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
 \caption{Belt Maximum Efficiency Curve Coefficients \label{table:belt-maximum-efficiency-curve-coefficients}} \tabularnewline
 \toprule 
-Efficiency Class (Loss) & c & c & c & c & c \tabularnewline
+Efficiency Class (Loss) & \(c_1\) & \(c_2\) & \(c_3\) & \(c_4\) & \(c_5\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Belt Maximum Efficiency Curve Coefficients} \tabularnewline
 \toprule 
-Efficiency Class (Loss) & c & c & c & c & c \tabularnewline
+Efficiency Class (Loss) & \(c_1\) & \(c_2\) & \(c_3\) & \(c_4\) & \(c_5\) \tabularnewline
 \midrule
 \endhead
 
@@ -530,9 +597,11 @@ Low (High Loss) & -1.422E-1 & 5.112E-2 & -1.353E-2 & 1.814E-3 & -9.909E-5 \tabul
 
 The belt maximum efficiency is therefore:
 
-\({\eta_{belt,\max }} = {e^{{\eta_{belt,\max ,\ln }}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{belt,max }} = {e^{{\eta_{belt,max,ln}}}}
+\end{equation}
 
-The normalized \emph{part-load} belt efficiency model is provided to modify the maximum efficiency of the belt. This model is based on part-load data for belts in ACEEE's handbook on motor systems (Nadel et al. 2002). To determine the normalized belt efficiency at part-load (\emph{η\(_{belt}\)}(\emph{x\(_{belt}\)})/* η\(_{belt,max}\)\emph{), use the fan shaft (belt output) fractional torque (}x\(_{belt}\)* = \emph{τ\(_{belt}\)} / \emph{τ\(_{belt,max;}\) τ\(_{belt}\) = τ\(_{fan}\)}) as the belt fractional load in Equation or (select the equation for the region that contains \emph{x\(_{belt}\)}) and use coefficients from Table~\ref{table:belt-normalized-efficiency-curve-coefficients} that correspond to that region and the belt type: V-Belt or synchronous (toothed). Figure~\ref{fig:belt-normalized-efficiency-vs.-belt} shows a graphical representation of the curves defined by these equations and coefficients.
+The normalized \emph{part-load} belt efficiency model is provided to modify the maximum efficiency of the belt. This model is based on part-load data for belts in ACEEE's handbook on motor systems (Nadel et al. 2002). To determine the normalized belt efficiency at part-load (\(\eta_{belt} {x_{belt}}) / \eta_{belt,max}\)), use the fan shaft (belt output) fractional torque (\(x_{belt} = \tau_{belt} / \tau_{belt,max}\); \(\tau_{belt} = \tau_{fan}\)) as the belt fractional load in Equation~\ref{eq:etabeltoveretabeltmaxRegion1} or~\ref{eq:etabeltoveretabeltmaxRegion2} (select the equation for the region that contains \emph{x\(_{belt}\)}) and use coefficients from Table~\ref{table:belt-normalized-efficiency-curve-coefficients} that correspond to that region and the belt type: V-Belt or synchronous (toothed). Figure~\ref{fig:belt-normalized-efficiency-vs.-belt} shows a graphical representation of the curves defined by these equations and coefficients.
 
 \begin{figure}[hbtp] % fig 213
 \centering
@@ -544,21 +613,31 @@ The belt normalized (part-load) efficiency curves in Figure~\ref{fig:belt-normal
 
 Region 1 (0 \textless{} = \emph{x\(_{belt}\)} \textless{} \emph{x\(_{belt,trans}\)}) and Region 3 (\emph{x\(_{belt}\)} \textgreater{} 1):
 
-\(\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = \left[ {\frac{{{a_{belt}} \cdot {x_{belt}}}}{{{b_{belt}} + {x_{belt}}}}} \right] + {c_{belt}} \cdot {x_{belt}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,max}}}} = \left[ {\frac{{{a_{belt}} \cdot {x_{belt}}}}{{{b_{belt}} + {x_{belt}}}}} \right] + {c_{belt}} \cdot {x_{belt}}
+\label{eq:etabeltoveretabeltmaxRegion1}
+\end{equation}
 
 Region 2 (\emph{x\(_{belt,trans}\)} \textless{} = \emph{x\(_{belt}\)} \textless{} = 1):
 
-\(\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = {a_{belt}} + {b_{belt}} \cdot {e^{\left( {{c_{belt}} \cdot {x_{belt}}} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,max}}}} = {a_{belt}} + {b_{belt}} \cdot {e^{\left( {{c_{belt}} \cdot {x_{belt}}} \right)}}
+\label{eq:etabeltoveretabeltmaxRegion2}
+\end{equation}
 
-where x\(_{belt}\) = \(\tau\) \(_{belt}\) / \(\tau\) \(_{belt,max}\)
+where x\(_{belt}\) = \(\tau_{belt}\) / \(\tau_{belt,max}\)
 
 Belt efficiency therefore is:
 
-\({\eta_{belt}}({x_{belt}}) = {\eta_{belt,\max }}\left[ {\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}}} \right]\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{belt}}({x_{belt}}) = {\eta_{belt,max}}\left[ {\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}}} \right]
+\end{equation}
 
 Belt input power (mechanical, W) at the motor shaft is:
 
-\({H_{belt}} = \frac{{{H_{fan}}}}{{{\eta_{belt}}({x_{belt}})}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{H_{belt}} = \frac{{{H_{fan}}}}{{{\eta_{belt}}({x_{belt}})}}
+\end{equation}
 
 % table 69
 \begin{longtable}[l]{@{}llllll@{}}
@@ -583,7 +662,7 @@ Synchronous & 0.137 & 1 & 0.982167 & 0.049135 & 0.158164 \tabularnewline
 \bottomrule
 \end{longtable}
 
-\emph{Motor Efficiency and Input Power Model:} Figure~\ref{fig:maximum-motor-efficiency-vs.-belt-power-input} shows three maximum efficiency (\emph{η\(_{motor,max}\)}) curves for motors (low, medium, and high) as a function of rated motor output power (belt input power). This set of efficiency curves is based on maximum efficiency data in DOE's MotorMaster+ database (2003) from about 800 tests. It is provided for use in the absence of manufacturer's data.
+\emph{Motor Efficiency and Input Power Model:} Figure~\ref{fig:maximum-motor-efficiency-vs.-belt-power-input} shows three maximum efficiency (\(\eta_{motor,max}\)) curves for motors (low, medium, and high) as a function of rated motor output power (belt input power). This set of efficiency curves is based on maximum efficiency data in DOE's MotorMaster+ database (2003) from about 800 tests. It is provided for use in the absence of manufacturer's data.
 
 \begin{figure}[hbtp] % fig 214
 \centering
@@ -591,27 +670,34 @@ Synchronous & 0.137 & 1 & 0.982167 & 0.049135 & 0.158164 \tabularnewline
 \caption{Maximum Motor Efficiency vs. Belt Power Input (Motor Output) \protect \label{fig:maximum-motor-efficiency-vs.-belt-power-input}}
 \end{figure}
 
-To determine \emph{η\(_{motor,max}\)} if data for a specific motor are not available (e.g., as listed in Table~\ref{table:example-motor-normalized-efficiency-curve}), first use the maximum belt input power (\emph{H\(_{belt,max}\)}) for the load spectrum (multiplied by whatever oversizing factor may be desired) to calculate the natural logarithm of belt power capacity:
+To determine \(\eta_{motor,max}\) if data for a specific motor are not available (e.g., as listed in Table~\ref{table:example-motor-normalized-efficiency-curve}), first use the maximum belt input power (\emph{H\(_{belt,max}\)}) for the load spectrum (multiplied by whatever oversizing factor may be desired) to calculate the natural logarithm of belt power capacity:
 
-\emph{x\(_{motor,max}\) =}ln(\emph{H\(_{belt,max}\)}) with \emph{H\(_{belt,max}\)} expressed in terms of hp~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+x_{motor,max} = ln({H_{belt,max}})
+\end{equation}
 
-Then, use Equation , along with a choice of low, medium, or high efficiency coefficients from Table~\ref{table:motor-maximum-efficiency-curve-coefficients}, to calculate \emph{η\(_{motor,max}\)}.
+where \emph{H\(_{belt,max}\)} is expressed in terms of hp.
+
+Then, use Equation~\ref{eq:etamotormax}, along with a choice of low, medium, or high efficiency coefficients from Table~\ref{table:motor-maximum-efficiency-curve-coefficients}, to calculate \(\eta_{motor,max}\).
 
 The maximum motor efficiency curves in Figure~\ref{fig:maximum-motor-efficiency-vs.-belt-power-input} (single rectangular hyperbola type 1) and their coefficients are as follows:
 
-\({\eta_{motor,\max }} = \left[ {\frac{{{a_{motor,\max }} \cdot {x_{motor,\max }}}}{{{b_{motor,\max }} + {x_{motor,\max }}}}} \right] + {c_{motor,\max }}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{motor,max}} = \left[ {\frac{{{a_{motor,max}} \cdot {x_{motor,max}}}}{{{b_{motor,max}} + {x_{motor,max}}}}} \right] + {c_{motor,max}}
+\label{eq:etamotormax}
+\end{equation}
 
 % table 70
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Motor Maximum Efficiency Curve Coefficients \label{table:motor-maximum-efficiency-curve-coefficients}} \tabularnewline
 \toprule 
-Case & a & b & c \tabularnewline
+Case & \(a_{motor,max}\) & \(b_{motor,max}\) & \(c_{motor,max}\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Motor Maximum Efficiency Curve Coefficients} \tabularnewline
 \toprule 
-Case & a & b & c \tabularnewline
+Case & \(a_{motor,max}\) & \(b_{motor,max}\) & \(c_{motor,max}\) \tabularnewline
 \midrule
 \endhead
 
@@ -621,7 +707,7 @@ Low-Efficiency & 0.395895 & 3.065240 & 0.674321 \tabularnewline
 \bottomrule
 \end{longtable}
 
-The normalized \emph{part-load} motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE's MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (\emph{η\(_{motor}\)}(\emph{x\(_{motor}\)})/* η\(_{motor,max}\)\emph{), use the motor fractional power output (}x\(_{motor}\) = H\(_{belt}\)* / \emph{H\(_{belt,max}\)}) as the fraction of motor output power in Equation and use coefficients from Table~\ref{table:example-motor-normalized-efficiency-curve}, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer's data. Figure~\ref{fig:motor-normalized-efficiency-vs.-motor-load} shows a graphical representation of eight example curves defined by these equations and coefficients.
+The normalized \emph{part-load} motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE's MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (\(\eta_{motor}(x_{motor}) / \eta_{motor,max}\)), use the motor fractional power output (x\(_{motor}\) = H\(_{belt}\) / \emph{H\(_{belt,max}\)}) as the fraction of motor output power in Equation and use coefficients from Table~\ref{table:example-motor-normalized-efficiency-curve}, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer's data. Figure~\ref{fig:motor-normalized-efficiency-vs.-motor-load} shows a graphical representation of eight example curves defined by these equations and coefficients.
 
 \begin{figure}[hbtp] % fig 215
 \centering
@@ -631,7 +717,9 @@ The normalized \emph{part-load} motor efficiency model is provided to modify the
 
 The example motor normalized efficiency curves (single rectangular hyperbola type 2) and their coefficients as a function of motor load fraction in Figure~\ref{fig:motor-normalized-efficiency-vs.-motor-load} are determined from DOE MotorMaster+ data and are as follows:
 
-\(\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}} = \left[ {\frac{{{a_{PLmotor}} \cdot {x_{motor}}}}{{{b_{PLmotor}} + {x_{motor}}}}} \right] + {c_{PLmotor}} \cdot {x_{motor}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,max}}}} = \left[ {\frac{{{a_{PLmotor}} \cdot {x_{motor}}}}{{{b_{PLmotor}} + {x_{motor}}}}} \right] + {c_{PLmotor}} \cdot {x_{motor}}
+\end{equation}
 
 % table 71
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
@@ -661,13 +749,17 @@ Poles & Motor Rated Output (hp) & Maximum Efficiency & a\(_{Plmotor}\) & b\(_{Pl
 
 Motor efficiency therefore is:
 
-\({\eta_{motor}}({x_{motor}}) = {\eta_{motor,\max }}\left[ {\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}}} \right]\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{motor}}({x_{motor}}) = {\eta_{motor,max}}\left[ {\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,max}}}}} \right]
+\end{equation}
 
 Motor input power (electrical, W) is:
 
-\({H_{motor}} = \frac{{{H_{belt}}}}{{{\eta_{motor}}({x_{motor}})}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{H_{motor}} = \frac{{{H_{belt}}}}{{{\eta_{motor}}({x_{motor}})}}
+\end{equation}
 
-\emph{VFD Efficiency and Input Power Model:} For VFDs, published performance data are limited. Data from DOE (2008) suggest using a functional relation similar to that used for motors to represent VFD efficiency (\emph{η\(_{VFD}\)}) as a function of the fraction of full-load motor input power (\emph{x\(_{VFD}\) = H\(_{motor}\)} / \emph{H\(_{motor,max}\)}), as shown in Figure~\ref{fig:vfd-efficiency-vs.-fraction-of-motor-full}, or as a function of the fraction of full-load speed (\emph{x\(_{VFD}\) = ω\(_{motor}\) / ω\(_{motor,max}\)}), as shown in Figure~\ref{fig:vfd-efficiency-vs.-fraction-of-full-load}.
+\emph{VFD Efficiency and Input Power Model:} For VFDs, published performance data are limited. Data from DOE (2008) suggest using a functional relation similar to that used for motors to represent VFD efficiency (\(\eta_{VFD}\)) as a function of the fraction of full-load motor input power (\emph{x\(_{VFD}\) = H\(_{motor}\)} / \emph{H\(_{motor,max}\)}), as shown in Figure~\ref{fig:vfd-efficiency-vs.-fraction-of-motor-full}, or as a function of the fraction of full-load speed (\emph{x\(_{VFD}\) = \(\omega_{motor}\) / \(\omega_{motor,max}\)}), as shown in Figure~\ref{fig:vfd-efficiency-vs.-fraction-of-full-load}.
 
 \begin{figure}[hbtp] % fig 216
 \centering
@@ -683,7 +775,9 @@ Motor input power (electrical, W) is:
 
 The performance curve (single rectangular hyperbola type 2) used here for VFD efficiency is:
 
-\({\eta_{VFD}} = \left[ {\frac{{{a_{VFD}} \cdot {x_{VFD}}}}{{{b_{VFD}} + {x_{VFD}}}}} \right] + {c_{VFD}} \cdot {x_{VFD}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{VFD}} = \left[ {\frac{{{a_{VFD}} \cdot {x_{VFD}}}}{{{b_{VFD}} + {x_{VFD}}}}} \right] + {c_{VFD}} \cdot {x_{VFD}}
+\end{equation}
 
 Example coefficients derived from the DOE data as a function of the fraction of full-load motor input power are listed in Table~\ref{table:example-vfd-efficiency-curve-coefficients}.
 
@@ -716,15 +810,147 @@ VFD Rated Output Power (hp) & a\(_{vfd}\) & b\(_{vfd}\) & c\(_{vfd}\) \tabularne
 
 VFD input power (electrical, W) is:
 
-\({H_{VFD}} = \frac{{{H_{motor}}}}{{{\eta_{VFD}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{H_{VFD}} = \frac{{{H_{motor}}}}{{{\eta_{VFD}}}}
+\end{equation}
 
 \emph{System Total Efficiency: T}he combined efficiency of the fan system components (i.e., fan, belt, motor, and VFD) is:
 
-\({\eta_{TOTAL}} = {\eta_{fan}} \cdot {\eta_{belt}} \cdot {\eta_{motor}} \cdot {\eta_{VFD}}\) ~~~ \(\left( { = \frac{{{Q_{fan}} \cdot \Delta {P_{fan}}}}{{{H_{VFD}}}}} \right)\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\eta_{TOTAL}} = {\eta_{fan}} \cdot {\eta_{belt}} \cdot {\eta_{motor}} \cdot {\eta_{VFD}} ~~~ \left( { = \frac{{{Q_{fan}} \cdot \Delta {P_{fan}}}}{{{H_{VFD}}}}} \right)
+\end{equation}
 
 \emph{Heat Loss to Air}: To calculate the temperature rise from waste heat entering the air stream from the fan, belt, and motor, it is assumed that the user-specified ``motor in air fraction'' applies to the belt and motor but not to the VFD. The power ``lost'' to the air (W) is:
 
-\({\dot Q_{toair}} = {H_{fan}} + \left( {{H_{motor}} - {H_{fan}}} \right) \cdot {f_{motortoair}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+{\dot Q_{toair}} = {H_{fan}} + \left( {{H_{motor}} - {H_{fan}}} \right) \cdot {f_{motortoair}}
+\end{equation}
+
+\subsection{Fan Energy Index}\label{fan-energy-index}
+
+Fan Energy Index (FEI) is an energy-efficiency metric for fans including their motors and drives. This metric provides a standardized and consistent basis for comparing fan energy performance across fan types and sizes at a given fan operating point. Fan specifiers can use it to understand and communicate fan-efficiency design intent, while legislative and regulatory bodies can use it to define energy-efficiency requirements of fans.
+
+ANSI/AMCA Standard 208-18 defines the calculation method for FEI. The standard has been written to support the adoption of energy efficient fans in the energy and construction codes and standards (e.g., ASHRAE Standards 90.1, 189.1, and California Appliances Standards Title 20) and to support utility rebate programs. FEI is a replacement for fan efficiency grade (FEG), a metric currently referenced in model energy codes and standards such as ASHRAE 90.1, ASHRAE 189.1, and IECC and in federal regulations in several Asian countries.
+
+FEI is defined as a ratio of the electrical input power of a reference fan to the electrical input power of the actual fan for which the FEI is calculated, both calculated at the same duty point, i, which is characterized by a value of airflow \((Q_i)\) and pressure (\(P_{t,i}\) or \(P_{s,i}\)). FEI can be calculated for each point on a fan curve.
+
+FEI is reported in the EquipmentSummary table report in the Fans subtable.
+
+\begin{equation}
+FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP_{ref,i}}{FEP_{act,i}}
+\label{eq:fei_calculation}
+\end{equation}
+
+where:
+
+\(FEI_{t,i}\) is the FEI based on fan total pressure
+
+\(FEI_{s,i}\) is the FEI based on fan static pressure.
+
+The FEI is reported for \emph{Fan:SystemModel}, \emph{Fan:ConstantVolume},\emph{Fan:OnOff}, \emph{Fan:VariableVolume}, and \emph{Fan:ZoneExhaust} objects. User defined Fan objects are used to simulate the actual fan electrical input power \(FEP_{act,i}\) at the design operating point. The reference fan electrical input power \(FEP_{ref,i}\) is calculated using the following method.
+
+Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI. For all EnergyPlus fans (except) \emph{Fan:ComponentModel}) total pressure is defined. So the FEI is reportable only for limited category of fans that are calculated based on the fan total pressure, namely Centrifugal Housed, Centrifugal Inline, Centrifugal PRV Supply, Axial Inline, Laboratory Exhaust, Jet Fan and Circulating. 
+
+The reference fan concept is used to normalize the FEI calculation to a consistent power level independent of fan type, fan drive components or any regulatory requirements. The reference fan electrical input power is a function of airflow and fan pressure. The reference fan is defined as one that requires a certain reference fan shaft power, uses a V-belt drive, has a motor efficiency based on the IE3 level for a four-pole 60 Hz motor and does not have a speed control.
+
+\begin{equation}
+FEP_{ref,i}=H_{i,ref}(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) 
+\label{eq:fep_calculation}
+\end{equation}
+
+where:
+
+\(H_{i,ref}\) is the reference fan shaft power (kW)
+
+\(\eta_{trans,ref}\) is the reference fan transmission efficiency
+
+\(\eta_{mtr,ref}\) is the reference fan motor efficiency
+
+\(\eta_{ctrl,ref}\) is the reference fan motor controller efficiency
+
+\emph{Reference fan shaft power}
+
+Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis:
+
+\begin{equation}
+H_{i,ref}=\frac{(Q_i + Q_0)(P_{t,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0}
+\label{eq:Href_calculation}
+\end{equation}
+
+where:
+
+\(Q_i\) is the fan air flow (\(m^3/s\))
+
+\(P_{t,i}\) is the fan total pressure (Pa)
+
+\(\rho\) is the air density (\(kg/m^3\))
+
+\(\rho_{std}\) is the standard air density (1.2 \(kg/m^3\))
+
+\(Q_0\) is 0.118 \(m^3/s\)
+
+\(P_0\) is 100 Pa
+
+\(\eta_0\) is 66\%.
+
+\emph{Reference fan transmission efficiency}
+
+For consistency, the reference fan is defined as one having a V-belt drive transmission, regardless of the drive arrangement of the actual fan for which the FEI is calculated. The reference fan transmission efficiency is calculated using the same equations as found in ANSI/AMCA Standard 207 for V-belt drives:
+
+\begin{equation}
+eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05}
+\label{eq:eta_trans_calculation}
+\end{equation}
+
+\emph{Reference fan motor efficiency}
+
+The reference fan is defined as having a motor efficiency based on the IE3 level for a four-pole 60 Hz motor. In order to simplify the calculation of part load efficiency for this reference fan motor and to avoid sizing and otherwise identifying a specific motor for this reference fan, a curve fit is used through the IE3 motor efficiency requirements. The result is a reference motor efficiency that varies continuously based on the required motor output power.
+
+Reference fan motor output power:
+
+\begin{equation}
+H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}}
+\label{eq:eta_ref_calculation}
+\end{equation}
+
+The reference fan motor efficiency is calculated according to Equation~\ref{eq:eta_mtr_calculation} using the coefficients A–E found in Table~\ref{table:reference-motor-efficiency-coefficients}:
+
+\begin{equation}
+\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E
+\label{eq:eta_mtr_calculation}
+\end{equation}
+
+% table 73
+\begin{longtable}[c]{p{1.0in}p{1.5in}p{1.5in}}
+\caption{Reference Motor Efficiency Coefficients \label{table:reference-motor-efficiency-coefficients}} \tabularnewline
+\toprule 
+Type & \(H_{t,ref}\)$<$185 kW ($<$250 BHP) & \(H_{t,ref}\)$\geq$185 kW ($\geq$250 BHP) \tabularnewline \midrule
+\midrule
+\endfirsthead
+
+\caption[]{Reference Motor Efficiency Coefficients} \tabularnewline
+\toprule 
+Type & \(H_{t,ref}\)$<$185 kW ($<$250 BHP) & \(H_{t,ref}\)$\geq$185 kW ($\geq$250 BHP) \tabularnewline \midrule
+\midrule
+\endhead
+
+A & -0.003812 & 0 \tabularnewline
+B & 0.025834 & 0 \tabularnewline
+C & -0.072577 & 0 \tabularnewline
+D & 0.125559 & 0 \tabularnewline
+E & 0.850274 & 0.962 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{Reference fan motor controller efficiency}
+
+
+The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100$\%$.
+
+\begin{equation}
+\eta_{ctrl,ref} = 1
+\label{eq:eta_ctrl_calculation}
+\end{equation}
 
 \subsection{References}\label{references-002}
 

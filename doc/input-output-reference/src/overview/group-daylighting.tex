@@ -99,7 +99,7 @@ Daylight glare from a window depends on occupant view direction. It is highest w
 
 \paragraph{Field: Maximum Allowable Discomfort Glare Index}\label{field-maximum-allowable-discomfort-glare-index}
 
-If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at Daylighting:ReferencePoint specified in the Glare Calculation Daylighting Reference Point Name field exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in WindowProperty:ShadingControl for one or more windows in the zone (see WindowProperty:ShadingControl). This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
+If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at Daylighting:ReferencePoint specified in the Glare Calculation Daylighting Reference Point Name field exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in WindowShadingControl for one or more windows in the zone (see WindowShadingControl). This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 If a zone has two or more windows with glare control, the shading devices will be deployed one by one in the order in which the windows are input until the glare level at each reference point falls below Maximum Allowable Discomfort Glare Index or is as close as possible to it.
 
@@ -212,7 +212,7 @@ An IDF example:
 
 \end{lstlisting}
 
-\subsection{Guidelines for Daylighting Modeling Ssing the SplitFlux Method)}\label{guidelines-for-daylighting-modeling-splitflux-method}
+\subsection{Guidelines for Daylighting Modeling Using the SplitFlux Method)}\label{guidelines-for-daylighting-modeling-splitflux-method}
 
 Following are some guidelines for preparing EnergyPlus input to model the effects of daylighting when using the SplitFlux method. Before studying these guidelines, however, you should read the description of each input field under Daylighting:Controls, Daylighting:ReferencePoint, and review the IDF example, above, and the sample daylighting input, PurchAirWithDaylighting.idf.
 
@@ -338,9 +338,9 @@ Figure~\ref{fig:configuration-in-which-daylighting-of-zone-z} shows schematicall
 
 There are two restrictions on the use of exterior-window shading devices when a daylit zone has interior windows:
 
-1)~~~If two daylit zones share an interior window, neither zone can have an exterior window whose shading device does glare control (i.e., the WindowProperty:ShadingControl for the exterior window has Glare Control Is Active = Yes).
+1)~~~If two daylit zones share an interior window, neither zone can have an exterior window whose shading device does glare control (i.e., the WindowShadingControl for the exterior window has Glare Control Is Active = Yes).
 
-2)~~~If two daylit zones share an interior window, neither zone can have an exterior window with a WindowProperty:ShadingControl that has Shading Control Type = MeetDaylightIlluminanceSetpoint.
+2)~~~If two daylit zones share an interior window, neither zone can have an exterior window with a WindowShadingControl that has Shading Control Type = MeetDaylightIlluminanceSetpoint.
 
 \subsection{DElight Daylighting Method}\label{delight-daylighting-method}
 
@@ -521,7 +521,7 @@ The amount by which the overhead electric lighting power in a zone is multiplied
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
-The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with Daylighting:Controls, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone.
+The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with Daylighting:Controls, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in Daylighting:Controls object. 
 
 \subsubsection{Inputs}\label{inputs-4-006}
 
@@ -1061,9 +1061,9 @@ Option & Object/Field or Output Variable & Input File \tabularnewline
 Allow a thermal zone to be daylit & Daylighting:Controls, Daylighting:ReferencePoint & PurchAirWithDaylighting.idf, DElight-Detailed-Comparison.idf \tabularnewline
 Specify visible transmittance of the glazing & WindowMaterial:Glazing & PurchAirWithDaylighting.idf \tabularnewline
 Specify the visible transmittance of a shading device & WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind & PurchAirWindowBlind.idf \tabularnewline
-Use a shading device to control glare & WindowMaterial:Shade or WindowMaterial:Blind; WindowProperty:ShadingControl* & PurchAirWindowBlind.idf \tabularnewline
-Use electrochromic glazing to control glare & WindowProperty:ShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = On If High Glare, Glare Control Is Active = Yes* & PurchAirWithDaylighting.idf \tabularnewline
-Adjust electrochromic glazing to just meet daylighting illuminance setpoint & WindowProperty:ShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = MeetDaylightIlluminanceSetpoint* & ~ \tabularnewline
+Use a shading device to control glare & WindowMaterial:Shade or WindowMaterial:Blind; WindowShadingControl* & PurchAirWindowBlind.idf \tabularnewline
+Use electrochromic glazing to control glare & WindowShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = On If High Glare, Glare Control Is Active = Yes* & PurchAirWithDaylighting.idf \tabularnewline
+Adjust electrochromic glazing to just meet daylighting illuminance setpoint & WindowShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = MeetDaylightIlluminanceSetpoint* & ~ \tabularnewline
 Print an illuminance map & Daylighting:Illuminance Map* & ~ \tabularnewline
 Control electric lighting response to daylight illuminance level & Daylighting:Controls/Lighting Control Type = Continuous, Stepped or Continuous/Off, plus other fields; or …. & PurchAirWithDaylighting.idf; DElight-Detailed-Comparison.idf \tabularnewline
 Add a light shelf (with Daylighting:Controls) & DaylightingDevice:Shelf * & DaylightingDeviceShelf.idf \tabularnewline

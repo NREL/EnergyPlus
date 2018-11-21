@@ -52,9 +52,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -64,32 +65,36 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Fans;
 
-TEST_F( EnergyPlusFixture, Fans_FanSizing )
+TEST_F(EnergyPlusFixture, Fans_FanSizing)
 {
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
-	NumFans = 1;
-	Fan.allocate( NumFans );
-	FanNumericFields.allocate( NumFans );
-	FanNumericFields( NumFans ).FieldNames.allocate( 3 );
+    CurZoneEqNum = 0;
+    CurSysNum = 0;
+    CurOASysNum = 0;
+    NumFans = 1;
+    Fan.allocate(NumFans);
+    FanNumericFields.allocate(NumFans);
+    FanNumericFields(NumFans).FieldNames.allocate(3);
 
-	int FanNum = 1;
-	Fan( FanNum ).FanName = "Test Fan";
-	Fan( FanNum ).FanType = "Fan:OnOff";
-	Fan( FanNum ).FanType_Num = FanType_SimpleOnOff;
-	Fan( FanNum ).MaxAirFlowRate = AutoSize;
-	Fan( FanNum ).FanEff = 0.4; // Prevent divide by zero computing RatedPower
+    int FanNum = 1;
+    Fan(FanNum).FanName = "Test Fan";
+    Fan(FanNum).FanType = "Fan:OnOff";
+    Fan(FanNum).FanType_Num = FanType_SimpleOnOff;
+    Fan(FanNum).MaxAirFlowRate = AutoSize;
+    Fan(FanNum).DeltaPress = 500.0;
+    Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
 
-	FanNumericFields( FanNum ).FieldNames( 3 ) = "Maximum Flow Rate";
+    DataEnvironment::StdRhoAir = 1.2;
 
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
+    FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 
-	// DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-	DataNonZoneNonAirloopValue = 1.00635;
-	SizeFan( FanNum );
-	EXPECT_DOUBLE_EQ( 1.00635, Fan( FanNum ).MaxAirFlowRate );
-	DataNonZoneNonAirloopValue = 0.0;
+    CurZoneEqNum = 0;
+    CurSysNum = 0;
+    CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataNonZoneNonAirloopValue = 1.00635;
+    SizeFan(FanNum);
+    EXPECT_DOUBLE_EQ(1.00635, Fan(FanNum).MaxAirFlowRate);
+    DataNonZoneNonAirloopValue = 0.0;
+    EXPECT_NEAR(1.0371, Fan(FanNum).DesignPointFEI, 0.0001);
 }

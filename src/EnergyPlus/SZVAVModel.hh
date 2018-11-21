@@ -61,69 +61,79 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <FanCoilUnits.hh>
 #include <General.hh>
-#include <HVACUnitarySystem.hh>
 #include <PackagedTerminalHeatPump.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
 namespace SZVAVModel {
 
-	// Data
-	// This module should not contain variables in the module sense as it is
-	// intended strictly to provide "interfaces" to routines used by other
-	// parts of the simulation.
+    // Data
+    // This module should not contain variables in the module sense as it is
+    // intended strictly to provide "interfaces" to routines used by other
+    // parts of the simulation.
 
-	// MODULE PARAMETER DEFINITIONS
-	// na
+    // MODULE PARAMETER DEFINITIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// INTERFACE DEFINITIONS
+    // INTERFACE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE General
-	//PUBLIC  SaveCompDesWaterFlow
-	//PUBLIC  ErfFunction
+    // SUBROUTINE SPECIFICATIONS FOR MODULE General
+    // PUBLIC  SaveCompDesWaterFlow
+    // PUBLIC  ErfFunction
 
-	// Functions
+    // Functions
 
-	void
-	calcSZVAVModel(
-		HVACUnitarySystem::UnitarySystemData & SZVAVModel,
-		int const & SysIndex,
-		bool const & FirstHVACIteration,
-		bool const & CoolingLoad,
-		bool const & HeatingLoad,
-		Real64 const & ZoneLoad,
-		Real64 & OnOffAirFlowRatio,
-		bool const & HXUnitOn,
-		int const & AirLoopNum,
-		Real64 & PartLoadFrac,
-		int const & CompressorONFlag
-	);
+    void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
+                        int const &SysIndex,
+                        bool const &FirstHVACIteration,
+                        bool const &CoolingLoad,
+                        bool const &HeatingLoad,
+                        Real64 const &ZoneLoad,
+                        Real64 &OnOffAirFlowRatio,
+                        bool const &HXUnitOn,
+                        int const &AirLoopNum,
+                        Real64 &PartLoadFrac,
+                        int const &CompressorONFlag
 
-	void
-	calcSZVAVModel(
-		PackagedTerminalHeatPump::PTUnitData & SZVAVModel,
-		int const & SysIndex,
-		bool const & FirstHVACIteration,
-		bool const & CoolingLoad,
-		bool const & HeatingLoad,
-		Real64 const & ZoneLoad,
-		Real64 & OnOffAirFlowRatio,
-		bool const & HXUnitOn,
-		int const & AirLoopNum,
-		Real64 & PartLoadFrac,
-		int const & CompressorONFlag
+    );
 
-	);
+    void calcSZVAVModel(FanCoilUnits::FanCoilData &SZVAVModel,
+                        int const &SysIndex,
+                        bool const &FirstHVACIteration,
+                        bool const &CoolingLoad,
+                        bool const &HeatingLoad,
+                        Real64 const &ZoneLoad,
+                        Real64 &OnOffAirFlowRatio,
+                        bool const &HXUnitOn,
+                        int const &AirLoopNum,
+                        Real64 &PartLoadFrac,
+                        int const &CompressorONFlag
 
-} // SZVAVModel
+    );
 
-} // EnergyPlus
+    void calcSZVAVModel(UnitarySystems::UnitarySys &SZVAVModel,
+                        int const &SysIndex,
+                        bool const &FirstHVACIteration,
+                        bool const &CoolingLoad,
+                        bool const &HeatingLoad,
+                        Real64 const &ZoneLoad,
+                        Real64 &OnOffAirFlowRatio,
+                        bool const &HXUnitOn,
+                        int const &AirLoopNum,
+                        Real64 &PartLoadFrac,
+                        int const &CompressorONFlag);
+
+} // namespace SZVAVModel
+
+} // namespace EnergyPlus
 
 #endif

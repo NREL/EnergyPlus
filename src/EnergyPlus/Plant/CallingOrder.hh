@@ -51,22 +51,21 @@
 #include <Plant/MeterData.hh>
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct PlantCallingOrderInfoStruct {
-            // Members
-            int LoopIndex; // plant or condenser loop indexes in calling order
-            int LoopSide; // plant or condenser loop sides in calling order
-            int LoopPumpSimulationType; // type of pump topology on half loop
+    struct PlantCallingOrderInfoStruct
+    {
+        // Members
+        int LoopIndex;              // plant or condenser loop indexes in calling order
+        int LoopSide;               // plant or condenser loop sides in calling order
+        int LoopPumpSimulationType; // type of pump topology on half loop
 
-            // Default Constructor
-            PlantCallingOrderInfoStruct() :
-                    LoopIndex(0),
-                    LoopSide(0),
-                    LoopPumpSimulationType(0) {}
-
-        };
-    }
-}
+        // Default Constructor
+        PlantCallingOrderInfoStruct() : LoopIndex(0), LoopSide(0), LoopPumpSimulationType(0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

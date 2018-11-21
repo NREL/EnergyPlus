@@ -57,123 +57,140 @@
 
 namespace EnergyPlus {
 
-	class SQLiteFixture : public EnergyPlusFixture
-	{
+class SQLiteFixture : public EnergyPlusFixture
+{
 
-	protected:
-		static void SetUpTestCase() { EnergyPlusFixture::SetUpTestCase(); }
-		static void TearDownTestCase() { }
+protected:
+    static void SetUpTestCase()
+    {
+        EnergyPlusFixture::SetUpTestCase();
+    }
+    static void TearDownTestCase()
+    {
+    }
 
-		std::shared_ptr<std::ostringstream> ss;
+    std::shared_ptr<std::ostringstream> ss;
 
-		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-			ss = std::make_shared<std::ostringstream>();
-			// Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
-			ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
-			ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
-			ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
-			EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
-			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
-			ss->str(std::string());
-		}
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+        ss = std::make_shared<std::ostringstream>();
+        // Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
+        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, ":memory:", "std::ostringstream", true, true)));
+        ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
+        ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
+        EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
+        EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
+        ss->str(std::string());
+    }
 
-		virtual void TearDown() {
-			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-		}
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
 
-		void resetDatabase() {
-			ss = std::make_shared<std::ostringstream>();
-			ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
-			ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
-			ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
-			EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
-			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
-			ss->str(std::string());
-		}
+    void resetDatabase()
+    {
+        ss = std::make_shared<std::ostringstream>();
+        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, ":memory:", "std::ostringstream", true, true)));
+        ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
+        ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
+        EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
+        EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
+        ss->str(std::string());
+    }
 
-		std::string storageType( const int storageTypeIndex ) {
-			return EnergyPlus::sqlite->storageType( storageTypeIndex );
-		}
+    std::string storageType(const int storageTypeIndex)
+    {
+        return EnergyPlus::sqlite->storageType(storageTypeIndex);
+    }
 
-		std::string timestepTypeName( const int timestepType ) {
-			return EnergyPlus::sqlite->timestepTypeName( timestepType );
-		}
+    std::string timestepTypeName(const int timestepType)
+    {
+        return EnergyPlus::sqlite->timestepTypeName(timestepType);
+    }
 
-		std::string reportingFreqName( const int reportingFreqIndex ) {
-			return EnergyPlus::sqlite->reportingFreqName( reportingFreqIndex );
-		}
+    std::string reportingFreqName(const int reportingFreqIndex)
+    {
+        return EnergyPlus::sqlite->reportingFreqName(reportingFreqIndex);
+    }
 
-		std::string columnText( const unsigned char* column ) {
-			return std::string( reinterpret_cast<const char*>( column ) );
-		}
+    std::string columnText(const unsigned char *column)
+    {
+        return std::string(reinterpret_cast<const char *>(column));
+    }
 
-		int logicalToInteger( const bool value ) {
-			return EnergyPlus::sqlite->logicalToInteger(value);
-		}
+    int logicalToInteger(const bool value)
+    {
+        return EnergyPlus::sqlite->logicalToInteger(value);
+    }
 
-		void adjustReportingHourAndMinutes( int & hour, int & minutes ) {
-			EnergyPlus::sqlite->adjustReportingHourAndMinutes( hour, minutes );
-		}
+    void adjustReportingHourAndMinutes(int &hour, int &minutes)
+    {
+        EnergyPlus::sqlite->adjustReportingHourAndMinutes(hour, minutes);
+    }
 
-		bool indexExists( const std::string& indexName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma index_info(" + indexName + ");");
-			bool success = false;
-			int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return success;
-			}
-			if ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				success = true;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return success;
-		}
+    bool indexExists(const std::string &indexName)
+    {
+        sqlite3_stmt *sqlStmtPtr;
+        std::string sql("pragma index_info(" + indexName + ");");
+        bool success = false;
+        int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
+        if (SQLITE_OK != rc) {
+            sqlite3_finalize(sqlStmtPtr);
+            return success;
+        }
+        if (SQLITE_ROW == sqlite3_step(sqlStmtPtr)) {
+            success = true;
+        }
+        sqlite3_finalize(sqlStmtPtr);
+        return success;
+    }
 
-		int columnCount( const std::string& tableName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma table_info(" + tableName + ");");
-			int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return -1;
-			}
-			int rowCount = 0;
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				++rowCount;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return rowCount;
-		}
+    int columnCount(const std::string &tableName)
+    {
+        sqlite3_stmt *sqlStmtPtr;
+        std::string sql("pragma table_info(" + tableName + ");");
+        int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
+        if (SQLITE_OK != rc) {
+            sqlite3_finalize(sqlStmtPtr);
+            return -1;
+        }
+        int rowCount = 0;
+        while (SQLITE_ROW == sqlite3_step(sqlStmtPtr)) {
+            ++rowCount;
+        }
+        sqlite3_finalize(sqlStmtPtr);
+        return rowCount;
+    }
 
-		std::vector < std::vector < std::string > > queryResult( const std::string& statement, const std::string& tableName ) {
-			std::vector < std::vector < std::string > > queryVector;
+    std::vector<std::vector<std::string>> queryResult(const std::string &statement, const std::string &tableName)
+    {
+        std::vector<std::vector<std::string>> queryVector;
 
-			int rowCount = columnCount( tableName );
-			if ( rowCount < 1 ) return queryVector;
+        int rowCount = columnCount(tableName);
+        if (rowCount < 1) return queryVector;
 
-			sqlite3_stmt* sqlStmtPtr;
+        sqlite3_stmt *sqlStmtPtr;
 
-			sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				std::vector < std::string > valueVector;
-				for ( int i = 0; i < rowCount; ++i ) {
-					auto sqlite_value = sqlite3_column_text(sqlStmtPtr, i);
-					if (nullptr == sqlite_value) {
-						valueVector.push_back("");
-					} else {
-						valueVector.push_back(columnText(sqlite_value));
-					}
-				}
-				queryVector.push_back(valueVector);
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return queryVector;
-		}
-	};
+        sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
+        while (SQLITE_ROW == sqlite3_step(sqlStmtPtr)) {
+            std::vector<std::string> valueVector;
+            for (int i = 0; i < rowCount; ++i) {
+                auto sqlite_value = sqlite3_column_text(sqlStmtPtr, i);
+                if (nullptr == sqlite_value) {
+                    valueVector.push_back("");
+                } else {
+                    valueVector.push_back(columnText(sqlite_value));
+                }
+            }
+            queryVector.push_back(valueVector);
+        }
+        sqlite3_finalize(sqlStmtPtr);
+        return queryVector;
+    }
+};
 
-}
+} // namespace EnergyPlus
 
 #endif

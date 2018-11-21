@@ -35,7 +35,11 @@ The objects used by EnergyPlus to model the faults are as follows:
 \item
   FaultModel:EnthalpySensorOffset:ReturnAir
 \item
-  FaultModel:Fouling:Coil
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir
 \item
   FaultModel:ThermostatOffset
 \item
@@ -43,13 +47,15 @@ The objects used by EnergyPlus to model the faults are as follows:
 \item
   FaultModel:Fouling:AirFilter
 \item
-  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+  FaultModel:Fouling:Boiler
 \item
-  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+  FaultModel:Fouling:Chiller
+\item
+  FaultModel:Fouling:Coil
 \item
   FaultModel:Fouling:CoolingTower
 \item
-  FaultModel:TemperatureSensorOffset:CoilSupplyAir
+  FaultModel:Fouling:EvaporativeCooler
 \end{itemize}
 
 \subsection{FaultModel:TemperatureSensorOffset:OutdoorAir}\label{faultmodeltemperaturesensoroffsetoutdoorair}
@@ -98,7 +104,7 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-1}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined humidity offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-1}
 
@@ -128,7 +134,7 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-2}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined enthalpy offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-2}
 
@@ -188,7 +194,7 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-4}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined enthalpy offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-4}
 
@@ -222,7 +228,8 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-5}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined fouling. If this field is blank, the schedule has values of 1 (no changes to fouling) for all time periods.
+This field provides the name of a schedule that represents severity of a fault. If this field is blank, the schedule has values of 1 (no changes to fouling) for all time periods.
+This is used to increase or decrease the fouling by a percentage. For example, if the schedule has a value of 1.2, it implies 20\% more fouling: if the Fouling Factor is 0.8, then resulting Fouling Factor would be $0.8 / 1.2 = 0.67$.
 
 \paragraph{Field: Fouling Input Method}\label{field-fouling-input-method}
 
@@ -640,7 +647,8 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This is used to increase or decrease the fouling by a percentage. For example, if the schedule has a value of 1.2, it implies 20\% more fouling: if the Fouling Factor is 0.8, then resulting Fouling Factor would be $0.8 / 1.2 = 0.67$.
 
 \paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
 
@@ -705,7 +713,8 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This is used to increase or decrease the fouling by a percentage. For example, if the schedule has a value of 1.2, it implies 20\% more fouling: if the Fouling Factor is 0.8, then resulting Fouling Factor would be $0.8 / 1.2 = 0.67$.
 
 \paragraph{Field: Boiler Object Type}\label{field-boiler-object-type}
 
@@ -770,7 +779,8 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This is used to increase or decrease the fouling by a percentage. For example, if the schedule has a value of 1.2, it implies 20\% more fouling: if the Fouling Factor is 0.8, then resulting Fouling Factor would be $0.8 / 1.2 = 0.67$.
 
 \paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
 
@@ -845,7 +855,8 @@ This field provides the name of a schedule that will determine if this fault is 
 
 \paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
 
-This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This field provides the name of a schedule that represents severity of a fault. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+This is used to increase or decrease the fouling by a percentage. For example, if the schedule has a value of 1.2, it implies 20\% more fouling: if the Fouling Factor is 0.8, then resulting Fouling Factor would be $0.8 / 1.2 = 0.67$.
 
 \paragraph{Field: Evaporative Cooler Object Type}\label{field-evaporative cooler-object-type}
 
@@ -911,7 +922,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Coil Object Type}\label{field-coil-object-type}
 
-This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam, Coil:Heating:Desuperheater, Coil:Heating:Water, Coil:Cooling:Water, and Coil:Cooling:Water:Detailedgeometry.
+This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam, Coil:Heating:Desuperheater, Coil:Heating:Water, Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and AirloopHVAC:UnitarySystem using set point control.
 
 \paragraph{Field: Coil Object Name}\label{field-coil-object-name}
 
@@ -969,4 +980,3 @@ This field defines the reference offset of the temperature sensor. A positive va
     2.0;                     !- Reference Sensor Offset {deltaC}
 
 \end{lstlisting}
-
