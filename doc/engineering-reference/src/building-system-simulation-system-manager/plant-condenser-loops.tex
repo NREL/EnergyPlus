@@ -416,7 +416,7 @@ The \textbf{UniformPLR} Load Distribution occurs in three steps:
 \item
     While the load to be met is below the LargestMinCompPLR equipment still in consideration, remove the last equipment in the Plant Equipment List. Always keep one equipment.
 \item
-    Divide the Plant Load accross the remaining equipment
+    Divide the Plant Load across the remaining equipment
 \end{enumerate}
 
 
@@ -428,7 +428,7 @@ The \textbf{UniformPLR} Load Distribution occurs in three steps:
 \hline
 Equipment Considered: & A & A \& B \\ \hline
 PlantCapacity & 40 & 140 \\ \hline
-LargestMinCompPLR & 0.2 & 0.15 \\ \hline
+LargestMinCompPLR & 0.2 & 0.2 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -444,9 +444,9 @@ Plant Load & Plant PLR             & B         & Plant PLR       & A            
 Plant Load & Plant PLR             & B         & Plant PLR       & A               & B                & A              & B             \\ \hline
 \endhead
 
-5          & 0.04                  & OFF       & 0.125           & 0.125           & -                & 0.2 *          & -             \\ \hline
-10         & 0.07                  & OFF       & 0.25            & 0.25            & -                & 0.2 *          & -             \\ \hline
-25         & 0.18                  & ON        & N/A             & 7.14            & 17.86            & 0.2 *          & 0.18          \\ \hline
+5          & 0.04                  & OFF       & 0.125           & 5.0           & -                  & 0.2 *          & -             \\ \hline
+10         & 0.07                  & OFF       & 0.25            & 10.0            & -                & 0.25           & -             \\ \hline
+25         & 0.18                  & OFF       & 0.625           & 25.0            & -                & 0.625          & -             \\ \hline
 50         & 0.36                  & ON        & N/A             & 14.29           & 35.71            & 0.36           & 0.36          \\ \hline
 100        & 0.71                  & ON        & N/A             & 28.57           & 71.43            & 0.71           & 0.71          \\ \hline
 150        & 1.07                  & ON        & N/A             & 40.00           & 100.00           & 1 **           & 1 **          \\ \hline

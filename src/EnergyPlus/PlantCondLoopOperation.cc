@@ -2244,6 +2244,7 @@ namespace PlantCondLoopOperation {
             switch (LoadFlag) {
             case OptimalLoading:
                 // step 1: load all machines to optimal PLR
+                numAvail = 0;
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                     // look up topology from the equipment list
@@ -2254,6 +2255,7 @@ namespace PlantCondLoopOperation {
                     auto &this_component(this_loopside.Branch(BranchNum).Comp(CompNum));
 
                     if (!this_component.Available) continue;
+                    ++numAvail;
 
                     if (this_component.OptLoad > 0.0) {
                         ChangeInLoad = min(this_component.OptLoad, std::abs(RemLoopDemand));
@@ -2277,7 +2279,7 @@ namespace PlantCondLoopOperation {
 
                 // step 2: Evenly distribute remaining loop demand
                 if (std::abs(RemLoopDemand) > SmallLoad) {
-                    DivideLoad = std::abs(RemLoopDemand) / NumCompsOnList;
+                    DivideLoad = std::abs(RemLoopDemand) / numAvail;
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                         BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
@@ -2361,6 +2363,7 @@ namespace PlantCondLoopOperation {
             case UniformLoading:
 
                 // step 1: distribute load equally to all available machines
+                numAvail = 0;
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                     BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
