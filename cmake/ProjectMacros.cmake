@@ -83,7 +83,7 @@ function( ADD_SIMULATION_TEST )
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-  
+
   if( DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
   elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION  )
@@ -92,11 +92,24 @@ function( ADD_SIMULATION_TEST )
     set(ANNUAL_SIMULATION false)
   endif()
 
+  # TODO: -r means "Call ReadVarEso", which unless you actually have BUILD_FORTRAN=TRUE shouldn't exist
   if(ANNUAL_SIMULATION)
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a -r" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
   else()
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
   endif()
+
+  if( DO_REGRESSION_TESTING or PERFORMANCE)
+    # For these, we add -r, but need to check if BUILD_FORTRAN
+    if (BUILD_FORTRAN)
+        set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
+    else()
+        # TODO: make error?
+        message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE")
+    endif()
+
+  endif()
+
 
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
