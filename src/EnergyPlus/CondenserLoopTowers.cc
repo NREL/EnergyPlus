@@ -3247,12 +3247,10 @@ namespace CondenserLoopTowers {
                                         ". Design Loop Exit Temperature must be greater than " +
                                         TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C when autosizing the tower UA.");
                         ShowContinueError("The Design Loop Exit Temperature specified in Sizing:Plant object = " +
-                                          PlantSizData(PltSizCondNum).PlantLoopName);
+                                          PlantSizData(PltSizCondNum).PlantLoopName
+                                          + " (" + TrimSigDigits(PlantSizData(PltSizCondNum).ExitTemp, 2)  + " C)");
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
-                                          TrimSigDigits(SimpleTowerInlet(TowerNum).AirWetBulb, 2) + " C.");
-                        ShowContinueError(
-                            "It is recommended that the Design Loop Exit Temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) +
-                            " C plus the cooling tower design approach temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesApproach, 2) + "C.");
+                                          TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C.");
                         ShowContinueError(
                             "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " +
                             TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
@@ -3333,17 +3331,30 @@ namespace CondenserLoopTowers {
                     DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * DesTowerWaterDeltaT;
                     // This conditional statement is to trap when the user specified condenser/tower water design setpoint
                     //  temperature is less than design inlet air wet bulb temperature
+                    // Note JM 2018-11-22
+                    // * If actually user-specified:
+                    //  SimpleTower(TowerNum).DesOutletWaterTemp = SimpleTower(TowerNum).DesInletAirWBTemp
+                    //                                           + SimpleTower(TowerNum).DesApproach;
+                    //  DesTowerExitWaterTemp = SimpleTower(TowerNum).DesOutletWaterTemp;
+                    //  => This basically means that approach is negative, which is impossible (must be > 0 per IDD)
+                    // * If not, hardcoded above to 21C
                     if (DesTowerExitWaterTemp <= SimpleTower(TowerNum).DesInletAirWBTemp) {
                         ShowSevereError("Error when autosizing the UA value for cooling tower = " + SimpleTower(TowerNum).Name +
                                         ". Design Tower Exit Temperature must be greater than " +
                                         TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C when autosizing the tower UA.");
-                        ShowContinueError("The Design Loop Exit Temperature specified in Sizing:Plant object = " +
-                                          PlantSizData(PltSizCondNum).PlantLoopName);
+                        ShowContinueError("The User-specified Design Loop Exit Temperature=" + TrimSigDigits(DesTowerExitWaterTemp, 2));
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
-                                          TrimSigDigits(SimpleTowerInlet(TowerNum).AirWetBulb, 2) + " C.");
-                        ShowContinueError(
-                            "It is recommended that the Design Loop Exit Temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) +
-                            " C plus the cooling tower design approach temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesApproach, 2) + "C.");
+                                          TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C.");
+
+                        if ( SimpleTower(TowerNum).TowerInletCondsAutoSize ) {
+                            ShowContinueError("Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, "
+                                              "it was defaulted to " + TrimSigDigits(DesTowerExitWaterTemp, 2) + " C.");
+                        } else {
+                            // Should never get there...
+                            ShowContinueError("The Design Loop Exit Temperature is the sum of the design air inlet wet-bulb temperature= "
+                                + TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) +
+                                " C plus the cooling tower design approach temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesApproach, 2) + "C.");
+                        }
                         ShowContinueError(
                             "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " +
                             TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
