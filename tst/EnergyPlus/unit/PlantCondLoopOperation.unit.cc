@@ -58,346 +58,228 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, DistributePlantLoad_Sequential)
+class DistributePlantLoadTest : public EnergyPlusFixture
 {
-    // unit test for plant equipment list load distribution
-    // set up one plantloop side with 1 branches, 12 components
-    // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).OpScheme.allocate(1);
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList.allocate(1);
-    auto &thisEquipList(DataPlant::PlantLoop(1).OpScheme(1).EquipList(1));
-    thisEquipList.NumComps = 12;
-    thisEquipList.Comp.allocate(thisEquipList.NumComps);
 
-    DataPlant::PlantLoop(1).LoopSide.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+public:
+    static void SetUpTestCase()
+    {
+        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    }
+    static void TearDownTestCase()
+    {
+    }
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialLoading;
- 
-    // set up equipment list data
-    thisEquipList.Comp(1).CompNumPtr = 1;
-    thisEquipList.Comp(2).CompNumPtr = 2;
-    thisEquipList.Comp(3).CompNumPtr = 3;
-    thisEquipList.Comp(4).CompNumPtr = 4;
-    thisEquipList.Comp(5).CompNumPtr = 5;
-    thisEquipList.Comp(6).CompNumPtr = 6;
-    thisEquipList.Comp(7).CompNumPtr = 7;
-    thisEquipList.Comp(8).CompNumPtr = 8;
-    thisEquipList.Comp(9).CompNumPtr = 9;
-    thisEquipList.Comp(10).CompNumPtr = 10;
-    thisEquipList.Comp(11).CompNumPtr = 11;
-    thisEquipList.Comp(12).CompNumPtr = 12;
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
 
-    thisEquipList.Comp(1).BranchNumPtr = 1;
-    thisEquipList.Comp(2).BranchNumPtr = 1;
-    thisEquipList.Comp(3).BranchNumPtr = 1;
-    thisEquipList.Comp(4).BranchNumPtr = 1;
-    thisEquipList.Comp(5).BranchNumPtr = 1;
-    thisEquipList.Comp(6).BranchNumPtr = 1;
-    thisEquipList.Comp(7).BranchNumPtr = 1;
-    thisEquipList.Comp(8).BranchNumPtr = 1;
-    thisEquipList.Comp(9).BranchNumPtr = 1;
-    thisEquipList.Comp(10).BranchNumPtr = 1;
-    thisEquipList.Comp(11).BranchNumPtr = 1;
-    thisEquipList.Comp(12).BranchNumPtr = 1;
+                                    // unit test for plant equipment list load distribution
+                                    // set up one plantloop side with 1 branches, 12 components
+                                    // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
+        DataPlant::PlantLoop.allocate(1);
+        DataPlant::PlantLoop(1).OpScheme.allocate(1);
+        DataPlant::PlantLoop(1).OpScheme(1).EquipList.allocate(1);
+        auto &thisEquipList(DataPlant::PlantLoop(1).OpScheme(1).EquipList(1));
+        thisEquipList.NumComps = 12;
+        thisEquipList.Comp.allocate(thisEquipList.NumComps);
 
-    // set up individual component data - start with 12 equal size, all available
-    auto &thisComp1(thisBranch.Comp(1));
-    thisComp1.Available = true;
-    thisComp1.OptLoad = 90.0;
-    thisComp1.MaxLoad = 100.0;
-    thisComp1.MinLoad = 0.0;
-    thisComp1.MyLoad = 0.0;
+        DataPlant::PlantLoop(1).LoopSide.allocate(1);
+        DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+        DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
+        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    auto &thisComp2(thisBranch.Comp(2));
-    thisComp2.Available = true;
-    thisComp2.OptLoad = 90.0;
-    thisComp2.MaxLoad = 100.0;
-    thisComp2.MinLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
+        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+            // set up equipment list data
+            thisEquipList.Comp(compNum).CompNumPtr = compNum;
 
-    auto &thisComp3(thisBranch.Comp(3));
-    thisComp3.Available = true;
-    thisComp3.OptLoad = 90.0;
-    thisComp3.MaxLoad = 100.0;
-    thisComp3.MinLoad = 0.0;
-    thisComp3.MyLoad = 0.0;
+            thisEquipList.Comp(compNum).BranchNumPtr = 1;
 
-    auto &thisComp4(thisBranch.Comp(4));
-    thisComp4.Available = true;
-    thisComp4.OptLoad = 90.0;
-    thisComp4.MaxLoad = 100.0;
-    thisComp4.MinLoad = 0.0;
-    thisComp4.MyLoad = 0.0;
+            // set up individual component data - start with 12 equal size, all available
+            thisBranch.Comp(compNum).Available = true;
+            thisBranch.Comp(compNum).OptLoad = 90.0;
+            thisBranch.Comp(compNum).MaxLoad = 100.0;
+            thisBranch.Comp(compNum).MinLoad = 0.0;
+            thisBranch.Comp(compNum).MyLoad = 0.0;
+        }
+    }
 
-    auto &thisComp5(thisBranch.Comp(5));
-    thisComp5.Available = true;
-    thisComp5.OptLoad = 90.0;
-    thisComp5.MaxLoad = 100.0;
-    thisComp5.MinLoad = 0.0;
-    thisComp5.MyLoad = 0.0;
+    virtual void ResetLoads()
+    {
+        // reset loads
+        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+            thisBranch.Comp(compNum).MyLoad = 0.0;
+        }
+    }
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-    auto &thisComp6(thisBranch.Comp(6));
-    thisComp6.Available = true;
-    thisComp6.OptLoad = 90.0;
-    thisComp6.MaxLoad = 100.0;
-    thisComp6.MinLoad = 0.0;
-    thisComp6.MyLoad = 0.0;
+    }
+};
 
-    auto &thisComp7(thisBranch.Comp(7));
-    thisComp7.Available = true;
-    thisComp7.OptLoad = 90.0;
-    thisComp7.MaxLoad = 100.0;
-    thisComp7.MinLoad = 0.0;
-    thisComp7.MyLoad = 0.0;
-
-    auto &thisComp8(thisBranch.Comp(8));
-    thisComp8.Available = true;
-    thisComp8.OptLoad = 90.0;
-    thisComp8.MaxLoad = 100.0;
-    thisComp8.MinLoad = 0.0;
-    thisComp8.MyLoad = 0.0;
-
-    auto &thisComp9(thisBranch.Comp(9));
-    thisComp9.Available = true;
-    thisComp9.OptLoad = 90.0;
-    thisComp9.MaxLoad = 100.0;
-    thisComp9.MinLoad = 0.0;
-    thisComp9.MyLoad = 0.0;
-
-    auto &thisComp10(thisBranch.Comp(10));
-    thisComp10.Available = true;
-    thisComp10.OptLoad = 90.0;
-    thisComp10.MaxLoad = 100.0;
-    thisComp10.MinLoad = 0.0;
-    thisComp10.MyLoad = 0.0;
-
-    auto &thisComp11(thisBranch.Comp(11));
-    thisComp11.Available = true;
-    thisComp11.OptLoad = 90.0;
-    thisComp11.MaxLoad = 100.0;
-    thisComp11.MinLoad = 0.0;
-    thisComp11.MyLoad = 0.0;
-
-    auto &thisComp12(thisBranch.Comp(12));
-    thisComp12.Available = true;
-    thisComp12.OptLoad = 90.0;
-    thisComp12.MaxLoad = 100.0;
-    thisComp12.MinLoad = 0.0;
-    thisComp12.MyLoad = 0.0;
-
-
+TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
+{
     // Loop demand 550W
+    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    DistributePlantLoadTest::ResetLoads();
     Real64 loopDemand = 550.0;
     Real64 remainingLoopDemand = 0.0;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialLoading;
 
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 100.0);
-    EXPECT_EQ(thisComp2.MyLoad, 100.0);
-    EXPECT_EQ(thisComp3.MyLoad, 100.0);
-    EXPECT_EQ(thisComp4.MyLoad, 100.0);
-    EXPECT_EQ(thisComp5.MyLoad, 100.0);
-    EXPECT_EQ(thisComp6.MyLoad, 50.0);
-    EXPECT_EQ(thisComp7.MyLoad, 0.0);
-    EXPECT_EQ(thisComp8.MyLoad, 0.0);
-    EXPECT_EQ(thisComp9.MyLoad, 0.0);
-    EXPECT_EQ(thisComp10.MyLoad, 0.0);
-    EXPECT_EQ(thisComp11.MyLoad, 0.0);
-    EXPECT_EQ(thisComp12.MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(4).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(5).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(6).MyLoad, 50.0);
+    EXPECT_EQ(thisBranch.Comp(7).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(8).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(9).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(10).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(11).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(12).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
-
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
-    thisComp3.MyLoad = 0.0;
-    thisComp4.MyLoad = 0.0;
-    thisComp5.MyLoad = 0.0;
-    thisComp6.MyLoad = 0.0;
-    thisComp7.MyLoad = 0.0;
-    thisComp8.MyLoad = 0.0;
-    thisComp9.MyLoad = 0.0;
-    thisComp10.MyLoad = 0.0;
-    thisComp11.MyLoad = 0.0;
-    thisComp12.MyLoad = 0.0;
-
+    DistributePlantLoadTest::ResetLoads();
 
     // Loop demand 50W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 50.0;
     remainingLoopDemand = 0.0;
 
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 50.0);
-    EXPECT_EQ(thisComp2.MyLoad, 0.0);
-    EXPECT_EQ(thisComp3.MyLoad, 0.0);
-    EXPECT_EQ(thisComp4.MyLoad, 0.0);
-    EXPECT_EQ(thisComp5.MyLoad, 0.0);
-    EXPECT_EQ(thisComp6.MyLoad, 0.0);
-    EXPECT_EQ(thisComp7.MyLoad, 0.0);
-    EXPECT_EQ(thisComp8.MyLoad, 0.0);
-    EXPECT_EQ(thisComp9.MyLoad, 0.0);
-    EXPECT_EQ(thisComp10.MyLoad, 0.0);
-    EXPECT_EQ(thisComp11.MyLoad, 0.0);
-    EXPECT_EQ(thisComp12.MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 50.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(4).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(5).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(6).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(7).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(8).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(9).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(10).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(11).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(12).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
-    thisComp3.MyLoad = 0.0;
-    thisComp4.MyLoad = 0.0;
-    thisComp5.MyLoad = 0.0;
-    thisComp6.MyLoad = 0.0;
-    thisComp7.MyLoad = 0.0;
-    thisComp8.MyLoad = 0.0;
-    thisComp9.MyLoad = 0.0;
-    thisComp10.MyLoad = 0.0;
-    thisComp11.MyLoad = 0.0;
-    thisComp12.MyLoad = 0.0;
-
     // Loop demand 5000W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 5000.0;
     remainingLoopDemand = 0.0;
 
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 100.0);
-    EXPECT_EQ(thisComp2.MyLoad, 100.0);
-    EXPECT_EQ(thisComp3.MyLoad, 100.0);
-    EXPECT_EQ(thisComp4.MyLoad, 100.0);
-    EXPECT_EQ(thisComp5.MyLoad, 100.0);
-    EXPECT_EQ(thisComp6.MyLoad, 100.0);
-    EXPECT_EQ(thisComp7.MyLoad, 100.0);
-    EXPECT_EQ(thisComp8.MyLoad, 100.0);
-    EXPECT_EQ(thisComp9.MyLoad, 100.0);
-    EXPECT_EQ(thisComp10.MyLoad, 100.0);
-    EXPECT_EQ(thisComp11.MyLoad, 100.0);
-    EXPECT_EQ(thisComp12.MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(4).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(5).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(6).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(7).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(8).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(9).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(10).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(11).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(12).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 3800.0);
 
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
-    thisComp3.MyLoad = 0.0;
-    thisComp4.MyLoad = 0.0;
-    thisComp5.MyLoad = 0.0;
-    thisComp6.MyLoad = 0.0;
-    thisComp7.MyLoad = 0.0;
-    thisComp8.MyLoad = 0.0;
-    thisComp9.MyLoad = 0.0;
-    thisComp10.MyLoad = 0.0;
-    thisComp11.MyLoad = 0.0;
-    thisComp12.MyLoad = 0.0;
-
     // Loop demand 550W, even numbered components unavailable
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 550.0;
     remainingLoopDemand = 0.0;
-    thisComp2.Available = false;
-    thisComp4.Available = false;
-    thisComp6.Available = false;
-    thisComp8.Available = false;
-    thisComp10.Available = false;
-    thisComp12.Available = false;
+    thisBranch.Comp(2).Available = false;
+    thisBranch.Comp(4).Available = false;
+    thisBranch.Comp(6).Available = false;
+    thisBranch.Comp(8).Available = false;
+    thisBranch.Comp(10).Available = false;
+    thisBranch.Comp(12).Available = false;
 
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 100.0);
-    EXPECT_EQ(thisComp2.MyLoad, 0.0);
-    EXPECT_EQ(thisComp3.MyLoad, 100.0);
-    EXPECT_EQ(thisComp4.MyLoad, 0.0);
-    EXPECT_EQ(thisComp5.MyLoad, 100.0);
-    EXPECT_EQ(thisComp6.MyLoad, 0.0);
-    EXPECT_EQ(thisComp7.MyLoad, 100.0);
-    EXPECT_EQ(thisComp8.MyLoad, 0.0);
-    EXPECT_EQ(thisComp9.MyLoad, 100.0);
-    EXPECT_EQ(thisComp10.MyLoad, 0.0);
-    EXPECT_EQ(thisComp11.MyLoad, 50.0);
-    EXPECT_EQ(thisComp12.MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(4).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(5).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(6).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(7).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(8).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(9).MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(10).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(11).MyLoad, 50.0);
+    EXPECT_EQ(thisBranch.Comp(12).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
-    thisComp3.MyLoad = 0.0;
-    thisComp4.MyLoad = 0.0;
-    thisComp5.MyLoad = 0.0;
-    remainingLoopDemand = 0.0;
-    thisComp2.Available = true;
 
     //Duplicate tests from engineering reference examples for Sequential
-    thisEquipList.NumComps = 2;
-    thisComp1.MaxLoad = 40.0;
-    thisComp1.MinLoad = 0.2 * 40.0;
-    thisComp1.OptLoad = 0.6 * 40.0;
-    thisComp2.MaxLoad = 100.0;
-    thisComp2.MinLoad = 0.15 * 100.0;
-    thisComp2.OptLoad = 0.4 * 100.0;
+    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    thisBranch.Comp(1).MaxLoad = 40.0;
+    thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
+    thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
+    thisBranch.Comp(1).Available = true;
+    thisBranch.Comp(2).MaxLoad = 100.0;
+    thisBranch.Comp(2).MinLoad = 0.15 * 100.0;
+    thisBranch.Comp(2).OptLoad = 0.4 * 100.0;
+    thisBranch.Comp(2).Available = true;
 
     // 5W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 5.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 5.0);
-    EXPECT_EQ(thisComp2.MyLoad, 0.0);
-    EXPECT_EQ(remainingLoopDemand, 0.0);
-
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
     remainingLoopDemand = 0.0;
+
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 25W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 25.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 25.0);
-    EXPECT_EQ(thisComp2.MyLoad, 0.0);
-    EXPECT_EQ(remainingLoopDemand, 0.0);
-
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
     remainingLoopDemand = 0.0;
+
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 25.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 50W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 50.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 40.0);
-    EXPECT_EQ(thisComp2.MyLoad, 10.0);
-    EXPECT_EQ(remainingLoopDemand, 0.0);
-
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
     remainingLoopDemand = 0.0;
+
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 10.0);
+    EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 100W
+    DistributePlantLoadTest::ResetLoads();
     loopDemand = 100.0;
+    remainingLoopDemand = 0.0;
+
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 40.0);
-    EXPECT_EQ(thisComp2.MyLoad, 60.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 60.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
+    // 150W
+    DistributePlantLoadTest::ResetLoads();
+    loopDemand = 150.0;
     remainingLoopDemand = 0.0;
 
-    // 150W
-    loopDemand = 150.0;
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 40.0);
-    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
 
-    // reset loads
-    thisComp1.MyLoad = 0.0;
-    thisComp2.MyLoad = 0.0;
+    // 200W
+    DistributePlantLoadTest::ResetLoads();
+    loopDemand = 200.0;
     remainingLoopDemand = 0.0;
 
-    // 200W
-    loopDemand = 200.0;
     PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(thisComp1.MyLoad, 40.0);
-    EXPECT_EQ(thisComp2.MyLoad, 100.0);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
 }
 
