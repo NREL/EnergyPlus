@@ -82,34 +82,40 @@ function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL PERFORMANCE)
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
+  # CMake Parse Arguments: will set the value of variables starting with 'ADD_SIM_TEST_', eg: 'ADD_SIM_TEST_IDF_FILE'
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
-  if( DESIGN_DAY_ONLY )
+  if( ADD_SIM_TEST_DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
-  elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION  )
+  # If passed argument "ANNUAL_SIMULATION" or global cache variables
+  elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION )
     set(ANNUAL_SIMULATION true)
   else()
     set(ANNUAL_SIMULATION false)
   endif()
 
-  # TODO: -r means "Call ReadVarEso", which unless you actually have BUILD_FORTRAN=TRUE shouldn't exist
+  # Note JM 2018-11-23: -r means "Call ReadVarEso", which unless you actually have BUILD_FORTRAN=TRUE shouldn't exist
   if(ANNUAL_SIMULATION)
    set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
   else()
    set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
   endif()
 
-  if( DO_REGRESSION_TESTING or PERFORMANCE)
+  # DO_REGRESSION_TESTING shouldn't really occur here since EnergyPlus/CMakeLists.txt will throw an error if BUILD_FORTRAN isn't enabled
+  if( DO_REGRESSION_TESTING OR ADD_SIM_TEST_PERFORMANCE)
     # For these, we add -r, but need to check if BUILD_FORTRAN
     if (BUILD_FORTRAN)
-        set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
+      set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
     else()
-        # TODO: make error?
-        message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE")
+      if( ADD_SIM_TEST_PERFORMANCE )
+        # For performance testing, it's more problematic, because that'll cut on the ReadVarEso time
+        message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
+      else()
+        # Not that bad, just a dev warning
+        message(AUTHOR_WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
+      endif()
     endif()
-
   endif()
-
 
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
