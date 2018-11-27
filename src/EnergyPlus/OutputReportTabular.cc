@@ -10450,6 +10450,7 @@ namespace OutputReportTabular {
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 rowHead(iZone) = Zone(iZone).Name;
+                // Conditioned or not
                 if (Zone(iZone).SystemZoneNodeNumber > 0) {
                     tableBody(2, iZone) = "Yes";
                     zoneIsCond = true;
@@ -10457,6 +10458,7 @@ namespace OutputReportTabular {
                     tableBody(2, iZone) = "No";
                     zoneIsCond = false;
                 }
+                // Part of Total Floor Area or not
                 if (Zone(iZone).isPartOfTotalArea) {
                     tableBody(3, iZone) = "Yes";
                     usezoneFloorArea = true;
@@ -10487,7 +10489,7 @@ namespace OutputReportTabular {
                         totLightPower += Lights(iLight).DesignLevel;
                     }
                 }
-                if (Zone(iZone).FloorArea > 0 && usezoneFloorArea) {
+                if (Zone(iZone).FloorArea > 0) {
                     tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
                 }
                 // people density
@@ -10522,12 +10524,26 @@ namespace OutputReportTabular {
                         totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
                     }
                 }
-                if (Zone(iZone).FloorArea > 0 && usezoneFloorArea) {
+                if (Zone(iZone).FloorArea > 0) {
                     tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
                 }
 
-                // total rows for conditioned, unconditioned, and total
-                if (usezoneFloorArea) {
+                // total rows for Total / Not Part of Total
+                // In "Total": break between conditioned/unconditioned
+
+                // If not part of total, goes directly to this row
+                if (!usezoneFloorArea) {
+                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
+                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
+                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
+                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
+                    zstLight(notpartTotal) += mult * totLightPower;
+                    zstPeople(notpartTotal) += mult * totNumPeople;
+                    zstPlug(notpartTotal) += mult * totPlugProcess;
+                } else {
+                    // Add it to the 'Total'
                     zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
                     zstVolume(grandTotal) += mult * Zone(iZone).Volume;
                     zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
@@ -10537,47 +10553,29 @@ namespace OutputReportTabular {
                     zstLight(grandTotal) += mult * totLightPower;
                     zstPeople(grandTotal) += mult * totNumPeople;
                     zstPlug(grandTotal) += mult * totPlugProcess;
-                } else {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
-                }
-                if (zoneIsCond && usezoneFloorArea) {
-                    zstArea(condTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(condTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(condTotal) += mult * totLightPower;
-                    zstPeople(condTotal) += mult * totNumPeople;
-                    zstPlug(condTotal) += mult * totPlugProcess;
-                } else if (!zoneIsCond) {
-                    zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(uncondTotal) += mult * totLightPower;
-                    zstPeople(uncondTotal) += mult * totNumPeople;
-                    zstPlug(uncondTotal) += mult * totPlugProcess;
-                } else {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
+
+                    // Subtotal between cond/unconditioned
+                    if (zoneIsCond) {
+                        zstArea(condTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(condTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(condTotal) += mult * totLightPower;
+                        zstPeople(condTotal) += mult * totNumPeople;
+                        zstPlug(condTotal) += mult * totPlugProcess;
+                    } else if (!zoneIsCond) {
+                        zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(uncondTotal) += mult * totLightPower;
+                        zstPeople(uncondTotal) += mult * totNumPeople;
+                        zstPlug(uncondTotal) += mult * totPlugProcess;
+                    }
                 }
             }
             for (iTotal = 1; iTotal <= 4; ++iTotal) {
