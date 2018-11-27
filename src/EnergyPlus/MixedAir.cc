@@ -3684,11 +3684,13 @@ namespace MixedAir {
         }
 
         // Apply Maximum Fraction of Outdoor Air Schedule
+        Real64 currentMaxOAMassFlowRate = this->MaxOAMassFlowRate;
         if (this->MaxOAflowSchPtr > 0) {
             Real64 MaxOAflowfracVal = GetCurrentScheduleValue(this->MaxOAflowSchPtr);
             MaxOAflowfracVal = min(max(MaxOAflowfracVal, 0.0), 1.0);
+            currentMaxOAMassFlowRate = min(this->MaxOAMassFlowRate, this->MixMassFlow * MaxOAflowfracVal);
             OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
-            this->OAMassFlow = min(this->OAMassFlow, this->MixMassFlow * MaxOAflowfracVal);
+            this->OAMassFlow = min(this->OAMassFlow, currentMaxOAMassFlowRate);
         }
 
         // Don't let the OA flow be > than the max OA limit. OA for high humidity control is allowed to be greater than max OA.
@@ -3731,7 +3733,7 @@ namespace MixedAir {
             if (HighHumidityOperationFlag && OASignal > 1.0) {
                 curAirLoopFlow.MaxOutAir = this->MaxOAMassFlowRate * OASignal;
             } else {
-                curAirLoopFlow.MaxOutAir = this->MaxOAMassFlowRate;
+                curAirLoopFlow.MaxOutAir = currentMaxOAMassFlowRate;
             }
 
             // MJW - Not sure if this is necessary but keeping it for now

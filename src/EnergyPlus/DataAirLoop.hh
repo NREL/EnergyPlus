@@ -219,7 +219,7 @@ namespace DataAirLoop {
         Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
         Real64 ReqSupplyFrac;         // required flow (as a fraction of DesSupply) set by a manager
         Real64 MinOutAir;             // minimum outside air mass flow rate [kg/s]
-        Real64 MaxOutAir;             // maximum outside air mass flow rate [kg/s]
+        Real64 MaxOutAir;             // current maximum available outside air mass flow rate [kg/s]
         Real64 OAMinFrac;             // minimum outside air flow fraction this time step
         Real64 Previous;              // Previous mass air flow rate for this loop [kg/s]
         Real64 SupFlow;               // supply air flow rate (includes LeakFlow) [kg/s]

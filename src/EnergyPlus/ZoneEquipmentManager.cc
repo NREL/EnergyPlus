@@ -4661,9 +4661,10 @@ namespace ZoneEquipmentManager {
             }
         }
 
-        // Set OA flow and frac for systems which are all OA (no OASys)
+        // Set max OA flow and frac for systems which are all OA (no OASys)
         for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
             if (PrimaryAirSystem(airLoop).isAllOA) {
+                DataAirLoop::AirLoopFlow(airLoop).MaxOutAir = DataAirLoop::AirLoopFlow(airLoop).SupFlow;
                 DataAirLoop::AirLoopFlow(airLoop).OAFlow = DataAirLoop::AirLoopFlow(airLoop).SupFlow;
                 DataAirLoop::AirLoopFlow(airLoop).OAFrac = 1.0;
             }
@@ -4835,7 +4836,7 @@ namespace ZoneEquipmentManager {
                         AirLoopFlow(airLoop).ZoneRetFlow += Node(retNode).MassFlowRate;
                         if (ZoneEquipConfig(ZoneNum).TotAvailAirLoopOA > 0.0) {
                             AirLoopFlow(airLoop).ExcessZoneExhFlow +=
-                                ZoneEquipConfig(ZoneNum).ExcessZoneExh * AirLoopFlow(airLoop).OAFlow / ZoneEquipConfig(ZoneNum).TotAvailAirLoopOA;
+                                ZoneEquipConfig(ZoneNum).ExcessZoneExh * AirLoopFlow(airLoop).MaxOutAir / ZoneEquipConfig(ZoneNum).TotAvailAirLoopOA;
                         }
                     }
                 }
@@ -4978,10 +4979,10 @@ namespace ZoneEquipmentManager {
                     }
 
                     airLoopReturnFrac = thisAirLoopFlow.DesReturnFrac;
-                    if (DataAirSystems::PrimaryAirSystem(airLoop).OASysExists && (thisAirLoopFlow.OAFlow > 0.0)) {
-                        // Set return flow as fraction of matching inlet node flow if there is an OA system and OA flow > 0.0
+                    if (DataAirSystems::PrimaryAirSystem(airLoop).OASysExists && (thisAirLoopFlow.MaxOutAir > 0.0)) {
+                        // Set return flow as fraction of matching inlet node flow if there is an OA system and available OA flow > 0.0
                         returnNodeMassFlow = airLoopReturnFrac * inletMassFlow;
-                        thisZoneEquip.TotAvailAirLoopOA += thisAirLoopFlow.OAFlow;
+                        thisZoneEquip.TotAvailAirLoopOA += thisAirLoopFlow.MaxOutAir;
                     } else {
                         // Set return flow to matching inlet node flow
                         returnNodeMassFlow = inletMassFlow;
@@ -4997,7 +4998,7 @@ namespace ZoneEquipmentManager {
                     if ((DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing) && numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                         if (airLoop > 0) {
-                            if (!DataAirSystems::PrimaryAirSystem(airLoop).OASysExists || (DataAirLoop::AirLoopFlow(airLoop).OAFlow == 0.0)) {
+                            if (!DataAirSystems::PrimaryAirSystem(airLoop).OASysExists || (DataAirLoop::AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
                                 ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow - thisZoneEquip.ZoneExhBalanced + thisZoneEquip.ZoneExh);
                                 returnNodeMassFlow = ExpTotalReturnMassFlow;
                             }

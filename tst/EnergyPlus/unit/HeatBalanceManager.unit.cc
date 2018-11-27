@@ -550,6 +550,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
     AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
