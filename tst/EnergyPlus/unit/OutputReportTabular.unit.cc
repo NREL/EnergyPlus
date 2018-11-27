@@ -6157,7 +6157,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Zone(2).ExteriorTotalGroundSurfArea = 0;
     Zone(2).ExtWindowArea = 0.0;
 
-    Zone(3).Name = "NOT PartofTot Zone";
+    Zone(3).Name = "NOT PartofTot Conditioned Zone";
     Zone(3).SystemZoneNodeNumber = 1; // Conditioned
     Zone(3).isPartOfTotalArea = false;
     Zone(3).Multiplier = 1.;
