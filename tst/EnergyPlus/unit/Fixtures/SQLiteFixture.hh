@@ -76,7 +76,11 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
         ss = std::make_shared<std::ostringstream>();
         // Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
-        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, ":memory:", "std::ostringstream", true, true)));
+        // Note JM 2018-11-26: By default, set the SQLite location to memory
+        std::string sql_filepath(":memory:");
+        // Alternatively, when debugging a test, change outpath to the location on disk so you can query the database manually after test ran
+        // std::string sql_filepath("/path/on/disk/to/eplusout.sql");
+        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, sql_filepath, "std::ostringstream", true, true)));
         ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
         ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
         EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
@@ -188,6 +192,27 @@ protected:
         }
         sqlite3_finalize(sqlStmtPtr);
         return queryVector;
+    }
+
+    // Helper method that will return the first double it finds, or -10000.0 if not found (abritrarily chosen value)
+    Real64 execAndReturnFirstDouble(const std::string& statement) {
+
+        Real64 result(-10000.0);
+
+        sqlite3_stmt* sqlStmtPtr;
+
+        int code = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
+
+        code = sqlite3_step(sqlStmtPtr);
+        if (code == SQLITE_ROW)
+        {
+          result = sqlite3_column_double(sqlStmtPtr, 0);
+        }
+
+        // must finalize to prevent memory leaks
+        sqlite3_finalize(sqlStmtPtr);
+
+        return result;
     }
 };
 
