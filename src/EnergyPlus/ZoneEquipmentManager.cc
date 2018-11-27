@@ -3866,20 +3866,6 @@ namespace ZoneEquipmentManager {
                 UpdateSystemOutputRequired(ActualZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum);
                 CurTermUnitSizingNum = 0;
             } // zone loop
-
-            if (!ZoneEquipConfig(ControlledZoneNum).ZoneHasAirLoopWithOASys) {
-                if (((ZoneEquipConfig(ControlledZoneNum).ZoneExh - ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced) > SmallMassFlow) &&
-                    !ZoneEquipConfig(ControlledZoneNum).FlowError && AirLoopsSimOnce) {
-                    if (!isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag) {
-                        ShowWarningError("In zone " + ZoneEquipConfig(ControlledZoneNum).ZoneName +
-                                         " there is unbalanced exhaust air flow with no airloop serving the zone with outdoor air.");
-                        ShowContinueErrorTimeStamp("");
-                        ShowContinueError("  Unless there is balancing infiltration / ventilation air flow, this will result in");
-                        ShowContinueError("  load due to induced outdoor air being neglected in the simulation.");
-                        ZoneEquipConfig(ControlledZoneNum).FlowError = true;
-                    }
-                }
-            }
         } // End of controlled zone loop
         CurZoneEqNum = 0;
         FirstPassZoneEquipFlag = false;
@@ -4856,29 +4842,30 @@ namespace ZoneEquipmentManager {
 
                 // Check zone flow balance - only for zones not served by an airloop with OA - and not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
-                    !DataGlobals::WarmupFlag) {
-                    if (!ZoneEquipConfig(ZoneNum).ZoneHasAirLoopWithOASys && !ZoneEquipConfig(ZoneNum).FlowError) {
+                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing) {
+                    if (!ZoneEquipConfig(ZoneNum).FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
                         Real64 unbalancedFlow = (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced) + FinalTotalReturnMassFlow -
-                                                TotInletAirMassFlowRate;
+                            TotInletAirMassFlowRate;
                         int actualZone = ZoneEquipConfig(ZoneNum).ActualZoneNum;
                         // Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
                         unbalancedFlow = max(0.0,
-                                             unbalancedFlow - DataHeatBalFanSys::OAMFL(actualZone) - DataHeatBalFanSys::VAMFL(actualZone) -
-                                                 DataHeatBalFanSys::MixingMassFlowZone(actualZone));
+                            unbalancedFlow - DataHeatBalFanSys::OAMFL(actualZone) - DataHeatBalFanSys::VAMFL(actualZone) -
+                            DataHeatBalFanSys::MixingMassFlowZone(actualZone));
                         if (unbalancedFlow > SmallMassFlow) {
                             ShowWarningError("In zone " + ZoneEquipConfig(ZoneNum).ZoneName +
-                                             " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
+                                " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
                             ShowContinueErrorTimeStamp("");
                             ShowContinueError("  Flows [kg/s]: Inlets: " + General::RoundSigDigits(TotInletAirMassFlowRate, 6) +
-                                              "  Unbalanced exhausts: " +
-                                              General::RoundSigDigits((TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced), 6) +
-                                              "  Returns: " + General::RoundSigDigits(FinalTotalReturnMassFlow, 6));
+                                "  Unbalanced exhausts: " +
+                                General::RoundSigDigits((TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced), 6) +
+                                "  Returns: " + General::RoundSigDigits(FinalTotalReturnMassFlow, 6));
                             ShowContinueError("  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone), 6) +
-                                              "  Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone), 6) +
-                                              "  Mixing(incoming): " + General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone), 6));
+                                "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone), 6) +
+                                "  Mixing (incoming): " + General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone), 6));
                             ShowContinueError("  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedFlow, 6) +
-                                              "  This error will only be reported once per zone.");
+                                "  Total system OA flow (for all airloops serving this zone): " + General::RoundSigDigits(ZoneEquipConfig(ZoneNum).TotAvailAirLoopOA, 6));
+                            ShowContinueError("  This error will only be reported once per zone.");
                             ZoneEquipConfig(ZoneNum).FlowError = true;
                         }
                     }
@@ -4925,24 +4912,10 @@ namespace ZoneEquipmentManager {
             Iteration += 1;
 
         } while (Iteration < IterMax);
-
-        // Check for unbalanced airloop
+        // Set system return flows
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            {
-                auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
-                thisAirLoopFlow.SysRetFlow = thisAirLoopFlow.ZoneRetFlow - thisAirLoopFlow.RecircFlow + thisAirLoopFlow.LeakFlow;
-                if (!isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce) {
-                    Real64 exhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.SysRetFlow;
-                    Real64 unbalancedExhaustDelta = max(0.0, (exhaustDelta - thisAirLoopFlow.OAFlow));
-                    if ((unbalancedExhaustDelta > SmallMassFlow) && !thisAirLoopFlow.FlowError) {
-                        ShowWarningError("In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow.");
-                        ShowContinueErrorTimeStamp("");
-                        ShowContinueError("  Unless there is balancing infiltration / ventilation air flow, this will result in");
-                        ShowContinueError("  load due to induced outdoor air being neglected in the simulation.");
-                        thisAirLoopFlow.FlowError = true;
-                    }
-                }
-            }
+            auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
+            thisAirLoopFlow.SysRetFlow = thisAirLoopFlow.ZoneRetFlow - thisAirLoopFlow.RecircFlow + thisAirLoopFlow.LeakFlow;
         }
     }
 
