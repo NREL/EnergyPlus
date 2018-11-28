@@ -137,21 +137,21 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess balanced zone exhaust from exhaust fan, still no warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_TRUE(has_err_output());
 
     // Deallocate everything - should all be taken care of in clear_states
@@ -663,14 +663,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
         Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_EQ(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_NEAR(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
 }
 

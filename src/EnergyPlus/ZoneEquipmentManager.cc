@@ -799,7 +799,7 @@ namespace ZoneEquipmentManager {
             }
         }
 
-        CalcZoneMassBalance();
+        CalcZoneMassBalance(true);
 
         CalcZoneLeavingConditions(true);
 
@@ -3916,7 +3916,7 @@ namespace ZoneEquipmentManager {
 
         } // end of the Supply Air Path DO Loop
 
-        CalcZoneMassBalance();
+        CalcZoneMassBalance(FirstHVACIteration);
 
         CalcZoneLeavingConditions(FirstHVACIteration);
 
@@ -4576,7 +4576,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void CalcZoneMassBalance()
+    void CalcZoneMassBalance(bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4843,7 +4843,7 @@ namespace ZoneEquipmentManager {
 
                 // Check zone flow balance - only for zones not served by an airloop with OA - and not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
-                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing) {
+                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
                     if (!ZoneEquipConfig(ZoneNum).FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
                         Real64 unbalancedFlow = (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced) + FinalTotalReturnMassFlow -

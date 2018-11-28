@@ -365,6 +365,8 @@ namespace SimulationManager {
         if (DoDesDaySim || DoWeathSim || DoHVACSizingSimulation) {
             DoOutputReporting = true;
         }
+        DoingSizing = false;
+
         if ((DoZoneSizing || DoSystemSizing || DoPlantSizing) && !(DoDesDaySim || (DoWeathSim && RunPeriodsInInput))) {
             ShowWarningError("ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
@@ -380,8 +382,6 @@ namespace SimulationManager {
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
         SizingManager::ManageSystemVentilationAdjustments();
-
-        DoingSizing = false;
 
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
