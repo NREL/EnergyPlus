@@ -103,6 +103,8 @@ namespace HVACManager {
 
     void UpdateZoneInletConvergenceLog();
 
+    void CheckAirLoopFlowBalance();
+
 } // namespace HVACManager
 
 } // namespace EnergyPlus

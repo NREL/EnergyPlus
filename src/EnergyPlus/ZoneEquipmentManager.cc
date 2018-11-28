@@ -4607,7 +4607,6 @@ namespace ZoneEquipmentManager {
         using DataHeatBalFanSys::ZoneInfiltrationFlag;
         using DataHeatBalFanSys::ZoneMassBalanceFlag;
         using DataHeatBalFanSys::ZoneReOrder;
-        using DataHVACGlobals::AirLoopsSimOnce;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::SmallMassFlow;
         using DataHVACGlobals::ZoneMassBalanceHVACReSim;
