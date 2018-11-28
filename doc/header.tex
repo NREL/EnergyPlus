@@ -22,6 +22,7 @@
 \usepackage[table,svgnames]{xcolor}
 \usepackage{framed}
 \usepackage{longtable,booktabs}
+\usepackage{multirow}
 \usepackage{listings}
 \usepackage{enumitem}
 \PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
@@ -78,7 +79,42 @@
 \fi
 
 % this is a great package for printing units in a standard way, we should move this way
-\usepackage{siunitx}
+\usepackage[per-mode=symbol]{siunitx}
+
+% Note: To use a unit without a number, use either `\si{\wattperVolumeFlowRate}`
+% or `\SI{}{\wattperVolumeFlowRate}`.
+
+% add some helper unit macros
+\DeclareSIUnit\area{\m\squared}
+\DeclareSIUnit\volume{\m\cubed}
+\DeclareSIUnit\volumeFlowRate{\m\cubed\per\s}
+\DeclareSIUnit\massFlowRate{\kg\per\s}
+\DeclareSIUnit\density{\kg\per\m\cubed}
+\DeclareSIUnit\humidityRatio{\kg\of{W}\per\kg\of{DA}}
+\DeclareSIUnit\specificHeatCapacity{\J\per\kg\per\K}
+\DeclareSIUnit\specificEnthalpy{\J\per\kg}
+\DeclareSIUnit\coefficientOfPerformance{\watt\per\watt}
+\DeclareSIUnit\wattperVolumeFlowRate{\watt\per({\volumeFlowRate})} % Displays "W/(m^3/s)"
+\DeclareSIUnit\volumeFlowRateperArea{({\volumeFlowRate})\per\area}
+\DeclareSIUnit\volumeFlowRateperWatt{({\volumeFlowRate})\per\watt}
+
+% Make alias, so its clear these are IP units
+\let\DeclareIPUnit\DeclareSIUnit
+\let\IP\SI
+\let\ip\si
+
+% Add a few IP units, eg use like \IP{80}{\fahrenheit}
+\DeclareIPUnit[number-unit-product = \,]
+\fahrenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
+\DeclareIPUnit\in{in}
+\DeclareIPUnit\ft{ft}
+\DeclareIPUnit\sqft{\ft\squared}
+\DeclareIPUnit\cfm{\ft\cubed\per\minute}
+\DeclareIPUnit\CFM{CFM}
+\DeclareIPUnit\gal{gal}
+\DeclareIPUnit\gpm{gpm}
+\DeclareIPUnit\MBH{MBH}
+
 
 % The current implementation of \degree doesn't use ensuremath and doesn't show
 % see https://github.com/josephwright/siunitx/issues/351

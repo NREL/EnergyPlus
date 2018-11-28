@@ -358,7 +358,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
                                       "[W/m2-C]",
                                       "[W/m2-K]",
                                       "[W/W]",
-                                      "[W]"};
+                                      "[W]",
+                                      "[person/m2]",
+    };
 
     for (auto u : units) {
         LookupSItoIP(u, indexUnitConv, curUnits);
