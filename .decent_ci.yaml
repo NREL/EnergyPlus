@@ -9,7 +9,7 @@ regression_baseline_master : ""
 notification_recipients:
   - lgentile
 aging_pull_requests_notification: true
-aging_pull_requests_numdays: 14
+aging_pull_requests_numdays: 28
 
 
 

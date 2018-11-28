@@ -246,7 +246,7 @@ namespace PVWatts {
         const std::string name(cAlphaArgs(AlphaFields::NAME));
         const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
         const std::map<std::string, ModuleType> moduleTypeMap = {
-            {"STANDARD", ModuleType::STANDARD}, {"PREMIUM", ModuleType::PREMIUM}, {"ThinFilm", ModuleType::THIN_FILM}};
+            {"STANDARD", ModuleType::STANDARD}, {"PREMIUM", ModuleType::PREMIUM}, {"THINFILM", ModuleType::THIN_FILM}};
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {

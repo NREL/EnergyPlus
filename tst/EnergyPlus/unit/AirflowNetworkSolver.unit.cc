@@ -115,3 +115,43 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     MultizoneSurfaceData.deallocate();
     AirflowNetworkCompData.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_Coil)
+{
+
+    int NF;
+    std::array<Real64,2> F;
+    std::array<Real64,2> DF;
+
+    AirflowNetworkCompData.allocate(1);
+    AirflowNetworkCompData[0].TypeNum = 1;
+
+    DisSysCompCoilData.allocate(1);
+    DisSysCompCoilData[0].D = 1.0;
+    DisSysCompCoilData[0].L = 1.0;
+
+    properties.resize(2);
+    properties[0].density = 1.2;
+    properties[1].density = 1.2;
+
+    properties[0].viscosity = 1.0e-5;
+    properties[1].viscosity = 1.0e-5;
+
+    F[1] = DF[1] = 0.0;
+
+
+    NF = AFECOI(1, 1, 0.05, 1, properties[0], properties[1], F, DF);
+    EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
+    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    NF = AFECOI(1, 1, -0.05, 1, properties[0], properties[1], F, DF);
+    EXPECT_NEAR( 294.5243112740431, F[0], 0.00001);
+    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    DisSysCompCoilData.deallocate();
+    AirflowNetworkCompData.deallocate();
+}
