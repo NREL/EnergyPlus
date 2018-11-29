@@ -3012,24 +3012,22 @@ namespace HVACManager {
     void CheckAirLoopFlowBalance()
     {
         // Check for unbalanced airloop
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
-            if (!isPulseZoneSizing && !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce &&
-                !thisAirLoopFlow.FlowError) {
-                Real64 exhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.SysRetFlow;
-                Real64 unbalancedExhaustDelta = max(0.0, (exhaustDelta - thisAirLoopFlow.OAFlow));
-                if (unbalancedExhaustDelta > SmallMassFlow) {
-                    ShowWarningError("In AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
-                        " there is unbalanced exhaust air flow.");
-                    ShowContinueErrorTimeStamp("");
-                    ShowContinueError("  Unless there is balancing infiltration / ventilation air flow, this will result in");
-                    ShowContinueError("  load due to induced outdoor air being neglected in the simulation.");
-                    ShowContinueError("  Flows [kg/s]: Supply: " + General::RoundSigDigits(thisAirLoopFlow.SupFlow, 6) +
-                        "  Return: " + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow, 6) +
-                        "  Outdoor Air: " + General::RoundSigDigits(thisAirLoopFlow.OAFlow, 6));
-                    ShowContinueError("  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedExhaustDelta, 6));
-                    ShowContinueError("  This error will only be reported once per system.");
-                    thisAirLoopFlow.FlowError = true;
+        if (!isPulseZoneSizing && !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce) {
+            for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+                auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
+                if (!thisAirLoopFlow.FlowError) {
+                    Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
+                    if (unbalancedExhaustDelta > SmallMassFlow) {
+                        ShowSevereError("CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
+                            " is unbalanced. Supply is > return plus outdoor air.");
+                        ShowContinueErrorTimeStamp("");
+                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" + General::RoundSigDigits(thisAirLoopFlow.SupFlow * DataEnvironment::StdRhoAir, 6) +
+                            "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow*DataEnvironment::StdRhoAir, 6) +
+                            "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow*DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta*DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  This error will only be reported once per system.");
+                        thisAirLoopFlow.FlowError = true;
+                    }
                 }
             }
         }
