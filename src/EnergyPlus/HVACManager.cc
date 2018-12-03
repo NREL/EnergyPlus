@@ -3012,7 +3012,7 @@ namespace HVACManager {
     void CheckAirLoopFlowBalance()
     {
         // Check for unbalanced airloop
-        if (!isPulseZoneSizing && !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce) {
+        if (!DataGlobals::WarmupFlag && AirLoopsSimOnce) {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
                 if (!thisAirLoopFlow.FlowError) {
