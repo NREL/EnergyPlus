@@ -780,7 +780,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
         }
 
         if (!DataIPShortCuts::lAlphaFieldBlanks(11)) {
-            demandMeterName_ = DataIPShortCuts::cAlphaArgs(11);
+            trackSorageOpMeterName_ = DataIPShortCuts::cAlphaArgs(11);
 
         } else {
             if (storageScheme_ == StorageOpScheme::meterDemandStoreExcessOnSite) { // throw error
