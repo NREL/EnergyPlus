@@ -18,19 +18,45 @@ using namespace std::placeholders;
 
 #define UNUSED(expr) do { (void)(expr); } while (0);
 
+struct Variable {
+  Variable(const char * name, int ref)
+    : valueRef(ref)
+  {
+    std::vector<std::string> strings;
+    std::istringstream f(name);
+    std::string s;    
+    while (std::getline(f, s, ',')) {
+        strings.push_back(s);
+    }
+
+    zoneName = strings[0];
+    varName = strings[1];
+  };
+
+  int zoneNum() const {
+    std::string name(zoneName);
+    std::transform(name.begin(), name.end(),name.begin(), ::toupper);
+    for ( int i = 0; i < EnergyPlus::DataGlobals::NumOfZones; ++i ) {
+      if ( EnergyPlus::DataHeatBalance::Zone[i].Name == name ) {
+        return i + 1;
+      }
+    }
+  
+    return 0;
+  };
+
+  std::string zoneName;
+  int valueRef;
+  std::string varName;
+};
+
 std::map<unsigned int, std::function<void(double*)> > valueGetters;
 std::map<unsigned int, std::function<void(const double*)> > valueSetters;
 std::thread * epthread;
 
-const char ** g_parameterNames;
-const unsigned int * g_parameterValueReferences;
-size_t g_nPar;
-const char ** g_inputNames;
-const unsigned int * g_inputValueReferences;
-size_t g_nInp;
-const char ** g_outputNames;
-const unsigned int * g_outputValueReferences;
-size_t g_nOut;
+std::vector<Variable> parameters;
+std::vector<Variable> inputs;
+std::vector<Variable> outputs;
 
 void noGetter(double*) {
   // This Getter is not implemented
@@ -67,48 +93,6 @@ void getZoneCapacityMult(double* mult, int zoneNum) {
   *mult = EnergyPlus::DataHeatBalance::Zone( zoneNum ).ZoneVolCapMultpSens;
 }
 
-// Pair of strings, first is a zone name, second is a variable name
-typedef std::pair<std::string, std::string> NamePair;
-
-struct VarInfo {
-  std::string zoneName;
-  int zoneNum;
-  int varValueRef;
-  std::string varName;
-};
-
-int zoneIndex(const std::string & zoneName) {
-  std::string name(zoneName);
-  std::transform(name.begin(), name.end(),name.begin(), ::toupper);
-  for ( int i = 0; i < EnergyPlus::DataGlobals::NumOfZones; ++i ) {
-    if ( EnergyPlus::DataHeatBalance::Zone[i].Name == name ) {
-      return i + 1;
-    }
-  }
-
-  return 0;
-}
-
-// Split a char * with zone name and variable name, 
-// separated by a ","
-VarInfo createVarInfo(const char * name, int varValueRef) {
-  NamePair pair;
-
-  std::vector<std::string> strings;
-  std::istringstream f(name);
-  std::string s;    
-  while (std::getline(f, s, ',')) {
-      strings.push_back(s);
-  }
-
-  VarInfo info;
-  info.zoneName = strings[0];
-  info.varName = strings[1];
-  info.zoneNum = zoneIndex(info.zoneName);
-  info.varValueRef = varValueRef;
-
-  return info;
-}
 
 unsigned int instantiate(const char *input,
                          const char *weather,
@@ -128,17 +112,16 @@ unsigned int instantiate(const char *input,
   UNUSED(instanceName);
   UNUSED(log);
 
-  g_parameterNames = parameterNames;
-  g_parameterValueReferences = parameterValueReferences;
-  g_nPar = nPar;
-  g_inputNames = inputNames;
-  g_inputValueReferences = inputValueReferences;
-  g_nInp = nInp;
-  g_outputNames = outputNames;
-  g_outputValueReferences = outputValueReferences;
-  g_nOut = nOut;
-
   for ( size_t i = 0; i < nPar; ++i ) {
+    parameters.emplace_back(parameterNames[i], parameterValueReferences[i]);
+  }
+
+  for ( size_t i = 0; i < nInp; ++i ) {
+    inputs.emplace_back(inputNames[i], inputValueReferences[i]);
+  }
+
+  for ( size_t i = 0; i < nOut; ++i ) {
+    outputs.emplace_back(outputNames[i], outputValueReferences[i]);
   }
 
   const int argc = 8;
@@ -180,31 +163,25 @@ unsigned int setupExperiment(double tStart,
     time_cv.wait( lk, [](){ return epstatus == EPStatus::IDLE; } );
   }
 
-  for ( size_t i = 0; i < g_nInp; ++i ) {
-    const char * inputNamePair = g_inputNames[i];
-    const unsigned int inputValueRef = g_inputValueReferences[i];
-
-    auto varInfo = createVarInfo(inputNamePair, inputValueRef);
-
-    if ( varInfo.varName == "T" ) {
-      valueSetters[varInfo.varValueRef] = std::bind(setZoneTemperature, _1, varInfo.zoneNum);
+  for ( const auto & param : parameters ) {
+    if ( param.varName == "V" ) {
+      valueGetters[param.valueRef] = std::bind(getZoneVolume, _1, param.zoneNum());
+    } else if ( param.varName == "AFlo" ) {
+      valueGetters[param.valueRef] = std::bind(getZoneFloorArea, _1, param.zoneNum());
+    } else if ( param.varName == "mSenFac" ) {
+      valueGetters[param.valueRef] = std::bind(getZoneCapacityMult, _1, param.zoneNum());
     }
   }
 
-  for ( size_t i = 0; i < g_nOut; ++i ) {
-    const char * outputNamePair = g_outputNames[i];
-    const unsigned int outputValueRef = g_outputValueReferences[i];
+  for ( const auto & input : inputs ) {
+    if ( input.varName == "T" ) {
+      valueSetters[input.valueRef] = std::bind(setZoneTemperature, _1, input.zoneNum());
+    }
+  }
 
-    auto varInfo = createVarInfo(outputNamePair, outputValueRef);
-
-    if ( varInfo.varName == "QConSen_flow" ) {
-      valueGetters[varInfo.varValueRef] = std::bind(getZoneH, _1, varInfo.zoneNum);
-    } else if ( varInfo.varName == "V" ) {
-      valueGetters[varInfo.varValueRef] = std::bind(getZoneVolume, _1, varInfo.zoneNum);
-    } else if ( varInfo.varName == "AFlo" ) {
-      valueGetters[varInfo.varValueRef] = std::bind(getZoneFloorArea, _1, varInfo.zoneNum);
-    } else if ( varInfo.varName == "mSenFac" ) {
-      valueGetters[varInfo.varValueRef] = std::bind(getZoneCapacityMult, _1, varInfo.zoneNum);
+  for ( const auto & output : outputs ) {
+    if ( output.varName == "QConSen_flow" ) {
+      valueGetters[output.valueRef] = std::bind(getZoneH, _1, output.zoneNum());
     }
   }
 

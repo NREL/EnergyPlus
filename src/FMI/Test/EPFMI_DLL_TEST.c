@@ -175,16 +175,23 @@ int main(){
 
 	const char * outputNames[] = {
 	"Attic,QConSen_flow", "Core_ZN,QConSen_flow", "Perimeter_ZN_1,QConSen_flow", "Perimeter_ZN_2,QConSen_flow", "Perimeter_ZN_3,QConSen_flow", "Perimeter_ZN_4,QConSen_flow",
+	};
+	const unsigned int outputValueReferences[] = {
+	  6, 7, 8, 9, 10, 11
+	};
+
+	const char * parNames[] = {
 	"Attic,V", "Core_ZN,V", "Perimeter_ZN_1,V", "Perimeter_ZN_2,V", "Perimeter_ZN_3,V", "Perimeter_ZN_4,V",
 	"Attic,AFlo", "Core_ZN,AFlo", "Perimeter_ZN_1,AFlo", "Perimeter_ZN_2,AFlo", "Perimeter_ZN_3,AFlo", "Perimeter_ZN_4,AFlo",
 	"Attic,mSenFac", "Core_ZN,mSenFac", "Perimeter_ZN_1,mSenFac", "Perimeter_ZN_2,mSenFac", "Perimeter_ZN_3,mSenFac", "Perimeter_ZN_4,mSenFac"
 	};
-	const unsigned int outputValueReferences[] = {
-	  6, 7, 8, 9, 10, 11,
+	const unsigned int parValueReferences[] = {
 	  12, 13, 14, 15, 16, 17,
 	  18, 19, 20, 21, 22, 23,
 	  24, 25, 26, 27, 28, 29
 	};
+
+
   retVal = loadLib(fmulib, fmu);
 	if (retVal  < 0) {
 		 printf("There was an error loading the EnergyPlus library\n");
@@ -194,15 +201,15 @@ int main(){
                            weather, // weather
                            idd, // idd
                            "office", // instanceName
-                           NULL, // parameterNames
-                           NULL, // parameterValueReferences[]
-                           0, // nPar
+                           parNames, // parameterNames
+                           parValueReferences, // parameterValueReferences[]
+                           18, // nPar
                            inputNames, // inputNames
                            inputValueReferences, // inputValueReferences[]
                            6, // nInp
                            outputNames, // outputNames
                            outputValueReferences, // outputValueReferences[]
-                           24, // nOut
+                           6, // nOut
                            NULL); //log);
 
 

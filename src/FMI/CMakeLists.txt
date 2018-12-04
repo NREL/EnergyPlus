@@ -32,13 +32,6 @@ add_executable( libfmi_test Test/EPFMI_DLL_TEST.c )
 add_dependencies( libfmi_test epfmi )
 target_link_libraries( libfmi_test ${CMAKE_DL_LIBS} )
 
-set(test_src
-  Test/EPFMI_Test.cpp
-  Test/main.cc
-)
-
-CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
-
 install( TARGETS epfmi
   RUNTIME DESTINATION ./bin
   LIBRARY DESTINATION ./lib
