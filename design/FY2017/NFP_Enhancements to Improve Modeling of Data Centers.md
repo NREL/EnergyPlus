@@ -22,7 +22,7 @@ Based on discussions with data center experts and manufacturers, data centers ar
 
 $$\Delta T_{supply}=\Delta T_{in}-\Delta T_{supply}$$
 
-$$\Delta T_{return}=\Delta T_{return}-\Delta T_{return-mixed</sub}$$
+$$\Delta T_{return}=\Delta T_{return}-\Delta T_{out}$$
 
 Where, 
 
@@ -32,7 +32,7 @@ T<sub>supply</sub> : AHU supply air temperature
 
 T<sub>return</sub> : The actual AHU return air temperature
 
-T<sub>airzone</sub> : The calculated zone air temperature (or return air temperature) if the room is well-mixed
+T<sub>out</sub> : The IT equipment outlet temperature
 
 The two approach temperatures can be calculated by CFD tools for typical IT load levels and air flow management of data centers, or provided by measurement data or lookup tables. 
 
@@ -81,13 +81,13 @@ We propose a calculation logic as shown in Figure 2. Detailed calculation steps 
 + **Step 3**:
 	Calculate AHU return air temperature (Treturn) and AHU air flow rate (V\_AHU).
 	
-	$$T_{return}=\Delta T_{return}+T_{return-mixed}$$
+	$$T_{return}=\Delta T_{return}+T_{out}$$
 
 	$$Q_{AHU}=Q_{IT}+Q_{ITfan}+Q_{UPS}$$
 
 	$$V_{AHU}=Q_{AHU}/(T_{return}-T_{supply})$$
 	- Input:
-		- T<sub>return-mixed</sub>: The calculated AHU return air temperature if air is well-mixed. This is the simulated result from the last time step based on the zone setpoint in EnergyPlus
+		- T<sub>out</sub>: IT equipment outlet temperature
 		- ∆T<sub>return</sub>: Return approach temperature
 		- Q<sub>UPS</sub>*: UPS load
 	- Output:
