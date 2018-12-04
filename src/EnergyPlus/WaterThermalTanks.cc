@@ -8524,47 +8524,21 @@ namespace WaterThermalTanks {
             }
         }();
 
-//        Real64 TempUp = 0.0;                // Temperature of the upper node (C)
-//        Real64 TempDn = 0.0;                // Temperature of the lower node (C)
-//        Real64 Eloss = 0.0;                 // Energy change due to ambient losses over the timestep (J)
-//        Real64 Elosszone = 0.0;             // Energy change to the zone due to ambient losses over the timestep (J)
-//        Real64 Euse = 0.0;                  // Energy change due to use side mass flow over the timestep (J)
-//        Real64 Esource = 0.0;               // Energy change due to source side mass flow over the timestep (J)
-//        Real64 Eheater1 = 0.0;              // Energy change due to heater 1 over the timestep (J)
-//        Real64 Eheater2 = 0.0;              // Energy change due to heater 2 over the timestep (J)
-//        Real64 Event = 0.0;                 // Energy change due to venting over the timestep (J)
-//        Real64 Eneeded = 0.0;               // Energy change needed over the timestep (J)
-//        Real64 Eunmet = 0.0;                // Energy change unmet over the timestep (J)
-//        Real64 Efuel = 0.0;                 // Energy change for fuel consumed over the timestep (J)
-//        Real64 Eoncycfuel = 0.0;            // Fuel energy consumed by on-cycle parasitics over the timestep (J)
-//        Real64 Eoffcycfuel = 0.0;           // Fuel energy consumed by off-cycle parasitics over the timestep (J)
+        Real64 Eloss = 0.0;                 // Energy change due to ambient losses over the timestep (J)
+        Real64 Euse = 0.0;                  // Energy change due to use side mass flow over the timestep (J)
+        Real64 Esource = 0.0;               // Energy change due to source side mass flow over the timestep (J)
+        Real64 Eheater1 = 0.0;              // Energy change due to heater 1 over the timestep (J)
+        Real64 Eheater2 = 0.0;              // Energy change due to heater 2 over the timestep (J)
+        Real64 Eunmet = 0.0;                // Energy change unmet over the timestep (J)
         int CycleOnCount1 = 0;              // Number of times heater 1 cycles on in the current time step
         int CycleOnCount2 = 0;              // Number of times heater 2 cycles on in the current time step
-//        Real64 Runtime = 0.0;               // Time that either heater is running (s)
-//        Real64 Runtime1 = 0.0;              // Time that heater 1 is running (s)
-//        Real64 Runtime2 = 0.0;              // Time that heater 2 is running (s)
+        Real64 Runtime = 0.0;               // Time that either heater is running (s)
+        Real64 Runtime1 = 0.0;              // Time that heater 1 is running (s)
+        Real64 Runtime2 = 0.0;              // Time that heater 2 is running (s)
         bool SetPointRecovered = false;     // Flag to indicate when set point is recovered for the first time
 
-//        Real64 Quse;                // Heating rate due to use side mass flow (W)
-//        Real64 Qsource;             // Heating rate due to source side mass flow (W)
-//        Real64 Qcond;               // Heating rate due to vertical conduction between nodes
-//        Real64 Qflow;               // Heating rate due to fluid flow between inlet and outlet nodes
-//        Real64 Qmix;                // Heating rate due to temperature inversion mixing between nodes
-//        Real64 Qloss;               // Heating rate due to ambient environment (W)
-//        Real64 Qlosszone;           // Heating rate of fraction of losses added to the zone as a gain (W)
-//        Real64 Qheat;               // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
         Real64 Qheater1;            // Heating rate of burner or electric heating element 1 (W)
         Real64 Qheater2;            // Heating rate of burner or electric heating element 2 (W)
-//        Real64 Qheater;             // Combined heating rate of heater 1 and 2 (W)
-        Real64 Qoffcycfuel;         // Fuel consumption rate of off-cycle parasitics (W)
-//        Real64 Qoffcycheat;         // Heating rate of fraction of off-cycle parasitics added to the tank (W)
-        Real64 Qoncycfuel;          // Fuel consumption rate on-cycle parasitics added to the tank (W)
-//        Real64 Qoncycheat;          // Heating rate of fraction of on-cycle parasitics added to the tank (W)
-//        Real64 Qneeded;             // Heating rate needed to recover or maintain the setpoint temperature (W)
-//        Real64 Qunmet;              // The difference between Qneeded and Qheater (W)
-//        Real64 Qvent;               // Heating rate due to venting because tank exceeded max temperature limit (W)
-        Real64 Qfuel;               // Heating rate for fuel consumed (W)
-//        Real64 Qusl;                // Quse + Qsource + Qloss
 
         if (Tank.InletMode == InletModeFixed) CalcNodeMassFlows(WaterThermalTankNum, InletModeFixed);
 
@@ -8585,18 +8559,29 @@ namespace WaterThermalTanks {
         std::vector<Real64> Tavg;
         Tavg.resize(nTankNodes);
 
-        auto calc_time_until_temperature = [&Tank, &A, &B, &Tavg](Real64 Tf, int NodeNum) -> Real64 {
+        auto calc_time_until_temperature = [&Tank, &A, &B](Real64 Tf, int NodeNum) -> Real64 {
             const int i = NodeNum - 1;
             const int b_a = B[i] / A[i];
-            return 1.0 / A[i] * log((Tf + b_a) / (Tank.Node(NodeNum).Temp + b_a));
+            const Real64 logexpr = (Tf + b_a) / (Tank.Node(NodeNum).Temp + b_a);
+            if (logexpr > 0.0) {
+                const Real64 retval = log(logexpr) / A[i];
+                if (retval > 0.0) {
+                    return retval;
+                } else {
+                    return std::numeric_limits<Real64>::max();
+                }
+            } else {
+                return std::numeric_limits<Real64>::max();
+            }
         };
 
         while(TimeRemaining > 0.0) {
 
-            // Make initial guess that average temperatures over the timestep are equal to the starting temperatures
+            // Make initial guess that average and final temperatures over the timestep are equal to the starting temperatures
             {
                 int i = 0;
                 for (auto &e : Tank.Node) {
+                    Tfinal[i] = e.Temp;
                     Tavg[i++] = e.Temp;
                 }
             }
@@ -8659,20 +8644,12 @@ namespace WaterThermalTanks {
                     Qheater2 = 0.0;
                 }
             }
-            Real64 const Qheaters(Qheater1 + Qheater2);
-
-            if (Tank.HeaterOn1 || Tank.HeaterOn2) {
-                Qfuel = Qheaters / Tank.Efficiency;
-                Qoncycfuel = Tank.OnCycParaLoad;
-                Qoffcycfuel = 0.0;
-            } else {
-                Qfuel = 0.0;
-                Qoncycfuel = 0.0;
-                Qoffcycfuel = Tank.OffCycParaLoad;
-            }
 
             Real64 dt;
             for (int ConvergenceCounter = 1; ConvergenceCounter <= 10; ConvergenceCounter++) {
+
+                std::fill(A.begin(), A.end(), 0.0);
+                std::fill(B.begin(), B.end(), 0.0);
 
                 // Heater Coefficients
                 B[Tank.HeaterNode1 - 1] += Qheater1;
@@ -8685,13 +8662,13 @@ namespace WaterThermalTanks {
                     // Parasitic Loads and Losses to Ambient
                     if (Tank.HeaterOn1 || Tank.HeaterOn2) {
                         // Parasitic Loads
-                        B[i] += tank_node.OnCycParaLoad * Tank.OnCycParaFracToTank; // TODO: stop double counting this!
+                        B[i] += tank_node.OnCycParaLoad;
                         // Losses to Ambient
                         A[i] += -tank_node.OnCycLossCoeff;
                         B[i] += tank_node.OnCycLossCoeff * Tank.AmbientTemp;
                     } else {
                         // Parasitic Loads
-                        B[i] += tank_node.OffCycParaLoad * Tank.OffCycParaFracToTank; // TODO: stop double counting this!
+                        B[i] += tank_node.OffCycParaLoad;
                         // Losses to Ambient
                         A[i] += -tank_node.OffCycLossCoeff;
                         B[i] += tank_node.OffCycLossCoeff * Tank.AmbientTemp;
@@ -8703,22 +8680,24 @@ namespace WaterThermalTanks {
                     if (NodeNum < nTankNodes) B[i] += tank_node.CondCoeffDn * Tavg[i+1];
 
                     // Use side plant connection
-                    const Real64 use_e_mdot_cp = Tank.UseEffectiveness * tank_node.UseMassFlowRate * Cp; // TODO: stop double counting the effectiveness!
+                    const Real64 use_e_mdot_cp = tank_node.UseMassFlowRate * Cp;
                     A[i] += -use_e_mdot_cp;
                     B[i] += use_e_mdot_cp * Tank.SourceInletTemp;
 
-                    if (Tank.HeatPumpNum > 0) {
-                        // Heat Pump Water Heater
-                        if ((HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped) && (tank_node.SourceMassFlowRate > 0.0) ) {
-                            B[i] += Qheatpump;
-                        } else if (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped) {
-                            B[i] += Qheatpump * tank_node.HPWHWrappedCondenserHeatingFrac;
-                        }
+                    // Source side heat transfer rate
+                    if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
+                        // Pumped Condenser Heat Pump Water Heater
+                        if (tank_node.SourceMassFlowRate > 0.0) B[i] += Qheatpump;
                     } else {
                         // Source side plant connection (constant temperature)
-                        const Real64 src_e_mdot_cp = Tank.SourceEffectiveness * tank_node.SourceMassFlowRate * Cp; // TODO: stop double counting the effectiveness!
+                        const Real64 src_e_mdot_cp = tank_node.SourceMassFlowRate * Cp;
                         A[i] += -src_e_mdot_cp;
                         B[i] += src_e_mdot_cp * Tank.SourceInletTemp;
+                    }
+
+                    // Wrapped condenser heat pump water heater
+                    if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped)) {
+                        B[i] += Qheatpump * tank_node.HPWHWrappedCondenserHeatingFrac;
                     }
 
                     // Internodal flow
@@ -8728,6 +8707,14 @@ namespace WaterThermalTanks {
 
                     // Inversion Mixing
                     // TODO: Figure out what to do here...
+
+                    // Venting
+                    // TODO: Figure out what to do with venting.
+
+                    // Divide by mass and specific heat
+                    // m * cp * dT/dt = q_net  =>  dT/dt = a * T + b
+                    A[i] /= tank_node.Mass * Cp;
+                    B[i] /= tank_node.Mass * Cp;
 
 
                 } // end for each node
@@ -8746,12 +8733,12 @@ namespace WaterThermalTanks {
                 }
 
                 // Calculate the average and final temperatures over the interval
-                Real64 TfinalDiff = std::numeric_limits<Real64>::max();
+                Real64 TfinalDiff = 0.0;
                 for (int i=0; i < nTankNodes; i++) {
                     const Real64 Tstart = Tank.Node(i+1).Temp;
                     const Real64 b_a = B[i] / A[i];
                     const Real64 e_a_dt = exp(A[i] * dt);
-                    Tavg[i] = (Tstart + b_a) * e_a_dt / (A[i] * dt) - b_a;
+                    Tavg[i] = (Tstart + b_a) * (e_a_dt - 1.0) / (A[i] * dt) - b_a;
                     const Real64 Tfinal_old = Tfinal[i];
                     Tfinal[i] = (Tstart + b_a) * e_a_dt - b_a;
                     TfinalDiff = max(fabs(Tfinal[i] - Tfinal_old), TfinalDiff);
@@ -8764,16 +8751,123 @@ namespace WaterThermalTanks {
             TimeRemaining -= dt;
             {
                 int i = 0;
+                Real64 Qloss = 0.0;
                 for (auto &e : Tank.Node) {
-                    e.Temp = Tfinal[i++];
-                }
-            }
+                    e.Temp = Tfinal[i];
+                    e.TempSum += Tavg[i] * dt;
 
-            // TODO: Bookkeeping for reporting variables
+                    // Bookkeeping for reporting variables
+                    if (Tank.HeaterOn1 || Tank.HeaterOn2) {
+                        Qloss += e.OnCycLossCoeff * (Tank.AmbientTemp - Tavg[i]);
+                    } else {
+                        Qloss += e.OffCycLossCoeff * (Tank.AmbientTemp - Tavg[i]);
+                    }
+
+                    ++i;
+                }
+                // More bookkeeping for reporting variables
+                Eloss += Qloss * dt;
+                const Real64 Quse = Tank.UseEffectiveness * Tank.UseMassFlowRate * Cp * (Tank.UseInletTemp - Tavg[Tank.UseInletStratNode - 1]);
+                Euse += Quse * dt;
+                Real64 Qsource;
+                if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
+                    Qsource = Qheatpump;
+                } else {
+                    Qsource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[Tank.SourceInletStratNode - 1]);
+                }
+                Esource += Qsource * dt;
+                if (Tank.HeaterOn1) Runtime1 += dt;
+                if (Tank.HeaterOn2) Runtime2 += dt;
+                if (Tank.HeaterOn1 || Tank.HeaterOn2) Runtime += dt;
+                Eheater1 += Qheater1 * dt;
+                Eheater2 += Qheater2 * dt;
+                Real64 Qneeded = -(Quse + Qsource + Qloss);
+                Qneeded -= (Tank.HeaterOn1 || Tank.HeaterOn2) ? Tank.OnCycParaLoad * Tank.OnCycParaFracToTank : Tank.OffCycParaLoad * Tank.OffCycParaFracToTank;
+                Qneeded = max(Qneeded, 0.0);
+                const Real64 Qunmet = max(Qneeded - Qheater1 - Qheater2, 0.0);
+                Eunmet += Qunmet * dt;
+            }
 
         } // end while TimeRemaining > 0.0
 
-        // TODO: Reporting variables
+        for (auto &e : Tank.Node) {
+            e.TempAvg = e.TempSum / SecInTimeStep;
+            e.TempSum = 0.0;
+        }
+
+        Tank.TankTemp = sum(Tank.Node, &StratifiedNodeData::Temp) / Tank.Nodes;
+        Tank.TankTempAvg = sum(Tank.Node, &StratifiedNodeData::TempAvg) / Tank.Nodes;
+
+        if (Tank.UseOutletStratNode > 0) {
+            Tank.UseOutletTemp = Tank.Node(Tank.UseOutletStratNode).TempAvg;
+            // Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
+            if (Tank.UseMassFlowRate > 0.0) {
+                Tank.UseOutletTemp = Tank.UseInletTemp * (1.0 - Tank.UseEffectiveness) + Tank.UseOutletTemp * Tank.UseEffectiveness;
+            }
+        }
+
+        if (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped) {
+            // If we have a wrapped condenser HPWH, set the source outlet to the weighted average of the node
+            // temperatures the condenser sees
+            Real64 WeightedAverageSourceOutletTemp(0.0);
+            for (int i = 1; i <= Tank.Nodes; ++i) {
+                WeightedAverageSourceOutletTemp += Tank.Node(i).TempAvg * Tank.Node(i).HPWHWrappedCondenserHeatingFrac;
+            }
+            Tank.SourceOutletTemp = WeightedAverageSourceOutletTemp;
+        } else if (Tank.SourceOutletStratNode > 0) {
+            // otherwise set it to the temperature of the source outlet node
+            Tank.SourceOutletTemp = Tank.Node(Tank.SourceOutletStratNode).TempAvg;
+        }
+        if (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped) {
+            // For pumped condensers, set the source inlet and outlets to match the delta T
+            // across the water side of the DX coil.
+            HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+            DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+            DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+            Real64 const HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
+            Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
+        }
+
+        // Revised source outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
+        if (Tank.SourceOutletStratNode > 0) {
+            if (Tank.SourceMassFlowRate > 0.0) {
+                Tank.SourceOutletTemp = Tank.SourceInletTemp * (1.0 - Tank.SourceEffectiveness) + Tank.SourceOutletTemp * Tank.SourceEffectiveness;
+            }
+        }
+
+        Tank.LossRate = Eloss / SecInTimeStep;
+        Tank.UseRate = Euse / SecInTimeStep;
+        if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
+            Tank.SourceRate = Qheatpump;
+        } else {
+            Tank.SourceRate = Esource / SecInTimeStep;
+        }
+
+        Tank.OffCycParaFuelRate = Tank.OffCycParaLoad * (SecInTimeStep - Runtime) / SecInTimeStep;
+        Tank.OnCycParaFuelRate = Tank.OnCycParaLoad * Runtime / SecInTimeStep;
+        Tank.OffCycParaRateToTank = Tank.OffCycParaFuelRate * Tank.OffCycParaFracToTank;
+        Tank.OnCycParaRateToTank = Tank.OnCycParaFuelRate * Tank.OnCycParaFracToTank;
+        Tank.TotalDemandRate = -Tank.UseRate - Tank.SourceRate - Tank.LossRate - Tank.OffCycParaRateToTank - Tank.OnCycParaRateToTank;
+        Tank.HeaterRate1 = Eheater1 / SecInTimeStep;
+        Tank.HeaterRate2 = Eheater2 / SecInTimeStep;
+        Tank.HeaterRate = Tank.HeaterRate1 + Tank.HeaterRate2;
+
+        Tank.UnmetRate = Eunmet / SecInTimeStep;
+        Tank.VentRate = 0.0; // TODO: Calculate vent rate
+        Tank.NetHeatTransferRate = Tank.UseRate + Tank.SourceRate + Tank.LossRate + Tank.OffCycParaRateToTank + Tank.OnCycParaRateToTank + Tank.HeaterRate + Tank.VentRate;
+
+        Tank.CycleOnCount = CycleOnCount1 + CycleOnCount2;
+        Tank.CycleOnCount1 = CycleOnCount1;
+        Tank.CycleOnCount2 = CycleOnCount2;
+
+        Tank.RuntimeFraction = Runtime / SecInTimeStep;
+        Tank.RuntimeFraction1 = Runtime1 / SecInTimeStep;
+        Tank.RuntimeFraction2 = Runtime2 / SecInTimeStep;
+
+        Tank.FuelRate = (Eheater1 + Eheater2) / Tank.Efficiency / SecInTimeStep;
+
+        // Add water heater skin losses and venting losses to ambient zone, if specified
+        if (Tank.AmbientTempZone > 0) Tank.AmbientZoneGain = -Tank.LossRate * Tank.SkinLossFracToZone - Tank.VentRate;
 
     }
 
