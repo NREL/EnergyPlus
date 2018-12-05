@@ -23,7 +23,13 @@ UtilityCost:Tariff,
 
 Overall, the goals of the economics section of EnergyPlus are to make simple tariffs easy to model and complex tariffs possible to model.
 
-The cost implications of alternative, energy-related design options may be important in determining the whether or not a particular design is viable. Although the main purpose of EnergyPlus is to determine the energy performance of a building, component cost modeling is provided to allow estimating initial construction costs associated with the building and HVAC system being modeled. This is provided in order to ensure that cost estimates are consistent with the EnergyPlus model and it allows using results calculated during a simulation such as equipment sizes and surface areas. The cost estimating capabilities are not comprehensive and are not intended to duplicate all the types of analyses included in cost estimating software. Economics modeling is being implemented in stages. Future versions of EnergyPlus will add other investment related analyses such as life-cycle cost. The objects used by EnergyPlus for calculating first costs for construction projects are as follows:
+The cost implications of alternative, energy-related design options may be important in determining the whether or not a particular design is viable.
+Although the main purpose of EnergyPlus is to determine the energy performance of a building, component cost modeling is provided to allow estimating initial construction costs associated with the building and HVAC system being modeled.
+This is provided in order to ensure that cost estimates are consistent with the EnergyPlus model and it allows using results calculated during a simulation such as equipment sizes and surface areas.
+The cost estimating capabilities are not comprehensive and are not intended to duplicate all the types of analyses included in cost estimating software.
+Economics modeling is being implemented in stages.
+
+The objects used by EnergyPlus for calculating first costs for construction projects are as follows:
 
 \begin{itemize}
 \item
@@ -36,4 +42,21 @@ The cost implications of alternative, energy-related design options may be impor
 
 The results of the cost estimate are reported in a Construction Cost Estimate Summary table provided that the user requests the results using the object Output:Table:SummaryReports object with the Component Cost Economics Summary option selected. The style of this predefined report can be controlled using the OutputControl:Table:Style object. If the Annual Building Performance Report Summary is also requested, then cost estimate results will follow that data in the same output file.
 
-The rest of this Economics section is organized to first present reference material on tariff calculations followed by construction cost estimating.
+EnergyPlus also implements other objects for life-cycle costing:
+
+\begin{itemize}
+\item
+  LifeCycleCost:Parameters
+\item
+  LifeCycleCost:RecurringCosts
+\item
+  LifeCycleCost:NonrecurringCost
+\item
+  LifeCycleCost:UsePriceEscalation
+\item
+  LifeCycleCost:UseAdjustment
+\end{itemize}
+
+
+The rest of this Economics section is organized to first present reference material on tariff calculations followed by construction cost estimating, and finally
+life-cycle costing

@@ -659,14 +659,11 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
     case ';':
         return Token::SEMICOLON;
     default:
-        static std::string const search_chars("-:.#/\\[]{}_@$%^&*()|+=<>?'\"~");
         static std::string const numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
             return Token::NUMBER;
-        } else if (isalnum(c) || (std::string::npos != search_chars.find_first_of(c))) {
-            return Token::STRING;
         }
-        break;
+        return Token::STRING;
     }
     decrement_both_index(index, index_into_cur_line);
     return Token::NONE;
