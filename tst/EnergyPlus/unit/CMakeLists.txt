@@ -122,6 +122,7 @@ set( test_src
   Plant/Branch.unit.cc
   Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantCentralGSHP.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantComponentTemperatureSources.unit.cc
