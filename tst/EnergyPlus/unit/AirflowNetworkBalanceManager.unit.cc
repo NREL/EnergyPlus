@@ -12991,10 +12991,10 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
     Node(AirflowNetwork::DisSysCompCVFData(2).InletNode).MassFlowRate = 0.52;
     AirflowNetwork::DisSysCompCVFData(2).FlowRate = Node(AirflowNetwork::DisSysCompCVFData(2).InletNode).MassFlowRate;
 
-    AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode = 1;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.2795108;
-    AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode = 6;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode).MassFlowRate = 0.1095108;
+    AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode = 1;
+    Node(AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode).MassFlowRate = 0.2795108;
+    AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode = 6;
+    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.1095108;
 
     if (AirflowNetwork::DisSysCompReliefAirData(1).InletNode == 0) {
         AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
