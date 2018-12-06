@@ -493,9 +493,21 @@ namespace PlantCentralGSHP {
                         if (Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCoolingWasAutoSized) {
                             Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling = tmpNomCap;
 
+                            // Now that we have the Reference Cooling Capacity, we need to also initialize the Heating side
+                            // given the ratios
                             Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg =
                                 Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling *
                                 Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).ClgHtgToCoolingCapRatio;
+
+                            Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefPowerClgHtg =
+                                ( Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling
+                                / Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCOPCooling )
+                                * Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).ClgHtgtoCogPowerRatio;
+
+                            Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCOPClgHtg =
+                                Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg
+                                / Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefPowerClgHtg;
+
                             if (PlantFinalSizesOkayToReport) {
                                 ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                    Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).Name,
@@ -552,13 +564,14 @@ namespace PlantCentralGSHP {
                 }
 
                 // auto-size the condenser volume flow rate
-                // each individule chiller heater module is sized to be capable of supporting the total load on the wrapper
+                // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizCondNum > 0) {
                     if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                         rho = GetDensityGlycol(PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidIndex,
                                                RoutineName);
+                        // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
                         Cp = GetSpecificHeatGlycol(PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidName,
                                                    Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).TempRefCondIn,
                                                    PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidIndex,
@@ -1383,11 +1396,9 @@ namespace PlantCentralGSHP {
             ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling = rNumericArgs(3);
             ChillerHeater(ChillerHeaterNum).TempRefCondInCooling = rNumericArgs(4);
             ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling = rNumericArgs(5);
-            ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = rNumericArgs(6);
-            if (!ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
-                ChillerHeater(ChillerHeaterNum).RefCapClgHtg = rNumericArgs(6) * ChillerHeater(ChillerHeaterNum).RefCapCooling;
-            }
 
+            // Reference Heating Mode Ratios for Capacity and Power
+            ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = rNumericArgs(6);
             if (rNumericArgs(6) == 0.0) {
                 ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Entered in " + cNumericFieldNames(6) + '=' + RoundSigDigits(rNumericArgs(6), 2));
@@ -1395,16 +1406,23 @@ namespace PlantCentralGSHP {
             }
 
             ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio = rNumericArgs(7);
-            ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =
-                ChillerHeater(ChillerHeaterNum).RefCapCooling / ChillerHeater(ChillerHeaterNum).RefCOPCooling * rNumericArgs(7);
-            ChillerHeater(ChillerHeaterNum).RefCOPClgHtg =
-                ChillerHeater(ChillerHeaterNum).RefCapClgHtg / ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
-
             if (rNumericArgs(7) == 0.0) {
                 ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Entered in " + cNumericFieldNames(7) + '=' + RoundSigDigits(rNumericArgs(7), 2));
                 CHErrorsFound = true;
             }
+
+
+            if (!ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
+                ChillerHeater(ChillerHeaterNum).RefCapClgHtg = ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio
+                                                             * ChillerHeater(ChillerHeaterNum).RefCapCooling;
+                ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =( ChillerHeater(ChillerHeaterNum).RefCapCooling
+                                                                / ChillerHeater(ChillerHeaterNum).RefCOPCooling )
+                                                                * ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio;
+                ChillerHeater(ChillerHeaterNum).RefCOPClgHtg = ChillerHeater(ChillerHeaterNum).RefCapClgHtg
+                                                             / ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
+            }
+
 
             ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg = rNumericArgs(8);
             ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg = rNumericArgs(9);
