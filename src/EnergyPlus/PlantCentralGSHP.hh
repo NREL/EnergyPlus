@@ -427,6 +427,8 @@ namespace PlantCentralGSHP {
 
     // Functions
 
+    void clear_state();
+
     void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
                                         int const EquipFlowCtrl,        // Flow control mode for the equipment
                                         int &CompIndex,                 // Chiller number pointer

@@ -145,9 +145,10 @@ namespace PlantCentralGSHP {
 
     // Object Data
     Array1D<WrapperSpecs> Wrapper;
+    Array1D<WrapperReportVars> WrapperReport;
     Array1D<ChillerHeaterSpecs> ChillerHeater;
     Array1D<CHReportVars> ChillerHeaterReport;
-    Array1D<WrapperReportVars> WrapperReport;
+
 
     // MODULE SUBROUTINES:
 
@@ -155,6 +156,28 @@ namespace PlantCentralGSHP {
     //*************************************************************************
 
     // Functions
+
+
+    void clear_state()
+    {
+        GetInputWrapper = true;
+        NumWrappers = 0;
+        NumChillerHeaters = 0;
+
+        CondenserFanPower = 0.0;
+        ChillerCapFT = 0.0;
+        ChillerEIRFT = 0.0;
+        ChillerEIRFPLR = 0.0;
+        ChillerPartLoadRatio = 0.0;
+        ChillerCyclingRatio = 0.0;
+        ChillerFalseLoadRate = 0.0;
+
+        Wrapper.deallocate();
+        WrapperReport.deallocate();
+        ChillerHeater.deallocate();
+        ChillerHeaterReport.deallocate();
+
+    }
 
     void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
                                         int const EquipFlowCtrl,        // Flow control mode for the equipment
