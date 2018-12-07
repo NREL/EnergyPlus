@@ -573,7 +573,7 @@ namespace PlantCentralGSHP {
                                                RoutineName);
                         // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
                         Cp = GetSpecificHeatGlycol(PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidName,
-                                                   Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).TempRefCondIn,
+                                                   Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).TempRefCondInCooling,
                                                    PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidIndex,
                                                    RoutineName);
                         tmpCondVolFlowRate = tmpNomCap *
