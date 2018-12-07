@@ -826,6 +826,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFlowRatio * locRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;
@@ -877,6 +879,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFanRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
                                         (locFanRunTimeFraction <= m_flowFractionAtSpeed[loop + 1])) {
