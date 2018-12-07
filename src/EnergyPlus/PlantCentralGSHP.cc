@@ -2165,6 +2165,8 @@ namespace PlantCentralGSHP {
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).RefCOP = Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).RefCOPClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefEvapOut =
                         Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
+                    Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondIn =
+                        Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondOut =
                         Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).OptPartLoadRat =
