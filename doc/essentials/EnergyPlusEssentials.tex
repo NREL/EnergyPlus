@@ -1,0 +1,192 @@
+%% LyX 2.3.1-1 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\begin{document}
+\title{EnergyPlus Essentials}
+\date{December 10, 2018}
+\maketitle
+
+\section{Introduction}
+
+\section*{What is BEM?}
+
+According to the \href{https://www.bemlibrary.com/index.php/owners-managers/introduction/what-bem/}{BEM Library}:
+\begin{quotation}
+Building Energy Modeling (BEM) is the practice of using computer-based
+simulation software to perform a detailed analysis of a building\textquoteright s
+energy use and energy-using systems. The simulation software works
+by enacting a mathematical model that provides an approximate representation
+of the building. 
+
+BEM includes whole-building simulation as well as detailed component
+analysis utilizing specialized software tools that address specific
+concerns, such as moisture transfer through building materials, daylighting,
+indoor air quality, natural ventilation, and occupant comfort.
+
+BEM offers an alternative approach that encourages customized, integrated
+design solutions, which offer deeper savings. Using BEM to compare
+energy-efficiency options directs design decisions prior to construction.
+It also guides existing building projects to optimize operation or
+explore retrofit opportunities.
+\end{quotation}
+Some other terms that are used to describe the same topic are:
+\begin{itemize}
+\item Building Simulation
+\item Building Performance Simulation
+\item Building Energy Simulation
+\item Building Performance Modeling
+\end{itemize}
+Somewhat confusing, the term ``model'' can refer to both the specific
+building being described and analyzed as well as referencing the software
+for implementing a specific component of the building such as a wall
+or chiller.
+
+<add link to ashrae handbook?>
+
+\section*{Questions that BEM can answer}
+
+The most common questions that BEM can answer are:
+\begin{itemize}
+\item If my building was made or operated differently, how would the energy
+consumption change?
+\item Does my building comply with a building energy code or standard?
+\item What kind of rating or how many points can I get in a environmental
+certification program?
+\item Is my building operating as it was designed to?
+\item What is a good target for energy consumption for my building?
+\end{itemize}
+These questions can take place at different times during the life-cycle
+of a building from before schematic design all through the rest of
+the design process, and into the operation of the building
+
+\subsection*{The Design Process and BEM }
+
+\subsection*{EnergyPlus Capabilities}
+
+\subsection*{Open Source}
+
+\href{https://energyplus.net/}{EnergyPlus}is an \href{https://opensource.org/}{Open Source}
+program so all the \href{https://github.com/NREL/EnergyPlus}{source code}
+is available to inspect and modify. If you are interested in how calculations
+are performed and the \href{https://energyplus.net/documentation}{Engineering Reference}
+does not provide enough details to you, you can review the source
+code itself. \href{https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus}{Instructions to build the code}
+(compile the source code into an executable application) are available
+in source code repository wiki if you see something that needs to
+be enhanced or fixed. 
+
+\subsection*{Brief History}
+
+\subsection*{Documentation and Other Resources}
+
+\section{The EnergyPlus Ecosystem }
+
+\subsection*{Current GUIs }
+
+<Make the list for major GUIs and tools and than reference IPBSA.
+Say \textquotedbl at time of writing..\textquotedbl . Say \textquotedbl many
+people use E+ inside an existing GUI\textquotedbl . Minimize confusion
+and upkeep.> 
+
+\subsection*{Approaches to Implement Measures }
+
+\subsection*{Parametric Analysis Tools }
+
+\subsection*{Weather Files }
+
+\subsection*{Co-simulation and Linked Software }
+
+\subsection*{Interoperability }
+
+\subsection*{Example Files }
+
+\section{Using EnergyPlus }
+
+\subsection*{Running EnergyPlus}
+
+<quickstart guide>
+
+\subsection*{Run-Check-Edit Repeat}
+
+\subsection*{IDF and JSON syntax}
+
+\subsection*{Common Objects}
+
+\subsection*{Key Concepts}
+
+\subsection*{Versions and Updating}
+
+\subsection*{Errors and How to Fix Them}
+
+\subsection*{Modeling Simply}
+
+\subsection*{Quality Control}
+
+\subsection*{Choosing a Baseline}
+
+<The importance of deciding on the baseline model that is used as
+a basis of comparison for various energy efficiency measures that
+are used during the design process>
+
+\subsection*{Presenting Results to Others}
+
+\section{Introduction to Example Building Models}
+
+\section{Envelope and Geometry }
+
+\subsection*{Coordinate System}
+
+\subsection*{Surfaces and Zones}
+
+\subsection*{Zoning}
+
+\subsection*{Materials and Constructions}
+
+\subsection*{Heat Transfer to the Ground}
+
+\section{Internal Loads }
+
+\subsection*{Lights and Equipment}
+
+\subsection*{Daylighting}
+
+\subsection*{People and Comfort}
+
+\subsection*{Infiltration and Airflow}
+
+\section{HVAC }
+
+\subsection*{Ideal Loads}
+
+\subsection*{HVAC Templates}
+
+\subsection*{Zone Equipment}
+
+\subsection*{Air Loops}
+
+\subsection*{Coils}
+
+\subsection*{Plant Loops}
+
+\subsection*{Plant Equipment}
+
+\subsection*{Controls}
+
+\subsection*{EMS}
+
+\section{Economics and Emissions}
+
+\subsection*{Tariffs}
+
+\subsection*{Life Cycle Costs}
+
+\subsection*{Emissions and TDV}
+
+\section{Specific Tips }
+\end{document}

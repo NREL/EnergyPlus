@@ -1,0 +1,497 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EnergyPlus Essentials
+\end_layout
+
+\begin_layout Date
+December 10, 2018
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Section*
+What is BEM?
+\end_layout
+
+\begin_layout Standard
+According to the 
+\begin_inset CommandInset href
+LatexCommand href
+name "BEM Library"
+target "https://www.bemlibrary.com/index.php/owners-managers/introduction/what-bem/"
+literal "false"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Quotation
+Building Energy Modeling (BEM) is the practice of using computer-based simulatio
+n software to perform a detailed analysis of a building’s energy use and
+ energy-using systems.
+ The simulation software works by enacting a mathematical model that provides
+ an approximate representation of the building.
+ 
+\end_layout
+
+\begin_layout Quotation
+BEM includes whole-building simulation as well as detailed component analysis
+ utilizing specialized software tools that address specific concerns, such
+ as moisture transfer through building materials, daylighting, indoor air
+ quality, natural ventilation, and occupant comfort.
+\end_layout
+
+\begin_layout Quotation
+BEM offers an alternative approach that encourages customized, integrated
+ design solutions, which offer deeper savings.
+ Using BEM to compare energy-efficiency options directs design decisions
+ prior to construction.
+ It also guides existing building projects to optimize operation or explore
+ retrofit opportunities.
+\end_layout
+
+\begin_layout Standard
+Some other terms that are used to describe the same topic are:
+\end_layout
+
+\begin_layout Itemize
+Building Simulation
+\end_layout
+
+\begin_layout Itemize
+Building Performance Simulation
+\end_layout
+
+\begin_layout Itemize
+Building Energy Simulation
+\end_layout
+
+\begin_layout Itemize
+Building Performance Modeling
+\end_layout
+
+\begin_layout Standard
+Somewhat confusing, the term 
+\begin_inset Quotes eld
+\end_inset
+
+model
+\begin_inset Quotes erd
+\end_inset
+
+ can refer to both the specific building being described and analyzed as
+ well as referencing the software for implementing a specific component
+ of the building such as a wall or chiller.
+\end_layout
+
+\begin_layout Standard
+<add link to ashrae handbook?>
+\end_layout
+
+\begin_layout Section*
+Questions that BEM can answer
+\end_layout
+
+\begin_layout Standard
+The most common questions that BEM can answer are:
+\end_layout
+
+\begin_layout Itemize
+If my building was made or operated differently, how would the energy consumptio
+n change?
+\end_layout
+
+\begin_layout Itemize
+Does my building comply with a building energy code or standard?
+\end_layout
+
+\begin_layout Itemize
+What kind of rating or how many points can I get in a environmental certificatio
+n program?
+\end_layout
+
+\begin_layout Itemize
+Is my building operating as it was designed to?
+\end_layout
+
+\begin_layout Itemize
+What is a good target for energy consumption for my building?
+\end_layout
+
+\begin_layout Standard
+These questions can take place at different times during the life-cycle
+ of a building from before schematic design all through the rest of the
+ design process, and into the operation of the building
+\end_layout
+
+\begin_layout Subsection*
+The Design Process and BEM 
+\end_layout
+
+\begin_layout Subsection*
+EnergyPlus Capabilities
+\end_layout
+
+\begin_layout Subsection*
+Open Source
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "EnergyPlus"
+target "https://energyplus.net/"
+literal "false"
+
+\end_inset
+
+is an 
+\begin_inset CommandInset href
+LatexCommand href
+name "Open Source"
+target "https://opensource.org/"
+literal "false"
+
+\end_inset
+
+ program so all the 
+\begin_inset CommandInset href
+LatexCommand href
+name "source code"
+target "https://github.com/NREL/EnergyPlus"
+literal "false"
+
+\end_inset
+
+ is available to inspect and modify.
+ If you are interested in how calculations are performed and the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Engineering Reference"
+target "https://energyplus.net/documentation"
+literal "false"
+
+\end_inset
+
+ does not provide enough details to you, you can review the source code
+ itself.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Instructions to build the code"
+target "https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus"
+literal "false"
+
+\end_inset
+
+ (compile the source code into an executable application) are available
+ in source code repository wiki if you see something that needs to be enhanced
+ or fixed.
+ 
+\end_layout
+
+\begin_layout Subsection*
+Brief History
+\end_layout
+
+\begin_layout Subsection*
+Documentation and Other Resources
+\end_layout
+
+\begin_layout Section
+The EnergyPlus Ecosystem 
+\end_layout
+
+\begin_layout Subsection*
+Current GUIs 
+\end_layout
+
+\begin_layout Standard
+<Make the list for major GUIs and tools and than reference IPBSA.
+ Say "at time of writing..".
+ Say "many people use E+ inside an existing GUI".
+ Minimize confusion and upkeep.> 
+\end_layout
+
+\begin_layout Subsection*
+Approaches to Implement Measures 
+\end_layout
+
+\begin_layout Subsection*
+Parametric Analysis Tools 
+\end_layout
+
+\begin_layout Subsection*
+Weather Files 
+\end_layout
+
+\begin_layout Subsection*
+Co-simulation and Linked Software 
+\end_layout
+
+\begin_layout Subsection*
+Interoperability 
+\end_layout
+
+\begin_layout Subsection*
+Example Files 
+\end_layout
+
+\begin_layout Section
+Using EnergyPlus 
+\end_layout
+
+\begin_layout Subsection*
+Running EnergyPlus
+\end_layout
+
+\begin_layout Standard
+<quickstart guide>
+\end_layout
+
+\begin_layout Subsection*
+Run-Check-Edit Repeat
+\end_layout
+
+\begin_layout Subsection*
+IDF and JSON syntax
+\end_layout
+
+\begin_layout Subsection*
+Common Objects
+\end_layout
+
+\begin_layout Subsection*
+Key Concepts
+\end_layout
+
+\begin_layout Subsection*
+Versions and Updating
+\end_layout
+
+\begin_layout Subsection*
+Errors and How to Fix Them
+\end_layout
+
+\begin_layout Subsection*
+Modeling Simply
+\end_layout
+
+\begin_layout Subsection*
+Quality Control
+\end_layout
+
+\begin_layout Subsection*
+Choosing a Baseline
+\end_layout
+
+\begin_layout Standard
+<The importance of deciding on the baseline model that is used as a basis
+ of comparison for various energy efficiency measures that are used during
+ the design process>
+\end_layout
+
+\begin_layout Subsection*
+Presenting Results to Others
+\end_layout
+
+\begin_layout Section
+Introduction to Example Building Models
+\end_layout
+
+\begin_layout Section
+Envelope and Geometry 
+\end_layout
+
+\begin_layout Subsection*
+Coordinate System
+\end_layout
+
+\begin_layout Subsection*
+Surfaces and Zones
+\end_layout
+
+\begin_layout Subsection*
+Zoning
+\end_layout
+
+\begin_layout Subsection*
+Materials and Constructions
+\end_layout
+
+\begin_layout Subsection*
+Heat Transfer to the Ground
+\end_layout
+
+\begin_layout Section
+Internal Loads 
+\end_layout
+
+\begin_layout Subsection*
+Lights and Equipment
+\end_layout
+
+\begin_layout Subsection*
+Daylighting
+\end_layout
+
+\begin_layout Subsection*
+People and Comfort
+\end_layout
+
+\begin_layout Subsection*
+Infiltration and Airflow
+\end_layout
+
+\begin_layout Section
+HVAC 
+\end_layout
+
+\begin_layout Subsection*
+Ideal Loads
+\end_layout
+
+\begin_layout Subsection*
+HVAC Templates
+\end_layout
+
+\begin_layout Subsection*
+Zone Equipment
+\end_layout
+
+\begin_layout Subsection*
+Air Loops
+\end_layout
+
+\begin_layout Subsection*
+Coils
+\end_layout
+
+\begin_layout Subsection*
+Plant Loops
+\end_layout
+
+\begin_layout Subsection*
+Plant Equipment
+\end_layout
+
+\begin_layout Subsection*
+Controls
+\end_layout
+
+\begin_layout Subsection*
+EMS
+\end_layout
+
+\begin_layout Section
+Economics and Emissions
+\end_layout
+
+\begin_layout Subsection*
+Tariffs
+\end_layout
+
+\begin_layout Subsection*
+Life Cycle Costs
+\end_layout
+
+\begin_layout Subsection*
+Emissions and TDV
+\end_layout
+
+\begin_layout Section
+Specific Tips 
+\end_layout
+
+\end_body
+\end_document
