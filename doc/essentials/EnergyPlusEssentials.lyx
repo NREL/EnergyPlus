@@ -116,6 +116,9 @@ literal "false"
 \end_layout
 
 \begin_layout Quotation
+\begin_inset Quotes eld
+\end_inset
+
 Building Energy Modeling (BEM) is the practice of using computer-based simulatio
 n software to perform a detailed analysis of a building’s energy use and
  energy-using systems.
@@ -125,6 +128,9 @@ n software to perform a detailed analysis of a building’s energy use and
 \end_layout
 
 \begin_layout Quotation
+\begin_inset Quotes eld
+\end_inset
+
 BEM includes whole-building simulation as well as detailed component analysis
  utilizing specialized software tools that address specific concerns, such
  as moisture transfer through building materials, daylighting, indoor air
@@ -132,12 +138,19 @@ BEM includes whole-building simulation as well as detailed component analysis
 \end_layout
 
 \begin_layout Quotation
+\begin_inset Quotes eld
+\end_inset
+
 BEM offers an alternative approach that encourages customized, integrated
  design solutions, which offer deeper savings.
  Using BEM to compare energy-efficiency options directs design decisions
  prior to construction.
  It also guides existing building projects to optimize operation or explore
  retrofit opportunities.
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -218,8 +231,105 @@ These questions can take place at different times during the life-cycle
 The Design Process and BEM 
 \end_layout
 
+\begin_layout Standard
+<std 209>
+\end_layout
+
 \begin_layout Subsection*
 EnergyPlus Capabilities
+\end_layout
+
+\begin_layout Standard
+According to the 
+\begin_inset CommandInset href
+LatexCommand href
+name "energyplus.net web site"
+target "https://energyplus.net/"
+literal "false"
+
+\end_inset
+
+ (as of December 2018):
+\end_layout
+
+\begin_layout Quotation
+\begin_inset Quotes eld
+\end_inset
+
+EnergyPlus™ is a whole building energy simulation program that engineers,
+ architects, and researchers use to model both energy consumption—for heating,
+ cooling, ventilation, lighting and plug and process loads—and water use
+ in buildings.
+ Some of the notable features and capabilities of EnergyPlus include:
+\end_layout
+
+\begin_layout Itemize
+Integrated, simultaneous solution of thermal zone conditions and HVAC system
+ response that does not assume that the HVAC system can meet zone loads
+ and can simulate un-conditioned and under-conditioned spaces.
+\end_layout
+
+\begin_layout Itemize
+Heat balance-based solution of radiant and convective effects that produce
+ surface temperatures thermal comfort and condensation calculations.
+\end_layout
+
+\begin_layout Itemize
+Sub-hourly, user-definable time steps for interaction between thermal zones
+ and the environment; with automatically varied time steps for interactions
+ between thermal zones and HVAC systems.
+ These allow EnergyPlus to model systems with fast dynamics while also trading
+ off simulation speed for precision.
+\end_layout
+
+\begin_layout Itemize
+Combined heat and mass transfer model that accounts for air movement between
+ zones.
+\end_layout
+
+\begin_layout Itemize
+Advanced fenestration models including controllable window blinds, electrochromi
+c glazings, and layer-by-layer heat balances that calculate solar energy
+ absorbed by window panes.
+\end_layout
+
+\begin_layout Itemize
+Illuminance and glare calculations for reporting visual comfort and driving
+ lighting controls.
+\end_layout
+
+\begin_layout Itemize
+Component-based HVAC that supports both standard and novel system configurations.
+\end_layout
+
+\begin_layout Itemize
+A large number of built-in HVAC and lighting control strategies and an extensibl
+e runtime scripting system for user-defined control.
+\end_layout
+
+\begin_layout Itemize
+Functional Mockup Interface import and export for co-simulation with other
+ engines.
+\end_layout
+
+\begin_layout Itemize
+Standard summary and detailed output reports as well as user definable reports
+ with selectable time-resolution from annual to sub-hourly, all with energy
+ source multipliers.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+EnergyPlus runs on Windows, MacOS, and Linux computers.
+ 
+\end_layout
+
+\begin_layout Standard
+<need to balance overview with enough details to help people, I think a
+ list of what can be modeled might be more helpful>
 \end_layout
 
 \begin_layout Subsection*
@@ -282,6 +392,56 @@ literal "false"
 
 \begin_layout Subsection*
 Brief History
+\end_layout
+
+\begin_layout Standard
+EnergyPlus has been under development since 1997 and was first released
+ in 2001<?>.
+ 
+\end_layout
+
+\begin_layout Standard
+EnergyPlus has its roots in both the BLAST and DOE–2 programs.
+ BLAST (Building Loads Analysis and System Thermodynamics) and DOE–2 were
+ both developed and released in the late 1970s and early 1980s as energy
+ and load simulation tools.
+ BLAST was developed by 
+\begin_inset CommandInset href
+LatexCommand href
+name "Construction Engineering Researrch Laboratory (CERL)"
+target "https://www.erdc.usace.army.mil/Locations/CERL/"
+literal "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "University of Illinois"
+target "https://illinois.edu/"
+literal "false"
+
+\end_inset
+
+ which DOE-2 was developed by 
+\begin_inset CommandInset href
+LatexCommand href
+name "Berkeley Lab"
+target "https://www.lbl.gov/"
+literal "false"
+
+\end_inset
+
+ and many others.
+ Their intended audience is a design engineer or architect that wishes to
+ size appropriate HVAC equipment, develop retrofit studies for life cycling
+ cost analyses, optimize energy performance, etc.
+ Born out of concerns driven by the energy crisis of the early 1970s and
+ recognition that building energy consumption is a major component of the
+ American energy usage statistics, the two programs attempted to solve the
+ same problem from two slightly different perspectives.
+ Both programs had their merits and shortcomings, their supporters and detractor
+s, and solid user bases both nationally and internationally.
 \end_layout
 
 \begin_layout Subsection*
@@ -395,6 +555,10 @@ Envelope and Geometry
 
 \begin_layout Subsection*
 Coordinate System
+\end_layout
+
+\begin_layout Standard
+<maybe take this from existing documentation>
 \end_layout
 
 \begin_layout Subsection*

@@ -3,6 +3,7 @@
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
+\usepackage{textcomp}
 \usepackage[unicode=true,pdfusetitle,
  bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
  breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
@@ -18,22 +19,22 @@
 
 According to the \href{https://www.bemlibrary.com/index.php/owners-managers/introduction/what-bem/}{BEM Library}:
 \begin{quotation}
-Building Energy Modeling (BEM) is the practice of using computer-based
+``Building Energy Modeling (BEM) is the practice of using computer-based
 simulation software to perform a detailed analysis of a building\textquoteright s
 energy use and energy-using systems. The simulation software works
 by enacting a mathematical model that provides an approximate representation
 of the building. 
 
-BEM includes whole-building simulation as well as detailed component
+``BEM includes whole-building simulation as well as detailed component
 analysis utilizing specialized software tools that address specific
 concerns, such as moisture transfer through building materials, daylighting,
 indoor air quality, natural ventilation, and occupant comfort.
 
-BEM offers an alternative approach that encourages customized, integrated
-design solutions, which offer deeper savings. Using BEM to compare
-energy-efficiency options directs design decisions prior to construction.
-It also guides existing building projects to optimize operation or
-explore retrofit opportunities.
+``BEM offers an alternative approach that encourages customized,
+integrated design solutions, which offer deeper savings. Using BEM
+to compare energy-efficiency options directs design decisions prior
+to construction. It also guides existing building projects to optimize
+operation or explore retrofit opportunities.''
 \end{quotation}
 Some other terms that are used to describe the same topic are:
 \begin{itemize}
@@ -67,7 +68,51 @@ the design process, and into the operation of the building
 
 \subsection*{The Design Process and BEM }
 
+<std 209>
+
 \subsection*{EnergyPlus Capabilities}
+
+According to the \href{https://energyplus.net/}{energyplus.net web site}
+(as of December 2018):
+\begin{quotation}
+``EnergyPlus\texttrademark{} is a whole building energy simulation
+program that engineers, architects, and researchers use to model both
+energy consumption---for heating, cooling, ventilation, lighting
+and plug and process loads---and water use in buildings. Some of
+the notable features and capabilities of EnergyPlus include:
+\end{quotation}
+\begin{itemize}
+\item Integrated, simultaneous solution of thermal zone conditions and HVAC
+system response that does not assume that the HVAC system can meet
+zone loads and can simulate un-conditioned and under-conditioned spaces.
+\item Heat balance-based solution of radiant and convective effects that
+produce surface temperatures thermal comfort and condensation calculations.
+\item Sub-hourly, user-definable time steps for interaction between thermal
+zones and the environment; with automatically varied time steps for
+interactions between thermal zones and HVAC systems. These allow EnergyPlus
+to model systems with fast dynamics while also trading off simulation
+speed for precision.
+\item Combined heat and mass transfer model that accounts for air movement
+between zones.
+\item Advanced fenestration models including controllable window blinds,
+electrochromic glazings, and layer-by-layer heat balances that calculate
+solar energy absorbed by window panes.
+\item Illuminance and glare calculations for reporting visual comfort and
+driving lighting controls.
+\item Component-based HVAC that supports both standard and novel system
+configurations.
+\item A large number of built-in HVAC and lighting control strategies and
+an extensible runtime scripting system for user-defined control.
+\item Functional Mockup Interface import and export for co-simulation with
+other engines.
+\item Standard summary and detailed output reports as well as user definable
+reports with selectable time-resolution from annual to sub-hourly,
+all with energy source multipliers.''
+\end{itemize}
+EnergyPlus runs on Windows, MacOS, and Linux computers. 
+
+<need to balance overview with enough details to help people, I think
+a list of what can be modeled might be more helpful>
 
 \subsection*{Open Source}
 
@@ -82,6 +127,25 @@ in source code repository wiki if you see something that needs to
 be enhanced or fixed. 
 
 \subsection*{Brief History}
+
+EnergyPlus has been under development since 1997 and was first released
+in 2001<?>. 
+
+EnergyPlus has its roots in both the BLAST and DOE--2 programs. BLAST
+(Building Loads Analysis and System Thermodynamics) and DOE--2 were
+both developed and released in the late 1970s and early 1980s as energy
+and load simulation tools. BLAST was developed by \href{https://www.erdc.usace.army.mil/Locations/CERL/}{Construction Engineering Researrch Laboratory (CERL)}
+and \href{https://illinois.edu/}{University of Illinois} which DOE-2
+was developed by \href{https://www.lbl.gov/}{Berkeley Lab} and many
+others. Their intended audience is a design engineer or architect
+that wishes to size appropriate HVAC equipment, develop retrofit studies
+for life cycling cost analyses, optimize energy performance, etc.
+Born out of concerns driven by the energy crisis of the early 1970s
+and recognition that building energy consumption is a major component
+of the American energy usage statistics, the two programs attempted
+to solve the same problem from two slightly different perspectives.
+Both programs had their merits and shortcomings, their supporters
+and detractors, and solid user bases both nationally and internationally.
 
 \subsection*{Documentation and Other Resources}
 
@@ -141,6 +205,8 @@ are used during the design process>
 \section{Envelope and Geometry }
 
 \subsection*{Coordinate System}
+
+<maybe take this from existing documentation>
 
 \subsection*{Surfaces and Zones}
 
