@@ -652,6 +652,8 @@ namespace StandardRatings {
             }
         }
 
+        // Note: we pass as string to avoid unit conversions to happen, otherwise W/W will convert to Btuh/Btuh
+        // which we want to avoid here
         PreDefTableEntry(pdchMechIPLVSI, ChillerName, RoundSigDigits(IPLVValueSI, 2));
         PreDefTableEntry(pdchMechIPLVIP, ChillerName, RoundSigDigits(IPLVValueIP, 2));
     }
@@ -2585,11 +2587,11 @@ namespace StandardRatings {
                     PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
                     PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
 
-                    // These will stay in W, so it doesn't matter as much, so I'll leave it that way
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 4), 1));
+                    // These will stay in W, so it doesn't matter as much, but let's be consistent
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, TotElectricPowerRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, TotElectricPowerRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, TotElectricPowerRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, TotElectricPowerRated(Num + 4), 1);
 
                     addFootNoteSubTable(pdstDXCoolCoil2, "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
                 }
