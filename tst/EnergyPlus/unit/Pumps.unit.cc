@@ -85,13 +85,15 @@ TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPowerTest)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        "1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 162.5, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPower22W_per_gpm)
@@ -188,13 +190,15 @@ TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPowerTest)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        "1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 162.5, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPower19W_per_gpm)
@@ -293,7 +297,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingMinVolFlowRate)
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
         "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
-        "0.3;                        !- Design Minimum Flow Rate Sizing Factor",
+        "0.3,                     !- Design Minimum Flow Rate Sizing Factor",
+        "Pump Energy;             !- End-Use Subcategory",
 
     });
 
@@ -302,6 +307,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingMinVolFlowRate)
     EXPECT_NEAR(Pumps::PumpEquip(1).MinVolFlowRate, DataSizing::AutoSize, 0.000001);
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).MinVolFlowRate, 0.0003, 0.00001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPowerPerPressureTest)
@@ -456,13 +462,15 @@ TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPower19W_per_gpm)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlow,            !- Design Power Sizing Method",
         "301156.1,                !- Design Electric Power per Unit Flow Rate",
-        ";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        ",                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 301.1561, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPowerPerPressureTest)
@@ -554,7 +562,8 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerDefaults)
         ",                        !- Skin Loss Radiative Fraction",
         ",                        !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        ";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        ",                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
 
     });
 
@@ -562,6 +571,7 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerDefaults)
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 153.3, 0.1);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, CondensatePumpSizingPower19W_per_gpm)
