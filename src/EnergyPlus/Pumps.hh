@@ -204,6 +204,7 @@ namespace Pumps {
         int ZoneNum;                  // index for zone surrounding pump
         Real64 SkinLossRadFraction;   // radiative split for skin losses to zone
         bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
+        std::string EndUseSubcategoryName;
 
         // Default Constructor
         PumpSpecs()

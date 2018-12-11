@@ -107,6 +107,7 @@ namespace OutputReportPredefined {
     extern int pdchPumpFlow;
     extern int pdchPumpPower;
     extern int pdchPumpPwrPerFlow;
+    extern int pdchPumpEndUse;
     extern int pdchMotEff;
     // Cooling coil subtable
     extern int pdstCoolCoil;
