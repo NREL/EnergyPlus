@@ -2,7 +2,7 @@ results_repository : NREL/EnergyPlusBuildResults
 results_path : _posts
 results_base_url : https://nrel.github.io/EnergyPlusBuildResults
 regression_repository : NREL/EnergyPlusRegressionTool
-regression_branch : master  # this is the branch of NREL/EnergyPlusRegressionTool to use
+regression_branch : IncludeBs4# this is the branch of NREL/EnergyPlusRegressionTool to use
 regression_baseline_default : develop  # this is the branch to use as the baseline for regressions
 regression_baseline_develop : ""
 regression_baseline_master : ""
