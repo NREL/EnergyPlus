@@ -685,11 +685,11 @@ This field is optional. This input is used when the input field Design Power Con
 
 This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
 
-An example for constant speed pump bank follows.
-
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-4-000}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+An example for constant speed pump bank follows.
 
 \begin{lstlisting}
 
