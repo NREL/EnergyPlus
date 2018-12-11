@@ -2454,10 +2454,12 @@ namespace StandardRatings {
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, RoundSigDigits(EERValueSI, 2));
-                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, RoundSigDigits(EERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, RoundSigDigits(IEERValueIP, 2));
+                // W/W is the same as Btuh/Btuh so that's fine too
+                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
@@ -2473,8 +2475,9 @@ namespace StandardRatings {
                 PreDefTableEntry(pdchDXHeatCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
                 PreDefTableEntry(pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
-                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, RoundSigDigits(HSPFValueIP, 2));
-                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RoundSigDigits(RegionNum));
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
+                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RegionNum, 0);
                 addFootNoteSubTable(pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
@@ -2488,7 +2491,7 @@ namespace StandardRatings {
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else {
