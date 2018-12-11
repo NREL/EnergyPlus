@@ -652,10 +652,9 @@ namespace StandardRatings {
             }
         }
 
-        // Note: we pass as string to avoid unit conversions to happen, otherwise W/W will convert to Btuh/Btuh
-        // which we want to avoid here
-        PreDefTableEntry(pdchMechIPLVSI, ChillerName, RoundSigDigits(IPLVValueSI, 2));
-        PreDefTableEntry(pdchMechIPLVIP, ChillerName, RoundSigDigits(IPLVValueIP, 2));
+        // Note: We don't want unit conversio, here, but it's ok since W/W will convert to itself since the column heading has "SI" as a hint
+        PreDefTableEntry(pdchMechIPLVSI, ChillerName, IPLVValueSI, 2);
+        PreDefTableEntry(pdchMechIPLVIP, ChillerName, IPLVValueIP, 2);
     }
 
     void CheckCurveLimitsForIPLV(std::string const &ChillerName, // Name of Chiller
