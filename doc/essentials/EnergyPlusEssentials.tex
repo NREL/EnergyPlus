@@ -169,13 +169,10 @@ be enhanced or fixed.
 \subsection*{Brief History}
 
 EnergyPlus has been under development since 1997 and was first released
-in 2001. Originally written in Fortran, in 2014 it was converted to
-C++.
-
-EnergyPlus has its roots in both the BLAST and DOE--2 programs. BLAST
-(Building Loads Analysis and System Thermodynamics) and DOE--2 were
-both developed and released in the late 1970s and early 1980s as energy
-and load simulation tools. BLAST was developed by \href{https://www.erdc.usace.army.mil/Locations/CERL/}{Construction Engineering Researrch Laboratory (CERL)}
+in 2001. EnergyPlus has its roots in both the BLAST and DOE--2 programs.
+BLAST (Building Loads Analysis and System Thermodynamics) and DOE--2
+were both developed and released in the late 1970s and early 1980s
+as energy and load simulation tools. BLAST was developed by \href{https://www.erdc.usace.army.mil/Locations/CERL/}{Construction Engineering Researrch Laboratory (CERL)}
 and \href{https://illinois.edu/}{University of Illinois} which DOE-2
 was developed by \href{https://www.lbl.gov/}{Berkeley Lab} and many
 others. Their intended audience is a design engineer or architect
@@ -187,6 +184,9 @@ of the American energy usage statistics, the two programs attempted
 to solve the same problem from two slightly different perspectives.
 Both programs had their merits and shortcomings, their supporters
 and detractors, and solid user bases both nationally and internationally.
+Originally written in Fortran, in 2014 it was converted to C++. It
+was developed as a simulation engine and many graphical user interfaces
+utilize it.
 
 \subsection*{Documentation and Other Resources}
 
@@ -233,7 +233,19 @@ and
 
 \section{The EnergyPlus Ecosystem }
 
-\subsection*{Current GUIs }
+\subsection*{Current Interfaces }
+
+EnergyPlus is often used directly using the text file input (IDF or
+epJSON) and various output file formats along with the utilities that
+come with the installation package. More information on that can be
+found in the Using EnergyPlus section. In addition, EnergyPlus is
+often the simulation engine for graphical user interfaces. To see
+comprehensive list, see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Director}y
+that is operated by \href{https://www.ibpsa.us/}{IBPSA-USA}. At the
+time of writing, many people use EnergyPlus inside an existing graphical
+user interface such as OpenStudio, DesignBuilder, Simergy, Euclid,
+Honeybee, Insight, AECOsim, and Sefaira. Other interfaces are also
+available.
 
 <Make the list for major GUIs and tools and than reference IPBSA.
 Say \textquotedbl at time of writing..\textquotedbl . Say \textquotedbl many

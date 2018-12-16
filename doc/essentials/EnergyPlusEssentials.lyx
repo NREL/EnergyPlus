@@ -544,11 +544,7 @@ Brief History
 \begin_layout Standard
 EnergyPlus has been under development since 1997 and was first released
  in 2001.
- Originally written in Fortran, in 2014 it was converted to C++.
-\end_layout
-
-\begin_layout Standard
-EnergyPlus has its roots in both the BLAST and DOE–2 programs.
+ EnergyPlus has its roots in both the BLAST and DOE–2 programs.
  BLAST (Building Loads Analysis and System Thermodynamics) and DOE–2 were
  both developed and released in the late 1970s and early 1980s as energy
  and load simulation tools.
@@ -589,6 +585,9 @@ literal "false"
  same problem from two slightly different perspectives.
  Both programs had their merits and shortcomings, their supporters and detractor
 s, and solid user bases both nationally and internationally.
+ Originally written in Fortran, in 2014 it was converted to C++.
+ It was developed as a simulation engine and many graphical user interfaces
+ utilize it.
 \end_layout
 
 \begin_layout Subsection*
@@ -699,7 +698,39 @@ The EnergyPlus Ecosystem
 \end_layout
 
 \begin_layout Subsection*
-Current GUIs 
+Current Interfaces 
+\end_layout
+
+\begin_layout Standard
+EnergyPlus is often used directly using the text file input (IDF or epJSON)
+ and various output file formats along with the utilities that come with
+ the installation package.
+ More information on that can be found in the Using EnergyPlus section.
+ In addition, EnergyPlus is often the simulation engine for graphical user
+ interfaces.
+ To see comprehensive list, see the 
+\begin_inset CommandInset href
+LatexCommand href
+name "BEST (Building Energy Software Tools) Director"
+target "https://www.buildingenergysoftwaretools.com/"
+literal "false"
+
+\end_inset
+
+y that is operated by 
+\begin_inset CommandInset href
+LatexCommand href
+name "IBPSA-USA"
+target "https://www.ibpsa.us/"
+literal "false"
+
+\end_inset
+
+.
+ At the time of writing, many people use EnergyPlus inside an existing graphical
+ user interface such as OpenStudio, DesignBuilder, Simergy, Euclid, Honeybee,
+ Insight, AECOsim, and Sefaira.
+ Other interfaces are also available.
 \end_layout
 
 \begin_layout Standard
