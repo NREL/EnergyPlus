@@ -188,7 +188,75 @@ model
 \end_layout
 
 \begin_layout Standard
-<add link to ashrae handbook?>
+To learn more about building energy modeling consider reviewing the following
+ resources:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "2017 ASHRAE Handbook - Fundamentals "
+target "https://www.ashrae.org/technical-resources/ashrae-handbook/description-2017-ashrae-handbook-fundamentals"
+literal "false"
+
+\end_inset
+
+Chapter 19 Energy Estimating and Modeling Methods
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "BEM Libary"
+target "https://www.bemlibrary.com/"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "IBPSA"
+target "http://www.ibpsa.org/?page_id=695"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "IBPSA-USA"
+target "https://www.ibpsa.us/videos/all"
+literal "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset href
+LatexCommand href
+name "YouTube"
+target "https://www.youtube.com/results?search_query=building+energy+modeling"
+literal "false"
+
+\end_inset
+
+ videos
+\end_layout
+
+\begin_layout Itemize
+And numerous 
+\begin_inset CommandInset href
+LatexCommand href
+name "books"
+target "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Daps&field-keywords=building+energy+modeling"
+literal "false"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section*
@@ -396,8 +464,8 @@ Brief History
 
 \begin_layout Standard
 EnergyPlus has been under development since 1997 and was first released
- in 2001<?>.
- 
+ in 2001.
+ Originally written in Fortran, in 2014 it was converted to C++.
 \end_layout
 
 \begin_layout Standard
@@ -446,6 +514,105 @@ s, and solid user bases both nationally and internationally.
 
 \begin_layout Subsection*
 Documentation and Other Resources
+\end_layout
+
+\begin_layout Standard
+The EnergyPlus documentation is currently included the installation in the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Documenation
+\begin_inset Quotes erd
+\end_inset
+
+ folder as PDFs.
+ It is also available as 
+\begin_inset CommandInset href
+LatexCommand href
+name "PDFs online"
+target "https://energyplus.net/documentation"
+literal "false"
+
+\end_inset
+
+ and as 
+\begin_inset CommandInset href
+LatexCommand href
+name "browsable HTML"
+target "https://bigladdersoftware.com/epx/docs/"
+literal "false"
+
+\end_inset
+
+.
+ The documentation includes:
+\end_layout
+
+\begin_layout Itemize
+Input and Output Reference: Contains a thorough description of the various
+ input and output files related to EnergyPlus, the format of these files,
+ and how the files interact and interrelate.
+\end_layout
+
+\begin_layout Itemize
+Output Details, Examples and Data Sets: Contains details on output from
+ EnergyPlus and specific examples.
+ It also addresses the reference data sets that are included.
+\end_layout
+
+\begin_layout Itemize
+Auxiliary Programs: Contains information for the auxiliary programs that
+ are part of the EnergyPlus package.
+ For example, this document contains the user manual for the Weather Converter
+ program, descriptions on using Ground Heat Transfer auxiliary programs
+ with EnergyPlus, Compact HVAC descriptions, the Transition program/package
+ and other assorted documents.
+\end_layout
+
+\begin_layout Itemize
+The Engineering Reference: Provides more in-depth knowledge into the theoretical
+ basis behind the various calculations contained in the program including
+ algorithm descriptions.
+\end_layout
+
+\begin_layout Itemize
+EMS Application Guide: Contains information useful to use the advanced feature
+ of EnergyPlus: Energy Management System tweaks.
+ The Erl language is described and examples for use are given.
+\end_layout
+
+\begin_layout Itemize
+External Interface Application Guide: Contains information specific to using
+ the external interface feature of EnergyPlus to connect other simulation
+ systems.
+\end_layout
+
+\begin_layout Itemize
+Plant Application Guide: Details the methods for simulating real chilled
+ and hot water plant systems within EnergyPlus.
+\end_layout
+
+\begin_layout Itemize
+Using EnergyPlus for Compliance Guide: Contains information specific to
+ using EnergyPlus in Compliance and Standard Rating systems.
+\end_layout
+
+\begin_layout Itemize
+External Interface(s) Application Guide: Contains information about external
+ interfaces (through the Building Controls Virtual Test Bed link) to EnergyPlus.
+\end_layout
+
+\begin_layout Itemize
+Tips & Tricks for Using EnergyPlus: Contains short tips and tricks for using
+ various parts of EnergyPlus.
+ <MAYBE THIS SHOULD BE ELIMINATED AND PORTIONS INCLUDED IN THIS DOCUMENT>
+\end_layout
+
+\begin_layout Standard
+To learn more about how to use EnergyPlus, the example files are a great
+ resource.
+ The example files are in the directory ExampleFiles and  
 \end_layout
 
 \begin_layout Section

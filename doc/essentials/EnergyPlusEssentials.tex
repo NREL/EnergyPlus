@@ -48,7 +48,17 @@ building being described and analyzed as well as referencing the software
 for implementing a specific component of the building such as a wall
 or chiller.
 
-<add link to ashrae handbook?>
+To learn more about building energy modeling consider reviewing the
+following resources:
+\begin{itemize}
+\item \href{https://www.ashrae.org/technical-resources/ashrae-handbook/description-2017-ashrae-handbook-fundamentals}{2017 ASHRAE Handbook - Fundamentals }Chapter
+19 Energy Estimating and Modeling Methods
+\item \href{https://www.bemlibrary.com/}{BEM Libary}
+\item \href{http://www.ibpsa.org/?page_id=695}{IBPSA}, \href{https://www.ibpsa.us/videos/all}{IBPSA-USA},
+and \href{https://www.youtube.com/results?search_query=building+energy+modeling}{YouTube}
+videos
+\item And numerous \href{https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias\%3Daps&field-keywords=building+energy+modeling}{books}
+\end{itemize}
 
 \section*{Questions that BEM can answer}
 
@@ -129,7 +139,8 @@ be enhanced or fixed.
 \subsection*{Brief History}
 
 EnergyPlus has been under development since 1997 and was first released
-in 2001<?>. 
+in 2001. Originally written in Fortran, in 2014 it was converted to
+C++.
 
 EnergyPlus has its roots in both the BLAST and DOE--2 programs. BLAST
 (Building Loads Analysis and System Thermodynamics) and DOE--2 were
@@ -148,6 +159,47 @@ Both programs had their merits and shortcomings, their supporters
 and detractors, and solid user bases both nationally and internationally.
 
 \subsection*{Documentation and Other Resources}
+
+The EnergyPlus documentation is currently included the installation
+in the ``Documenation'' folder as PDFs. It is also available as
+\href{https://energyplus.net/documentation}{PDFs online} and as \href{https://bigladdersoftware.com/epx/docs/}{browsable HTML}.
+The documentation includes:
+\begin{itemize}
+\item Input and Output Reference: Contains a thorough description of the
+various input and output files related to EnergyPlus, the format of
+these files, and how the files interact and interrelate.
+\item Output Details, Examples and Data Sets: Contains details on output
+from EnergyPlus and specific examples. It also addresses the reference
+data sets that are included.
+\item Auxiliary Programs:~Contains information for the auxiliary programs
+that are part of the EnergyPlus package. For example, this document
+contains the user manual for the Weather Converter program, descriptions
+on using Ground Heat Transfer auxiliary programs with EnergyPlus,
+Compact HVAC descriptions, the Transition program/package and other
+assorted documents.
+\item The Engineering Reference: Provides more in-depth knowledge into the
+theoretical basis behind the various calculations contained in the
+program including algorithm descriptions.
+\item EMS Application Guide: Contains information useful to use the advanced
+feature of EnergyPlus: Energy Management System tweaks. The Erl language
+is described and examples for use are given.
+\item External Interface Application Guide: Contains information specific
+to using the external interface feature of EnergyPlus to connect other
+simulation systems.
+\item Plant Application Guide: Details the methods for simulating real chilled
+and hot water plant systems within EnergyPlus.
+\item Using EnergyPlus for Compliance Guide: Contains information specific
+to using EnergyPlus in Compliance and Standard Rating systems.
+\item External Interface(s) Application Guide: Contains information about
+external interfaces (through the Building Controls Virtual Test Bed
+link) to EnergyPlus.
+\item Tips \& Tricks for Using EnergyPlus: Contains short tips and tricks
+for using various parts of EnergyPlus. <MAYBE THIS SHOULD BE ELIMINATED
+AND PORTIONS INCLUDED IN THIS DOCUMENT>
+\end{itemize}
+To learn more about how to use EnergyPlus, the example files are a
+great resource. The example files are in the directory ExampleFiles
+and  
 
 \section{The EnergyPlus Ecosystem }
 
