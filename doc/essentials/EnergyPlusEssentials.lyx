@@ -91,7 +91,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-December 10, 2018
+December 16, 2018
 \end_layout
 
 \begin_layout Section
@@ -300,7 +300,86 @@ The Design Process and BEM
 \end_layout
 
 \begin_layout Standard
-<std 209>
+Building energy modeling can be used throughout the design process for a
+ new building or when considering updates to existing buildings.
+ It can also be used later in the life-cycle of a building related to comparing
+ actual operation of the building with predicted operation.
+ ASHRAE 
+\begin_inset CommandInset href
+LatexCommand href
+name "Standard 209"
+target "https://www.techstreet.com/ashrae/standards/ashrae-209-2018?gateway_code=ashrae&product_id=2010483"
+literal "false"
+
+\end_inset
+
+ titled 
+\begin_inset Quotes eld
+\end_inset
+
+Energy Simulation Aided Design for Buildings Except Low-Rise Residential
+ Buildings
+\begin_inset Quotes erd
+\end_inset
+
+ is a critical document to in how to apply building energy modeling.
+ It describes a methodology to apply building energy modeling to the design
+ and was created to define reliable and consistent procedures that advance
+ the use of timely energy modeling to quanifty the impact of design decision
+ s at the point in time which they are made.
+ The standard includes different “Modeling Cycles” for different stages
+ of using building energy modeling during the life-cycle of the building:
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #1 – Simple Box Modeling
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #2 – Conceptual Design Modeling
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #3 – Load Reduction Modeling
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #4 – HVAC System Selection Modeling
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #5 – Design Refinement
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #6 – Design Integration and Optimization
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #7 – Energy Simulated-Aided Value Engineering
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #8 – As-Designed Energy Performance
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #9 – Change Orders
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #10 – As-Built Energy Performance
+\end_layout
+
+\begin_layout Itemize
+Modeling Cycle #11 – Postoccupancy Energy Comparison
+\end_layout
+
+\begin_layout Standard
+In addition it has information about how to integrate climate and site analysis,
+ benchmarking, energy charretts, the energy performance goals of the owners
+ project requirements in to the design process when using buiding energy
+ modeling.
 \end_layout
 
 \begin_layout Subsection*
@@ -612,7 +691,7 @@ Tips & Tricks for Using EnergyPlus: Contains short tips and tricks for using
 \begin_layout Standard
 To learn more about how to use EnergyPlus, the example files are a great
  resource.
- The example files are in the directory ExampleFiles and  
+ The example files are in the directory ExampleFiles and 
 \end_layout
 
 \begin_layout Section
