@@ -91,7 +91,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-December 16, 2018
+December 17, 2018
 \end_layout
 
 \begin_layout Section
@@ -377,8 +377,8 @@ Modeling Cycle #11 – Postoccupancy Energy Comparison
 
 \begin_layout Standard
 In addition it has information about how to integrate climate and site analysis,
- benchmarking, energy charretts, the energy performance goals of the owners
- project requirements in to the design process when using buiding energy
+ benchmarking, energy charrettes, the energy performance goals of the owners
+ project requirements in to the design process when using building energy
  modeling.
 \end_layout
 
@@ -711,13 +711,13 @@ EnergyPlus is often used directly using the text file input (IDF or epJSON)
  To see comprehensive list, see the 
 \begin_inset CommandInset href
 LatexCommand href
-name "BEST (Building Energy Software Tools) Director"
+name "BEST (Building Energy Software Tools) Directory"
 target "https://www.buildingenergysoftwaretools.com/"
 literal "false"
 
 \end_inset
 
-y that is operated by 
+ that is operated by 
 \begin_inset CommandInset href
 LatexCommand href
 name "IBPSA-USA"
@@ -728,20 +728,250 @@ literal "false"
 
 .
  At the time of writing, many people use EnergyPlus inside an existing graphical
- user interface such as OpenStudio, DesignBuilder, Simergy, Euclid, Honeybee,
- Insight, AECOsim, and Sefaira.
- Other interfaces are also available.
-\end_layout
+ user interface such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenStudio"
+target "https://www.openstudio.net/"
+literal "false"
 
-\begin_layout Standard
-<Make the list for major GUIs and tools and than reference IPBSA.
- Say "at time of writing..".
- Say "many people use E+ inside an existing GUI".
- Minimize confusion and upkeep.> 
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "DesignBuilder"
+target "https://www.designbuilder.com/"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Simergy"
+target "https://d-alchemy.com/products/simergy"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Euclid"
+target "https://bigladdersoftware.com/projects/euclid/"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ladybug"
+target "https://www.ladybug.tools/"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Insight"
+target "https://www.autodesk.com/products/insight/overview"
+literal "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset href
+LatexCommand href
+name "AECOsim"
+target "https://www.bentley.com/en/products/brands/aecosim"
+literal "false"
+
+\end_inset
+
+.
+ Other interfaces are also available.
+ 
 \end_layout
 
 \begin_layout Subsection*
 Approaches to Implement Measures 
+\end_layout
+
+\begin_layout Standard
+In the terminology used within the building energy modeling industry 
+\begin_inset Quotes eld
+\end_inset
+
+measures,
+\begin_inset Quotes erd
+\end_inset
+
+ sometimes called energy conservation measures (ECMs) or energy efficiency
+ measures (EEMs), are when alternatives configurations of a building are
+ considered and simulated and compared with the original building model.
+ Measures include added wall or roof insulation, lower internal lighting
+ power, higher efficiency heating and cooling equipment, and many others.
+ When using EnergyPlus within a graphical user interface, that interface
+ often provides a way to implement various measures.
+ When not working within a graphically user interface, users have several
+ options for implementing measures:
+\end_layout
+
+\begin_layout Standard
+For a specific building input file, a copy of the input file can be made
+ and then modified to reflect the measure.
+ This is an easy approach initially but since the original building model
+ might change, it means making the change in the file that reflects the
+ measure.
+ When many measures are being considered, this duplicative editing can be
+ inefficient and prone to errors.
+ In addition, the measure cannot be easily applied to a different building
+ energy model without again editing another set of files duplicating the
+ original effort.
+ Due to this, it is very common for some type of scripting to be used so
+ that measures can be applied to the original building model and other models
+ of other buildings reliably and quickly.
+ Scripting in this approach means to apply some type of programming language
+ to the task of modifying files.
+\end_layout
+
+\begin_layout Standard
+EnergyPlus includes, with the installation package, two methods of implementing
+ measures EP-Macro and the ParametricPreprocessor.
+ EP-Macro is similar to the C langauge pre-processor and allows for portions
+ of the file to be included or excluded, for portions of other files to
+ be included when desired, and for specific entries that are normally fixed
+ values to change programmatically.
+ EP-Macro is documented int he AuxiliaryPrograms documentation.
+ A file with lines starting 
+\begin_inset Quotes eld
+\end_inset
+
+##
+\begin_inset Quotes erd
+\end_inset
+
+ or with the 
+\begin_inset Quotes eld
+\end_inset
+
+imf
+\begin_inset Quotes erd
+\end_inset
+
+ file extension are likely to be a file using EP-Macro files.
+ 
+\end_layout
+
+\begin_layout Standard
+The EnergyPlus ParametricPreprocessor uses special objects in EnergyPlus
+ to set values for any field in any other object for a series of simple
+ options <OBJECTS HAVE NOT BEEN DEFINED YET>.
+ This is briefly described in the AuxiliaryPrograms documentation and more
+ details are present in the InputOutputReference under the section on 
+\begin_inset Quotes eld
+\end_inset
+
+Parametric Objects.
+\begin_inset Quotes erd
+\end_inset
+
+ The ParametricPreprocessor approach is very simple but limited in the flexibili
+ty that it affords.
+ It is suitable for implementing measures related to internal loads, constructio
+ns, and simple efficiency changes but is probably not the appropriate tool
+ for more complicated measures.
+\end_layout
+
+\begin_layout Standard
+Another approach to writing measures and using measures written by others
+ is to use 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenStudio"
+target "https://www.openstudio.net/"
+literal "false"
+
+\end_inset
+
+ and its 
+\begin_inset CommandInset href
+LatexCommand href
+name "documentation"
+target "http://nrel.github.io/OpenStudio-user-documentation/"
+literal "false"
+
+\end_inset
+
+.
+ OpenStudio is closely aligned with EnergyPlus but has a different data
+ model and file format.
+ It is an application programming interface for EnergyPlus and some graphical
+ user interfaces are using it to work with EnergyPlus.
+ It has two categories of measures: native OpenStudio measures and EnergyPlus
+ measures.
+ Both types of measures are usually written in the Ruby programming language.
+ Many measures are already available for OpenStudio and can be found in
+ the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Building Component Library."
+target "https://bcl.nrel.gov/"
+literal "false"
+
+\end_inset
+
+It is an open source project.
+ 
+\end_layout
+
+\begin_layout Standard
+Using the Python scripting language, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Eppy"
+target "https://github.com/santoshphilip/eppy"
+literal "false"
+
+\end_inset
+
+ allows access to any of the input objects in EnergyPlus as if they were
+ native Python objects.
+ It is very flexible and an especially good choice if you are already familiar
+ with Python.
+ It is also an open source project.
+\end_layout
+
+\begin_layout Standard
+Another option based on the Ruby programming language is 
+\begin_inset CommandInset href
+LatexCommand href
+name "Modelkit"
+target "https://bigladdersoftware.com/projects/modelkit/"
+literal "false"
+
+\end_inset
+
+ which similar to EP-Macro consists of embedding scripting within normal
+ EnergyPlus input files but since it is using Ruby has a great deal more
+ flexility.
+\end_layout
+
+\begin_layout Standard
+A 
+\begin_inset CommandInset href
+LatexCommand href
+name "paper"
+target "https://www.ashrae.org/File%20Library/Conferences/Specialty%20Conferences/2018%20Building%20Performance%20Analysis%20Conference%20and%20SimBuild/Papers/C043.pdf"
+literal "false"
+
+\end_inset
+
+ that describes these approaches to scripting and more was made during the
+ 2018 ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
 \end_layout
 
 \begin_layout Subsection*
@@ -762,6 +992,10 @@ Interoperability
 
 \begin_layout Subsection*
 Example Files 
+\end_layout
+
+\begin_layout Subsection*
+Getting Help
 \end_layout
 
 \begin_layout Section
