@@ -325,6 +325,24 @@ the 2018 ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
 
 \subsection*{Parametric Analysis Tools }
 
+When just implementing a simple measure or even a series of measures
+is not enough, a parametric analysis tool may be appropriate. These
+tools allow the exploration of throughout the range of variables (such
+as the thickness of insulation in the roof or the efficiency of a
+boiler) to see the impacts of optimization. While any of the approaches
+to implement measures described previously may be used for parametric
+analysis, a few specific tools have been developed. \href{http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/}{OpenStudio Parametric Analysis}
+tool works with OpenStudio measures and allows the simulation of a
+large number of options using cloud computing services and is part
+of the \href{https://www.openstudio.net/}{OpenStudio} suite. JEPlus
+is a simulation manager for parametrics that includes optimization
+and leverages both the EP-Macro style of implementing measures as
+well as Eppy for implementing measures in the Python programming language.
+\href{https://simulationresearch.lbl.gov/GO/summary.html}{GenOpt}
+is a Java based generic optimization program that can use EnergyPlus.
+\href{https://beopt.nrel.gov/}{BEopt} is a building optimization
+tool focused on residential applications.
+
 \subsection*{Weather Files }
 
 \subsection*{Co-simulation and Linked Software }

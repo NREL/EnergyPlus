@@ -978,6 +978,59 @@ literal "false"
 Parametric Analysis Tools 
 \end_layout
 
+\begin_layout Standard
+When just implementing a simple measure or even a series of measures is
+ not enough, a parametric analysis tool may be appropriate.
+ These tools allow the exploration of throughout the range of variables
+ (such as the thickness of insulation in the roof or the efficiency of a
+ boiler) to see the impacts of optimization.
+ While any of the approaches to implement measures described previously
+ may be used for parametric analysis, a few specific tools have been developed.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenStudio Parametric Analysis"
+target "http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/"
+literal "false"
+
+\end_inset
+
+ tool works with OpenStudio measures and allows the simulation of a large
+ number of options using cloud computing services and is part of the 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenStudio"
+target "https://www.openstudio.net/"
+literal "false"
+
+\end_inset
+
+ suite.
+ JEPlus is a simulation manager for parametrics that includes optimization
+ and leverages both the EP-Macro style of implementing measures as well
+ as Eppy for implementing measures in the Python programming language.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "GenOpt"
+target "https://simulationresearch.lbl.gov/GO/summary.html"
+literal "false"
+
+\end_inset
+
+ is a Java based generic optimization program that can use EnergyPlus.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "BEopt"
+target "https://beopt.nrel.gov/"
+literal "false"
+
+\end_inset
+
+ is a building optimization tool focused on residential applications.
+\end_layout
+
 \begin_layout Subsection*
 Weather Files 
 \end_layout
