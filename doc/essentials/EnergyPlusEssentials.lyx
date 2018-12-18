@@ -1035,20 +1035,148 @@ literal "false"
 Weather Files 
 \end_layout
 
+\begin_layout Standard
+Weather files are available for many locations throughout the world.
+ Finding the right file that represents the weather in your specific location
+ can sometimes be a challenge.
+ Often the closest weather location is the best one to choose but sometimes
+ a site that is further away may actually have the most similar weather.
+ This is especially the case in terrain that varies in elevation or when
+ near large bodies of water.
+ Many weather files are available from both public and private sources.
+ The 
+\begin_inset CommandInset href
+LatexCommand href
+name "EnergyPlus weather file "
+target "https://energyplus.net/weather"
+literal "false"
+
+\end_inset
+
+ web site has many weather files with 
+\begin_inset CommandInset href
+LatexCommand href
+name "sources described"
+target "https://energyplus.net/weather/sources"
+literal "false"
+
+\end_inset
+
+.
+ That web site also has a 
+\begin_inset CommandInset href
+LatexCommand href
+name "page with links"
+target "https://energyplus.net/weather/simulation"
+literal "false"
+
+\end_inset
+
+ to many other sites that provide weather files.
+\end_layout
+
 \begin_layout Subsection*
-Co-simulation and Linked Software 
+Co-simulation and Linked Software
+\end_layout
+
+\begin_layout Standard
+<<NEED CONTENT>>
 \end_layout
 
 \begin_layout Subsection*
 Interoperability 
 \end_layout
 
+\begin_layout Standard
+<<NEED CONTENT>>
+\end_layout
+
 \begin_layout Subsection*
 Example Files 
 \end_layout
 
+\begin_layout Standard
+Many hundreds of example files come with EnergyPlus are in the ExampleFiles
+ folder from the installation.
+ The 
+\backslash
+ExampleFiles
+\backslash
+ExampleFiles.html lists each one and includes the name, a description (scroll
+ all the way to the right) and lots of information such as the floor area
+ and whether certain types of objects are included in the file.
+ Often searching through this file is a good way to find the proper example
+ file to learn about a feature.
+ Another method is the 
+\backslash
+ExampleFiles
+\backslash
+ExampleFiles-ObjectsLink.html file which lists every type of object that
+ EnergyPlus uses and then the first three files that use that object.
+ It is possible that many other files also use a particular object so if
+ the first three files do not help, a text search of files in the ExampleFiles
+ folder may find some more.
+ 
+\end_layout
+
 \begin_layout Subsection*
 Getting Help
+\end_layout
+
+\begin_layout Standard
+Several resources are available for getting help when using EnergyPlus:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "UnmetHours"
+target "https://unmethours.com/questions/"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "EnergyPlus Helpdesk"
+target "http://energyplus.helpserve.com/"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "EnergyPlus_support mailing list"
+target "https://groups.yahoo.com/neo/groups/EnergyPlus_Support/info"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Several organizations provide paid support"
+target "https://buildingenergysoftwaretools.com/?capabilities=Support+Services&keys=EnergyPlus"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Please do not post questions as issues on the EnergyPlus Github website.
 \end_layout
 
 \begin_layout Section
