@@ -1177,6 +1177,57 @@ literal "false"
 
 \begin_layout Standard
 Please do not post questions as issues on the EnergyPlus Github website.
+ Of course, if you are using a graphical user interface with EnergyPlus,
+ the vendor will provide direct support.
+\end_layout
+
+\begin_layout Standard
+After reviewing this document and other pertinant documents that come with
+ EnergyPlus like the InputOutputReference, if additional training is required,
+ several sources are available:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "YouTube"
+target "https://www.youtube.com/results?search_query=energyplus"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+University 
+\begin_inset CommandInset href
+LatexCommand href
+name "course"
+target "https://energyplus.net/support"
+literal "false"
+
+\end_inset
+
+ teaching materials
+\end_layout
+
+\begin_layout Itemize
+Several 
+\begin_inset CommandInset href
+LatexCommand href
+name "organizations"
+target "https://www.buildingenergysoftwaretools.com/?capabilities=Training+Services&keys=EnergyPlus"
+literal "false"
+
+\end_inset
+
+ provide paid training
+\end_layout
+
+\begin_layout Standard
+In addition, if you are using a graphical user interface, the vendor probably
+ also provides training.
 \end_layout
 
 \begin_layout Section
