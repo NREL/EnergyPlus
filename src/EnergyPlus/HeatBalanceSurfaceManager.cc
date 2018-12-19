@@ -1456,6 +1456,9 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea.dimension(TotSurfaces, 0.0);
         QRadOutReport.dimension(TotSurfaces, 0.0);
 
+        QAirExtReport.dimension(TotSurfaces, 0.0);
+        QHeatEmiReport.dimension(TotSurfaces, 0.0);
+
         OpaqSurfInsFaceConduction.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceConductionFlux.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceCondGainRep.dimension(TotSurfaces, 0.0);
@@ -1747,6 +1750,18 @@ namespace HeatBalanceSurfaceManager {
                 SetupOutputVariable("Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
                                     OutputProcessor::Unit::W_m2K,
                                     HGrdExtSurf(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    QAirExtReport(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Heat Emission to Air Rate",
+                                    OutputProcessor::Unit::W,
+                                    QHeatEmiReport(loop),
                                     "Zone",
                                     "State",
                                     Surface(loop).Name);
@@ -2117,6 +2132,8 @@ namespace HeatBalanceSurfaceManager {
         QRadOutReport = 0.0;
         QdotRadOutRep = 0.0;
         QdotRadOutRepPerArea = 0.0;
+        QAirExtReport = 0.0;
+        QHeatEmiReport = 0.0;
         OpaqSurfInsFaceConduction = 0.0;
         OpaqSurfInsFaceConductionFlux = 0.0;
         OpaqSurfInsFaceConductionEnergy = 0.0;
@@ -5780,7 +5797,6 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
             }
-
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
 
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
@@ -7275,6 +7291,12 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea(SurfNum) = QdotRadOutRep(SurfNum) / Surface(SurfNum).Area;
 
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+
+        // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
+        QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+        QHeatEmiReport(SurfNum) =
+            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {
 

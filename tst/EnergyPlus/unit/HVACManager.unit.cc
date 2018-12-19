@@ -100,6 +100,13 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalance::CrossMixing(1).ZonePtr = 1;
     DataHeatBalance::CrossMixing(1).FromZone = 2;
     DataHeatBalance::CrossMixing(1).DesiredAirFlowRate = 0.1;
+    DataZoneEquipment::ZoneEquipConfig.allocate(NumOfZones);
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
     ReportAirHeatBalance();
@@ -157,7 +164,13 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataEnvironment::StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-
+    DataZoneEquipment::ZoneEquipConfig.allocate(NumOfZones);
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
     // Call HVACManager
     ReportAirHeatBalance();
 
@@ -169,5 +182,4 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.5702731, DataHeatBalance::ZnAirRpt(2).VentilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(4.4741862, DataHeatBalance::ZnAirRpt(2).InfilVolumeStdDensity, 0.0001);
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
-
 }

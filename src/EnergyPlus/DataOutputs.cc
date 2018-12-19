@@ -83,7 +83,7 @@ namespace DataOutputs {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const NumMonthlyReports(62);
+    int const NumMonthlyReports(63);
     Array1D_string const MonthlyNamedReports(NumMonthlyReports,
                                              {"ZONECOOLINGSUMMARYMONTHLY",
                                               "ZONEHEATINGSUMMARYMONTHLY",
@@ -146,7 +146,8 @@ namespace DataOutputs {
                                               "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
                                               "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
                                               "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
-                                              "MECHANICALVENTILATIONLOADSMONTHLY"});
+                                              "MECHANICALVENTILATIONLOADSMONTHLY",
+                                              "HEATEMISSIONSREPORTMONTHLY"});
 
     // DERIVED TYPE DEFINITIONS:
 

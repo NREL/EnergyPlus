@@ -3195,6 +3195,24 @@ namespace MixedAir {
                                         "System",
                                         "Average",
                                         airloopName);
+                    SetupOutputVariable("Air System Relief Air Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelTotalLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+                    SetupOutputVariable("Air System Relief Air Sensible Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelSensiLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+                    SetupOutputVariable("Air System Relief Air Latent Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelLatentLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
 
                     if (loopOAController.MixedAirSPMNum > 0) {
                         SetupOutputVariable("Air System Outdoor Air Maximum Flow Fraction",
@@ -3771,6 +3789,11 @@ namespace MixedAir {
                 this->OAFractionRpt = 0.0;
             }
         }
+        this->RelTemp = this->RetTemp;
+        this->RelEnth = this->RetEnth;
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RetEnth - OutEnthalpy);
+        this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 
     void VentilationMechanicalProps::CalcMechVentController(

@@ -444,6 +444,7 @@ namespace DXCoils {
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
         Real64 FuelUsed;         // Energy used, in addition to electricity [W]
         Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
+        Real64 MSFuelWasteHeat;   // Total waste heat [J]
         bool MSHPHeatRecActive;  // True when entered Heat Rec Vol Flow Rate > 0
         int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
         // End of multispeed DX coil input
@@ -552,7 +553,7 @@ namespace DXCoils {
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
               PrintHighAmbMessage(false), EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
-              CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false),
+              CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0),
               MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
               SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0),
               SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
@@ -977,3 +978,4 @@ namespace DXCoils {
 } // namespace EnergyPlus
 
 #endif
+

@@ -210,6 +210,7 @@ namespace OutputReportTabular {
     extern bool displayLifeCycleCostReport;
     extern bool displayTariffReport;
     extern bool displayEconomicResultSummary;
+    extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
 
     // BEPS Report Related Variables
@@ -743,6 +744,8 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
 
+    void GatherHeatEmissionReport(int const IndexTypeKey);
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -780,6 +783,8 @@ namespace OutputReportTabular {
     void WriteVeriSumTable();
 
     void WriteAdaptiveComfortTable();
+
+    void WriteHeatEmissionTable();
 
     void WritePredefinedTables();
 

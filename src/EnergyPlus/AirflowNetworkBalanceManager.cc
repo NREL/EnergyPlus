@@ -8488,6 +8488,7 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         }
+                        // TODO: H2O Heat of Vap?
                         if (ZoneAirHumRat(ZN2) > ZoneAirHumRat(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
@@ -8517,6 +8518,7 @@ namespace AirflowNetworkBalanceManager {
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(i), MAT(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
+            // TODO: InfilHeatLoss is watt?
             if (MAT(i) > Tamb) {
                 AirflowNetworkZnRpt(i).InfilHeatLoss = AirflowNetworkExchangeData(i).SumMCp * (MAT(i) - Tamb) * ReportingConstant;
                 AirflowNetworkZnRpt(i).InfilHeatGain = 0.0;
@@ -8536,6 +8538,28 @@ namespace AirflowNetworkBalanceManager {
                     ZonePreDefRep(i).AFNInfilVolMin = AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
+
+            // TODO: add report var?
+            Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
+            AirflowNetworkZnRpt(i).InletMass = 0;
+            AirflowNetworkZnRpt(i).OutletMass = 0;
+            if (ZoneEquipConfig(i).IsControlled) {
+                for (int j = 1; j <= ZoneEquipConfig(i).NumInletNodes; ++j) {
+                    AirflowNetworkZnRpt(i).InletMass += Node(ZoneEquipConfig(i).InletNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumExhaustNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ExhaustNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumReturnNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ReturnNode(j)).MassFlowRate * ReportingConstant;
+                }
+            }
+            AirflowNetworkZnRpt(i).ExfilMass = AirflowNetworkZnRpt(i).InfilMass + AirflowNetworkZnRpt(i).VentilMass + AirflowNetworkZnRpt(i).MixMass +
+                                               AirflowNetworkZnRpt(i).InletMass - AirflowNetworkZnRpt(i).OutletMass;
+            AirflowNetworkZnRpt(i).ExfilSensiLoss = AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (MAT(i) - Tamb) * CpAir;
+            AirflowNetworkZnRpt(i).ExfilLatentLoss =
+                AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
+            AirflowNetworkZnRpt(i).ExfilTotalLoss = AirflowNetworkZnRpt(i).ExfilSensiLoss + AirflowNetworkZnRpt(i).ExfilLatentLoss;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate

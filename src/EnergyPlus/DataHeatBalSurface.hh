@@ -129,6 +129,9 @@ namespace DataHeatBalSurface {
     extern Array1D<Real64> QRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
     extern Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
     extern Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
+
+    extern Array1D<Real64> QAirExtReport;  // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    extern Array1D<Real64> QHeatEmiReport; // Surface Outside Face Heat Emission to Air Rate [W]
     //      Outside face surf
 
     extern Array1D<Real64> OpaqSurfInsFaceCondGainRep; // Equals Opaq Surf Ins Face Cond

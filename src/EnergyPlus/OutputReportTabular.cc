@@ -63,7 +63,13 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetworkBalanceManager.hh>
+#include <Boilers.hh>
+#include <ChillerElectricEIR.hh>
+#include <ChillerReformulatedEIR.hh>
 #include <CommandLineInterface.hh>
+#include <CondenserLoopTowers.hh>
+#include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataCostEstimate.hh>
@@ -73,6 +79,7 @@
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -87,24 +94,35 @@
 #include <DisplayRoutines.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <ElectricPowerServiceManager.hh>
+#include <EvaporativeCoolers.hh>
+#include <EvaporativeFluidCoolers.hh>
 #include <ExteriorEnergyUse.hh>
+#include <FluidCoolers.hh>
 #include <General.hh>
+#include <HVACVariableRefrigerantFlow.hh>
+#include <HeatingCoils.hh>
 #include <HybridModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
+#include <MixedAir.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReportTabularAnnual.hh>
+#include <PackagedThermalStorageCoil.hh>
+#include <PlantChillers.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
+#include <RefrigeratedCase.hh>
 #include <ReportCoilSelection.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 #include <VentilatedSlab.hh>
+#include <WaterThermalTanks.hh>
 #include <WeatherManager.hh>
 #include <ZonePlenum.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -229,7 +247,7 @@ namespace OutputReportTabular {
     int BinResultsTableCount(0);
     int BinResultsIntervalCount(0);
 
-    int const numNamedMonthly(62);
+    int const numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
     int MonthlyInputCount(0);
@@ -282,6 +300,7 @@ namespace OutputReportTabular {
     bool displayLifeCycleCostReport(false);
     bool displayTariffReport(false);
     bool displayEconomicResultSummary(false);
+    bool displayHeatEmissionsSummary(false);
     bool displayEioSummary(false);
 
     // BEPS Report Related Variables
@@ -574,6 +593,7 @@ namespace OutputReportTabular {
         displayLifeCycleCostReport = false;
         displayTariffReport = false;
         displayEconomicResultSummary = false;
+        displayHeatEmissionsSummary = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -779,6 +799,7 @@ namespace OutputReportTabular {
                 GatherSourceEnergyEndUseResultsForTimestep(IndexTypeKey);
                 GatherPeakDemandForTimestep(IndexTypeKey);
                 GatherHeatGainReport(IndexTypeKey);
+                GatherHeatEmissionReport(IndexTypeKey);
             }
         }
     }
@@ -2070,6 +2091,10 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     WriteTabularFiles = true;
                     nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "HeatEmissionsSummary")) {
+                    displayHeatEmissionsSummary = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2550,6 +2575,7 @@ namespace OutputReportTabular {
         namedMonthly(60).title = "AirLoopSystemComponentLoadsMonthly";
         namedMonthly(61).title = "AirLoopSystemComponentEnergyUseMonthly";
         namedMonthly(62).title = "MechanicalVentilationLoadsMonthly";
+        namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
             ShowFatalError("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits(numNamedMonthly) +
@@ -3227,6 +3253,11 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Decrease Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", aggTypeSumOrAvg);
+        }
+        if (namedMonthly(63).show) {
+            curReport = AddMonthlyReport("HeatEmissionsReportMonthly", 2);
+            // Place holder
+            AddMonthlyFieldSetInput(curReport, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "", aggTypeSumOrAvg);
         }
     }
 
@@ -4765,6 +4796,298 @@ namespace OutputReportTabular {
         }
     }
 
+    void GatherHeatEmissionReport(int const IndexTypeKey)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   August 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   Gathers the data each zone timestep for the heat gain report.
+        // The routine generates an annual table with the following columns which correspond to
+        // the output variables and data structures shown:
+
+        // Using/Aliasing
+        using AirflowNetworkBalanceManager::AirflowNetworkZnRpt;
+        using Boilers::BoilerReport;
+        using Boilers::NumBoilers;
+        using ChillerElectricEIR::ElectricEIRChiller;
+        using ChillerElectricEIR::ElectricEIRChillerReport;
+        using ChillerElectricEIR::NumElectricEIRChillers;
+        using ChillerReformulatedEIR::ElecReformEIRChiller;
+        using ChillerReformulatedEIR::ElecReformEIRChillerReport;
+        using ChillerReformulatedEIR::NumElecReformEIRChillers;
+        using CondenserLoopTowers::NumSimpleTowers;
+        using CondenserLoopTowers::SimpleTowerReport;
+        using DataAirflowNetwork::AirflowNetworkControlSimple;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataEnvironment::OutEnthalpy;
+        using DataHeatBalance::BuildingPreDefRep;
+        using DataHeatBalance::NumRefrigCondensers;
+        using DataHeatBalance::NumRefrigeratedRacks;
+        using DataHeatBalance::ZnAirRpt;
+        using DataHeatBalSurface::QConvOutReport;
+        using DataHeatBalSurface::QHeatEmiReport;
+        using DataHVACGlobals::AirCooled;
+        using DataHVACGlobals::EvapCooled;
+        using DataHVACGlobals::FanType_ZoneExhaust;
+        using DataHVACGlobals::WaterCooled;
+        using DataSurfaces::ExternalEnvironment;
+        using DataSurfaces::Surface;
+        using DataSurfaces::TotSurfaces;
+        using DXCoils::DXCoil;
+        using DXCoils::NumDXCoils;
+        using EvaporativeCoolers::EvapCond;
+        using EvaporativeCoolers::NumEvapCool;
+        using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using FluidCoolers::NumSimpleFluidCoolers;
+        using FluidCoolers::SimpleFluidCoolerReport;
+        using HeatingCoils::HeatingCoil;
+        using HeatingCoils::NumHeatingCoils;
+        using HVACVariableRefrigerantFlow::NumVRFCond;
+        using HVACVariableRefrigerantFlow::VRF;
+        using MixedAir::NumOAControllers;
+        using MixedAir::OAController;
+        using PackagedThermalStorageCoil::NumTESCoils;
+        using PackagedThermalStorageCoil::TESCoil;
+        using PlantChillers::ConstCOPChiller;
+        using PlantChillers::ConstCOPChillerReport;
+        using PlantChillers::ElectricChiller;
+        using PlantChillers::ElectricChillerReport;
+        using PlantChillers::EngineDrivenChiller;
+        using PlantChillers::EngineDrivenChillerReport;
+        using PlantChillers::GTChiller;
+        using PlantChillers::GTChillerReport;
+        using PlantChillers::NumConstCOPChillers;
+        using PlantChillers::NumElectricChillers;
+        using PlantChillers::NumEngineDrivenChillers;
+        using PlantChillers::NumGTChillers;
+        using RefrigeratedCase::AirChillerSet;
+        using RefrigeratedCase::Condenser;
+        using RefrigeratedCase::GasCooler;
+        using RefrigeratedCase::RefrigRack;
+        using VariableSpeedCoils::NumVarSpeedCoils;
+        using VariableSpeedCoils::VarSpeedCoil;
+        using WaterThermalTanks::AmbientTempOutsideAir;
+        using WaterThermalTanks::NumWaterThermalTank;
+        using WaterThermalTanks::WaterThermalTank;
+
+        static int iSurf(0);
+        static int iZone(0);
+        static int iOACtrl(0);
+        static int iCoil(0);
+        static int iCooler(0);
+        static int iChiller(0);
+        static int iBoiler(0);
+        static int iTank(0);
+        static int iRef(0);
+
+        static Real64 convertJtoGJ = 1.0 / 1000000000.0;
+        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
+        static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        Real64 rejectHeatHVAC = 0;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        if (!DoWeathSim) return;
+
+        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
+
+        if (IndexTypeKey != stepTypeZone) return; // only add values over the zone timestep basis
+
+        // Surface convection
+        for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+            if (Surface(iSurf).ExtBoundCond == ExternalEnvironment) {
+                BuildingPreDefRep.emiEnvelopConv += QHeatEmiReport(iSurf) * TimeStepZoneSec * convertJtoGJ;
+            }
+        }
+
+        // Zone exfiltration and relief
+        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                BuildingPreDefRep.emiZoneExfiltration += ZnAirRpt(iZone).ExfilTotalLoss * TimeStepZoneSec * convertJtoGJ;
+
+            } else {
+                BuildingPreDefRep.emiZoneExfiltration += AirflowNetworkZnRpt(iZone).ExfilTotalLoss * TimeStepZoneSec * convertJtoGJ;
+            }
+            BuildingPreDefRep.emiZoneExhaust += ZnAirRpt(iZone).ExhTotalLoss * TimeStepZoneSec * convertJtoGJ;
+        }
+
+        // HVAC relief air
+        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
+            BuildingPreDefRep.emiHVACRelief += OAController(iOACtrl).RelTotalLossRate * TimeStepZoneSec * convertJtoGJ;
+        }
+
+        // Consendor water loop
+        for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
+            rejectHeatHVAC += SimpleTowerReport(iCooler).Qactual * TimeStepZoneSec + SimpleTowerReport(iCooler).FanEnergy +
+                              SimpleTowerReport(iCooler).BasinHeaterConsumption;
+        }
+        for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
+            rejectHeatHVAC += SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepZoneSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+        }
+        for (iCooler = 1; iCooler <= NumSimpleFluidCoolers; ++iCooler) {
+            rejectHeatHVAC += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepZoneSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
+        }
+
+        // Air- and Evap-cooled chiller
+        for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
+            if (ElectricChiller(iChiller).Base.CondenserType != WaterCooled) {
+                rejectHeatHVAC += ElectricChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
+            if (EngineDrivenChiller(iChiller).Base.CondenserType != WaterCooled) {
+                rejectHeatHVAC += EngineDrivenChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
+            if (GTChiller(iChiller).Base.CondenserType != WaterCooled) {
+                rejectHeatHVAC += GTChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
+            if (ConstCOPChiller(iChiller).Base.CondenserType != WaterCooled) {
+                rejectHeatHVAC += ConstCOPChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
+            if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
+                rejectHeatHVAC += ElectricEIRChillerReport(iChiller).CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
+            if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
+                rejectHeatHVAC += ElecReformEIRChillerReport(iChiller).CondEnergy;
+            }
+        }
+
+        // Water / steam boiler
+        for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
+            rejectHeatHVAC +=
+                BoilerReport(iBoiler).FuelConsumed + BoilerReport(iBoiler).ParasiticElecConsumption - BoilerReport(iBoiler).BoilerEnergy;
+        }
+
+        // DX Coils air to air
+        // TODO: CoilDX_HeatPumpWaterHeaterPumped
+        for (iCoil = 1; iCoil <= NumDXCoils; ++iCoil) {
+            if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
+                    rejectHeatHVAC += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
+                                      DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
+                } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
+                    rejectHeatHVAC += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
+                                      DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+                }
+                if (DXCoil(iCoil).FuelType != DXCoils::FuelTypeElectricity) {
+                    rejectHeatHVAC += DXCoil(iCoil).MSFuelWasteHeat * TimeStepZoneSec;
+                }
+            } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
+                       DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                rejectHeatHVAC += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
+                                  DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
+            }
+        }
+        // VAV coils - air to air
+        for (iCoil = 1; iCoil <= NumVarSpeedCoils; ++iCoil) {
+            if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
+                    rejectHeatHVAC += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                      VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
+                } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
+                    rejectHeatHVAC += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                                      VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+                }
+            } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                rejectHeatHVAC += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                  VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
+            }
+        }
+
+        // Heating coils - fuel
+        for (iCoil = 1; iCoil <= NumHeatingCoils; ++iCoil) {
+            if (HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
+                HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
+                rejectHeatHVAC += HeatingCoil(iCoil).FuelUseLoad + HeatingCoil(iCoil).ParasiticFuelLoad - HeatingCoil(iCoil).HeatingCoilLoad;
+            }
+        }
+
+        // Packaged TES
+        for (iCoil = 1; iCoil <= NumTESCoils; ++iCoil) {
+            if (TESCoil(iCoil).CondenserType == AirCooled) {
+                rejectHeatHVAC += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy + TESCoil(iCoil).ElectColdWeatherEnergy -
+                                  TESCoil(iCoil).Q_Ambient;
+            } else if (TESCoil(iCoil).CondenserType == EvapCooled) {
+                rejectHeatHVAC += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
+                                  TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
+            }
+        }
+
+        // Water heater and thermal storage
+        for (iTank = 1; iTank <= NumWaterThermalTank; ++iTank) {
+            if (WaterThermalTank(iTank).AmbientTempIndicator == AmbientTempOutsideAir) {
+                rejectHeatHVAC += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
+            }
+        }
+
+        // Variable Refrigerant Flow
+        for (iCoil = 1; iCoil <= NumVRFCond; ++iCoil) {
+            if (VRF(iCoil).CondenserType == AirCooled) {
+                rejectHeatHVAC += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption + VRF(iCoil).CrankCaseHeaterElecConsumption +
+                                  VRF(iCoil).DefrostConsumption +
+                                  (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepZoneSec;
+            } else if (VRF(iCoil).CondenserType == EvapCooled) {
+                rejectHeatHVAC += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
+                                  VRF(iCoil).EvapWaterConsumpRate * TimeStepZoneSec * RhoWater * H2OHtOfVap_HVAC;
+            } else if (VRF(iCoil).CondenserType == WaterCooled) {
+                rejectHeatHVAC += VRF(iCoil).QCondEnergy;
+            }
+        }
+        // Refrigerated Rack
+        for (iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
+            if (RefrigRack(iRef).CondenserType == AirCooled) {
+                rejectHeatHVAC += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
+            } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
+                rejectHeatHVAC += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
+                                  RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
+            } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
+                rejectHeatHVAC += RefrigRack(iCoil).CondEnergy;
+            }
+        }
+        // Refrigerated Case - Condenser
+        for (iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
+            rejectHeatHVAC += RefrigRack(iCoil).CondEnergy;
+        }
+
+        // Evaporative coolers
+
+        for (iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
+            rejectHeatHVAC += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
+        }
+
+        BuildingPreDefRep.emiHVACReject += rejectHeatHVAC * convertJtoGJ;
+        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
+                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
+    }
+
     void GatherHeatGainReport(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
@@ -5434,6 +5757,7 @@ namespace OutputReportTabular {
             WriteAdaptiveComfortTable();
             WriteEioTables();
             WriteLoadComponentSummaryTables();
+            WriteHeatEmissionTable();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
@@ -10695,6 +11019,82 @@ namespace OutputReportTabular {
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            }
+        }
+    }
+
+    void WriteHeatEmissionTable()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Xuan Luo
+        //       DATE WRITTEN   November 2018
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Writes summary table for heat emissions
+
+        // METHODOLOGY EMPLOYED:
+
+        // REFERENCES:
+
+        // Using/Aliasing
+        //        using DataHeatBalSurface::QHeatEmiReport;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        Array1D_string columnHead(2);
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+
+        // Should deallocate after writing table. - LKL
+
+        if (displayHeatEmissionsSummary) {
+
+            WriteReportHeaders("Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            WriteSubtitle("Heat Emission by Components");
+
+            columnWidth.allocate(1);
+            columnWidth = 10;
+
+            rowHead.allocate(6);
+            tableBody.allocate(1, 6);
+
+            columnHead(1) = "Heat Emissions [GJ]";
+            rowHead(1) = "Envelope Convection";
+            rowHead(2) = "Zone Exfiltration";
+            rowHead(3) = "Zone Exhaust Air";
+            rowHead(4) = "HVAC Relief Air";
+            rowHead(5) = "HVAC Reject Heat";
+            rowHead(6) = "Total";
+
+            tableBody = "";
+            tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv, 2);
+            tableBody(1, 2) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
+            tableBody(1, 3) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
+            tableBody(1, 4) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
+            tableBody(1, 5) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
+            tableBody(1, 6) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
+
+            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
             }
         }
     }

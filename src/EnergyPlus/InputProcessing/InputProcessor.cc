@@ -1861,6 +1861,10 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
 
+    } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
+        // Place holder
+        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+
     } else {
     }
 }
