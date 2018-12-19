@@ -4,6 +4,10 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
+if(WIN32)
+  configure_file( ExpandObjects.rc.in "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
+endif()
+
 set(SRC epfilter.f90) 
 
 set(STATIC_EXE FALSE)
@@ -42,7 +46,11 @@ else()  # Windows
 endif()
 
 set(SKIP_BUILD_RPATH TRUE)
-add_executable( ExpandObjects ${SRC} )
+if (APPLE OR UNIX)
+  add_executable( ExpandObjects ${SRC} )
+else()  # windows
+  add_executable( ExpandObjects ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
+endif()
 
 install( TARGETS ExpandObjects DESTINATION "./" )
 if(NOT ${STATIC_EXE})

@@ -52,12 +52,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
+set(CPACK_PACKAGE_CONTACT "Edwin Lee <edwin.lee@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
-option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
@@ -65,7 +64,6 @@ option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
 option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
-
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
@@ -86,7 +84,6 @@ if( BUILD_TESTING )
     else()
       set( ARCH_FLAG "" )
     endif()
-
     set( REGRESSION_BASELINE_SHA "" CACHE STRING "SHA of baseline comparison" )
     set( COMMIT_SHA "" CACHE STRING "Commit sha of this build" )
     set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
@@ -195,7 +192,7 @@ configure_file( idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
-# EPLaunch workflow files should be configured -- for now it's just a plain copy
+# EPLaunch workflow files should be configured
 configure_file( "workflows/app_g_postprocess.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" )
 configure_file( "workflows/calc_soil_surface_temp.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/calc_soil_surface_temp.py" )
 configure_file( "workflows/coeff_check.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" )
@@ -206,20 +203,13 @@ configure_file( "workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wor
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
-# Include scripts for enabling the testing of 179D compliance
-include(cmake/179DReporting.cmake)
-
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
-
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
-
   if (BUILD_PERFORMANCE_TESTS)
-
     if (UNIX AND NOT APPLE)
       option( VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF )
-
       if (VALGRIND_ANALYZE_PERFORMANCE_TESTS)
         find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
       endif()
@@ -266,28 +256,6 @@ if( BUILD_PACKAGE )
   include(cmake/Install.cmake)
 endif()
 
-if (BUILD_VALIDATION_REPORTS)
-  if ( NOT BUILD_FORTRAN )
-    message("*** VALIDATION REPORT ERROR : Cannot build validation reports without Fortran targets.  Turn on BUILD_FORTRAN.")
-  endif()
-  # we should check to make sure the Python 3 binary is actually available on the system
-  # we won't use it here, the ValidationReports CMake will do all the setup, we just want a quick check to find the binary
-  find_program(PYTHON_THREE python3)
-  if ( PYTHON_THREE STREQUAL "PYTHON_THREE-NOTFOUND" )
-    message("*** VALIDATION REPORT ERROR : Cannot find Python3 on the system; Validation report building requires Python 3.")
-  endif()
-  include(ExternalProject)
-  ExternalProject_Add(ValidationReports
-    DEPENDS energyplus ReadVarsESO Basement Slab
-    GIT_REPOSITORY git://github.com/NREL/EnergyPlusValidationReports
-    GIT_TAG master
-    CMAKE_CACHE_ARGS
-      -DENERGYPLUS_PATH:PATH=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
-    INSTALL_COMMAND ""
-    )
-endif()
-
 if (BUILD_DOCS)
   # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
   find_package(LATEX)
@@ -306,3 +274,21 @@ if (BUILD_DOCS)
   set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX." FORCE)
   set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 endif()
+
+# some parameters are simply not needed for everyday building
+mark_as_advanced(CMAKE_INSTALL_PREFIX)
+mark_as_advanced(BUILD_SHARED_LIBS)
+mark_as_advanced(ENABLE_COVERAGE)
+mark_as_advanced(ENABLE_GTEST_DEBUG_MODE)
+mark_as_advanced(ENABLE_GTEST_SHUFFLE)
+mark_as_advanced(ENABLE_MEMORY_SANITIZER)
+mark_as_advanced(ENABLE_OPENMP)
+mark_as_advanced(KIVA_3D)
+mark_as_advanced(KIVA_COVERAGE)
+mark_as_advanced(KIVA_EXE_BUILD)
+mark_as_advanced(KIVA_GROUND_PLOT)
+mark_as_advanced(KIVA_STATIC_LIB)
+mark_as_advanced(KIVA_TESTING)
+mark_as_advanced(RE2_BUILD_TESTING)
+mark_as_advanced(USEPCRE)
+

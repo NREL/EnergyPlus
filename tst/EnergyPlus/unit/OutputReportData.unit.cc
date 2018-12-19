@@ -158,8 +158,11 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex)
     ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 10);
+    // FindItemInVariableList is case-insentive, so we also test that
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Mass Flow Rate"));
     EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList("OutsIDE AiR InLEt NoDE", "System NoDE MaSS FLOw Rate"));
+    EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System NODE Mass Flow RATE"));
     EXPECT_TRUE(FindItemInVariableList("Mixed Air Node", "System Node Temperature"));
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Temperature"));
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
