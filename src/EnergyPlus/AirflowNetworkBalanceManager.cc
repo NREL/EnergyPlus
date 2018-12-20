@@ -525,14 +525,14 @@ namespace AirflowNetworkBalanceManager {
         // REFERENCES:
         // na
 
-        static std::string const RoutineName{"GetAirflowElementInput"};
+        static std::string const RoutineName{"getAirflowElementInput"};
         std::string CurrentModuleObject;
         bool success{true};
 
         // *** Read AirflowNetwork simulation reference crack conditions
         std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
-        ReferenceConditions defaultReferenceConditions;                           // Defaulted conditions
-        bool conditionsAreDefaulted(true);                        // Conditions are defaulted?
+        ReferenceConditions defaultReferenceConditions("Default");                // Defaulted conditions
+        bool conditionsAreDefaulted(true);                                        // Conditions are defaulted?
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
         auto instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
@@ -559,8 +559,9 @@ namespace AirflowNetworkBalanceManager {
                 }
                 Real64 humidity{fields.at("reference_humidity_ratio")};
                 // globalSolverObject.referenceConditions.emplace_back(thisObjectName, temperature, pressure, humidity);
-                referenceConditions.emplace(
-                    std::piecewise_construct, std::forward_as_tuple(thisObjectName), std::forward_as_tuple(temperature, pressure, humidity));
+                referenceConditions.emplace(std::piecewise_construct,
+                                            std::forward_as_tuple(thisObjectName),
+                                            std::forward_as_tuple(thisObjectName, temperature, pressure, humidity));
             }
             // Check that there is more than one
             if (referenceConditions.size() == 1) {
@@ -808,12 +809,675 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompReliefAirData(i).Name = thisObjectName; // Name of zone exhaust fan component
                 DisSysCompReliefAirData(i).FlowCoef = coeff;      // flow coefficient
                 DisSysCompReliefAirData(i).FlowExpo = expnt;      // Flow exponent
-
                 DisSysCompReliefAirData(i).OAMixerNum = OAMixerNum;
-
                 DisSysCompReliefAirData(i).StandardT = refT;
                 DisSysCompReliefAirData(i).StandardP = refP;
                 DisSysCompReliefAirData(i).StandardW = refW;
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork simulation detailed openings
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:DetailedOpening";
+        AirflowNetworkNumOfDetOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                            // Temporary workaround
+            MultizoneCompDetOpeningData.allocate(AirflowNetworkNumOfDetOpenings); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                }
+
+                int LVOtype{1};
+                std::string LVOstring;
+                if (fields.find("type_of_rectangular_large_vertical_opening_lvo_") != fields.end()) {
+                    LVOstring = fields.at("type_of_rectangular_large_vertical_opening_lvo_").get<std::string>();
+                    if (UtilityRoutines::SameString(LVOstring, "NonPivoted") || UtilityRoutines::SameString(LVOstring, "1")) {
+                        LVOtype = 1; // Large vertical opening type number
+                    } else if (UtilityRoutines::SameString(LVOstring, "HorizontallyPivoted") || UtilityRoutines::SameString(LVOstring, "2")) {
+                        LVOtype = 2; // Large vertical opening type number
+                    } else {
+                        ShowSevereError(RoutineName + "Invalid Type of Rectangular Large Vertical Opening (LVO) = " + LVOstring + "in " +
+                                        CurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError("Valid choices are NonPivoted and HorizontallyPivoted.");
+                        success = false;
+                    }
+                }
+
+                Real64 extra{0.0};
+                if (fields.find("extra_crack_length_or_height_of_pivoting_axis") != fields.end()) {
+                    extra = fields.at("extra_crack_length_or_height_of_pivoting_axis");
+                }
+
+                Real64 N{fields.at("number_of_sets_of_opening_factor_data")};
+
+                std::vector<Real64> factors(N);
+                std::vector<Real64> cds(N);
+                std::vector<Real64> width_factors(N);
+                std::vector<Real64> height_factors(N);
+                std::vector<Real64> start_height_factors(N);
+
+                // Real64 factor{0.0};
+                // if (fields.find("opening_factor_1") != fields.end()) {
+                //    factor = fields.at("opening_factor_1");
+                //}
+                Real64 cd{0.001};
+                if (fields.find("discharge_coefficient_for_opening_factor_1") != fields.end()) {
+                    cd = fields.at("discharge_coefficient_for_opening_factor_1");
+                }
+                Real64 width_factor{0.0};
+                if (fields.find("width_factor_for_opening_factor_1") != fields.end()) {
+                    width_factor = fields.at("width_factor_for_opening_factor_1");
+                }
+                Real64 height_factor{0.0};
+                if (fields.find("height_factor_for_opening_factor_1") != fields.end()) {
+                    height_factor = fields.at("height_factor_for_opening_factor_1");
+                }
+                Real64 start_height_factor{0.0};
+                if (fields.find("start_height_factor_for_opening_factor_1") != fields.end()) {
+                    start_height_factor = fields.at("start_height_factor_for_opening_factor_1");
+                }
+
+                factors[0] = 0.0; // factor; // This factor must be zero
+                cds[0] = cd;
+                width_factors[0] = width_factor;
+                height_factors[0] = height_factor;
+                start_height_factors[0] = start_height_factor;
+
+                Real64 factor{fields.at("opening_factor_2")};
+                cd = 1.0;
+                if (fields.find("discharge_coefficient_for_opening_factor_2") != fields.end()) {
+                    cd = fields.at("discharge_coefficient_for_opening_factor_2");
+                }
+                width_factor = 1.0;
+                if (fields.find("width_factor_for_opening_factor_2") != fields.end()) {
+                    width_factor = fields.at("width_factor_for_opening_factor_2");
+                }
+                height_factor = 1.0;
+                if (fields.find("height_factor_for_opening_factor_2") != fields.end()) {
+                    height_factor = fields.at("height_factor_for_opening_factor_2");
+                }
+                start_height_factor = 0.0;
+                if (fields.find("start_height_factor_for_opening_factor_2") != fields.end()) {
+                    start_height_factor = fields.at("start_height_factor_for_opening_factor_2");
+                }
+
+                factors[1] = factor;
+                cds[1] = cd;
+                width_factors[1] = width_factor;
+                height_factors[1] = height_factor;
+                start_height_factors[1] = start_height_factor;
+
+                if (N >= 3) {
+                    factor = fields.at("opening_factor_3");
+                    cd = 0.0;
+                    if (fields.find("discharge_coefficient_for_opening_factor_3") != fields.end()) {
+                        cd = fields.at("discharge_coefficient_for_opening_factor_3");
+                    }
+                    width_factor = 0.0;
+                    if (fields.find("width_factor_for_opening_factor_3") != fields.end()) {
+                        width_factor = fields.at("width_factor_for_opening_factor_3");
+                    }
+                    height_factor = 0.0;
+                    if (fields.find("height_factor_for_opening_factor_3") != fields.end()) {
+                        height_factor = fields.at("height_factor_for_opening_factor_3");
+                    }
+                    start_height_factor = 0.0;
+                    if (fields.find("start_height_factor_for_opening_factor_3") != fields.end()) {
+                        start_height_factor = fields.at("start_height_factor_for_opening_factor_3");
+                    }
+
+                    factors[2] = factor;
+                    cds[2] = cd;
+                    width_factors[2] = width_factor;
+                    height_factors[2] = height_factor;
+                    start_height_factors[2] = start_height_factor;
+
+                    if (N >= 4) {
+                        factor = fields.at("opening_factor_4");
+                        cd = 0.0;
+                        if (fields.find("discharge_coefficient_for_opening_factor_4") != fields.end()) {
+                            cd = fields.at("discharge_coefficient_for_opening_factor_4");
+                        }
+                        width_factor = 0.0;
+                        if (fields.find("width_factor_for_opening_factor_4") != fields.end()) {
+                            width_factor = fields.at("width_factor_for_opening_factor_4");
+                        }
+                        height_factor = 0.0;
+                        if (fields.find("height_factor_for_opening_factor_4") != fields.end()) {
+                            height_factor = fields.at("height_factor_for_opening_factor_4");
+                        }
+                        start_height_factor = 0.0;
+                        if (fields.find("start_height_factor_for_opening_factor_4") != fields.end()) {
+                            start_height_factor = fields.at("start_height_factor_for_opening_factor_4");
+                        }
+
+                        factors[3] = factor;
+                        cds[3] = cd;
+                        width_factors[3] = width_factor;
+                        height_factors[3] = height_factor;
+                        start_height_factors[3] = start_height_factor;
+                    }
+                }
+
+                MultizoneCompDetOpeningData(i).Name = thisObjectName; // Name of large detailed opening component
+                MultizoneCompDetOpeningData(i).FlowCoef = coeff;      // Air Mass Flow Coefficient When Window or Door Is Closed
+                MultizoneCompDetOpeningData(i).FlowExpo = expnt;      // Air Mass Flow exponent When Window or Door Is Closed
+                MultizoneCompDetOpeningData(i).TypeName = LVOstring;  // Large vertical opening type
+                MultizoneCompDetOpeningData(i).LVOType = LVOtype;     // Large vertical opening type number
+                MultizoneCompDetOpeningData(i).LVOValue = extra;      // Extra crack length for LVO type 1 with multiple openable parts,
+                                                                      // or Height of pivoting axis for LVO type 2
+
+                MultizoneCompDetOpeningData(i).NumFac = N; // Number of Opening Factor Values
+
+                MultizoneCompDetOpeningData(i).OpenFac1 = factors[0];                // Opening factor #1
+                MultizoneCompDetOpeningData(i).DischCoeff1 = cds[0];                 // Discharge coefficient for opening factor #1
+                MultizoneCompDetOpeningData(i).WidthFac1 = width_factors[0];         // Width factor for for Opening factor #1
+                MultizoneCompDetOpeningData(i).HeightFac1 = height_factors[0];       // Height factor for opening factor #1
+                MultizoneCompDetOpeningData(i).StartHFac1 = start_height_factors[0]; // Start height factor for opening factor #1
+                MultizoneCompDetOpeningData(i).OpenFac2 = factors[1];                // Opening factor #2
+                MultizoneCompDetOpeningData(i).DischCoeff2 = cds[1];                 // Discharge coefficient for opening factor #2
+                MultizoneCompDetOpeningData(i).WidthFac2 = width_factors[1];         // Width factor for for Opening factor #2
+                MultizoneCompDetOpeningData(i).HeightFac2 = height_factors[1];       // Height factor for opening factor #2
+                MultizoneCompDetOpeningData(i).StartHFac2 = start_height_factors[1]; // Start height factor for opening factor #2
+
+                MultizoneCompDetOpeningData(i).OpenFac3 = 0.0;    // Opening factor #3
+                MultizoneCompDetOpeningData(i).DischCoeff3 = 0.0; // Discharge coefficient for opening factor #3
+                MultizoneCompDetOpeningData(i).WidthFac3 = 0.0;   // Width factor for for Opening factor #3
+                MultizoneCompDetOpeningData(i).HeightFac3 = 0.0;  // Height factor for opening factor #3
+                MultizoneCompDetOpeningData(i).StartHFac3 = 0.0;  // Start height factor for opening factor #3
+                MultizoneCompDetOpeningData(i).OpenFac4 = 0.0;    // Opening factor #4
+                MultizoneCompDetOpeningData(i).DischCoeff4 = 0.0; // Discharge coefficient for opening factor #4
+                MultizoneCompDetOpeningData(i).WidthFac4 = 0.0;   // Width factor for for Opening factor #4
+                MultizoneCompDetOpeningData(i).HeightFac4 = 0.0;  // Height factor for opening factor #4
+                MultizoneCompDetOpeningData(i).StartHFac4 = 0.0;  // Start height factor for opening factor #4
+                if (N == 2) {
+                    if (factors[1] != 1.0) {
+                        ShowWarningError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError(
+                            "..This object specifies that only 3 opening factors will be used. So, the value of Opening Factor #2 is set to 1.0.");
+                        ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac2, 2));
+                        MultizoneCompDetOpeningData(i).OpenFac2 = 1.0;
+                    }
+                } else if (N >= 3) {
+                    MultizoneCompDetOpeningData(i).OpenFac3 = factors[2];                // Opening factor #3
+                    MultizoneCompDetOpeningData(i).DischCoeff3 = cds[2];                 // Discharge coefficient for opening factor #3
+                    MultizoneCompDetOpeningData(i).WidthFac3 = width_factors[2];         // Width factor for for Opening factor #3
+                    MultizoneCompDetOpeningData(i).HeightFac3 = height_factors[2];       // Height factor for opening factor #3
+                    MultizoneCompDetOpeningData(i).StartHFac3 = start_height_factors[2]; // Start height factor for opening factor #3
+                    if (N >= 4) {
+                        MultizoneCompDetOpeningData(i).OpenFac4 = factors[3]; // Opening factor #4
+                        if (factors[3] != 1.0) {
+                            ShowWarningError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError("..This object specifies that 4 opening factors will be used. So, the value of Opening Factor #4 "
+                                              "is set to 1.0.");
+                            ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac4, 2));
+                            MultizoneCompDetOpeningData(i).OpenFac4 = 1.0;
+                        }
+                        MultizoneCompDetOpeningData(i).DischCoeff4 = cds[3];                 // Discharge coefficient for opening factor #4
+                        MultizoneCompDetOpeningData(i).WidthFac4 = width_factors[3];         // Width factor for for Opening factor #4
+                        MultizoneCompDetOpeningData(i).HeightFac4 = height_factors[3];       // Height factor for opening factor #4
+                        MultizoneCompDetOpeningData(i).StartHFac4 = start_height_factors[3]; // Start height factor for opening factor #4
+                    } else {
+                        if (factors[2] != 1.0) {
+                            ShowWarningError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError("..This object specifies that only 3 opening factors will be used. So, the value of Opening Factor #3 "
+                                              "is set to 1.0.");
+                            ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac3, 2));
+                            MultizoneCompDetOpeningData(i).OpenFac3 = 1.0;
+                        }
+                    }
+                }
+
+                // Sanity checks, check sum of Height Factor and the Start Height Factor
+                if (MultizoneCompDetOpeningData(i).HeightFac1 + MultizoneCompDetOpeningData(i).StartHFac1 > 1.0) {
+                    ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                    ShowContinueError(
+                        "..The sum of Height Factor for Opening Factor 1 and Start Height Factor for Opening Factor 1 is greater than 1.0");
+                    success = false;
+                }
+                if (MultizoneCompDetOpeningData(i).HeightFac2 + MultizoneCompDetOpeningData(i).StartHFac2 > 1.0) {
+                    ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                    ShowContinueError(
+                        "..The sum of Height Factor for Opening Factor 2 and Start Height Factor for Opening Factor 2 is greater than 1.0");
+                    success = false;
+                }
+                if (MultizoneCompDetOpeningData(i).NumFac > 2) {
+                    if (MultizoneCompDetOpeningData(i).OpenFac2 >= MultizoneCompDetOpeningData(i).OpenFac3) {
+                        ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError("..The value of Opening Factor #2 >= the value of Opening Factor #3");
+                        success = false;
+                    }
+                    if (MultizoneCompDetOpeningData(i).HeightFac3 + MultizoneCompDetOpeningData(i).StartHFac3 > 1.0) {
+                        ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError(
+                            "..The sum of Height Factor for Opening Factor 3 and Start Height Factor for Opening Factor 3 is greater than 1.0");
+                        success = false;
+                    }
+                    if (MultizoneCompDetOpeningData(i).NumFac == 4) {
+                        if (MultizoneCompDetOpeningData(i).OpenFac3 >= MultizoneCompDetOpeningData(i).OpenFac4) {
+                            ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError("..The value of Opening Factor #3 >= the value of Opening Factor #4");
+                            success = false;
+                        }
+                        if (MultizoneCompDetOpeningData(i).HeightFac4 + MultizoneCompDetOpeningData(i).StartHFac4 > 1.0) {
+                            ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(
+                                "..The sum of Height Factor for Opening Factor 4 and Start Height Factor for Opening Factor 4 is greater than 1.0");
+                            success = false;
+                        }
+                    }
+                }
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork simulation simple openings
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:SimpleOpening";
+        AirflowNetworkNumOfSimOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                               // Temporary workaround
+            MultizoneCompSimpleOpeningData.allocate(AirflowNetworkNumOfSimOpenings); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                }
+                Real64 diff{fields.at("minimum_density_difference_for_two_way_flow")};
+                Real64 dischargeCoeff{fields.at("discharge_coefficient")};
+
+                MultizoneCompSimpleOpeningData(i).Name = thisObjectName;       // Name of large simple opening component
+                MultizoneCompSimpleOpeningData(i).FlowCoef = coeff;            // Air Mass Flow Coefficient When Window or Door Is Closed
+                MultizoneCompSimpleOpeningData(i).FlowExpo = expnt;            // Air Mass Flow exponent When Window or Door Is Closed
+                MultizoneCompSimpleOpeningData(i).MinRhoDiff = diff;           // Minimum density difference for two-way flow
+                MultizoneCompSimpleOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork simulation horizontal openings
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:HorizontalOpening";
+        AirflowNetworkNumOfHorOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                            // Temporary workaround
+            MultizoneCompHorOpeningData.allocate(AirflowNetworkNumOfHorOpenings); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                }
+                Real64 angle{90.0};
+                if (fields.find("sloping_plane_angle") != fields.end()) {
+                    angle = fields.at("sloping_plane_angle");
+                }
+                Real64 dischargeCoeff{fields.at("discharge_coefficient")};
+
+                MultizoneCompHorOpeningData(i).Name = thisObjectName;       // Name of large simple opening component
+                MultizoneCompHorOpeningData(i).FlowCoef = coeff;            // Air Mass Flow Coefficient When Window or Door Is Closed
+                MultizoneCompHorOpeningData(i).FlowExpo = expnt;            // Air Mass Flow exponent When Window or Door Is Closed
+                MultizoneCompHorOpeningData(i).Slope = angle;               // Sloping plane angle
+                MultizoneCompHorOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
+                ++i;
+            }
+        }
+
+        // *** Read AirflowNetwork simulation surface effective leakage area component
+        CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
+        AirflowNetworkNumOfSurELA = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                                   // Temporary workaround
+            MultizoneSurfaceELAData.allocate(AirflowNetworkNumOfSurELA); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 ela{fields.at("effective_leakage_area")};
+                Real64 cd{1.0};
+                if (fields.find("discharge_coefficient") != fields.end()) {
+                    cd = fields.at("discharge_coefficient");
+                }
+                Real64 dp{4.0};
+                if (fields.find("reference_pressure_difference") != fields.end()) {
+                    dp = fields.at("reference_pressure_difference");
+                }
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent");
+                }
+
+                MultizoneSurfaceELAData(i).Name = thisObjectName; // Name of surface effective leakage area component
+                MultizoneSurfaceELAData(i).ELA = ela;             // Effective leakage area
+                MultizoneSurfaceELAData(i).DischCoeff = cd;       // Discharge coefficient
+                MultizoneSurfaceELAData(i).RefDeltaP = dp;        // Reference pressure difference
+                MultizoneSurfaceELAData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+                MultizoneSurfaceELAData(i).TestDeltaP = 0.0;      // Testing pressure difference
+                MultizoneSurfaceELAData(i).TestDisCoef = 0.0;     // Testing Discharge coefficient
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: duct leakage
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
+        DisSysNumOfLeaks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                     // Temporary workaround
+            DisSysCompLeakData.allocate(DisSysNumOfLeaks); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 coeff{fields.at("air_mass_flow_coefficient")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent");
+                }
+
+                DisSysCompLeakData(i).Name = thisObjectName; // Name of duct leak component
+                DisSysCompLeakData(i).FlowCoef = coeff;      // Air Mass Flow Coefficient
+                DisSysCompLeakData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: duct effective leakage ratio
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:LeakageRatio";
+        DisSysNumOfELRs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                   // Temporary workaround
+            DisSysCompELRData.allocate(DisSysNumOfELRs); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 elr{fields.at("effective_leakage_ratio")};
+                Real64 maxflow{fields.at("maximum_flow_rate")};
+                Real64 dp{fields.at("reference_pressure_difference")};
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent") != fields.end()) {
+                    expnt = fields.at("air_mass_flow_exponent");
+                }
+
+                DisSysCompELRData(i).Name = thisObjectName;          // Name of duct effective leakage ratio component
+                DisSysCompELRData(i).ELR = elr;                      // Value of effective leakage ratio
+                DisSysCompELRData(i).FlowRate = maxflow * StdRhoAir; // Maximum airflow rate
+                DisSysCompELRData(i).RefPres = dp;                   // Reference pressure difference
+                DisSysCompELRData(i).FlowExpo = expnt;               // Air Mass Flow exponent
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: duct
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
+        DisSysNumOfDucts = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                     // Temporary workaround
+            DisSysCompDuctData.allocate(DisSysNumOfDucts); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 L{fields.at("duct_length")};
+                Real64 D{fields.at("hydraulic_diameter")};
+                Real64 A{fields.at("cross_section_area")};
+                Real64 e{0.0009};
+                if (fields.find("surface_roughness") != fields.end()) {
+                    e = fields.at("surface_roughness");
+                }
+                Real64 dlc{0.0};
+                if (fields.find("coefficient_for_local_dynamic_loss_due_to_fitting") != fields.end()) {
+                    dlc = fields.at("coefficient_for_local_dynamic_loss_due_to_fitting");
+                }
+                Real64 U{0.943};
+                if (fields.find("heat_transmittance_coefficient_u_factor_for_duct_wall_construction") != fields.end()) {
+                    U = fields.at("heat_transmittance_coefficient_u_factor_for_duct_wall_construction");
+                }
+                Real64 Um{0.001};
+                if (fields.find("overall_moisture_transmittance_coefficient_from_air_to_air") != fields.end()) {
+                    Um = fields.at("overall_moisture_transmittance_coefficient_from_air_to_air");
+                }
+                Real64 hout{0.0};
+                if (fields.find("outside_convection_coefficient") != fields.end()) {
+                    hout = fields.at("outside_convection_coefficient");
+                }
+                Real64 hin{0.0};
+                if (fields.find("inside_convection_coefficient") != fields.end()) {
+                    hin = fields.at("inside_convection_coefficient");
+                }
+
+                DisSysCompDuctData(i).Name = thisObjectName;   // Name of duct effective leakage ratio component
+                DisSysCompDuctData(i).L = L;                   // Duct length [m]
+                DisSysCompDuctData(i).hydraulicDiameter = D;   // Hydraulic diameter [m]
+                DisSysCompDuctData(i).A = A;                   // Cross section area [m2]
+                DisSysCompDuctData(i).roughness = e;           // Surface roughness [m]
+                DisSysCompDuctData(i).TurDynCoef = dlc;        // Turbulent dynamic loss coefficient
+                DisSysCompDuctData(i).UThermConduct = U;       // Conduction heat transmittance [W/m2.K]
+                DisSysCompDuctData(i).UMoisture = Um;          // Overall moisture transmittance [kg/m2]
+                DisSysCompDuctData(i).OutsideConvCoeff = hout; // Outside convection coefficient [W/m2.K]
+                DisSysCompDuctData(i).InsideConvCoeff = hin;   // Inside convection coefficient [W/m2.K]
+                DisSysCompDuctData(i).MThermal = 0.0;          // Thermal capacity [J/K]
+                DisSysCompDuctData(i).MMoisture = 0.0;         // Moisture capacity [kg]
+                DisSysCompDuctData(i).LamDynCoef = 64.0;       // Laminar dynamic loss coefficient
+                DisSysCompDuctData(i).LamFriCoef = dlc;        // Laminar friction loss coefficient
+                DisSysCompDuctData(i).InitLamCoef = 128.0;     // Coefficient of linear initialization
+                DisSysCompDuctData(i).RelRough = e / D;        // e/D: relative roughness
+                DisSysCompDuctData(i).RelL = L / D;            // L/D: relative length
+                DisSysCompDuctData(i).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(i).RelRough); // 1.14 - 0.868589*ln(e/D)
+                DisSysCompDuctData(i).g = DisSysCompDuctData(i).A1;                                    // 1/sqrt(Darcy friction factor)
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: constant volume fan
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
+        DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (DisSysNumOfCVFs > 0 && DisSysNumOfCVFs != inputProcessor->getNumObjectsFound("AirLoopHVAC")) {
+            ShowSevereError("The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits(DisSysNumOfCVFs));
+            ShowSevereError("The number of entered AirLoopHVAC objects is " + RoundSigDigits(inputProcessor->getNumObjectsFound("AirLoopHVAC")));
+            ShowContinueError("Both numbers should be equal. Please check your inputs.");
+            success = false;
+        }
+
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                   // Temporary workaround
+            DisSysCompCVFData.allocate(DisSysNumOfCVFs); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string fan_name = UtilityRoutines::MakeUPPERCase(fields.at("fan_name"));
+                std::string fan_type = fields.at("supply_fan_object_type");
+
+                bool FanErrorFound = false;
+                int fanIndex;
+                Real64 flowRate;
+                int fanType_Num;
+
+                GetFanIndex(fan_name, fanIndex, FanErrorFound);
+
+                if (FanErrorFound) {
+                    ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
+                    success = false;
+                }
+
+                GetFanVolFlow(fanIndex, flowRate);
+                flowRate *= StdRhoAir;
+
+                GetFanType(fan_name, fanType_Num, FanErrorFound);
+
+                SupplyFanType = fanType_Num;
+                if (!(fanType_Num == FanType_SimpleConstVolume || fanType_Num == FanType_SimpleOnOff || fanType_Num == FanType_SimpleVAV)) {
+                    ShowSevereError(RoutineName + "The Supply Fan Object Type in " + CurrentModuleObject + " = " + thisObjectName +
+                                    " is not a valid fan type.");
+                    ShowContinueError("Valid fan types are  Fan:ConstantVolume or Fan:OnOff");
+                    success = false;
+                } else {
+                    if (UtilityRoutines::SameString(fan_type, "Fan:ConstantVolume") && fanType_Num == FanType_SimpleOnOff) {
+                        ShowSevereError("The Supply Fan Object Type defined in " + CurrentModuleObject + " is " + fan_type);
+                        ShowContinueError("The Supply Fan Object Type defined in an AirLoopHVAC is Fan:OnOff");
+                        success = false;
+                    }
+                    if (UtilityRoutines::SameString(fan_type, "Fan:OnOff") && fanType_Num == FanType_SimpleConstVolume) {
+                        ShowSevereError("The Supply Fan Object Type defined in " + CurrentModuleObject + " is " + fan_type);
+                        ShowContinueError("The Supply Fan Object Type defined in an AirLoopHVAC is Fan:ConstantVolume");
+                        success = false;
+                    }
+                }
+                bool ErrorsFound{false};
+                int inletNode;
+                int outletNode;
+                if (fanType_Num == FanType_SimpleConstVolume) {
+                    inletNode = GetFanInletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
+                }
+                if (fanType_Num == FanType_SimpleOnOff) {
+                    inletNode = GetFanInletNode("Fan:OnOff", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode("Fan:OnOff", fan_name, ErrorsFound);
+                }
+                if (fanType_Num == FanType_SimpleVAV) {
+                    inletNode = GetFanInletNode("Fan:VariableVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode("Fan:VariableVolume", fan_name, ErrorsFound);
+                    VAVSystem = true;
+                }
+                SupplyFanInletNode = inletNode;
+                SupplyFanOutletNode = outletNode;
+
+                if (ErrorsFound) {
+                    success = false;
+                }
+
+                DisSysCompCVFData(i).Name = fan_name; // Name of duct effective leakage ratio component
+                DisSysCompCVFData(i).Ctrl = 1.0;            // Control ratio
+                DisSysCompCVFData(i).FanIndex = fanIndex;
+                DisSysCompCVFData(i).FlowRate = flowRate;
+                DisSysCompCVFData(i).FanTypeNum = fanType_Num;
+                DisSysCompCVFData(i).InletNode = inletNode;
+                DisSysCompCVFData(i).OutletNode = outletNode;
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: coil
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
+        DisSysNumOfCoils = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                     // Temporary workaround
+            DisSysCompCoilData.allocate(DisSysNumOfCoils); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string coil_name = fields.at("coil_name");
+                std::string coil_type = fields.at("coil_object_type");
+                Real64 L{fields.at("air_path_length")};
+                Real64 D{fields.at("air_path_hydraulic_diameter")};
+
+                DisSysCompCoilData(i).Name = UtilityRoutines::MakeUPPERCase(coil_name); // Name of associated EPlus coil component
+                DisSysCompCoilData(i).EPlusType = coil_type; // coil type
+                DisSysCompCoilData(i).L = L;                 // Air path length
+                DisSysCompCoilData(i).hydraulicDiameter = D; // Air path hydraulic diameter
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: heat exchanger
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
+        DisSysNumOfHXs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                 // Temporary workaround
+            DisSysCompHXData.allocate(DisSysNumOfHXs); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string hx_name = fields.at("heatexchanger_name");
+                std::string hx_type = fields.at("heatexchanger_object_type");
+                Real64 L{fields.at("air_path_length")};
+                Real64 D{fields.at("air_path_hydraulic_diameter")};
+
+                DisSysCompHXData(i).Name = UtilityRoutines::MakeUPPERCase(hx_name); // Name of associated EPlus heat exchange component
+                DisSysCompHXData(i).EPlusType = hx_type;                            // coil type
+                DisSysCompHXData(i).L = L;                                          // Air path length
+                DisSysCompHXData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(hx_type, hx_name);
+                ++i;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: terminal unit
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:TerminalUnit";
+        DisSysNumOfTermUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                             // Temporary workaround
+            DisSysCompTermUnitData.allocate(DisSysNumOfTermUnits); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                std::string tu_name = fields.at("terminal_unit_name");
+                std::string tu_type = fields.at("terminal_unit_object_type");
+                Real64 L{fields.at("air_path_length")};
+                Real64 D{fields.at("air_path_hydraulic_diameter")};
+
+                DisSysCompTermUnitData(i).Name = UtilityRoutines::MakeUPPERCase(tu_name); // Name of associated EPlus coil component
+                DisSysCompTermUnitData(i).EPlusType = tu_type;                            // Terminal unit type
+                DisSysCompTermUnitData(i).L = L;                                          // Air path length
+                DisSysCompTermUnitData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                ++i;
+            }
+        }
+
+        // Get input data of constant pressure drop component
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:ConstantPressureDrop";
+        DisSysNumOfCPDs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            int i = 1;                                   // Temporary workaround
+            DisSysCompCPDData.allocate(DisSysNumOfCPDs); // Temporary workaround
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                Real64 dp{fields.at("pressure_difference_across_the_component")};
+
+                DisSysCompCPDData(i).Name = thisObjectName; // Name of constant pressure drop component
+                DisSysCompCPDData(i).A = 1.0;               // cross section area
+                DisSysCompCPDData(i).DP = dp;               // Pressure difference across the component
                 ++i;
             }
         }
@@ -931,21 +1595,21 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers);
         // MaxNums = max(MaxNums, NumNumbers);
         // MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:DetailedOpening", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers);
         // MaxNums = max(MaxNums, NumNumbers);
         // MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -961,30 +1625,30 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Leak", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:LeakageRatio", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Leak", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:LeakageRatio", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:TerminalUnit", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ConstantPressureDrop", TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:TerminalUnit", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ConstantPressureDrop", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -1003,9 +1667,9 @@ namespace AirflowNetworkBalanceManager {
         // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers);
         // MaxNums = max(MaxNums, NumNumbers);
         // MaxAlphas = max(MaxAlphas, NumAlphas);
-        //inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers);
-        //MaxNums = max(MaxNums, NumNumbers);
-        //MaxAlphas = max(MaxAlphas, NumAlphas);
+        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers);
+        // MaxNums = max(MaxNums, NumNumbers);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
 
         Alphas.allocate(MaxAlphas);
         cAlphaFields.allocate(MaxAlphas);
@@ -2161,241 +2825,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Read AirflowNetwork simulation detailed openings
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:DetailedOpening";
-        AirflowNetworkNumOfDetOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfDetOpenings > 0) {
-            MultizoneCompDetOpeningData.allocate(AirflowNetworkNumOfDetOpenings);
-            for (i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneCompDetOpeningData(i).Name = Alphas(1);      // Name of large detailed opening component
-                MultizoneCompDetOpeningData(i).FlowCoef = Numbers(1); // Air Mass Flow Coefficient When Window or Door Is Closed
-                MultizoneCompDetOpeningData(i).FlowExpo = Numbers(2); // Air Mass Flow exponent When Window or Door Is Closed
-                MultizoneCompDetOpeningData(i).TypeName = Alphas(2);  // Large vertical opening type
-                if (UtilityRoutines::SameString(Alphas(2), "NonPivoted") || UtilityRoutines::SameString(Alphas(2), "1")) {
-                    MultizoneCompDetOpeningData(i).LVOType = 1; // Large vertical opening type number
-                } else if (UtilityRoutines::SameString(Alphas(2), "HorizontallyPivoted") || UtilityRoutines::SameString(Alphas(2), "2")) {
-                    MultizoneCompDetOpeningData(i).LVOType = 2; // Large vertical opening type number
-                } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " = " + Alphas(2) + "in " + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("Valid choices are NonPivoted and HorizontallyPivoted.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompDetOpeningData(i).LVOValue = Numbers(3); // Extra crack length for LVO type 1 with multiple openable parts,
-                // or Height of pivoting axis for LVO type 2
-                if (MultizoneCompDetOpeningData(i).LVOValue < 0) {
-                    ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFields(3) + " in " + CurrentModuleObject + " = " +
-                                    Alphas(1));
-                    ShowContinueError("The input value is " + RoundSigDigits(Numbers(3), 2));
-                    ErrorsFound = true;
-                }
-                MultizoneCompDetOpeningData(i).NumFac = Numbers(4); // Number of Opening Factor Values
-
-                MultizoneCompDetOpeningData(i).OpenFac1 = Numbers(5); // Opening factor #1
-                if (MultizoneCompDetOpeningData(i).OpenFac1 > 0.0) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..The value of " + cNumericFields(5) + " is reset to 0.0");
-                    ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac1, 2));
-                    MultizoneCompDetOpeningData(i).OpenFac1 = 0.0;
-                }
-                MultizoneCompDetOpeningData(i).DischCoeff1 = Numbers(6); // Discharge coefficient for opening factor #1
-                if (MultizoneCompDetOpeningData(i).DischCoeff1 <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(6) + " is less than or equal to 0. A value greater than zero is required.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompDetOpeningData(i).WidthFac1 = Numbers(7);  // Width factor for for Opening factor #1
-                MultizoneCompDetOpeningData(i).HeightFac1 = Numbers(8); // Height factor for opening factor #1
-                MultizoneCompDetOpeningData(i).StartHFac1 = Numbers(9); // Start height factor for opening factor #1
-                MultizoneCompDetOpeningData(i).OpenFac2 = Numbers(10);  // Opening factor #2
-                if (MultizoneCompDetOpeningData(i).OpenFac2 != 1.0 && MultizoneCompDetOpeningData(i).NumFac == 2) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..This object specifies that only 2 opening factors will be used. So, the value of " + cNumericFields(10) +
-                                      " is reset to 1.0.");
-                    ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac2, 2));
-                    MultizoneCompDetOpeningData(i).OpenFac2 = 1.0;
-                }
-                MultizoneCompDetOpeningData(i).DischCoeff2 = Numbers(11); // Discharge coefficient for opening factor #2
-                MultizoneCompDetOpeningData(i).WidthFac2 = Numbers(12);   // Width factor for for Opening factor #2
-                MultizoneCompDetOpeningData(i).HeightFac2 = Numbers(13);  // Height factor for opening factor #2
-                MultizoneCompDetOpeningData(i).StartHFac2 = Numbers(14);  // Start height factor for opening factor #2
-                if (MultizoneCompDetOpeningData(i).DischCoeff2 <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(11) + " is less than or equal to 0. A value greater than zero is required.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompDetOpeningData(i).OpenFac3 = 0.0;    // Opening factor #3
-                MultizoneCompDetOpeningData(i).DischCoeff3 = 0.0; // Discharge coefficient for opening factor #3
-                MultizoneCompDetOpeningData(i).WidthFac3 = 0.0;   // Width factor for for Opening factor #3
-                MultizoneCompDetOpeningData(i).HeightFac3 = 0.0;  // Height factor for opening factor #3
-                MultizoneCompDetOpeningData(i).StartHFac3 = 0.0;  // Start height factor for opening factor #3
-                MultizoneCompDetOpeningData(i).OpenFac4 = 0.0;    // Opening factor #4
-                MultizoneCompDetOpeningData(i).DischCoeff4 = 0.0; // Discharge coefficient for opening factor #4
-                MultizoneCompDetOpeningData(i).WidthFac4 = 0.0;   // Width factor for for Opening factor #4
-                MultizoneCompDetOpeningData(i).HeightFac4 = 0.0;  // Height factor for opening factor #4
-                MultizoneCompDetOpeningData(i).StartHFac4 = 0.0;  // Start height factor for opening factor #4
-                if (MultizoneCompDetOpeningData(i).NumFac > 2) {
-                    if (NumNumbers >= 19) {
-                        MultizoneCompDetOpeningData(i).OpenFac3 = Numbers(15);    // Opening factor #3
-                        MultizoneCompDetOpeningData(i).DischCoeff3 = Numbers(16); // Discharge coefficient for opening factor #3
-                        MultizoneCompDetOpeningData(i).WidthFac3 = Numbers(17);   // Width factor for for Opening factor #3
-                        MultizoneCompDetOpeningData(i).HeightFac3 = Numbers(18);  // Height factor for opening factor #3
-                        MultizoneCompDetOpeningData(i).StartHFac3 = Numbers(19);  // Start height factor for opening factor #3
-                        if (MultizoneCompDetOpeningData(i).DischCoeff3 <= 0.0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("The value of " + cNumericFields(16) + " is equal to 0. A value greater than zero is required.");
-                            ErrorsFound = true;
-                        }
-                        if (MultizoneCompDetOpeningData(i).OpenFac3 != 1.0 && MultizoneCompDetOpeningData(i).NumFac == 3) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("..This object specifies that only 3 opening factors will be used. So, the value of " +
-                                              cNumericFields(15) + " is set to 1.0.");
-                            ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac3, 2));
-                            MultizoneCompDetOpeningData(i).OpenFac3 = 1.0;
-                        }
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + ": " + Alphas(1) +
-                                        ". The number of opening fields is less than required (21).");
-                        ErrorsFound = true;
-                    }
-                }
-                if (MultizoneCompDetOpeningData(i).NumFac == 4) {
-                    if (NumNumbers == 24) {
-                        MultizoneCompDetOpeningData(i).OpenFac4 = Numbers(20);    // Opening factor #4
-                        MultizoneCompDetOpeningData(i).DischCoeff4 = Numbers(21); // Discharge coefficient for opening factor #4
-                        MultizoneCompDetOpeningData(i).WidthFac4 = Numbers(22);   // Width factor for for Opening factor #4
-                        MultizoneCompDetOpeningData(i).HeightFac4 = Numbers(23);  // Height factor for opening factor #4
-                        MultizoneCompDetOpeningData(i).StartHFac4 = Numbers(24);  // Start height factor for opening factor #4
-                        if (MultizoneCompDetOpeningData(i).DischCoeff4 <= 0.0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("The value of " + cNumericFields(21) + " is equal to 0. A value greater than zero is required.");
-                            ErrorsFound = true;
-                        }
-                        if (MultizoneCompDetOpeningData(i).OpenFac4 != 1.0) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("..This object specifies that 4 opening factors will be used. So, the value of " + cNumericFields(20) +
-                                              " is set to 1.0.");
-                            ShowContinueError("..Input value was " + RoundSigDigits(MultizoneCompDetOpeningData(i).OpenFac3, 2));
-                            MultizoneCompDetOpeningData(i).OpenFac4 = 1.0;
-                        }
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + ": " + Alphas(1) +
-                                        ". The number of opening fields is less than required (26).");
-                        ErrorsFound = true;
-                    }
-                }
-                if (MultizoneCompDetOpeningData(i).NumFac > 2) {
-                    if (MultizoneCompDetOpeningData(i).OpenFac2 >= MultizoneCompDetOpeningData(i).OpenFac3) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(10) + " >= the value of " + cNumericFields(15));
-                        ErrorsFound = true;
-                    }
-                }
-                if (MultizoneCompDetOpeningData(i).NumFac == 4) {
-                    if (MultizoneCompDetOpeningData(i).OpenFac3 >= MultizoneCompDetOpeningData(i).OpenFac4) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(15) + " >= the value of " + cNumericFields(20));
-                        ErrorsFound = true;
-                    }
-                }
-                // Check values to meet requirements
-                if (MultizoneCompDetOpeningData(i).NumFac >= 2) {
-                    // Check width factor
-                    if (MultizoneCompDetOpeningData(i).WidthFac1 < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(7) + " must be greater than or equal to zero.");
-                        ErrorsFound = true;
-                    }
-                    if (MultizoneCompDetOpeningData(i).WidthFac2 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(12) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                    // Check height factor
-                    if (MultizoneCompDetOpeningData(i).HeightFac1 < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(8) + " must be greater than or equal to zero.");
-                        ErrorsFound = true;
-                    }
-                    if (MultizoneCompDetOpeningData(i).HeightFac2 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(13) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                }
-                if (MultizoneCompDetOpeningData(i).NumFac >= 3) {
-                    // Check width factor
-                    if (MultizoneCompDetOpeningData(i).WidthFac3 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(17) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                    // Check height factor
-                    if (MultizoneCompDetOpeningData(i).HeightFac3 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(18) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                    if (MultizoneCompDetOpeningData(i).DischCoeff3 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("The value of " + cNumericFields(16) +
-                                          " is less than or equal to 0. A value greater than zero is required.");
-                        ErrorsFound = true;
-                    }
-                }
-                if (MultizoneCompDetOpeningData(i).NumFac >= 4) {
-                    // Check width factor
-                    if (MultizoneCompDetOpeningData(i).WidthFac4 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(22) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                    // Check height factor
-                    if (MultizoneCompDetOpeningData(i).HeightFac4 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("..The value of " + cNumericFields(23) + " must be greater than zero.");
-                        ErrorsFound = true;
-                    }
-                    if (MultizoneCompDetOpeningData(i).DischCoeff4 <= 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError("The value of " + cNumericFields(21) +
-                                          " is less than or equal to 0. A value greater than zero is required.");
-                        ErrorsFound = true;
-                    }
-                }
-                // Check sum of Height Factor and the Start Height Factor
-                if (MultizoneCompDetOpeningData(i).HeightFac1 + MultizoneCompDetOpeningData(i).StartHFac1 > 1.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..The sum of " + cNumericFields(8) + " and " + cNumericFields(9) + " is greater than 1.0");
-                    ErrorsFound = true;
-                }
-                if (MultizoneCompDetOpeningData(i).HeightFac2 + MultizoneCompDetOpeningData(i).StartHFac2 > 1.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..The sum of " + cNumericFields(13) + " and " + cNumericFields(14) + " is greater than 1.0");
-                    ErrorsFound = true;
-                }
-                if (MultizoneCompDetOpeningData(i).HeightFac3 + MultizoneCompDetOpeningData(i).StartHFac3 > 1.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..The sum of " + cNumericFields(18) + " and " + cNumericFields(19) + " is greater than 1.0");
-                    ErrorsFound = true;
-                }
-                if (MultizoneCompDetOpeningData(i).HeightFac4 + MultizoneCompDetOpeningData(i).StartHFac4 > 1.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("..The sum of " + cNumericFields(23) + " and " + cNumericFields(24) + " is greater than 1.0");
-                    ErrorsFound = true;
-                }
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Validate opening component and assign opening dimension
         if (AirflowNetworkNumOfDetOpenings > 0) {
@@ -2412,76 +2842,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Read AirflowNetwork simulation simple openings
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:SimpleOpening";
-        AirflowNetworkNumOfSimOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfSimOpenings > 0) {
-            MultizoneCompSimpleOpeningData.allocate(AirflowNetworkNumOfSimOpenings);
-            for (i = 1; i <= AirflowNetworkNumOfSimOpenings; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneCompSimpleOpeningData(i).Name = Alphas(1);        // Name of large simple opening component
-                MultizoneCompSimpleOpeningData(i).FlowCoef = Numbers(1);   // Air Mass Flow Coefficient When Window or Door Is Closed
-                MultizoneCompSimpleOpeningData(i).FlowExpo = Numbers(2);   // Air Mass Flow exponent When Window or Door Is Closed
-                MultizoneCompSimpleOpeningData(i).MinRhoDiff = Numbers(3); // Minimum density difference for two-way flow
-                MultizoneCompSimpleOpeningData(i).DischCoeff = Numbers(4); // Discharge coefficient at full opening
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read AirflowNetwork simulation horizontal openings
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:HorizontalOpening";
-        AirflowNetworkNumOfHorOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfHorOpenings > 0) {
-            MultizoneCompHorOpeningData.allocate(AirflowNetworkNumOfHorOpenings);
-            for (i = 1; i <= AirflowNetworkNumOfHorOpenings; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneCompHorOpeningData(i).Name = Alphas(1);      // Name of large simple opening component
-                MultizoneCompHorOpeningData(i).FlowCoef = Numbers(1); // Air Mass Flow Coefficient When Window or Door Is Closed
-                if (Numbers(1) <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(1) + " is less than or equal to 0. A value greater than zero is required.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompHorOpeningData(i).FlowExpo = Numbers(2); // Air Mass Flow exponent When Window or Door Is Closed
-                if (Numbers(2) > 1.0 || Numbers(2) < 0.5) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(2) + " is beyond the boundary. A value between 0.5 and 1.0 is required.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompHorOpeningData(i).Slope = Numbers(3); // Sloping plane angle
-                if (Numbers(3) > 90.0 || Numbers(3) < 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(3) + " is beyond the boundary. A value between 0 and 90.0 is required.");
-                    ErrorsFound = true;
-                }
-                MultizoneCompHorOpeningData(i).DischCoeff = Numbers(4); // Discharge coefficient at full opening
-                if (Numbers(4) <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError("The value of " + cNumericFields(4) + " is less than or equal to 0. A value greater than zero is required.");
-                    ErrorsFound = true;
-                }
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Check status of control level for each surface with an opening
         j = 0;
@@ -2629,135 +2993,12 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation surface crack component
         // Moved into getAirflowElementInput
-        /*
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
-        AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfSurCracks > 0) {
-            MultizoneSurfaceCrackData.allocate(AirflowNetworkNumOfSurCracks);
-            for (i = 1; i <= AirflowNetworkNumOfSurCracks; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneSurfaceCrackData(i).Name = Alphas(1);      // Name of surface crack component
-                MultizoneSurfaceCrackData(i).FlowCoef = Numbers(1); // Air Mass Flow Coefficient
-                MultizoneSurfaceCrackData(i).FlowExpo = Numbers(2); // Air Mass Flow exponent
-
-                if (lAlphaBlanks(2)) {
-                    MultizoneSurfaceCrackData(i).StandardT = defaultReferenceConditions.temperature;
-                    MultizoneSurfaceCrackData(i).StandardP = defaultReferenceConditions.pressure;
-                    MultizoneSurfaceCrackData(i).StandardW = defaultReferenceConditions.humidityRatio;
-                } else {
-                    auto iter = referenceConditions.find(Alphas(2));
-                    if (iter == referenceConditions.end()) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(2) + " = " + Alphas(2) +
-                                        " not found.");
-                        ErrorsFound = true;
-                    } else {
-                        MultizoneSurfaceCrackData(i).StandardT = iter->second.temperature;
-                        MultizoneSurfaceCrackData(i).StandardP = iter->second.pressure;
-                        MultizoneSurfaceCrackData(i).StandardW = iter->second.humidityRatio;
-                    }
-                }
-            }
-        }
-        */
 
         // *** Read AirflowNetwork simulation surface effective leakage area component
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
-        AirflowNetworkNumOfSurELA = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (AirflowNetworkNumOfSurELA > 0) {
-            MultizoneSurfaceELAData.allocate(AirflowNetworkNumOfSurELA);
-            for (i = 1; i <= AirflowNetworkNumOfSurELA; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneSurfaceELAData(i).Name = Alphas(1);        // Name of surface effective leakage area component
-                MultizoneSurfaceELAData(i).ELA = Numbers(1);        // Effective leakage area
-                MultizoneSurfaceELAData(i).DischCoeff = Numbers(2); // Discharge coefficient
-                MultizoneSurfaceELAData(i).RefDeltaP = Numbers(3);  // Reference pressure difference
-                MultizoneSurfaceELAData(i).FlowExpo = Numbers(4);   // Air Mass Flow exponent
-                MultizoneSurfaceELAData(i).TestDeltaP = 0.0;        // Testing pressure difference
-                MultizoneSurfaceELAData(i).TestDisCoef = 0.0;       // Testing Discharge coefficient
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // *** Read AirflowNetwork simulation zone exhaust fan component
         // Moved into getAirflowElementInput
-        /*
-        CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
-        AirflowNetworkNumOfExhFan = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        NumOfExhaustFans = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");
-        if (AirflowNetworkNumOfExhFan > 0) {
-            MultizoneCompExhaustFanData.allocate(AirflowNetworkNumOfExhFan);
-            for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                MultizoneCompExhaustFanData(i).Name = Alphas(1);      // Name of zone exhaust fan component
-                MultizoneCompExhaustFanData(i).FlowCoef = Numbers(1); // flow coefficient
-                MultizoneCompExhaustFanData(i).FlowExpo = Numbers(2); // Flow exponent
-                FanErrorFound = false;
-                GetFanIndex(MultizoneCompExhaustFanData(i).Name, FanIndex, FanErrorFound);
-                if (FanErrorFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + " is not found in Fan:ZoneExhaust objects.");
-                    ErrorsFound = true;
-                }
-                GetFanVolFlow(FanIndex, MultizoneCompExhaustFanData(i).FlowRate);
-                MultizoneCompExhaustFanData(i).FlowRate *= StdRhoAir;
-                MultizoneCompExhaustFanData(i).InletNode = GetFanInletNode("Fan:ZoneExhaust", Alphas(1), ErrorsFound);
-                MultizoneCompExhaustFanData(i).OutletNode = GetFanOutletNode("Fan:ZoneExhaust", Alphas(1), ErrorsFound);
-                GetFanType(Alphas(1), FanType_Num, FanErrorFound);
-                if (FanType_Num != FanType_ZoneExhaust) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". The specified " + cAlphaFields(1) +
-                                    " is not found as a valid Fan:ZoneExhaust object.");
-                    ErrorsFound = true;
-                }
-                if (lAlphaBlanks(2)) {
-                    MultizoneCompExhaustFanData(i).StandardT = defaultReferenceConditions.temperature;
-                    MultizoneCompExhaustFanData(i).StandardP = defaultReferenceConditions.pressure;
-                    MultizoneCompExhaustFanData(i).StandardW = defaultReferenceConditions.humidityRatio;
-                } else {
-                    auto iter = referenceConditions.find(Alphas(2));
-                    if (iter == referenceConditions.end()) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1) + ". Specified " + cAlphaFields(2) + " = " + Alphas(2) +
-                                        " not found.");
-                        ErrorsFound = true;
-                    } else {
-                        MultizoneCompExhaustFanData(i).StandardT = iter->second.temperature;
-                        MultizoneCompExhaustFanData(i).StandardP = iter->second.pressure;
-                        MultizoneCompExhaustFanData(i).StandardW = iter->second.humidityRatio;
-                    }
-                }
-            }
-        }
-        */
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
@@ -3349,101 +3590,15 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Read AirflowNetwork Distribution system component: duct leakage
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
-        DisSysNumOfLeaks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfLeaks > 0) {
-            DisSysCompLeakData.allocate(DisSysNumOfLeaks);
-            for (i = 1; i <= DisSysNumOfLeaks; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompLeakData(i).Name = Alphas(1);      // Name of duct leak component
-                DisSysCompLeakData(i).FlowCoef = Numbers(1); // Air Mass Flow Coefficient
-                DisSysCompLeakData(i).FlowExpo = Numbers(2); // Air Mass Flow exponent
-            }
-        } else {
-            //   if (AirflowNetworkSimu%DistControl == "DISTRIBUTIONSYSTEM") &
-            //     CALL ShowMessage('GetAirflowNetworkInput: AirflowNetwork:Distribution:Component Leak: This object is not used')
-        }
+        // Moved into getAirflowElementInput
 
         // Read AirflowNetwork Distribution system component: duct effective leakage ratio
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:LeakageRatio";
-        DisSysNumOfELRs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfELRs > 0) {
-            DisSysCompELRData.allocate(DisSysNumOfELRs);
-            for (i = 1; i <= DisSysNumOfELRs; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompELRData(i).Name = Alphas(1);      // Name of duct effective leakage ratio component
-                DisSysCompELRData(i).ELR = Numbers(1);      // Value of effective leakage ratio
-                DisSysCompELRData(i).FlowRate = Numbers(2); // Maximum airflow rate
-                DisSysCompELRData(i).RefPres = Numbers(3);  // Reference pressure difference
-                DisSysCompELRData(i).FlowExpo = Numbers(4); // Air Mass Flow exponent
-                DisSysCompELRData(i).FlowRate = Numbers(2) * StdRhoAir;
-            }
-        } else {
-            //   if (AirflowNetworkSimu%DistControl == "DISTRIBUTIONSYSTEM") &
-            //     CALL ShowMessage('GetAirflowNetworkInput: AirflowNetwork:Distribution:Component Leakage Ratio: This object is not used')
-        }
+        // Moved into getAirflowElementInput
 
         // Read AirflowNetwork Distribution system component: duct
+        // Moved into getAirflowElementInput
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
-        DisSysNumOfDucts = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfDucts > 0) {
-            DisSysCompDuctData.allocate(DisSysNumOfDucts);
-            for (i = 1; i <= DisSysNumOfDucts; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompDuctData(i).Name = Alphas(1);                   // Name of duct effective leakage ratio component
-                DisSysCompDuctData(i).L = Numbers(1);                     // Duct length [m]
-                DisSysCompDuctData(i).hydraulicDiameter = Numbers(2);     // Hydraulic diameter [m]
-                DisSysCompDuctData(i).A = Numbers(3);                     // Cross section area [m2]
-                DisSysCompDuctData(i).roughness = Numbers(4);             // Surface roughness [m]
-                DisSysCompDuctData(i).TurDynCoef = Numbers(5);            // Turbulent dynamic loss coefficient
-                DisSysCompDuctData(i).UThermConduct = Numbers(6);         // Conduction heat transmittance [W/m2.K]
-                DisSysCompDuctData(i).UMoisture = Numbers(7);             // Overall moisture transmittance [kg/m2]
-                DisSysCompDuctData(i).OutsideConvCoeff = Numbers(8);      // Outside convection coefficient [W/m2.K]
-                DisSysCompDuctData(i).InsideConvCoeff = Numbers(9);       // Inside convection coefficient [W/m2.K]
-                DisSysCompDuctData(i).MThermal = 0.0;                     // Thermal capacity [J/K]
-                DisSysCompDuctData(i).MMoisture = 0.0;                    // Moisture capacity [kg]
-                DisSysCompDuctData(i).LamDynCoef = 64.0;                  // Laminar dynamic loss coefficient
-                DisSysCompDuctData(i).LamFriCoef = Numbers(5);            // Laminar friction loss coefficient
-                DisSysCompDuctData(i).InitLamCoef = 128.0;                // Coefficient of linear initialization
-                DisSysCompDuctData(i).RelRough = Numbers(4) / Numbers(2); // e/D: relative roughness
-                DisSysCompDuctData(i).RelL = Numbers(1) / Numbers(2);     // L/D: relative length
-                DisSysCompDuctData(i).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(i).RelRough); // 1.14 - 0.868589*ln(e/D)
-                DisSysCompDuctData(i).g = DisSysCompDuctData(i).A1;                                    // 1/sqrt(Darcy friction factor)
-            }
-        } else {
+        if (DisSysNumOfDucts == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
@@ -3541,81 +3696,9 @@ namespace AirflowNetworkBalanceManager {
         // Deleted on Aug. 13, 2008
 
         // Read AirflowNetwork Distribution system component: constant volume fan
+        // Moved into getAirflowElementInput
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
-        DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfCVFs > 0 && DisSysNumOfCVFs != NumAPL) {
-            ShowSevereError("The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits(DisSysNumOfCVFs));
-            ShowSevereError("The number of entered AirLoopHVAC objects is " + RoundSigDigits(NumAPL));
-            ShowContinueError("Both numbers should be equal. Please check your inputs.");
-            ErrorsFound = true;
-        }
-        if (DisSysNumOfCVFs > 0) {
-            DisSysCompCVFData.allocate(DisSysNumOfCVFs);
-            for (i = 1; i <= DisSysNumOfCVFs; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                DisSysCompCVFData(i).Name = Alphas(1); // Name of duct effective leakage ratio component
-                DisSysCompCVFData(i).Ctrl = 1.0;       // Control ratio
-                FanErrorFound = false;
-                GetFanIndex(DisSysCompCVFData(i).Name, FanIndex, FanErrorFound);
-                DisSysCompCVFData(i).FanIndex = FanIndex;
-                if (FanErrorFound) {
-                    ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
-                    ErrorsFound = true;
-                }
-                GetFanVolFlow(FanIndex, DisSysCompCVFData(i).FlowRate);
-                DisSysCompCVFData(i).FlowRate *= StdRhoAir;
-
-                GetFanType(Alphas(1), FanType_Num, FanErrorFound);
-                DisSysCompCVFData(i).FanTypeNum = FanType_Num;
-                SupplyFanType = FanType_Num;
-                if (!(FanType_Num == FanType_SimpleConstVolume || FanType_Num == FanType_SimpleOnOff || FanType_Num == FanType_SimpleVAV)) {
-                    ShowSevereError(RoutineName + "The " + cAlphaFields(2) + " in " + CurrentModuleObject + " = " + Alphas(1) +
-                                    " is not a valid fan type.");
-                    ShowContinueError("Valid fan types are  Fan:ConstantVolume or Fan:OnOff");
-                    ErrorsFound = true;
-                } else {
-                    if (UtilityRoutines::SameString(Alphas(2), "Fan:ConstantVolume") && FanType_Num == FanType_SimpleOnOff) {
-                        ShowSevereError("The " + cAlphaFields(2) + " defined in " + CurrentModuleObject + " is " + Alphas(2));
-                        ShowContinueError("The " + cAlphaFields(2) + " defined in an AirLoopHVAC is Fan:OnOff");
-                        ErrorsFound = true;
-                    }
-                    if (UtilityRoutines::SameString(Alphas(2), "Fan:OnOff") && FanType_Num == FanType_SimpleConstVolume) {
-                        ShowSevereError("The " + cAlphaFields(2) + " defined in " + CurrentModuleObject + " is " + Alphas(2));
-                        ShowContinueError("The " + cAlphaFields(2) + " defined in an AirLoopHVAC is Fan:ConstantVolume");
-                        ErrorsFound = true;
-                    }
-                }
-                if (FanType_Num == FanType_SimpleConstVolume) {
-                    SupplyFanInletNode = GetFanInletNode("Fan:ConstantVolume", Alphas(1), ErrorsFound);
-                    DisSysCompCVFData(i).InletNode = SupplyFanInletNode;
-                    DisSysCompCVFData(i).OutletNode = GetFanOutletNode("Fan:ConstantVolume", Alphas(1), ErrorsFound);
-                    SupplyFanOutletNode = DisSysCompCVFData(i).OutletNode;
-                }
-                if (FanType_Num == FanType_SimpleOnOff) {
-                    SupplyFanInletNode = GetFanInletNode("Fan:OnOff", Alphas(1), ErrorsFound);
-                    DisSysCompCVFData(i).InletNode = SupplyFanInletNode;
-                    DisSysCompCVFData(i).OutletNode = GetFanOutletNode("Fan:OnOff", Alphas(1), ErrorsFound);
-                    SupplyFanOutletNode = DisSysCompCVFData(i).OutletNode;
-                }
-                if (FanType_Num == FanType_SimpleVAV) {
-                    SupplyFanInletNode = GetFanInletNode("Fan:VariableVolume", Alphas(1), ErrorsFound);
-                    DisSysCompCVFData(i).InletNode = SupplyFanInletNode;
-                    DisSysCompCVFData(i).OutletNode = GetFanOutletNode("Fan:VariableVolume", Alphas(1), ErrorsFound);
-                    SupplyFanOutletNode = DisSysCompCVFData(i).OutletNode;
-                    VAVSystem = true;
-                }
-            }
-        } else {
+        if (DisSysNumOfCVFs == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
@@ -3627,114 +3710,16 @@ namespace AirflowNetworkBalanceManager {
         // Deleted on Aug. 13, 2008
 
         // Read AirflowNetwork Distribution system component: coil
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
-        DisSysNumOfCoils = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfCoils > 0) {
-            DisSysCompCoilData.allocate(DisSysNumOfCoils);
-            for (i = 1; i <= DisSysNumOfCoils; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompCoilData(i).Name = Alphas(1);      // Name of associated EPlus coil component
-                DisSysCompCoilData(i).EPlusType = Alphas(2); // coil type
-                DisSysCompCoilData(i).L = Numbers(1);        // Air path length
-                DisSysCompCoilData(i).D = Numbers(2);        // Air path hydraulic diameter
-            }
-        } else {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
-                //     CALL ShowMessage(RoutineName//TRIM(CurrentModuleObject)//': This object is not used')
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read AirflowNetwork Distribution system component: heat exchanger
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
-        DisSysNumOfHXs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfHXs > 0) {
-            DisSysCompHXData.allocate(DisSysNumOfHXs);
-            for (i = 1; i <= DisSysNumOfHXs; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompHXData(i).Name = Alphas(1);      // Name of associated EPlus heat exchange component
-                DisSysCompHXData(i).EPlusType = Alphas(2); // coil type
-                DisSysCompHXData(i).L = Numbers(1);        // Air path length
-                DisSysCompHXData(i).D = Numbers(2);        // Air path hydraulic diameter
-                DisSysCompHXData(i).CoilParentExists = VerifyHeatExchangerParent(DisSysCompHXData(i).EPlusType, DisSysCompHXData(i).Name);
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read AirflowNetwork Distribution system component: terminal unit
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:TerminalUnit";
-        DisSysNumOfTermUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfTermUnits > 0) {
-            DisSysCompTermUnitData.allocate(DisSysNumOfTermUnits);
-            for (i = 1; i <= DisSysNumOfTermUnits; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompTermUnitData(i).Name = Alphas(1);      // Name of associated EPlus coil component
-                DisSysCompTermUnitData(i).EPlusType = Alphas(2); // Terminal unit type
-                DisSysCompTermUnitData(i).L = Numbers(1);        // Air path length
-                DisSysCompTermUnitData(i).D = Numbers(2);        // Air path hydraulic diameter
-            }
-        } else {
-            //     CALL ShowMessage(RoutineName//TRIM(CurrentModuleObject)//': This object is not used')
-        }
+        // Moved into getAirflowElementInput
 
         // Get input data of constant pressure drop component
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:ConstantPressureDrop";
-        DisSysNumOfCPDs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (DisSysNumOfCPDs > 0) {
-            DisSysCompCPDData.allocate(DisSysNumOfCPDs);
-            for (i = 1; i <= DisSysNumOfCPDs; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              i,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                DisSysCompCPDData(i).Name = Alphas(1); // Name of constant pressure drop component
-                DisSysCompCPDData(i).A = 1.0;          // cross section area
-                DisSysCompCPDData(i).DP = Numbers(1);  // Pressure difference across the component
-            }
-        } else {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
-                //     CALL ShowMessage(RoutineName//TRIM(CurrentModuleObject)//': This object is not used')
-            }
-        }
+        // Moved into getAirflowElementInput
 
         // Read Outdoor Airflow object
         // Moved into getAirflowElementInput
@@ -7003,12 +6988,12 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = std::exp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).D * Pi /
+                Ei = std::exp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                               (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
                 if (AirflowNetworkLinkSimu(i).FLOW == 0.0) Ei = 1.0;
                 Tamb = AirflowNetworkNodeSimu(LT).TZ;
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    Ei = std::exp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).D * Pi /
+                    Ei = std::exp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                                   (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
                     if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) Ei = 1.0;
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
@@ -7336,12 +7321,12 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = std::exp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).D * Pi /
+                Ei = std::exp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                               (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 if (AirflowNetworkLinkSimu(i).FLOW == 0.0) Ei = 1.0;
                 Wamb = AirflowNetworkNodeSimu(LT).WZ;
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    Ei = std::exp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).D * Pi /
+                    Ei = std::exp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                                   (AirflowNetworkLinkSimu(i).FLOW2));
                     if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) Ei = 1.0;
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);

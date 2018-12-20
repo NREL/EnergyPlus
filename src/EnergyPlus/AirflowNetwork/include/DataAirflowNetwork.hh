@@ -52,9 +52,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include "AirflowNetworkSolver.hh"
+#include "Properties.hh"
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
-#include "Properties.hh"
 
 namespace EnergyPlus {
 
@@ -363,7 +364,11 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DetailedOpening // Large detailed opening component
+    struct AirflowElement
+    {
+    };
+
+    struct DetailedOpening : public AirflowElement // Large detailed opening component
     {
         // Members
         std::string Name;     // Name of large detailed opening component
@@ -408,9 +413,18 @@ namespace AirflowNetwork {
               HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0), HeightErrIndex(0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const EP_UNUSED(i),     // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct SimpleOpening // Large simple opening component
+    struct SimpleOpening : public AirflowElement // Large simple opening component
     {
         // Members
         std::string Name;  // Name of large simple opening component
@@ -424,9 +438,18 @@ namespace AirflowNetwork {
         SimpleOpening() : FlowCoef(0.0), FlowExpo(0.0), MinRhoDiff(0.0), DischCoeff(0.0), OpenFactor(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct HorizontalOpening // Large horizontal opening component
+    struct HorizontalOpening : public AirflowElement // Large horizontal opening component
     {
         // Members
         std::string Name;  // Name of large horizontal opening component
@@ -439,183 +462,63 @@ namespace AirflowNetwork {
         HorizontalOpening() : FlowCoef(0.0), FlowExpo(0.0), Slope(0.0), DischCoeff(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
     struct ReferenceConditions // Surface crack standard conditions
     {
         // Members
-        std::string Name; // Name of standard conditions component
+        std::string name;     // Name of standard conditions component
         Real64 temperature;   // Standard temperature for crack data
         Real64 pressure;      // Standard barometric pressure for crack data
         Real64 humidityRatio; // Standard humidity ratio for crack data
 
         ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
-            : Name(name), temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
+            : name(name), temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
         {
         }
 
-        ReferenceConditions(Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
-            : temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
-        {
-        }
+        // ReferenceConditions(Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
+        //    : temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
+        //{
+        //}
     };
 
-    struct SurfaceCrack // Surface crack component
+    struct SurfaceCrack : public AirflowElement // Surface crack component
     {
         // Members
-        std::string Name;              // Name of crack component
-        //std::string ExternalNodeNames; // Name of external node.Not required for internal surface
-        Real64 FlowCoef;               // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
-        Real64 FlowExpo;               // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 StandardT;              // Standard temperature for crack data
-        Real64 StandardP;              // Standard barometric pressure for crack data
-        Real64 StandardW;              // Standard humidity ratio for crack data
+        std::string Name; // Name of crack component
+        // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
+        Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+        Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
+        Real64 StandardT; // Standard temperature for crack data
+        Real64 StandardP; // Standard barometric pressure for crack data
+        Real64 StandardW; // Standard humidity ratio for crack data
 
         // Default Constructor
         SurfaceCrack() : FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
         {
         }
 
-        /*
-        template <typename NODE>
-        int calculate(bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,              // Linkage number
-                      const NODE &propN,        // Node 1 properties
-                      const NODE &propM,        // Node 2 properties
-                      std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF // Partial derivative:  DF/DP
-        )
-        {
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         George Walton
-            //       DATE WRITTEN   Extracted from AIRNET
-            //       MODIFIED       Lixing Gu, 2/1/04
-            //                      Revised the subroutine to meet E+ needs
-            //       MODIFIED       Lixing Gu, 6/8/05
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This subroutine solves airflow for a surface crack component
-
-            // METHODOLOGY EMPLOYED:
-            // na
-
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-            // na
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS
-            // na
-
-            // DERIVED TYPE DEFINITIONS
-            // na
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            Real64 CDM;
-            Real64 FL;
-            Real64 FT;
-            Real64 RhozNorm;
-            Real64 VisczNorm;
-            Real64 expn;
-            Real64 Ctl;
-            Real64 coef;
-            Real64 Corr;
-            Real64 VisAve;
-            Real64 Tave;
-            Real64 RhoCor;
-            //int CompNum;
-
-            // Formats
-            //static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-            // FLOW:
-            // Crack standard condition from given inputs
-            if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
-                Corr = 1.0;
-            } else {
-                Corr = MultizoneSurfaceData(i).Factor;
-            }
-            //CompNum = AirflowNetworkCompData(j).TypeNum;
-            RhozNorm = PsyRhoAirFnPbTdbW(StandardP,
-                                         StandardT,
-                                         StandardW);
-            VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
-
-            expn = FlowExpo;
-            VisAve = (propN.viscosity + propM.viscosity) / 2.0;
-            Tave = (propN.temperature + propM.temperature) / 2.0;
-            if (PDROP >= 0.0) {
-                coef = FlowCoef / propN.sqrtDensity * Corr;
-            } else {
-                coef = FlowCoef / propM.sqrtDensity * Corr;
-            }
-
-            if (LFLAG) {
-                // Initialization by linear relation.
-                if (PDROP >= 0.0) {
-                    RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
-                    Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                    DF[0] = coef * propN.density / propN.viscosity * Ctl;
-                } else {
-                    RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
-                    Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                    DF[0] = coef * propM.density / propM.viscosity * Ctl;
-                }
-                F[0] = -DF[0] * PDROP;
-            } else {
-                // Standard calculation.
-                if (PDROP >= 0.0) {
-                    // Flow in positive direction.
-                    // Laminar flow.
-                    RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
-                    Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                    CDM = coef * propN.density / propN.viscosity * Ctl;
-                    FL = CDM * PDROP;
-                    // Turbulent flow.
-                    if (expn == 0.5) {
-                        FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
-                    } else {
-                        FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
-                    }
-                } else {
-                    // Flow in negative direction.
-                    // Laminar flow.
-                    RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
-                    Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                    CDM = coef * propM.density / propM.viscosity * Ctl;
-                    FL = CDM * PDROP;
-                    // Turbulent flow.
-                    if (expn == 0.5) {
-                        FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
-                    } else {
-                        FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
-                    }
-                }
-                // Select laminar or turbulent flow.
-                //if (LIST >= 4) gio::write(Unit21, Format_901) << " scr: " << i << PDROP << FL << FT;
-                if (std::abs(FL) <= std::abs(FT)) {
-                    F[0] = FL;
-                    DF[0] = CDM;
-                } else {
-                    F[0] = FT;
-                    DF[0] = FT * expn / PDROP;
-                }
-            }
-            return 1;
-        }
-        */
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct SurfaceEffectiveLeakageArea // Surface effective leakage area component
+    struct EffectiveLeakageArea : public AirflowElement // Surface effective leakage area component
     {
         // Members
         std::string Name;   // Name of effective leakage area component
@@ -627,12 +530,21 @@ namespace AirflowNetwork {
         Real64 TestDisCoef; // Testing Discharge coefficient
 
         // Default Constructor
-        SurfaceEffectiveLeakageArea() : ELA(0.0), DischCoeff(0.0), RefDeltaP(0.0), FlowExpo(0.0), TestDeltaP(0.0), TestDisCoef(0.0)
+        EffectiveLeakageArea() : ELA(0.0), DischCoeff(0.0), RefDeltaP(0.0), FlowExpo(0.0), TestDeltaP(0.0), TestDisCoef(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct ZoneExhaustFan // Zone exhaust fan component
+    struct ZoneExhaustFan : public AirflowElement // Zone exhaust fan component
     {
         // Members
         std::string Name; // Name of exhaust fan component
@@ -654,6 +566,15 @@ namespace AirflowNetwork {
               EPlusZoneNum(0), PressCtrlNum(0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
     struct MultizoneExternalNodeProp // External node properties
@@ -747,7 +668,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DuctLeak // duct leak component
+    struct DuctLeak : public AirflowElement // duct leak component
     {
         // Members
         std::string Name; // Name of component leak
@@ -758,9 +679,18 @@ namespace AirflowNetwork {
         DuctLeak() : FlowCoef(0.0), FlowExpo(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct EffectiveLeakageRatio // effective leakage ratio component
+    struct EffectiveLeakageRatio : public AirflowElement // effective leakage ratio component
     {
         // Members
         std::string Name; // Name of component leak
@@ -773,217 +703,59 @@ namespace AirflowNetwork {
         EffectiveLeakageRatio() : ELR(0.0), FlowRate(0.0), RefPres(0.0), FlowExpo(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const EP_UNUSED(i),     // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct Duct // Duct component
+    struct Duct : public AirflowElement // Duct component
     {
         // Members
-        std::string Name;        // Name of duct component
-        Real64 L;                // Duct length [m]
+        std::string Name;         // Name of duct component
+        Real64 L;                 // Duct length [m]
         Real64 hydraulicDiameter; // Hydraulic diameter [m]
-        Real64 A;                // Cross section area [m2]
-        Real64 roughness;        // Surface roughness [m]
-        Real64 TurDynCoef;       // Turbulent dynamic loss coefficient
-        Real64 UThermConduct;    // Conduction heat transmittance [W/m2-K]
-        Real64 UMoisture;        // Overall moisture transmittance [kg/m2]
-        Real64 InsideConvCoeff;  // Inside convection coefficient [W/m2-K]
-        Real64 OutsideConvCoeff; // Outside convection coefficient [W/m2-K]
-        Real64 MThermal;         // Thermal capacity [J/K]
-        Real64 MMoisture;        // Moisture capacity [kg]
-        Real64 LamDynCoef;       // Laminar dynamic loss coefficient
-        Real64 LamFriCoef;       // Laminar friction loss coefficient
-        Real64 InitLamCoef;      // Coefficient of linear initialization
-        Real64 RelRough;         // e/D: relative roughness,
-        Real64 RelL;             // L/D: relative length,
-        Real64 g;                // 1/sqrt(Darcy friction factor),
-        Real64 A1;               // 1.14 - 0.868589*ln(e/D),
+        Real64 A;                 // Cross section area [m2]
+        Real64 roughness;         // Surface roughness [m]
+        Real64 TurDynCoef;        // Turbulent dynamic loss coefficient
+        Real64 UThermConduct;     // Conduction heat transmittance [W/m2-K]
+        Real64 UMoisture;         // Overall moisture transmittance [kg/m2]
+        Real64 InsideConvCoeff;   // Inside convection coefficient [W/m2-K]
+        Real64 OutsideConvCoeff;  // Outside convection coefficient [W/m2-K]
+        Real64 MThermal;          // Thermal capacity [J/K]
+        Real64 MMoisture;         // Moisture capacity [kg]
+        Real64 LamDynCoef;        // Laminar dynamic loss coefficient
+        Real64 LamFriCoef;        // Laminar friction loss coefficient
+        Real64 InitLamCoef;       // Coefficient of linear initialization
+        Real64 RelRough;          // e/D: relative roughness,
+        Real64 RelL;              // L/D: relative length,
+        Real64 g;                 // 1/sqrt(Darcy friction factor),
+        Real64 A1;                // 1.14 - 0.868589*ln(e/D),
 
         // Default Constructor
         Duct()
-            : L(0.0), hydraulicDiameter(0.0), A(0.0), roughness(0.0), TurDynCoef(0.0), UThermConduct(0.0), UMoisture(0.0), InsideConvCoeff(0.0), OutsideConvCoeff(0.0),
-              MThermal(0.0), MMoisture(0.0), LamDynCoef(0.0), LamFriCoef(0.0), InitLamCoef(0.0), RelRough(0.0), RelL(0.0), g(0.0), A1(0.0)
+            : L(0.0), hydraulicDiameter(0.0), A(0.0), roughness(0.0), TurDynCoef(0.0), UThermConduct(0.0), UMoisture(0.0), InsideConvCoeff(0.0),
+              OutsideConvCoeff(0.0), MThermal(0.0), MMoisture(0.0), LamDynCoef(0.0), LamFriCoef(0.0), InitLamCoef(0.0), RelRough(0.0), RelL(0.0),
+              g(0.0), A1(0.0)
         {
         }
 
-        template <typename NODE> 
-        int calculate(bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const EP_UNUSED(i),   // Linkage number
-                      const NODE &propN,        // Node 1 properties
-                      const NODE &propM,        // Node 2 properties
-                      std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF // Partial derivative:  DF/DP
-        )
-        {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         George Walton
-            //       DATE WRITTEN   Extracted from AIRNET
-            //       MODIFIED       Lixing Gu, 2/1/04
-            //                      Revised the subroutine to meet E+ needs
-            //       MODIFIED       Lixing Gu, 6/8/05
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
-            // turbulent friction factor
-
-            // METHODOLOGY EMPLOYED:
-            // na
-
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-            // na
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            Real64 const C(0.868589);
-            Real64 const EPS(0.001);
-
-            // INTERFACE BLOCK SPECIFICATIONS
-            // na
-
-            // DERIVED TYPE DEFINITIONS
-            // na
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            //     RE      - Reynolds number.
-            //     FL      - friction factor for laminar flow.
-            //     FT      - friction factor for turbulent flow.
-
-            Real64 A0;
-            Real64 A1;
-            Real64 A2;
-            Real64 B;
-            Real64 D;
-            Real64 S2;
-            Real64 CDM;
-            Real64 FL;
-            Real64 FT;
-            Real64 FTT;
-            Real64 RE;
-            //int CompNum;
-            Real64 ed;
-            Real64 ld;
-            Real64 g;
-            Real64 AA1;
-
-            // Formats
-            //static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-            // FLOW:
-            //CompNum = AirflowNetworkCompData(j).TypeNum;
-            ed = roughness / hydraulicDiameter;
-            ld = L / hydraulicDiameter;
-            g = 1.14 - 0.868589 * std::log(ed);
-            AA1 = g;
-
-            if (LFLAG) {
-                // Initialization by linear relation.
-                if (PDROP >= 0.0) {
-                    DF[0] = (2.0 * propN.density * A * hydraulicDiameter) /
-                            (propN.viscosity * InitLamCoef * ld);
-                } else {
-                    DF[0] = (2.0 * propM.density * A * hydraulicDiameter) /
-                            (propM.viscosity * InitLamCoef * ld);
-                }
-                F[0] = -DF[0] * PDROP;
-                //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << InitLamCoef << F[0] << DF[0];
-            } else {
-                // Standard calculation.
-                if (PDROP >= 0.0) {
-                    // Flow in positive direction.
-                    // Laminar flow coefficient !=0
-                    if (LamFriCoef >= 0.001) {
-                        A2 = LamFriCoef /
-                             (2.0 * propN.density * A * A);
-                        A1 = (propN.viscosity * LamDynCoef * ld) /
-                             (2.0 * propN.density * A * hydraulicDiameter);
-                        A0 = -PDROP;
-                        CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                        FL = (CDM - A1) / (2.0 * A2);
-                        CDM = 1.0 / CDM;
-                    } else {
-                        CDM = (2.0 * propN.density * A * hydraulicDiameter) /
-                              (propN.viscosity * LamDynCoef * ld);
-                        FL = CDM * PDROP;
-                    }
-                    RE = FL * hydraulicDiameter / (propN.viscosity * A);
-                    //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-                    // Turbulent flow; test when Re>10.
-                    if (RE >= 10.0) {
-                        S2 = std::sqrt(2.0 * propN.density * PDROP) * A;
-                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                        //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                        while (true) {
-                            FT = FTT;
-                            B = (9.3 * propN.viscosity * A) / (FT * roughness);
-                            D = 1.0 + g * B;
-                            g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                            FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                            //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                            if (std::abs(FTT - FT) / FTT < EPS) break;
-                        }
-                        FT = FTT;
-                    } else {
-                        FT = FL;
-                    }
-                } else {
-                    // Flow in negative direction.
-                    // Laminar flow coefficient !=0
-                    if (LamFriCoef >= 0.001) {
-                        A2 = LamFriCoef /
-                             (2.0 * propM.density * A * A);
-                        A1 = (propM.viscosity * LamDynCoef * ld) /
-                             (2.0 * propM.density * A * hydraulicDiameter);
-                        A0 = PDROP;
-                        CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                        FL = -(CDM - A1) / (2.0 * A2);
-                        CDM = 1.0 / CDM;
-                    } else {
-                        CDM = (2.0 * propM.density * A * hydraulicDiameter) /
-                              (propM.viscosity * LamDynCoef * ld);
-                        FL = CDM * PDROP;
-                    }
-                    RE = -FL * hydraulicDiameter / (propM.viscosity * A);
-                    //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-                    // Turbulent flow; test when Re>10.
-                    if (RE >= 10.0) {
-                        S2 = std::sqrt(-2.0 * propM.density * PDROP) * A;
-                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                        //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                        while (true) {
-                            FT = FTT;
-                            B = (9.3 * propM.viscosity * A) / (FT * roughness);
-                            D = 1.0 + g * B;
-                            g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                            FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                            //if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                            if (std::abs(FTT - FT) / FTT < EPS) break;
-                        }
-                        FT = -FTT;
-                    } else {
-                        FT = FL;
-                    }
-                }
-                // Select laminar or turbulent flow.
-                if (std::abs(FL) <= std::abs(FT)) {
-                    F[0] = FL;
-                    DF[0] = CDM;
-                } else {
-                    F[0] = FT;
-                    DF[0] = 0.5 * FT / PDROP;
-                }
-            }
-            return 1;
-        }
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct Damper // Damper component
+    struct Damper : public AirflowElement // Damper component
     {
         // Members
         std::string Name; // Name of damper component
@@ -1002,9 +774,18 @@ namespace AirflowNetwork {
         Damper() : LTP(0.0), LamFlow(0.0), TurFlow(0.0), FlowExpo(0.0), FlowMin(0.0), FlowMax(0.0), A0(0.0), A1(0.0), A2(0.0), A3(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct ConstantVolumeFan // Constant volume fan component
+    struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
     {
         // Members
         std::string Name;          // Name of detailed fan component
@@ -1022,9 +803,18 @@ namespace AirflowNetwork {
             : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct DetailedFan // Detailed fan component
+    struct DetailedFan : public AirflowElement // Detailed fan component
     {
         // Members
         std::string Name;      // Name of constant volume fan component
@@ -1042,56 +832,92 @@ namespace AirflowNetwork {
         DetailedFan() : FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct DisSysCompCoilProp // Coil component
+    struct DisSysCompCoilProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;      // Name of coil component
-        std::string EPlusType; // EnergyPlus coil type
-        Real64 L;              // Air path length
-        Real64 D;              // Air path hydraulic diameter
-        int AirLoopNum;        // AirLoop number
+        std::string Name;         // Name of coil component
+        std::string EPlusType;    // EnergyPlus coil type
+        Real64 L;                 // Air path length
+        Real64 hydraulicDiameter; // Air path hydraulic diameter
+        int AirLoopNum;           // AirLoop number
 
         // Default Constructor
-        DisSysCompCoilProp() : L(0.0), D(0.0), AirLoopNum(0)
+        DisSysCompCoilProp() : L(0.0), hydraulicDiameter(0.0), AirLoopNum(0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct DisSysCompHXProp // Coil component
+    struct DisSysCompHXProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;      // Name of coil component
-        std::string EPlusType; // EnergyPlus coil type
-        Real64 L;              // Air path length
-        Real64 D;              // Air path hydraulic diameter
-        bool CoilParentExists; // Is a coil component
+        std::string Name;         // Name of coil component
+        std::string EPlusType;    // EnergyPlus coil type
+        Real64 L;                 // Air path length
+        Real64 hydraulicDiameter; // Air path hydraulic diameter
+        bool CoilParentExists;    // Is a coil component
 
         // Default Constructor
-        DisSysCompHXProp() : L(0.0), D(0.0), CoilParentExists(false)
+        DisSysCompHXProp() : L(0.0), hydraulicDiameter(0.0), CoilParentExists(false)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct DisSysCompTermUnitProp // Terminal unit component
+    struct DisSysCompTermUnitProp : public AirflowElement // Terminal unit component
     {
         // Members
         std::string Name;      // Name of coil component
         std::string EPlusType; // EnergyPlus coil type
         Real64 L;              // Air path length
-        Real64 D;              // Air path hydraulic diameter
+        Real64 hydraulicDiameter; // Air path hydraulic diameter
         int DamperInletNode;   // Damper inlet node number
         int DamperOutletNode;  // Damper outlet node number
         int AirLoopNum;        // AirLoop number
 
         // Default Constructor
-        DisSysCompTermUnitProp() : L(0.0), D(0.0), DamperInletNode(0), DamperOutletNode(0), AirLoopNum(0)
+        DisSysCompTermUnitProp() : L(0.0), hydraulicDiameter(0.0), DamperInletNode(0), DamperOutletNode(0), AirLoopNum(0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
-    struct ConstantPressureDrop // Constant pressure drop component
+    struct ConstantPressureDrop : public AirflowElement // Constant pressure drop component
     {
         // Members
         std::string Name; // Name of constant pressure drop component
@@ -1102,6 +928,15 @@ namespace AirflowNetwork {
         ConstantPressureDrop() : A(0.0), DP(0.0)
         {
         }
+
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
     struct DisSysLinkageProp : public AirflowNetworkLinkage // Distribution system linkage data
@@ -1206,7 +1041,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DisSysCompAirflowProp // OA fan component
+    struct OutdoorAirFan : public AirflowElement // OA fan component
     {
         // Members
         std::string Name; // Name of exhaust fan component
@@ -1222,11 +1057,38 @@ namespace AirflowNetwork {
         int PressCtrlNum; // Pressure control number
 
         // Default Constructor
-        DisSysCompAirflowProp()
+        OutdoorAirFan()
             : SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0), OAMixerNum(0),
               PressCtrlNum(0)
         {
         }
+
+        virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
+    };
+
+    struct ReliefFlow : public OutdoorAirFan // OA fan component
+    {
+
+        // Default Constructor
+        ReliefFlow() : OutdoorAirFan()
+        {
+        }
+
+        virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
     };
 
     struct AirflowNetworkNodeSimuData // Node variable for simulation
@@ -1455,9 +1317,9 @@ namespace AirflowNetwork {
     extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
     extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
     extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    //extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
+    // extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    extern Array1D<SurfaceEffectiveLeakageArea> MultizoneSurfaceELAData;
+    extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
     extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
     extern Array1D<DeltaCpProp> DeltaCp;
     extern Array1D<DeltaCpProp> EPDeltaCP;
@@ -1477,8 +1339,8 @@ namespace AirflowNetwork {
     extern Array1D<ConstantPressureDrop> DisSysCompCPDData;
     extern Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
     extern Array1D<PressureControllerProp> PressureControllerData;
-    extern Array1D<DisSysCompAirflowProp> DisSysCompOutdoorAirData;
-    extern Array1D<DisSysCompAirflowProp> DisSysCompReliefAirData;
+    extern Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
+    extern Array1D<ReliefFlow> DisSysCompReliefAirData;
     extern Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
     void clear_state();
