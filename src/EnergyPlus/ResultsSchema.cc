@@ -670,40 +670,41 @@ namespace ResultsFramework {
     void ResultsSchema::setupOutputOptions()
     {
         int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound("Output:JSON");
-        if (numberOfOutputSchemaObjects == 1) {
-            Array1D_string alphas(5);
-            int numAlphas;
-            Array1D<Real64> numbers(2);
-            int numNumbers;
-            int status;
-            inputProcessor->getObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
+        if (numberOfOutputSchemaObjects == 0) {
+            return;
+        }
 
-            if (numAlphas > 0) {
-                std::string option = alphas(1);
-                if (UtilityRoutines::SameString(option, "TimeSeries")) {
-                    tsEnabled = true;
-                } else if (UtilityRoutines::SameString(option, "TimeSeriesAndTabular")) {
-                    tsEnabled = true;
-                    tsAndTabularEnabled = true;
-                }
+        Array1D_string alphas(5);
+        int numAlphas;
+        Array1D<Real64> numbers(2);
+        int numNumbers;
+        int status;
+        inputProcessor->getObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
 
-                if (numAlphas >= 2) {
-                    if (UtilityRoutines::SameString(alphas(2), "Yes")) {
-                        outputJSON = true;
-                    }
-                }
+        if (numAlphas > 0) {
+            std::string option = alphas(1);
+            if (UtilityRoutines::SameString(option, "TimeSeries")) {
+                tsEnabled = true;
+            } else if (UtilityRoutines::SameString(option, "TimeSeriesAndTabular")) {
+                tsEnabled = true;
+                tsAndTabularEnabled = true;
+            }
 
-                if (numAlphas >= 3) {
-                    if (UtilityRoutines::SameString(alphas(3), "Yes")) {
-                        outputCBOR = true;
-                    }
-                }
+            // defaults
+            outputJSON = true;
+            outputCBOR = false;
+            outputMsgPack = false;
 
-                if (numAlphas >= 4) {
-                    if (UtilityRoutines::SameString(alphas(4), "Yes")) {
-                        outputMsgPack = true;
-                    }
-                }
+            if (numAlphas >= 2) {
+                outputJSON = UtilityRoutines::SameString(alphas(2), "Yes");
+            }
+
+            if (numAlphas >= 3) {
+                outputCBOR = UtilityRoutines::SameString(alphas(3), "Yes");
+            }
+
+            if (numAlphas >= 4) {
+                outputMsgPack = UtilityRoutines::SameString(alphas(4), "Yes");
             }
         }
     }
