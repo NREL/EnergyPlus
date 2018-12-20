@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -76,6 +77,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -6611,3 +6613,90 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
     EXPECT_FALSE(hasSizingPeriodsDays());
 }
 
+// This tests aims to ensure that the needed Output:Variables for the Predefined Monthly table
+// are indeeed set up, and that as a result the numTables is good.
+// https://github.com/NREL/EnergyPlus/issues/7019
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputVars) {
+
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " SetpointsNotMetWithTemperaturesMonthly; !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_EQ(1, inputProcessor->getNumObjectsFound("Output:Table:SummaryReports"));
+    EXPECT_EQ(0, inputProcessor->getNumObjectsFound("Output:Variable"));
+
+    // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
+    // for the SetpointsNotMetWithTemperatureMonthly report
+    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+
+    // The Variables needed for the report are initialized (=SetupOutputVariable)
+    // Inside ThermalComfort::InitThermalComfort();
+    // Except Zone Mean Air Temperature, which is in HeatBalanceAirManager::GetSimpleAirModelInputs()
+    // Instead of calling these
+    // Fake the setup of the OutputVariables needed for two different zones
+    Real64 zoneTemp;
+    Real64 timeNotMet;
+    std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
+
+
+    for (int i=0; i < 2; ++i) {
+        SetupOutputVariable("Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
+
+        SetupOutputVariable("Zone Heating Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+    }
+
+
+    // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
+    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+
+    OutputProcessor::GetReportVariableInput();
+    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::InitializeTabularMonthly();
+
+    // We check that the Predefined Table is actually set to show
+    EXPECT_EQ("SetpointsNotMetWithTemperaturesMonthly", namedMonthly(31).title);
+    EXPECT_TRUE(namedMonthly(31).show);
+
+    // Check that it's the only one that's shown
+    for (int i = 1; i <= OutputReportTabular::numNamedMonthly; ++i) {
+        if (i != 31) {
+            EXPECT_FALSE(OutputReportTabular::namedMonthly(i).show);
+        }
+    }
+
+    // Variables aren't going to be output to SQL/ESO anyways
+    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 0);
+
+    EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+    // If everything worked, we should have 2 tables, one for each zone.
+    // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
+    // and so the numTables was zero
+    EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
+
+}

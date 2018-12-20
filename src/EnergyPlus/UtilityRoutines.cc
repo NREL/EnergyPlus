@@ -428,6 +428,15 @@ namespace UtilityRoutines {
         gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
     }
+
+    size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
+            std::string keyCopy = MakeUPPERCase(key);
+            return std::hash<std::string>()(keyCopy);
+    }
+
+    bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
+        return SameString(a, b);
+    }
 } // namespace UtilityRoutines
 
 int AbortEnergyPlus()

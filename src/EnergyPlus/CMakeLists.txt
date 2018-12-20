@@ -3,6 +3,11 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 
+if(WIN32)
+  configure_file( energyplus.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
+  configure_file( energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
+endif()
+
 configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
@@ -658,7 +663,11 @@ if (WIN32)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+if (APPLE OR UNIX)
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+else()  # windows
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
+endif()
 target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
@@ -672,13 +681,12 @@ install( TARGETS energyplusapi
   ARCHIVE DESTINATION ./
 )
 
-if (MINGW)
-  add_executable( energyplus main.cc  )
-  target_link_libraries( energyplus energyplusapi )
-else()
-  add_executable( energyplus main.cc  )
-  target_link_libraries( energyplus energyplusapi )
+if (APPLE OR UNIX)
+  add_executable( energyplus main.cc )
+else()  # windows
+  add_executable( energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
 endif()
+target_link_libraries( energyplus energyplusapi )
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})

@@ -127,6 +127,7 @@ set( test_src
   PlantPipingSystemsManager.unit.cc
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
+  PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc

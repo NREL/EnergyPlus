@@ -5600,7 +5600,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
-    using DataOutputs::FindItemInVariableList;
     using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5611,8 +5610,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
     bool OnMeter;        // True if this variable is on a meter
-    std::string VarName; // Variable name without units
-    //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
     std::string ResourceType;       // Will hold value of ResourceTypeKey
     std::string EndUse;             // Will hold value of EndUseKey
     std::string EndUseSub;          // Will hold value of EndUseSubKey
@@ -5624,7 +5621,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     if (!OutputInitialized) InitializeOutput();
 
-    VarName = VariableName;
+    // Variable name without units
+    std::string VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -5641,7 +5639,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         ReportList = 0;
     }
 
-    ThisOneOnTheList = FindItemInVariableList(KeyedValue, VarName);
+    // DataOutputs::OutputVariablesForSimulation is case-insensitive
+    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
     OnMeter = false; // just a safety initialization
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
@@ -5841,13 +5840,11 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
-    using DataOutputs::FindItemInVariableList;
     using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
     std::string IDOut;
-    std::string VarName; // Variable without units
     //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
     int IndexType;          // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType; // 1=Average, 2=Sum, 3=Min/Max
@@ -5858,7 +5855,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     if (!OutputInitialized) InitializeOutput();
 
-    VarName = VariableName;
+    // Variable name without units
+    std::string VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -5875,7 +5873,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         ReportList = 0;
     }
 
-    ThisOneOnTheList = FindItemInVariableList(KeyedValue, VarName);
+    // DataOutputs::OutputVariablesForSimulation is case-insentitive
+    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
