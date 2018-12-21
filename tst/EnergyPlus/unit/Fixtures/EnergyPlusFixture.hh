@@ -159,6 +159,13 @@ protected:
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
     // if it makes sense for the unit test to continue after returning from function.
     // Will return true if string matches the stream and false if it does not
+    bool compare_json_stream(std::string const &expected_string, bool reset_stream = true);
+
+    // Compare an expected string against the ESO stream. The default is to reset the ESO stream after every call.
+    // It is easier to test successive functions if the ESO stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string matches the stream and false if it does not
     bool compare_eso_stream(std::string const &expected_string, bool reset_stream = true);
 
     // Compare an expected string against the EIO stream. The default is to reset the EIO stream after every call.
@@ -202,6 +209,9 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // Will return true if string matches the stream and false if it does not
     bool compare_delightin_stream(std::string const &expected_string, bool reset_stream = true);
+
+    // Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
+    bool has_json_output(bool reset_stream = true);
 
     // Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
     bool has_eso_output(bool reset_stream = true);
@@ -259,6 +269,7 @@ private:
 
     static bool process_idd(std::string const &idd, bool &errors_found);
 
+    std::unique_ptr<std::ostringstream> json_stream;
     std::unique_ptr<std::ostringstream> eso_stream;
     std::unique_ptr<std::ostringstream> eio_stream;
     std::unique_ptr<std::ostringstream> mtr_stream;
