@@ -84,10 +84,11 @@ extern "C" {
 #include <NodeInputManager.hh>
 #include <OutputReports.hh>
 #include <Plant/PlantManager.hh>
-#include <SQLiteProcedures.hh>
+#include <ResultsSchema.hh>
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <SystemReports.hh>
+#include <SQLiteProcedures.hh>
 #include <Timer.h>
 #include <UtilityRoutines.hh>
 
@@ -577,6 +578,11 @@ int AbortEnergyPlus()
     if (Seconds < 0.0) Seconds = 0.0;
     gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
+    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
     ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
@@ -597,6 +603,18 @@ int AbortEnergyPlus()
                                      " Severe Errors; Elapsed Time=" + Elapsed;
 
     gio::close(tempfl);
+
+    // Output detailed ZONE time series data
+    SimulationManager::OpenOutputJsonFiles();
+
+    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        ResultsFramework::OutputSchema->writeTimeSeriesReports();
+    }
+
+    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+        ResultsFramework::OutputSchema->WriteReport();
+    }
+
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
@@ -837,6 +855,11 @@ int EndEnergyPlus()
     if (Seconds < 0.0) Seconds = 0.0;
     gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
+    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
     ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
@@ -856,6 +879,18 @@ int EndEnergyPlus()
     gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
                                     " Severe Errors; Elapsed Time=" + Elapsed;
     gio::close(tempfl);
+
+    // Output detailed ZONE time series data
+    SimulationManager::OpenOutputJsonFiles();
+
+    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        ResultsFramework::OutputSchema->writeTimeSeriesReports();
+    }
+
+    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+        ResultsFramework::OutputSchema->WriteReport();
+    }
+
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
