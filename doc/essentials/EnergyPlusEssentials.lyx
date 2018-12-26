@@ -867,8 +867,8 @@ imf
 \end_layout
 
 \begin_layout Standard
-The EnergyPlus ParametricPreprocessor uses special objects in EnergyPlus
- to set values for any field in any other object for a series of simple
+The EnergyPlus ParametricPreprocessor uses special input objects in EnergyPlus
+ to set values for any field in any other input object for a series of simple
  options <OBJECTS HAVE NOT BEEN DEFINED YET>.
  This is briefly described in the AuxiliaryPrograms documentation and more
  details are present in the InputOutputReference under the section on 
@@ -1104,18 +1104,19 @@ ExampleFiles
 \backslash
 ExampleFiles.html lists each one and includes the name, a description (scroll
  all the way to the right) and lots of information such as the floor area
- and whether certain types of objects are included in the file.
+ and whether certain types of input objects are included in the file.
  Often searching through this file is a good way to find the proper example
  file to learn about a feature.
  Another method is the 
 \backslash
 ExampleFiles
 \backslash
-ExampleFiles-ObjectsLink.html file which lists every type of object that
- EnergyPlus uses and then the first three files that use that object.
- It is possible that many other files also use a particular object so if
- the first three files do not help, a text search of files in the ExampleFiles
- folder may find some more.
+ExampleFiles-ObjectsLink.html file which lists every type of input object
+ that EnergyPlus uses and then the first three files that use that input
+ object.
+ It is possible that many other files also use a particular input object
+ so if the first three files do not help, a text search of files in the
+ ExampleFiles folder may find some more.
  
 \end_layout
 
@@ -1239,7 +1240,8 @@ Running EnergyPlus
 \end_layout
 
 \begin_layout Standard
-<quickstart guide>
+<for command line referenced quickstart guide, for this include EP-Launch
+ and IDF Editor examples>
 \end_layout
 
 \begin_layout Subsection*
@@ -1251,7 +1253,7 @@ IDF and JSON syntax
 \end_layout
 
 \begin_layout Subsection*
-Common Objects
+Common Input Objects
 \end_layout
 
 \begin_layout Subsection*
