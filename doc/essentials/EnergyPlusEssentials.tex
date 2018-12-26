@@ -10,10 +10,13 @@
  {hyperref}
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{December 17, 2018}
+\date{December 26, 2018}
 \maketitle
 
 \section{Introduction}
+
+The following background on building energy modeling (BEM) will provide
+a foundation before learning the essentials of EnergyPlus. 
 
 \section*{What is BEM?}
 
@@ -149,8 +152,27 @@ other engines.
 reports with selectable time-resolution from annual to sub-hourly,
 all with energy source multipliers.''
 \end{itemize}
-EnergyPlus runs on Windows, MacOS, and Linux computers. 
-
+In addition:
+\begin{itemize}
+\item ASCII text based weather, input, and output files that include hourly
+or sub-hourly environmental conditions, and standard and user definable
+reports, respectively 
+\item Transient heat conduction through building elements such as walls,
+roofs, floors, etc. using conduction transfer functions
+\item Thermal comfort models based on activity, inside dry bulb, humidity,
+etc.
+\item Anisotropic sky model for improved calculation of diffuse solar on
+tilted surfaces
+\item Atmospheric pollution calculations that predict CO2, SOx, NOx, CO,
+particulate matter, and hydrocarbon production for both on site and
+remote energy conversion
+\item System and plant output is allowed to directly impact the building
+thermal response rather than calculating all loads first, then simulating
+systems and plants which allows the designer to more accurately investigate
+the effect of undersizing fans and equipment and what impact that
+might have on the thermal comfort of occupants within the building 
+\item EnergyPlus runs on Windows, MacOS, and Linux computers. 
+\end{itemize}
 <need to balance overview with enough details to help people, I think
 a list of what can be modeled might be more helpful>
 
@@ -205,8 +227,7 @@ data sets that are included.
 that are part of the EnergyPlus package. For example, this document
 contains the user manual for the Weather Converter program, descriptions
 on using Ground Heat Transfer auxiliary programs with EnergyPlus,
-Compact HVAC descriptions, the Transition program/package and other
-assorted documents.
+HVAC Template descriptions, and other assorted topics.
 \item The Engineering Reference: Provides more in-depth knowledge into the
 theoretical basis behind the various calculations contained in the
 program including algorithm descriptions.
@@ -286,15 +307,16 @@ he AuxiliaryPrograms documentation. A file with lines starting ``\#\#''
 or with the ``imf'' file extension are likely to be a file using
 EP-Macro files. 
 
-The EnergyPlus ParametricPreprocessor uses special objects in EnergyPlus
-to set values for any field in any other object for a series of simple
-options <OBJECTS HAVE NOT BEEN DEFINED YET>. This is briefly described
-in the AuxiliaryPrograms documentation and more details are present
-in the InputOutputReference under the section on ``Parametric Objects.''
-The ParametricPreprocessor approach is very simple but limited in
-the flexibility that it affords. It is suitable for implementing measures
-related to internal loads, constructions, and simple efficiency changes
-but is probably not the appropriate tool for more complicated measures.
+The EnergyPlus ParametricPreprocessor uses special input objects in
+EnergyPlus to set values for any field in any other input object for
+a series of simple options <OBJECTS HAVE NOT BEEN DEFINED YET>. This
+is briefly described in the AuxiliaryPrograms documentation and more
+details are present in the InputOutputReference under the section
+on ``Parametric Objects.'' The ParametricPreprocessor approach is
+very simple but limited in the flexibility that it affords. It is
+suitable for implementing measures related to internal loads, constructions,
+and simple efficiency changes but is probably not the appropriate
+tool for more complicated measures.
 
 Another approach to writing measures and using measures written by
 others is to use \href{https://www.openstudio.net/}{OpenStudio} and
@@ -371,14 +393,14 @@ Many hundreds of example files come with EnergyPlus are in the ExampleFiles
 folder from the installation. The \textbackslash ExampleFiles\textbackslash ExampleFiles.html
 lists each one and includes the name, a description (scroll all the
 way to the right) and lots of information such as the floor area and
-whether certain types of objects are included in the file. Often searching
-through this file is a good way to find the proper example file to
-learn about a feature. Another method is the \textbackslash ExampleFiles\textbackslash ExampleFiles-ObjectsLink.html
-file which lists every type of object that EnergyPlus uses and then
-the first three files that use that object. It is possible that many
-other files also use a particular object so if the first three files
-do not help, a text search of files in the ExampleFiles folder may
-find some more. 
+whether certain types of input objects are included in the file. Often
+searching through this file is a good way to find the proper example
+file to learn about a feature. Another method is the \textbackslash ExampleFiles\textbackslash ExampleFiles-ObjectsLink.html
+file which lists every type of input object that EnergyPlus uses and
+then the first three files that use that input object. It is possible
+that many other files also use a particular input object so if the
+first three files do not help, a text search of files in the ExampleFiles
+folder may find some more. 
 
 \subsection*{Getting Help}
 
@@ -410,15 +432,70 @@ probably also provides training.
 
 \subsection*{Running EnergyPlus}
 
-<quickstart guide>
+<for command line referenced quickstart guide, for this include EP-Launch
+and IDF Editor examples>
+
+FROM GETTING STARTED:
+
+EnergyPlus is a simulation program designed for modeling buildings
+with all their associated heat- ing, ventilating, and air conditioning
+equipment. EnergyPlus is a simulation engine: it was designed to be
+an element within a system of programs that would include a graphical
+user interface to de- scribe the building. However, it can be run
+stand alone without such an interface. This document describes how
+to run EnergyPlus in such a stand alone fashion. This section will
+introduce you to the EP-Launch program, which helps you run EnergyPlus. 
+
+For users that want a simple way of selecting files and running EnergyPlus,
+EP-Launch provides this and more. In addition, EP-Launch can help
+open a text editor for the input and output files, open a spreadsheet
+for the postprocessor results files, a web browser for the tabular
+results file, and start up a viewer for the selected drawing file.
+
+<Include EP-Launch 3 screen shot and some explanation on how to use
+it>
 
 \subsection*{Run-Check-Edit Repeat}
 
 \subsection*{IDF and JSON syntax}
 
-\subsection*{Common Objects}
+\subsection*{Common Input Objects}
 
 \subsection*{Key Concepts}
+
+\subsubsection*{Always Plan Ahead.}
+
+Some preliminary steps will facilitate the construction of your input
+file. EnergyPlus requires some information in specified, externally
+available formats; other information may require some lead time to
+obtain. The following checklist should be completed before you start
+to construct your input file.
+\begin{itemize}
+\item Obtain location and design climate information for the city in which
+your building is located. If possible, use one of the weather files
+available for your weather period run.
+\item Obtain sufficient building construction information to allow specification
+of overall building geometry and surface constructions (including
+exterior walls, interior walls, partitions, floors, ceilings, roofs,
+windows and doors).
+\item Obtain sufficient building use information to allow specification
+of the lighting and other equipment (e.g. electric, gas, etc.) and
+the number of people in each area of the building.
+\item Obtain sufficient building thermostatic control information to allow
+specification of the temperature control strategy for each area of
+the building.
+\item Obtain sufficient HVAC operation information to allow specification
+and scheduling of the fan systems.
+\item Obtain sufficient central plant information to allow specification
+and scheduling of the boilers, chillers and other plant equipment.
+\end{itemize}
+
+\subsection*{What are All These Files}
+
+<lots of file extensions, maybe just reference a few and move rest
+to Aux doc, see list in old getting started>
+
+<maybe include description of all the directories that come with EnergyPlus>
 
 \subsection*{Versions and Updating}
 
@@ -446,9 +523,64 @@ are used during the design process>
 
 \subsection*{Surfaces and Zones}
 
+A building \textquotedblleft surface\textquotedblright{} is the fundamental
+element in the building model. In the general sense, there are two
+types of \textquotedblleft surfaces\textquotedblright{} in EnergyPlus.
+These are: 
+\begin{itemize}
+\item heat transfer surfaces
+\item heat storage surfaces 
+\end{itemize}
+A good rule to follow for EnergyPlus modeling of surfaces is: \textquotedblleft Always
+define a surface as a heat storage surface unless it must be defined
+as a heat transfer surface.\textquotedblright{} Any surface, which
+is expected to separate spaces of significantly different temperatures,
+must be defined as a heat transfer surface. Thus, exterior surfaces,
+such as outside walls, roofs and floors, are heat transfer surfaces.
+Interior surfaces (partitions) are heat storage surfaces if they separate
+spaces maintained at the same temperature and heat transfer surfaces
+if they separate spaces maintained at different temperatures. A discussion
+of how to define heat transfer and heat storage surfaces will occur
+in later steps. In order to correctly \textquotedblleft zone\textquotedblright{}
+the building it is necessary only to distinguish between the two. 
+
 \subsection*{Zoning}
 
+A \textquotedblleft zone\textquotedblright{} is a thermal, not a geometric,
+concept. A \textquotedblleft zone\textquotedblright{} is an air volume
+at a uniform temperature plus all the heat transfer and heat storage
+surfaces bounding or inside of that air volume. EnergyPlus calculates
+the energy required to maintain each zone at a specified temperature
+for each hour of the day. Since EnergyPlus performs a zone heat balance,
+the first step in preparing a building description is to break the
+building into zones. The objective of this exercise is to define as
+few zones as possible without significantly compromising the integrity
+of the simulation. 
+
+Although defining building zones is somewhat of an art, a few general
+rules will keep the new simulation user out of trouble. <\textcompwordmark <Consider
+the following figure, which shows the floor plan of an Adult Education
+Center. >\textcompwordmark >
+
+The question is, \textquotedblleft How many thermal zones should be
+used to model this building?\textquotedblright{} The inexperienced
+building modeler may be tempted to define each room in the building
+as a zone, but the thermal zone is defined as a volume of air at a
+uniform temperature. The general rule then is to use the number of
+fan systems (and radiant systems) not the number of rooms to determine
+the number of zones in the building. The minimum number of zones in
+a general simulation model will usually be equal to the number of
+systems serving the building. The collection of heat transfer and
+heat storage surfaces defined within each zone will include all surfaces
+bounding or inside of the space conditioned by the system. 
+
 \subsection*{Materials and Constructions}
+
+When you don't know the specific materials and constructions for the
+builidng being modeled, you may want to review the ASHRAE\_2005\_HOF\_Materials.idf
+file contained in the DataSets folder. The file contains typical materials
+and constructionsand is based on the 2005 version of the ASHRAE Handbook
+- Fundamentals.
 
 \subsection*{Heat Transfer to the Ground}
 

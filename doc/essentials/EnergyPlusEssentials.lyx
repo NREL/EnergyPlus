@@ -91,11 +91,17 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-December 17, 2018
+December 26, 2018
 \end_layout
 
 \begin_layout Section
 Introduction
+\end_layout
+
+\begin_layout Standard
+The following background on building energy modeling (BEM) will provide
+ a foundation before learning the essentials of EnergyPlus.
+ 
 \end_layout
 
 \begin_layout Section*
@@ -470,6 +476,45 @@ Standard summary and detailed output reports as well as user definable reports
 \end_layout
 
 \begin_layout Standard
+In addition:
+\end_layout
+
+\begin_layout Itemize
+ASCII text based weather, input, and output files that include hourly or
+ sub-hourly environmental conditions, and standard and user definable reports,
+ respectively 
+\end_layout
+
+\begin_layout Itemize
+Transient heat conduction through building elements such as walls, roofs,
+ floors, etc.
+ using conduction transfer functions
+\end_layout
+
+\begin_layout Itemize
+Thermal comfort models based on activity, inside dry bulb, humidity, etc.
+\end_layout
+
+\begin_layout Itemize
+Anisotropic sky model for improved calculation of diffuse solar on tilted
+ surfaces
+\end_layout
+
+\begin_layout Itemize
+Atmospheric pollution calculations that predict CO2, SOx, NOx, CO, particulate
+ matter, and hydrocarbon production for both on site and remote energy conversio
+n
+\end_layout
+
+\begin_layout Itemize
+System and plant output is allowed to directly impact the building thermal
+ response rather than calculating all loads first, then simulating systems
+ and plants which allows the designer to more accurately investigate the
+ effect of undersizing fans and equipment and what impact that might have
+ on the thermal comfort of occupants within the building 
+\end_layout
+
+\begin_layout Itemize
 EnergyPlus runs on Windows, MacOS, and Linux computers.
  
 \end_layout
@@ -644,8 +689,7 @@ Auxiliary Programs: Contains information for the auxiliary programs that
  are part of the EnergyPlus package.
  For example, this document contains the user manual for the Weather Converter
  program, descriptions on using Ground Heat Transfer auxiliary programs
- with EnergyPlus, Compact HVAC descriptions, the Transition program/package
- and other assorted documents.
+ with EnergyPlus, HVAC Template descriptions, and other assorted topics.
 \end_layout
 
 \begin_layout Itemize
@@ -1244,6 +1288,36 @@ Running EnergyPlus
  and IDF Editor examples>
 \end_layout
 
+\begin_layout Standard
+FROM GETTING STARTED:
+\end_layout
+
+\begin_layout Standard
+EnergyPlus is a simulation program designed for modeling buildings with
+ all their associated heat- ing, ventilating, and air conditioning equipment.
+ EnergyPlus is a simulation engine: it was designed to be an element within
+ a system of programs that would include a graphical user interface to de-
+ scribe the building.
+ However, it can be run stand alone without such an interface.
+ This document describes how to run EnergyPlus in such a stand alone fashion.
+ This section will introduce you to the EP-Launch program, which helps you
+ run EnergyPlus.
+ 
+\end_layout
+
+\begin_layout Standard
+For users that want a simple way of selecting files and running EnergyPlus,
+ EP-Launch provides this and more.
+ In addition, EP-Launch can help open a text editor for the input and output
+ files, open a spreadsheet for the postprocessor results files, a web browser
+ for the tabular results file, and start up a viewer for the selected drawing
+ file.
+\end_layout
+
+\begin_layout Standard
+<Include EP-Launch 3 screen shot and some explanation on how to use it>
+\end_layout
+
 \begin_layout Subsection*
 Run-Check-Edit Repeat
 \end_layout
@@ -1258,6 +1332,66 @@ Common Input Objects
 
 \begin_layout Subsection*
 Key Concepts
+\end_layout
+
+\begin_layout Subsubsection*
+Always Plan Ahead.
+\end_layout
+
+\begin_layout Standard
+Some preliminary steps will facilitate the construction of your input file.
+ EnergyPlus requires some information in specified, externally available
+ formats; other information may require some lead time to obtain.
+ The following checklist should be completed before you start to construct
+ your input file.
+\end_layout
+
+\begin_layout Itemize
+Obtain location and design climate information for the city in which your
+ building is located.
+ If possible, use one of the weather files available for your weather period
+ run.
+\end_layout
+
+\begin_layout Itemize
+Obtain sufficient building construction information to allow specification
+ of overall building geometry and surface constructions (including exterior
+ walls, interior walls, partitions, floors, ceilings, roofs, windows and
+ doors).
+\end_layout
+
+\begin_layout Itemize
+Obtain sufficient building use information to allow specification of the
+ lighting and other equipment (e.g.
+ electric, gas, etc.) and the number of people in each area of the building.
+\end_layout
+
+\begin_layout Itemize
+Obtain sufficient building thermostatic control information to allow specificati
+on of the temperature control strategy for each area of the building.
+\end_layout
+
+\begin_layout Itemize
+Obtain sufficient HVAC operation information to allow specification and
+ scheduling of the fan systems.
+\end_layout
+
+\begin_layout Itemize
+Obtain sufficient central plant information to allow specification and schedulin
+g of the boilers, chillers and other plant equipment.
+\end_layout
+
+\begin_layout Subsection*
+What are All These Files
+\end_layout
+
+\begin_layout Standard
+<lots of file extensions, maybe just reference a few and move rest to Aux
+ doc, see list in old getting started>
+\end_layout
+
+\begin_layout Standard
+<maybe include description of all the directories that come with EnergyPlus>
 \end_layout
 
 \begin_layout Subsection*
@@ -1310,12 +1444,89 @@ Coordinate System
 Surfaces and Zones
 \end_layout
 
+\begin_layout Standard
+A building “surface” is the fundamental element in the building model.
+ In the general sense, there are two types of “surfaces” in EnergyPlus.
+ These are: 
+\end_layout
+
+\begin_layout Itemize
+heat transfer surfaces
+\end_layout
+
+\begin_layout Itemize
+heat storage surfaces 
+\end_layout
+
+\begin_layout Standard
+A good rule to follow for EnergyPlus modeling of surfaces is: “Always define
+ a surface as a heat storage surface unless it must be defined as a heat
+ transfer surface.” Any surface, which is expected to separate spaces of
+ significantly different temperatures, must be defined as a heat transfer
+ surface.
+ Thus, exterior surfaces, such as outside walls, roofs and floors, are heat
+ transfer surfaces.
+ Interior surfaces (partitions) are heat storage surfaces if they separate
+ spaces maintained at the same temperature and heat transfer surfaces if
+ they separate spaces maintained at different temperatures.
+ A discussion of how to define heat transfer and heat storage surfaces will
+ occur in later steps.
+ In order to correctly “zone” the building it is necessary only to distinguish
+ between the two.
+ 
+\end_layout
+
 \begin_layout Subsection*
 Zoning
 \end_layout
 
+\begin_layout Standard
+A “zone” is a thermal, not a geometric, concept.
+ A “zone” is an air volume at a uniform temperature plus all the heat transfer
+ and heat storage surfaces bounding or inside of that air volume.
+ EnergyPlus calculates the energy required to maintain each zone at a specified
+ temperature for each hour of the day.
+ Since EnergyPlus performs a zone heat balance, the first step in preparing
+ a building description is to break the building into zones.
+ The objective of this exercise is to define as few zones as possible without
+ significantly compromising the integrity of the simulation.
+ 
+\end_layout
+
+\begin_layout Standard
+Although defining building zones is somewhat of an art, a few general rules
+ will keep the new simulation user out of trouble.
+ <<Consider the following figure, which shows the floor plan of an Adult
+ Education Center.
+ >>
+\end_layout
+
+\begin_layout Standard
+The question is, “How many thermal zones should be used to model this building?”
+ The inexperienced building modeler may be tempted to define each room in
+ the building as a zone, but the thermal zone is defined as a volume of
+ air at a uniform temperature.
+ The general rule then is to use the number of fan systems (and radiant
+ systems) not the number of rooms to determine the number of zones in the
+ building.
+ The minimum number of zones in a general simulation model will usually
+ be equal to the number of systems serving the building.
+ The collection of heat transfer and heat storage surfaces defined within
+ each zone will include all surfaces bounding or inside of the space conditioned
+ by the system.
+ 
+\end_layout
+
 \begin_layout Subsection*
 Materials and Constructions
+\end_layout
+
+\begin_layout Standard
+When you don't know the specific materials and constructions for the builidng
+ being modeled, you may want to review the ASHRAE_2005_HOF_Materials.idf
+ file contained in the DataSets folder.
+ The file contains typical materials and constructionsand is based on the
+ 2005 version of the ASHRAE Handbook - Fundamentals.
 \end_layout
 
 \begin_layout Subsection*
