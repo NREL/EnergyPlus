@@ -60,13 +60,13 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetworkSolver.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
@@ -1395,7 +1395,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 std::string coil_name = fields.at("coil_name");
                 std::string coil_type = fields.at("coil_object_type");
@@ -1420,7 +1420,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 std::string hx_name = fields.at("heatexchanger_name");
                 std::string hx_type = fields.at("heatexchanger_object_type");
@@ -1446,7 +1446,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 std::string tu_name = fields.at("terminal_unit_name");
                 std::string tu_type = fields.at("terminal_unit_object_type");

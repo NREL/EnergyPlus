@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>

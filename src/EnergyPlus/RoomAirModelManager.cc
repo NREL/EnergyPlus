@@ -58,7 +58,7 @@
 
 // EnergyPlus Headers
 #include <CrossVentMgr.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>

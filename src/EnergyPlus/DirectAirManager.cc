@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>

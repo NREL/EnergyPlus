@@ -52,8 +52,8 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetworkSolver.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

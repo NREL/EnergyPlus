@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataSurfaces.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>

@@ -51,7 +51,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataGlobals.hh>
 #include <DataHVACControllers.hh>
 #include <DataHeatBalFanSys.hh>

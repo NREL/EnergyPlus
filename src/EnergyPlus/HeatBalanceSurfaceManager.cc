@@ -63,7 +63,7 @@
 #include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
 #include <DElightManagerF.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataDElight.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>

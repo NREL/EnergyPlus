@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include "AirflowNetworkSolver.hh"
-#include "Properties.hh"
+#include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Properties.hpp"
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 

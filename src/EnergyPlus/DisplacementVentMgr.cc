@@ -55,7 +55,7 @@
 
 // EnergyPlus Headers
 #include <ConvectionCoefficients.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>

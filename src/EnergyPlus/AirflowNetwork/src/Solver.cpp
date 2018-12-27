@@ -54,10 +54,11 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkSolver.hh>
+#include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Elements.hpp"
+
 #include <CommandLineInterface.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>

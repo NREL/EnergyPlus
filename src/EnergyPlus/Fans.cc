@@ -55,7 +55,7 @@
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataLoopNode.hh>

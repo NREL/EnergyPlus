@@ -52,8 +52,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
-#include <EnergyPlus/DataGlobals.hh>
+#include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
