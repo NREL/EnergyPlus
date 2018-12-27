@@ -40,8 +40,8 @@
 \pdf_colorlinks false
 \pdf_backref false
 \pdf_pdfusetitle true
-\papersize default
-\use_geometry false
+\papersize letterpaper
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -66,6 +66,13 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 0.5in
+\topmargin 0.5in
+\rightmargin 0.5in
+\bottommargin 0.5in
+\headheight 0.5in
+\headsep 0.5in
+\footskip 0.5in
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -1294,10 +1301,10 @@ FROM GETTING STARTED:
 
 \begin_layout Standard
 EnergyPlus is a simulation program designed for modeling buildings with
- all their associated heat- ing, ventilating, and air conditioning equipment.
+ all their associated heating, ventilating, and air conditioning equipment.
  EnergyPlus is a simulation engine: it was designed to be an element within
- a system of programs that would include a graphical user interface to de-
- scribe the building.
+ a system of programs that would include a graphical user interface to describe
+ the building.
  However, it can be run stand alone without such an interface.
  This document describes how to run EnergyPlus in such a stand alone fashion.
  This section will introduce you to the EP-Launch program, which helps you
@@ -1319,11 +1326,303 @@ For users that want a simple way of selecting files and running EnergyPlus,
 \end_layout
 
 \begin_layout Subsection*
-Run-Check-Edit Repeat
+IDF and JSON syntax
+\end_layout
+
+\begin_layout Standard
+EnergyPlus has two different input file formats that can be used to describe
+ the building and system that is simulated.
+ The file extensions for the two formats are IDF and epJSON.
+\end_layout
+
+\begin_layout Subsubsection*
+IDF
+\end_layout
+
+\begin_layout Standard
+The legacy file format is a text based format that describes each object
+ in series.
+ The name of the type of objects starts the object and each value for each
+ field follows separated by commas.
+ The end of the object is indicated by a semi-colon.
+ Comments are indicated by a exclamation point 
+\begin_inset Quotes eld
+\end_inset
+
+!
+\begin_inset Quotes erd
+\end_inset
+
+ and anything after this is ignored by EnergyPlus.
+ Commonly, an object is spread over many lines in the file with one value
+ for each field per line.
+ The names of each field are not required but are usually shown after the
+ value and the comma or semicolon as a special comment using 
+\begin_inset Quotes eld
+\end_inset
+
+!-
+\begin_inset Quotes erd
+\end_inset
+
+ as an indicator.
+ The objects can be in any order.
+ A small piece of an IDF file 
+\end_layout
+
+\begin_layout LyX-Code
+Building,
+\end_layout
+
+\begin_layout LyX-Code
+  Simple One Zone,   !- Name
+\end_layout
+
+\begin_layout LyX-Code
+  0,                 !- North Axis {deg}
+\end_layout
+
+\begin_layout LyX-Code
+  Suburbs,           !- Terrain
+\end_layout
+
+\begin_layout LyX-Code
+  0.04,              !- Loads Convergence Tolerance Value
+\end_layout
+
+\begin_layout LyX-Code
+  0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+\end_layout
+
+\begin_layout LyX-Code
+  MinimalShadowing,  !- Solar Distribution
+\end_layout
+
+\begin_layout LyX-Code
+  30,                !- Maximum Number of Warmup Days
+\end_layout
+
+\begin_layout LyX-Code
+  6;                 !- Minimum Number of Warmup Days
+\end_layout
+
+\begin_layout Standard
+The details of this example object are not important but the use of commas,
+ exclamation points, and the closing semi-colon are important.
+ The IDF format is currently the most commonly used format throughout the
+ EnergyPlus ecosystem of utilities and GUIs.
+ The list of possible objects and fields is documented in the Energy+.idd
+ file.
+\end_layout
+
+\begin_layout Subsubsection*
+epJSON
+\end_layout
+
+\begin_layout Standard
+A new file format based on the industry standard 
+\begin_inset CommandInset href
+LatexCommand href
+name "JSON"
+target "https://www.json.org/"
+literal "false"
+
+\end_inset
+
+ format most often used to transmit extra data to web applications.
+ It is a text based file format.
+ The JSON format has wide industy usage and is supported in just about every
+ modern programming langauge.
+ It is a field-value style format using brackets and colons to indicate
+ the heirarchy and commas to separate each field and value pair.
+ The objects must appear grouped by the type of object.
+ The list of possible objects and fields is documented in the Energy+.schema.epJSO
+N file which uses 
+\begin_inset CommandInset href
+LatexCommand href
+name "json-schema"
+target "http://json-schema.org/"
+literal "false"
+
+\end_inset
+
+.
+ The same object shown above in IDF format is shown below in epJSON format:
+\end_layout
+
+\begin_layout LyX-Code
+{
+\end_layout
+
+\begin_layout LyX-Code
+    "Building": {
+\end_layout
+
+\begin_layout LyX-Code
+        "Simple One Zone: {
+\end_layout
+
+\begin_layout LyX-Code
+            "idf_max_extensible_fields": 0,
+\end_layout
+
+\begin_layout LyX-Code
+            "idf_max_fields": 8,
+\end_layout
+
+\begin_layout LyX-Code
+            "idf_order": 3,
+\end_layout
+
+\begin_layout LyX-Code
+            "loads_convergence_tolerance_value": 0.04,
+\end_layout
+
+\begin_layout LyX-Code
+            "maximum_number_of_warmup_days": 30,
+\end_layout
+
+\begin_layout LyX-Code
+            "minimum_number_of_warmup_days": 6,
+\end_layout
+
+\begin_layout LyX-Code
+            "north_axis": 0,
+\end_layout
+
+\begin_layout LyX-Code
+            "solar_distribution": "MinimalShadowing",
+\end_layout
+
+\begin_layout LyX-Code
+            "temperature_convergence_tolerance_value": 0.004,
+\end_layout
+
+\begin_layout LyX-Code
+            "terrain": "Suburbs"
+\end_layout
+
+\begin_layout LyX-Code
+        }
+\end_layout
+
+\begin_layout LyX-Code
+    }
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout Standard
+While the IDF and epJSON file formats are quite different they contain the
+ same information and either may be used.
+ In general, if producing EnergyPlus input files using a programming langauge,
+ the epJSON format might make more sense while, at this point, if producing
+ IDF files using a GUI, they are likely to use the IDF format.
+ EnergyPlus, when used on the command line, can convert from IDF to epJSON
+ and from epJSON to IDF using the -c or --convert option.
 \end_layout
 
 \begin_layout Subsection*
-IDF and JSON syntax
+Creating and Editing Input Files
+\end_layout
+
+\begin_layout Standard
+Since both the IDF and epJSON file formats are text formats, a simple text
+ editor may be used to edit them.
+ Even if not regularly used, a good text editor is an important application
+ to have when working with EnergyPlus.
+ There are many different 
+\begin_inset CommandInset href
+LatexCommand href
+name "text editors"
+target "https://en.wikipedia.org/wiki/Comparison_of_text_editors"
+literal "false"
+
+\end_inset
+
+ and a few have special features related to the IDF format such as syntax
+ highlighting including 
+\begin_inset CommandInset href
+LatexCommand href
+name "Atom"
+target "https://github.com/bigladder/atom-language-energyplus"
+literal "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Notepad++"
+target "https://github.com/jmarrec/notepad"
+literal "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset href
+LatexCommand href
+name "UltraEdit"
+target "http://energyplus.helpserve.com/knowledgebase/article/View/102/47/ultraedit-syntax-highlighting-file---v80"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another editing choice for IDF file is the IDF Editor which comes with EnergyPlu
+s in the 
+\backslash
+PreProcess
+\backslash
+IDFEditor directory.
+ It is a Windows only program and is was not designed to run on Linux or
+ MacOS.
+ It is specially designed for editing IDF files and includes many features
+ to simplify the process.
+ The main screen of the IDF editor is shown below.
+ Full details of the IDF Editor can be found in the Auxiliary Programs document
+ under the 
+\begin_inset Quotes eld
+\end_inset
+
+Creating Input Files
+\begin_inset Quotes erd
+\end_inset
+
+ section.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename idfeditor.png
+	width 6in
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A cross platform program called 
+\begin_inset CommandInset href
+LatexCommand href
+name "IDF+"
+target "https://bitbucket.org/mattdoiron/idfplus/src/default/"
+literal "false"
+
+\end_inset
+
+ is currently being developed independantly and will have many of the same
+ features as the IDF Editor when complete.
+\end_layout
+
+\begin_layout Subsection*
+Run-Check-Edit Repeat
 \end_layout
 
 \begin_layout Subsection*
@@ -1396,6 +1695,10 @@ What are All These Files
 
 \begin_layout Subsection*
 Versions and Updating
+\end_layout
+
+\begin_layout Subsection*
+Command Line Options
 \end_layout
 
 \begin_layout Subsection*

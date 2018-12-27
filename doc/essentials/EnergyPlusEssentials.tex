@@ -2,12 +2,31 @@
 %% Do not edit unless you really know what you are doing.
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=0.5in,bmargin=0.5in,lmargin=0.5in,rmargin=0.5in,headheight=0.5in,headsep=0.5in,footskip=0.5in}
 \usepackage{babel}
 \usepackage{textcomp}
+\usepackage{graphicx}
 \usepackage[unicode=true,pdfusetitle,
  bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
  breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
  {hyperref}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\newenvironment{lyxcode}
+	{\par\begin{list}{}{
+		\setlength{\rightmargin}{\leftmargin}
+		\setlength{\listparindent}{0pt}% needed for AMS classes
+		\raggedright
+		\setlength{\itemsep}{0pt}
+		\setlength{\parsep}{0pt}
+		\normalfont\ttfamily}%
+	 \item[]}
+	{\end{list}}
+
+\makeatother
+
 \begin{document}
 \title{EnergyPlus Essentials}
 \date{December 26, 2018}
@@ -438,13 +457,13 @@ and IDF Editor examples>
 FROM GETTING STARTED:
 
 EnergyPlus is a simulation program designed for modeling buildings
-with all their associated heat- ing, ventilating, and air conditioning
+with all their associated heating, ventilating, and air conditioning
 equipment. EnergyPlus is a simulation engine: it was designed to be
 an element within a system of programs that would include a graphical
-user interface to de- scribe the building. However, it can be run
-stand alone without such an interface. This document describes how
-to run EnergyPlus in such a stand alone fashion. This section will
-introduce you to the EP-Launch program, which helps you run EnergyPlus. 
+user interface to describe the building. However, it can be run stand
+alone without such an interface. This document describes how to run
+EnergyPlus in such a stand alone fashion. This section will introduce
+you to the EP-Launch program, which helps you run EnergyPlus. 
 
 For users that want a simple way of selecting files and running EnergyPlus,
 EP-Launch provides this and more. In addition, EP-Launch can help
@@ -455,9 +474,128 @@ results file, and start up a viewer for the selected drawing file.
 <Include EP-Launch 3 screen shot and some explanation on how to use
 it>
 
-\subsection*{Run-Check-Edit Repeat}
-
 \subsection*{IDF and JSON syntax}
+
+EnergyPlus has two different input file formats that can be used to
+describe the building and system that is simulated. The file extensions
+for the two formats are IDF and epJSON.
+
+\subsubsection*{IDF}
+
+The legacy file format is a text based format that describes each
+object in series. The name of the type of objects starts the object
+and each value for each field follows separated by commas. The end
+of the object is indicated by a semi-colon. Comments are indicated
+by a exclamation point ``!'' and anything after this is ignored
+by EnergyPlus. Commonly, an object is spread over many lines in the
+file with one value for each field per line. The names of each field
+are not required but are usually shown after the value and the comma
+or semicolon as a special comment using ``!-'' as an indicator.
+The objects can be in any order. A small piece of an IDF file 
+\begin{lyxcode}
+Building,
+
+~~Simple~One~Zone,~~~!-~Name
+
+~~0,~~~~~~~~~~~~~~~~~!-~North~Axis~\{deg\}
+
+~~Suburbs,~~~~~~~~~~~!-~Terrain
+
+~~0.04,~~~~~~~~~~~~~~!-~Loads~Convergence~Tolerance~Value
+
+~~0.004,~~~~~~~~~~~~~!-~Temperature~Convergence~Tolerance~Value~\{deltaC\}
+
+~~MinimalShadowing,~~!-~Solar~Distribution
+
+~~30,~~~~~~~~~~~~~~~~!-~Maximum~Number~of~Warmup~Days
+
+~~6;~~~~~~~~~~~~~~~~~!-~Minimum~Number~of~Warmup~Days
+\end{lyxcode}
+The details of this example object are not important but the use of
+commas, exclamation points, and the closing semi-colon are important.
+The IDF format is currently the most commonly used format throughout
+the EnergyPlus ecosystem of utilities and GUIs. The list of possible
+objects and fields is documented in the Energy+.idd file.
+
+\subsubsection*{epJSON}
+
+A new file format based on the industry standard \href{https://www.json.org/}{JSON}
+format most often used to transmit extra data to web applications.
+It is a text based file format. The JSON format has wide industy usage
+and is supported in just about every modern programming langauge.
+It is a field-value style format using brackets and colons to indicate
+the heirarchy and commas to separate each field and value pair. The
+objects must appear grouped by the type of object. The list of possible
+objects and fields is documented in the Energy+.schema.epJSON file
+which uses \href{http://json-schema.org/}{json-schema}. The same
+object shown above in IDF format is shown below in epJSON format:
+\begin{lyxcode}
+\{
+
+~~~~\textquotedbl Building\textquotedbl :~\{
+
+~~~~~~~~\textquotedbl Simple~One~Zone:~\{
+
+~~~~~~~~~~~~\textquotedbl idf\_max\_extensible\_fields\textquotedbl :~0,
+
+~~~~~~~~~~~~\textquotedbl idf\_max\_fields\textquotedbl :~8,
+
+~~~~~~~~~~~~\textquotedbl idf\_order\textquotedbl :~3,
+
+~~~~~~~~~~~~\textquotedbl loads\_convergence\_tolerance\_value\textquotedbl :~0.04,
+
+~~~~~~~~~~~~\textquotedbl maximum\_number\_of\_warmup\_days\textquotedbl :~30,
+
+~~~~~~~~~~~~\textquotedbl minimum\_number\_of\_warmup\_days\textquotedbl :~6,
+
+~~~~~~~~~~~~\textquotedbl north\_axis\textquotedbl :~0,
+
+~~~~~~~~~~~~\textquotedbl solar\_distribution\textquotedbl :~\textquotedbl MinimalShadowing\textquotedbl ,
+
+~~~~~~~~~~~~\textquotedbl temperature\_convergence\_tolerance\_value\textquotedbl :~0.004,
+
+~~~~~~~~~~~~\textquotedbl terrain\textquotedbl :~\textquotedbl Suburbs\textquotedbl{}
+
+~~~~~~~~\}
+
+~~~~\}
+
+\}
+\end{lyxcode}
+While the IDF and epJSON file formats are quite different they contain
+the same information and either may be used. In general, if producing
+EnergyPlus input files using a programming langauge, the epJSON format
+might make more sense while, at this point, if producing IDF files
+using a GUI, they are likely to use the IDF format. EnergyPlus, when
+used on the command line, can convert from IDF to epJSON and from
+epJSON to IDF using the -c or -{}-convert option.
+
+\subsection*{Creating and Editing Input Files}
+
+Since both the IDF and epJSON file formats are text formats, a simple
+text editor may be used to edit them. Even if not regularly used,
+a good text editor is an important application to have when working
+with EnergyPlus. There are many different \href{https://en.wikipedia.org/wiki/Comparison_of_text_editors}{text editors}
+and a few have special features related to the IDF format such as
+syntax highlighting including \href{https://github.com/bigladder/atom-language-energyplus}{Atom},
+\href{https://github.com/jmarrec/notepad}{Notepad++}, and \href{http://energyplus.helpserve.com/knowledgebase/article/View/102/47/ultraedit-syntax-highlighting-file---v80}{UltraEdit}.
+
+Another editing choice for IDF file is the IDF Editor which comes
+with EnergyPlus in the \textbackslash PreProcess\textbackslash IDFEditor
+directory. It is a Windows only program and is was not designed to
+run on Linux or MacOS. It is specially designed for editing IDF files
+and includes many features to simplify the process. The main screen
+of the IDF editor is shown below. Full details of the IDF Editor can
+be found in the Auxiliary Programs document under the ``Creating
+Input Files'' section.
+
+\includegraphics[width=6in]{idfeditor}
+
+A cross platform program called \href{https://bitbucket.org/mattdoiron/idfplus/src/default/}{IDF+}
+is currently being developed independantly and will have many of the
+same features as the IDF Editor when complete.
+
+\subsection*{Run-Check-Edit Repeat}
 
 \subsection*{Common Input Objects}
 
@@ -498,6 +636,8 @@ to Aux doc, see list in old getting started>
 <maybe include description of all the directories that come with EnergyPlus>
 
 \subsection*{Versions and Updating}
+
+\subsection*{Command Line Options}
 
 \subsection*{Errors and How to Fix Them}
 
