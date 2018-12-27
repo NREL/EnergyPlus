@@ -153,7 +153,6 @@ namespace PVWatts {
         std::unique_ptr<pvwatts_celltemp> m_tccalc;
 
         // State variables
-        Real64 m_TimeElapsed;                // total time elapsed, to keep track of system time steps
         Real64 m_lastCellTemperature;        // last cell temperature
         Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
         Real64 m_cellTemperature;
