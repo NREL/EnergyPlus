@@ -542,7 +542,7 @@ namespace AirflowNetwork {
 
     int DuctLeak::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                             Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                            int const i,                // Linkage number
+                            int const EP_UNUSED(i),     // Linkage number
                             const AirProperties &propN, // Node 1 properties
                             const AirProperties &propM, // Node 2 properties
                             std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -984,7 +984,7 @@ namespace AirflowNetwork {
 
     int EffectiveLeakageRatio::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                          Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                         int const i,                // Linkage number
+                                         int const EP_UNUSED(i),     // Linkage number
                                          const AirProperties &propN, // Node 1 properties
                                          const AirProperties &propM, // Node 2 properties
                                          std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -1881,7 +1881,7 @@ namespace AirflowNetwork {
 
     int DisSysCompCoilProp::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                      int const i,                // Linkage number
+                                      int const EP_UNUSED(i),     // Linkage number
                                       const AirProperties &propN, // Node 1 properties
                                       const AirProperties &propM, // Node 2 properties
                                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -2576,7 +2576,6 @@ namespace AirflowNetwork {
         Real64 RhozAver;
         Real64 expn;
         Real64 coef;
-        int CompNum;
         Real64 Width;      // Opening width
         Real64 Height;     // Opening height
         Real64 Fact;       // Opening factor

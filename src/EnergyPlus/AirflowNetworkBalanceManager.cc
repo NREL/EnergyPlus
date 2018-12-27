@@ -1543,7 +1543,6 @@ namespace AirflowNetworkBalanceManager {
         bool CompFound;
         bool ErrorsFound;
         bool found;
-        bool FanErrorFound;
         bool NodeFound1;
         bool NodeFound2;
         int NumAPL;
@@ -1553,8 +1552,6 @@ namespace AirflowNetworkBalanceManager {
         std::string StringOut;
         int ZoneNum;
         int NodeNum;
-        int FanIndex;
-        int FanType_Num;
 
         // Declare variables used in this subroutine for debug purpose
         bool AirflowNetworkInitFlag;

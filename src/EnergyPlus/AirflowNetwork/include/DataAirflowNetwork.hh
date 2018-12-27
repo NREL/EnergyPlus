@@ -894,13 +894,13 @@ namespace AirflowNetwork {
     struct DisSysCompTermUnitProp : public AirflowElement // Terminal unit component
     {
         // Members
-        std::string Name;      // Name of coil component
-        std::string EPlusType; // EnergyPlus coil type
-        Real64 L;              // Air path length
+        std::string Name;         // Name of coil component
+        std::string EPlusType;    // EnergyPlus coil type
+        Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
-        int DamperInletNode;   // Damper inlet node number
-        int DamperOutletNode;  // Damper outlet node number
-        int AirLoopNum;        // AirLoop number
+        int DamperInletNode;      // Damper inlet node number
+        int DamperOutletNode;     // Damper outlet node number
+        int AirLoopNum;           // AirLoop number
 
         // Default Constructor
         DisSysCompTermUnitProp() : L(0.0), hydraulicDiameter(0.0), DamperInletNode(0), DamperOutletNode(0), AirLoopNum(0)
@@ -1063,13 +1063,17 @@ namespace AirflowNetwork {
         {
         }
 
+        virtual ~OutdoorAirFan()
+        {
+        }
+
         virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
-                      const AirProperties &propN, // Node 1 properties
-                      const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              int const i,                // Linkage number
+                              const AirProperties &propN, // Node 1 properties
+                              const AirProperties &propM, // Node 2 properties
+                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
     };
 
@@ -1082,12 +1086,12 @@ namespace AirflowNetwork {
         }
 
         virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
-                      const AirProperties &propN, // Node 1 properties
-                      const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              int const i,                // Linkage number
+                              const AirProperties &propN, // Node 1 properties
+                              const AirProperties &propM, // Node 2 properties
+                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
     };
 
