@@ -797,10 +797,10 @@ namespace HeatBalanceKivaManager {
                         if (combinationMap.count({Surfaces(wl).Construction, surfHeight}) == 0) {
                             // create new combination
                             std::vector<int> walls = {wl};
-                            combinationMap[{Surfaces(wl).Construction, surfHeight}] = WallGroup(perimeter * exposedFraction, walls);
+                            combinationMap[{Surfaces(wl).Construction, surfHeight}] = WallGroup(perimeter, walls);
                         } else {
                             // add to existing combination
-                            combinationMap[{Surfaces(wl).Construction, surfHeight}].exposedPerimeter += perimeter * exposedFraction;
+                            combinationMap[{Surfaces(wl).Construction, surfHeight}].exposedPerimeter += perimeter;
                             combinationMap[{Surfaces(wl).Construction, surfHeight}].wallIDs.push_back(wl);
                         }
                     }
@@ -1204,11 +1204,18 @@ namespace HeatBalanceKivaManager {
                 Real64 qt = 0.0;
                 Real64 Tavg = 0.0;
                 Real64 Tz = DataHeatBalFanSys::MAT(DataSurfaces::Surface(surfNum).Zone) + DataGlobals::KelvinConv;
+                Real64 checkWeight = 0.0;
                 assert(surfaceMap[surfNum].size() > 0);
                 for (auto &i : surfaceMap[surfNum]) {
                     auto &kI = kivaInstances[i.first];
                     auto &st = i.second;
-                    auto &p = kI.weightedPerimeter;
+                    Real64 p;
+                    if (surfaceMap[surfNum].size() > 1) {
+                        p = kI.weightedPerimeter;
+                    }
+                    else {
+                        p = 1.0;
+                    }
                     auto hci = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_CONV});
                     auto Ts = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_TEMP});
                     auto Ta = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_AVG_TEMP});
@@ -1218,7 +1225,10 @@ namespace HeatBalanceKivaManager {
                     hc += p * hci;
                     Tavg += p * Ta;
                     qt += p * qi;
+                    checkWeight += p;
                 }
+
+                assert(Kiva::isEqual(checkWeight, 1.0));
 
                 SurfaceResults results;
                 results.h = hc;
