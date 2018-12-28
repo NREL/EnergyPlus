@@ -2278,7 +2278,7 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 2: Evenly distribute remaining loop demand
-                if (std::abs(RemLoopDemand) > SmallLoad) {
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
                     DivideLoad = std::abs(RemLoopDemand) / numAvail;
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
@@ -2302,7 +2302,7 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 3: If RemLoopDemand is still greater than zero, look for any machine
-                if (std::abs(RemLoopDemand) > SmallLoad) {
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                         BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;

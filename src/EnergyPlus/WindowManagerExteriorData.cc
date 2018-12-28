@@ -103,7 +103,6 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        std::pair<Real64, Real64> Angles;
         return getWCECoordinates(t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
     }
 

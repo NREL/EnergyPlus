@@ -521,6 +521,16 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
 
+    // 200W - no equipment available
+    DistributePlantLoadTest::ResetLoads();
+    remainingLoopDemand = 0.0;
+    loopDemand = 200.0;
+    thisBranch.Comp(1).Available = false;
+    thisBranch.Comp(2).Available = false;
+    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_EQ(thisBranch.Comp(1).MyLoad, 0.0);
+    EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
+    EXPECT_EQ(remainingLoopDemand, 200.0);
 }
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
