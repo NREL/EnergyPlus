@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-December 26, 2018
+December 31, 2018
 \end_layout
 
 \begin_layout Section
@@ -1287,16 +1287,16 @@ Using EnergyPlus
 \end_layout
 
 \begin_layout Subsection*
+Installing EnergyPlus
+\end_layout
+
+\begin_layout Standard
+Please see the EnergyPlus QuickStart Guide <ADD LINK> for instructions on
+ how to install EnergyPlus for your system.
+\end_layout
+
+\begin_layout Subsection*
 Running EnergyPlus
-\end_layout
-
-\begin_layout Standard
-<for command line referenced quickstart guide, for this include EP-Launch
- and IDF Editor examples>
-\end_layout
-
-\begin_layout Standard
-FROM GETTING STARTED:
 \end_layout
 
 \begin_layout Standard
@@ -1306,10 +1306,72 @@ EnergyPlus is a simulation program designed for modeling buildings with
  a system of programs that would include a graphical user interface to describe
  the building.
  However, it can be run stand alone without such an interface.
- This document describes how to run EnergyPlus in such a stand alone fashion.
- This section will introduce you to the EP-Launch program, which helps you
- run EnergyPlus.
+ There are several option for performing a simulation with EnergyPlus:
+\end_layout
+
+\begin_layout Itemize
+Graphical user interface
+\end_layout
+
+\begin_layout Itemize
+Command line
+\end_layout
+
+\begin_layout Itemize
+EP-Launch
+\end_layout
+
+\begin_layout Standard
+In each case, a building model will be simulated in combination with a weather
+ file from the appropriate building location.
  
+\end_layout
+
+\begin_layout Subsubsection*
+Graphical User Interface
+\end_layout
+
+\begin_layout Standard
+When running an EnergyPlus simulation within a graphical user interface,
+ the exact method will vary depending on the specific program being used.
+ You should read the documentation for that software to understand how to
+ perfom a simulation.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Command Line
+\end_layout
+
+\begin_layout Standard
+EnergyPlus can be used as a command line tool within a Terminal window in
+ Linux or MacOS or with the CMD prompt or PowerShell window under Windows.
+ Basic usage using the command line approach is will documented in the QuickStar
+t Guide <ADD LINK>.
+ To learn more about the command line mode, you can type:
+\end_layout
+
+\begin_layout Verbatim
+
+energyplus --help 
+\end_layout
+
+\begin_layout Standard
+when in the Energyplus folder.
+ More about this can be found in 
+\begin_inset CommandInset href
+LatexCommand href
+name "How to run EnergyPlus from the command line"
+target "https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+EP-Launch
 \end_layout
 
 \begin_layout Standard
@@ -1319,10 +1381,88 @@ For users that want a simple way of selecting files and running EnergyPlus,
  files, open a spreadsheet for the postprocessor results files, a web browser
  for the tabular results file, and start up a viewer for the selected drawing
  file.
+ There are two different versions of EP-Launch currently part of the EnergyPlus
+ system.
+ 
 \end_layout
 
 \begin_layout Standard
-<Include EP-Launch 3 screen shot and some explanation on how to use it>
+The main screen of EP-Launch 2 is shown below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename eplaunch2.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is a Windows program only.
+ EP-Launch 2 is included in the EnergyPlus installation package when installing
+ on Windows so no additional steps are needed to run it.
+ It is located in the main 
+\begin_inset Quotes eld
+\end_inset
+
+root
+\begin_inset Quotes erd
+\end_inset
+
+ folder of EnergyPlus, usually a folder named EnergyPlusVx-x-x, where the
+ x's are the version number.
+ 
+\end_layout
+
+\begin_layout Standard
+In 2018, EP-Launch 3 was developed and its main screen is shown below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename eplaunch3.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+EP-Launch 3 is not part of the EnergyPlus installation package and needs
+ to be installed separately.
+ It is also open source and is available from 
+\begin_inset CommandInset href
+LatexCommand href
+name "GitHub"
+target "https://github.com/NREL/EP-Launch"
+literal "false"
+
+\end_inset
+
+ and it is documented on 
+\begin_inset CommandInset href
+LatexCommand href
+name "readthedocs"
+target "https://ep-launch.readthedocs.io/en/"
+literal "false"
+
+\end_inset
+
+ or in the docs folder on GitHub.
+ EP-Launch works on Windows, MacOS, and Linux systems and is written in
+ Python.
+\end_layout
+
+\begin_layout Standard
+While both EP-Launch 2 and EP-Launch 3 do many of the same functions the
+ interface is quite different.
+ For now, EP-Launch 2 allows groups of files to be run together and has
+ access to some utilities that the newer version does not.
+ EP-Launch works across multiple platforms and is a built from the ground
+ up to be flexible and extensible so that individuals can make their own
+ workflows that run what ever programs they need to run.
 \end_layout
 
 \begin_layout Subsection*
