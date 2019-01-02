@@ -212,6 +212,7 @@
 #include <InputProcessing/InputValidation.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -309,6 +310,10 @@ int RunEnergyPlus(std::string const & filepath)
 #endif
 
     CreateCurrentDateTimeString(CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+
     VerString += "," + CurrentDateTime;
 
     get_environment_variable(DDOnlyEnvVar, cEnvValue);
@@ -450,6 +455,8 @@ int RunEnergyPlus(std::string const & filepath)
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+
+        ResultsFramework::OutputSchema->setupOutputOptions();
 
         ManageSimulation();
 
