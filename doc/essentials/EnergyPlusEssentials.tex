@@ -29,7 +29,7 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{December 26, 2018}
+\date{January 02, 2019}
 \maketitle
 
 \section{Introduction}
@@ -135,7 +135,7 @@ when using building energy modeling.
 \subsection*{EnergyPlus Capabilities}
 
 According to the \href{https://energyplus.net/}{energyplus.net web site}
-(as of December 2018):
+(as of January 2019):
 \begin{quotation}
 ``EnergyPlus\texttrademark{} is a whole building energy simulation
 program that engineers, architects, and researchers use to model both
@@ -449,30 +449,182 @@ probably also provides training.
 
 \section{Using EnergyPlus }
 
+\subsection*{Installing EnergyPlus}
+
+Please see the EnergyPlus QuickStart Guide <ADD LINK> for instructions
+on how to install EnergyPlus for your system.
+
 \subsection*{Running EnergyPlus}
-
-<for command line referenced quickstart guide, for this include EP-Launch
-and IDF Editor examples>
-
-FROM GETTING STARTED:
 
 EnergyPlus is a simulation program designed for modeling buildings
 with all their associated heating, ventilating, and air conditioning
 equipment. EnergyPlus is a simulation engine: it was designed to be
 an element within a system of programs that would include a graphical
 user interface to describe the building. However, it can be run stand
-alone without such an interface. This document describes how to run
-EnergyPlus in such a stand alone fashion. This section will introduce
-you to the EP-Launch program, which helps you run EnergyPlus. 
+alone without such an interface. There are several option for performing
+a simulation with EnergyPlus:
+\begin{itemize}
+\item Graphical user interface
+\item Command line
+\item EP-Launch
+\end{itemize}
+In each case, a building model will be simulated in combination with
+a weather file from the appropriate building location. 
+
+\subsubsection*{Graphical User Interface}
+
+When running an EnergyPlus simulation within a graphical user interface,
+the exact method will vary depending on the specific program being
+used. You should read the documentation for that software to understand
+how to perfom a simulation. 
+
+\subsubsection*{Command Line}
+
+EnergyPlus can be used as a command line tool within a Terminal window
+in Linux or MacOS or with the CMD prompt or PowerShell window under
+Windows. Basic usage using the command line approach is will documented
+in the QuickStart Guide <ADD LINK>. To learn more about the command
+line mode, you can type:
+\begin{verbatim}
+energyplus --help 
+\end{verbatim}
+when in the Energyplus folder. This will give the following display
+of options:
+\begin{verbatim}
+EnergyPlus, Version 9.0.1-bb7ca4f0da
+Usage: energyplus [options] [input-file]
+Options:
+  -a, --annual                 Force annual simulation
+  -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent on
+                               input file type
+  -d, --output-directory ARG   Output directory path (default: current
+                               directory)
+  -D, --design-day             Force design-day-only simulation
+  -h, --help                   Display help information
+  -i, --idd ARG                Input data dictionary path (default: Energy+.idd
+                               in executable directory)
+  -m, --epmacro                Run EPMacro prior to simulation
+  -p, --output-prefix ARG      Prefix for output file names (default: eplus)
+  -r, --readvars               Run ReadVarsESO after simulation
+  -s, --output-suffix ARG      Suffix style for output file names (default: L)
+                                  L: Legacy (e.g., eplustbl.csv)
+                                  C: Capital (e.g., eplusTable.csv)
+                                  D: Dash (e.g., eplus-table.csv)
+  -v, --version                Display version information
+  -w, --weather ARG            Weather file path (default: in.epw in current
+                               directory)
+  -x, --expandobjects          Run ExpandObjects prior to simulation
+Example: energyplus -w weather.epw -r input.idf
+\end{verbatim}
+EnergyPlus can be run by specifying a number of options followed by
+the path to the input file. The file itself is usually in IDF (Input
+Data File) format or epJSON format, but it may also be in IMF (Input
+Macro File) format to be run with EPMacro using the -{}-epmacro option.
+
+Each option has a short form (a single-character preceded by a single
+dash, e.g., \textquotedbl -h\textquotedbl ) and a long form (a more
+descriptive string of characters preceded by double dashes, e.g.,
+\textquotedbl -{}-help\textquotedbl ).
+
+The options generally fall into four categories:
+\begin{itemize}
+\item Basic informational switches: 
+\begin{itemize}
+\item help 
+\item version 
+\end{itemize}
+\item Input/output control flags: 
+\begin{itemize}
+\item idd 
+\item weather 
+\item output-directory 
+\item output-prefix 
+\item output-suffix 
+\end{itemize}
+\item Pre- and post-processing switches: 
+\begin{itemize}
+\item epmacro 
+\item expandobjects 
+\item readvars 
+\end{itemize}
+\item Input override switches: 
+\begin{itemize}
+\item annual 
+\item design-day
+\end{itemize}
+\end{itemize}
+Several of these options are commonly used including the weather,
+output-prefix, expandobjects, and readvars options.
+
+\paragraph*{Examples}
+
+Using a custom IDD file:
+\begin{verbatim*}
+energyplus -i custom.idd -w weather.epw input.idf
+\end{verbatim*}
+Pre-processing using EPMacro and ExpandObjects:
+\begin{verbatim*}
+energyplus -w weather.epw -m -x input.imf
+\end{verbatim*}
+Forcing design-day only simulations:
+\begin{verbatim*}
+energyplus -D input.idf
+\end{verbatim*}
+Giving all output files the prefix being the same as the input file
+(building.idf) and placing them in a directory called output:
+\begin{verbatim*}
+energyplus -w weather -p building -d output building.idf
+\end{verbatim*}
+
+\paragraph*{Legacy Mode}
+
+The command line interface is a new feature as of EnergyPlus 8.3.
+Prior to version 8.3, the EnergyPlus executable took no command line
+arguments, and instead expected the IDD (Input Data Dictionary) file
+and the IDF files to be located in the current working directory and
+named Energy+.idd and in.idf respectively. If a weather file was required
+by the simulation, then an in.epw file was also required in the same
+directory. This behavior is still respected if no arguments are passed
+on the command line.
+
+\subsubsection*{EP-Launch}
 
 For users that want a simple way of selecting files and running EnergyPlus,
 EP-Launch provides this and more. In addition, EP-Launch can help
 open a text editor for the input and output files, open a spreadsheet
 for the postprocessor results files, a web browser for the tabular
 results file, and start up a viewer for the selected drawing file.
+There are two different versions of EP-Launch currently part of the
+EnergyPlus system. 
 
-<Include EP-Launch 3 screen shot and some explanation on how to use
-it>
+The main screen of EP-Launch 2 is shown below:
+
+\includegraphics{eplaunch2}
+
+It is a Windows program only. EP-Launch 2 is included in the EnergyPlus
+installation package when installing on Windows so no additional steps
+are needed to run it. It is located in the main ``root'' folder
+of EnergyPlus, usually a folder named EnergyPlusVx-x-x, where the
+x's are the version number. 
+
+In 2018, EP-Launch 3 was developed and its main screen is shown below:
+
+\includegraphics{eplaunch3}
+
+EP-Launch 3 is not part of the EnergyPlus installation package and
+needs to be installed separately. It is also open source and is available
+from \href{https://github.com/NREL/EP-Launch}{GitHub} and it is documented
+on \href{https://ep-launch.readthedocs.io/en/}{readthedocs} or in
+the docs folder on GitHub. EP-Launch works on Windows, MacOS, and
+Linux systems and is written in Python.
+
+While both EP-Launch 2 and EP-Launch 3 do many of the same functions
+the interface is quite different. For now, EP-Launch 2 allows groups
+of files to be run together and has access to some utilities that
+the newer version does not. EP-Launch works across multiple platforms
+and is a built from the ground up to be flexible and extensible so
+that individuals can make their own workflows that run what ever programs
+they need to run.
 
 \subsection*{IDF and JSON syntax}
 
@@ -596,6 +748,61 @@ is currently being developed independantly and will have many of the
 same features as the IDF Editor when complete.
 
 \subsection*{Run-Check-Edit Repeat}
+
+For most building energy modeling projects, whether assisting in early
+design, refining a design, selecting a control method, or calibrating
+an existing building, the use of EnergyPlus will be part of a repeating
+cycle. The cycle will probably be in the form of:
+\begin{itemize}
+\item Running an EnergyPlus input file
+\item Checking error and other output files
+\item Fixing the input file
+\item Repeat
+\end{itemize}
+Don't expect that an initial model is ever correct, it is probably
+not. Initially, errors are likely to exist. The .ERR file should be
+the first file checked each time EnergyPlus is run. The .ERR file
+has several levels of messages: 
+\begin{itemize}
+\item Warning
+\item Severe
+\item Fatal 
+\end{itemize}
+A fatal error means that EnergyPlus has stopped during the simulation
+and the input file needs to be fixed before the simulation can be
+run to completion. Fatal errors should be the first thing fixed. Some
+Fatal messages reference previous Severe messages so in that case
+those should be fixed. Since the entire simulation was not performed,
+it is likely that once the fatal errors are fixed that new Severe
+and Warning messages will be shown. After all Fatal messages are eliminated
+you should work on Severe messages. They should be fixed also. Finally,
+Warning messages should be reviewed. Often Warning messages are informative
+and point out unusual configurations, conditions, or choices. If what
+is being described by the Warning message is as intended by you, then
+the Warning message can be ignored. More often, the Warning message
+points out something that is not as intended and should be fixed or
+addressed. Since the .ERR file is a text file, you can usually keep
+it open in a text editor program. Many (but not all) text editor programs
+will detect that the .ERR file has been updated after each EnergyPlus
+simulation and let you load the most recent version.
+
+The next files to be examined are ones that show output results from
+the simulation. Either the tabular output file (usually an HTML file
+see Output:Table:SummaryReports and OutputControl:Table:Style) or
+CSV file (see Output:Variable and Output:Meter) should be examined
+depending on what you want to look at. Upon examination of the output
+results, it is very likely that an aspect of the building and its
+systems is not behaving as expected. With an input file representing
+many thousands of assumptions, some assumptions made by you or as
+a default of EnergyPlus is likely to be incorrect. Revising the EnergyPlus
+input file to address this may cause new issues to be shown in the
+.ERR file so it should \emph{always} be examined after each change.
+
+To speed the process of running the simulations, you may want to only
+run a design day (see SizingPeriod:DesignDay) or a subset of the year
+(see RunPeriod). This approach speeds up the simulation time itself
+and if used, please remember to recheck the .ERR file when running
+an annual simulation for the first time.
 
 \subsection*{Common Input Objects}
 

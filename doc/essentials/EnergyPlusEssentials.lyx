@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-December 31, 2018
+January 02, 2019
 \end_layout
 
 \begin_layout Section
@@ -409,7 +409,7 @@ literal "false"
 
 \end_inset
 
- (as of December 2018):
+ (as of January 2019):
 \end_layout
 
 \begin_layout Quotation
@@ -1352,22 +1352,258 @@ t Guide <ADD LINK>.
 \end_layout
 
 \begin_layout Verbatim
-
 energyplus --help 
 \end_layout
 
 \begin_layout Standard
 when in the Energyplus folder.
- More about this can be found in 
-\begin_inset CommandInset href
-LatexCommand href
-name "How to run EnergyPlus from the command line"
-target "https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md"
-literal "false"
+ This will give the following display of options:
+\end_layout
 
-\end_inset
+\begin_layout Verbatim
+EnergyPlus, Version 9.0.1-bb7ca4f0da
+\end_layout
 
-.
+\begin_layout Verbatim
+Usage: energyplus [options] [input-file]
+\end_layout
+
+\begin_layout Verbatim
+Options:
+\end_layout
+
+\begin_layout Verbatim
+  -a, --annual                 Force annual simulation
+\end_layout
+
+\begin_layout Verbatim
+  -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
+ on
+\end_layout
+
+\begin_layout Verbatim
+                               input file type
+\end_layout
+
+\begin_layout Verbatim
+  -d, --output-directory ARG   Output directory path (default: current
+\end_layout
+
+\begin_layout Verbatim
+                               directory)
+\end_layout
+
+\begin_layout Verbatim
+  -D, --design-day             Force design-day-only simulation
+\end_layout
+
+\begin_layout Verbatim
+  -h, --help                   Display help information
+\end_layout
+
+\begin_layout Verbatim
+  -i, --idd ARG                Input data dictionary path (default: Energy+.idd
+\end_layout
+
+\begin_layout Verbatim
+                               in executable directory)
+\end_layout
+
+\begin_layout Verbatim
+  -m, --epmacro                Run EPMacro prior to simulation
+\end_layout
+
+\begin_layout Verbatim
+  -p, --output-prefix ARG      Prefix for output file names (default: eplus)
+\end_layout
+
+\begin_layout Verbatim
+  -r, --readvars               Run ReadVarsESO after simulation
+\end_layout
+
+\begin_layout Verbatim
+  -s, --output-suffix ARG      Suffix style for output file names (default:
+ L)
+\end_layout
+
+\begin_layout Verbatim
+                                  L: Legacy (e.g., eplustbl.csv)
+\end_layout
+
+\begin_layout Verbatim
+                                  C: Capital (e.g., eplusTable.csv)
+\end_layout
+
+\begin_layout Verbatim
+                                  D: Dash (e.g., eplus-table.csv)
+\end_layout
+
+\begin_layout Verbatim
+  -v, --version                Display version information
+\end_layout
+
+\begin_layout Verbatim
+  -w, --weather ARG            Weather file path (default: in.epw in current
+\end_layout
+
+\begin_layout Verbatim
+                               directory)
+\end_layout
+
+\begin_layout Verbatim
+  -x, --expandobjects          Run ExpandObjects prior to simulation
+\end_layout
+
+\begin_layout Verbatim
+Example: energyplus -w weather.epw -r input.idf
+\end_layout
+
+\begin_layout Standard
+EnergyPlus can be run by specifying a number of options followed by the
+ path to the input file.
+ The file itself is usually in IDF (Input Data File) format or epJSON format,
+ but it may also be in IMF (Input Macro File) format to be run with EPMacro
+ using the --epmacro option.
+\end_layout
+
+\begin_layout Standard
+Each option has a short form (a single-character preceded by a single dash,
+ e.g., "-h") and a long form (a more descriptive string of characters preceded
+ by double dashes, e.g., "--help").
+\end_layout
+
+\begin_layout Standard
+The options generally fall into four categories:
+\end_layout
+
+\begin_layout Itemize
+Basic informational switches: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+help 
+\end_layout
+
+\begin_layout Itemize
+version 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Input/output control flags: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+idd 
+\end_layout
+
+\begin_layout Itemize
+weather 
+\end_layout
+
+\begin_layout Itemize
+output-directory 
+\end_layout
+
+\begin_layout Itemize
+output-prefix 
+\end_layout
+
+\begin_layout Itemize
+output-suffix 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Pre- and post-processing switches: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+epmacro 
+\end_layout
+
+\begin_layout Itemize
+expandobjects 
+\end_layout
+
+\begin_layout Itemize
+readvars 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Input override switches: 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+annual 
+\end_layout
+
+\begin_layout Itemize
+design-day
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Several of these options are commonly used including the weather, output-prefix,
+ expandobjects, and readvars options.
+\end_layout
+
+\begin_layout Paragraph*
+Examples
+\end_layout
+
+\begin_layout Standard
+Using a custom IDD file:
+\end_layout
+
+\begin_layout Verbatim*
+energyplus -i custom.idd -w weather.epw input.idf
+\end_layout
+
+\begin_layout Standard
+Pre-processing using EPMacro and ExpandObjects:
+\end_layout
+
+\begin_layout Verbatim*
+energyplus -w weather.epw -m -x input.imf
+\end_layout
+
+\begin_layout Standard
+Forcing design-day only simulations:
+\end_layout
+
+\begin_layout Verbatim*
+energyplus -D input.idf
+\end_layout
+
+\begin_layout Standard
+Giving all output files the prefix being the same as the input file (building.idf
+) and placing them in a directory called output:
+\end_layout
+
+\begin_layout Verbatim*
+energyplus -w weather -p building -d output building.idf
+\end_layout
+
+\begin_layout Paragraph*
+Legacy Mode
+\end_layout
+
+\begin_layout Standard
+The command line interface is a new feature as of EnergyPlus 8.3.
+ Prior to version 8.3, the EnergyPlus executable took no command line arguments,
+ and instead expected the IDD (Input Data Dictionary) file and the IDF files
+ to be located in the current working directory and named Energy+.idd and
+ in.idf respectively.
+ If a weather file was required by the simulation, then an in.epw file was
+ also required in the same directory.
+ This behavior is still respected if no arguments are passed on the command
+ line.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1763,6 +1999,99 @@ literal "false"
 
 \begin_layout Subsection*
 Run-Check-Edit Repeat
+\end_layout
+
+\begin_layout Standard
+For most building energy modeling projects, whether assisting in early design,
+ refining a design, selecting a control method, or calibrating an existing
+ building, the use of EnergyPlus will be part of a repeating cycle.
+ The cycle will probably be in the form of:
+\end_layout
+
+\begin_layout Itemize
+Running an EnergyPlus input file
+\end_layout
+
+\begin_layout Itemize
+Checking error and other output files
+\end_layout
+
+\begin_layout Itemize
+Fixing the input file
+\end_layout
+
+\begin_layout Itemize
+Repeat
+\end_layout
+
+\begin_layout Standard
+Don't expect that an initial model is ever correct, it is probably not.
+ Initially, errors are likely to exist.
+ The .ERR file should be the first file checked each time EnergyPlus is run.
+ The .ERR file has several levels of messages: 
+\end_layout
+
+\begin_layout Itemize
+Warning
+\end_layout
+
+\begin_layout Itemize
+Severe
+\end_layout
+
+\begin_layout Itemize
+Fatal 
+\end_layout
+
+\begin_layout Standard
+A fatal error means that EnergyPlus has stopped during the simulation and
+ the input file needs to be fixed before the simulation can be run to completion.
+ Fatal errors should be the first thing fixed.
+ Some Fatal messages reference previous Severe messages so in that case
+ those should be fixed.
+ Since the entire simulation was not performed, it is likely that once the
+ fatal errors are fixed that new Severe and Warning messages will be shown.
+ After all Fatal messages are eliminated you should work on Severe messages.
+ They should be fixed also.
+ Finally, Warning messages should be reviewed.
+ Often Warning messages are informative and point out unusual configurations,
+ conditions, or choices.
+ If what is being described by the Warning message is as intended by you,
+ then the Warning message can be ignored.
+ More often, the Warning message points out something that is not as intended
+ and should be fixed or addressed.
+ Since the .ERR file is a text file, you can usually keep it open in a text
+ editor program.
+ Many (but not all) text editor programs will detect that the .ERR file has
+ been updated after each EnergyPlus simulation and let you load the most
+ recent version.
+\end_layout
+
+\begin_layout Standard
+The next files to be examined are ones that show output results from the
+ simulation.
+ Either the tabular output file (usually an HTML file see Output:Table:SummaryRe
+ports and OutputControl:Table:Style) or CSV file (see Output:Variable and
+ Output:Meter) should be examined depending on what you want to look at.
+ Upon examination of the output results, it is very likely that an aspect
+ of the building and its systems is not behaving as expected.
+ With an input file representing many thousands of assumptions, some assumptions
+ made by you or as a default of EnergyPlus is likely to be incorrect.
+ Revising the EnergyPlus input file to address this may cause new issues
+ to be shown in the .ERR file so it should 
+\emph on
+always
+\emph default
+ be examined after each change.
+\end_layout
+
+\begin_layout Standard
+To speed the process of running the simulations, you may want to only run
+ a design day (see SizingPeriod:DesignDay) or a subset of the year (see
+ RunPeriod).
+ This approach speeds up the simulation time itself and if used, please
+ remember to recheck the .ERR file when running an annual simulation for
+ the first time.
 \end_layout
 
 \begin_layout Subsection*
