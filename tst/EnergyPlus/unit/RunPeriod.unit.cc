@@ -276,3 +276,159 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 
     EXPECT_TRUE(errors_in_input);
 }
+
+// Test for #6937: this tests that whenever the RunPeriod has a name, it should be used in the error warnings
+TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
+{
+
+    // Case 1: has a name, but mistmatched start day and year
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "RunPeriod,",
+            "  Jan,                     !- Name",
+            "  1,                       !- Begin Month",
+            "  1,                       !- Begin Day of Month",
+            "  2005,                    !- Begin Year",
+            "  12,                      !- End Month",
+            "  31,                      !- End Day of Month",
+            "  ,                        !- End Year",
+            "  Tuesday,                 !- Day of Week for Start Day",
+            "  Yes,                     !- Use Weather File Holidays and Special Days",
+            "  Yes,                     !- Use Weather File Daylight Saving Period",
+            "  No,                      !- Apply Weekend Holiday Rule",
+            "  Yes,                     !- Use Weather File Rain Indicators",
+            "  Yes;                     !- Use Weather File Snow Indicators",
+
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        int totalrps(1);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
+        // This should just issue a warning
+        EXPECT_FALSE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
+
+    // Case 2: doesn't have a name, should default to "RUNPERIOD 1" via InputProcessor, and mistmatched start day and year
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "RunPeriod,",
+            "  ,                        !- Name",
+            "  1,                       !- Begin Month",
+            "  1,                       !- Begin Day of Month",
+            "  2005,                    !- Begin Year",
+            "  12,                      !- End Month",
+            "  31,                      !- End Day of Month",
+            "  ,                        !- End Year",
+            "  Tuesday,                 !- Day of Week for Start Day",
+            "  Yes,                     !- Use Weather File Holidays and Special Days",
+            "  Yes,                     !- Use Weather File Daylight Saving Period",
+            "  No,                      !- Apply Weekend Holiday Rule",
+            "  Yes,                     !- Use Weather File Rain Indicators",
+            "  Yes;                     !- Use Weather File Snow Indicators",
+
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        int totalrps(1);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
+        // This should just issue a warning
+        EXPECT_FALSE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Warning ** RunPeriod: object=RUNPERIOD 1, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
+
+
+    // Case 3: has a name, but starts on 2/29 on a non-leap year.
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "RunPeriod,",
+            "  NotLeap,                 !- Name",
+            "  2,                       !- Begin Month",
+            "  29,                      !- Begin Day of Month",
+            "  2005,                    !- Begin Year",
+            "  12,                      !- End Month",
+            "  31,                      !- End Day of Month",
+            "  ,                        !- End Year",
+            "  Tuesday,                 !- Day of Week for Start Day",
+            "  Yes,                     !- Use Weather File Holidays and Special Days",
+            "  Yes,                     !- Use Weather File Daylight Saving Period",
+            "  No,                      !- Apply Weekend Holiday Rule",
+            "  Yes,                     !- Use Weather File Rain Indicators",
+            "  Yes;                     !- Use Weather File Snow Indicators",
+
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        int totalrps(1);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
+        // This should issue a severe
+        EXPECT_TRUE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
+
+
+}
+
+// Side issue discovered in #6937: The parsing of SizingPeriod:WeatherFileDays and WeatherFileConditionType references RunPeriod array
+// when it hits a warning/severe to create the error message
+// This test should not throw!
+TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
+{
+
+    // Case 1: bad start day/month combination
+    {
+
+        std::string const idf_objects = delimited_string({
+            "Version, 9.0;",
+
+            "SizingPeriod:WeatherFileDays,",
+            "  Weather File Sizing Period,  !- Name",
+            "  4,                       !- Begin Month",
+            "  31,                      !- Begin Day of Month",
+            "  7,                       !- End Month",
+            "  25,                      !- End Day of Month",
+            "  SummerDesignDay,         !- Day of Week for Start Day",
+            "  No,                      !- Use Weather File Daylight Saving Period",
+            "  No;                      !- Use Weather File Rain and Snow Indicators",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool ErrorsFound = false;
+        WeatherManager::GetRunPeriodDesignData(ErrorsFound);
+        // This should just issue a severe
+        EXPECT_TRUE(ErrorsFound);
+
+        std::string const error_string =
+            delimited_string({"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
+
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    }
+}
