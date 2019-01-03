@@ -301,6 +301,7 @@ namespace AirflowNetworkBalanceManager {
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
     Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
+
     // Functions
 
     void clear_state()
@@ -561,11 +562,13 @@ namespace AirflowNetworkBalanceManager {
                 // globalSolverObject.referenceConditions.emplace_back(thisObjectName, temperature, pressure, humidity);
                 referenceConditions.emplace(std::piecewise_construct,
                                             std::forward_as_tuple(thisObjectName),
-                                            std::forward_as_tuple(thisObjectName, temperature, pressure, humidity));
+                                            std::forward_as_tuple(instance.key(), temperature, pressure, humidity));
             }
             // Check that there is more than one
             if (referenceConditions.size() == 1) {
+                inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions", referenceConditions.begin()->second.name);
                 defaultReferenceConditions = referenceConditions.begin()->second;
+
             } else {
                 conditionsAreDefaulted = false;
             }
@@ -585,6 +588,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
@@ -605,6 +609,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidityRatio;
+                            inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions", result->second.name);
                         }
                     }
                 }
@@ -631,6 +636,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_the_zone_exhaust_fan_is_off_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
@@ -678,6 +684,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidityRatio;
+                            inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions", result->second.name);
                         }
                     }
                 }
@@ -716,6 +723,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
@@ -745,6 +753,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidityRatio;
+                            inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions", result->second.name);
                         }
                     }
                 }
@@ -773,6 +782,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
@@ -802,6 +812,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidityRatio;
+                            inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions", result->second.name);
                         }
                     }
                 }
@@ -828,6 +839,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -1090,6 +1102,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -1119,6 +1132,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -1151,6 +1165,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 ela{fields.at("effective_leakage_area")};
                 Real64 cd{1.0};
@@ -1188,6 +1203,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient")};
                 Real64 expnt{0.65};
@@ -1213,6 +1229,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 elr{fields.at("effective_leakage_ratio")};
                 Real64 maxflow{fields.at("maximum_flow_rate")};
@@ -1242,6 +1259,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 L{fields.at("duct_length")};
                 Real64 D{fields.at("hydraulic_diameter")};
@@ -1375,7 +1393,7 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 DisSysCompCVFData(i).Name = fan_name; // Name of duct effective leakage ratio component
-                DisSysCompCVFData(i).Ctrl = 1.0;            // Control ratio
+                DisSysCompCVFData(i).Ctrl = 1.0;      // Control ratio
                 DisSysCompCVFData(i).FanIndex = fanIndex;
                 DisSysCompCVFData(i).FlowRate = flowRate;
                 DisSysCompCVFData(i).FanTypeNum = fanType_Num;
@@ -1396,6 +1414,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string coil_name = fields.at("coil_name");
                 std::string coil_type = fields.at("coil_object_type");
@@ -1403,9 +1422,9 @@ namespace AirflowNetworkBalanceManager {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompCoilData(i).Name = UtilityRoutines::MakeUPPERCase(coil_name); // Name of associated EPlus coil component
-                DisSysCompCoilData(i).EPlusType = coil_type; // coil type
-                DisSysCompCoilData(i).L = L;                 // Air path length
-                DisSysCompCoilData(i).hydraulicDiameter = D; // Air path hydraulic diameter
+                DisSysCompCoilData(i).EPlusType = coil_type;                            // coil type
+                DisSysCompCoilData(i).L = L;                                            // Air path length
+                DisSysCompCoilData(i).hydraulicDiameter = D;                            // Air path hydraulic diameter
                 ++i;
             }
         }
@@ -1421,6 +1440,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string hx_name = fields.at("heatexchanger_name");
                 std::string hx_type = fields.at("heatexchanger_object_type");
@@ -1447,6 +1467,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string tu_name = fields.at("terminal_unit_name");
                 std::string tu_type = fields.at("terminal_unit_object_type");
@@ -1472,6 +1493,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 dp{fields.at("pressure_difference_across_the_component")};
 
