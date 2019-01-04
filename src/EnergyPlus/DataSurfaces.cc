@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1013,7 +1013,7 @@ namespace DataSurfaces {
         Real64 const &caz(CosAzim);
         for (Vertices::size_type i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D((v.x - xRef)*caz + (v.y - yRef)*saz, v.z);
+            v2d[i] = Vertex2D(-(v.x - xRef)*caz + (v.y - yRef)*saz, v.z);
         }
 
         // piecewise linear integration
@@ -1026,6 +1026,12 @@ namespace DataSurfaces {
             maxX = std::max(maxX, v.x);
         }
         Real64 totalWidth = maxX - minX;
+
+        if (totalWidth == 0.0) {
+            // This should never happen, but if it does, print a somewhat meaningful fatal error
+            // (instead of allowing a divide by zero).
+            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        }
 
         Real64 averageHeight = 0.0;
         for (Vertices::size_type i = 0; i < n; ++i) {
