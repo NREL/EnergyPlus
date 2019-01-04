@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,6 +100,7 @@
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
 #include <ReportCoilSelection.hh>
+#include <ResultsSchema.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
@@ -5477,12 +5478,6 @@ namespace OutputReportTabular {
         //   The stat file that is attached may have several formats -- from evolution of the
         //   stat file from the weather converter (or others that produce a similar stat file).
 
-        // METHODOLOGY EMPLOYED:
-        //   na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace OutputReportPredefined;
 
@@ -5491,7 +5486,7 @@ namespace OutputReportTabular {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const degChar("°");
+        static std::string const degChar("Â°");
 
         // LineTypes for reading the stat file
         int const StatisticsLine(1);
@@ -5622,9 +5617,9 @@ namespace OutputReportTabular {
                         coolingDesignlinepassed = true;
                         lineType = coolingConditionsLine;
                     }
-                } else if (has(lineIn, "(standard) heating degree-days (18.3°C baseline)")) {
+                } else if (has(lineIn, "(standard) heating degree-days (18.3Â°C baseline)")) {
                     lineType = stdHDDLine;
-                } else if (has(lineIn, "(standard) cooling degree-days (10°C baseline)")) {
+                } else if (has(lineIn, "(standard) cooling degree-days (10Â°C baseline)")) {
                     lineType = stdCDDLine;
 
                 } else if (has(lineIn, "Maximum Dry Bulb")) {
@@ -5635,15 +5630,15 @@ namespace OutputReportTabular {
                     lineType = maxDewPointLine;
                 } else if (has(lineIn, "Minimum Dew Point")) {
                     lineType = minDewPointLine;
-                } else if (has(lineIn, "(wthr file) heating degree-days (18°C baseline)") || has(lineIn, "heating degree-days (18°C baseline)")) {
+                } else if (has(lineIn, "(wthr file) heating degree-days (18Â°C baseline)") || has(lineIn, "heating degree-days (18Â°C baseline)")) {
                     lineType = wthHDDLine;
-                } else if (has(lineIn, "(wthr file) cooling degree-days (10°C baseline)") || has(lineIn, "cooling degree-days (10°C baseline)")) {
+                } else if (has(lineIn, "(wthr file) cooling degree-days (10Â°C baseline)") || has(lineIn, "cooling degree-days (10Â°C baseline)")) {
                     lineType = wthCDDLine;
                 }
                 // these not part of big if/else because sequential
                 if (lineType == KoppenDes1Line && isKoppen) lineType = KoppenDes2Line;
                 if (lineType == KoppenLine && isKoppen) lineType = KoppenDes1Line;
-                if (has(lineIn, "(Köppen classification)")) lineType = KoppenLine;
+                if (has(lineIn, "(KÃ¶ppen classification)")) lineType = KoppenLine;
                 if (lineType == AshStdDes2Line) lineType = AshStdDes3Line;
                 if (lineType == AshStdDes1Line) lineType = AshStdDes2Line;
                 if (lineType == AshStdLine) lineType = AshStdDes1Line;
@@ -5655,7 +5650,7 @@ namespace OutputReportTabular {
                         PreDefTableEntry(pdchWthrVal, "Reference", lineIn.substr(15));
                     } else if (SELECT_CASE_var == LocationLine) { // Location -- SAN_FRANCISCO CA USA
                         PreDefTableEntry(pdchWthrVal, "Site:Location", lineIn.substr(11));
-                    } else if (SELECT_CASE_var == LatLongLine) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
+                    } else if (SELECT_CASE_var == LatLongLine) { //      {N 37Â° 37'} {W 122Â° 22'} {GMT -8.0 Hours}
                         // find the {}
                         sposlt = index(lineIn, '{');
                         eposlt = index(lineIn, '}');
@@ -5853,15 +5848,20 @@ namespace OutputReportTabular {
                                 }
                             }
                         }
-                    } else if (SELECT_CASE_var == stdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
+                    } else if (SELECT_CASE_var == stdHDDLine) { //  - 1745 annual (standard) heating degree-days (10Â°C baseline)
                         storeASHRAEHDD = lineIn.substr(2, 4);
-                    } else if (SELECT_CASE_var == stdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
+                    } else if (SELECT_CASE_var == stdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3Â°C baseline)
                         storeASHRAECDD = lineIn.substr(2, 4);
-                    } else if (SELECT_CASE_var == maxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
+                    } else if (SELECT_CASE_var == maxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6Â°C on Jul  9
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
@@ -5884,11 +5884,16 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
+                    } else if (SELECT_CASE_var == minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8Â°C on Jan  7
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
@@ -5911,11 +5916,16 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+                    } else if (SELECT_CASE_var == maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6Â°C on Aug  4
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
@@ -5938,11 +5948,16 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == minDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+                    } else if (SELECT_CASE_var == minDewPointLine) { //   - Minimum Dew Point temperature of -28.9Â°C on Dec 31
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
-                        eposlt -= 2;
+                        auto deg_index = index(lineIn, degChar);
+                        if (deg_index != std::string::npos) {
+                            eposlt = deg_index - 1;
+                        } else {
+                            eposlt -= 2;
+                        }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
@@ -5965,89 +5980,89 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
+                    } else if (SELECT_CASE_var == wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10Â°C baseline)
                         if (storeASHRAEHDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
-                                curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+                                curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65Â°(C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(
                                     pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", storeASHRAEHDD);
                             }
                         } else {
                             if (unitsStyle == unitsStyleInchPound) {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65Â°F)", "not found");
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", "not found");
                             }
                         }
                         if (unitsStyle == unitsStyleInchPound) {
-                            curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+                            curNameWithSIUnits = "Weather File Heating Degree-Days - base 65Â°(C)";
                             LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(
                                 pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                             PreDefTableEntry(
                                 pdchLeedGenData, "Heating Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
-                            PreDefTableEntry(pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
+                            PreDefTableEntry(pdchWthrVal, "Weather File Heating Degree-Days (base 18Â°C)", lineIn.substr(2, 4));
                             PreDefTableEntry(pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
                         }
                         PreDefTableEntry(pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
-                    } else if (SELECT_CASE_var == wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+                    } else if (SELECT_CASE_var == wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18Â°C baseline)
                         if (storeASHRAECDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
-                                curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+                                curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50Â°(C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(
                                     pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAECDD)), 1));
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", storeASHRAECDD);
                             }
                         } else {
                             if (unitsStyle == unitsStyleInchPound) {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50Â°F)", "not found");
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
+                                PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", "not found");
                             }
                         }
                         if (unitsStyle == unitsStyleInchPound) {
-                            curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+                            curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50Â°(C)";
                             LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(
                                 pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                             PreDefTableEntry(
                                 pdchLeedGenData, "Cooling Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
-                            PreDefTableEntry(pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
+                            PreDefTableEntry(pdchWthrVal, "Weather File Cooling Degree-Days (base 10Â°C)", lineIn.substr(2, 4));
                             PreDefTableEntry(pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
                         }
-                    } else if (SELECT_CASE_var == KoppenLine) { // - Climate type "BSk" (Köppen classification)
+                    } else if (SELECT_CASE_var == KoppenLine) { // - Climate type "BSk" (KÃ¶ppen classification)
                         if (!has(lineIn, "not shown")) {
                             isKoppen = true;
                             if (lineIn[18] == '"') { // two character classification
-                                PreDefTableEntry(pdchWthrVal, "Köppen Classification", lineIn.substr(16, 2));
+                                PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr(16, 2));
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Köppen Classification", lineIn.substr(16, 3));
+                                PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr(16, 3));
                             }
                         } else {
                             isKoppen = false;
-                            PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                            PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr(2));
                         }
-                    } else if (SELECT_CASE_var == KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
+                    } else if (SELECT_CASE_var == KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25Â°)
                         if (isKoppen) {
-                            PreDefTableEntry(pdchWthrVal, "Köppen Description", lineIn.substr(2));
+                            PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Description", lineIn.substr(2));
                         }
                     } else if (SELECT_CASE_var == KoppenDes2Line) { // - Unbearably humid periods in summer, but passive cooling is possible
                         if (isKoppen) {
                             if (len(lineIn) > 3) {                 // avoid blank lines
                                 if (lineIn.substr(2, 2) != "**") { // avoid line with warning
-                                    PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                                    PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr(2));
                                 } else {
-                                    PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", "");
+                                    PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Recommendation", "");
                                 }
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", "");
+                                PreDefTableEntry(pdchWthrVal, "KÃ¶ppen Recommendation", "");
                             }
                         }
                     } else if ((SELECT_CASE_var == AshStdLine) || (SELECT_CASE_var == AshStdDes1Line) || (SELECT_CASE_var == AshStdDes2Line) ||
@@ -6976,6 +6991,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
+                }
             } // jTables
         }     // iInput
     }
@@ -7175,6 +7194,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
+                }
                 // create statistics table
                 rowHeadStat(1) = "Minimum";
                 rowHeadStat(2) = "Mean minus two standard deviations";
@@ -7217,6 +7240,10 @@ namespace OutputReportTabular {
                 WriteTable(tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
             }
@@ -7686,6 +7713,11 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                 }
+
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
+                }
             }
 
             //---- Source and Site Energy Sub-Table
@@ -7835,6 +7867,12 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Site to Source Energy Conversion Factors");
                 }
+
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
+                        "Site to Source Energy Conversion Factors");
+                }
             }
 
             //---- Building Area Sub-Table
@@ -7876,6 +7914,11 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
+                }
+
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
                 }
             }
 
@@ -8098,6 +8141,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
+                }
             }
 
             //---- End Uses By Subcategory Sub-Table
@@ -8227,6 +8274,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
+                }
             }
 
             // EAp2-4/5. Performance Rating Method Compliance
@@ -8353,6 +8404,11 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Conditioned Floor Area");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
+                        "Utility Use Per Conditioned Floor Area");
+                }
             }
             //---- Normalized by Total Area Sub-Table
             tableBody = "";
@@ -8374,6 +8430,11 @@ namespace OutputReportTabular {
                                                            "AnnualBuildingUtilityPerformanceSummary",
                                                            "Entire Facility",
                                                            "Utility Use Per Total Floor Area");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility", "Utility Use Per Total Floor Area");
                 }
             }
 
@@ -8455,6 +8516,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
+                }
             }
 
             //---- On-Site Thermal Sources Sub-Table
@@ -8526,6 +8591,10 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
                 }
             }
 
@@ -8618,6 +8687,10 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
+                }
             }
 
             //---- Comfort and Setpoint Not Met Sub-Table
@@ -8653,6 +8726,11 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility", "Setpoint Not Met Criteria");
+                }
             }
 
             rowHead.allocate(3);
@@ -8687,6 +8765,11 @@ namespace OutputReportTabular {
                                                            "AnnualBuildingUtilityPerformanceSummary",
                                                            "Entire Facility",
                                                            "Comfort and Setpoint Not Met Summary");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
+                        "Comfort and Setpoint Not Met Summary");
                 }
             }
 
@@ -8918,6 +9001,11 @@ namespace OutputReportTabular {
                                                        "Entire Facility",
                                                        "Source Energy End Use Components Summary");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                                                                                        "Source Energy End Use Components Summary");
+            }
 
             //---- Normalized by Conditioned Area Sub-Table
 
@@ -8967,6 +9055,11 @@ namespace OutputReportTabular {
                                                        "Entire Facility",
                                                        "Source Energy End Use Component Per Conditioned Floor Area");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                                                                                        "Source Energy End Use Component Per Conditioned Floor Area");
+            }
 
             //---- Normalized by Total Area Sub-Table
             tableBody = "";
@@ -8989,6 +9082,11 @@ namespace OutputReportTabular {
                                                        "SourceEnergyEndUseComponentsSummary",
                                                        "Entire Facility",
                                                        "Source Energy End Use Components Per Total Floor Area");
+            }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                                                                                        "Source Energy End Use Components Per Total Floor Area");
             }
         }
     }
@@ -9343,6 +9441,10 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
+            }
 
             //---- End Uses By Subcategory Sub-Table
             numRows = 0;
@@ -9471,6 +9573,10 @@ namespace OutputReportTabular {
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
+            }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
 
             // EAp2-4/5. Performance Rating Method Compliance
@@ -9710,6 +9816,10 @@ namespace OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
+        }
 
         NumRows = NumLineItems + 1; // body will have the total and line items
         NumCols = 6;                // Line no., Line name, Qty, Units, ValperQty, Subtotal
@@ -9761,6 +9871,10 @@ namespace OutputReportTabular {
         WriteTable(tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(
+                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+        }
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
     }
@@ -10036,6 +10150,10 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
+            }
 
             //---- Window Wall Ratio Sub-Table
             WriteTextLine("ENVELOPE", true);
@@ -10260,6 +10378,10 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
+            }
 
             //---- Conditioned Window Wall Ratio Sub-Table
             rowHead.allocate(5);
@@ -10324,6 +10446,10 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
+            }
 
             //---- Skylight Roof Ratio Sub-Table
             rowHead.allocate(3);
@@ -10353,6 +10479,10 @@ namespace OutputReportTabular {
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
+            }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
             }
 
             //---- Hybrid Model: Internal Thermal Mass Sub-Table
@@ -10605,6 +10735,10 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
             }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+            }
         }
     }
 
@@ -10696,6 +10830,10 @@ namespace OutputReportTabular {
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Adaptive Comfort Report",
+                                                                                        "Entire Facility", "People Summary");
             }
         }
     }
@@ -10908,6 +11046,10 @@ namespace OutputReportTabular {
                         WriteTable(tableBody, rowHead, columnHead, columnWidth, false, subTable(jSubTable).footnote);
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
+                        }
+                        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
                     }
@@ -11129,6 +11271,11 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField);
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Component Sizing Summary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField,
+                        "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                }
             }
         }
     }
@@ -11266,6 +11413,11 @@ namespace OutputReportTabular {
                                                                "Entire Facility",
                                                                "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
+                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility",
+                            "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
+                    }
                 } else if (iKindRec == recKindSubsurface) {
                     WriteSubtitle("Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     if (sqlite) {
@@ -11275,6 +11427,11 @@ namespace OutputReportTabular {
                                                                "SurfaceShadowingSummary",
                                                                "Entire Facility",
                                                                "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
+                    }
+                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility",
+                            "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
                 }
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -13529,6 +13686,10 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
+                                                                                            zoneAirLoopFacilityName, peakLoadCompName);
+                }
 
                 //---- Peak Conditions
 
@@ -13607,6 +13768,10 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
+                                                                                            zoneAirLoopFacilityName, peakCondName);
+                }
 
                 //---- Engineering Checks
 
@@ -13656,6 +13821,10 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
+                                                                                            zoneAirLoopFacilityName, engineeringCheckName);
+                }
 
                 // write the list of zone for the AirLoop level report
                 if (kind == airLoopOutput && curCompLoad.zoneIndices.allocated()) {
@@ -13686,6 +13855,10 @@ namespace OutputReportTabular {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                    }
+                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
+                                                                                                zoneAirLoopFacilityName, zonesIncludedName);
                     }
                 }
             }
@@ -13968,6 +14141,7 @@ namespace OutputReportTabular {
         colLabelMulti = blank; // set array to blank
         numColLabelRows = 0;   // default value
         maxNumColLabelRows = 0;
+
         for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
             std::ostream &tbl_stream(*TabularOutputFile(iStyle));
             curDel = del(iStyle);
@@ -14011,6 +14185,7 @@ namespace OutputReportTabular {
                     }
                 }
             }
+
             // output depending on style of format
             auto const style(TableStyle(iStyle));
             if ((style == tableStyleComma) || (style == tableStyleTab)) {
@@ -15355,7 +15530,7 @@ namespace OutputReportTabular {
         UnitConvSize = 117;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
-        UnitConv(2).siName = "°C";
+        UnitConv(2).siName = "Â°C";
         UnitConv(3).siName = "0=OFF 1=ON";
         UnitConv(4).siName = "0-NO  1-YES";
         UnitConv(5).siName = "1-YES 0-NO";

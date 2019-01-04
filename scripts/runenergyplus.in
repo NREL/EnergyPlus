@@ -1,12 +1,12 @@
 #!/bin/bash
 #====================================================================
 # Runs EnergyPlus
-# This script is intended to duplicate the RunEPlus / EPL-Run PC 
+# This script is intended to duplicate the RunEPlus / EPL-Run PC
 # batch files with some Linux/Unix flavoring.
 #
-# On Mac OS X systems this script will look for the optional environment 
+# On Mac OS X systems this script will look for the optional environment
 # variable ENERGYPLUS_DIR in order to locate the EnergyPlus installation.
-# 
+#
 # Weather files are searched in the paths (in this order)
 #   $ENERGYPLUS_WEATHER
 #   $ENERGYPLUS_DIR/weatherdata
@@ -64,7 +64,7 @@ if [ -n "$ENERGYPLUS_DIR" ]; then
   auto_eplus_dir=false
 fi
 
-# Set the ENERGYPLUS_DIR 
+# Set the ENERGYPLUS_DIR
 if $auto_eplus_dir; then
   SetEnergyPlusDir
 fi
@@ -263,6 +263,35 @@ rm -f  eplusout.log
 rm -f  eplusout.svg
 rm -f  eplusout.shd
 rm -f  eplusout.wrl
+
+rm -f  eplusout.json
+rm -f  eplusout_detailed_zone.json
+rm -f  eplusout_detailed_HVAC.json
+rm -f  eplusout_timestep.json
+rm -f  eplusout_hourly.json
+rm -f  eplusout_daily.json
+rm -f  eplusout_yearly.json
+rm -f  eplusout_monthly.json
+rm -f  eplusout_runperiod.json
+rm -f  eplusout.cbor
+rm -f  eplusout_detailed_zone.cbor
+rm -f  eplusout_detailed_HVAC.cbor
+rm -f  eplusout_timestep.cbor
+rm -f  eplusout_hourly.cbor
+rm -f  eplusout_daily.cbor
+rm -f  eplusout_yearly.cbor
+rm -f  eplusout_monthly.cbor
+rm -f  eplusout_runperiod.cbor
+rm -f  eplusout.msgpack
+rm -f  eplusout_detailed_zone.msgpack
+rm -f  eplusout_detailed_HVAC.msgpack
+rm -f  eplusout_timestep.msgpack
+rm -f  eplusout_hourly.msgpack
+rm -f  eplusout_daily.msgpack
+rm -f  eplusout_yearly.msgpack
+rm -f  eplusout_monthly.msgpack
+rm -f  eplusout_runperiod.msgpack
+
 rm -f  eplusoutscreen.csv
 rm -f  eplusout.delightin
 rm -f  eplusout.delightout
@@ -279,7 +308,6 @@ rm -f  eplusmtr.inp
 rm -f  expanded.idf
 rm -f  expandedidf.err
 rm -f  readvars.audit
-
 rm -f  eplusout.sql
 rm -f  sqlite.err
 
@@ -329,6 +357,35 @@ rm -f "${OUT_P}/${ARG1}DElight.eldmp"
 rm -f "${OUT_P}/${ARG1}.svg"
 rm -f "${OUT_P}/${ARG1}.shd"
 rm -f "${OUT_P}/${ARG1}.wrl"
+
+rm -f "${OUT_P}/${ARG1}.json"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.json"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.json"
+rm -f "${OUT_P}/${ARG1}_timestep.json"
+rm -f "${OUT_P}/${ARG1}_hourly.json"
+rm -f "${OUT_P}/${ARG1}_daily.json"
+rm -f "${OUT_P}/${ARG1}_yearly.json"
+rm -f "${OUT_P}/${ARG1}_monthly.json"
+rm -f "${OUT_P}/${ARG1}_runperiod.json"
+rm -f "${OUT_P}/${ARG1}.cbor"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.cbor"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.cbor"
+rm -f "${OUT_P}/${ARG1}_timestep.cbor"
+rm -f "${OUT_P}/${ARG1}_hourly.cbor"
+rm -f "${OUT_P}/${ARG1}_daily.cbor"
+rm -f "${OUT_P}/${ARG1}_yearly.cbor"
+rm -f "${OUT_P}/${ARG1}_monthly.cbor"
+rm -f "${OUT_P}/${ARG1}_runperiod.cbor"
+rm -f "${OUT_P}/${ARG1}.msgpack"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.msgpack"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.msgpack"
+rm -f "${OUT_P}/${ARG1}_timestep.msgpack"
+rm -f "${OUT_P}/${ARG1}_hourly.msgpack"
+rm -f "${OUT_P}/${ARG1}_daily.msgpack"
+rm -f "${OUT_P}/${ARG1}_yearly.msgpack"
+rm -f "${OUT_P}/${ARG1}_monthly.msgpack"
+rm -f "${OUT_P}/${ARG1}_runperiod.msgpack"
+
 rm -f "${OUT_P}/${ARG1}Screen.csv"
 rm -f "${OUT_P}/${ARG1}SPARK.log"
 rm -f "${OUT_P}/${ARG1}.expidf"
@@ -476,7 +533,7 @@ if [ -f in.idf ]; then
     echo
     echo "$HEADER"
     echo "   Input file  : ${ARG1}.expidf"
-  else 
+  else
     echo
     echo "$HEADER"
     echo "   Input file  : ${ARG1}.idf"
@@ -639,6 +696,89 @@ fi
 if [ -f eplusscreen.csv ]; then
   mv eplusscreen.csv "${OUT_P}/${ARG1}Screen.csv"
 fi
+
+if [ -f eplusout.json ]; then
+  mv eplusout.json "${OUT_P}/${ARG1}.json"
+fi
+if [ -f eplusout_detailed_zone.json ]; then
+  mv eplusout_detailed_zone.json "${OUT_P}/${ARG1}_detailed_zone.json"
+fi
+if [ -f eplusout_detailed_HVAC.json ]; then
+  mv eplusout_detailed_HVAC.json "${OUT_P}/${ARG1}_detailed_HVAC.json"
+fi
+if [ -f eplusout_timestep.json ]; then
+  mv eplusout_timestep.json "${OUT_P}/${ARG1}_timestep.json"
+fi
+if [ -f eplusout_hourly.json ]; then
+  mv eplusout_hourly.json "${OUT_P}/${ARG1}_hourly.json"
+fi
+if [ -f eplusout_daily.json ]; then
+  mv eplusout_daily.json "${OUT_P}/${ARG1}_daily.json"
+fi
+if [ -f eplusout_yearly.json ]; then
+  mv eplusout_yearly.json "${OUT_P}/${ARG1}_yearly.json"
+fi
+if [ -f eplusout_monthly.json ]; then
+  mv eplusout_monthly.json "${OUT_P}/${ARG1}_monthly.json"
+fi
+if [ -f eplusout_runperiod.json ]; then
+  mv eplusout_runperiod.json "${OUT_P}/${ARG1}_runperiod.json"
+fi
+if [ -f eplusout.cbor ]; then
+  mv eplusout.cbor "${OUT_P}/${ARG1}.cbor"
+fi
+if [ -f eplusout_detailed_zone.cbor ]; then
+  mv eplusout_detailed_zone.cbor "${OUT_P}/${ARG1}_detailed_zone.cbor"
+fi
+if [ -f eplusout_detailed_HVAC.cbor ]; then
+  mv eplusout_detailed_HVAC.cbor "${OUT_P}/${ARG1}_detailed_HVAC.cbor"
+fi
+if [ -f eplusout_timestep.cbor ]; then
+  mv eplusout_timestep.cbor "${OUT_P}/${ARG1}_timestep.cbor"
+fi
+if [ -f eplusout_hourly.cbor ]; then
+  mv eplusout_hourly.cbor "${OUT_P}/${ARG1}_hourly.cbor"
+fi
+if [ -f eplusout_daily.cbor ]; then
+  mv eplusout_daily.cbor "${OUT_P}/${ARG1}_daily.cbor"
+fi
+if [ -f eplusout_yearly.cbor ]; then
+  mv eplusout_yearly.cbor "${OUT_P}/${ARG1}_yearly.cbor"
+fi
+if [ -f eplusout_monthly.cbor ]; then
+  mv eplusout_monthly.cbor "${OUT_P}/${ARG1}_monthly.cbor"
+fi
+if [ -f eplusout_runperiod.cbor ]; then
+  mv eplusout_runperiod.cbor "${OUT_P}/${ARG1}_runperiod.cbor"
+fi
+if [ -f eplusout.msgpack ]; then
+  mv eplusout.msgpack "${OUT_P}/${ARG1}.msgpack"
+fi
+if [ -f eplusout_detailed_zone.msgpack ]; then
+  mv eplusout_detailed_zone.msgpack "${OUT_P}/${ARG1}_detailed_zone.msgpack"
+fi
+if [ -f eplusout_detailed_HVAC.msgpack ]; then
+  mv eplusout_detailed_HVAC.msgpack "${OUT_P}/${ARG1}_detailed_HVAC.msgpack"
+fi
+if [ -f eplusout_timestep.msgpack ]; then
+  mv eplusout_timestep.msgpack "${OUT_P}/${ARG1}_timestep.msgpack"
+fi
+if [ -f eplusout_hourly.msgpack ]; then
+  mv eplusout_hourly.msgpack "${OUT_P}/${ARG1}_hourly.msgpack"
+fi
+if [ -f eplusout_daily.msgpack ]; then
+  mv eplusout_daily.msgpack "${OUT_P}/${ARG1}_daily.msgpack"
+fi
+if [ -f eplusout_yearly.msgpack ]; then
+  mv eplusout_yearly.msgpack "${OUT_P}/${ARG1}_yearly.msgpack"
+fi
+if [ -f eplusout_monthly.msgpack ]; then
+  mv eplusout_monthly.msgpack "${OUT_P}/${ARG1}_monthly.msgpack"
+fi
+if [ -f eplusout_runperiod.msgpack ]; then
+  mv eplusout_runperiod.msgpack "${OUT_P}/${ARG1}_runperiod.msgpack"
+fi
+
 if [ -f eplusmtr.csv ]; then
   mv eplusmtr.csv "${OUT_P}/${ARG1}Meter.csv"
 fi
@@ -705,9 +845,9 @@ fi
 
 # move FMU generated output files to output folder -- FMI
 #if [ "$OSFMU" != "Darwin" ]; then
-#  if [ -f *.mat ]; then 
-#    mv *.mat "${OUT_P}/${ARG1}.mat" 
-#  fi 
+#  if [ -f *.mat ]; then
+#    mv *.mat "${OUT_P}/${ARG1}.mat"
+#  fi
 #fi
 
 # Delete additional files
