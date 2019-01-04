@@ -1,5 +1,5 @@
-Multiple/Partial HVAC Control
-=============================
+Multiple/Partial HVAC Control, now with user specified fractions!
+=================================================================
 
 **Noel Merket, NREL**
 
