@@ -46,10 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataAirflowNetwork.hh>
+
 #include <DataPrecisionGlobals.hh>
 
-#include "Properties.hh"
+#include "AirflowNetwork/Elements.hpp"
+#include "AirflowNetwork/Properties.hpp"
 
 #include "DataAirLoop.hh"
 #include "DataHVACGlobals.hh"
@@ -1780,7 +1781,7 @@ namespace AirflowNetwork {
 
     int EffectiveLeakageArea::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                         Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                        int const i,                // Linkage number
+                                        int const EP_UNUSED(i),     // Linkage number
                                         const AirProperties &propN, // Node 1 properties
                                         const AirProperties &propM, // Node 2 properties
                                         std::array<Real64, 2> &F,   // Airflow through the component [kg/s]

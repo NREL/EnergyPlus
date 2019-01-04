@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
-#include "Properties.hh"
+#include "AirflowNetwork/Properties.hpp"
 
 namespace EnergyPlus {
 

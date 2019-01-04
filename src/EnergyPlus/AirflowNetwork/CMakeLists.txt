@@ -14,14 +14,14 @@ project(AirflowNetwork)
 #  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 #endif()
 
-set( HDRS include/AirflowNetworkSolver.hh
-          include/DataAirflowNetwork.hh
-          include/Properties.hh
+set( HDRS include/AirflowNetwork/Solver.hpp
+          include/AirflowNetwork/Elements.hpp
+          include/AirflowNetwork/Properties.hpp
 )
 
-set( SRCS src/AirflowNetworkSolver.cc
-          src/DataAirflowNetwork.cc
-          src/Properties.cc
+set( SRCS src/Solver.cpp
+          src/Elements.cpp
+          src/Properties.cpp
 )
 
 #include_directories( include )

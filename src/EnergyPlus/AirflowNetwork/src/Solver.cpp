@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,11 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkSolver.hh>
+#include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Elements.hpp"
+
 #include <CommandLineInterface.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>

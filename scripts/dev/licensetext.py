@@ -2,6 +2,10 @@ import datetime
 import json
 import glob
 #
+# The previous year that is in the license. It should be a string
+#
+_previous_year = '2018'
+#
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
 # This is the license text EXACTLY as agreed upon with LBL IPO, so don't
@@ -66,10 +70,10 @@ _original = """// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of 
 """
 
 def previous():
-    '''Return the previous license text, last changed January 3, 2018.'''
+    '''Return the previous license text, last changed January 2, 2019.'''
     # Modify the year in the text
     originalYear = '2015'
-    currentYear = '2017'
+    currentYear = _previous_year
     txt = _original.replace(originalYear, currentYear)
     # Modify and delete some lines with LBL IP permission
     # Keep in mind that the line numbering here starts with 0
@@ -205,7 +209,21 @@ class Checker(CodeChecker):
         self.message = message
     def filecheck(self, filepath):
         fp = open(filepath,'r')
-        txt = fp.read()
+        try:
+            txt = fp.read()
+        except UnicodeDecodeError as exc:
+            try:
+                fp.close()
+                fp = open(filepath,'r',encoding='utf8')
+                txt = fp.read()
+            except:
+                self.message({'tool':self.toolname,
+                              'filename':filepath,
+                              'line':0,
+                              'messagetype':'error',
+                              'message':'UnicodeDecodeError: '+ str(exc)})
+                fp.close()
+                return
         fp.close()
         n = txt.count(self.text)
         if n == 0:
@@ -235,9 +253,20 @@ class Replacer(CodeChecker):
         self.newtxt = newtext
         self.dryrun = dryrun
         self.replaced = 0
+        self.failures = []
     def filecheck(self,filepath):
         fp = open(filepath,'r')
-        txt = fp.read()
+        try:
+            txt = fp.read()
+        except UnicodeDecodeError as exc:
+            message = filepath + ', UnicodeDecodeError: '+ str(exc)
+            try:
+                fp.close()
+                fp = open(filepath,'r',encoding='utf8')
+                txt = fp.read()
+            except:
+                self.failures.append(message)
+                return
         fp.close()
         if self.dryrun:
             if self.oldtxt in txt:
@@ -255,6 +284,10 @@ class Replacer(CodeChecker):
             txt.append('Would have replaced text in %d files' % self.replaced)
         else:
             txt.append('Replaced text in %d files' % self.replaced)
+        if len(self.failures):
+            txt.append('Failures in %d files' % len(self.failures))
+            for message in self.failures:
+                txt.append('\t' + message)
         return '\n'.join(txt)
 
 if __name__ == '__main__':
