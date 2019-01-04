@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,6 +212,7 @@
 #include <InputProcessing/InputValidation.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -309,6 +310,10 @@ int RunEnergyPlus(std::string const & filepath)
 #endif
 
     CreateCurrentDateTimeString(CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+
     VerString += "," + CurrentDateTime;
 
     get_environment_variable(DDOnlyEnvVar, cEnvValue);
@@ -450,6 +455,8 @@ int RunEnergyPlus(std::string const & filepath)
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+
+        ResultsFramework::OutputSchema->setupOutputOptions();
 
         ManageSimulation();
 
