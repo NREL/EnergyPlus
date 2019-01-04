@@ -1330,6 +1330,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string fan_name = UtilityRoutines::MakeUPPERCase(fields.at("fan_name"));
                 std::string fan_type = fields.at("supply_fan_object_type");
