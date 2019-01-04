@@ -32,7 +32,7 @@ character(len=*), parameter, dimension(0:8) :: DiffDescription=(/"<unknown>     
   TYPE ObjectStatus
     CHARACTER(len=MaxNameLength) :: Name  = ' '! Object Name
     LOGICAL :: Same                       = .true. ! Definitions are same (true) or different
-    INTEGER :: StatusFlag                 = 0 ! What's different
+    INTEGER :: StatusFlag                 = 0 ! What is different
     INTEGER :: OldIndex                   = 0 ! Where this is in ObjectDef
     INTEGER :: NewIndex                   = 0 ! Where this is in NewObjectDef
     LOGICAL :: UnitsMatched               =.false.
@@ -62,7 +62,9 @@ logical withUnits  ! True if units should be displayed on output lines (by field
 logical LeaveBlank  ! True if blank fields on input should be left blank (no default fill)
 integer auditf  ! auditfile
 real  :: VersionNum=0.0
-CHARACTER(len=3) :: sVersionNum=''
+
+! This one will be either len=3 (release, eg '9.0') or len=5 (iteration, includes patch version, eg '9.0.1')
+CHARACTER(len=5) :: sVersionNum=''
 
 ! Added for compare routines
 
