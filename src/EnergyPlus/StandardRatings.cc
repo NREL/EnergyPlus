@@ -2477,7 +2477,7 @@ namespace StandardRatings {
                 PreDefTableEntry(pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
                 // Btu/W-h will convert to itself
                 PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
-                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RegionNum, 0);
+                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RegionNum);
                 addFootNoteSubTable(pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
@@ -2580,7 +2580,7 @@ namespace StandardRatings {
                         << RoundSigDigits(TotElectricPowerRated(Num + 3), 1) << RoundSigDigits(NetCoolingCapRated(Num + 4), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 4), 1);
                     PreDefTableEntry(pdchDXCoolCoilType, CompNameNew, CompType);
-                    // Note JM 2018-10-25: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
+                    // Note: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
                     // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
                     // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
                     // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
