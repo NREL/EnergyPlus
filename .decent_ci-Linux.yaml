@@ -30,8 +30,8 @@ compilers:
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
-    coverage_pass_limit: 7.20
-    coverage_warn_limit: 7.10
+    coverage_pass_limit: 41.0
+    coverage_warn_limit: 40.0
     coverage_s3_bucket: energyplus
     build_tag: UnitTestsCoverage
     ctest_filter: -E "integration.*"
@@ -46,8 +46,8 @@ compilers:
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
-    coverage_pass_limit: 69.9
-    coverage_warn_limit: 69.0
+    coverage_pass_limit: 72.0
+    coverage_warn_limit: 71.0
     coverage_s3_bucket: energyplus
     build_tag: IntegrationCoverage
     skip_regression: true

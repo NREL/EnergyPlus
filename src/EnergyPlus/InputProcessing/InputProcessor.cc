@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1900,11 +1900,14 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
     } else {
         vnameLen = len_trim(VariableName.substr(0, rbpos));
     }
+
     std::string const VarName(VariableName.substr(0, vnameLen));
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables> data;
+        std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
+                           UtilityRoutines::case_insensitive_hasher,
+                           UtilityRoutines::case_insensitive_comparator> data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));

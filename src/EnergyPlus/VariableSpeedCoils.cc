@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -245,7 +245,9 @@ namespace VariableSpeedCoils {
           RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
           AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
           FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
-          MSHPDesignSpecIndex(0), MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
+          // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
+          MSHPDesignSpecIndex(-1),
+          MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
           MSRatedSHR(MaxSpedLevels, 0.0), MSRatedCOP(MaxSpedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(MaxSpedLevels, 0.0),
           MSRatedAirVolFlowRate(MaxSpedLevels, 0.0), MSRatedAirMassFlowRate(MaxSpedLevels, 0.0),
           MSRatedWaterVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), MSRatedWaterVolFlowRate(MaxSpedLevels, 0.0),
