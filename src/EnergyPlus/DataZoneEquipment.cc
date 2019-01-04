@@ -578,7 +578,6 @@ namespace DataZoneEquipment {
                 ZoneEquipList(ControlledZoneNum).HeatingCapacity = 0;
 
                 IdealLoadsOnEquipmentList = false;
-                int countAirTermsInZone = 0;
 
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 1);
@@ -624,11 +623,13 @@ namespace DataZoneEquipment {
 
                         if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = AirDistUnit_Num;
-                            ++countAirTermsInZone;
+                            // For sequenced loads, must set minimum iterations to highest air terminal equipment number
+                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = ZoneEquipTypeNum;
 
                         } else if (SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = DirectAir_Num;
-                            ++countAirTermsInZone;
+                            // For sequenced loads, must set minimum iterations to highest air terminal equipment number
+                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = ZoneEquipTypeNum;
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
@@ -738,8 +739,6 @@ namespace DataZoneEquipment {
                         }
                     }
                 }
-                // If there are two or more air terminals in a zone, then set minimum iterations to number of air terminals
-                DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(MinAirLoopIterationsAfterFirst, countAirTermsInZone);
 
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     if (count_eq(ZoneEquipList(ControlledZoneNum).CoolingPriority, ZoneEquipTypeNum) > 1) {
