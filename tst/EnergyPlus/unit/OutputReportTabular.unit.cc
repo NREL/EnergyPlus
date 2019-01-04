@@ -208,7 +208,7 @@ TEST(OutputReportTabularTest, unitsFromHeading)
     unitsStyle = unitsStyleInchPound;
 
     unitString = "";
-    EXPECT_EQ(96, unitsFromHeading(unitString));
+    EXPECT_EQ(97, unitsFromHeading(unitString));
     EXPECT_EQ("", unitString);
     unitString = "Zone Floor Area {m2}";
     EXPECT_EQ(46, unitsFromHeading(unitString));
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(95, indexUnitConv);
+    EXPECT_EQ(96, indexUnitConv);
     EXPECT_EQ("Invalid/Undefined", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -336,7 +336,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(96, indexUnitConv);
+    EXPECT_EQ(97, indexUnitConv);
     EXPECT_EQ("", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -413,12 +413,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
 
     varNameWithUnits = "Electric Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(85, indexUnitConv);
+    EXPECT_EQ(86, indexUnitConv);
     EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(94, indexUnitConv);
+    EXPECT_EQ(95, indexUnitConv);
     EXPECT_EQ("Electricty [kWh/m2]", curUnits);
 }
 
