@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1874,7 +1874,7 @@ namespace OutputReportPredefined {
         pdchFanPwrPerFlow = newPreDefColumn(pdstFan, "Rated Power Per Max Air Flow Rate [W-s/m3]");
         pdchFanMotorIn = newPreDefColumn(pdstFan, "Motor Heat In Air Fraction");
         pdchFanEnergyIndex = newPreDefColumn(pdstFan, "Fan Energy Index");
-        pdchFanEndUse = newPreDefColumn(pdstFan, "End Use");
+        pdchFanEndUse = newPreDefColumn(pdstFan, "End Use Subcategory");
         pdchFanDesDay = newPreDefColumn(pdstFan, "Design Day Name for Fan Sizing Peak");
         pdchFanPkTime = newPreDefColumn(pdstFan, "Date/Time for Fan Sizing Peak");
 
