@@ -1,15 +1,29 @@
-Currently the transition program can take idf from one major version 8.x.0 (starting with version 8.2.0, prior to that major versions were 8.x.y) to the current iteration version represented by CMAKE_VERSION_MAJOR.CMAKE_VERSION_MINOR.CMAKE_VERSION_PATCH.  It is not possible to go from a minor version (iteration) to current at this time.  The capability of the transition program is naturally dependent on the transition rules being maintained throughout the iteration cycle.  
+Transition
+-----------
 
-Maintenance of the transition program consists of updating the rules during feature development.  (Rules should come in with feature branches if transition is required) It also requires managing some files at major release events.  Here are the steps as they are known at this time.
+This **Transition** program is written in Fortran and is responsible for handling changes from one IDD version to the next, in order to maintain compatibility as much as possible.
 
-Task List:
+Currently the **Transition** program can take idf from one **major** version (where PATCH=0, eg: '8.x.0') (starting with version 8.2.0, prior to that major versions were 8.x.y)
+to the current iteration version represented by `CMAKE_VERSION_MAJOR.CMAKE_VERSION_MINOR.CMAKE_VERSION_PATCH`.
+To do this it uses CMake to configure the file `CreateNewIDFUsingRules.in.f90` by injecting the last official major version and the current iteration version.
 
-* Append to the VERSIONS list in CMakeLists.txt at the root of the Transition project.
-* Rename CreateNewIDFUsingRulesVX_Y_Z.in.f90 to CreateNewIDFUsingRulesVX_Y_Z.f90 and remove cmake tokens.
-* Rename IDDAssignVX_Y_Z.in.f90 to IDDAssignVX_Y_Z.f90 and remove cmake tokens.
-* Create a new CreateNewIDFUsingRulesVX_Y_Z.in.f90 file that is named according to the next upcoming MAJOR release.
-* Create a new IDDAssignVX_Y_Z.in.f90 file that is named according to the next upcoming MAJOR release.
-* Move EnergyPlusBuildSupport / release / Report Variables X1.Y1.Z1 to X2.Y2.Z2.csv to EnergyPlusBuildSupport / bin / IDFVersionUpdater / ReportVars, where the version represents the major releases.
-* Create a new ReportVariables...csv files named according to the upcoming major release and prevous major release.  Place new file in EnergyPlusBuildSupport / release.
-* Update install commands for previous major version IDD as well as ReportVariables...csv located in EnergyPlusTeam / CPack.cmake, so that new upcoming major version is reflected.
+It is not possible to go from a minor version (iteration) to current at this time.
+The capability of the transition program is naturally dependent on the transition rules being maintained throughout the iteration cycle.
+
+Maintenance of the **Transition** program consists of updating the rules during feature development.
+Rules should come in with feature branches if transition is required.
+It also requires managing some files at major release events.
+Here are the steps as they are known at this time.
+
+**Task List for a new major release:**
+
+* Append the last major release to the `VERSIONS` list in `src/Transition/CMakeLists.txt`.
+* Copy `CreateNewIDFUsingRules.in.f90` to `CreateNewIDFUsingRulesVX_Y_Z.f90` and remove CMake tokens. You can also go to `build/src/Transition/Transition-VXXXX/` to get the last generated f90 file. You'll need to ensure that in `SetThisVersionVariables` you use only MAJOR and MINOR versions (not PATCH, eg: '9.0', not '9.0.1')
+* Clean out `CreateNewIDFUsingRules.in.f90` by removing out the portions where code is actually added by users and that are labeled as such inside the file.
+* Create a new ReportVariables...csv files named according to the upcoming major release and previous major release.
+
+**TODO:**
+
+* Not sure about naming conventions: should it include the next official version in the name? Should the 'template' in.f90 file be left alone in the repo in that case?
+* Not sure about how to manage the ReportVariables.csv file either
 
