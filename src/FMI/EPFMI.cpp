@@ -170,18 +170,24 @@ unsigned int setupExperiment(double tStart,
       valueGetters[param.valueRef] = std::bind(getZoneFloorArea, _1, param.zoneNum());
     } else if ( param.varName == "mSenFac" ) {
       valueGetters[param.valueRef] = std::bind(getZoneCapacityMult, _1, param.zoneNum());
+    } else {
+      std::cout << "parameter named " << param.varName << " is not valid" << std::endl;
     }
   }
 
   for ( const auto & input : inputs ) {
     if ( input.varName == "T" ) {
       valueSetters[input.valueRef] = std::bind(setZoneTemperature, _1, input.zoneNum());
+    } else {
+      std::cout << "input named " << input.varName << " is not valid" << std::endl;
     }
   }
 
   for ( const auto & output : outputs ) {
     if ( output.varName == "QConSen_flow" ) {
       valueGetters[output.valueRef] = std::bind(getZoneH, _1, output.zoneNum());
+    } else {
+      std::cout << "output named " << output.varName << " is not valid" << std::endl;
     }
   }
 
