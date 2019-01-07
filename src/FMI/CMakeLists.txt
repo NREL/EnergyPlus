@@ -35,11 +35,13 @@ if( BUILD_TESTING )
   target_link_libraries( libfmi_test ${CMAKE_DL_LIBS} )
 endif()
 
-install( TARGETS epfmi
+install( TARGETS epfmi EXPORT energyplus
   RUNTIME DESTINATION ./bin
   LIBRARY DESTINATION ./lib
   ARCHIVE DESTINATION ./lib
 )
 
 install( FILES EPFMI.hpp DESTINATION ./include )
+
+export(TARGETS energyplus)
 
