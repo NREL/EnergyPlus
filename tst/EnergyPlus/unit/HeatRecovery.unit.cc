@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1730,7 +1730,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FRONT-1,                 !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",
@@ -1746,7 +1745,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FRONT-1,                 !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",
@@ -1762,7 +1760,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    RIGHT-1,                 !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",
@@ -1778,7 +1775,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    BACK-1,                  !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",
@@ -1794,7 +1790,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    BACK-1,                  !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",
@@ -1810,7 +1805,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    LEFT-1,                  !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.50000,                 !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    4,                       !- Number of Vertices",

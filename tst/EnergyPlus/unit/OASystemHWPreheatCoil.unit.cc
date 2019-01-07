@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,8 +97,10 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    12,                      !- End Month",
         "    31,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1082,8 +1084,10 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    12,                      !- End Month",
         "    31,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",

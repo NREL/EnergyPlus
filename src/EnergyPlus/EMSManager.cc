@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1563,6 +1563,12 @@ namespace EMSManager {
                                  "[degree]",
                                  Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
+                for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed; ActuatorUsedLoop++) {
+                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") && UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
+                        Node(NodeNum).IsLocalNode = true;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1806,7 +1812,7 @@ namespace EMSManager {
 
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(loopSurfNum).WindowShadingControlPtr == 0) continue;
+            if (!Surface(loopSurfNum).HasShadeControl) continue;
 
             if (SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer) {
                 SetupEMSActuator("Window Shading Control",

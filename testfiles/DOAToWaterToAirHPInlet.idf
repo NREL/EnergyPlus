@@ -218,29 +218,31 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
 
@@ -1455,7 +1457,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1471,7 +1472,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1487,7 +1487,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1503,7 +1502,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1519,7 +1517,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1535,7 +1532,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3279,113 +3275,113 @@
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:System ===========
 
   GroundHeatExchanger:System,
-    Vertical Ground Heat Exchanger, !- Name
-    GHE Inlet Node,           !- Inlet Node Name
-    GHE Outlet Node,          !- Outlet Node Name
-    0.00033000,               !- Design Flow Rate {m3/s}
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Undisturbed Ground Temperature Model Type
-    Vertical Ground Heat Exchanger Ground Temps, !- Undisturbed Ground Temperature Model Name
-    0.692626E+00,             !- Ground Thermal Conductivity {W/m-K}
-    0.234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
-    Vertical Ground Heat Exchanger g-functions; !- Response Factors Object Name
+    Vertical Ground Heat Exchanger,  !- Name
+    GHE Inlet Node,          !- Inlet Node Name
+    GHE Outlet Node,         !- Outlet Node Name
+    0.00033000,              !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    Vertical Ground Heat Exchanger Ground Temps,  !- Undisturbed Ground Temperature Model Name
+    0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
+    0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
+    Vertical Ground Heat Exchanger g-functions;  !- GHE:Vertical:ResponseFactors Object Name
 
   GroundHeatExchanger:Vertical:Properties,
-    Vertical Ground Heat Exchanger Props, !- Name
-    1,                        !- Depth of Top of Borehole {m}
-    76.2,                     !- Bore Hole Length {m}
-    0.127016,                 !- Borehole Diameter {m}
-    0.692626E+00,             !- Grout Thermal Conductivity {W/m-K}
-    3.90E+06,                 !- Grout Thermal Heat Capacity {J/m3-K}
-    0.391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
-    1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
-    2.66667E-02,              !- Pipe Out Diameter {m}
-    2.41285E-03,              !- Pipe Thickness {m}
-    5.1225E-02;               !- U-Tube Distance {m}
+    Vertical Ground Heat Exchanger Props,  !- Name
+    1,                       !- Depth of Top of Borehole {m}
+    76.2,                    !- Borehole Length {m}
+    0.127016,                !- Borehole Diameter {m}
+    0.692626E+00,            !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,                !- Grout Thermal Heat Capacity {J/m3-K}
+    0.391312E+00,            !- Pipe Thermal Conductivity {W/m-K}
+    1.542E+06,               !- Pipe Thermal Heat Capacity {J/m3-K}
+    2.66667E-02,             !- Pipe Outer Diameter {m}
+    2.41285E-03,             !- Pipe Thickness {m}
+    5.1225E-02;              !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
-    Vertical Ground Heat Exchanger Ground Temps, !- Undisturbed Ground Temperature Model Name
-    0.692626E+00,             !- Soil Thermal Conductivity {W/m-K}
-    920,                      !- Soil Density {kg/m3}
-    2551.09,                  !- Soil Specific Heat {J/kg-K}
-    13.375,                   !- Average Soil Surface Temperature {C}
-    3.2,                      !- Average Amplitude of Surface Temperature {deltaC}
-    8;                        !- Phase Shift of Minimum Surface Temperature {days}
+    Vertical Ground Heat Exchanger Ground Temps,  !- Name
+    0.692626E+00,            !- Soil Thermal Conductivity {W/m-K}
+    920,                     !- Soil Density {kg/m3}
+    2551.09,                 !- Soil Specific Heat {J/kg-K}
+    13.375,                  !- Average Soil Surface Temperature {C}
+    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}
+    8;                       !- Phase Shift of Minimum Surface Temperature {days}
 
   GroundHeatExchanger:ResponseFactors,
-    Vertical Ground Heat Exchanger g-functions, !- Name
-    Vertical Ground Heat Exchanger Props, !- Name
-    24,                       !- Number of Bore Holes
-    0.0005,                   !- G-Function Reference Ratio {dimensionless}
-    -15.2996,                 !- G-Function Ln(T/Ts) Value 1
-    -0.348322,                !- G-Function G Value 1
-    -14.201,                  !- G-Function Ln(T/Ts) Value 2
-    0.022208,                 !- G-Function G Value 2
-    -13.2202,                 !- G-Function Ln(T/Ts) Value 3
-    0.412345,                 !- G-Function G Value 3
-    -12.2086,                 !- G-Function Ln(T/Ts) Value 4
-    0.867498,                 !- G-Function G Value 4
-    -11.1888,                 !- G-Function Ln(T/Ts) Value 5
-    1.357839,                 !- G-Function G Value 5
-    -10.1816,                 !- G-Function Ln(T/Ts) Value 6
-    1.852024,                 !- G-Function G Value 6
-    -9.1815,                  !- G-Function Ln(T/Ts) Value 7
-    2.345656,                 !- G-Function G Value 7
-    -8.6809,                  !- G-Function Ln(T/Ts) Value 8
-    2.593958,                 !- G-Function G Value 8
-    -8.5,                     !- G-Function Ln(T/Ts) Value 9
-    2.679,                    !- G-Function G Value 9
-    -7.8,                     !- G-Function Ln(T/Ts) Value 10
-    3.023,                    !- G-Function G Value 10
-    -7.2,                     !- G-Function Ln(T/Ts) Value 11
-    3.32,                     !- G-Function G Value 11
-    -6.5,                     !- G-Function Ln(T/Ts) Value 12
-    3.681,                    !- G-Function G Value 12
-    -5.9,                     !- G-Function Ln(T/Ts) Value 13
-    4.071,                    !- G-Function G Value 13
-    -5.2,                     !- G-Function Ln(T/Ts) Value 14
-    4.828,                    !- G-Function G Value 14
-    -4.5,                     !- G-Function Ln(T/Ts) Value 15
-    6.253,                    !- G-Function G Value 15
-    -3.963,                   !- G-Function Ln(T/Ts) Value 16
-    7.894,                    !- G-Function G Value 16
-    -3.27,                    !- G-Function Ln(T/Ts) Value 17
-    11.82,                    !- G-Function G Value 17
-    -2.864,                   !- G-Function Ln(T/Ts) Value 18
-    15.117,                   !- G-Function G Value 18
-    -2.577,                   !- G-Function Ln(T/Ts) Value 19
-    18.006,                   !- G-Function G Value 19
-    -2.171,                   !- G-Function Ln(T/Ts) Value 20
-    22.887,                   !- G-Function G Value 20
-    -1.884,                   !- G-Function Ln(T/Ts) Value 21
-    26.924,                   !- G-Function G Value 21
-    -1.191,                   !- G-Function Ln(T/Ts) Value 22
-    38.004,                   !- G-Function G Value 22
-    -0.497,                   !- G-Function Ln(T/Ts) Value 23
-    49.919,                   !- G-Function G Value 23
-    -0.274,                   !- G-Function Ln(T/Ts) Value 24
-    53.407,                   !- G-Function G Value 24
-    -0.051,                   !- G-Function Ln(T/Ts) Value 25
-    56.632,                   !- G-Function G Value 25
-    0.196,                    !- G-Function Ln(T/Ts) Value 26
-    59.825,                   !- G-Function G Value 26
-    0.419,                    !- G-Function Ln(T/Ts) Value 27
-    62.349,                   !- G-Function G Value 27
-    0.642,                    !- G-Function Ln(T/Ts) Value 28
-    64.524,                   !- G-Function G Value 28
-    0.873,                    !- G-Function Ln(T/Ts) Value 29
-    66.412,                   !- G-Function G Value 29
-    1.112,                    !- G-Function Ln(T/Ts) Value 30
-    67.993,                   !- G-Function G Value 30
-    1.335,                    !- G-Function Ln(T/Ts) Value 31
-    69.162,                   !- G-Function G Value 31
-    1.679,                    !- G-Function Ln(T/Ts) Value 32
-    70.476,                   !- G-Function G Value 32
-    2.028,                    !- G-Function Ln(T/Ts) Value 33
-    71.361,                   !- G-Function G Value 33
-    2.275,                    !- G-Function Ln(T/Ts) Value 34
-    71.79,                    !- G-Function G Value 34
-    3.003,                    !- G-Function Ln(T/Ts) Value 35
-    72.511;                   !- G-Function G Value 35
+    Vertical Ground Heat Exchanger g-functions,  !- Name
+    Vertical Ground Heat Exchanger Props,  !- GHE:Vertical:Properties Object Name
+    24,                      !- Number of Boreholes
+    0.0005,                  !- G-Function Reference Ratio {dimensionless}
+    -15.2996,                !- g-Function Ln(T/Ts) Value 1
+    -0.348322,               !- g-Function g Value 1
+    -14.201,                 !- g-Function Ln(T/Ts) Value 2
+    0.022208,                !- g-Function g Value 2
+    -13.2202,                !- g-Function Ln(T/Ts) Value 3
+    0.412345,                !- g-Function g Value 3
+    -12.2086,                !- g-Function Ln(T/Ts) Value 4
+    0.867498,                !- g-Function g Value 4
+    -11.1888,                !- g-Function Ln(T/Ts) Value 5
+    1.357839,                !- g-Function g Value 5
+    -10.1816,                !- g-Function Ln(T/Ts) Value 6
+    1.852024,                !- g-Function g Value 6
+    -9.1815,                 !- g-Function Ln(T/Ts) Value 7
+    2.345656,                !- g-Function g Value 7
+    -8.6809,                 !- g-Function Ln(T/Ts) Value 8
+    2.593958,                !- g-Function g Value 8
+    -8.5,                    !- g-Function Ln(T/Ts) Value 9
+    2.679,                   !- g-Function g Value 9
+    -7.8,                    !- g-Function Ln(T/Ts) Value 10
+    3.023,                   !- g-Function g Value 10
+    -7.2,                    !- g-Function Ln(T/Ts) Value 11
+    3.32,                    !- g-Function g Value 11
+    -6.5,                    !- g-Function Ln(T/Ts) Value 12
+    3.681,                   !- g-Function g Value 12
+    -5.9,                    !- g-Function Ln(T/Ts) Value 13
+    4.071,                   !- g-Function g Value 13
+    -5.2,                    !- g-Function Ln(T/Ts) Value 14
+    4.828,                   !- g-Function g Value 14
+    -4.5,                    !- g-Function Ln(T/Ts) Value 15
+    6.253,                   !- g-Function g Value 15
+    -3.963,                  !- g-Function Ln(T/Ts) Value 16
+    7.894,                   !- g-Function g Value 16
+    -3.27,                   !- g-Function Ln(T/Ts) Value 17
+    11.82,                   !- g-Function g Value 17
+    -2.864,                  !- g-Function Ln(T/Ts) Value 18
+    15.117,                  !- g-Function g Value 18
+    -2.577,                  !- g-Function Ln(T/Ts) Value 19
+    18.006,                  !- g-Function g Value 19
+    -2.171,                  !- g-Function Ln(T/Ts) Value 20
+    22.887,                  !- g-Function g Value 20
+    -1.884,                  !- g-Function Ln(T/Ts) Value 21
+    26.924,                  !- g-Function g Value 21
+    -1.191,                  !- g-Function Ln(T/Ts) Value 22
+    38.004,                  !- g-Function g Value 22
+    -0.497,                  !- g-Function Ln(T/Ts) Value 23
+    49.919,                  !- g-Function g Value 23
+    -0.274,                  !- g-Function Ln(T/Ts) Value 24
+    53.407,                  !- g-Function g Value 24
+    -0.051,                  !- g-Function Ln(T/Ts) Value 25
+    56.632,                  !- g-Function g Value 25
+    0.196,                   !- g-Function Ln(T/Ts) Value 26
+    59.825,                  !- g-Function g Value 26
+    0.419,                   !- g-Function Ln(T/Ts) Value 27
+    62.349,                  !- g-Function g Value 27
+    0.642,                   !- g-Function Ln(T/Ts) Value 28
+    64.524,                  !- g-Function g Value 28
+    0.873,                   !- g-Function Ln(T/Ts) Value 29
+    66.412,                  !- g-Function g Value 29
+    1.112,                   !- g-Function Ln(T/Ts) Value 30
+    67.993,                  !- g-Function g Value 30
+    1.335,                   !- g-Function Ln(T/Ts) Value 31
+    69.162,                  !- g-Function g Value 31
+    1.679,                   !- g-Function Ln(T/Ts) Value 32
+    70.476,                  !- g-Function g Value 32
+    2.028,                   !- g-Function Ln(T/Ts) Value 33
+    71.361,                  !- g-Function g Value 33
+    2.275,                   !- g-Function Ln(T/Ts) Value 34
+    71.79,                   !- g-Function g Value 34
+    3.003,                   !- g-Function Ln(T/Ts) Value 35
+    72.511;                  !- g-Function g Value 35
 
 !-   ===========  ALL OBJECTS IN CLASS: CONDENSERLOOP ===========
 

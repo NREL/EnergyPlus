@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -205,6 +205,8 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> AdapComfortCoolingSetPoint;
     extern Array1D<Real64> ZoneThermostatSetPointHi;
     extern Array1D<Real64> ZoneThermostatSetPointLo;
+    extern Array1D<Real64> ZoneThermostatSetPointHiAver;
+    extern Array1D<Real64> ZoneThermostatSetPointLoAver;
 
     extern Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
 

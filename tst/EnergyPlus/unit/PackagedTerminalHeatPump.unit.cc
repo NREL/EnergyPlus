@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -437,6 +438,11 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // Note JM 2018-11-08: Test for #7053:
+    // Fake that there is at least one UnitarySystemPerformance:Multispeed object
+    UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
+    UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);
+
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData();
@@ -537,13 +543,13 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
     Real64 expectedAirFlowRate = refAirflowRatio * PTUnit(1).MaxCoolAirVolFlow;
-    EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).CoolVolumeFlowRate(4), 0.00001);
-    EXPECT_NEAR(expectedAirFlowRate, 3.9343830134190632, 0.00001);
+    EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).CoolVolumeFlowRate(4), 0.00000001);
+    EXPECT_NEAR(expectedAirFlowRate, 3.939704195, 0.00000001);
 
     refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference heating data and full flow rate at speed 9
     expectedAirFlowRate = refAirflowRatio * PTUnit(1).MaxHeatAirVolFlow;
     EXPECT_NEAR(expectedAirFlowRate, PTUnit(1).HeatVolumeFlowRate(4), 0.00001);
-    EXPECT_NEAR(expectedAirFlowRate, 3.0302392264439715, 0.00001);
+    EXPECT_NEAR(expectedAirFlowRate, 3.034337569, 0.00000001);
 
     // #6028 child components not sizing correctly on air flow rate
     // VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and

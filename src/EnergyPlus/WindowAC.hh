@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -145,6 +145,7 @@ namespace WindowAC {
         int AvailStatus;
         int ZonePtr;         // pointer to a zone served by a Window AC unit
         int HVACSizingIndex; // index of a HVACSizing object for a Window AC unit
+        bool FirstPass;      // detects first time through for resetting sizing data
 
         // Default Constructor
         WindACData()
@@ -153,7 +154,8 @@ namespace WindowAC {
               FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0), OpMode(0), FanPlace(0), MaxIterIndex1(0),
               MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
-              ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), AvailStatus(0), ZonePtr(0), HVACSizingIndex(0)
+              ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), AvailStatus(0), ZonePtr(0), HVACSizingIndex(0),
+              FirstPass(true)
         {
         }
     };

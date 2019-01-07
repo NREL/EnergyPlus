@@ -29,7 +29,7 @@ EPA categorizes pollutants as either Criteria Pollutants or Hazardous Pollutants
 The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases.~ This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas.~ This equivalent is based on a factor of 1.0 for carbon.~ This group of gases includes carbon dioxide (CO\(_{2}\)), carbon monoxide, nitrous oxide, methane, halocarbon emission, hydrofluorocarbons (HFC), perfluorocarbons (PFC), and chlorofluorocarbons (CFC).~ For building energy use, the main gases of concern are carbon dioxide, carbon monoxide, methane, and nitrous oxide.~ Although carbon monoxide has a relatively short life, CO emissions into the atmosphere may have a significant impact on climate forcing due to chemical impact on CH\(_{4}\) lifetime, and tropospheric O\(_{3}\) and CO\(_{2}\) photochemical production normally reacts to produce carbon dioxide, but it can't be ignored since it is produced in incomplete combustion and the carbon remains to interact as CO\(_{2}\) Yet there is no agreement on its carbon equivalent (IPCC 2001). The carbon equivalent of carbon dioxide, methane, and nitrous oxide are calculated and then multiplied by their GWP on a 100 year time frame.~ The Carbon Equivalents of the following gases have been determined and used in the program are shown in the following table.
 
 % table 93
-\begin{longtable}[c]{@{}ll@{}}
+\begin{longtable}[c]{@{}lc@{}}
 \caption{Carbon Equivalents (IPCC 2001) \label{table:carbon-equivalents-ipcc-2001}} \tabularnewline
 \toprule 
 Gas & Carbon Equivalent \tabularnewline
@@ -42,9 +42,9 @@ Gas & Carbon Equivalent \tabularnewline
 \midrule
 \endhead
 
-NO & 80.7272 \tabularnewline
-CH & 6.2727 \tabularnewline
-CO & 0.2727 \tabularnewline
+NO\(_x\) & 80.7272 \tabularnewline
+CH\(_4\) & 6.2727 \tabularnewline
+CO\(_2\) & 0.2727 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -58,69 +58,82 @@ Emission factors for on-site fossil fuel consumption are based on Section 1.4 Na
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
 \caption{Emission Factors for Natural Gas \label{table:emission-factors-for-natural-gas}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+Pollutant & Emission Factor\(^a\)  ~~ (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for Natural Gas} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+Pollutant & Emission Factor\(^a\)  ~~ (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 50.23439 \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 50.23439 \tabularnewline
 Carbon Monoxide (CO) & 3.51641E-02 \tabularnewline
-Methane (CH  ) & 9.62826E-04 \tabularnewline
-Nitrogen Oxides (NO  ) & 4.18620E-02 \tabularnewline
-Nitrous Oxide (N  O) & 9.20964E-04 \tabularnewline
-Sulphur Dioxide (SO  ) & 2.51172E-04 \tabularnewline
-Particulate Matter (PM) & 3.18151E-03 \tabularnewline
-Particulate Matter (PM10) & 2.38613E-03 \tabularnewline
-Particulate Matter (PM2.5) & 7.95378E-04 \tabularnewline
-Ammonia (NH  ) & 0 \tabularnewline
+Methane (CH\(_4\)) & 9.62826E-04 \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 4.18620E-02 \tabularnewline
+Nitrous Oxide (N\(_2\)O)\(^b\) & 9.20964E-04 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^c\) & 2.51172E-04 \tabularnewline
+Particulate Matter (PM)\(^d\) & 3.18151E-03 \tabularnewline
+Particulate Matter (PM10)\(^d\) & 2.38613E-03 \tabularnewline
+Particulate Matter (PM2.5)\(^d\) & 7.95378E-04 \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^e\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 2.30241E-03 \tabularnewline
 Mercury (Hg) & 1.08841E-07 \tabularnewline
 Lead (Pb) & 2.09310E-07 \tabularnewline
-a Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4~ in EPA (1998a), Natural gas heat value of 1027 Btu/ft3 based on data for 2003 in Table A-4 in DOE (2004) \tabularnewline
-b Values shown are for uncontrolled burner.~ For controlled-low NO   burner, use 0.64 lb/106 ft3, 0.000627 lb/MMBtu, 0.0002679 g/MJ \tabularnewline
-c Based on 100\% conversion of fuel sulfur to SO  . Assumes sulfur content is natural gas of 2,000 grains/106 ft3. The SO2 emission factor can be converted to other natural gas sulfur contents by multiplying the SO   emission factor by the ratio of the site-specific sulfur content (grains/106 ft3) to 2,000 grains/106 ft3. \tabularnewline
-d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively. \tabularnewline
-e No data \tabularnewline
+\midrule
+\multicolumn{2}{l}{a: Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4~ in EPA (1998a),} \tabularnewline
+\multicolumn{2}{l}{Natural gas heat value of 1027 Btu/ft\(^3\) based on data for 2003 in} \tabularnewline
+\multicolumn{2}{l}{Table A-4 in DOE (2004).} \tabularnewline
+\multicolumn{2}{l}{b: Values shown are for uncontrolled burner.~ For controlled-low NO } \tabularnewline
+\multicolumn{2}{l}{burner, use 0.64 lb/106 ft\(^\)3, 0.000627 lb/MMBtu, 0.0002679 g/MJ.} \tabularnewline
+\multicolumn{2}{l}{c: Based on 100\% conversion of fuel sulfur to SO. Assumes sulfur content} \tabularnewline
+\multicolumn{2}{l}{is natural gas of 2,000 grains/106 ft\(^3\). The SO\(_2\) emission factor} \tabularnewline
+\multicolumn{2}{l}{can be converted to other natural gas sulfur contents by multiplying the} \tabularnewline
+\multicolumn{2}{l}{SO emission factor by the ratio of the site-specific sulfur content} \tabularnewline
+\multicolumn{2}{l}{(grains/106 ft\(^3\)) to 2,000 grains/106 ft\(^3\).} \tabularnewline
+\multicolumn{2}{l}{d: PM is the sum of all particulate matter including PM10 and PM2.5. PM10} \tabularnewline
+\multicolumn{2}{l}{and PM2.5 stand for particles smaller than 10 and 2.5 microns,} \tabularnewline
+\multicolumn{2}{l}{respectively.} \tabularnewline
+\multicolumn{2}{l}{e: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
 % table 95
-\begin{longtable}[c]{p{4.5in}p{1.5in}}
+\begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil) \label{table:emission-factors-for-residual-fuel-oil-no.-4}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor    (g/MJ) \tabularnewline
+Pollutant & No. 4 Fuel Oil Emission Factor\(^2\)   (g/MJ) & No. 6 Fuel Oil Emission Factor\(^2\)   (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil)} \tabularnewline
+\caption[]{Emission Factors for Distillates (No. 4 and No. 6 Fuel Oil)} \tabularnewline
 \toprule 
-Pollutant & Emission Factor    (g/MJ) \tabularnewline
+Pollutant & No. 4 Fuel Oil Emission Factor\(^2\)   (g/MJ) & No. 6 Fuel Oil Emission Factor\(^2\)   (g/MJ) \tabularnewline
 \midrule
 \endhead
-
-Carbon Dioxide (CO 2 ) & 50.23439 \tabularnewline
-Carbon Monoxide (CO) & 3.52E-002 \tabularnewline
-Methane (CH 4 ) & 9.63E-004 \tabularnewline
-Nitrogen Oxides (NO X ) & 4.19E-002 \tabularnewline
-Nitrous Oxide (N 2 O) & 9.21E-004 \tabularnewline
-Sulphur Dioxide (SO 2 ) & 2.51E-004 \tabularnewline
-Particulate Matter (PM) & 3.18E-003 \tabularnewline
-Particulate Matter (PM10) & 2.39E-003 \tabularnewline
-Particulate Matter (PM2.5) & 7.95E-004 \tabularnewline
-Ammonia (NH 3 ) & 0 \tabularnewline
-Volatile Organic Compounds (NMVOC) & 2.30E-003 \tabularnewline
-Mercury (Hg) & 1.09E-007 \tabularnewline
-Lead (Pb) & 2.09E-007 \tabularnewline
-Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4 in EPA (1998a), Natural gas heat value of 1027 Btu/ft3 based on data for 2003 in Table A-4 in DOE (2004) \tabularnewline
-Values shown are for uncontrolled burner. For controlled-low NOX burner, use 0.64 lb/106 ft3, 0.000627 lb/MMBtu, 0.0002679 g/MJ \tabularnewline
-Based on 100\% conversion of fuel sulfur to SO2. Assumes sulfur content is natural gas of 2,000 contents by multiplying the SO2 emission factor by the ratio of the site-specific sulfur content (grains/106 ft3) to 2,000 grains/106 ft3. grains/106 ft3. The SO2 emission factor can be converted to other natural gas sulfur \tabularnewline
-PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively. \tabularnewline
-No data. \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 76.77128 & 76.77128 \tabularnewline
+Carbon Monoxide (CO) & 1.53543E-02 & 1.53543E-02 \tabularnewline
+Methane (CH\(_4\)) & 1.45865E-03 & 6.63304E-04 \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 1.68897E-01 & 6.14170E-02 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 3.37794E-04 & 3.37794E-04 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^b\) & 4.82124E-01 & 4.60628E-01 \tabularnewline
+Particulate Matter (PM)\(^c\) & 2.56109E-02 & 2.14960E-02 \tabularnewline
+Particulate Matter (PM10)\(^c\) & 1.58763E-02 & 1.58763E-02 \tabularnewline
+Particulate Matter (PM2.5)\(^c\) & 5.89603E-03 & 5.89603E-03 \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^d\) & 0\(^d\) \tabularnewline
+Volatile Organic Compounds (NMVOC) & 3.47006E-03 & 1.04409E-03 \tabularnewline
+Mercury (Hg) & 3.47006E-06 & 3.47006E-06 \tabularnewline
+Lead (Pb) & 4.63699E-06 & 4.63699E-06 \tabularnewline
+\midrule
+\multicolumn{3}{l}{a: Based on data from Tables 1.3-1, 1.3-3, 1-3.8, 1.3-10 and 1.3-12 in EPA (1998b).} \tabularnewline
+\multicolumn{3}{l}{b: Based on 100\% conversion of fuel sulfur to SO\(_2\). Assumes 1\%} \tabularnewline
+\multicolumn{3}{l}{sulfur content. The SO\(_2\) emission factor in this table can be} \tabularnewline
+\multicolumn{3}{l}{converted to other natural gas sulfur contents by multiplying the} \tabularnewline
+\multicolumn{3}{l}{SO\(_2\) emission factor by percentage sulfur content.} \tabularnewline
+\multicolumn{3}{l}{c: PM is the sum of all particulate matter including PM10 and PM2.5. PM10} \tabularnewline
+\multicolumn{3}{l}{and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.} \tabularnewline
+\multicolumn{3}{l}{d: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -128,33 +141,38 @@ No data. \tabularnewline
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil) \label{table:emission-factors-for-distillates-no.-1}} \tabularnewline
 \toprule 
-Pollutant & No. 1 Fuel Oil Emission Factor   (g/MJ) & No. 2 Fuel Oil Emission Factor   (g/MJ) \tabularnewline
+Pollutant & No. 1 Fuel Oil Emission Factor\(^a\)   (g/MJ) & No. 2 Fuel Oil Emission Factor\(^a\)   (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil)} \tabularnewline
 \toprule 
-Pollutant & No. 1 Fuel Oil Emission Factor   (g/MJ) & No. 2 Fuel Oil Emission Factor   (g/MJ) \tabularnewline
+Pollutant & No. 1 Fuel Oil Emission Factor\(^a\)   (g/MJ) & No. 2 Fuel Oil Emission Factor\(^a\)   (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 66.0233 & 68.47998 \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 66.0233 & 68.47998 \tabularnewline
 Carbon Monoxide (CO) & 1.54E-002 & 1.54E-002 \tabularnewline
-Methane (CH  ) & 6.63E-004 & 6.63E-004 \tabularnewline
-Nitrogen Oxides (NO  ) & 6.14E-002 & 7.37E-002 \tabularnewline
-Nitrous Oxide (N  O) & 3.38E-004 & 3.38E-004 \tabularnewline
-Sulphur Dioxide (SO  ) & 4.36E-001 & 4.82E-001 \tabularnewline
-Particulate Matter (PM) & 6.14E-003 & 6.14E-003 \tabularnewline
-Particulate Matter (PM10) & 3.32E-003 & 3.32E-003 \tabularnewline
-Particulate Matter (PM2.5) & 2.55E-003 & 2.55E-003 \tabularnewline
-Ammonia (NH  ) & 0 & 0 \tabularnewline
+Methane (CH\(_4\)) & 6.63E-004 & 6.63E-004 \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 6.14E-002 & 7.37E-002 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 3.38E-004 & 3.38E-004 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^b\) & 4.36E-001 & 4.82E-001 \tabularnewline
+Particulate Matter (PM)\(^c\) & 6.14E-003 & 6.14E-003 \tabularnewline
+Particulate Matter (PM10)\(^c\) & 3.32E-003 & 3.32E-003 \tabularnewline
+Particulate Matter (PM2.5)\(^c\) & 2.55E-003 & 2.55E-003 \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^d\) & 0\(^d\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 1.04E-003 & 1.04E-003 \tabularnewline
 Mercury (Hg) & 3.47E-006 & 3.47E-006 \tabularnewline
 Lead (Pb) & 4.64E-006 & 4.64E-006 \tabularnewline
-a Based on data from Tables 1.3-1, 1.3-3, 1-3.8, 1.3-10 and 1.3-12 in EPA (1998b). &  &  \tabularnewline
-b Based on 100\% conversion of fuel sulfur to SO  . Assumes 1\% sulfur content. The SO   emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO   emission factor by percentage sulfur content. &  &  \tabularnewline
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively &  &  \tabularnewline
-d No data. &  &  \tabularnewline
+\midrule
+\multicolumn{3}{l}{a: Based on data from Tables 1.3-1, 1.3-3, 1-3.8, 1.3-10 and 1.3-12 in EPA (1998b).} \tabularnewline
+\multicolumn{3}{l}{b: Based on 100\% conversion of fuel sulfur to SO\(_2\). Assumes 1\% sulfur content.} \tabularnewline
+\multicolumn{3}{l}{The SO\(_2\) emission factor in this table can be converted to other natural} \tabularnewline
+\multicolumn{3}{l}{gas sulfur contents by multiplying the SO\(_2\) emission factor by percentage} \tabularnewline
+\multicolumn{3}{l}{sulfur content.} \tabularnewline
+\multicolumn{3}{l}{c: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5} \tabularnewline
+\multicolumn{3}{l}{stand for particles smaller than 10 and 2.5 microns, respectively.} \tabularnewline
+\multicolumn{3}{l}{d: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -162,33 +180,38 @@ d No data. &  &  \tabularnewline
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
 \caption{Emission Factors for Residential Oil Furnace \label{table:emission-factors-for-residential-oil-furnace}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+Pollutant & Emission Factor\(^a\)  ~~ (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for Residential Oil Furnace} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+Pollutant & Emission Factor\(^a\)  ~~ (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 68.48237 \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 68.48237 \tabularnewline
 Carbon Monoxide (CO) & 1.53543E-02 \tabularnewline
-Methane (CH  ) & 5.46612E-02 \tabularnewline
-Nitrogen Oxides (NO  ) & 5.52753E-02 \tabularnewline
-Nitrous Oxide (N  O) & 1.53543E-04 \tabularnewline
-Sulphur Dioxide (SO  ) & 4.36061E-01 \tabularnewline
-Particulate Matter (PM) & 2.14960E-02 \tabularnewline
-Particulate Matter (PM10) & 1.58763E-02 \tabularnewline
-Particulate Matter (PM2.5) & 5.89603E-03 \tabularnewline
-Ammonia (NH  ) & 0 \tabularnewline
+Methane (CH\(_4\)) & 5.46612E-02 \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 5.52753E-02 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 1.53543E-04 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^b\) & 4.36061E-01 \tabularnewline
+Particulate Matter (PM)\(^c\) & 2.14960E-02 \tabularnewline
+Particulate Matter (PM10)\(^c\) & 1.58763E-02 \tabularnewline
+Particulate Matter (PM2.5)\(^c\) & 5.89603E-03 \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^d\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 2.18952E-03 \tabularnewline
 Mercury (Hg) & 3.47006E-06 \tabularnewline
 Lead (Pb) & 4.63699E-06 \tabularnewline
-a Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b). \tabularnewline
-b Based on 100\% conversion of fuel sulfur to SO  . Assumes 1\% sulfur content. The SO   emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO   emission factor by percentage sulfur content. \tabularnewline
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively. \tabularnewline
-d No data. \tabularnewline
+\midrule
+\multicolumn{2}{l}{a: Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b).} \tabularnewline
+\multicolumn{2}{l}{b: Based on 100\% conversion of fuel sulfur to SO\(_2\). Assumes 1\% sulfur content.} \tabularnewline
+\multicolumn{2}{l}{The SO\(_2\) emission factor in this table can be converted to other natural} \tabularnewline
+\multicolumn{2}{l}{gas sulfur contents by multiplying the SO\(_2\) emission factor by percentage} \tabularnewline
+\multicolumn{2}{l}{sulfur content.} \tabularnewline
+\multicolumn{2}{l}{c: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5} \tabularnewline
+\multicolumn{2}{l}{stand for particles smaller than 10 and 2.5 microns, respectively.} \tabularnewline
+\multicolumn{2}{l}{d: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -196,33 +219,39 @@ d No data. \tabularnewline
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Emission Factors for LPG (butane and propane) \label{table:emission-factors-for-lpg-butane-and-propane}} \tabularnewline
 \toprule 
-Pollutant & LPG (butane) Emission Factor    (g/MJ) & Propane Emission Factor    (g/MJ) \tabularnewline
+Pollutant & LPG (butane) Emission Factor\(^a\)    (g/MJ) & Propane Emission Factor\(^a\)    (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for LPG (butane and propane)} \tabularnewline
 \toprule 
-Pollutant & LPG (butane) Emission Factor    (g/MJ) & Propane Emission Factor    (g/MJ) \tabularnewline
+Pollutant & LPG (butane) Emission Factor\(^a\)    (g/MJ) & Propane Emission Factor\(^a\)    (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 66.0233 & 68.47998 \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 66.0233 & 68.47998 \tabularnewline
 Carbon Monoxide (CO) & 1.54E-002 & 1.54E-002 \tabularnewline
-Methane (CH  ) & 6.63E-004 & 6.63E-004 \tabularnewline
-Nitrogen Oxides (NO  ) & 6.14E-002 & 7.37E-002 \tabularnewline
-Nitrous Oxide (N  O) & 3.38E-004 & 3.38E-004 \tabularnewline
-Sulphur Dioxide (SO  ) & 4.36E-001 & 4.82E-001 \tabularnewline
-Particulate Matter (PM) & 6.14E-003 & 6.14E-003 \tabularnewline
-Particulate Matter (PM10) & 3.32E-003 & 3.32E-003 \tabularnewline
-Particulate Matter (PM2.5) & 2.55E-003 & 2.55E-003 \tabularnewline
-Ammonia (NH  ) & 0 & 0 \tabularnewline
+Methane (CH\(_4\)) & 6.63E-004 & 6.63E-004 \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 6.14E-002 & 7.37E-002 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 3.38E-004 & 3.38E-004 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^b\) & 4.36E-001 & 4.82E-001 \tabularnewline
+Particulate Matter (PM)\(^c\) & 6.14E-003 & 6.14E-003 \tabularnewline
+Particulate Matter (PM10)\(^c\) & 3.32E-003 & 3.32E-003 \tabularnewline
+Particulate Matter (PM2.5)\(^c\) & 2.55E-003 & 2.55E-003 \tabularnewline
+Ammonia (NH  ) & 0\(^d\) & 0\(^d\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 1.04E-003 & 1.04E-003 \tabularnewline
 Mercury (Hg) & 3.47E-006 & 3.47E-006 \tabularnewline
 Lead (Pb) & 4.64E-006 & 4.64E-006 \tabularnewline
-a Based on data from Table \# 1.5-1 in EPA (1996); Higher Heating value of 1.02 MMBtu/gal for butane and 0.915 MMBtu/gal for propane based on data in EPA (1996). \tabularnewline
-b Based on 100\% conversion of fuel sulfur to SO  . Assumes sulphur content is 0.18 gr/100 ft3.The SO   emission factor can be converted to other LPG sulphur contents by multiplying the SO   emission factor by the ratio of the site-specific sulphur content gr/100 ft3 to 0.18 gr/100 ft3. \tabularnewline
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns; respectively. \tabularnewline
-d No data. \tabularnewline
+\midrule
+\multicolumn{3}{l}{a: Based on data from Table \# 1.5-1 in EPA (1996); Higher Heating value of 1.02} \tabularnewline
+\multicolumn{3}{l}{MMBtu/gal for butane and 0.915 MMBtu/gal for propane based on data in EPA (1996).} \tabularnewline
+\multicolumn{3}{l}{b: Based on 100\% conversion of fuel sulfur to SO\(_2\). Assumes sulphur content} \tabularnewline
+\multicolumn{3}{l}{is 0.18 gr/100 ft\(^3\).The SO\(_2\) emission factor can be converted to other LPG} \tabularnewline
+\multicolumn{3}{l}{sulphur contents by multiplying the SO\(_2\) emission factor by the ratio of the} \tabularnewline
+\multicolumn{3}{l}{site-specific sulphur content gr/100 ft\(^3\) to 0.18 gr/100 ft\(^3\).} \tabularnewline
+\multicolumn{3}{l}{c: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5} \tabularnewline
+\multicolumn{3}{l}{stand for particles smaller than 10 and 2.5 microns; respectively.} \tabularnewline
+\multicolumn{3}{l}{d: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -230,32 +259,36 @@ d No data. \tabularnewline
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Emission Factors for Gasoline and Diesel \label{table:emission-factors-for-gasoline-and-diesel}} \tabularnewline
 \toprule 
-Pollutant & Gasoline Emission Factor   (g/MJ) & Diesel Emission Factor   (g/MJ) \tabularnewline
+Pollutant & Gasoline Emission Factor\(^a\)   (g/MJ) & Diesel Emission Factor\(^a\)   (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for Gasoline and Diesel} \tabularnewline
 \toprule 
-Pollutant & Gasoline Emission Factor   (g/MJ) & Diesel Emission Factor   (g/MJ) \tabularnewline
+Pollutant & Gasoline Emission Factor\(^a\)   (g/MJ) & Diesel Emission Factor\(^a\)   (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 66.20808 & 70.50731 \tabularnewline
+Carbon Dioxide (C)\(_2\)) & 66.20808 & 70.50731 \tabularnewline
 Carbon Monoxide (CO) & 2.70E+001 & 4.08E-001 \tabularnewline
-Methane (CH  ) & 0 & 0 \tabularnewline
-Nitrogen Oxides (NO  ) & 7.01E-001 & 1.90E+000 \tabularnewline
-Nitrous Oxide (N  O) & 0 & 0 \tabularnewline
-Sulphur Dioxide (SO  ) & 3.61E-002 & 1.25E-001 \tabularnewline
-Particulate Matter (PM) & 0 & 0 \tabularnewline
-Particulate Matter (PM10) & 4.30E-002 & 1.33E-001 \tabularnewline
-Particulate Matter (PM2.5) & 0 & 0 \tabularnewline
-Ammonia (NH  ) & 0 & 0 \tabularnewline
+Methane (CH\(_4\)) & 0\(^c\) & 0\(^c\) \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 7.01E-001 & 1.90E+000 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 0\(^c\) & 0\(^c\) \tabularnewline
+Sulphur Dioxide (SO\(_2\)) & 3.61E-002 & 1.25E-001 \tabularnewline
+Particulate Matter (PM)\(^a\) & 0\(^c\) & 0\(^c\) \tabularnewline
+Particulate Matter (PM10)\(^a\) & 4.30E-002 & 1.33E-001 \tabularnewline
+Particulate Matter (PM2.5)\(^a\) & 0\(^c\) & 0\(^c\) \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^c\) & 0\(^c\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 9.03E-001 & 1.50E-001 \tabularnewline
 Mercury (Hg) & 0 & 0 \tabularnewline
 Lead (Pb) & 0 & 0 \tabularnewline
-a Based on data from Table \# 3.3-1 in EPA (1996); Diesel higher heating value of 19300 Btu/lb and gasoline higher heating value of 20300 Btu/lb based on data in EPA (1996). \tabularnewline
-b PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns; respectively. \tabularnewline
-c No data. \tabularnewline
+\midrule
+\multicolumn{3}{l}{a: Based on data from Table \# 3.3-1 in EPA (1996); Diesel higher heating value of} \tabularnewline
+\multicolumn{3}{l}{19300 Btu/lb and gasoline higher heating value of 20300 Btu/lb based on data in} \tabularnewline
+\multicolumn{3}{l}{EPA (1996).} \tabularnewline
+\multicolumn{3}{l}{b: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5} \tabularnewline
+\multicolumn{3}{l}{stand for particles smaller than 10 and 2.5 microns; respectively.} \tabularnewline
+\multicolumn{3}{l}{c: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -263,35 +296,43 @@ c No data. \tabularnewline
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Emission Factors for Coal \label{table:emission-factors-for-coal}} \tabularnewline
 \toprule 
-Pollutant & Bituminous Emission Factor   (g/MJ) & Anthracite Emission Factor   (g/MJ) & Lignite Emission Factor   (g/MJ) \tabularnewline
+Pollutant & Bituminous Emission Factor\(^a\)   (g/MJ) & Anthracite Emission Factor\(^b\)   (g/MJ) & Lignite Emission Factor\(^c\)   (g/MJ) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Emission Factors for Coal} \tabularnewline
 \toprule 
-Pollutant & Bituminous Emission Factor   (g/MJ) & Anthracite Emission Factor   (g/MJ) & Lignite Emission Factor   (g/MJ) \tabularnewline
+Pollutant & Bituminous Emission Factor\(^a\)   (g/MJ) & Anthracite Emission Factor\(^b\)   (g/MJ) & Lignite Emission Factor\(^c\)   (g/MJ) \tabularnewline
 \midrule
 \endhead
 
-Carbon Dioxide (CO  ) & 91.11052 & 99.26669 & 152.12646 \tabularnewline
+Carbon Dioxide (CO\(_2\)) & 91.11052 & 99.26669 & 152.12646 \tabularnewline
 Carbon Monoxide (CO) & 8.27E-003 & 1.05E-002 & 8.27E-003 \tabularnewline
-Methane (CH  ) & 6.61E-004 & 0 & 0 \tabularnewline
-Nitrogen Oxides (NO  ) & 1.98E-001 & 3.15E-001 & 2.35E-001 \tabularnewline
-Nitrous Oxide (N  O) & 4.96E-004 & 0 & 0 \tabularnewline
-Sulphur Dioxide (SO  ) & 6.28E-001 & 6.82E-001 & 9.92E-001 \tabularnewline
-Particulate Matter (PM) & 1.65E-001 & 1.75E-001 & 2.18E-001 \tabularnewline
-Particulate Matter (PM10) & 3.80E-002 & 4.02E-002 & 7.61E-002 \tabularnewline
-Particulate Matter (PM2.5) & 9.92E-003 & 1.05E-002 & 2.18E-002 \tabularnewline
-Ammonia (NH  ) & 0 & 0 & 0 \tabularnewline
+Methane (CH\(_4\)) & 6.61E-004 & 0\(^f\) & 0\(^f\) \tabularnewline
+Nitrogen Oxides (NO\(_x\)) & 1.98E-001 & 3.15E-001 & 2.35E-001 \tabularnewline
+Nitrous Oxide (N\(_2\)O) & 4.96E-004 & 0\(^f\) & 0\(^f\) \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^d\) & 6.28E-001 & 6.82E-001 & 9.92E-001 \tabularnewline
+Particulate Matter (PM)\(^e\) & 1.65E-001 & 1.75E-001 & 2.18E-001 \tabularnewline
+Particulate Matter (PM10)\(^e\) & 3.80E-002 & 4.02E-002 & 7.61E-002 \tabularnewline
+Particulate Matter (PM2.5)\(^e\) & 9.92E-003 & 1.05E-002 & 2.18E-002 \tabularnewline
+Ammonia (NH\(_3\)) & 0\(^f\) & 0\(^f\) & 0\(^f\) \tabularnewline
 Volatile Organic Compounds (NMVOC) & 9.92E-004 & 2.15E-002 & 1.32E-003 \tabularnewline
 Mercury (Hg) & 6.94E-006 & 2.27E-006 & 2.74E-006 \tabularnewline
 Lead (Pb) & 1.37E-006 & 1.56E-004 & 1.39E-005 \tabularnewline
-a Based on data on pulverized coal from Tables 1.1-3, 1.1-6, 1.1-18, 1.1-19 in EPA (1998a), Coal average higher heating value of 26.0 MMBtu/ton based on EPA (1998a). \tabularnewline
-b Based on data on pulverized coal from Tables 1.2-1, 1.2-2, 1.2-3, 1.2-4, 1.2-7 in EPA (1996), Coal average higher heating value of 24.6 MMBtu/ton based on EPA (1996). \tabularnewline
-c Based on data on pulverized coal from Tables 1.7-1, 1.7-3, 1.7-7, 1.7-14 in EPA (1998b), Coal average higher heating value of 13.0 MMBtu/ton based on EPA (1998b). \tabularnewline
-d Based on 100\% conversion of fuel sulfur to SO  . Assumes 1\% sulfur content. The SO   emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO   emission factor by percentage sulfur content. \tabularnewline
-e PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 are particles smaller than 10 and 2.5 microns, respectively. Expressed in terms of coal ash content, assumes 1\% ash content. Multiply weight \% ash content of coal (as fired) by the value. \tabularnewline
-f No data. \tabularnewline
+\midrule
+\multicolumn{4}{l}{a: Based on data on pulverized coal from Tables 1.1-3, 1.1-6, 1.1-18, 1.1-19 in EPA (1998a),} \tabularnewline
+\multicolumn{4}{l}{Coal average higher heating value of 26.0 MMBtu/ton based on EPA (1998a).} \tabularnewline
+\multicolumn{4}{l}{b: Based on data on pulverized coal from Tables 1.2-1, 1.2-2, 1.2-3, 1.2-4, 1.2-7 in EPA (1996),} \tabularnewline
+\multicolumn{4}{l}{Coal average higher heating value of 24.6 MMBtu/ton based on EPA (1996).} \tabularnewline
+\multicolumn{4}{l}{c: Based on data on pulverized coal from Tables 1.7-1, 1.7-3, 1.7-7, 1.7-14 in EPA (1998b),} \tabularnewline
+\multicolumn{4}{l}{Coal average higher heating value of 13.0 MMBtu/ton based on EPA (1998b).} \tabularnewline
+\multicolumn{4}{l}{d: Based on 100\% conversion of fuel sulfur to SO\(_2\). Assumes 1\% sulfur content. The SO\(_2\)} \tabularnewline
+\multicolumn{4}{l}{emission factor in this table can be converted to other natural gas sulfur contents by multiplying} \tabularnewline
+\multicolumn{4}{l}{the SO\(_2\) emission factor by percentage sulfur content.} \tabularnewline
+\multicolumn{4}{l}{e: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 are} \tabularnewline
+\multicolumn{4}{l}{particles smaller than 10 and 2.5 microns, respectively. Expressed in terms of coal ash content,} \tabularnewline
+\multicolumn{4}{l}{assumes 1\% ash content. Multiply weight \% ash content of coal (as fired) by the value.} \tabularnewline
+\multicolumn{4}{l}{f: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -315,27 +356,29 @@ As mentioned in the introduction to this section, EnergyPlus also calculates wat
 \midrule
 \endhead
 
-Ratio of Heat Input to Electricity Output & 2.253 \tabularnewline
+Ratio of Heat Input to Electricity Output\(^a\) & 2.253 \tabularnewline
 ~ & ~ \tabularnewline \midrule
-Pollutant & Emission Factor~~ (g/MJ) \tabularnewline \midrule
-Carbon Dioxide (CO  ) & 168.333168 \tabularnewline
-Carbon Monoxide (CO) & 4.20616E-02 \tabularnewline
-Methane (CH  ) & 1.39858E-03 \tabularnewline
-Nitrogen Oxides (NO  ) & 4.10753E-01 \tabularnewline
-Nitrous Oxide (N  O) & 2.41916E-03 \tabularnewline
-Sulphur Dioxide (SO  ) & 8.65731E-01 \tabularnewline
-Particulate Matter (PM) & 2.95827E-02 \tabularnewline
-Particulate Matter (PM10) & 1.80450E-02 \tabularnewline
-Particulate Matter (PM2.5) & 1.15377E-02 \tabularnewline
-Ammonia (NH  ) & 1.10837E-03 \tabularnewline
-Volatile Organic Compounds (NMVOC) & 3.72332E-03 \tabularnewline
-Mercury (Hg) & 3.36414E-06 \tabularnewline
-Lead (Pb) & 0 \tabularnewline
-Data based on 1999 data from *eGRID* version 2.01 (EPA 2003a). \tabularnewline
-Data based on 1998-2000 average data in DOE (2002). \tabularnewline
-Data based on tier emissions report for criteria air pollutants in EPA (2003b). \tabularnewline
-PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively. \tabularnewline
-No data. \tabularnewline
+Pollutant & Emission Factor (g/MJ) \tabularnewline \midrule
+Carbon Dioxide (CO\(_2\))\(^b\) & 168.333168 \tabularnewline
+Carbon Monoxide (CO)\(^c\) & 4.20616E-02 \tabularnewline
+Methane (CH\(_4\))\(^b\) & 1.39858E-03 \tabularnewline
+Nitrogen Oxides (NO\(_x\))\(^a\) & 4.10753E-01 \tabularnewline
+Nitrous Oxide (N\(_2\)O)\(^b\) & 2.41916E-03 \tabularnewline
+Sulphur Dioxide (SO\(_2\))\(^a\) & 8.65731E-01 \tabularnewline
+Particulate Matter (PM)\(^{c,d}\) & 2.95827E-02 \tabularnewline
+Particulate Matter (PM10)\(^{c,d}\) & 1.80450E-02 \tabularnewline
+Particulate Matter (PM2.5)\(^{c,d}\) & 1.15377E-02 \tabularnewline
+Ammonia (NH\(_3\))\(^c\) & 1.10837E-03 \tabularnewline
+Volatile Organic Compounds (NMVOC)\(^a\) & 3.72332E-03 \tabularnewline
+Mercury (Hg)\(^c\) & 3.36414E-06 \tabularnewline
+Lead (Pb) & 0\(^e\) \tabularnewline
+\midrule
+\multicolumn{2}{l}{a: Data based on 1999 data from *eGRID* version 2.01 (EPA 2003a).} \tabularnewline
+\multicolumn{2}{l}{b: Data based on 1998-2000 average data in DOE (2002).} \tabularnewline
+\multicolumn{2}{l}{c: Data based on tier emissions report for criteria air pollutants in EPA (2003b).} \tabularnewline
+\multicolumn{2}{l}{d: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and} \tabularnewline
+\multicolumn{2}{l}{PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.} \tabularnewline
+\multicolumn{2}{l}{e: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -343,13 +386,13 @@ No data. \tabularnewline
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ \label{table:u.-s.-state-average-greenhouse-gas-emission}} \tabularnewline
 \toprule 
- & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO 2 ) b & Carbon Monoxide (CO) c & Methane (CH4) b & Nitrogen Oxides (NO X ) a & Nitrous Oxide (N 2 O) b & Sulphur Dioxide (SO 2 ) a \tabularnewline
+ & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO\(_2\))\(^b\) & Carbon Monoxide (CO)\(^c\) & Methane (CH\(_4\))\(^b\) & Nitrogen Oxides (NO\(_x\))\(^a\) & Nitrous Oxide (N\(_2\)O)\(^b\) & Sulphur Dioxide (SO\(_2\))\(^a\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ} \tabularnewline
 \toprule 
- & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO 2 ) b & Carbon Monoxide (CO) c & Methane (CH4) b & Nitrogen Oxides (NO X ) a & Nitrous Oxide (N 2 O) b & Sulphur Dioxide (SO 2 ) a \tabularnewline
+ & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO\(_2\))\(^b\) & Carbon Monoxide (CO)\(^c\) & Methane (CH\(_4\))\(^b\) & Nitrogen Oxides (NO\(_x\))\(^a\) & Nitrous Oxide (N\(_2\)O)\(^b\) & Sulphur Dioxide (SO\(_2\))\(^a\) \tabularnewline
 \midrule
 \endhead
 
@@ -404,11 +447,10 @@ Washington & 0.414 & 30.99548 & 4.30E+002 & 4.66E-004 & 5.30E-002 & 5.04E-004 & 
 West Virginia & 2.917 & 248.97181 & 1.28E+003 & 1.73E-003 & 7.78E-001 & 3.98E-003 & 1.87E+000 \tabularnewline
 Wisconsin & 2.68 & 206.88852 & 1.00E+003 & 1.74E-003 & 4.97E-001 & 3.28E-003 & 9.25E-001 \tabularnewline
 Wyoming & 3.534 & 270.39145 & 9.01E+002 & 1.85E-003 & 5.59E-001 & 4.26E-003 & 5.79E-001 \tabularnewline
-a Data based on 1999 data from eGRID version 2.01 (EPA 2003a). \tabularnewline
-b Data based on 1998-2000 average data in DOE (2002). \tabularnewline
-c Data based on tier emissions report for criteria air pollutants in EPA (2003b). \tabularnewline
-d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively. \tabularnewline
-e No data. \tabularnewline
+\midrule
+\multicolumn{8}{l}{a: Data based on 1999 data from eGRID version 2.01 (EPA 2003a).} \tabularnewline
+\multicolumn{8}{l}{b: Data based on 1998-2000 average data in DOE (2002).} \tabularnewline
+\multicolumn{8}{l}{c: Data based on tier emissions report for criteria air pollutants in EPA (2003b).} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -416,13 +458,13 @@ e No data. \tabularnewline
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ \label{table:u.-s.-state-average-criteria-pollutant}} \tabularnewline
 \toprule 
-~ & Particulate Matter (PM) & Particulate Matter (PM10) & Particulate Matter (PM2.5) & Ammonia (NH  ) & Volatile Organic Compounds (NMVOC) & Mercury (Hg) & Lead (Pb) \tabularnewline
+~ & Particulate Matter (PM)\(^{c,d}\) & Particulate Matter (PM10)\(^{c,d}\) & Particulate Matter (PM2.5)\(^{c,d}\) & Ammonia (NH\(_3\))\(^{c}\) & Volatile Organic Compounds (NMVOC)\(^{a}\) & Mercury (Hg)\(^{c}\) & Lead (Pb)\(^{e}\) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ} \tabularnewline
 \toprule 
-~ & Particulate Matter (PM) & Particulate Matter (PM10) & Particulate Matter (PM2.5) & Ammonia (NH  ) & Volatile Organic Compounds (NMVOC) & Mercury (Hg) & Lead (Pb) \tabularnewline
+~ & Particulate Matter (PM)\(^{c,d}\) & Particulate Matter (PM10)\(^{c,d}\) & Particulate Matter (PM2.5)\(^{c,d}\) & Ammonia (NH\(_3\))\(^{c}\) & Volatile Organic Compounds (NMVOC)\(^{a}\) & Mercury (Hg)\(^{c}\) & Lead (Pb)\(^{e}\) \tabularnewline
 \midrule
 \endhead
 
@@ -477,44 +519,56 @@ Washington & 5.37627E-04 & 5.32210E-04 & 5.41708E-06 & 6.46409E-06 & 6.87348E-04
 West Virginia & 2.39677E-03 & 2.38177E-03 & 1.50018E-05 & 4.25792E-05 & 3.09497E-03 & 6.55189E-06 & 0 \tabularnewline
 Wisconsin & 7.34187E-03 & 7.28252E-03 & 5.93472E-05 & 6.45613E-05 & 4.61829E-03 & 4.83832E-06 & 0 \tabularnewline
 Wyoming & 5.08215E-02 & 5.06042E-02 & 2.17349E-04 & 5.19787E-05 & 4.78782E-03 & 5.27931E-06 & 0 \tabularnewline
+\midrule
+\multicolumn{8}{l}{a: Data based on 1999 data from eGRID version 2.01 (EPA 2003a).} \tabularnewline
+\multicolumn{8}{l}{b: Data based on 1998-2000 average data in DOE (2002).} \tabularnewline
+\multicolumn{8}{l}{c: Data based on tier emissions report for criteria air pollutants in EPA (2003b).} \tabularnewline
+\multicolumn{8}{l}{d: PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand} \tabularnewline
+\multicolumn{8}{l}{for particles smaller than 10 and 2.5 microns, respectively.} \tabularnewline
+\multicolumn{8}{l}{e: No data.} \tabularnewline
 \bottomrule
 \end{longtable}
 
 % table 104
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
-\caption{United States National Average Water Consumption Factorssup{}a \label{table:united-states-national-average-water}} \tabularnewline
+\caption{United States National Average Water Consumption Factors\(^a\) \label{table:united-states-national-average-water}} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+ & \multicolumn{2}{c}{ThermoElectric Generation} & \multicolumn{2}{c}{HydroElectric Generation} & Weighted Total Water Consumption \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{United States National Average Water Consumption Factorssup{}a} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+ & \multicolumn{2}{c}{ThermoElectric Generation} & \multicolumn{2}{c}{HydroElectric Generation} & Weighted Total Water Consumption \tabularnewline
 \midrule
 \endhead
 
  & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
+\midrule
 United States & 0.4960 & 89.4\% & 19.2095 & 8.6\% & 2.1007 \tabularnewline
-a Based on data from Torcellini, Long, and Judkoff (2004). \tabularnewline
+\midrule
+\multicolumn{6}{l}{a: Based on data from Torcellini, Long, and Judkoff (2004).} \tabularnewline
 \bottomrule
 \end{longtable}
 
 % table 105
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
-\caption{U.S. State Average Water Consumption Factors for Electricity Generationsup{}a \label{table:u.s.-state-average-water-consumption-factors}} \tabularnewline
+\caption{U.S. State Average Water Consumption Factors for Electricity Generationsup\(^a\) \label{table:u.s.-state-average-water-consumption-factors}} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+ & \multicolumn{2}{c}{ThermoElectric Generation} & \multicolumn{2}{c}{HydroElectric Generation} & Weighted Total Water Consumption \tabularnewline
+\midrule
+State & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{U.S. State Average Water Consumption Factors for Electricity Generationsup{}a} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+ & \multicolumn{2}{c}{ThermoElectric Generation} & \multicolumn{2}{c}{HydroElectric Generation} & Weighted Total Water Consumption \tabularnewline
+\midrule
+State & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
 \midrule
 \endhead
 
-State & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
 Alabama & 0.1503 & 89.80\% & 38.9053 & 6.4\% & 2.6274 \tabularnewline
 Alaska & 0.3295 & 86.20\% & -- & 13.8\% & 0.2839 \tabularnewline
 Arizona & 0.3313 & 88.30\% & 68.1928 & 11.7\% & 8.2533 \tabularnewline
@@ -566,7 +620,8 @@ Washington & 0.3013 & 15.70\% & 3.3506 & 83.2\% & 2.8344 \tabularnewline
 West Virginia & 0.618 & 99.00\% & -- & 1.0\% & 0.6119 \tabularnewline
 Wisconsin & 0.5199 & 93.60\% & -- & 3.3\% & 0.4867 \tabularnewline
 Wyoming & 0.519 & 97.10\% & 144.0177 & 2.7\% & 4.3654 \tabularnewline
-a Based on data from Torcellini, Long, and Judkoff (2004). \tabularnewline
+\midrule
+\multicolumn{6}{l}{a: Based on data from Torcellini, Long, and Judkoff (2004).} \tabularnewline
 \bottomrule
 \end{longtable}
 

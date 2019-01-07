@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,7 +137,7 @@ namespace FileSystem {
 
         } else {
             DisplayString("ERROR: Could not resolve path for " + path + ".");
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         }
 #endif
     }
@@ -153,7 +153,7 @@ namespace FileSystem {
         ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath) - 1);
         if (len == -1) {
             DisplayString("ERROR: Unable to locate executable.");
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         } else {
             executableRelativePath[len] = '\0';
         }
@@ -182,13 +182,13 @@ namespace FileSystem {
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
                 DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
-                exit(EXIT_FAILURE);
+                std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
             std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
             if (!pathExists(parentDirectoryPath)) {
                 DisplayString("ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory.");
-                exit(EXIT_FAILURE);
+                std::exit(EXIT_FAILURE);
             }
 #ifdef _WIN32
             CreateDirectory(directoryPath.c_str(), NULL);

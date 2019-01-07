@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,6 +77,7 @@
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2399,6 +2400,8 @@ namespace ThermalComfort {
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHeatBalFanSys::ZoneThermostatSetPointHiAver;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLoAver;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using namespace OutputReportPredefined;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
@@ -2409,6 +2412,7 @@ namespace ThermalComfort {
         using DataHVACGlobals::SingleHeatingSetPoint;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::RoomAirModel_Mixing;
+        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2453,7 +2457,11 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointLo(iZone);
                 } else {
-                    deltaT = ZTAV(iZone) - ZoneThermostatSetPointLo(iZone);
+                    if (NumOnOffCtrZone > 0) {
+                        deltaT = ZTAV(iZone) - ZoneThermostatSetPointLoAver(iZone);
+                    } else {
+                        deltaT = ZTAV(iZone) - ZoneThermostatSetPointLo(iZone);
+                    }
                 }
                 if (deltaT < deviationFromSetPtThresholdHtg) {
                     ThermalComfortSetPoint(iZone).notMetHeating = TimeStepZone;
@@ -2470,7 +2478,11 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointHi(iZone);
                 } else {
-                    deltaT = ZTAV(iZone) - ZoneThermostatSetPointHi(iZone);
+                    if (NumOnOffCtrZone > 0) {
+                        deltaT = ZTAV(iZone) - ZoneThermostatSetPointHiAver(iZone);
+                    } else {
+                        deltaT = ZTAV(iZone) - ZoneThermostatSetPointHi(iZone);
+                    }
                 }
 
                 if (Zone(iZone).HasAdjustedReturnTempByITE) {
@@ -2584,7 +2596,6 @@ namespace ThermalComfort {
         using DataEnvironment::Month;
         using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
-        using General::InvJulianDay;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 

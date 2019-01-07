@@ -13,10 +13,15 @@ The heat balance on the outside face is:
 \end{equation}
 
 where:
-\(q''_{\alpha sol}\) = Absorbed direct and diffuse solar (short wavelength) radiation heat flux.
-\(q''_{LWR}\) = Net long wavelength (thermal) radiation flux exchange with the air and surroundings.
-\(q''_{conv}\) = Convective flux exchange with outside air.
-\(q''_{ko}\) = Conduction heat flux (q/A) into the wall.
+
+\(q''_{\alpha sol}\) = Absorbed direct and diffuse solar (short wavelength) radiation heat flux
+
+\(q''_{LWR}\) = Net long wavelength (thermal) radiation flux exchange with the air and surroundings
+
+\(q''_{conv}\) = Convective flux exchange with outside air
+
+\(q''_{ko}\) = Conduction heat flux (q/A) into the wall
+
 
 All terms are positive for net flux to the face except the conduction term, which is traditionally taken to be positive in the direction from outside to inside of the wall.~ Simplified procedures generally combine the first three terms by using the concept of a \emph{sol-air temperature}.~ Each of these heat balance components is introduced briefly below.
 
@@ -74,13 +79,13 @@ $\sigma$ & Stefan-Boltzmann constant & $W/m^2.K^4$ & $5.67 \times 10^{-8}$ \tabu
 Consider an enclosure consisting of building exterior surface, surrounding ground surface, and sky.~ Using the assumptions above, we can determine the longwave radiative heat flux at the building exterior surface (Walton 1983; McClellan and Pedersen 1997).~ The total longwave radiative heat flux is the sum of components due to radiation exchange with the ground, sky, and air.
 
 \begin{equation}
-q_{LWR}^`` = {q''_{gnd}} + {q''_{sky}} + {q''_{air}}
+{q''_{LWR}} = {q''_{gnd}} + {q''_{sky}} + {q''_{air}}
 \end{equation}
 
 Applying the Stefan-Boltzmann Law to each component yields:
 
 \begin{equation}
-q_{_{LWR}}^`` = \varepsilon \sigma {F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + \varepsilon \sigma {F_{sky}}(T_{sky}^4 - T_{surf}^4) + \varepsilon \sigma {F_{air}}(T_{air}^4 - T_{surf}^4)
+{q''_{LWR}} = \varepsilon \sigma {F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + \varepsilon \sigma {F_{sky}}(T_{sky}^4 - T_{surf}^4) + \varepsilon \sigma {F_{air}}(T_{air}^4 - T_{surf}^4)
 \end{equation}
 
 where
@@ -106,7 +111,7 @@ T\(_{air}\) = air temperature
 Linearized radiative heat transfer coefficients are introduced to render the above equation more compatible with the heat balance formulation,
 
 \begin{equation}
-q_{_{LWR}}^`` = {h_{r,gnd}}({T_{gnd}} - {T_{surf}}) + {h_{r,sky}}({T_{sky}} - {T_{surf}}) + {h_{r,air}}({T_{air}} - {T_{surf}})
+{q''_{LWR}} = {h_{r,gnd}}({T_{gnd}} - {T_{surf}}) + {h_{r,sky}}({T_{sky}} - {T_{surf}}) + {h_{r,air}}({T_{air}} - {T_{surf}})
 \end{equation}
 
 where
@@ -155,7 +160,7 @@ The ground surface temperature is assumed to be the same as the air temperature.
 
 Optionally, however, the long wave radiation from surrounding surfaces to an exterior surface, can also be considered if explicitly defined. Then the equation above should be modified as:
 \begin{equation}
-q_{_{LWR}}^`` = \varepsilon \sigma[{F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + {F_{sky}}(T_{sky}^4 - T_{surf}^4)  + {F_{s_1}}(T_{s_1}^4 - T_{surf}^4)+ ... + {F_{s_n}}(T_{s_n}^4 - T_{surf}^4) +  {F_{air}}(T_{air}^4 - T_{surf}^4)]
+{q''_{LWR}} = \varepsilon \sigma[{F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + {F_{sky}}(T_{sky}^4 - T_{surf}^4)  + {F_{s_1}}(T_{s_1}^4 - T_{surf}^4)+ ... + {F_{s_n}}(T_{s_n}^4 - T_{surf}^4) +  {F_{air}}(T_{air}^4 - T_{surf}^4)]
 \end{equation}
 
 where
@@ -251,7 +256,7 @@ The default value for \emph{z\(_{met}\)} for air temperature measurement is 1.5 
 
 \subsubsection{Local Wind Speed Calculation}\label{local-wind-speed-calculation}
 
-Chapter 16 of the Handbook of Fundamentals (ASHRAE 2005).~ The wind speed measured at a meteorological station is extrapolated to other altitudes with the equation:
+In Chapter 16 of the Handbook of Fundamentals (ASHRAE 2005), the wind speed measured at a meteorological station is extrapolated to other altitudes with the equation:
 
 \begin{equation}
 {V_z} = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{\alpha_{met}}}}{\left( {\frac{z}{\delta }} \right)^\alpha }
@@ -365,7 +370,7 @@ where
 
 D, E, F = material roughness coefficients
 
-The roughness correlation is taken from Figure~\ref{fig:energyplus-program-schematic}, Page 22.4, ASHRAE Handbook of Fundamentals (ASHRAE 1989).~ The roughness coefficients are shown in the following table:
+The roughness correlation is taken from Figure 1, Page 22.4, ASHRAE Handbook of Fundamentals (ASHRAE 1989).~ The roughness coefficients are shown in the following table:
 
 % table 6
 \begin{longtable}[c]{@{}lllll@{}}
@@ -481,14 +486,14 @@ The natural convection component \emph{h\(_{n}\)} is calculated in the same way 
 For no temperature difference OR a vertical surface the following correlation is used:
 
 \begin{equation}
-h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
+{h_n} = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
 \label{eq:HcVertical}
 \end{equation}
 
 For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
 \begin{equation}
-h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}
+{h_n} = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}
 \label{eq:HcEnhanced}
 \end{equation}
 
@@ -497,7 +502,7 @@ where $\Sigma$ is the surface tilt angle.
 For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
 
 \begin{equation}
-h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
+{h_n} = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
 \label{eq:HcReduced}
 \end{equation}
 
@@ -589,7 +594,6 @@ $\Phi$ & Angle between the ground outward normal and the surface outward normal 
 \bottomrule
 \end{longtable}
 
-\paragraph{}\label{section}
 
 The DOE-2 convection model is a combination of the MoWiTT and BLAST Detailed convection models (LBL 1994). The convection coefficient for very smooth surfaces (e.g.~glass) is calculated as:
 

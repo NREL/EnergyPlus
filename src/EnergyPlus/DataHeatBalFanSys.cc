@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,6 +212,8 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> AdapComfortCoolingSetPoint;
     Array1D<Real64> ZoneThermostatSetPointHi;
     Array1D<Real64> ZoneThermostatSetPointLo;
+    Array1D<Real64> ZoneThermostatSetPointHiAver;
+    Array1D<Real64> ZoneThermostatSetPointLoAver;
 
     Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
 
@@ -332,6 +334,8 @@ namespace DataHeatBalFanSys {
         AdapComfortCoolingSetPoint.deallocate();
         ZoneThermostatSetPointHi.deallocate();
         ZoneThermostatSetPointLo.deallocate();
+        ZoneThermostatSetPointHiAver.deallocate();
+        ZoneThermostatSetPointLoAver.deallocate();
         LoadCorrectionFactor.deallocate();
         AIRRAT.deallocate();
         ZTM1.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -76,6 +77,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -358,7 +360,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
                                       "[W/m2-C]",
                                       "[W/m2-K]",
                                       "[W/W]",
-                                      "[W]"};
+                                      "[W]",
+                                      "[person/m2]",
+    };
 
     for (auto u : units) {
         LookupSItoIP(u, indexUnitConv, curUnits);
@@ -4094,7 +4098,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn001:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn001:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    4,                       !- Starting X Coordinate {m}                                          ",
@@ -4106,7 +4109,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn001:Wall001:Door001,   !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn001:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    14,                      !- Starting X Coordinate {m}                                          ",
@@ -4232,7 +4234,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn002:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn002:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    4,                       !- Starting X Coordinate {m}                                          ",
@@ -4253,7 +4254,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn002:Wall001:Win002,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn002:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    10,                      !- Starting X Coordinate {m}                                          ",
@@ -4337,7 +4337,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn003:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn003:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    8,                       !- Starting X Coordinate {m}                                          ",
@@ -4456,7 +4455,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Zn004:Wall001:Win001,    !- Name                                                               ",
 //"    SINGLE PANE HW WINDOW,   !- Construction Name                                                  ",
 //"    Zn004:Wall001,           !- Building Surface Name                                              ",
-//"    ,                        !- Shading Control Name                                               ",
 //"    ,                        !- Frame and Divider Name                                             ",
 //"    1,                       !- Multiplier                                                         ",
 //"    8,                       !- Starting X Coordinate {m}                                          ",
@@ -5609,7 +5607,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Attic Roof,       !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5625,7 +5622,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Ceiling,          !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5652,7 +5648,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Attic Roof,       !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -5668,7 +5663,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"    Daylit Ceiling,          !- Building Surface Name                                     ",
 //"    ,                        !- Outside Boundary Condition Object                         ",
 //"    0.0,                     !- View Factor to Ground                                     ",
-//"    ,                        !- Shading Control Name                                      ",
 //"    ,                        !- Frame and Divider Name                                    ",
 //"    1.0,                     !- Multiplier                                                ",
 //"    4,                       !- Number of Vertices                                        ",
@@ -6544,4 +6538,165 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EXPECT_EQ(460ul, tabularData.size());
     EXPECT_EQ(76ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:DesignDay,",
+  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+  "  1,                       !- Month",
+  "  21,                      !- Day of Month",
+  "  WinterDesignDay,         !- Day Type",
+  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+  "  Wetbulb,                 !- Humidity Condition Type",
+  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+  "  ,                        !- Humidity Condition Day Schedule Name",
+  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+  "  99063.,                  !- Barometric Pressure {Pa}",
+  "  4.9,                     !- Wind Speed {m/s}",
+  "  270,                     !- Wind Direction {deg}",
+  "  No,                      !- Rain Indicator",
+  "  No,                      !- Snow Indicator",
+  "  No,                      !- Daylight Saving Time Indicator",
+  "  ASHRAEClearSky,          !- Solar Model Indicator",
+  "  ,                        !- Beam Solar Day Schedule Name",
+  "  ,                        !- Diffuse Solar Day Schedule Name",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+  "  0.0;                     !- Sky Clearness",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays());
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileDays,",
+  "  Summer including Extreme Summer days,  !- Name",
+  "  7,                       !- Begin Month",
+  "  18,                      !- Begin Day of Month",
+  "  7,                       !- End Month",
+  "  25,                      !- End Day of Month",
+  "  SummerDesignDay,         !- Day of Week for Start Day",
+  "  No,                      !- Use Weather File Daylight Saving Period",
+  "  No;                      !- Use Weather File Rain and Snow Indicators",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays());
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileConditionType)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileConditionType,",
+  "  Hot,                     !- Name",
+  "  SummerExtreme,           !- Period Selection",
+  "  Monday,                  !- Day of Week for Start Day",
+  "  Yes,                     !- Use Weather File Daylight Saving Period",
+  "  Yes;                     !- Use Weather File Rain and Snow Indicators",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // this test should show a false since this type of sizing period is not compatible with the component loads calculations
+    EXPECT_FALSE(hasSizingPeriodsDays());
+}
+
+// This tests aims to ensure that the needed Output:Variables for the Predefined Monthly table
+// are indeeed set up, and that as a result the numTables is good.
+// https://github.com/NREL/EnergyPlus/issues/7019
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputVars) {
+
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " SetpointsNotMetWithTemperaturesMonthly; !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_EQ(1, inputProcessor->getNumObjectsFound("Output:Table:SummaryReports"));
+    EXPECT_EQ(0, inputProcessor->getNumObjectsFound("Output:Variable"));
+
+    // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
+    // for the SetpointsNotMetWithTemperatureMonthly report
+    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+
+    // The Variables needed for the report are initialized (=SetupOutputVariable)
+    // Inside ThermalComfort::InitThermalComfort();
+    // Except Zone Mean Air Temperature, which is in HeatBalanceAirManager::GetSimpleAirModelInputs()
+    // Instead of calling these
+    // Fake the setup of the OutputVariables needed for two different zones
+    Real64 zoneTemp;
+    Real64 timeNotMet;
+    std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
+
+
+    for (int i=0; i < 2; ++i) {
+        SetupOutputVariable("Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
+
+        SetupOutputVariable("Zone Heating Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+    }
+
+
+    // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
+    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+
+    OutputProcessor::GetReportVariableInput();
+    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::InitializeTabularMonthly();
+
+    // We check that the Predefined Table is actually set to show
+    EXPECT_EQ("SetpointsNotMetWithTemperaturesMonthly", namedMonthly(31).title);
+    EXPECT_TRUE(namedMonthly(31).show);
+
+    // Check that it's the only one that's shown
+    for (int i = 1; i <= OutputReportTabular::numNamedMonthly; ++i) {
+        if (i != 31) {
+            EXPECT_FALSE(OutputReportTabular::namedMonthly(i).show);
+        }
+    }
+
+    // Variables aren't going to be output to SQL/ESO anyways
+    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 0);
+
+    EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+    // If everything worked, we should have 2 tables, one for each zone.
+    // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
+    // and so the numTables was zero
+    EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
+
 }

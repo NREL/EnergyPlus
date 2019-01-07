@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -332,7 +332,7 @@ namespace DataPlant {
                                                "HeatExchanger:FluidToFluid",
                                                "PlantComponent:TemperatureSource",
                                                "CentralHeatPumpSystem",
-                                               "AirloopHVAC:UnitarySystem",
+                                               "AirLoopHVAC:UnitarySystem",
                                                "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                                "CoolingTower:VariableSpeed:Merkel",
                                                "SwimmingPool:Indoor",
@@ -375,7 +375,6 @@ namespace DataPlant {
     int const TypeOf_CoolingTower_VarSpd(14);
     int const TypeOf_Generator_FCExhaust(15);
     int const TypeOf_HeatPumpWtrHeaterPumped(16);
-    int const TypeOf_HeatPumpWtrHeaterWrapped(92);
     int const TypeOf_HPWaterEFCooling(17);
     int const TypeOf_HPWaterEFHeating(18);
     int const TypeOf_HPWaterPECooling(19);
@@ -446,12 +445,12 @@ namespace DataPlant {
     int const TypeOf_FluidToFluidPlantHtExchg(84);
     int const TypeOf_WaterSource(85);
     int const TypeOf_CentralGroundSourceHeatPump(86);
-    int const TypeOf_UnitarySystemRecovery(87);
+    int const TypeOf_UnitarySysRecovery(87);
     int const TypeOf_PackagedTESCoolingCoil(88);
     int const TypeOf_CoolingTower_VarSpdMerkel(89);
     int const TypeOf_SwimmingPool_Indoor(90);
     int const TypeOf_GrndHtExchgSlinky(91);
-    // int const TypeOf_HPWrappedCondenser ?? 92 ??
+    int const TypeOf_HeatPumpWtrHeaterWrapped(92);
     int const TypeOf_FourPipeBeamAirTerminal(93);
     int const TypeOf_CoolingPanel_Simple(94);
     int const TypeOf_HeatPumpEIRCooling(95);

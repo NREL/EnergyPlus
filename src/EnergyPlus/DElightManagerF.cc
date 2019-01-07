@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -373,7 +373,7 @@ namespace DElightManagerF {
 
                                         // Error if window has a shading device (blind/shade/screen) since
                                         // DElight cannot perform dynamic shading device deployment
-                                        if (wndo.WindowShadingControlPtr > 0) {
+                                        if (wndo.HasShadeControl) {
                                             ShowSevereError("Shading Device on window " + wndo.Name +
                                                             " dynamic control is not supported in a zone with DElight daylighting.");
                                             ErrorsFound = true;

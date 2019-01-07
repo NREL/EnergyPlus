@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,6 +104,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
@@ -136,7 +137,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -185,6 +185,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -205,6 +206,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -246,11 +248,13 @@ void EnergyPlusFixture::SetUp()
     this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
     DataGlobals::eso_stream = this->eso_stream.get();
     DataGlobals::eio_stream = this->eio_stream.get();
     DataGlobals::mtr_stream = this->mtr_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
+    DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -274,6 +278,7 @@ void EnergyPlusFixture::TearDown()
         flags.DISPOSE("DELETE");
         gio::close(OutputProcessor::OutputFileMeterDetails, flags);
         gio::close(DataGlobals::OutputFileStandard, flags);
+        gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         gio::close(DataGlobals::OutputStandardError, flags);
         gio::close(DataGlobals::OutputFileInits, flags);
         gio::close(DataGlobals::OutputFileDebug, flags);
@@ -337,6 +342,7 @@ void EnergyPlusFixture::clear_all_states()
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
+    DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DirectAirManager::clear_state();
@@ -378,7 +384,6 @@ void EnergyPlusFixture::clear_all_states()
     HVACSingleDuctInduc::clear_state();
     HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
-    HVACUnitarySystem::clear_state();
     HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
@@ -433,6 +438,7 @@ void EnergyPlusFixture::clear_all_states()
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
     ThermalComfort::clear_state();
+    UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
     VariableSpeedCoils::clear_state();
@@ -453,6 +459,7 @@ void EnergyPlusFixture::clear_all_states()
     ZoneEquipmentManager::clear_state();
     ZonePlenum::clear_state();
     ZoneTempPredictorCorrector::clear_state();
+    ResultsFramework::clear_state();
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -473,6 +480,15 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const
         lines.push_back(line);
     }
     return lines;
+}
+
+bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = this->json_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->json_stream->str(std::string());
+    return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
@@ -527,6 +543,13 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
     bool are_equal = (expected_string == stream_str);
     if (reset_stream) this->m_cerr_buffer->str(std::string());
     return are_equal;
+}
+
+bool EnergyPlusFixture::has_json_output(bool reset_stream)
+{
+    auto const has_output = this->json_stream->str().size() > 0;
+    if (reset_stream) this->json_stream->str(std::string());
+    return has_output;
 }
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)

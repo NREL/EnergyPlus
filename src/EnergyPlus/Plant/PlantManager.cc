@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1088,7 +1088,11 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:HeatPump:PumpedCondenser")) {
                             this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
                             this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -1183,23 +1187,43 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:InternalCombustionEngine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:CombustionTurbine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_CTurbine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                             this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
@@ -1262,7 +1286,7 @@ namespace PlantManager {
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem")) {
-                            this_comp.TypeOf_Num = TypeOf_UnitarySystemRecovery;
+                            this_comp.TypeOf_Num = TypeOf_UnitarySysRecovery;
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
@@ -4176,7 +4200,7 @@ namespace PlantManager {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                 this_component.HowLoadServed = HowMet_PassiveCap;
-                            } else if (SELECT_CASE_var == TypeOf_UnitarySystemRecovery) {
+                            } else if (SELECT_CASE_var == TypeOf_UnitarySysRecovery) {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                 this_component.HowLoadServed = HowMet_PassiveCap;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,10 +64,17 @@ int main(int argc, char *argv[])
     StoreMessageCallback(message_callback_handler);
     StoreProgressCallback(progress_callback_handler);
 
+    int status(EXIT_FAILURE);
     if (argc < 2) {
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     } else {
-        EnergyPlusPgm(argv[1]);
+        status = RunEnergyPlus(argv[1]);
     }
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+    std::cerr << "Standard error is still available for use" << std::endl;
+    std::cout << "Standard output is still available for use" << std::endl;
+    return status;
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,6 +122,7 @@ namespace DaylightingManager {
     extern std::string mapLine; // character variable to hold map outputs
 
     // Functions
+    void clear_state();
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
@@ -345,6 +346,8 @@ namespace DaylightingManager {
 
     void CheckTDDsAndLightShelvesInDaylitZones();
 
+    void AssociateWindowShadingControlWithDaylighting();
+
     void GetLightWellData(bool &ErrorsFound); // If errors found in input
 
     void DayltgGlare(int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
@@ -465,6 +468,10 @@ namespace DaylightingManager {
     void CloseDFSFile();
 
     void DayltgSetupAdjZoneListsAndPointers();
+
+    void CreateShadeDeploymentOrder(int &ZoneNum);
+
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum); // Zone number
 

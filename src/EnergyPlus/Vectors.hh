@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -119,6 +119,8 @@ namespace Vectors {
     );
 
     void CalcCoPlanarNess(Array1A<Vector> Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
+
+    std::vector<int> PointsInPlane(Array1A<Vector> BaseSurf, int const BaseSides, Array1A<Vector> QuerySurf, int const QuerySides, bool &ErrorFound);
 
     Real64 CalcPolyhedronVolume(Polyhedron const &Poly);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 #include <OutputProcessor.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -111,8 +112,8 @@ namespace DataZoneEquipment {
     extern int const BBElectric_Num;
     extern int const RefrigerationAirChillerSet_Num;
     extern int const UserDefinedZoneHVACForcedAir_Num;
-    extern int const ZoneUnitarySystem_Num; // AirloopHVAC:UnitarySystem configured as zone equipment
     extern int const CoolingPanel_Num;
+    extern int const ZoneUnitarySys_Num; // UnitarySystem configured as zone equipment
     extern int const TotalNumZoneEquipType;
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types
@@ -392,6 +393,7 @@ namespace DataZoneEquipment {
         Array1D_int EquipType_Num;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
+        std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]

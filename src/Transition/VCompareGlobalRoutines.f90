@@ -748,7 +748,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ENDIF
           CALL WriteOutIDFLinesAsSingleLine(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,FieldUnits)
 
-        CASE('BUILDINGSURFACE:DETAILED','FENESTRATIONSURFACE:DETAILED')
+        CASE('BUILDINGSURFACE:DETAILED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-10)/3
@@ -776,6 +776,65 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             VArg=VArg+3
           ENDDO
           WRITE(DifUnit,fmta) ''
+
+        CASE('FENESTRATIONSURFACE:DETAILED')
+          IF (VersionNum < 9.0) THEN
+            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
+            IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
+              NVert=(CurArgs-10)/3
+            ELSEIF (OutArgs(10) == '') THEN
+              NVert=(CurArgs-10)/3
+            ELSE
+              READ(OutArgs(10),*) NVert
+            ENDIF
+            VArg=11
+            DO Arg=1,NVert
+              IF (Arg /= NVert) THEN
+                LString=',  !- '
+              ELSE
+                LString=';  !- '
+              ENDIF
+              WRITE(VString,'(I4)') Arg
+              VString=ADJUSTL(VString)
+              IF (withUnits .and. FieldUnits(VArg) /= Blank) THEN
+                WRITE(DifUnit,fmta) '    '//TRIM(OutArgs(VArg))//','//TRIM(OutArgs(VArg+1))//','//TRIM(OutArgs(VArg+2))//  &
+                                         LString//TRIM(VertexString)//' '//TRIM(VString)//' {'//TRIM(FieldUnits(VArg))//'}'
+              ELSE
+                WRITE(DifUnit,fmta) '    '//TRIM(OutArgs(VArg))//','//TRIM(OutArgs(VArg+1))//','//TRIM(OutArgs(VArg+2))//  &
+                                         LString//TRIM(VertexString)//' '//TRIM(VString)
+              ENDIF
+              VArg=VArg+3
+            ENDDO
+            WRITE(DifUnit,fmta) ''
+          ELSE
+            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
+            IF (MakeUPPERCase(OutArgs(9)) == 'AUTOCALCULATE') THEN
+              NVert=(CurArgs-9)/3
+            ELSEIF (OutArgs(9) == '') THEN
+              NVert=(CurArgs-9)/3
+            ELSE
+              READ(OutArgs(9),*) NVert
+            ENDIF
+            VArg=10
+            DO Arg=1,NVert
+              IF (Arg /= NVert) THEN
+                LString=',  !- '
+              ELSE
+                LString=';  !- '
+              ENDIF
+              WRITE(VString,'(I4)') Arg
+              VString=ADJUSTL(VString)
+              IF (withUnits .and. FieldUnits(VArg) /= Blank) THEN
+                WRITE(DifUnit,fmta) '    '//TRIM(OutArgs(VArg))//','//TRIM(OutArgs(VArg+1))//','//TRIM(OutArgs(VArg+2))//  &
+                                         LString//TRIM(VertexString)//' '//TRIM(VString)//' {'//TRIM(FieldUnits(VArg))//'}'
+              ELSE
+                WRITE(DifUnit,fmta) '    '//TRIM(OutArgs(VArg))//','//TRIM(OutArgs(VArg+1))//','//TRIM(OutArgs(VArg+2))//  &
+                                         LString//TRIM(VertexString)//' '//TRIM(VString)
+              ENDIF
+              VArg=VArg+3
+            ENDDO
+            WRITE(DifUnit,fmta) ''
+          ENDIF
 
         CASE('WALL:DETAILED','ROOFCEILING:DETAILED','FLOOR:DETAILED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)

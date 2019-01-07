@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -165,6 +165,18 @@ namespace DataSurfaces {
     int const SurfaceClass_Fin(16);
     int const SurfaceClass_TDD_Dome(17);
     int const SurfaceClass_TDD_Diffuser(18);
+
+    Array1D_string const HeatTransferModelNames(10,
+        { "CTF - ConductionTransferFunction",
+        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "",
+        "",
+        "CondFD - ConductionFiniteDifference",
+        "HAMT - CombinedHeatAndMoistureFiniteElement",
+        "Window - Detailed layer-by-layer",
+        "Window - ComplexFenestration",
+        "Tubular daylighting device",
+        "KivaFoundation - TwoDimensionalFiniteDifference"});
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
@@ -980,6 +992,60 @@ namespace DataSurfaces {
             }
             return Surface2D(shapeCat, axis, v2d, Vertex2D(xl, yl), Vertex2D(xu, yu));
         }
+    }
+
+    Real64 SurfaceData::get_average_height() const
+    {
+        if (std::abs(SinTilt) < 1.e-4) {
+            return 0.0;
+        }
+        using Vertex2D = ObjexxFCL::Vector2<Real64>;
+        using Vertices2D = ObjexxFCL::Array1D<Vertex2D>;
+        Vertices::size_type const n(Vertex.size());
+        assert(n >= 3);
+
+        Vertices2D v2d(n);
+
+        // project onto 2D vertical plane
+        Real64 xRef = Vertex[0].x;
+        Real64 yRef = Vertex[0].y;
+        Real64 const &saz(SinAzim);
+        Real64 const &caz(CosAzim);
+        for (Vertices::size_type i = 0; i < n; ++i) {
+            Vector const &v(Vertex[i]);
+            v2d[i] = Vertex2D(-(v.x - xRef)*caz + (v.y - yRef)*saz, v.z);
+        }
+
+        // piecewise linear integration
+
+        // Get total width of polygon
+        Real64 minX(v2d[0].x), maxX(v2d[0].x);
+        for (Vertices::size_type i = 0; i < n; ++i) {
+            Vertex2D const &v(v2d[i]);
+            minX = std::min(minX, v.x);
+            maxX = std::max(maxX, v.x);
+        }
+        Real64 totalWidth = maxX - minX;
+
+        if (totalWidth == 0.0) {
+            // This should never happen, but if it does, print a somewhat meaningful fatal error
+            // (instead of allowing a divide by zero).
+            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        }
+
+        Real64 averageHeight = 0.0;
+        for (Vertices::size_type i = 0; i < n; ++i) {
+            Vertex2D const &v(v2d[i]);
+
+            Vertex2D *v2;
+            if (i == n - 1) {
+                v2 = &v2d[0];
+            } else {
+                v2 = &v2d[i+1];
+            }
+            averageHeight += 0.5*(v.y + v2->y)*(v2->x - v.x)/totalWidth;
+        }
+        return std::abs(averageHeight)/SinTilt;
     }
 
     // Functions

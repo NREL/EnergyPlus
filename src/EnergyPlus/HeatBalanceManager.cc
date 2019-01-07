@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -346,6 +346,8 @@ namespace HeatBalanceManager {
 
             ManageHeatBalanceGetInputFlag = false;
         }
+
+        // Suggest new calling point here ManageEMS(emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan);
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
@@ -5248,6 +5250,11 @@ namespace HeatBalanceManager {
                 e.ThetaFace = 296.15;
                 e.EffInsSurfTemp = 23.0;
             }
+        }
+
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
         }
 
         if (TotStormWin > 0) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -770,6 +770,23 @@ namespace Vectors {
 
         if (std::abs(MaxDist) > DistTooSmall) IsCoPlanar = false;
     }
+
+    std::vector<int> PointsInPlane(Array1A<Vector> BaseSurf, int const BaseSides, Array1A<Vector> QuerySurf, int const QuerySides, bool &ErrorFound) {
+        std::vector<int> pointIndices;
+
+        PlaneEq NewellPlane;
+        PlaneEquation(BaseSurf, BaseSides, NewellPlane, ErrorFound);
+
+        for (int vert = 1; vert <= QuerySides; ++vert) {
+            Real64 dist = Pt2Plane(QuerySurf(vert), NewellPlane);
+            if (std::abs(dist) < 1.e-4) {  // point on query surface is co-planar with base surface
+                pointIndices.push_back(vert);
+            }
+        }
+        return pointIndices;
+    }
+
+
 
     Real64 CalcPolyhedronVolume(Polyhedron const &Poly)
     {

@@ -111,8 +111,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -675,7 +677,7 @@
   Schedule:File,
     ExtShadingSch:EAST SIDE TREE,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     1,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -689,7 +691,7 @@
   Schedule:File,
     ExtShadingSch:WEST SIDE TREE,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     2,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -703,7 +705,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     3,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -717,7 +719,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     4,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -731,7 +733,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     5,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -745,7 +747,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     6,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -759,7 +761,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     7,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -773,7 +775,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     8,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -787,7 +789,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     9,                       !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -801,7 +803,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     10,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -815,7 +817,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     11,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -829,7 +831,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     12,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -843,7 +845,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     13,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -857,7 +859,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     14,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -871,7 +873,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     15,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -885,7 +887,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     16,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -899,7 +901,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     17,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -913,7 +915,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     18,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -927,7 +929,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     19,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -941,7 +943,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     20,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -955,7 +957,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     21,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -969,7 +971,7 @@
   Schedule:File,
     ExtShadingSch:ZN001:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     22,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -983,7 +985,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     23,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -997,7 +999,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     24,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1011,7 +1013,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     25,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1025,7 +1027,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     26,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1039,7 +1041,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     27,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1053,7 +1055,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     28,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1067,7 +1069,7 @@
   Schedule:File,
     ExtShadingSch:ZN002:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     29,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1081,7 +1083,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     30,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1095,7 +1097,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     31,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1109,7 +1111,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     32,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1123,7 +1125,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     33,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1137,7 +1139,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     34,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1151,7 +1153,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     35,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1165,7 +1167,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     36,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1179,7 +1181,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     37,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1193,7 +1195,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL007,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     38,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1207,7 +1209,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL007:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     39,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1221,7 +1223,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:WALL008,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     40,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1235,7 +1237,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     41,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1249,7 +1251,7 @@
   Schedule:File,
     ExtShadingSch:ZN003:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     42,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1263,7 +1265,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     43,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1277,7 +1279,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     44,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1291,7 +1293,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     45,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1305,7 +1307,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     46,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1319,7 +1321,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     47,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1333,7 +1335,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     48,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1347,7 +1349,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     49,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1361,7 +1363,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     50,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1375,7 +1377,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:WALL006:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     51,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1389,7 +1391,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     52,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1403,7 +1405,7 @@
   Schedule:File,
     ExtShadingSch:ZN004:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     53,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1417,7 +1419,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     54,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1431,7 +1433,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     55,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1445,7 +1447,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     56,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1459,7 +1461,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     57,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1473,7 +1475,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     58,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1487,7 +1489,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     59,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1501,7 +1503,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     60,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1515,7 +1517,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     61,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1529,7 +1531,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     62,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1543,7 +1545,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     63,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1557,7 +1559,7 @@
   Schedule:File,
     ExtShadingSch:ZN005:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     64,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1571,7 +1573,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     65,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1585,7 +1587,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     66,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1599,7 +1601,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     67,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1613,7 +1615,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     68,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1627,7 +1629,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     69,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1641,7 +1643,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     70,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1655,7 +1657,7 @@
   Schedule:File,
     ExtShadingSch:ZN006:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     71,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1669,7 +1671,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     72,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1683,7 +1685,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     73,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1697,7 +1699,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     74,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1711,7 +1713,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     75,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1725,7 +1727,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     76,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1739,7 +1741,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     77,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1753,7 +1755,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     78,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1767,7 +1769,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     79,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1781,7 +1783,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL006:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     80,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1795,7 +1797,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL007,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     81,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1809,7 +1811,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:WALL008,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     82,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1823,7 +1825,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     83,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1837,7 +1839,7 @@
   Schedule:File,
     ExtShadingSch:ZN007:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     84,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1851,7 +1853,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     85,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1865,7 +1867,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     86,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1879,7 +1881,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     87,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1893,7 +1895,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     88,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1907,7 +1909,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     89,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1921,7 +1923,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     90,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1935,7 +1937,7 @@
   Schedule:File,
     ExtShadingSch:ZN008:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     91,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1949,7 +1951,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     92,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1963,7 +1965,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     93,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1977,7 +1979,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     94,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -1991,7 +1993,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     95,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2005,7 +2007,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     96,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2019,7 +2021,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     97,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2033,7 +2035,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     98,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2047,7 +2049,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     99,                      !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2061,7 +2063,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     100,                     !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2075,7 +2077,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     101,                     !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2089,7 +2091,7 @@
   Schedule:File,
     ExtShadingSch:ZN009:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
-    SolarShadingTest_Shading_Data.csv,   !- File Name
+    SolarShadingTest_Shading_Data.csv,  !- File Name
     102,                     !- Column Number
     1;                       !- Rows to Skip at Top
 
@@ -2132,7 +2134,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2174,7 +2175,6 @@
     Zn001:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2238,7 +2238,6 @@
     Zn001:Wall005,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2318,7 +2317,6 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2440,7 +2438,6 @@
     Zn003:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2482,7 +2479,6 @@
     Zn003:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2578,7 +2574,6 @@
     Zn003:Wall007,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2658,7 +2653,6 @@
     Zn004:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2700,7 +2694,6 @@
     Zn004:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2780,7 +2773,6 @@
     Zn004:Wall006,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2844,7 +2836,6 @@
     Zn005:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2886,7 +2877,6 @@
     Zn005:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -2950,7 +2940,6 @@
     Zn005:Wall005,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3030,7 +3019,6 @@
     Zn006:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3152,7 +3140,6 @@
     Zn007:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3194,7 +3181,6 @@
     Zn007:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3274,7 +3260,6 @@
     Zn007:Wall006,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3370,7 +3355,6 @@
     Zn008:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3492,7 +3476,6 @@
     Zn009:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3534,7 +3517,6 @@
     Zn009:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -3598,7 +3580,6 @@
     Zn009:Wall005,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices

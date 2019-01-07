@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -106,4 +106,20 @@ TEST(VectorsTest, VecRound)
     EXPECT_DOUBLE_EQ(11.5, v.x);
     EXPECT_DOUBLE_EQ(-33.5, v.y);
     EXPECT_DOUBLE_EQ(56.0, v.z);
+}
+
+TEST(VectorTest, CoplnarPoints) {
+    {
+        Array1D<Vector> base = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
+        std::vector<int> coplanarPoints;
+        bool ErrorsFound;
+
+        Array1D<Vector> query = {Vector(0, 0, 0), Vector(1, 1, 1), Vector(2, 0, 0), Vector(0, 0, -1)};
+        coplanarPoints = PointsInPlane(base, base.size(), query, query.size(), ErrorsFound);
+
+        EXPECT_EQ(coplanarPoints[0],1); // 1st point in query is coplanar with base
+        EXPECT_EQ(coplanarPoints[1],3); // 3rd point in query is coplanar with base
+        EXPECT_EQ(coplanarPoints.size(),2u); // Only 2 points in query are coplanar with base
+
+    }
 }

@@ -114,7 +114,10 @@ extension_renaming = {
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
     'ShadowCalculation': 'shading_zone_groups',
-    'Schedule:Year': 'schedule_weeks'
+    'Schedule:Year': 'schedule_weeks',
+    'WindowShadingControl': 'fenestration_surfaces',
+    'PlantEquipmentList': 'equipment',
+    'CondenserEquipmentList': 'equipment'
 }
 remaining_objects = [
     'Site:SpectrumData',

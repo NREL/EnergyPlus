@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -158,8 +158,11 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex)
     ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 10);
+    // FindItemInVariableList is case-insentive, so we also test that
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Mass Flow Rate"));
     EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList("OutsIDE AiR InLEt NoDE", "System NoDE MaSS FLOw Rate"));
+    EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System NODE Mass Flow RATE"));
     EXPECT_TRUE(FindItemInVariableList("Mixed Air Node", "System Node Temperature"));
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Temperature"));
     EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));

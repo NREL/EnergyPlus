@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -453,13 +453,12 @@ namespace Pumps {
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        TempCurveIndex,                 // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        PumpEquip(PumpNum).Name,        // Object Name
-                        cAlphaFieldNames(6));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                                                                {1},                     // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                PumpEquip(PumpNum).Name, // Object Name
+                                                                cAlphaFieldNames(6));    // Field Name
 
                     if (!ErrorsFound) {
                         PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
@@ -643,13 +642,12 @@ namespace Pumps {
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        TempCurveIndex,   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        cCurrentModuleObject,            // Object Type
-                        PumpEquip(PumpNum).Name,   // Object Name
-                        cAlphaFieldNames(6));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                                                                {1},                     // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                PumpEquip(PumpNum).Name, // Object Name
+                                                                cAlphaFieldNames(6));    // Field Name
 
                     if (!ErrorsFound) {
                         PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
@@ -1969,7 +1967,6 @@ namespace Pumps {
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToReport;
         using DataPlant::PlantLoop;
-        using DataSizing::AutoSize;
         using DataSizing::PlantSizData;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <memory>
-#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -176,6 +176,13 @@ namespace WeatherManager {
 
     static std::string const BlankString;
     Array1D_string const DaysOfWeek(7, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"});
+    std::map<std::string, WeekDay> weekDayLookUp{{"SUNDAY", WeekDay::Sunday},
+                                                 {"MONDAY", WeekDay::Monday},
+                                                 {"TUESDAY", WeekDay::Tuesday},
+                                                 {"WEDNESDAY", WeekDay::Wednesday},
+                                                 {"THURSDAY", WeekDay::Thursday},
+                                                 {"FRIDAY", WeekDay::Friday},
+                                                 {"SATURDAY", WeekDay::Saturday}};
 
     bool Debugout(false);
 
@@ -682,7 +689,7 @@ namespace WeatherManager {
 
         // do some calculations for natural convection from the bottom of the ship
         Real64 const distanceFromBottomOfHull = 12; // meters, assumed for now
-        // this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+                                                    // this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
         Real64 const prandtlCorrection =
             (0.75 * pow(waterPrandtlNumber, 0.5)) / pow(0.609 + 1.221 * pow(waterPrandtlNumber, 0.5) + 1.238 * waterPrandtlNumber, 0.25);
         // calculate the Grashof number
@@ -796,8 +803,6 @@ namespace WeatherManager {
 
         // Using/Aliasing
         using General::BetweenDates;
-        using General::InvJulianDay;
-        using General::JulianDay;
         using namespace DataSystemVariables;
         using DataHeatBalance::AdaptiveComfortRequested_ASH55;
         using DataHeatBalance::AdaptiveComfortRequested_CEN15251;
@@ -844,7 +849,6 @@ namespace WeatherManager {
         std::string EnDate;
         std::string string;
         std::string cTotalEnvDays;
-        int NumDays;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
@@ -852,7 +856,6 @@ namespace WeatherManager {
         int RunStJDay;
         int RunEnJDay;
         bool OkRun;
-        int ThisWeekDay;
         int TWeekDay;
         Array1D_int MonWeekDay(12);
         Array1D_int ActEndDayOfMonth(12);
@@ -1074,40 +1077,53 @@ namespace WeatherManager {
                             UseRainValues = Environment(Envrn).UseRain;
                             UseSnowValues = Environment(Envrn).UseSnow;
 
+                            bool missingLeap(false); // Defer acting on anything found here until after the other range checks (see below)
+                            if (Environment(Envrn).ActualWeather && !WFAllowsLeapYears) {
+                                for (int year = Environment(Envrn).StartYear; year <= Environment(Envrn).EndYear; year++) {
+                                    if (isLeapYear(year)) {
+                                        ShowSevereError(
+                                            "GetNextEnvironment: Weatherfile does not support leap years but runperiod includes a leap year (" +
+                                            std::to_string(year) + ")");
+                                        missingLeap = true;
+                                    }
+                                }
+                            }
+
                             OkRun = false;
-                            ThisWeekDay = 0;
-                            for (Loop = 1; Loop <= NumDataPeriods; ++Loop) {
-                                if (!Environment(Envrn).ActualWeather) {
-                                    RunStJDay = JulianDay(DataPeriods(Loop).StMon, DataPeriods(Loop).StDay, LeapYearAdd);
-                                    RunEnJDay = JulianDay(DataPeriods(Loop).EnMon, DataPeriods(Loop).EnDay, LeapYearAdd);
-                                    if (!BetweenDates(Environment(Envrn).StartJDay, RunStJDay, RunEnJDay)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndJDay, RunStJDay, RunEnJDay)) continue;
+
+                            if (Environment(Envrn).ActualWeather) {
+                                // Actual weather
+                                for (auto &dataperiod : DataPeriods) {
+                                    int runStartJulian = dataperiod.DataStJDay;
+                                    int runEndJulian = dataperiod.DataEnJDay;
+                                    if (!dataperiod.HasYearData) {
+                                        ShowSevereError("GetNextEnvironment: Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                                        "does not have year included in start/end date.");
+                                        ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
+                                        ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
+                                    }
+                                    if (!BetweenDates(Environment(Envrn).StartDate, runStartJulian, runEndJulian)) continue;
+                                    if (!BetweenDates(Environment(Envrn).EndDate, runStartJulian, runEndJulian)) continue;
                                     OkRun = true;
-                                    if (RunStJDay > Environment(Envrn).StartJDay) {
-                                        NumDays = RunStJDay - Environment(Envrn).StartJDay;
-                                    } else {
-                                        NumDays = Environment(Envrn).StartJDay - RunStJDay;
-                                    }
-                                    ThisWeekDay = mod(DataPeriods(Loop).WeekDay + NumDays - 1, 7) + 1;
                                     break;
-                                } else { // Actual Weather
-                                    RunStJDay = DataPeriods(Loop).DataStJDay;
-                                    RunEnJDay = DataPeriods(Loop).DataEnJDay;
-                                    if (!DataPeriods(Loop).HasYearData) {
-                                        ShowSevereError("GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile DATA PERIOD does "
-                                                        "not have year included in start/end date.");
-                                        ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both.");
+                                }
+                            } else {
+                                // Typical (or just non-actual) weather
+                                for (auto &dataperiod : DataPeriods) {
+                                    // Since this is not actual weather, there may be issues with this calculation
+                                    // Assume the weather data starts the same year as the simulation, so LeapYearAdd is what
+                                    // should be used.
+                                    int runStartOrdinal = General::OrdinalDay(dataperiod.StMon, dataperiod.StDay, LeapYearAdd);
+                                    // This one is harder, leave as is for now. What about multiple years of data?
+                                    int runEndOrdinal = General::OrdinalDay(dataperiod.EnMon, dataperiod.EnDay, LeapYearAdd);
+                                    if (runStartOrdinal == 1 && (runEndOrdinal == 366 || runEndOrdinal == 365)) {
+                                        // Complete year(s) of weather data, will wrap around
+                                        OkRun = true;
+                                        break;
                                     }
-                                    if (!BetweenDates(Environment(Envrn).StartDate, RunStJDay, RunEnJDay)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndDate, RunStJDay, RunEnJDay)) continue;
+                                    if (!BetweenDates(Environment(Envrn).StartJDay, runStartOrdinal, runEndOrdinal)) continue;
+                                    if (!BetweenDates(Environment(Envrn).EndJDay, runStartOrdinal, runEndOrdinal)) continue;
                                     OkRun = true;
-                                    if (RunStJDay > Environment(Envrn).StartDate) {
-                                        NumDays = RunStJDay - Environment(Envrn).StartDate;
-                                    } else {
-                                        NumDays = Environment(Envrn).StartDate - RunStJDay;
-                                    }
-                                    ThisWeekDay = mod(DataPeriods(Loop).WeekDay + NumDays - 1, 7) + 1;
-                                    break;
                                 }
                             }
 
@@ -1140,28 +1156,34 @@ namespace WeatherManager {
                                     EnDate += "/<noyear>";
                                 }
                                 if (NumDataPeriods == 1) {
-                                    ShowContinueError("Weather Data Period (Start=" + StDate + ",End=" + EnDate);
+                                    ShowContinueError("Weather Data Period (Start=" + StDate + ",End=" + EnDate + ')');
                                 } else {
                                     ShowContinueError("Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')');
                                 }
                                 ShowFatalError(RoutineName + "Program terminates due to preceding condition.");
                             }
 
+                            if (missingLeap) {
+                                // Bail out now if we still need to
+                                ShowFatalError(RoutineName + "Program terminates due to preceding condition.");
+                            }
+
                             // Following builds Environment start/end for ASHRAE 55 warnings
                             gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
                             gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
-                            if (Environment(Envrn).ActualWeather) {
-                                string = RoundSigDigits(Environment(Envrn).StartYear);
-                                StDate += "/" + string;
-                                string = RoundSigDigits(Environment(Envrn).EndYear);
-                                EnDate += "/" + string;
-                            } else if (Environment(Envrn).CurrentYear > 0 && Environment(Envrn).TreatYearsAsConsecutive) {
-                                string = RoundSigDigits(Environment(Envrn).CurrentYear);
-                                StDate += "/" + string;
-                                string = RoundSigDigits(Environment(Envrn).CurrentYear + Environment(Envrn).NumSimYears);
-                                EnDate += "/" + string;
+                            if (Environment(Envrn).KindOfEnvrn == ksRunPeriodWeather) {
+                                StDate += "/" + RoundSigDigits(Environment(Envrn).StartYear);
+                                EnDate += "/" + RoundSigDigits(Environment(Envrn).EndYear);
                             }
                             EnvironmentStartEnd = StDate + " - " + EnDate;
+
+                            if (Environment(Envrn).DayOfWeek == 0) { // Use Sunday
+                                TWeekDay = 1;
+                                MonWeekDay = DataPeriods(Loop).MonWeekDay;
+                            } else {
+                                TWeekDay = Environment(Envrn).DayOfWeek;
+                                MonWeekDay = Environment(Envrn).MonWeekDay;
+                            }
 
                             if (DoWeatherInitReporting) {
                                 if (Environment(Envrn).UseDST) {
@@ -1190,28 +1212,10 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
-                                if (Environment(Envrn).DayOfWeek == 0) { // Uses Weather file start
-                                    gio::write(OutputFileInits, EnvNameFormat)
-                                        << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(ThisWeekDay)
-                                        << cTotalEnvDays << "UseWeatherFile" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
-                                    TWeekDay = ThisWeekDay;
-                                    MonWeekDay = DataPeriods(Loop).MonWeekDay;
-                                } else {
-                                    gio::write(OutputFileInits, EnvNameFormat)
-                                        << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate
-                                        << ValidDayNames(Environment(Envrn).DayOfWeek) << cTotalEnvDays << "Use RunPeriod Specified Day" << AlpUseDST
-                                        << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
-                                    TWeekDay = Environment(Envrn).DayOfWeek;
-                                    MonWeekDay = Environment(Envrn).MonWeekDay;
-                                }
-                            } else {                                     // just in case
-                                if (Environment(Envrn).DayOfWeek == 0) { // Uses Weather file start
-                                    TWeekDay = ThisWeekDay;
-                                    MonWeekDay = DataPeriods(Loop).MonWeekDay;
-                                } else {
-                                    TWeekDay = Environment(Envrn).DayOfWeek;
-                                    MonWeekDay = Environment(Envrn).MonWeekDay;
-                                }
+
+                                gio::write(OutputFileInits, EnvNameFormat)
+                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay) << cTotalEnvDays
+                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
@@ -1229,8 +1233,8 @@ namespace WeatherManager {
                                             ErrorsFound = true;
                                         }
                                         if (DataPeriods(1).StMon == 1 && DataPeriods(1).StDay == 1) {
-                                            RunStJDay = JulianDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
-                                            RunEnJDay = JulianDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
+                                            RunStJDay = General::OrdinalDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
+                                            RunEnJDay = General::OrdinalDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
                                             if (RunEnJDay - RunStJDay + 1 != 365) {
                                                 ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
                                                                               "that do not contain 365 days.");
@@ -1253,13 +1257,11 @@ namespace WeatherManager {
                             // Only need to set Week days for Run Days
                             RunPeriodStartDayOfWeek = TWeekDay;
                             WeekDayTypes = 0;
-                            JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                            JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
-                            if (JDay5End >= JDay5Start) {
-                                curSimDayForEndOfRunPeriod = DayOfSim + (JDay5End - JDay5Start) + LeapYearAdd;
-                            } else {
-                                curSimDayForEndOfRunPeriod = DayOfSim + JulianDay(12, 31, LeapYearAdd) - JDay5Start + JDay5End;
-                            }
+                            JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                            JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
+
+                            curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;
+
                             Loop = JDay5Start;
                             while (true) {
                                 WeekDayTypes(Loop) = TWeekDay;
@@ -1280,9 +1282,7 @@ namespace WeatherManager {
                                 DaylightSavingIsActive = true;
                             }
                             Environment(Envrn).SetWeekDays = false;
-                            if (Environment(Envrn).ActualWeather) {
-                                curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;
-                            }
+
                             if (DaylightSavingIsActive) {
                                 SetDSTDateRanges(MonWeekDay, DSTIndex, DSTActStMon, DSTActStDay, DSTActEnMon, DSTActEnDay);
                             }
@@ -1803,7 +1803,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // Argument array dimensioning
 
@@ -1897,8 +1896,8 @@ namespace WeatherManager {
         }
 
         DSTIndex = 0;
-        JDay = JulianDay(ActStartMonth, ActStartDay, LeapYearAdd);
-        JDay1 = JulianDay(ActEndMonth, ActEndDay, LeapYearAdd);
+        JDay = General::OrdinalDay(ActStartMonth, ActStartDay, LeapYearAdd);
+        JDay1 = General::OrdinalDay(ActEndMonth, ActEndDay, LeapYearAdd);
         if (JDay1 >= JDay) {
             DSTIndex({JDay, JDay1}) = 1;
         } else {
@@ -1928,8 +1927,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Argument array dimensioning
 
@@ -1961,7 +1958,7 @@ namespace WeatherManager {
         for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
             if (SpecialDays(Loop).WthrFile && !UseSpecialDays) continue;
             if (SpecialDays(Loop).DateType <= MonthDay) {
-                JDay = JulianDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
                 if (SpecialDays(Loop).Duration == 1 && Environment(Envrn).ApplyWeekendRule) {
                     if (WeekDayTypes(JDay) == 1) {
                         // Sunday, must go to Monday
@@ -1974,7 +1971,7 @@ namespace WeatherManager {
                         if (JDay == 366 && LeapYearAdd == 0) JDay = 1;
                     }
                 }
-                InvJulianDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
+                General::InvOrdinalDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
             } else if (SpecialDays(Loop).DateType == NthDayInMonth) {
                 if (SpecialDays(Loop).WeekDay >= MonWeekDay(SpecialDays(Loop).Month)) {
                     ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
@@ -1989,7 +1986,7 @@ namespace WeatherManager {
                 }
                 SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
                 SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = JulianDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
             } else { // LastWeekDayInMonth
                 ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
                 while (ThisDay + 7 <= ActEndDayOfMonth(SpecialDays(Loop).Month)) {
@@ -1997,7 +1994,7 @@ namespace WeatherManager {
                 }
                 SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
                 SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = JulianDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
             }
             if (SpecialDayTypes(JDay) != 0) {
                 ShowWarningError(RoutineName + "Special Day definition (" + SpecialDays(Loop).Name +
@@ -2044,8 +2041,6 @@ namespace WeatherManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2187,8 +2182,6 @@ namespace WeatherManager {
                             SetSpecialDayDates(Environment(Envrn).MonWeekDay);
                         }
                         ++YearOfSim;
-                        DataGlobals::CalendarYear += 1;
-                        DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
                         FirstSimDayofYear = 1;
                         ReadWeatherForDay(FirstSimDayofYear, Envrn, false); // Read tomorrow's weather
                     } else {
@@ -2215,7 +2208,7 @@ namespace WeatherManager {
                     if (DatesShouldBeReset) {
                         if (Environment(Envrn).TreatYearsAsConsecutive) {
                             ++Environment(Envrn).CurrentYear;
-                            Environment(Envrn).IsLeapYear = IsLeapYear(Environment(Envrn).CurrentYear);
+                            Environment(Envrn).IsLeapYear = isLeapYear(Environment(Envrn).CurrentYear);
                             CurrentYearIsLeapYear = Environment(Envrn).IsLeapYear;
                             if (CurrentYearIsLeapYear) {
                                 if (WFAllowsLeapYears) {
@@ -2228,11 +2221,11 @@ namespace WeatherManager {
                             }
                             // need to reset MonWeekDay and WeekDayTypes
                             if (!CurrentYearIsLeapYear) {
-                                JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, 0);
-                                JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, 0);
+                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, 0);
+                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, 0);
                             } else {
-                                JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                                JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
+                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
                             }
                             if (!Environment(Envrn).ActualWeather)
                                 curSimDayForEndOfRunPeriod = DayOfSim + Environment(Envrn).RawSimDays + LeapYearAdd - 1;
@@ -2262,7 +2255,7 @@ namespace WeatherManager {
                 } else if ((Month == 1 && DayOfMonth == 1) && DatesShouldBeReset && (Jan1DatesShouldBeReset)) {
                     if (Environment(Envrn).TreatYearsAsConsecutive) {
                         ++Environment(Envrn).CurrentYear;
-                        Environment(Envrn).IsLeapYear = IsLeapYear(Environment(Envrn).CurrentYear);
+                        Environment(Envrn).IsLeapYear = isLeapYear(Environment(Envrn).CurrentYear);
                         CurrentYearIsLeapYear = Environment(Envrn).IsLeapYear;
                         if (CurrentYearIsLeapYear && !WFAllowsLeapYears) CurrentYearIsLeapYear = false;
                         if (DayOfSim < curSimDayForEndOfRunPeriod && CurrentYearIsLeapYear) ++curSimDayForEndOfRunPeriod;
@@ -2466,13 +2459,13 @@ namespace WeatherManager {
         // INTERPOL(IBLAST) legacy code.
 
         // Using/Aliasing
-        using General::JulianDay;
         using ScheduleManager::UpdateScheduleValues;
         using namespace GroundTemperatureManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static char time_stamp[10];
         static char day_stamp[6];
+        static char day_year_stamp[11];
         static std::string const RoutineName("SetCurrentWeather");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2484,12 +2477,12 @@ namespace WeatherManager {
 
         NextHour = HourOfDay + 1;
 
-        if (HourOfDay == 24) {
+        if (HourOfDay == 24) { // Should investigate whether EndDayFlag is always set here and use that instead
             NextHour = 1;
         }
 
-        if (HourOfDay == 1) {
-            DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+        if (HourOfDay == 1) { // Should investigate whether BeginDayFlag is always set here and use that instead
+            DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
         }
 
         UpdateScheduleValues();
@@ -2498,6 +2491,8 @@ namespace WeatherManager {
         CurMnDyHr = time_stamp;
         std::sprintf(day_stamp, "%02d/%02d", Month, DayOfMonth);
         CurMnDy = day_stamp;
+        std::sprintf(day_year_stamp, "%02d/%02d/%04d", Month, DayOfMonth, DataGlobals::CalendarYear);
+        DataEnvironment::CurMnDyYr = day_year_stamp;
 
         WeightNow = Interpolation(TimeStep);
         WeightPreviousHour = 1.0 - WeightNow;
@@ -2704,7 +2699,6 @@ namespace WeatherManager {
         // This subroutine reads the appropriate day of EPW weather data.
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleValuesForDay;
 
@@ -2892,7 +2886,11 @@ namespace WeatherManager {
                                              LiquidPrecip);
                 } else if (ReadStatus < 0) {
                     if (NumRewinds > 0) {
-                        ShowSevereError("Multiple rewinds on EPW while searching for first day");
+                        std::string date = std::to_string(Environment(Environ).StartMonth) + '/' + std::to_string(Environment(Environ).StartDay);
+                        if (Environment(Environ).MatchYear) {
+                            date += '/' + std::to_string(Environment(Environ).StartYear);
+                        }
+                        ShowSevereError("Multiple rewinds on EPW while searching for first day " + date);
                     } else {
                         gio::rewind(WeatherFileUnitNumber);
                         ++NumRewinds;
@@ -2940,8 +2938,8 @@ namespace WeatherManager {
                     }
                 }
                 if (ReadStatus != 0) {
-                    BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
-                                RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
+                    BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + ' ' + RoundSigDigits(WHour) +
+                                ':' + RoundSigDigits(WMinute);
                     gio::write(ErrOut, fmtLD) << ReadStatus;
                     strip(ErrOut);
                     ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
@@ -3308,11 +3306,17 @@ namespace WeatherManager {
                             SkipThisDay = false;
                         }
 
+                        if (Environment(Environ).ActualWeather && CurrentYearIsLeapYear) {
+                            if (WMonth == 3 && WDay == 1 && DataEnvironment::Month == 2 && DataEnvironment::DayOfMonth == 28) {
+                                ShowFatalError("ReadEPlusWeatherForDay: Current year is a leap year, but Feb29 data is missing.");
+                            }
+                        }
+
                         TomorrowVariables.Year = WYear;
                         TomorrowVariables.Month = WMonth;
                         TomorrowVariables.DayOfMonth = WDay;
-                        TomorrowVariables.DayOfYear = JulianDay(WMonth, WDay, LeapYearAdd);
-                        TomorrowVariables.DayOfYear_Schedule = JulianDay(WMonth, WDay, 1);
+                        TomorrowVariables.DayOfYear = General::OrdinalDay(WMonth, WDay, LeapYearAdd);
+                        TomorrowVariables.DayOfYear_Schedule = General::OrdinalDay(WMonth, WDay, 1);
                         CalculateDailySolarCoeffs(TomorrowVariables.DayOfYear,
                                                   A,
                                                   B,
@@ -4113,7 +4117,6 @@ namespace WeatherManager {
         // ASHRAE Handbook of Fundamentals?
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::RoundSigDigits;
         using ScheduleManager::GetSingleDayScheduleValues;
 
@@ -4215,7 +4218,7 @@ namespace WeatherManager {
         DesignDay(EnvrnNum).Year = CurrentYear; // f90 date_and_time implemented. full 4 digit year !+ 1900
         DesignDay(EnvrnNum).Month = DesDayInput(EnvrnNum).Month;
         DesignDay(EnvrnNum).DayOfMonth = DesDayInput(EnvrnNum).DayOfMonth;
-        DesignDay(EnvrnNum).DayOfYear = JulianDay(DesignDay(EnvrnNum).Month, DesignDay(EnvrnNum).DayOfMonth, 0);
+        DesignDay(EnvrnNum).DayOfYear = General::OrdinalDay(DesignDay(EnvrnNum).Month, DesignDay(EnvrnNum).DayOfMonth, 0);
         gio::write(CurMnDy, MnDyFmt) << DesDayInput(EnvrnNum).Month << DesDayInput(EnvrnNum).DayOfMonth;
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
         RunPeriodEnvironment = false;
@@ -5652,7 +5655,6 @@ namespace WeatherManager {
         // Legacy subroutine CKBLDE.
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -5871,8 +5873,6 @@ namespace WeatherManager {
         static bool ErrorsFound(false);
         int RPD1;
         int RPD2;
-        int RP;   // number of run periods
-        int RPAW; // number of run periods, actual weather
 
         // FLOW:
 
@@ -5880,9 +5880,7 @@ namespace WeatherManager {
         TotDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
         RPD1 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
         RPD2 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
-        RP = inputProcessor->getNumObjectsFound("RunPeriod");
-        RPAW = inputProcessor->getNumObjectsFound("RunPeriod:CustomRange");
-        TotRunPers = RP + RPAW;
+        TotRunPers = inputProcessor->getNumObjectsFound("RunPeriod");
         NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
         if (TotRunPers > 0) {
             WeathSimReq = true;
@@ -5970,6 +5968,30 @@ namespace WeatherManager {
         }
     }
 
+    static int findYearForWeekday(int const month, int const day, WeekDay const weekday)
+    {
+        // Find a year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
+        // the date with the weekday specified.
+
+        // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
+        static std::array<int, 13> defaultYear{{2013, 2014, 2015, 2010, 2011, 2017, 2007, 2013, 2014, 2015, 2010, 2011, 2017}};
+
+        int rem = calculateDayOfYear(month, day) % 7;
+        return defaultYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
+    }
+
+    static int findLeapYearForWeekday(int const month, int const day, WeekDay const weekday)
+    {
+        // Find a leap year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
+        // the date with the weekday specified.
+
+        // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
+        static std::array<int, 13> defaultLeapYear{{2008, 1992, 2004, 2016, 2000, 2012, 1996, 2008, 1992, 2004, 2016, 2000, 2012}};
+
+        int rem = calculateDayOfYear(month, day, true) % 7;
+        return defaultLeapYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
+    }
+
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound)
     {
@@ -5986,7 +6008,6 @@ namespace WeatherManager {
         //  simulation dates
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
@@ -5997,16 +6018,6 @@ namespace WeatherManager {
         int IOStat;     // IO Status when calling get input subroutine
         int Loop;
         int Count;
-        int RP;   // number of run periods
-        int RPAW; // number of run periods, actual weather
-        int Ptr;
-        int LocalLeapYearAdd;
-
-        // Object Data
-
-        // FLOW:
-        RP = inputProcessor->getNumObjectsFound("RunPeriod");
-        RPAW = inputProcessor->getNumObjectsFound("RunPeriod:CustomRange");
 
         // Call Input Get routine to retrieve annual run data
         RunPeriodInput.allocate(TotRunPers);
@@ -6014,12 +6025,12 @@ namespace WeatherManager {
 
         cCurrentModuleObject = "RunPeriod";
         Count = 0;
-        if (!WFAllowsLeapYears) {
-            LocalLeapYearAdd = 0;
-        } else {
-            LocalLeapYearAdd = 1;
-        }
-        for (Loop = 1; Loop <= RP; ++Loop) {
+        // if ( ! WFAllowsLeapYears ) {
+        //   LocalLeapYearAdd = 0;
+        // } else {
+        //  LocalLeapYearAdd = 1;
+        // }
+        for (Loop = 1; Loop <= TotRunPers; ++Loop) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -6032,215 +6043,17 @@ namespace WeatherManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
+            // A1, \field Name
             if (!lAlphaFieldBlanks(1)) {
                 GlobalNames::VerifyUniqueInterObjectName(
                     RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             }
 
             ++Count;
-            RunPeriodInput(Loop).Title = cAlphaArgs(1);
-
-            // set the start and end day of month from user input
-            // N1 , \field Begin Month
-            // N2 , \field Begin Day of Month
-            // N3 , \field End Month
-            // N4 , \field End Day of Month
-            RunPeriodInput(Loop).StartMonth = int(rNumericArgs(1));
-            RunPeriodInput(Loop).StartDay = int(rNumericArgs(2));
-            RunPeriodInput(Loop).EndMonth = int(rNumericArgs(3));
-            RunPeriodInput(Loop).EndDay = int(rNumericArgs(4));
-
-            //  N5,  \field Number of Times Runperiod to be Repeated
-            if (int(rNumericArgs(5)) == 0) {
-                RunPeriodInput(Loop).NumSimYears = 1;
-            } else {
-                RunPeriodInput(Loop).NumSimYears = int(rNumericArgs(5));
-            }
-
-            //  N6;  \field Start Year
-            if (int(rNumericArgs(6)) == 0) {
-                RunPeriodInput(Loop).BeginYear = AutoCalculate;
-                RunPeriodInput(Loop).TreatYearsAsConsecutive = false;
-            } else {
-                RunPeriodInput(Loop).BeginYear = int(rNumericArgs(6));
-                RunPeriodInput(Loop).TreatYearsAsConsecutive = true;
-            }
-
-            if (FullAnnualRun && Loop == 1) {
-                RunPeriodInput(Loop).StartMonth = 1;
-                RunPeriodInput(Loop).StartDay = 1;
-                RunPeriodInput(Loop).EndMonth = 12;
-                RunPeriodInput(Loop).EndDay = 31;
-            }
-
-            {
-                auto const SELECT_CASE_var(RunPeriodInput(Loop).StartMonth);
-
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (RunPeriodInput(Loop).StartDay > 31) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (RunPeriodInput(Loop).StartDay > 30) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (RunPeriodInput(Loop).StartDay > 28 + LocalLeapYearAdd) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cNumericFieldNames(2) + " invalid=[" +
-                                    TrimSigDigits(RunPeriodInput(Loop).StartMonth) + ']');
-                    ErrorsFound = true;
-                }
-            }
-
-            {
-                auto const SELECT_CASE_var(RunPeriodInput(Loop).EndMonth);
-
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (RunPeriodInput(Loop).EndDay > 31) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (RunPeriodInput(Loop).EndDay > 30) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (RunPeriodInput(Loop).EndDay > 28 + LocalLeapYearAdd) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cNumericFieldNames(3) + " invalid=[" +
-                                    TrimSigDigits(RunPeriodInput(Loop).EndMonth) + ']');
-                    ErrorsFound = true;
-                }
-            }
-
-            // A2 , \field Day of Week for Start Day
-            if (lAlphaFieldBlanks(2) || cAlphaArgs(2) == "USEWEATHERFILE") {
-                RunPeriodInput(Loop).DayOfWeek = 0; // Defaults to Day of Week from Weather File
-            } else {
-                RunPeriodInput(Loop).DayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(2), DaysOfWeek, 7);
-                if (RunPeriodInput(Loop).DayOfWeek == 0) {
-                    ShowWarningError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
-                                     cAlphaArgs(2) + " for Start is not Valid, DayofWeek from WeatherFile will be used.");
-                }
-            }
-
-            // A3,  \field Use Weather File Holidays and Special Days
-            if (lAlphaFieldBlanks(3) || UtilityRoutines::SameString(cAlphaArgs(3), "YES")) {
-                RunPeriodInput(Loop).UseHolidays = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
-                RunPeriodInput(Loop).UseHolidays = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
-                ErrorsFound = true;
-            }
-
-            // A4,  \field Use Weather File Daylight Saving Period
-            if (lAlphaFieldBlanks(4) || UtilityRoutines::SameString(cAlphaArgs(4), "YES")) {
-                RunPeriodInput(Loop).UseDST = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
-                RunPeriodInput(Loop).UseDST = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
-                ErrorsFound = true;
-            }
-
-            // A5,  \field Apply Weekend Holiday Rule
-            if (lAlphaFieldBlanks(5) || UtilityRoutines::SameString(cAlphaArgs(5), "YES")) {
-                RunPeriodInput(Loop).ApplyWeekendRule = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
-                RunPeriodInput(Loop).ApplyWeekendRule = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
-                ErrorsFound = true;
-            }
-
-            // A6,  \field Use Weather File Rain Indicators
-            if (lAlphaFieldBlanks(6) || UtilityRoutines::SameString(cAlphaArgs(6), "YES")) {
-                RunPeriodInput(Loop).UseRain = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "NO")) {
-                RunPeriodInput(Loop).UseRain = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
-                ErrorsFound = true;
-            }
-
-            // A7,  \field Use Weather File Snow Indicators
-            if (lAlphaFieldBlanks(7) || UtilityRoutines::SameString(cAlphaArgs(7), "YES")) {
-                RunPeriodInput(Loop).UseSnow = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
-                RunPeriodInput(Loop).UseSnow = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
-                ErrorsFound = true;
-            }
-
-            // A8,  \field Increment Day of Week on repeat
-            if (lAlphaFieldBlanks(8) || UtilityRoutines::SameString(cAlphaArgs(8), "YES")) {
-                RunPeriodInput(Loop).RollDayTypeOnRepeat = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "NO")) {
-                RunPeriodInput(Loop).RollDayTypeOnRepeat = false;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ' ' + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) +
-                                ']');
-                ErrorsFound = true;
-            }
-
-            // calculate the annual start and end dates from the user inputted month and day
-            RunPeriodInput(Loop).StartDate = JulianDay(RunPeriodInput(Loop).StartMonth, RunPeriodInput(Loop).StartDay, LeapYearAdd);
-            RunPeriodInput(Loop).EndDate = JulianDay(RunPeriodInput(Loop).EndMonth, RunPeriodInput(Loop).EndDay, LeapYearAdd);
-            RunPeriodInput(Loop).MonWeekDay = 0;
-            if (RunPeriodInput(Loop).DayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(
-                    RunPeriodInput(Loop).StartMonth, RunPeriodInput(Loop).StartDay, RunPeriodInput(Loop).DayOfWeek, RunPeriodInput(Loop).MonWeekDay);
-            }
-        }
-
-        cCurrentModuleObject = "RunPeriod:CustomRange";
-        Count = 0;
-        for (Ptr = 1; Ptr <= RPAW; ++Ptr) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          Ptr,
-                                          cAlphaArgs,
-                                          NumAlpha,
-                                          rNumericArgs,
-                                          NumNumeric,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-
-            if (!lAlphaFieldBlanks(1)) {
-                GlobalNames::VerifyUniqueInterObjectName(
-                    RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-            }
-            ++Count;
-            Loop = RP + Ptr;
-            RunPeriodInput(Loop).Title = cAlphaArgs(1);
+            // Loop = RP + Ptr;
+            // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "RUNPERIOD 1" anyways
+            // which is fine for our reporting below
+            RunPeriodInput(Loop).title = cAlphaArgs(1);
 
             // set the start and end day of month from user input
             // N1 , \field Begin Month
@@ -6249,162 +6062,265 @@ namespace WeatherManager {
             // N4 , \field End Month
             // N5 , \field End Day of Month
             // N6,  \field End Year
-            RunPeriodInput(Loop).StartMonth = int(rNumericArgs(1));
-            RunPeriodInput(Loop).StartDay = int(rNumericArgs(2));
-            RunPeriodInput(Loop).StartYear = int(rNumericArgs(3));
-            RunPeriodInput(Loop).EndMonth = int(rNumericArgs(4));
-            RunPeriodInput(Loop).EndDay = int(rNumericArgs(5));
-            RunPeriodInput(Loop).EndYear = int(rNumericArgs(6));
+            RunPeriodInput(Loop).startMonth = int(rNumericArgs(1));
+            RunPeriodInput(Loop).startDay = int(rNumericArgs(2));
+            RunPeriodInput(Loop).startYear = int(rNumericArgs(3));
+            RunPeriodInput(Loop).endMonth = int(rNumericArgs(4));
+            RunPeriodInput(Loop).endDay = int(rNumericArgs(5));
+            RunPeriodInput(Loop).endYear = int(rNumericArgs(6));
             RunPeriodInput(Loop).TreatYearsAsConsecutive = true;
 
             if (FullAnnualRun && Loop == 1) {
-                RunPeriodInput(Loop).StartMonth = 1;
-                RunPeriodInput(Loop).StartDay = 1;
-                RunPeriodInput(Loop).EndMonth = 12;
-                RunPeriodInput(Loop).EndDay = 31;
+                RunPeriodInput(Loop).startMonth = 1;
+                RunPeriodInput(Loop).startDay = 1;
+                RunPeriodInput(Loop).endMonth = 12;
+                RunPeriodInput(Loop).endDay = 31;
             }
 
-            {
-                auto const SELECT_CASE_var(RunPeriodInput(Loop).StartMonth);
-
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (RunPeriodInput(Loop).StartDay > 31) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (RunPeriodInput(Loop).StartDay > 30) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (RunPeriodInput(Loop).StartDay > 28 + LeapYearAdd) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(2) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(1) + "=[" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ' ' + cNumericFieldNames(2) + " invalid=[" +
-                                    TrimSigDigits(RunPeriodInput(Loop).StartMonth) + ']');
+            // Validate year inputs
+            if (RunPeriodInput(Loop).startYear == 0) {
+                if (RunPeriodInput(Loop).endYear != 0) { // Have to have an input start year to input an end year
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title +
+                                    ", end year cannot be specified if the start year is not.");
                     ErrorsFound = true;
                 }
+            } else if (RunPeriodInput(Loop).startYear < 1583) { // Bail on the proleptic Gregorian calendar
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
+                                std::to_string(RunPeriodInput(Loop).startYear) + ") is too early, please choose a date after 1582.");
+                ErrorsFound = true;
             }
 
-            {
-                auto const SELECT_CASE_var(RunPeriodInput(Loop).EndMonth);
-
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (RunPeriodInput(Loop).EndDay > 31) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (RunPeriodInput(Loop).EndDay > 30) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (RunPeriodInput(Loop).EndDay > 28 + LeapYearAdd) {
-                        ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", " + cNumericFieldNames(4) + " invalid=[" +
-                                        TrimSigDigits(RunPeriodInput(Loop).EndDay) + ']');
-                        ShowContinueError("Indicated " + cNumericFieldNames(3) + "=[" + TrimSigDigits(RunPeriodInput(Loop).EndMonth) + "].");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cNumericFieldNames(3) + " invalid=[" +
-                                    TrimSigDigits(RunPeriodInput(Loop).EndMonth) + ']');
-                    ErrorsFound = true;
-                }
+            if (RunPeriodInput(Loop).endYear != 0 && RunPeriodInput(Loop).startYear > RunPeriodInput(Loop).endYear) {
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
+                                std::to_string(RunPeriodInput(Loop).startYear) + ") is after the end year (" +
+                                std::to_string(RunPeriodInput(Loop).endYear) + ").");
+                ErrorsFound = true;
             }
 
             // A2 , \field Day of Week for Start Day
-            if (lAlphaFieldBlanks(2) || cAlphaArgs(2) == "USEWEATHERFILE") {
-                RunPeriodInput(Loop).DayOfWeek = 0; // Defaults to Day of Week from Weather File
+            bool inputWeekday = false;
+            if (!lAlphaFieldBlanks(2)) { // Have input
+                auto result = weekDayLookUp.find(cAlphaArgs(2));
+                if (result == weekDayLookUp.end()) {
+                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
+                                     cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
+                    RunPeriodInput(Loop).startWeekDay = WeekDay::Sunday;
+                } else {
+                    RunPeriodInput(Loop).startWeekDay = result->second;
+                    inputWeekday = true;
+                }
+            } else { // No input, set the default as Sunday. This may get overriden below
+                RunPeriodInput(Loop).startWeekDay = WeekDay::Sunday;
+            }
+
+            // Validate the dates now that the weekday field has been looked at
+            if (RunPeriodInput(Loop).startMonth == 2 && RunPeriodInput(Loop).startDay == 29) {
+                // Requested start date is a leap year
+                if (RunPeriodInput(Loop).startYear == 0) { // No input starting year
+                    if (inputWeekday) {
+                        RunPeriodInput(Loop).startYear =
+                            findLeapYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                    } else {
+                        // 2012 is the default year, 1/1 is a Sunday
+                        RunPeriodInput(Loop).startYear = 2012;
+                        RunPeriodInput(Loop).startWeekDay =
+                            calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                    }
+                } else {                                               // Have an input start year
+                    if (!isLeapYear(RunPeriodInput(Loop).startYear)) { // Start year is not a leap year
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start year (" +
+                                        std::to_string(RunPeriodInput(Loop).startYear) +
+                                        ") is not a leap year but the requested start date is 2/29.");
+                        ErrorsFound = true;
+                    } else { // Start year is a leap year
+                        WeekDay weekday =
+                            calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                        if (inputWeekday) { // Check for correctness of input
+                            if (weekday != RunPeriodInput(Loop).startWeekDay) {
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
+                                                 ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
+                                                 "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
+                                RunPeriodInput(Loop).startWeekDay = weekday;
+                            }
+                        } else { // Set the weekday if it was not input
+                            RunPeriodInput(Loop).startWeekDay = weekday;
+                        }
+                    }
+                }
             } else {
-                RunPeriodInput(Loop).DayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(2), DaysOfWeek, 7);
-                if (RunPeriodInput(Loop).DayOfWeek == 0) {
-                    ShowWarningError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
-                                     cAlphaArgs(2) + " for Start is not Valid, DayofWeek from WeatherFile will be used.");
+                // Non leap-day start date
+                if (!validMonthDay(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay)) {
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", Invalid input start month/day (" +
+                                    TrimSigDigits(RunPeriodInput(Loop).startMonth) + '/' + TrimSigDigits(RunPeriodInput(Loop).startDay) + ')');
+                    ErrorsFound = true;
+                } else {                                       // Month/day is valid
+                    if (RunPeriodInput(Loop).startYear == 0) { // No input starting year
+                        if (inputWeekday) {
+                            RunPeriodInput(Loop).startYear =
+                                findYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                        } else {
+                            // 2017 is the default year, 1/1 is a Sunday
+                            RunPeriodInput(Loop).startYear = 2017;
+                            RunPeriodInput(Loop).startWeekDay =
+                                calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                        }
+                    } else { // Have an input starting year
+                        WeekDay weekday =
+                            calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                        if (inputWeekday) { // Check for correctness of input
+                            if (weekday != RunPeriodInput(Loop).startWeekDay) {
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
+                                                 ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
+                                                 "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
+                                RunPeriodInput(Loop).startWeekDay = weekday;
+                            }
+                        } else { // Set the weekday if it was not input
+                            RunPeriodInput(Loop).startWeekDay = weekday;
+                        }
+                    }
                 }
             }
 
+            // Compute the Julian date of the start date
+            RunPeriodInput(Loop).startJulianDate =
+                computeJulianDate(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+
+            // Validate the end date
+            if (RunPeriodInput(Loop).endMonth == 2 && RunPeriodInput(Loop).endDay == 29) {
+                // Requested end date is a leap year
+                if (RunPeriodInput(Loop).endYear == 0) { // No input end year
+                    if (isLeapYear(RunPeriodInput(Loop).startYear) && RunPeriodInput(Loop).startMonth < 3) {
+                        // The run period is from some date on or before 2/29 through 2/29
+                        RunPeriodInput(Loop).endYear = RunPeriodInput(Loop).startYear;
+                    } else {
+                        // There might be a better approach here, but for now just loop forward for the next leap year
+                        for (int yr = RunPeriodInput(Loop).startYear + 1; yr < RunPeriodInput(Loop).startYear + 10; yr++) {
+                            if (isLeapYear(yr)) {
+                                RunPeriodInput(Loop).endYear = yr;
+                                break;
+                            }
+                        }
+                    }
+                } else {                                             // Have an input end year
+                    if (!isLeapYear(RunPeriodInput(Loop).endYear)) { // End year is not a leap year
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", end year (" +
+                                        std::to_string(RunPeriodInput(Loop).startYear) + ") is not a leap year but the requested end date is 2/29.");
+                        ErrorsFound = true;
+                    } else {
+                        RunPeriodInput(Loop).endJulianDate =
+                            computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
+                        if (RunPeriodInput(Loop).startJulianDate > RunPeriodInput(Loop).endJulianDate) {
+                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start Julian date (" +
+                                            std::to_string(RunPeriodInput(Loop).startJulianDate) + ") is after the end Julian date (" +
+                                            std::to_string(RunPeriodInput(Loop).endJulianDate) + ").");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            } else {
+                // Non leap-day end date
+                if (!validMonthDay(RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay)) {
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", Invalid input end month/day (" +
+                                    TrimSigDigits(RunPeriodInput(Loop).startMonth) + '/' + TrimSigDigits(RunPeriodInput(Loop).startDay) + ')');
+                    ErrorsFound = true;
+                } else {                                     // Month/day is valid
+                    if (RunPeriodInput(Loop).endYear == 0) { // No input end year
+                        // Assume same year as start year
+                        RunPeriodInput(Loop).endYear = RunPeriodInput(Loop).startYear;
+                        RunPeriodInput(Loop).endJulianDate =
+                            computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
+                        if (RunPeriodInput(Loop).startJulianDate > RunPeriodInput(Loop).endJulianDate) {
+                            RunPeriodInput(Loop).endJulianDate = 0; // Force recalculation later
+                            RunPeriodInput(Loop).endYear += 1;
+                        }
+                    } else { // Have an input end year
+                        RunPeriodInput(Loop).endJulianDate =
+                            computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
+                        if (RunPeriodInput(Loop).startJulianDate > RunPeriodInput(Loop).endJulianDate) {
+                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start Julian date (" +
+                                            std::to_string(RunPeriodInput(Loop).startJulianDate) + ") is after the end Julian date (" +
+                                            std::to_string(RunPeriodInput(Loop).endJulianDate) + ").");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
+            if (RunPeriodInput(Loop).endJulianDate == 0) {
+                RunPeriodInput(Loop).endJulianDate =
+                    computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
+            }
+
+            RunPeriodInput(Loop).numSimYears = RunPeriodInput(Loop).endYear - RunPeriodInput(Loop).startYear + 1;
+
             // A3,  \field Use Weather File Holidays and Special Days
             if (lAlphaFieldBlanks(3) || UtilityRoutines::SameString(cAlphaArgs(3), "YES")) {
-                RunPeriodInput(Loop).UseHolidays = true;
+                RunPeriodInput(Loop).useHolidays = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
-                RunPeriodInput(Loop).UseHolidays = false;
+                RunPeriodInput(Loop).useHolidays = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
                 ErrorsFound = true;
             }
 
             // A4,  \field Use Weather File Daylight Saving Period
             if (lAlphaFieldBlanks(4) || UtilityRoutines::SameString(cAlphaArgs(4), "YES")) {
-                RunPeriodInput(Loop).UseDST = true;
+                RunPeriodInput(Loop).useDST = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
-                RunPeriodInput(Loop).UseDST = false;
+                RunPeriodInput(Loop).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
             // A5,  \field Apply Weekend Holiday Rule
             if (lAlphaFieldBlanks(5) || UtilityRoutines::SameString(cAlphaArgs(5), "YES")) {
-                RunPeriodInput(Loop).ApplyWeekendRule = true;
+                RunPeriodInput(Loop).applyWeekendRule = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
-                RunPeriodInput(Loop).ApplyWeekendRule = false;
+                RunPeriodInput(Loop).applyWeekendRule = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
                 ErrorsFound = true;
             }
 
             // A6,  \field Use Weather File Rain Indicators
             if (lAlphaFieldBlanks(6) || UtilityRoutines::SameString(cAlphaArgs(6), "YES")) {
-                RunPeriodInput(Loop).UseRain = true;
+                RunPeriodInput(Loop).useRain = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), "NO")) {
-                RunPeriodInput(Loop).UseRain = false;
+                RunPeriodInput(Loop).useRain = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
                 ErrorsFound = true;
             }
 
             // A7,  \field Use Weather File Snow Indicators
             if (lAlphaFieldBlanks(7) || UtilityRoutines::SameString(cAlphaArgs(7), "YES")) {
-                RunPeriodInput(Loop).UseSnow = true;
+                RunPeriodInput(Loop).useSnow = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
-                RunPeriodInput(Loop).UseSnow = false;
+                RunPeriodInput(Loop).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
                 ErrorsFound = true;
             }
 
+            // A8,  \field Treat Weather as Actual
+            if (lAlphaFieldBlanks(8) || UtilityRoutines::SameString(cAlphaArgs(8), "NO")) {
+                RunPeriodInput(Loop).actualWeather = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "YES")) {
+                RunPeriodInput(Loop).actualWeather = true;
+            } else {
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) + ']');
+                ErrorsFound = true;
+            }
+
+            RunPeriodInput(Loop).dayOfWeek = static_cast<int>(RunPeriodInput(Loop).startWeekDay);
+            RunPeriodInput(Loop).isLeapYear = isLeapYear(RunPeriodInput(Loop).startYear);
+
             // calculate the annual start and end days from the user inputted month and day
-            RunPeriodInput(Loop).ActualWeather = true;
-            JGDate(GregorianToJulian,
-                   RunPeriodInput(Loop).StartDate,
-                   RunPeriodInput(Loop).StartYear,
-                   RunPeriodInput(Loop).StartMonth,
-                   RunPeriodInput(Loop).StartDay);
-            JGDate(GregorianToJulian,
-                   RunPeriodInput(Loop).EndDate,
-                   RunPeriodInput(Loop).EndYear,
-                   RunPeriodInput(Loop).EndMonth,
-                   RunPeriodInput(Loop).EndDay);
-            RunPeriodInput(Loop).MonWeekDay = 0;
-            if (RunPeriodInput(Loop).DayOfWeek != 0 && !ErrorsFound) {
+            RunPeriodInput(Loop).monWeekDay = 0;
+            if (RunPeriodInput(Loop).dayOfWeek != 0 && !ErrorsFound) {
                 SetupWeekDaysByMonth(
-                    RunPeriodInput(Loop).StartMonth, RunPeriodInput(Loop).StartDay, RunPeriodInput(Loop).DayOfWeek, RunPeriodInput(Loop).MonWeekDay);
+                    RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).dayOfWeek, RunPeriodInput(Loop).monWeekDay);
             }
         }
 
@@ -6415,12 +6331,12 @@ namespace WeatherManager {
             TotRunPers = 1;
             WeathSimReq = true;
             RunPeriodInput.allocate(TotRunPers);
-            RunPeriodInput(1).StartDate = JulianDay(RunPeriodInput(1).StartMonth, RunPeriodInput(1).StartDay, LeapYearAdd);
-            RunPeriodInput(1).EndDate = JulianDay(RunPeriodInput(1).EndMonth, RunPeriodInput(1).EndDay, LeapYearAdd);
-            RunPeriodInput(1).MonWeekDay = 0;
-            if (RunPeriodInput(1).DayOfWeek != 0 && !ErrorsFound) {
+            RunPeriodInput(1).startJulianDate = General::OrdinalDay(RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, LeapYearAdd);
+            RunPeriodInput(1).endJulianDate = General::OrdinalDay(RunPeriodInput(1).endMonth, RunPeriodInput(1).endDay, LeapYearAdd);
+            RunPeriodInput(1).monWeekDay = 0;
+            if (RunPeriodInput(1).dayOfWeek != 0 && !ErrorsFound) {
                 SetupWeekDaysByMonth(
-                    RunPeriodInput(1).StartMonth, RunPeriodInput(1).StartDay, RunPeriodInput(1).DayOfWeek, RunPeriodInput(1).MonWeekDay);
+                    RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, RunPeriodInput(1).dayOfWeek, RunPeriodInput(1).monWeekDay);
             }
         } else if (TotRunPers > 1 && FullAnnualRun) {
             TotRunPers = 1;
@@ -6441,7 +6357,6 @@ namespace WeatherManager {
         //  simulation dates
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
@@ -6497,94 +6412,98 @@ namespace WeatherManager {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+
+            // Increment Count
             ++Count;
-            RunPeriodDesignInput(Count).Title = cAlphaArgs(1);
-            RunPeriodDesignInput(Count).PeriodType = "User Selected WeatherFile RunPeriod (Design)";
+            RunPeriodDesignInput(Count).title = cAlphaArgs(1);
+            RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile RunPeriod (Design)";
 
             // set the start and end day of month from user input
-            RunPeriodDesignInput(Count).StartMonth = int(rNumericArgs(1));
-            RunPeriodDesignInput(Count).StartDay = int(rNumericArgs(2));
-            RunPeriodDesignInput(Count).EndMonth = int(rNumericArgs(3));
-            RunPeriodDesignInput(Count).EndDay = int(rNumericArgs(4));
+            RunPeriodDesignInput(Count).startMonth = int(rNumericArgs(1));
+            RunPeriodDesignInput(Count).startDay = int(rNumericArgs(2));
+            RunPeriodDesignInput(Count).endMonth = int(rNumericArgs(3));
+            RunPeriodDesignInput(Count).endDay = int(rNumericArgs(4));
 
             {
-                auto const SELECT_CASE_var(RunPeriodDesignInput(Count).StartMonth);
+                auto const SELECT_CASE_var(RunPeriodDesignInput(Count).startMonth);
 
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
                     (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (RunPeriodDesignInput(Count).StartDay > 31) {
-                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
+                    if (RunPeriodDesignInput(Count).startDay > 31) {
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (RunPeriodDesignInput(Count).StartDay > 30) {
-                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
+                    if (RunPeriodDesignInput(Count).startDay > 30) {
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == 2) {
-                    if (RunPeriodDesignInput(Count).StartDay > 28 + LeapYearAdd) {
-                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cNumericFieldNames(2) +
-                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodInput(Loop).StartDay) + ']');
+                    if (RunPeriodDesignInput(Count).startDay > 28 + LeapYearAdd) {
+                        ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(2) +
+                                        " invalid (Day of Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startDay) + ']');
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cNumericFieldNames(1) +
-                                    " invalid (Month) [" + TrimSigDigits(RunPeriodInput(Loop).StartMonth) + ']');
+                    ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cNumericFieldNames(1) +
+                                    " invalid (Month) [" + TrimSigDigits(RunPeriodDesignInput(Count).startMonth) + ']');
                     ErrorsFound = true;
                 }
             }
 
             if (lAlphaFieldBlanks(2)) {
-                RunPeriodDesignInput(Count).DayOfWeek = 2; // Defaults to Monday
+                RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
-                RunPeriodDesignInput(Count).DayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(2), ValidNames, 12);
-                if (RunPeriodDesignInput(Count).DayOfWeek == 0 || RunPeriodDesignInput(Count).DayOfWeek == 8) {
-                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(1) +
+                RunPeriodDesignInput(Count).dayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(2), ValidNames, 12);
+                if (RunPeriodDesignInput(Count).dayOfWeek == 0 || RunPeriodDesignInput(Count).dayOfWeek == 8) {
+                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(1) +
                                      " invalid (Day of Week) [" + cAlphaArgs(1) + " for Start is not Valid, Monday will be Used.");
-                    RunPeriodDesignInput(Count).DayOfWeek = 2; // Defaults to Monday
+                    RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
                 }
             }
 
             if (lAlphaFieldBlanks(3) || UtilityRoutines::SameString(cAlphaArgs(3), "YES")) {
-                RunPeriodDesignInput(Count).UseDST = true;
+                RunPeriodDesignInput(Count).useDST = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
-                RunPeriodDesignInput(Count).UseDST = false;
+                RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
                 ErrorsFound = true;
             }
 
             if (lAlphaFieldBlanks(4) || UtilityRoutines::SameString(cAlphaArgs(4), "YES")) {
-                RunPeriodDesignInput(Count).UseRain = true;
-                RunPeriodDesignInput(Count).UseSnow = true;
+                RunPeriodDesignInput(Count).useRain = true;
+                RunPeriodDesignInput(Count).useSnow = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
-                RunPeriodDesignInput(Count).UseRain = false;
-                RunPeriodDesignInput(Count).UseSnow = false;
+                RunPeriodDesignInput(Count).useRain = false;
+                RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
             // calculate the annual start and end days from the user inputted month and day
-            RunPeriodDesignInput(Count).StartDate =
-                JulianDay(RunPeriodDesignInput(Count).StartMonth, RunPeriodDesignInput(Count).StartDay, LeapYearAdd);
-            RunPeriodDesignInput(Count).EndDate = JulianDay(RunPeriodDesignInput(Count).EndMonth, RunPeriodDesignInput(Count).EndDay, LeapYearAdd);
-            if (RunPeriodDesignInput(Count).StartDate <= RunPeriodDesignInput(Count).EndDate) {
-                RunPeriodDesignInput(Count).TotalDays =
-                    (RunPeriodDesignInput(Count).EndDate - RunPeriodDesignInput(Count).StartDate + 1) * RunPeriodDesignInput(Count).NumSimYears;
+            RunPeriodDesignInput(Count).startJulianDate =
+                General::OrdinalDay(RunPeriodDesignInput(Count).startMonth, RunPeriodDesignInput(Count).startDay, LeapYearAdd);
+            RunPeriodDesignInput(Count).endJulianDate =
+                General::OrdinalDay(RunPeriodDesignInput(Count).endMonth, RunPeriodDesignInput(Count).endDay, LeapYearAdd);
+            if (RunPeriodDesignInput(Count).startJulianDate <= RunPeriodDesignInput(Count).endJulianDate) {
+                RunPeriodDesignInput(Count).totalDays =
+                    (RunPeriodDesignInput(Count).endJulianDate - RunPeriodDesignInput(Count).startJulianDate + 1) *
+                    RunPeriodDesignInput(Count).numSimYears;
             } else {
-                RunPeriodDesignInput(Count).TotalDays =
-                    (JulianDay(12, 31, LeapYearAdd) - RunPeriodDesignInput(Count).StartDate + 1 + RunPeriodDesignInput(Count).EndDate) *
-                    RunPeriodDesignInput(Count).NumSimYears;
+                RunPeriodDesignInput(Count).totalDays = (General::OrdinalDay(12, 31, LeapYearAdd) - RunPeriodDesignInput(Count).startJulianDate + 1 +
+                                                         RunPeriodDesignInput(Count).endJulianDate) *
+                                                        RunPeriodDesignInput(Count).numSimYears;
             }
-            RunPeriodDesignInput(Count).MonWeekDay = 0;
-            if (RunPeriodDesignInput(1).DayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodDesignInput(1).StartMonth,
-                                     RunPeriodDesignInput(1).StartDay,
-                                     RunPeriodDesignInput(1).DayOfWeek,
-                                     RunPeriodDesignInput(1).MonWeekDay);
+            RunPeriodDesignInput(Count).monWeekDay = 0;
+            if (RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
+                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth,
+                                     RunPeriodDesignInput(1).startDay,
+                                     RunPeriodDesignInput(1).dayOfWeek,
+                                     RunPeriodDesignInput(1).monWeekDay);
             }
         }
 
@@ -6603,94 +6522,96 @@ namespace WeatherManager {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+
+            // Increment count
             ++Count;
-            RunPeriodDesignInput(Count).Title = cAlphaArgs(1);
-            RunPeriodDesignInput(Count).PeriodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs(2);
+            RunPeriodDesignInput(Count).title = cAlphaArgs(1);
+            RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs(2);
 
             // Period Selection
             if (!lAlphaFieldBlanks(2)) {
                 WhichPeriod = UtilityRoutines::FindItem(cAlphaArgs(2), TypicalExtremePeriods, &TypicalExtremeData::MatchValue);
                 if (WhichPeriod != 0) {
-                    RunPeriodDesignInput(Count).StartDay = TypicalExtremePeriods(WhichPeriod).StartDay;
-                    RunPeriodDesignInput(Count).StartMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
-                    RunPeriodDesignInput(Count).StartDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
-                    RunPeriodDesignInput(Count).EndDay = TypicalExtremePeriods(WhichPeriod).EndDay;
-                    RunPeriodDesignInput(Count).EndMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
-                    RunPeriodDesignInput(Count).EndDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
-                    RunPeriodDesignInput(Count).TotalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
+                    RunPeriodDesignInput(Count).startDay = TypicalExtremePeriods(WhichPeriod).StartDay;
+                    RunPeriodDesignInput(Count).startMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
+                    RunPeriodDesignInput(Count).startJulianDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
+                    RunPeriodDesignInput(Count).endDay = TypicalExtremePeriods(WhichPeriod).EndDay;
+                    RunPeriodDesignInput(Count).endMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
+                    RunPeriodDesignInput(Count).endJulianDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
+                    RunPeriodDesignInput(Count).totalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
                 } else {
                     WhichPeriod = UtilityRoutines::FindItem(cAlphaArgs(2), TypicalExtremePeriods, &TypicalExtremeData::MatchValue1);
                     if (WhichPeriod != 0) {
-                        RunPeriodDesignInput(Count).StartDay = TypicalExtremePeriods(WhichPeriod).StartDay;
-                        RunPeriodDesignInput(Count).StartMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
-                        RunPeriodDesignInput(Count).StartDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
-                        RunPeriodDesignInput(Count).EndDay = TypicalExtremePeriods(WhichPeriod).EndDay;
-                        RunPeriodDesignInput(Count).EndMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
-                        RunPeriodDesignInput(Count).EndDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
-                        RunPeriodDesignInput(Count).TotalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
-                        ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(2) + '=' +
+                        RunPeriodDesignInput(Count).startDay = TypicalExtremePeriods(WhichPeriod).StartDay;
+                        RunPeriodDesignInput(Count).startMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
+                        RunPeriodDesignInput(Count).startJulianDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
+                        RunPeriodDesignInput(Count).endDay = TypicalExtremePeriods(WhichPeriod).EndDay;
+                        RunPeriodDesignInput(Count).endMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
+                        RunPeriodDesignInput(Count).endJulianDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
+                        RunPeriodDesignInput(Count).totalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
+                        ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(2) + '=' +
                                          cAlphaArgs(2) + " matched to " + TypicalExtremePeriods(WhichPeriod).MatchValue);
                     } else {
                         WhichPeriod = UtilityRoutines::FindItem(cAlphaArgs(2), TypicalExtremePeriods, &TypicalExtremeData::MatchValue2);
                         if (WhichPeriod != 0) {
-                            RunPeriodDesignInput(Count).StartDay = TypicalExtremePeriods(WhichPeriod).StartDay;
-                            RunPeriodDesignInput(Count).StartMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
-                            RunPeriodDesignInput(Count).StartDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
-                            RunPeriodDesignInput(Count).EndDay = TypicalExtremePeriods(WhichPeriod).EndDay;
-                            RunPeriodDesignInput(Count).EndMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
-                            RunPeriodDesignInput(Count).EndDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
-                            RunPeriodDesignInput(Count).TotalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
-                            ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(2) +
+                            RunPeriodDesignInput(Count).startDay = TypicalExtremePeriods(WhichPeriod).StartDay;
+                            RunPeriodDesignInput(Count).startMonth = TypicalExtremePeriods(WhichPeriod).StartMonth;
+                            RunPeriodDesignInput(Count).startJulianDate = TypicalExtremePeriods(WhichPeriod).StartJDay;
+                            RunPeriodDesignInput(Count).endDay = TypicalExtremePeriods(WhichPeriod).EndDay;
+                            RunPeriodDesignInput(Count).endMonth = TypicalExtremePeriods(WhichPeriod).EndMonth;
+                            RunPeriodDesignInput(Count).endJulianDate = TypicalExtremePeriods(WhichPeriod).EndJDay;
+                            RunPeriodDesignInput(Count).totalDays = TypicalExtremePeriods(WhichPeriod).TotalDays;
+                            ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(2) +
                                              '=' + cAlphaArgs(2) + " matched to " + TypicalExtremePeriods(WhichPeriod).MatchValue);
                         } else {
-                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(2) +
+                            ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(2) +
                                             " invalid (not on Weather File)=" + cAlphaArgs(2));
                             ErrorsFound = true;
                         }
                     }
                 }
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(2) +
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(2) +
                                 " invalid (blank).");
                 ErrorsFound = true;
             }
 
             if (lAlphaFieldBlanks(3)) {
-                RunPeriodDesignInput(Count).DayOfWeek = 2; // Defaults to Monday
+                RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
-                RunPeriodDesignInput(Count).DayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(3), ValidNames, 12);
-                if (RunPeriodDesignInput(Count).DayOfWeek == 0 || RunPeriodDesignInput(Count).DayOfWeek == 8) {
-                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).Title + ' ' + cAlphaFieldNames(3) +
+                RunPeriodDesignInput(Count).dayOfWeek = UtilityRoutines::FindItemInList(cAlphaArgs(3), ValidNames, 12);
+                if (RunPeriodDesignInput(Count).dayOfWeek == 0 || RunPeriodDesignInput(Count).dayOfWeek == 8) {
+                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(3) +
                                      " invalid (Day of Week) [" + cAlphaArgs(3) + " for Start is not Valid, Monday will be Used.");
-                    RunPeriodDesignInput(Count).DayOfWeek = 2; // Defaults to Monday
+                    RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
                 }
             }
 
             if (lAlphaFieldBlanks(4) || UtilityRoutines::SameString(cAlphaArgs(4), "YES")) {
-                RunPeriodDesignInput(Count).UseDST = true;
+                RunPeriodDesignInput(Count).useDST = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
-                RunPeriodDesignInput(Count).UseDST = false;
+                RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
             if (lAlphaFieldBlanks(5) || UtilityRoutines::SameString(cAlphaArgs(5), "YES")) {
-                RunPeriodDesignInput(Count).UseRain = true;
-                RunPeriodDesignInput(Count).UseSnow = true;
+                RunPeriodDesignInput(Count).useRain = true;
+                RunPeriodDesignInput(Count).useSnow = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
-                RunPeriodDesignInput(Count).UseRain = false;
-                RunPeriodDesignInput(Count).UseSnow = false;
+                RunPeriodDesignInput(Count).useRain = false;
+                RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
                 ErrorsFound = true;
             }
-            RunPeriodDesignInput(1).MonWeekDay = 0;
-            if (RunPeriodDesignInput(1).DayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodDesignInput(1).StartMonth,
-                                     RunPeriodDesignInput(1).StartDay,
-                                     RunPeriodDesignInput(1).DayOfWeek,
-                                     RunPeriodDesignInput(1).MonWeekDay);
+            RunPeriodDesignInput(1).monWeekDay = 0;
+            if (RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
+                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth,
+                                     RunPeriodDesignInput(1).startDay,
+                                     RunPeriodDesignInput(1).dayOfWeek,
+                                     RunPeriodDesignInput(1).monWeekDay);
             }
         }
     }
@@ -6837,7 +6758,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6866,7 +6786,7 @@ namespace WeatherManager {
 
             Warn = 0;
 
-            JDay = JulianDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd) - 1;
+            JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd) - 1;
 
             for (Loop1 = 1; Loop1 <= SpecialDays(Loop).Duration; ++Loop1) {
                 ++JDay;
@@ -8086,25 +8006,25 @@ namespace WeatherManager {
         // Initialize Site:GroundTemperature:BuildingSurface object
         siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
-            ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
+            ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
         siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
-            ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;
+            ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
         siteShallowGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
-            ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
+            ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
         siteDeepGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
-            ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
+            ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
     }
 
@@ -8779,7 +8699,6 @@ namespace WeatherManager {
         // reads in the line and processes as appropriate.
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static gio::Fmt fmtLD("*");
@@ -9103,13 +9022,14 @@ namespace WeatherManager {
                         }
                     }
                     TypicalExtremePeriods(Count).StartJDay =
-                        JulianDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, 0);
-                    TypicalExtremePeriods(Count).EndJDay = JulianDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, 0);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, 0);
+                    TypicalExtremePeriods(Count).EndJDay =
+                        General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, 0);
                     if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
                         TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
                     } else {
-                        TypicalExtremePeriods(Count).TotalDays =
-                            JulianDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
+                        TypicalExtremePeriods(Count).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay +
+                                                                 1 + TypicalExtremePeriods(Count).EndJDay;
                     }
                 }
 
@@ -9291,16 +9211,16 @@ namespace WeatherManager {
                     ++Count;
                 }
                 for (Count = 1; Count <= NumEPWTypExtSets; ++Count) {
-                    // JulianDay (Month,Day,LeapYearValue)
+                    // General::OrdinalDay (Month,Day,LeapYearValue)
                     TypicalExtremePeriods(Count).StartJDay =
-                        JulianDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, LeapYearAdd);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, LeapYearAdd);
                     TypicalExtremePeriods(Count).EndJDay =
-                        JulianDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, LeapYearAdd);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, LeapYearAdd);
                     if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
                         TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
                     } else {
-                        TypicalExtremePeriods(Count).TotalDays =
-                            JulianDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
+                        TypicalExtremePeriods(Count).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay +
+                                                                 1 + TypicalExtremePeriods(Count).EndJDay;
                     }
                 }
 
@@ -9427,9 +9347,9 @@ namespace WeatherManager {
                                     }
                                     if (DataPeriods(CurCount).StYear == 0 || DataPeriods(CurCount).EnYear == 0) {
                                         DataPeriods(CurCount).DataStJDay =
-                                            JulianDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
+                                            General::OrdinalDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
                                         DataPeriods(CurCount).DataEnJDay =
-                                            JulianDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
+                                            General::OrdinalDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
                                         if (DataPeriods(CurCount).DataStJDay <= DataPeriods(CurCount).DataEnJDay) {
                                             DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
                                         } else {
@@ -9989,8 +9909,6 @@ namespace WeatherManager {
 
         // Using/Aliasing
         using General::BetweenDates;
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10007,9 +9925,6 @@ namespace WeatherManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        int Loop1;
-        int JDay1;
-        int JDay2;
         int LocalLeapYearAdd;
 
         // Transfer weather file information to the Environment derived type
@@ -10020,33 +9935,33 @@ namespace WeatherManager {
             auto &env = Environment(Envrn);
             auto &runPer = RunPeriodDesignInput(Loop);
 
-            env.StartMonth = runPer.StartMonth;
-            env.StartDay = runPer.StartDay;
-            env.StartJDay = JulianDay(runPer.StartMonth, runPer.StartDay, LeapYearAdd);
-            env.TotalDays = runPer.TotalDays;
-            env.EndMonth = runPer.EndMonth;
-            env.EndDay = runPer.EndDay;
-            env.EndJDay = JulianDay(runPer.EndMonth, runPer.EndDay, LeapYearAdd);
-            env.NumSimYears = runPer.NumSimYears;
+            env.StartMonth = runPer.startMonth;
+            env.StartDay = runPer.startDay;
+            env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LeapYearAdd);
+            env.TotalDays = runPer.totalDays;
+            env.EndMonth = runPer.endMonth;
+            env.EndDay = runPer.endDay;
+            env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LeapYearAdd);
+            env.NumSimYears = runPer.numSimYears;
             if (env.StartJDay <= env.EndJDay) {
                 env.TotalDays = (env.EndJDay - env.StartJDay + 1) * env.NumSimYears;
             } else {
-                env.TotalDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
+                env.TotalDays = (General::OrdinalDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
             }
             TotRunDesPersDays += env.TotalDays;
-            env.UseDST = runPer.UseDST;
-            env.UseHolidays = runPer.UseHolidays;
-            env.Title = runPer.Title;
-            env.cKindOfEnvrn = runPer.PeriodType;
+            env.UseDST = runPer.useDST;
+            env.UseHolidays = runPer.useHolidays;
+            env.Title = runPer.title;
+            env.cKindOfEnvrn = runPer.periodType;
             env.KindOfEnvrn = ksRunPeriodDesign;
             env.DesignDayNum = 0;
             env.RunPeriodDesignNum = Loop;
-            env.DayOfWeek = runPer.DayOfWeek;
-            env.MonWeekDay = runPer.MonWeekDay;
+            env.DayOfWeek = runPer.dayOfWeek;
+            env.MonWeekDay = runPer.monWeekDay;
             env.SetWeekDays = false;
-            env.ApplyWeekendRule = runPer.ApplyWeekendRule;
-            env.UseRain = runPer.UseRain;
-            env.UseSnow = runPer.UseSnow;
+            env.ApplyWeekendRule = runPer.applyWeekendRule;
+            env.UseRain = runPer.useRain;
+            env.UseSnow = runPer.useSnow;
             ++Envrn;
         }
 
@@ -10055,83 +9970,70 @@ namespace WeatherManager {
             auto &env = Environment(Envrn);
             auto &runPer = RunPeriodInput(Loop);
 
-            env.StartMonth = runPer.StartMonth;
-            env.StartDay = runPer.StartDay;
-            env.EndMonth = runPer.EndMonth;
-            env.EndDay = runPer.EndDay;
-            env.NumSimYears = runPer.NumSimYears;
-            if (runPer.ActualWeather) {
-                env.CurrentYear = runPer.StartYear;
-                env.IsLeapYear = IsLeapYear(runPer.StartYear);
-                env.TreatYearsAsConsecutive = true;
-                env.StartYear = runPer.StartYear;
-                env.EndYear = runPer.EndYear;
-                JGDate(GregorianToJulian, env.StartDate, env.StartYear, env.StartMonth, env.StartDay);
-                JGDate(GregorianToJulian, env.EndDate, env.EndYear, env.EndMonth, env.EndDay);
-                env.StartJDay = env.StartDate;
-                env.EndJDay = env.EndDate;
+            env.StartMonth = runPer.startMonth;
+            env.StartDay = runPer.startDay;
+            env.StartYear = runPer.startYear;
+            env.EndMonth = runPer.endMonth;
+            env.EndDay = runPer.endDay;
+            env.EndYear = runPer.endYear;
+            env.NumSimYears = runPer.numSimYears;
+            env.CurrentYear = runPer.startYear;
+            env.IsLeapYear = runPer.isLeapYear;
+            env.TreatYearsAsConsecutive = true;
+            if (runPer.actualWeather) {
+                // This will require leap years to be present, thus Julian days can be used for all the calculations
+                env.StartJDay = env.StartDate = runPer.startJulianDate;
+                env.EndJDay = env.EndDate = runPer.endJulianDate;
                 env.TotalDays = env.EndDate - env.StartDate + 1;
                 env.RawSimDays = env.EndDate - env.StartDate + 1;
                 env.MatchYear = true;
                 env.ActualWeather = true;
-            } else if (runPer.BeginYear < 100) { // std RunPeriod
-                env.CurrentYear = 0;
-                if (!WFAllowsLeapYears) {
-                    env.IsLeapYear = false; // explicit set
-                    LocalLeapYearAdd = 0;
-                } else {
-                    env.IsLeapYear = true; // explicit set
-                    LocalLeapYearAdd = 1;
-                }
-                env.TreatYearsAsConsecutive = false;
+            } else { // std RunPeriod
                 env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                env.StartJDay = JulianDay(runPer.StartMonth, runPer.StartDay, LocalLeapYearAdd);
-                env.EndJDay = JulianDay(runPer.EndMonth, runPer.EndDay, LocalLeapYearAdd);
-                // need message if isleapyear and wfleapyearind=0
-                if (env.StartJDay <= env.EndJDay) {
-                    env.RawSimDays = (env.EndJDay - env.StartJDay + 1);
-                    env.TotalDays = (env.EndJDay - env.StartJDay + 1) * env.NumSimYears;
-                } else {
-                    env.RawSimDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay);
-                    env.TotalDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
-                }
 
-            } else { // Using Runperiod and StartYear option.
-                env.CurrentYear = runPer.BeginYear;
-                env.IsLeapYear = IsLeapYear(env.CurrentYear);
-                env.TreatYearsAsConsecutive = true;
-                env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                env.StartJDay = JulianDay(runPer.StartMonth, runPer.StartDay, LeapYearAdd);
-                env.EndJDay = JulianDay(runPer.EndMonth, runPer.EndDay, LeapYearAdd);
-                env.TotalDays = 0;
-                for (Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1) {
-                    if (!IsLeapYear(runPer.BeginYear - 1 + Loop1) || !WFAllowsLeapYears) {
-                        JDay1 = JulianDay(runPer.StartMonth, runPer.StartDay, 0);
-                        JDay2 = JulianDay(runPer.EndMonth, runPer.EndDay, 0);
-                        if (JDay1 <= JDay2) {
-                            if (Loop1 == 1) env.RawSimDays = (JDay2 - JDay1 + 1);
-                            env.TotalDays += (JDay2 - JDay1 + 1);
-                        } else {
-                            if (Loop1 == 1) env.RawSimDays = JulianDay(12, 31, 0) - JDay1 + 1 + JDay2;
-                            env.TotalDays += JulianDay(12, 31, 0) - JDay1 + 1 + JDay2;
-                        }
-                    } else { // Leap Year
-                        JDay1 = JulianDay(runPer.StartMonth, runPer.StartDay, 1);
-                        JDay2 = JulianDay(runPer.EndMonth, runPer.EndDay, 1);
-                        if (JDay1 <= JDay2) {
-                            env.TotalDays += (JDay2 - JDay1 + 1);
-                        } else {
-                            env.TotalDays += JulianDay(12, 31, 1) - JDay1 + 1 + JDay2;
-                        }
+                if (env.StartYear == env.EndYear) {
+                    // Short-circuit all the calculations, we're in a single year
+                    if (!WFAllowsLeapYears) {
+                        env.IsLeapYear = false; // explicit set
+                        LocalLeapYearAdd = 0;
+                    } else {
+                        env.IsLeapYear = true; // explicit set
+                        LocalLeapYearAdd = 1;
                     }
+                    env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
+                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
+                    env.RawSimDays = (env.EndJDay - env.StartJDay + 1);
+                    env.TotalDays = env.RawSimDays;
+                } else {
+                    // Environment crosses year boundaries
+                    env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+                    env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
+                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) && WFAllowsLeapYears ? 1 : 0);
+                    env.TotalDays = 366 - env.StartJDay + env.EndJDay + 365 * std::max(env.NumSimYears - 2, 0);
+                    if (WFAllowsLeapYears) {
+                        // First year
+                        if (env.StartJDay < 59) {
+                            if (isLeapYear(env.StartYear)) {
+                                ++env.TotalDays;
+                            }
+                        }
+                        // Middle years
+                        for (int yr = env.StartYear + 1; yr < env.EndYear; ++yr) {
+                            if (isLeapYear(yr)) {
+                                ++env.TotalDays;
+                            }
+                        }
+                        // Last year not needed, the end ordinal date will take this into account
+                    }
+                    env.RawSimDays = env.TotalDays;
                 }
             }
-            env.UseDST = runPer.UseDST;
-            env.UseHolidays = runPer.UseHolidays;
-            if (runPer.Title == BlankString) {
+            env.UseDST = runPer.useDST;
+            env.UseHolidays = runPer.useHolidays;
+            if (runPer.title == BlankString) {
                 env.Title = WeatherFileLocationTitle;
             } else {
-                env.Title = runPer.Title;
+                env.Title = runPer.title;
             }
             if (env.KindOfEnvrn == ksReadAllWeatherData) {
                 env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
@@ -10139,17 +10041,17 @@ namespace WeatherManager {
                 env.cKindOfEnvrn = "WeatherFileRunPeriod";
                 env.KindOfEnvrn = ksRunPeriodWeather;
             }
-            env.DayOfWeek = runPer.DayOfWeek;
-            env.MonWeekDay = runPer.MonWeekDay;
+            env.DayOfWeek = runPer.dayOfWeek;
+            env.MonWeekDay = runPer.monWeekDay;
             env.SetWeekDays = false;
-            env.ApplyWeekendRule = runPer.ApplyWeekendRule;
-            env.UseRain = runPer.UseRain;
-            env.UseSnow = runPer.UseSnow;
+            env.ApplyWeekendRule = runPer.applyWeekendRule;
+            env.UseRain = runPer.useRain;
+            env.UseSnow = runPer.useSnow;
             ++Envrn;
         }
     }
 
-    bool IsLeapYear(int const Year)
+    bool isLeapYear(int const Year)
     {
 
         // FUNCTION INFORMATION:
@@ -10170,9 +10072,6 @@ namespace WeatherManager {
         // USE STATEMENTS:
         // na
 
-        // Return value
-        bool YesNo;
-
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
 
@@ -10188,13 +10087,12 @@ namespace WeatherManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        YesNo = false;
         if (mod(Year, 4) == 0) { // Potential Leap Year
             if (!(mod(Year, 100) == 0 && mod(Year, 400) != 0)) {
-                YesNo = true;
+                return true;
             }
         }
-        return YesNo;
+        return false;
     }
 
     void JGDate(int const jflag, // indicates direction of conversion,
@@ -10278,6 +10176,60 @@ namespace WeatherManager {
         // c
     }
 
+    int computeJulianDate(int const gyyyy, // input/output gregorian year, should be specified as 4 digits
+                          int const gmm,   // input/output gregorian month
+                          int const gdd    // input/output gregorian day
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason DeGraw
+        //       DATE WRITTEN   10/25/2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Split the former JGDate function in two. Convert a gregorian
+        // date to actual julian date.  the advantage of storing a julian date
+        // in the jdate format rather than a 5 digit format is that any
+        // number of days can be add or subtracted to jdate and
+        // that result is a proper julian date.
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // for discussion of this algorithm,
+        // see cacm, vol 11, no 10, oct 1968, page 657
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int tyyyy; // integer*4 variable needed for double precision arithmetic
+        int tmm;   // integer*4 variable needed for double precision arithmetic
+        int tdd;   // integer*4 variable needed for double precision arithmetic
+        int l;     // temporary variable used in conversion.
+
+        tyyyy = gyyyy;
+        tmm = gmm;
+        tdd = gdd;
+        l = (tmm - 14) / 12;
+        return tdd - 32075 + 1461 * (tyyyy + 4800 + l) / 4 + 367 * (tmm - 2 - l * 12) / 12 - 3 * ((tyyyy + 4900 + l) / 100) / 4;
+    }
+
     int CalculateDayOfWeek(int const JulianDate) // from JGDate calculation
     {
 
@@ -10336,6 +10288,165 @@ namespace WeatherManager {
         return DayOfWeek;
     }
 
+    WeekDay calculateDayOfWeek(int const year, int const month, int const day)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   March 2012
+        //       MODIFIED       October 2017, Jason DeGraw
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculate the correct day of week.
+
+        // METHODOLOGY EMPLOYED:
+        // Zeller's algorithm.
+
+        // REFERENCES:
+        // http://en.wikipedia.org/wiki/Zeller%27s_congruence
+        // and other references around the web.
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int Gyyyy(year); // Gregorian yyyy
+        int Gmm(month);  // Gregorian mm
+
+        // Jan, Feb are 13, 14 months of previous year
+        if (Gmm < 3) {
+            Gmm += 12;
+            --Gyyyy;
+        }
+
+        DayOfWeek = mod(day + (13 * (Gmm + 1) / 5) + Gyyyy + (Gyyyy / 4) + 6 * (Gyyyy / 100) + (Gyyyy / 400), 7);
+        if (DayOfWeek == 0) DayOfWeek = 7;
+
+        return static_cast<WeekDay>(DayOfWeek);
+    }
+
+    int calculateDayOfYear(int const Month, int const Day)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jason DeGraw
+        //       DATE WRITTEN   October 10, 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Compute the day of the year for non-leap years.
+
+        // METHODOLOGY EMPLOYED:
+        // Lookup table.
+
+        // REFERENCES:
+        // NA
+
+        // USE STATEMENTS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
+
+        // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
+        return daysbefore[Month - 1] + Day;
+    }
+
+    int calculateDayOfYear(int const Month, int const Day, bool const leapYear)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jason DeGraw
+        //       DATE WRITTEN   October 10, 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Compute the day of the year for leap and non-leap years.
+
+        // METHODOLOGY EMPLOYED:
+        // Lookup table.
+
+        // REFERENCES:
+        // NA
+
+        // USE STATEMENTS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
+        static std::array<int, 12> daysbeforeleap{{0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}};
+
+        // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
+        if (leapYear) {
+            return daysbeforeleap[Month - 1] + Day;
+        } else {
+            return daysbefore[Month - 1] + Day;
+        }
+    }
+
+    bool validMonthDay(int const month, int const day, int const leapYearAdd)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jason DeGraw
+        //       DATE WRITTEN   October 31, 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Determine if a month/day+leapyear combination is valid.
+
+        // METHODOLOGY EMPLOYED:
+        // Lookup table.
+
+        // REFERENCES:
+        // NA
+
+        // USE STATEMENTS:
+        // NA
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // NA
+
+        switch (month) {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+        case 12:
+            if (day > 31) {
+                return false;
+            }
+            break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (day > 30) {
+                return false;
+            }
+            break;
+        case 2:
+            if (day > 28 + leapYearAdd) {
+                return false;
+            }
+            break;
+        default:
+            return false;
+        }
+        return true;
+    }
+
     void AnnualMonthlyDryBulbWeatherData::CalcAnnualAndMonthlyDryBulbTemp()
     {
 
@@ -10349,7 +10460,6 @@ namespace WeatherManager {
         // Opens and processes the weather or stat file only once
 
         // Using/Aliasing
-        using General::InvJulianDay;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 

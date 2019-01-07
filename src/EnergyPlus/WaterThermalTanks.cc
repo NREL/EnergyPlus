@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1234,13 +1234,12 @@ namespace WaterThermalTanks {
                                             cAlphaFieldNames(4) + " not found = " + cAlphaArgs(4));
                             ErrorsFound = true;
                         } else {
-                            ErrorsFound |= CurveManager::CheckCurveDims(
-                                WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,   // Curve index
-                                {2},                            // Valid dimensions
-                                RoutineName,                    // Routine name
-                                cCurrentModuleObject,            // Object Type
-                                WaterHeaterDesuperheater(DesuperheaterNum).Name,   // Object Name
-                                cAlphaFieldNames(4));  // Field Name
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
+                                                                        {2},                                                  // Valid dimensions
+                                                                        RoutineName,                                          // Routine name
+                                                                        cCurrentModuleObject,                                 // Object Type
+                                                                        WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
+                                                                        cAlphaFieldNames(4));                                 // Field Name
 
                             if (!ErrorsFound) {
                                 if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
@@ -2787,13 +2786,12 @@ namespace WaterThermalTanks {
                                 ErrorsFound = true;
                             }
 
-                            ErrorsFound |= CurveManager::CheckCurveDims(
-                                WaterThermalTank(WaterThermalTankNum).PLFCurve,   // Curve index
-                                {1},                            // Valid dimensions
-                                RoutineName,                    // Routine name
-                                cCurrentModuleObject,            // Object Type
-                                WaterThermalTank(WaterThermalTankNum).Name,   // Object Name
-                                cAlphaFieldNames(5));  // Field Name
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterThermalTank(WaterThermalTankNum).PLFCurve, // Curve index
+                                                                        {1},                                            // Valid dimensions
+                                                                        RoutineName,                                    // Routine name
+                                                                        cCurrentModuleObject,                           // Object Type
+                                                                        WaterThermalTank(WaterThermalTankNum).Name,     // Object Name
+                                                                        cAlphaFieldNames(5));                           // Field Name
                         }
                     }
 
@@ -5810,7 +5808,6 @@ namespace WaterThermalTanks {
         // Check 0 and 1
         if (CurveValue(CurveIndex, 0.0) <= 0) IsValid = false;
         if (CurveValue(CurveIndex, 1.0) <= 0) IsValid = false;
-
     }
 
     void SetupStratifiedNodes(int const WaterThermalTankNum) // Water Heater being simulated
@@ -6101,7 +6098,6 @@ namespace WaterThermalTanks {
         using DataHVACGlobals::HPWHInletDBTemp;
         using DataHVACGlobals::HPWHInletWBTemp;
         using DataLoopNode::Node;
-        using DataSizing::AutoSize;
         using DataSizing::CurZoneEqNum;
         using DataSizing::DataNonZoneNonAirloopValue;
         using DataSizing::ZoneEqSizing;
@@ -8372,8 +8368,6 @@ namespace WaterThermalTanks {
             DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
             Real64 const HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
             Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
-        } else {
-            Tank.SourceInletTemp = Tank.SourceOutletTemp;
         }
         // Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
         if (NodeNum > 0) {
@@ -10960,24 +10954,6 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // looping
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataSizing::AutoSize;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PlantLoopNum; // Used for looking up plant info
         int LoopSideNum;  // Used for looking up plant info
@@ -11707,7 +11683,6 @@ namespace WaterThermalTanks {
         // BA benchmark report for residential design mode
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using namespace OutputReportPredefined;
@@ -12161,7 +12136,6 @@ namespace WaterThermalTanks {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using DataSurfaces::Surface;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;

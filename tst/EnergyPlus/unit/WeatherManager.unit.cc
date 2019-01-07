@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,9 +79,11 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
         "RunPeriod,",
         ",                        !- Name",
         "2,                       !- Begin Month",
-        "27,                       !- Begin Day of Month",
-        "3,                      !- End Month",
-        "3,                      !- End Day of Month",
+        "27,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "3,                       !- End Month",
+        "3,                       !- End Day of Month",
+        ",                        !- End Year",
         "Tuesday,                 !- Day of Week for Start Day",
         "Yes,                     !- Use Weather File Holidays and Special Days",
         "Yes,                     !- Use Weather File Daylight Saving Period",

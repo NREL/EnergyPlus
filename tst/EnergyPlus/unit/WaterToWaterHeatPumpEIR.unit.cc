@@ -625,7 +625,7 @@ TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
     );
 }
 
-TEST_F(EIRWWHPFixture, Initialization) {
+TEST_F(EIRWWHPFixture, Initialization2) {
     std::string const idf_objects =
             delimited_string(
                     {

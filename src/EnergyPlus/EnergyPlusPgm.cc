@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,6 +212,7 @@
 #include <InputProcessing/InputValidation.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -224,6 +225,11 @@
 #endif
 
 void EnergyPlusPgm(std::string const &filepath)
+{
+    std::exit(RunEnergyPlus(filepath));
+}
+
+int RunEnergyPlus(std::string const & filepath)
 {
     // Using/Aliasing
     using namespace EnergyPlus;
@@ -304,6 +310,10 @@ void EnergyPlusPgm(std::string const &filepath)
 #endif
 
     CreateCurrentDateTimeString(CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+
     VerString += "," + CurrentDateTime;
 
     get_environment_variable(DDOnlyEnvVar, cEnvValue);
@@ -412,7 +422,7 @@ void EnergyPlusPgm(std::string const &filepath)
             DisplayString("Directory change successful.");
         } else {
             DisplayString("Couldn't change directory; aborting EnergyPlus");
-            exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
         ProgramPath = filepath + pathChar;
         int dummy_argc = 1;
@@ -429,10 +439,10 @@ void EnergyPlusPgm(std::string const &filepath)
         int write_stat = flags.ios();
         if (write_stat == 600) {
             DisplayString("ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory.");
-            std::exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         } else if (write_stat != 0) {
             DisplayString("ERROR: Could not open file " + outputErrFileName + " for output (write).");
-            std::exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
     }
     err_stream = gio::out_stream(OutputStandardError);
@@ -445,6 +455,8 @@ void EnergyPlusPgm(std::string const &filepath)
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+
+        ResultsFramework::OutputSchema->setupOutputOptions();
 
         ManageSimulation();
 
@@ -475,7 +487,7 @@ void EnergyPlusPgm(std::string const &filepath)
                 }
                 if (!FileExists) {
                     DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
-                    exit(EXIT_FAILURE);
+                    return EXIT_FAILURE;
                 }
             }
 
@@ -544,11 +556,14 @@ void EnergyPlusPgm(std::string const &filepath)
             moveFile("readvars.audit", outputRvauditFileName);
         }
 
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus();
     } catch (const std::exception &e) {
-        AbortEnergyPlus();
+        ShowSevereError(e.what());
+        return AbortEnergyPlus();
     }
 
-    EndEnergyPlus();
+    return EndEnergyPlus();
 }
 
 void StoreProgressCallback(void (*f)(int const))
