@@ -290,3 +290,5 @@ if (BUILD_DOCS)
   set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 endif()
 
+#export(EXPORT energyplus-exports FILE energyplus-exports.cmake)
+
