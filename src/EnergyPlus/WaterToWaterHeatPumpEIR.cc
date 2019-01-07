@@ -70,6 +70,7 @@ namespace EnergyPlus {
 
         bool getInputsWWHP(true);
         std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+        std::string static const __EQUIP__ = "EIRWaterToWaterHeatPump";
 
         void EIRWaterToWaterHeatPump::clear_state() {
             getInputsWWHP = true;
@@ -101,7 +102,11 @@ namespace EnergyPlus {
             }
         }
 
-        void EIRWaterToWaterHeatPump::setRunStateAndFlowRates(bool const runFlag) {
+        void EIRWaterToWaterHeatPump::initialize(bool const runFlag) {
+            // This function is used to set the struct up for simulation, including the following responsibilities:
+            // 1: Set load and source side flow rates
+            // 2: Set unit running flag
+            // 3: Set entering load and source temperatures
             this->running = runFlag;
             if (!this->running) {
                 this->loadSideMassFlowRate = 0.0;
@@ -178,17 +183,19 @@ namespace EnergyPlus {
                                                             DataPlant::CriteriaType_MassFlowRate,
                                                             this->sourceSideMassFlowRate);
             }
+            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
         }
 
         void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
                                                bool const FirstHVACIteration,
                                                Real64 &CurLoad,
                                                bool const RunFlag) {
+
             std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
 
-            this->setRunStateAndFlowRates(RunFlag);
-            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+            // Call initialize to set flow rates, run flag, and entering temperatures
+            this->initialize(RunFlag);
 
             if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
                 PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
@@ -284,8 +291,8 @@ namespace EnergyPlus {
         }
 
         void EIRWaterToWaterHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
-            std::string const routineName = "initWaterToWaterHeatPumpEIR";
-
+            // This function does all one-time and begin-environment initialization
+            std::string const routineName = EIRWaterToWaterHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
             if (this->oneTimeInit) {
                 // setup output variables
                 SetupOutputVariable(
