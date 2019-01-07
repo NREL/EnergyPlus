@@ -461,7 +461,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const double_val = stod(num_str, nullptr);
             val = double_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const double_val = stold(num_str, nullptr);
             val = double_val;
         }
@@ -469,7 +469,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const int_val = stoi(num_str, nullptr);
             val = int_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const int_val = stoll(num_str, nullptr);
             val = int_val;
         }
