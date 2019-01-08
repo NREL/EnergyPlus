@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-January 02, 2019
+January 08, 2019
 \end_layout
 
 \begin_layout Section
@@ -1352,6 +1352,7 @@ t Guide <ADD LINK>.
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus --help 
 \end_layout
 
@@ -1361,100 +1362,124 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
+
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
+
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
+
 Options:
 \end_layout
 
 \begin_layout Verbatim
+
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
+
                                input file type
 \end_layout
 
 \begin_layout Verbatim
+
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
+
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
+
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
+
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
+
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
+
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
+
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1562,6 +1587,7 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1570,6 +1596,7 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1578,6 +1605,7 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -D input.idf
 \end_layout
 
@@ -1587,6 +1615,7 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -1789,6 +1818,13 @@ The details of this example object are not important but the use of commas,
  EnergyPlus ecosystem of utilities and GUIs.
  The list of possible objects and fields is documented in the Energy+.idd
  file.
+\end_layout
+
+\begin_layout Standard
+A variation on the IDF file format is the IMF file format which includes
+ macros that can be used for parametric analysis or file management called
+ EP-Macros.
+ To learn more about macros see the AuxiliaryPrograms document <ADD LINK>
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2102,8 +2138,44 @@ Common Input Objects
 Key Concepts
 \end_layout
 
+\begin_layout Standard
+The following sections highlight some key concepts in EnergyPlus
+\end_layout
+
 \begin_layout Subsubsection*
-Always Plan Ahead.
+Wall Thickness
+\end_layout
+
+\begin_layout Standard
+Exterior and interior walls in real buildings have thickness as specified
+ on building plans by detailed cross sections.
+ For EnergyPlus, the Construction object is made up of a list of names for
+ the Material objects that make up the wall or roof or floor.
+ Each material is shown with a thickness along with the conductivity, density,
+ specific heat and other factors.
+ These thicknesses should match the the thicknesses shown in the detailed
+ cross sections.
+ But when it comes to specifying the walls themselves in three dimensional
+ space, the walls should be entered assuming zero thickness.
+ Once each surface has been placed, changing the material thickness will
+ have no impact on zone volume, ceiling height, floor area, shading, or
+ daylighting.
+ For most modern buildings the choice of inside vs outside vs centerline
+ should have little impact on results so many modelers just pick one a let
+ the volumes be off a little.
+ Using centerlines throughout the model splits the difference.
+ Or some modelers use outer edges for exterior walls and then use centerlines
+ for interior walls.
+ If you are modeling a very thick wall, such as an old stone building, then
+ you also have thermal mass considerations.
+ If you use the outside edges there will be too much mass, inside will be
+ too little.
+ Again, centerline will split the difference and will be very close to the
+ correct amount of thermal mass (possibly losing some corner mass).
+\end_layout
+
+\begin_layout Subsubsection*
+Always Plan Ahead
 \end_layout
 
 \begin_layout Standard
@@ -2150,36 +2222,336 @@ g of the boilers, chillers and other plant equipment.
 \end_layout
 
 \begin_layout Subsection*
-What are All These Files
+What Are All These Folders?
 \end_layout
 
 \begin_layout Standard
-<lots of file extensions, maybe just reference a few and move rest to Aux
- doc, see list in old getting started>
+The installation of EnergyPlus includes a lot of different files in different
+ folders:
 \end_layout
 
 \begin_layout Standard
-<maybe include description of all the directories that come with EnergyPlus>
+\begin_inset Graphics
+	filename energyplusfolder.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Many of these folders include valuable resources for using and learning
+ EnergyPlus.
+ The main folder includes the EnergyPlus executable which can be used on
+ the command line and EP-Launch 2, a program that makes it easier to use
+ EnergyPlus and the Energy+.IDD that describes each possible EnergyPlus object
+ and the default, minimum, maximum, and options for each field within each
+ object.
+ The Documentation folder includes this document as well as the InputOutputRefer
+ence, EngineeringReference, AuxiliaryPrograms, OutputDetailsAndExamples
+ which are very imporant to understand.
+ If you haven't looked through the documentation yet, take a few minutes
+ and get familiar with them.
+ The DataSets and MacroDataSets folders include files containing libraries
+ of objects that may be useful in constructing your own input files.
+ The ASHRAE_2005_HOF_Materials.idf and WindowConstructs.idf files, for example,
+ will help with defining walls and windows.
+ The ExampleFiles folder includes a huge number of example files that are
+ indexed in the two HYML files in that folder or can be searched through
+ using most text editors.
+ The Preprocess and PostProcess folders include many utilities that can
+ be used directly or as part of EP-Launch that can aid in the setting up
+ input files or or extracting or converting results.
+ The WeatherData folder includes a small sample of the many weather files
+ that are available <ADD LINK TO WEATHER DATA SECTION>
+\end_layout
+
+\begin_layout Subsection*
+What Are All These Output Files?
+\end_layout
+
+\begin_layout Standard
+When running EnergyPlus using EP-Launch or from the command line, depending
+ on the options selected, many different output files may be generated.
+ The file extensions and file suffixes (added to the original file name
+ prior to the file extension are shown below:
+\end_layout
+
+\begin_layout Itemize
+AUDIT – input file echo with input processor errors and warnings
+\end_layout
+
+\begin_layout Itemize
+BND – HVAC system node and component connection details
+\end_layout
+
+\begin_layout Itemize
+DBG – output from the debug command
+\end_layout
+
+\begin_layout Itemize
+DXF – drawing file in AutoCAD DXF format
+\end_layout
+
+\begin_layout Itemize
+EDD – Energy Management System details
+\end_layout
+
+\begin_layout Itemize
+EIO – additional EnergyPlus results
+\end_layout
+
+\begin_layout Itemize
+END - a single line synopsis of the simulation
+\end_layout
+
+\begin_layout Itemize
+EPMIDF – clean idf file after EP-Macro processing
+\end_layout
+
+\begin_layout Itemize
+EPMDET – EP-Macro detailed output with errors and warnings
+\end_layout
+
+\begin_layout Itemize
+ERR – list of errors and warnings
+\end_layout
+
+\begin_layout Itemize
+ESO – raw report variable output
+\end_layout
+
+\begin_layout Itemize
+MTD – list of meter component variables
+\end_layout
+
+\begin_layout Itemize
+MTR – raw report meter output
+\end_layout
+
+\begin_layout Itemize
+RDD – list of output variables available from the run
+\end_layout
+
+\begin_layout Itemize
+MDD – list of output meters available from the run 
+\end_layout
+
+\begin_layout Itemize
+SHD – output related to shading
+\end_layout
+
+\begin_layout Itemize
+SLN – output from “report, surfaces, lines”
+\end_layout
+
+\begin_layout Itemize
+SQL - sqlite3 oiutput database format
+\end_layout
+
+\begin_layout Itemize
+SSZ – system sizing details in comma, tab or space delimited format
+\end_layout
+
+\begin_layout Itemize
+ZSZ – zone sizing details in comma, tab or space delimited format
+\end_layout
+
+\begin_layout Itemize
+CSV, TAB, or TXT – tabulated results in comma, tab or space delimited format
+ (generated by the ReadVarsESO postprocessor) 
+\end_layout
+
+\begin_layout Itemize
+METER.CSV, METER.TAB, or METER.CSV File – tabulated meter report in comma,
+ tab or space delimited format (generated by the ReadVarsESO postprocessor)
+\end_layout
+
+\begin_layout Itemize
+MAP – daylighting illuminance map
+\end_layout
+
+\begin_layout Itemize
+DFS - daylighting factors report
+\end_layout
+
+\begin_layout Itemize
+Screen.CSV - window screen transmittance map report
+\end_layout
+
+\begin_layout Itemize
+TABLE.HTML, TABLE.TXT, TABLE.TAB, TABLE.CSV, TABLE.XML – tabulated report of
+ bin and monthly data in comma, tab or space delimited or HTML format or
+ XML format
+\end_layout
+
+\begin_layout Itemize
+RVAUDIT - output from the ReadVarsESO post processing program
+\end_layout
+
+\begin_layout Itemize
+SVG - HVAC Diagram related to the arrangement of HVAC components
+\end_layout
+
+\begin_layout Itemize
+SCI - surface cost information repor
+\end_layout
+
+\begin_layout Itemize
+WRL – drawing file in VRML (Virtual Reality Markup Language) format
+\end_layout
+
+\begin_layout Itemize
+Delight IN - DElight input generated from EnergyPlus processed input
+\end_layout
+
+\begin_layout Itemize
+Delight OUT – Detailed DElight output
+\end_layout
+
+\begin_layout Itemize
+Delight ELDMP – DElight reference point illuminance per time step
+\end_layout
+
+\begin_layout Itemize
+Delight DFDMP – DElight warning and error messages
+\end_layout
+
+\begin_layout Itemize
+EXPIDF – Expanded IDF when using HVACTemplate objects
+\end_layout
+
+\begin_layout Itemize
+Group Error – combined error files for a group run
+\end_layout
+
+\begin_layout Itemize
+VCpErr – Transition program error file
+\end_layout
+
+\begin_layout Itemize
+Proc.CSV – Simple statistiscs generated from CSVProc
+\end_layout
+
+\begin_layout Standard
+Almost of these output files are documents in the OutputDetailsAndExamples
+ document <ADD LINK> 
+\end_layout
+
+\begin_layout Standard
+Don't be intemindated by the long list of files, you can do a lot in EnergyPlus
+ with just the IDF input file, the TABLE.HTML file and the ERR file.
 \end_layout
 
 \begin_layout Subsection*
 Versions and Updating
 \end_layout
 
-\begin_layout Subsection*
-Command Line Options
+\begin_layout Standard
+When using the IDF input file format with EnergyPlus, each release (which
+ are generally twice per year) is likely to have small changes to the file
+ format.
+ Included with EnergyPlus are a number of ways to update files so that they
+ are compatible with the release.
+ Each method ultimately uses the TransitionVx-x-x-ToVx-x-x.exe files that
+ are located in the Preprocess
+\backslash
+IDFVersionUpdater folder.
+ The ways to update your IDF files are:
+\end_layout
+
+\begin_layout Itemize
+IDFVersionUpdater program (shown below) is included in the installation
+ and works on multiple platforms.
+ It is located in the Preprocess
+\backslash
+IDFVersionUpdater folder.
+ It can convert from EnergyPlus 7.2 to the most recent version and even older
+ versions can be converted if the proper files are downloaded from the 
+\begin_inset CommandInset href
+LatexCommand href
+name "helpdesk"
+target "http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files"
+literal "false"
+
+\end_inset
+
+.
+ It can also update a group of files.
+ It is documented in the AuxiliaryPrograms document <LINK>.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename IDFVersionUpdater.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+EP-Launch 2 - The windows only program that comes with the EnergyPlus installati
+on can update a single file from the just previous version of EnergyPlus
+ only by using the File..Transition command.
+\end_layout
+
+\begin_layout Itemize
+EP-Launch 3 - The program for Windows, Linux, and MacOS can update a single
+ file across multiple versions using the Transition workflow.
+\end_layout
+
+\begin_layout Itemize
+Command line Transition - This allows updating files using the command line
+ such as the Terminal for MacOS and Linux or the CMD or PowerShell for Windows.
+ It is documented in the AuxiliaryPrograms document <LINK>.
 \end_layout
 
 \begin_layout Subsection*
 Errors and How to Fix Them
 \end_layout
 
+\begin_layout Standard
+As described in the Run-Check-Edit Repeat section <ADD LINK> dealing with
+ errors described in the ERR file are part of creating files with EnergyPlus.
+ Resovling erros is something that both new and very experienced users have
+ to do.
+ Most of the, the error message itself, if carefully reviewed will point
+ to the problem.
+ Some error messages will also reference earlier messages that should also
+ be checked.
+ Careful review of the ERR file and the input file will often reveal solutions
+ to the most common errors.
+ 
+\end_layout
+
+\begin_layout Standard
+<IT WOULD BE GOOD TO ADD A LIST OF COMMON ERRORS AND SOLUTIONS HERE> 
+\end_layout
+
+\begin_layout Standard
+<MAYBE ADD LINK TO OTHER RESOURCES THAT CAN BE USED TO RESOLVE ERRORS -
+ UNMETHOURS, MAILING LISTS>
+\end_layout
+
+\begin_layout Standard
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
+\end_layout
+
 \begin_layout Subsection*
 Modeling Simply
 \end_layout
 
+\begin_layout Standard
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
+\end_layout
+
 \begin_layout Subsection*
 Quality Control
+\end_layout
+
+\begin_layout Standard
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
 \end_layout
 
 \begin_layout Subsection*
@@ -2194,6 +2566,10 @@ Choosing a Baseline
 
 \begin_layout Subsection*
 Presenting Results to Others
+\end_layout
+
+\begin_layout Standard
+<MAYBE SOMETHING FROM PROJECT STASIO>
 \end_layout
 
 \begin_layout Section

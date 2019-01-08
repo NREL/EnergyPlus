@@ -29,7 +29,7 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 02, 2019}
+\date{January 08, 2019}
 \maketitle
 
 \section{Introduction}
@@ -669,6 +669,11 @@ The IDF format is currently the most commonly used format throughout
 the EnergyPlus ecosystem of utilities and GUIs. The list of possible
 objects and fields is documented in the Energy+.idd file.
 
+A variation on the IDF file format is the IMF file format which includes
+macros that can be used for parametric analysis or file management
+called EP-Macros. To learn more about macros see the AuxiliaryPrograms
+document <ADD LINK>
+
 \subsubsection*{epJSON}
 
 A new file format based on the industry standard \href{https://www.json.org/}{JSON}
@@ -808,7 +813,33 @@ an annual simulation for the first time.
 
 \subsection*{Key Concepts}
 
-\subsubsection*{Always Plan Ahead.}
+The following sections highlight some key concepts in EnergyPlus
+
+\subsubsection*{Wall Thickness}
+
+Exterior and interior walls in real buildings have thickness as specified
+on building plans by detailed cross sections. For EnergyPlus, the
+Construction object is made up of a list of names for the Material
+objects that make up the wall or roof or floor. Each material is shown
+with a thickness along with the conductivity, density, specific heat
+and other factors. These thicknesses should match the the thicknesses
+shown in the detailed cross sections. But when it comes to specifying
+the walls themselves in three dimensional space, the walls should
+be entered assuming zero thickness. Once each surface has been placed,
+changing the material thickness will have no impact on zone volume,
+ceiling height, floor area, shading, or daylighting. For most modern
+buildings the choice of inside vs outside vs centerline should have
+little impact on results so many modelers just pick one a let the
+volumes be off a little. Using centerlines throughout the model splits
+the difference. Or some modelers use outer edges for exterior walls
+and then use centerlines for interior walls. If you are modeling a
+very thick wall, such as an old stone building, then you also have
+thermal mass considerations. If you use the outside edges there will
+be too much mass, inside will be too little. Again, centerline will
+split the difference and will be very close to the correct amount
+of thermal mass (possibly losing some corner mass).
+
+\subsubsection*{Always Plan Ahead}
 
 Some preliminary steps will facilitate the construction of your input
 file. EnergyPlus requires some information in specified, externally
@@ -835,22 +866,148 @@ and scheduling of the fan systems.
 and scheduling of the boilers, chillers and other plant equipment.
 \end{itemize}
 
-\subsection*{What are All These Files}
+\subsection*{What Are All These Folders?}
 
-<lots of file extensions, maybe just reference a few and move rest
-to Aux doc, see list in old getting started>
+The installation of EnergyPlus includes a lot of different files in
+different folders:
 
-<maybe include description of all the directories that come with EnergyPlus>
+\includegraphics{energyplusfolder}
+
+Many of these folders include valuable resources for using and learning
+EnergyPlus. The main folder includes the EnergyPlus executable which
+can be used on the command line and EP-Launch 2, a program that makes
+it easier to use EnergyPlus and the Energy+.IDD that describes each
+possible EnergyPlus object and the default, minimum, maximum, and
+options for each field within each object. The Documentation folder
+includes this document as well as the InputOutputReference, EngineeringReference,
+AuxiliaryPrograms, OutputDetailsAndExamples which are very imporant
+to understand. If you haven't looked through the documentation yet,
+take a few minutes and get familiar with them. The DataSets and MacroDataSets
+folders include files containing libraries of objects that may be
+useful in constructing your own input files. The ASHRAE\_2005\_HOF\_Materials.idf
+and WindowConstructs.idf files, for example, will help with defining
+walls and windows. The ExampleFiles folder includes a huge number
+of example files that are indexed in the two HYML files in that folder
+or can be searched through using most text editors. The Preprocess
+and PostProcess folders include many utilities that can be used directly
+or as part of EP-Launch that can aid in the setting up input files
+or or extracting or converting results. The WeatherData folder includes
+a small sample of the many weather files that are available <ADD LINK
+TO WEATHER DATA SECTION>
+
+\subsection*{What Are All These Output Files?}
+
+When running EnergyPlus using EP-Launch or from the command line,
+depending on the options selected, many different output files may
+be generated. The file extensions and file suffixes (added to the
+original file name prior to the file extension are shown below:
+\begin{itemize}
+\item AUDIT -- input file echo with input processor errors and warnings
+\item BND -- HVAC system node and component connection details
+\item DBG -- output from the debug command
+\item DXF -- drawing file in AutoCAD DXF format
+\item EDD -- Energy Management System details
+\item EIO -- additional EnergyPlus results
+\item END - a single line synopsis of the simulation
+\item EPMIDF -- clean idf file after EP-Macro processing
+\item EPMDET -- EP-Macro detailed output with errors and warnings
+\item ERR -- list of errors and warnings
+\item ESO -- raw report variable output
+\item MTD -- list of meter component variables
+\item MTR -- raw report meter output
+\item RDD -- list of output variables available from the run
+\item MDD -- list of output meters available from the run 
+\item SHD -- output related to shading
+\item SLN -- output from \textquotedblleft report, surfaces, lines\textquotedblright{}
+\item SQL - sqlite3 oiutput database format
+\item SSZ -- system sizing details in comma, tab or space delimited format
+\item ZSZ -- zone sizing details in comma, tab or space delimited format
+\item CSV, TAB, or TXT -- tabulated results in comma, tab or space delimited
+format (generated by the ReadVarsESO postprocessor) 
+\item METER.CSV, METER.TAB, or METER.CSV File -- tabulated meter report
+in comma, tab or space delimited format (generated by the ReadVarsESO
+postprocessor)
+\item MAP -- daylighting illuminance map
+\item DFS - daylighting factors report
+\item Screen.CSV - window screen transmittance map report
+\item TABLE.HTML, TABLE.TXT, TABLE.TAB, TABLE.CSV, TABLE.XML -- tabulated
+report of bin and monthly data in comma, tab or space delimited or
+HTML format or XML format
+\item RVAUDIT - output from the ReadVarsESO post processing program
+\item SVG - HVAC Diagram related to the arrangement of HVAC components
+\item SCI - surface cost information repor
+\item WRL -- drawing file in VRML (Virtual Reality Markup Language) format
+\item Delight IN - DElight input generated from EnergyPlus processed input
+\item Delight OUT -- Detailed DElight output
+\item Delight ELDMP -- DElight reference point illuminance per time step
+\item Delight DFDMP -- DElight warning and error messages
+\item EXPIDF -- Expanded IDF when using HVACTemplate objects
+\item Group Error -- combined error files for a group run
+\item VCpErr -- Transition program error file
+\item Proc.CSV -- Simple statistiscs generated from CSVProc
+\end{itemize}
+Almost of these output files are documents in the OutputDetailsAndExamples
+document <ADD LINK> 
+
+Don't be intemindated by the long list of files, you can do a lot
+in EnergyPlus with just the IDF input file, the TABLE.HTML file and
+the ERR file.
 
 \subsection*{Versions and Updating}
 
-\subsection*{Command Line Options}
+When using the IDF input file format with EnergyPlus, each release
+(which are generally twice per year) is likely to have small changes
+to the file format. Included with EnergyPlus are a number of ways
+to update files so that they are compatible with the release. Each
+method ultimately uses the TransitionVx-x-x-ToVx-x-x.exe files that
+are located in the Preprocess\textbackslash IDFVersionUpdater folder.
+The ways to update your IDF files are:
+\begin{itemize}
+\item IDFVersionUpdater program (shown below) is included in the installation
+and works on multiple platforms. It is located in the Preprocess\textbackslash IDFVersionUpdater
+folder. It can convert from EnergyPlus 7.2 to the most recent version
+and even older versions can be converted if the proper files are downloaded
+from the \href{http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files}{helpdesk}.
+It can also update a group of files. It is documented in the AuxiliaryPrograms
+document <LINK>.
+\end{itemize}
+\includegraphics{IDFVersionUpdater}
+\begin{itemize}
+\item EP-Launch 2 - The windows only program that comes with the EnergyPlus
+installation can update a single file from the just previous version
+of EnergyPlus only by using the File..Transition command.
+\item EP-Launch 3 - The program for Windows, Linux, and MacOS can update
+a single file across multiple versions using the Transition workflow.
+\item Command line Transition - This allows updating files using the command
+line such as the Terminal for MacOS and Linux or the CMD or PowerShell
+for Windows. It is documented in the AuxiliaryPrograms document <LINK>.
+\end{itemize}
 
 \subsection*{Errors and How to Fix Them}
 
+As described in the Run-Check-Edit Repeat section <ADD LINK> dealing
+with errors described in the ERR file are part of creating files with
+EnergyPlus. Resovling erros is something that both new and very experienced
+users have to do. Most of the, the error message itself, if carefully
+reviewed will point to the problem. Some error messages will also
+reference earlier messages that should also be checked. Careful review
+of the ERR file and the input file will often reveal solutions to
+the most common errors. 
+
+<IT WOULD BE GOOD TO ADD A LIST OF COMMON ERRORS AND SOLUTIONS HERE> 
+
+<MAYBE ADD LINK TO OTHER RESOURCES THAT CAN BE USED TO RESOLVE ERRORS
+- UNMETHOURS, MAILING LISTS>
+
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
+
 \subsection*{Modeling Simply}
 
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
+
 \subsection*{Quality Control}
+
+<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
 
 \subsection*{Choosing a Baseline}
 
@@ -859,6 +1016,8 @@ a basis of comparison for various energy efficiency measures that
 are used during the design process>
 
 \subsection*{Presenting Results to Others}
+
+<MAYBE SOMETHING FROM PROJECT STASIO>
 
 \section{Introduction to Example Building Models}
 
