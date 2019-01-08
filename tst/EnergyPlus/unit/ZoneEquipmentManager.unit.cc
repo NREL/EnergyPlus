@@ -960,15 +960,21 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     bool firstHVACIteration = true;
     InitSystemOutputRequired(ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP / 3.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP / 3.0);
+    // also expect remaining load to match first load here
+    EXPECT_EQ(energy.RemainingOutputRequired, energy.SequencedOutputRequired(1));
+    EXPECT_EQ(energy.RemainingOutputReqToHeatSP, energy.SequencedOutputRequiredToHeatingSP(1));
+    EXPECT_EQ(energy.RemainingOutputReqToCoolSP, energy.SequencedOutputRequiredToCoolingSP(1));
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 1
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
 
     // UniformLoad Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
@@ -995,15 +1001,19 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     firstHVACIteration = true;
     InitSystemOutputRequired(ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), 0.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP / 2.0);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), 0.0);
+    // also expect remaining load to match first load here
+    EXPECT_EQ(energy.RemainingOutputRequired, energy.SequencedOutputRequired(1));
+    EXPECT_EQ(energy.RemainingOutputReqToHeatSP, energy.SequencedOutputRequiredToHeatingSP(1));
+    EXPECT_EQ(energy.RemainingOutputReqToCoolSP, energy.SequencedOutputRequiredToCoolingSP(1));
 
     // UniformLoad Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
@@ -1160,6 +1170,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
 
     // UniformPLR Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
@@ -1352,6 +1364,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num plus 1
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 4);
 
     // SequentialUniformPLR Test 2 - Heating, FirstHVACIteration = false, low load requiring only 1 piece of equipment
     firstHVACIteration = false;
