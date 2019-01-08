@@ -4088,8 +4088,8 @@ namespace ZoneEquipmentManager {
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
                 ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
                     ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
-        } else if (FirstHVACIteration && (ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLRLoading) ||
-                   (ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading)) {
+        } else if (FirstHVACIteration && ((ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLRLoading) ||
+                   (ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading))) {
             // init each sequenced demand to the zone design load in order to get available capacities from equipment
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired)) {
                 if (ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
