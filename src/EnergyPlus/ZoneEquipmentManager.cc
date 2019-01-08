@@ -4048,7 +4048,7 @@ namespace ZoneEquipmentManager {
         ZoneSysMoistureDemand(ZoneNum).RemainingOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired;
         ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP;
         ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP;
-        // Check if controlled first, becuase if it's not, there is no zone equipment list
+        // Check if controlled first, because if it's not, there is no zone equipment list
         if (!DataHeatBalance::Zone(ZoneNum).IsControlled || DataGlobals::ZoneSizingCalc) {
             // init each sequenced demand to the full output
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))

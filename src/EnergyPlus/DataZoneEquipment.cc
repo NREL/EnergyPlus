@@ -528,15 +528,19 @@ namespace DataZoneEquipment {
                 UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
                 ZoneEquipList(ControlledZoneNum).Name = AlphArray(1);
 
+                int extraIterationforPLRScheme = 0;
                 if (!lAlphaBlanks(2)) {
                     if (UtilityRoutines::SameString(AlphArray(2), "SequentialLoad")) {
                         ZoneEquipList(ControlledZoneNum).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
                     } else if (UtilityRoutines::SameString(AlphArray(2), "UniformLoad")) {
+                        extraIterationforPLRScheme = 1;
                         ZoneEquipList(ControlledZoneNum).LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
                     } else if (UtilityRoutines::SameString(AlphArray(2), "UniformPLR")) {
                         ZoneEquipList(ControlledZoneNum).LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
+                        extraIterationforPLRScheme = 1;
                     } else if (UtilityRoutines::SameString(AlphArray(2), "SequentialUniformPLR")) {
                         ZoneEquipList(ControlledZoneNum).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
+                        extraIterationforPLRScheme = 1;
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
                         ShowContinueError("..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
@@ -618,18 +622,20 @@ namespace DataZoneEquipment {
                     if (ZoneEquipList(ControlledZoneNum).HeatingPriority(ZoneEquipTypeNum) > 0) ++ZoneEquipList(ControlledZoneNum).NumAvailHeatEquip;
                     if (ZoneEquipList(ControlledZoneNum).CoolingPriority(ZoneEquipTypeNum) > 0) ++ZoneEquipList(ControlledZoneNum).NumAvailCoolEquip;
 
+                    // Set
+
                     {
                         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum)));
 
                         if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = AirDistUnit_Num;
-                            // For sequenced loads, must set minimum iterations to highest air terminal equipment number
-                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = ZoneEquipTypeNum;
+                            // For air loop loads, must set minimum iterations to highest air terminal equipment number, plus one or two more depending on load distribution scheme
+                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(DataHVACGlobals::MinAirLoopIterationsAfterFirst,(ZoneEquipTypeNum + extraIterationforPLRScheme));
 
                         } else if (SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = DirectAir_Num;
-                            // For sequenced loads, must set minimum iterations to highest air terminal equipment number
-                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = ZoneEquipTypeNum;
+                            // For sequenced loads, must set minimum iterations to highest air terminal equipment number, plus one more for plr load distribution schemes
+                            DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(DataHVACGlobals::MinAirLoopIterationsAfterFirst, (ZoneEquipTypeNum + extraIterationforPLRScheme));
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
