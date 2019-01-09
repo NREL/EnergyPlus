@@ -45,31 +45,19 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-#include <string>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
-// EnergyPlus Headers
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Elements.hpp"
 
-#include <CommandLineInterface.hh>
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
-#include <General.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -103,7 +91,6 @@ namespace AirflowNetwork {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataEnvironment::Latitude;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -114,9 +101,6 @@ namespace AirflowNetwork {
     using DataGlobals::Pi;
     using DataGlobals::rTinyValue;
     using DataSurfaces::Surface;
-    using Psychrometrics::PsyCpAirFnWTdb;
-    using Psychrometrics::PsyHFnTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     std::vector<AirProperties> properties;
 
@@ -268,8 +252,8 @@ namespace AirflowNetwork {
         //   LIST = 5
         LIST = 0;
         if (LIST >= 1) {
-            Unit21 = GetNewUnitNumber();
-            gio::open(Unit21, DataStringGlobals::outputAdsFileName);
+            //Unit21 = GetNewUnitNumber();
+            //gio::open(Unit21, DataStringGlobals::outputAdsFileName);
         }
 
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -539,10 +523,10 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), OutDryBulbTemp, OutHumRat);
+                properties[n].density = AIRDENSITY(StdBaroPress + PZ(n), OutDryBulbTemp, OutHumRat);
                 properties[n].temperature = OutDryBulbTemp;
                 properties[n].humidityRatio = OutHumRat;
             }
@@ -659,9 +643,6 @@ namespace AirflowNetwork {
 
         // REFERENCES:
         // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Argument array dimensioning
         IK.dim(NetworkNumOfNodes + 1);
@@ -838,7 +819,7 @@ namespace AirflowNetwork {
             ShowWarningError("AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow "
                              "convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem.");
             ShowContinueErrorTimeStamp("");
-            ShowContinueError("..Iterations=" + RoundSigDigits(ITER) + ", Max allowed=" + RoundSigDigits(AirflowNetworkSimu.MaxIteration));
+            ShowContinueError("..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(AirflowNetworkSimu.MaxIteration));
             ShowFatalError("AirflowNetwork: SOLVER, The previous error causes termination.");
         } else {
             ShowRecurringWarningErrorAtEnd("AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
@@ -1394,7 +1375,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = PsyRhoAirFnPbTdbW(
+            RhozNorm = AIRDENSITY(
                 DisSysCompReliefAirData(CompNum).StandardP, DisSysCompReliefAirData(CompNum).StandardT, DisSysCompReliefAirData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompReliefAirData(CompNum).StandardT;
 
@@ -1520,7 +1501,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        RhozNorm = PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+        RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
         VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
@@ -2985,7 +2966,7 @@ namespace AirflowNetwork {
         Real64 CONV;
 
         // FLOW:
-        RhoREF = PsyRhoAirFnPbTdbW(PSea, OutDryBulbTemp, OutHumRat);
+        RhoREF = AIRDENSITY(PSea, OutDryBulbTemp, OutHumRat);
 
         CONV = Latitude * 2.0 * Pi / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
@@ -3066,8 +3047,8 @@ namespace AirflowNetwork {
             }
 
             // RhoDrL is Rho at link level without pollutant but with humidity
-            RhoDrL(i, 1) = PsyRhoAirFnPbTdbW(OutBaroPress + PzFrom, TempL1, Xhl1);
-            RhoDrL(i, 2) = PsyRhoAirFnPbTdbW(OutBaroPress + PzTo, TempL2, Xhl2);
+            RhoDrL(i, 1) = AIRDENSITY(OutBaroPress + PzFrom, TempL1, Xhl1);
+            RhoDrL(i, 2) = AIRDENSITY(OutBaroPress + PzTo, TempL2, Xhl2);
 
             // End initialisation
 
@@ -3355,15 +3336,15 @@ namespace AirflowNetwork {
                     Htop = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
-                    Rho = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
                     return;
 
                 } else {
@@ -3372,16 +3353,16 @@ namespace AirflowNetwork {
                     // P is the pressure up to the start height of the layer we just reached
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
 
-                    RhoDr = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
-                    Rho = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Hbot = H;
@@ -3433,31 +3414,31 @@ namespace AirflowNetwork {
                     Hbot = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(Pbz + P, T, X);
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
-                    Rho = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
                     return;
                 } else {
                     // bottom of the layer is below Z  (Z below ref)
                     Hbot = H;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(Pbz + P, T, X);
                         // T,X,C calculated for the lower height
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = PsyRhoAirFnPbTdbW(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
-                    Rho = PsyRhoAirFnPbTdbW(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Htop = H;

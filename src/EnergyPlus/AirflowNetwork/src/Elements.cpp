@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,10 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-
-#include <DataPrecisionGlobals.hh>
-
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
 
@@ -72,9 +68,6 @@ namespace AirflowNetwork {
     // performance of air distribution system, including pressure, temperature
     // and moisture levels at each node, and airflow and sensible and latent energy losses
     // at each element
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
 
     // Data
     // module should be available to other modules and routines.  Thus,

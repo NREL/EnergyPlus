@@ -194,10 +194,12 @@ class CodeChecker(Visitor):
     def __init__(self):
         Visitor.__init__(self)
     def files(self, path):
-        srcs = glob.glob(path+'*.cc')
-        hdrs = glob.glob(path+'*.hh')
-        hdrs.extend(glob.glob(path+'*.h'))
-        return srcs+hdrs
+        extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
+        results = []
+        for ext in extensions:
+            results.extend(glob.glob(path+'*.'+ext))
+            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+        return results
 
 class Checker(CodeChecker):
     def __init__(self, boilerplate, toolname='unspecified', message=error):

@@ -45,17 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DataAirflowNetwork_hh_INCLUDED
-#define DataAirflowNetwork_hh_INCLUDED
+#ifndef ELEMENTS_HPP
+#define ELEMENTS_HPP
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
-// EnergyPlus Headers
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Properties.hpp"
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
