@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2517,7 +2517,7 @@ namespace AirflowNetworkSolver {
         // FLOW:
         // Get component properties
         CompNum = AirflowNetworkCompData(j).TypeNum;
-        ed = Rough / DisSysCompDuctData(CompNum).D;
+        ed = Rough / DisSysCompCoilData(CompNum).D;
         area = pow_2(DisSysCompCoilData(CompNum).D) * Pi;
         ld = DisSysCompCoilData(CompNum).L / DisSysCompCoilData(CompNum).D;
         g = 1.14 - 0.868589 * std::log(ed);

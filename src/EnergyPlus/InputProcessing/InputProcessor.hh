@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -183,6 +184,15 @@ private:
         {
         }
 
+        bool operator<(const ObjectInfo& rhs) const
+        {
+            int cmp = this->objectType.compare(rhs.objectType);
+            if(cmp == 0) {
+                return this->objectName < rhs.objectName;
+            }
+            return cmp < 0;
+        }
+
         std::string objectType = "";
         std::string objectName = "";
     };
@@ -213,7 +223,7 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    void checkVersionMatch();
+    bool checkVersionMatch();
 
     bool processErrors();
 
@@ -235,7 +245,7 @@ private:
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
-    using UnorderedUnusedObjectMap = std::map<const json::object_t *const, ObjectInfo>;
+    using UnusedObjectSet = std::set<ObjectInfo>;
 
     std::unique_ptr<IdfParser> idf_parser;
     std::unique_ptr<Validation> validation;
@@ -246,7 +256,7 @@ private:
     private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
-    UnorderedUnusedObjectMap unusedInputs;
+    UnusedObjectSet unusedInputs;
     char s[129] = {0};
 
 }; // InputProcessor

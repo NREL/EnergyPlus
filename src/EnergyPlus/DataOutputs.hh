@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
+#include "UtilityRoutines.hh"
 
 namespace EnergyPlus {
 
@@ -94,7 +95,16 @@ namespace DataOutputs {
         std::unique_ptr<RE2> pattern;
         std::unique_ptr<RE2> case_insensitive_pattern;
     };
-    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables>> OutputVariablesForSimulation;
+
+
+
+    // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
+    // All of the string are considered as case insenstive (If we search for "ZONE MEAN AIR TEMPERATURE" it would find "Zone Mean Air Temperature")
+    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                              UtilityRoutines::case_insensitive_hasher,
+                                                              UtilityRoutines::case_insensitive_comparator>,
+                               UtilityRoutines::case_insensitive_hasher,
+                               UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
 
     // Functions
 
@@ -102,6 +112,7 @@ namespace DataOutputs {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
+    // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
     bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName);
 
 } // namespace DataOutputs
