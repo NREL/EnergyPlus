@@ -934,7 +934,7 @@ namespace OutputReportPredefined {
         pdchPumpPower = 0;
         pdchPumpPwrPerFlow = 0;
         pdchPumpEndUse = 0;
-         pdchMotEff = 0;
+        pdchMotEff = 0;
         pdstCoolCoil = 0;
         pdchCoolCoilType = 0;
         pdchCoolCoilDesCap = 0;
@@ -1887,8 +1887,8 @@ namespace OutputReportPredefined {
         pdchPumpFlow = newPreDefColumn(pdstPump, "Water Flow [m3/s]");
         pdchPumpPower = newPreDefColumn(pdstPump, "Electric Power [W]");
         pdchPumpPwrPerFlow = newPreDefColumn(pdstPump, "Power Per Water Flow Rate [W-s/m3]");
-        pdchPumpEndUse = newPreDefColumn(pdstPump, "End Use Subcategory");
         pdchMotEff = newPreDefColumn(pdstPump, "Motor Efficiency [W/W]");
+        pdchPumpEndUse = newPreDefColumn(pdstPump, "End Use Subcategory");
 
         pdstSWH = newPreDefSubTable(pdrEquip, "Service Water Heating");
         pdchSWHType = newPreDefColumn(pdstSWH, "Type");
