@@ -1172,7 +1172,14 @@ ExampleFiles-ObjectsLink.html file which lists every type of input object
 \end_layout
 
 \begin_layout Subsection*
-Getting Help
+Getting Help 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Getting-Help"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1352,7 +1359,6 @@ t Guide <ADD LINK>.
 \end_layout
 
 \begin_layout Verbatim
-
 energyplus --help 
 \end_layout
 
@@ -1362,124 +1368,100 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
-
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
-
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
-
 Options:
 \end_layout
 
 \begin_layout Verbatim
-
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
-
                                input file type
 \end_layout
 
 \begin_layout Verbatim
-
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
-
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
-
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
-
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
-
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
-
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
-
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1587,7 +1569,6 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1596,7 +1577,6 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1605,7 +1585,6 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -D input.idf
 \end_layout
 
@@ -1615,7 +1594,6 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -2034,7 +2012,14 @@ literal "false"
 \end_layout
 
 \begin_layout Subsection*
-Run-Check-Edit Repeat
+Run-Check-Edit Repeat 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Run-Check-Edit-Repeat"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2512,8 +2497,18 @@ Errors and How to Fix Them
 \end_layout
 
 \begin_layout Standard
-As described in the Run-Check-Edit Repeat section <ADD LINK> dealing with
- errors described in the ERR file are part of creating files with EnergyPlus.
+As described in the 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "subsec:Run-Check-Edit-Repeat"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ section dealing with errors described in the ERR file are part of creating
+ files with EnergyPlus.
  Resovling erros is something that both new and very experienced users have
  to do.
  Most of the, the error message itself, if carefully reviewed will point
@@ -2523,6 +2518,20 @@ As described in the Run-Check-Edit Repeat section <ADD LINK> dealing with
  Careful review of the ERR file and the input file will often reveal solutions
  to the most common errors.
  
+\end_layout
+
+\begin_layout Standard
+Also see the 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "subsec:Getting-Help"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ section
 \end_layout
 
 \begin_layout Standard
