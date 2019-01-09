@@ -3,7 +3,8 @@ Multiple/Partial HVAC Control, now with user specified fractions!
 
 **Noel Merket, NREL**
 
- - 4 January 2019 - Original NFP 
+ - 4 January 2019 - Original NFP
+ - 9 January 2019 - Revision to use sequential loads (Option B)
 
 ## Justification for New Feature ##
 
@@ -11,47 +12,71 @@ During the implementation of Mike Witte's [Improve Control of Multiple HVAC in O
 
 ## E-mail and  Conference Call Conclusions ##
 
-none yet.
+1/8/2019 - The initial approach did not appropriately handle more complicated cases such as:
+
+```
+ZoneHVAC:EquipmentList,
+   Living Zone Equipment_1,               !- Name
+   ???                                    !- Load Distribution Scheme
+   ZoneHVAC:EnergyRecoveryVentilator,     !- Zone Equipment 1 Object Type
+   ERV_1,                                 !- Zone Equipment 1 Name
+   1,                                     !- Zone Equipment 1 Cooling Sequence
+   1,                                     !- Zone Equipment 1 Heating or No-Load Sequence
+   AirTerminal:SingleDuct:Uncontrolled,   !- Zone Equipment 2 Object Type
+   CentralAirConditioner_1,               !- Zone Equipment 2 Name
+   2,                                     !- Zone Equipment 2 Cooling Sequence
+   2,                                     !- Zone Equipment 2 Heating or No-Load Sequence
+   AirTerminal:SingleDuct:Uncontrolled,   !- Zone Equipment 3 Object Type
+   CentralAirConditioner_2,               !- Zone Equipment 3 Name
+   3,                                     !- Zone Equipment 3 Cooling Sequence
+   3,                                     !- Zone Equipment 3 Heating or No-Load Sequence
+   ZoneHVAC:Dehumidifier:DX,              !- Zone Equipment 4 Object Type
+   Dehumidifier_1,                        !- Zone Equipment 4 Name
+   4,                                     !- Zone Equipment 4 Cooling Sequence
+   4;                                     !- Zone Equipment 4 Heating or No-Load Sequence
+```
+
+In that case we'd want the ERV to operate on all the load and add some load as they do. Then we want to be able to split the load between `CentralAirConditioner_1` and `CentralAirConditioner_2` with user specified fractions. Finally we want the dehumidifier to see all the remaining latent load. After some discussion with Mike Witte and Scott Horowitz, we now think the best approach is going to be more like ["Option B"](https://github.com/NREL/EnergyPlus/blob/8d7fcb46b41e083a30a872f2b9fc23ca65912c2e/design/FY2017/MultiplePartialHVACInOneZone.md#option-b---remaining-load) in the original NFP. I have revised the Overview and Approach section to reflect our current thinking. 
 
 ## Overview and Approach ##
 
-A new enumeration will be available on the `ZoneHVAC:Equipment` Load Distribution Scheme input. It will be called something like, `FractionalLoad` (open to suggestions). When that option is selected, it will read the fractions from the following pair of fields that will be added to the `ZoneHVAC:EquipmentList` for each equipment:
+
+When the `SequentialLoad` load distribution scheme option is selected, it will read the fractions from the following pair of fields that will be added to the `ZoneHVAC:EquipmentList` for each equipment:
 
 ```
-Zone Equipment <x> Cooling Fraction
-Zone Equipment <x> Heating or No-Load Fraction
+Zone Equipment <x> Sequential Cooling Fraction
+Zone Equipment <x> Sequential Heating or No-Load Fraction
 ```
 
-Similar to (and uapologetically lifted from) Mike Witte's ["Option A" from the previous NFP](https://github.com/NREL/EnergyPlus/blob/8d7fcb46b41e083a30a872f2b9fc23ca65912c2e/design/FY2017/MultiplePartialHVACInOneZone.md#option-a---initial-load), the fractions will be applied as follows:
+Similar to (and uapologetically lifted from) Mike Witte's ["Option B"](https://github.com/NREL/EnergyPlus/blob/8d7fcb46b41e083a30a872f2b9fc23ca65912c2e/design/FY2017/MultiplePartialHVACInOneZone.md#option-b---remaining-load), the fractions will be applied as follows:
 
-The zone equipment manager multiplies the initial load by the applicable schedule fraction before calling a given piece of equipment.  Here is an example where the radiant cooling panels meet 25% of the cooling load and the air system meets the remaining load.
+The zone equipment manager multiplies the current remaining load by the applicable schedule fraction before calling a given piece of equipment.  Here is an example where the radiant cooling panels meet 25% of the cooling load and the air system meets the remaining load.
 
 ```
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
-    FractionalLoad,          !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:CoolingPanel:RadiantConvective:Water,  !- Zone Equipment 1 Object Type
     SPACE2 Cooling Panel,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    0.25,                    !- Zone Equipment 1 Cooling Fraction
-    ,                        !- Zone Equipment 1 Heating or No-Load Fraction
+    0.25,                    !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating or No-Load Fraction
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    0.75,                    !- Zone Equipment 2 Cooling Fraction
-    ;                        !- Zone Equipment 2 Heating or No-Load Fraction
+    1.0,                     !- Zone Equipment 2 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating or No-Load Fraction
 ```
 
-If the current cooling load is 1000W, the cooling panel will be passed a load of 0.25 \* 1000=250W. The air distribution unit will be passed a load of 0.75 \* 1000W=750W. 
+If the current cooling load is 1000W, the cooling panel will be passed a load of 0.25*1000=250W. If the panel can provide this, then the remaining load of 750W is passed to the air distribution unit. If the cooling panel only provides 200W, then 1000-200=800W will be passed to the air distribution unit.
 
-*Pros* - The schedule fractions are intuitive, 0.25 + 0.75 = 1.0
+*Pros* - If the first piece of equipment cannot provide the requested load, the next one tries to meet to meet the unmet portion.
 
-*Cons* - If the first piece of equipment cannot provide the requested load, the next one will not try to meet to meet the unmet portion. and the zone setpoint will not be met.
+*Cons* - The schedule fractions are not intuitive. Because the schedule is applied to the remaining load, the schedule fractions will not add up to 1.0.
 
-If effect this will work exactly like the `UniformLoad` load distribution scheme, but will allow the user to specify the fractions instead of having it split evenly among the equipment.
-
+While the fractions are less intuitive, it will better be able to handle more complicated scenarios, such as the one described in the Email/Conference Call notes from 1/8. 
 
 ## Testing/Validation/Data Sources ##
 
