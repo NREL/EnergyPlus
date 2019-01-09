@@ -384,7 +384,7 @@ is a Java based generic optimization program that can use EnergyPlus.
 \href{https://beopt.nrel.gov/}{BEopt} is a building optimization
 tool focused on residential applications.
 
-\subsection*{Weather Files }
+\subsection*{Weather Files \label{subsec:Weather-Files}}
 
 Weather files are available for many locations throughout the world.
 Finding the right file that represents the weather in your specific
@@ -451,8 +451,8 @@ probably also provides training.
 
 \subsection*{Installing EnergyPlus}
 
-Please see the EnergyPlus QuickStart Guide <ADD LINK> for instructions
-on how to install EnergyPlus for your system.
+Please see the EnergyPlus QuickStart Guide for instructions on how
+to install EnergyPlus for your system.
 
 \subsection*{Running EnergyPlus}
 
@@ -483,8 +483,8 @@ how to perfom a simulation.
 EnergyPlus can be used as a command line tool within a Terminal window
 in Linux or MacOS or with the CMD prompt or PowerShell window under
 Windows. Basic usage using the command line approach is will documented
-in the QuickStart Guide <ADD LINK>. To learn more about the command
-line mode, you can type:
+in the QuickStart Guide. To learn more about the command line mode,
+you can type:
 \begin{verbatim}
 energyplus --help 
 \end{verbatim}
@@ -671,8 +671,8 @@ objects and fields is documented in the Energy+.idd file.
 
 A variation on the IDF file format is the IMF file format which includes
 macros that can be used for parametric analysis or file management
-called EP-Macros. To learn more about macros see the AuxiliaryPrograms
-document <ADD LINK>
+called EP-Macros. To learn more about macros see the Input Macros
+chapter of the AuxiliaryPrograms document.
 
 \subsubsection*{epJSON}
 
@@ -892,8 +892,8 @@ or can be searched through using most text editors. The Preprocess
 and PostProcess folders include many utilities that can be used directly
 or as part of EP-Launch that can aid in the setting up input files
 or or extracting or converting results. The WeatherData folder includes
-a small sample of the many weather files that are available <ADD LINK
-TO WEATHER DATA SECTION>
+a small sample of the many weather files that are available. For other
+weather files, please see the previous section on \ref{subsec:Weather-Files}. 
 
 \subsection*{What Are All These Output Files?}
 
@@ -946,8 +946,8 @@ HTML format or XML format
 \item VCpErr -- Transition program error file
 \item Proc.CSV -- Simple statistiscs generated from CSVProc
 \end{itemize}
-Almost of these output files are documents in the OutputDetailsAndExamples
-document <ADD LINK> 
+Almost of these output files are documented in the Output Files chapter
+of the OutputDetailsAndExamples document.
 
 Don't be intemindated by the long list of files, you can do a lot
 in EnergyPlus with just the IDF input file, the TABLE.HTML file and
@@ -968,8 +968,9 @@ and works on multiple platforms. It is located in the Preprocess\textbackslash I
 folder. It can convert from EnergyPlus 7.2 to the most recent version
 and even older versions can be converted if the proper files are downloaded
 from the \href{http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files}{helpdesk}.
-It can also update a group of files. It is documented in the AuxiliaryPrograms
-document <LINK>.
+It can also update a group of files. It is documented in the Chapter
+titled ``Using Older Version Input Files - Tranision'' in the AuxiliaryPrograms
+document.
 \end{itemize}
 \includegraphics{IDFVersionUpdater}
 \begin{itemize}
@@ -980,7 +981,8 @@ of EnergyPlus only by using the File..Transition command.
 a single file across multiple versions using the Transition workflow.
 \item Command line Transition - This allows updating files using the command
 line such as the Terminal for MacOS and Linux or the CMD or PowerShell
-for Windows. It is documented in the AuxiliaryPrograms document <LINK>.
+for Windows. It is documented in the Chapter titled ``Using Older
+Version Input Files - Tranision'' in the AuxiliaryPrograms document.
 \end{itemize}
 
 \subsection*{Errors and How to Fix Them}
