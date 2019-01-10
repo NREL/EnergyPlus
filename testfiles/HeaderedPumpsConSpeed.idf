@@ -2999,7 +2999,8 @@
     ,                        !- Skin Loss Radiative Fraction
     PowerPerFlowPerPressure, !- Design Power Sizing Method
     ,                        !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    1.282051282;             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
+    1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
+    Pump Energy;             !- End-Use Subcategory
 
   Chiller:Electric,
     Central Chiller 1,       !- Name
