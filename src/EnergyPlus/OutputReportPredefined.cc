@@ -1782,6 +1782,8 @@ namespace OutputReportPredefined {
         pdchMechType = newPreDefColumn(pdstMech, "Type");
         pdchMechNomCap = newPreDefColumn(pdstMech, "Nominal Capacity [W]");
         pdchMechNomEff = newPreDefColumn(pdstMech, "Nominal Efficiency [W/W]");
+        // Note: We don't want any of these to convert.
+        // The Btu/W-h isn't going to convert anyways, and the W/W will convert to W/W since it has "SI" in the string as a hint
         pdchMechIPLVSI = newPreDefColumn(pdstMech, "IPLV in SI Units [W/W]");
         pdchMechIPLVIP = newPreDefColumn(pdstMech, "IPLV in IP Units [Btu/W-h]");
 
