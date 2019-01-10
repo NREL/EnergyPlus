@@ -15886,7 +15886,7 @@ namespace OutputReportTabular {
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;
         UnitConv(25).offset = 7.6736;
-        UnitConv(80).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
+        UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
 
         UnitConv(20).hint = "ELEC";
         UnitConv(21).hint = "GAS";
