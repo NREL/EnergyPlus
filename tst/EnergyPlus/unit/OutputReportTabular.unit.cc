@@ -6189,7 +6189,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         {Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
     });
 
-    // Note JM 2018-11-26: I would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
+    // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
     std::string rowName;
     std::string columnName;
 
@@ -6263,7 +6263,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
             {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
     });
 
-    // Note JM 2018-11-26: I would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
+    // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
     for (auto v: results) {
 
         rowName = std::get<0>(v);

@@ -438,7 +438,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // Note JM 2018-11-08: Test for #7053:
+    // Test for #7053:
     // Fake that there is at least one UnitarySystemPerformance:Multispeed object
     UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
     UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);

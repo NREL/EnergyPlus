@@ -76,7 +76,7 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
         ss = std::make_shared<std::ostringstream>();
         // Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
-        // Note JM 2018-11-26: By default, set the SQLite location to memory
+        // By default, set the SQLite location to memory
         std::string sql_filepath(":memory:");
         // Alternatively, when debugging a test, change outpath to the location on disk so you can query the database manually after test ran
         // std::string sql_filepath("/path/on/disk/to/eplusout.sql");
