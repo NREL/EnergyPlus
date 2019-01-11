@@ -64,6 +64,7 @@
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -793,8 +794,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num
-    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 3);
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
@@ -973,8 +972,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     EXPECT_EQ(energy.RemainingOutputRequired, energy.SequencedOutputRequired(1));
     EXPECT_EQ(energy.RemainingOutputReqToHeatSP, energy.SequencedOutputRequiredToHeatingSP(1));
     EXPECT_EQ(energy.RemainingOutputReqToCoolSP, energy.SequencedOutputRequiredToCoolingSP(1));
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 1
-    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
 
     // UniformLoad Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
@@ -1170,7 +1167,27 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2
+    // Check sequenced load processing for unitary systems
+    // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int coolingPriority = 0;
+    int heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 1);
+    EXPECT_EQ(heatingPriority, 1);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    coolingPriority = 0;
+    heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 0);
+    EXPECT_EQ(heatingPriority, 3);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
 
     // UniformPLR Test 2 - Heating, FirstHVACIteration = false
@@ -1364,7 +1381,27 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num plus 1
+    // Check sequenced load processing for unitary systems
+    // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int coolingPriority = 0;
+    int heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 1);
+    EXPECT_EQ(heatingPriority, 1);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 2);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    coolingPriority = 0;
+    heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 0);
+    EXPECT_EQ(heatingPriority, 3);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 4);
 
     // SequentialUniformPLR Test 2 - Heating, FirstHVACIteration = false, low load requiring only 1 piece of equipment
@@ -1656,7 +1693,29 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(4), energy.OutputRequiredToCoolingSP);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num
+
+    // Check sequenced load processing for unitary systems
+    // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int coolingPriority = 0;
+    int heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 1);
+    EXPECT_EQ(heatingPriority, 1);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    coolingPriority = 0;
+    heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 3);
+    EXPECT_EQ(heatingPriority, 3);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 3);
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false

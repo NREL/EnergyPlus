@@ -576,8 +576,6 @@ namespace DataZoneEquipment {
                 ZoneEquipList(ControlledZoneNum).CoolingCapacity = 0;
                 ZoneEquipList(ControlledZoneNum).HeatingCapacity = 0;
 
-                int maxAirTermEquipNum = 0;
-
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 1);
                     ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 2);
@@ -622,11 +620,9 @@ namespace DataZoneEquipment {
 
                         if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = AirDistUnit_Num;
-                            maxAirTermEquipNum = ZoneEquipTypeNum;
 
                         } else if (SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = DirectAir_Num;
-                            maxAirTermEquipNum = ZoneEquipTypeNum;
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
@@ -734,26 +730,6 @@ namespace DataZoneEquipment {
                             ShowContinueError("..Invalid Equipment Type = " + ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum));
                             GetZoneEquipmentDataErrorsFound = true;
                         }
-                    }
-                }
-
-                // If there are any airterminal units, set extra iterations depending on load distribution scheme, save max across all zones
-                if (maxAirTermEquipNum > 0) {
-                    if (ZoneEquipList(ControlledZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading) {
-                        // Sequential needs one extra iterations up to the highest airterminal unit equipment number
-                        DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(maxAirTermEquipNum, DataHVACGlobals::MinAirLoopIterationsAfterFirst);
-                    }
-                    else if (ZoneEquipList(ControlledZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::UniformLoading) {
-                        // Uniform needs one extra iteration
-                        DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(1, DataHVACGlobals::MinAirLoopIterationsAfterFirst);
-                    }
-                    else if (ZoneEquipList(ControlledZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLRLoading) {
-                        // UniformPLR needs two extra iterations
-                        DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(2, DataHVACGlobals::MinAirLoopIterationsAfterFirst);
-                    }
-                    else if (ZoneEquipList(ControlledZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading) {
-                        // SequentialUniformPLR needs one extra iterations up to the highest airterminal unit equipment number plus one more
-                        DataHVACGlobals::MinAirLoopIterationsAfterFirst = max(maxAirTermEquipNum + 1, DataHVACGlobals::MinAirLoopIterationsAfterFirst);
                     }
                 }
 
@@ -1841,6 +1817,24 @@ namespace DataZoneEquipment {
                 break;
             }
         }
+        // Set MinAirLoopIterationsAfterFirst for equipment that uses sequenced loads, based on zone equip load distribution scheme
+        int minIterations = DataHVACGlobals::MinAirLoopIterationsAfterFirst;
+        if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading) {
+            // Sequential needs one extra iterations up to the highest airterminal unit equipment number
+            minIterations = max(coolingPriority, heatingPriority, minIterations);
+        }
+        else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::UniformLoading) {
+            // Uniform needs one extra iteration which is the default
+        }
+        else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLRLoading) {
+            // UniformPLR needs two extra iterations, regardless of unit equipment number
+            minIterations = max(2, minIterations);
+        }
+        else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading) {
+            // SequentialUniformPLR needs one extra iterations up to the highest airterminal unit equipment number plus one more
+            minIterations = max((coolingPriority + 1), (heatingPriority + 1), minIterations);
+        }
+        DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
     }
 
 } // namespace DataZoneEquipment
