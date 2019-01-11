@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2278,7 +2278,7 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 2: Evenly distribute remaining loop demand
-                if (std::abs(RemLoopDemand) > SmallLoad) {
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
                     DivideLoad = std::abs(RemLoopDemand) / numAvail;
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
@@ -2302,7 +2302,7 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 3: If RemLoopDemand is still greater than zero, look for any machine
-                if (std::abs(RemLoopDemand) > SmallLoad) {
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                         BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -201,11 +201,18 @@ TEST(OutputReportTabularTest, splitCommaString)
 TEST(OutputReportTabularTest, unitsFromHeading)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+
     std::string unitString;
+    int indexUnitConv;
+    std::string curUnits;
+    Real64 curConversionFactor;
+    Real64 curConversionOffset;
+
     SetupUnitConversions();
     unitsStyle = unitsStyleInchPound;
+
     unitString = "";
-    EXPECT_EQ(96, unitsFromHeading(unitString));
+    EXPECT_EQ(97, unitsFromHeading(unitString));
     EXPECT_EQ("", unitString);
     unitString = "Zone Floor Area {m2}";
     EXPECT_EQ(46, unitsFromHeading(unitString));
@@ -213,6 +220,25 @@ TEST(OutputReportTabularTest, unitsFromHeading)
     unitString = "Fictional field {nonsense}";
     EXPECT_EQ(0, unitsFromHeading(unitString));
     EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+    // Check a few report column headings too
+    unitString = "Standard Rated Net Cooling Capacity [W]";
+    indexUnitConv = unitsFromHeading(unitString);
+    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    // We expect W to convert to tons because it's cooling
+    EXPECT_EQ(70, indexUnitConv);
+    EXPECT_EQ("ton", curUnits);
+    EXPECT_EQ(0.0002843333, curConversionFactor);
+    EXPECT_EQ(0.0, curConversionOffset);
+
+    unitString = "Rated Net Cooling Capacity Test A [W]";
+    indexUnitConv = unitsFromHeading(unitString);
+    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    // We expect W to convert to tons because it's cooling
+    EXPECT_EQ(70, indexUnitConv);
+    EXPECT_EQ("ton", curUnits);
+    EXPECT_EQ(0.0002843333, curConversionFactor);
+    EXPECT_EQ(0.0, curConversionOffset);
 }
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
@@ -298,7 +324,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(95, indexUnitConv);
+    EXPECT_EQ(96, indexUnitConv);
     EXPECT_EQ("Invalid/Undefined", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -314,7 +340,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(96, indexUnitConv);
+    EXPECT_EQ(97, indexUnitConv);
     EXPECT_EQ("", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -392,12 +418,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
 
     varNameWithUnits = "Electric Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(85, indexUnitConv);
+    EXPECT_EQ(86, indexUnitConv);
     EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(94, indexUnitConv);
+    EXPECT_EQ(95, indexUnitConv);
     EXPECT_EQ("Electricty [kWh/m2]", curUnits);
 }
 
@@ -6833,4 +6859,61 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
     // and so the numTables was zero
     EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
+}
+// https://github.com/NREL/EnergyPlus/issues/6442
+TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    WriteTabularFiles = true;
+
+    SetupUnitConversions();
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
+
+    SetPredefinedTables();
+    std::string CompName = "My DX Coil with 10000W cooling";
+
+    PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompName, 16000., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompName, 3300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompName, 4300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompName, 5300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompName, 6300., 1);
+
+    EXPECT_EQ("10000.0", RetrievePreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompName));
+
+    // We enable the report we care about, making sure it's the right one
+    EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
+    OutputReportPredefined::reportName(5).show = true;
+
+    WritePredefinedTables();
+    EnergyPlus::sqlite->sqliteCommit();
+    EnergyPlus::sqlite->initializeIndexes();
+
+    auto units = queryResult("Select Units From TabularDataWithStrings "
+                             "WHERE ReportName = \"EquipmentSummary\" "
+                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+    auto values = queryResult("Select Value From TabularDataWithStrings "
+                             "WHERE ReportName = \"EquipmentSummary\" "
+                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+    EnergyPlus::sqlite->sqliteCommit();
+
+
+    EXPECT_EQ(1u, units.size());
+    // Because the table has 8 cols
+    EXPECT_EQ(8u, units[0].size());
+
+    EXPECT_EQ("ton", units[0][0]);
+
+    EXPECT_EQ(1u, values.size());
+    // 10000 W equavals 2.843 tons, rounded to 1 decimal gives 2.8
+    std::string s = values[0][0];
+    // Trim the string, it has leading spaces
+    s.erase( std::remove_if( s.begin(), s.end(), ::isspace ), s.end() );
+
+    EXPECT_EQ("2.8", s);
 }
