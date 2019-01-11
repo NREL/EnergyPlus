@@ -4154,8 +4154,9 @@ namespace ZoneEquipmentManager {
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::DeadBandOrSetback;
 
-        // Do nothing if this zone is uncontrolled
+        // Do nothing if this zone is uncontrolled or doing zone sizing
         if (!DataHeatBalance::Zone(ActualZoneNum).IsControlled) return;
+        if (DataGlobals::ZoneSizingCalc) return;
 
         int ctrlZoneNum = DataHeatBalance::Zone(ActualZoneNum).ZoneEqNum;
         // Do nothing on FirstHVACIteration if not UniformLoading
