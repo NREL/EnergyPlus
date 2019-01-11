@@ -1953,16 +1953,21 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
 
     WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
 
-//    std::vector<Real64> NodeTemps;
-//    NodeTemps.resize(Tank.Nodes);
-//    for (int i = 1; i <= Tank.Nodes; i++) {
-//        NodeTemps[i-1] = Tank.Node(i).Temp;
-//    }
-
-    for (int i = 5; i <= 7; i++) {
-        ASSERT_NEAR(Tank.Node(i).Temp, 59.907, 0.001);
+    std::vector<Real64> NodeTemps;
+    NodeTemps.resize(Tank.Nodes);
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
     }
-    ASSERT_GT(Tank.Node(11).Temp, Tank.Node(12).Temp);
+
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+
+    EXPECT_LT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp);
+    EXPECT_LT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2);
+    EXPECT_GT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp - Tank.DeadBandDeltaTemp);
+    EXPECT_GT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2);
 
     for (auto &node : Tank.Node) {
         node.Temp = 58.05;

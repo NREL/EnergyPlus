@@ -8447,6 +8447,7 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
+        const Real64 maxDt = 300.;
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
@@ -8559,6 +8560,58 @@ namespace WaterThermalTanks {
         std::vector<Real64> Tavg;
         Tavg.resize(nTankNodes);
 
+        auto inversion_mixing = [&](Real64 dt){
+            // Inversion mixing
+            bool HasInversion;
+            do {
+                HasInversion = false;
+                // Starting from the top of the tank check if the node below has a temperature inversion.
+                for (int j = 0; j < nTankNodes - 1; ++j) {
+                    if (Tfinal[j] < Tfinal[j + 1]) {
+
+                        // Temperature inversion!
+                        HasInversion = true;
+
+                        // From the node above the inversion, move down calculating a weighted average
+                        // of node temperatures until the node below the group of mixed nodes isn't hotter
+                        // or we hit the bottom of the tank.
+                        Real64 Tmixed = 0.0;
+                        Real64 MassMixed = 0.0;
+                        int m;
+                        for (m = j; m < nTankNodes; ++m) {
+                            Tmixed += Tfinal[m] * Tank.Node[m].Mass;
+                            MassMixed += Tank.Node[m].Mass;
+                            if ((m == nTankNodes - 1) or (Tmixed / MassMixed > Tfinal[m + 1])) break;
+                        }
+                        Tmixed /= MassMixed;
+
+                        // Now we have a range of nodes (j = top, m = bottom) that are mixed
+                        // and the mixed temperature (Tmixed).
+                        // Move through the mixed nodes and set the final temperature to the mixed temperature.
+                        // Also calculate a corrected average temperature for each node.
+                        for (int k = j; k <= m; ++k) {
+                            Real64 FinalFactorMixing;
+                            Real64 AvgFactorMixing;
+                            const Real64 NodeCapacitance = Tank.Node[k].Mass * Cp;
+                            if (A[k] == 0.0) {
+                                FinalFactorMixing = dt / NodeCapacitance;
+                                AvgFactorMixing = FinalFactorMixing / 2.0;
+                            } else {
+                                FinalFactorMixing = (exp(A[k] * dt) - 1.0) / A[k] / NodeCapacitance;
+                                AvgFactorMixing = ((exp(A[k] * dt) - 1.0) / A[k] / dt - 1.0) / A[k] / NodeCapacitance;
+                            }
+                            const Real64 Q_AdiabaticMixing = (Tmixed - Tfinal[k]) / FinalFactorMixing;
+                            Tfinal[k] = Tmixed;
+                            Tavg[k] += Q_AdiabaticMixing * AvgFactorMixing;
+                        }
+
+                        // Since we mixed, get out of here and start from the top to check again for mixing.
+                        break;
+                    }
+                }
+            } while ( HasInversion );
+        };
+
         auto converge_temperatures = [&](Real64 dt) {
 
             // Make initial guess that average and final temperatures over the timestep are equal to the starting temperatures
@@ -8597,7 +8650,6 @@ namespace WaterThermalTanks {
                     }
 
                     // Conduction to adjacent nodes
-                    // FIXME: this doesn't seem to be working right.
                     A[i] += -(tank_node.CondCoeffDn + tank_node.CondCoeffUp);
                     if (NodeNum > 1) B[i] += tank_node.CondCoeffUp * Tavg[i-1];
                     if (NodeNum < nTankNodes) B[i] += tank_node.CondCoeffDn * Tavg[i+1];
@@ -8628,9 +8680,6 @@ namespace WaterThermalTanks {
                     if (NodeNum > 1) B[i] += tank_node.MassFlowFromUpper * Cp * Tavg[i-1];
                     if (NodeNum < nTankNodes) B[i] += tank_node.MassFlowFromLower * Cp * Tavg[i+1];
 
-                    // Inversion Mixing
-                    // TODO: Figure out what to do here...
-
                     // Venting
                     // TODO: Figure out what to do with venting.
 
@@ -8656,6 +8705,8 @@ namespace WaterThermalTanks {
 
                 if (TfinalDiff < TemperatureConvergenceCriteria) break;
             } // end temperature convergence loop
+
+            inversion_mixing(dt);
 
         };
 
@@ -8753,26 +8804,59 @@ namespace WaterThermalTanks {
             }
 
             // Calculate the time until a heater turns on or off.
-            Real64 dt = TimeRemaining;
+            Real64 dt = min(TimeRemaining, maxDt);
+            converge_temperatures(dt);
+
+            bool reconvergeTemperatures = false;
             if (Tank.HeaterOn1) {
-                dt = min(converge_time_until_temperature(Tank.SetPointTemp, Tank.HeaterNode1), dt);
+                if (Tfinal[Tank.HeaterNode1-1] > Tank.SetPointTemp) {
+                    Real64 newdt = converge_time_until_temperature(Tank.SetPointTemp, Tank.HeaterNode1);
+                    if (newdt < dt) {
+                        dt = newdt;
+                        reconvergeTemperatures = false;
+                    } else {
+                        reconvergeTemperatures = true;
+                    }
+                }
             } else {
-                dt = min(converge_time_until_temperature(MinTemp1, Tank.HeaterNode1), dt);
+                if (Tfinal[Tank.HeaterNode1-1] < MinTemp1) {
+                    Real64 newdt = converge_time_until_temperature(MinTemp1, Tank.HeaterNode1);
+                    if (newdt < dt) {
+                        dt = newdt;
+                        reconvergeTemperatures = false;
+                    } else {
+                        reconvergeTemperatures = true;
+                    }
+                }
             }
             if (Tank.HeaterOn2) {
-                dt = min(converge_time_until_temperature(Tank.SetPointTemp2, Tank.HeaterNode2), dt);
+                if (Tfinal[Tank.HeaterNode2-1] > Tank.SetPointTemp2) {
+                    Real64 newdt = converge_time_until_temperature(Tank.SetPointTemp2, Tank.HeaterNode2);
+                    if (newdt < dt) {
+                        dt = newdt;
+                        reconvergeTemperatures = false;
+                    } else {
+                        reconvergeTemperatures = true;
+                    }
+                }
             } else {
-                dt = min(converge_time_until_temperature(MinTemp2, Tank.HeaterNode2), dt);
+                if (Tfinal[Tank.HeaterNode2-1] < MinTemp2) {
+                    Real64 newdt = converge_time_until_temperature(MinTemp2, Tank.HeaterNode2);
+                    if (newdt < dt) {
+                        dt = newdt;
+                        reconvergeTemperatures = false;
+                    } else {
+                        reconvergeTemperatures = true;
+                    }
+                }
             }
 
-            dt *= 1.01;
-            if ( dt > TimeRemaining ) dt = TimeRemaining;
-            converge_temperatures(dt);
+            if (reconvergeTemperatures) converge_temperatures(dt);
 
             // Increment to next internal time step
             TimeRemaining -= dt;
             Real64 Qloss = 0.0;
-            for (int i = 0; i < nTankNodes; i++) {
+            for (int i = 0; i < nTankNodes; ++i) {
                 auto &node = Tank.Node[i];
                 node.Temp = Tfinal[i];
                 node.TempSum += Tavg[i] * dt;
