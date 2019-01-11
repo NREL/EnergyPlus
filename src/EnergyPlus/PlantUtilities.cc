@@ -362,7 +362,8 @@ namespace PlantUtilities {
                     EMSLoadOverride = false;
 
                     for (CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                        CompInletNodeNum = comp.NodeNumIn;
+                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                        CompInletNodeNum = thisComp.NodeNumIn;
                         SeriesBranchHighFlowRequest = max(Node(CompInletNodeNum).MassFlowRateRequest, SeriesBranchHighFlowRequest);
                         SeriesBranchHardwareMaxLim = min(Node(CompInletNodeNum).MassFlowRateMax, SeriesBranchHardwareMaxLim);
                         SeriesBranchHardwareMinLim = max(Node(CompInletNodeNum).MassFlowRateMin, SeriesBranchHardwareMinLim);
@@ -370,7 +371,7 @@ namespace PlantUtilities {
                         SeriesBranchMinAvail = max(Node(CompInletNodeNum).MassFlowRateMinAvail, SeriesBranchMinAvail);
 
                         // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+
                         if (thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                     }
 
@@ -391,8 +392,9 @@ namespace PlantUtilities {
                     Node(OutletNode).MassFlowRate = CompFlow;
                     Node(InletNode).MassFlowRate = Node(OutletNode).MassFlowRate;
                     for (CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                        CompInletNodeNum = comp.NodeNumIn;
-                        CompOutletNodeNum = comp.NodeNumOut;
+                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                        CompInletNodeNum = thisComp.NodeNumIn;
+                        CompOutletNodeNum = thisComp.NodeNumOut;
                         Node(CompInletNodeNum).MassFlowRate = Node(OutletNode).MassFlowRate;
                         Node(CompOutletNodeNum).MassFlowRate = Node(OutletNode).MassFlowRate;
                     }
