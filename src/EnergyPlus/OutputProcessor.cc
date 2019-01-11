@@ -84,7 +84,6 @@
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -639,7 +638,8 @@ namespace OutputProcessor {
         for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             if (ReqRepVars(Loop).Key.empty()) continue;
             if (!UtilityRoutines::SameString(ReqRepVars(Loop).VarName, VariableName)) continue;
-            if (!(UtilityRoutines::SameString(ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key))) continue;
+            if (!(UtilityRoutines::SameString(ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key)))
+                continue;
 
             //   A match.  Make sure doesn't duplicate
 
@@ -5234,6 +5234,9 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::J:
             return "J";
             break;
+        case OutputProcessor::Unit::GJ:
+            return "GJ";
+            break;
         case OutputProcessor::Unit::W:
             return "W";
             break;
@@ -5385,6 +5388,8 @@ namespace OutputProcessor {
         std::string unitUpper = UtilityRoutines::MakeUPPERCase(unitIn);
         if (unitUpper == "J") {
             return OutputProcessor::Unit::J;
+        } else if (unitUpper == "GJ") {
+            return OutputProcessor::Unit::GJ;
         } else if (unitUpper == "DELTAC") {
             return OutputProcessor::Unit::deltaC;
         } else if (unitUpper == "") {
@@ -5535,7 +5540,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     StoreType VariableType; // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    bool OnMeter;        // True if this variable is on a meter
+    bool OnMeter;                   // True if this variable is on a meter
     std::string ResourceType;       // Will hold value of ResourceTypeKey
     std::string EndUse;             // Will hold value of EndUseKey
     std::string EndUseSub;          // Will hold value of EndUseSubKey

@@ -236,6 +236,7 @@ namespace DataHeatBalSurface {
     extern Array2D<Real64> FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
     extern Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
     extern bool InterZoneWindow;              // True if there is an interzone window
+    extern Real64 SumSurfaceHeatEmission;
 
     // Functions
 

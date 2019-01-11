@@ -58,10 +58,13 @@
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
+#include <DataLoopNode.hh>
 #include <DataZoneEquipment.hh>
+#include <Fans.hh>
 #include <Fixtures/EnergyPlusFixture.hh>
 #include <General.hh>
 #include <HVACManager.hh>
+#include <Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace HVACManager;
@@ -182,4 +185,67 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.5702731, DataHeatBalance::ZnAirRpt(2).VentilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(4.4741862, DataHeatBalance::ZnAirRpt(2).InfilVolumeStdDensity, 0.0001);
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
+{
+
+    int NumOfZones = 2;
+
+    DataHeatBalance::Zone.allocate(NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPI.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPV.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+
+    DataGlobals::NumOfZones = NumOfZones;
+    DataHVACGlobals::TimeStepSys = 1.0;
+    DataHeatBalFanSys::MCPI(1) = 1.0;
+    DataHeatBalFanSys::MCPI(2) = 1.5;
+    DataHeatBalFanSys::MCPV(1) = 2.0;
+    DataHeatBalFanSys::MCPV(2) = 2.5;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::OutHumRat = 0.0005;
+    DataHeatBalFanSys::MAT(1) = 22.0;
+    DataHeatBalFanSys::MAT(2) = 25.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
+    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    DataEnvironment::StdRhoAir = 1.20;
+    DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
+    DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
+    DataZoneEquipment::ZoneEquipConfig.allocate(NumOfZones);
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
+    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+
+    Fans::Fan.allocate(1);
+    Fans::NumFans = 1;
+    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
+    Fans::Fan(1).OutletAirMassFlowRate = 1.0;
+    Fans::Fan(1).OutletAirTemp = 22.0;
+    Fans::Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(Fans::Fan(1).OutletAirTemp, 0.0005);
+    Fans::Fan(1).InletNodeNum = 1;
+
+    DataLoopNode::Node.allocate(1);
+    DataLoopNode::Node(1).MassFlowRate = 0.0;
+
+    // Call HVACManager
+    ReportAirHeatBalance();
+
+    EXPECT_NEAR(9.7853391, DataHeatBalance::ZnAirRpt(1).ExfilTotalLoss, 0.0001);
+    EXPECT_NEAR(26.056543, DataHeatBalance::ZnAirRpt(2).ExfilTotalLoss, 0.0001);
+    EXPECT_NEAR(6.0, DataHeatBalance::ZnAirRpt(1).ExfilSensiLoss, 0.0001);
+    EXPECT_NEAR(20.0, DataHeatBalance::ZnAirRpt(2).ExfilSensiLoss, 0.0001);
+    EXPECT_NEAR(23377.40, DataHeatBalance::ZnAirRpt(1).ExhTotalLoss, 0.01);
+    EXPECT_NEAR(0, DataHeatBalance::ZnAirRpt(2).ExhTotalLoss, 0.01);
+    EXPECT_NEAR(35.841882 * 3600 * 1e-9, DataHeatBalance::ZoneTotalExfiltrationHeatLoss, 0.0001);
+    EXPECT_NEAR(23377.40 * 3600 * 1e-9, DataHeatBalance::ZoneTotalExhaustHeatLoss, 0.01);
 }

@@ -356,10 +356,13 @@ namespace DataHeatBalance {
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
     // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
-    extern int ZoneAirSolutionAlgo;           // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    extern Real64 BuildingRotationAppendixG;  // Building Rotation for Appendix G
-    extern bool ZoneAirMassBalanceSimulation; // if true, then enforces zone mass flow conservation
-
+    extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
+    extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
+    extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration
+    extern Real64 ZoneTotalExhaustHeatLoss;      // Building total heat emission through zone air exhaust
+    extern Real64 SysTotalHVACReliefHeatLoss;    // Building total heat emission through HVAC system relief air
+    extern Real64 SysTotalHVACRejectHeatLoss;    // Building total heat emission through HVAC system heat rejection
     // END SiteData
 
     extern int NumOfZoneLists;             // Total number of zone lists

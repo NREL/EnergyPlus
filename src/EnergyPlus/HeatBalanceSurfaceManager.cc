@@ -2029,6 +2029,9 @@ namespace HeatBalanceSurfaceManager {
             // CurrentModuleObject='Zone'
             SetupOutputVariable("Zone Mean Radiant Temperature", OutputProcessor::Unit::C, ZoneMRT(loop), "Zone", "State", Zone(loop).Name);
         }
+
+        SetupOutputVariable(
+            "Site Total Surface Heat Emission to Air", OutputProcessor::Unit::GJ, SumSurfaceHeatEmission, "Zone", "Sum", "Environment");
     }
 
     void InitThermalAndFluxHistories()
@@ -5015,6 +5018,8 @@ namespace HeatBalanceSurfaceManager {
         int ZoneNum;
         static int TimeStepInDay(0);
 
+        SumSurfaceHeatEmission = 0.0;
+
         ZoneMRT({1, NumOfZones}) = MRT({1, NumOfZones});
 
         ReportSurfaceShading();
@@ -5118,9 +5123,10 @@ namespace HeatBalanceSurfaceManager {
                 }
 
             } // opaque heat transfer surfaces.
-
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec * DataGlobals::convertJtoGJ;
+            }
         } // loop over surfaces
-
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = ZoneOpaqSurfInsFaceCond(ZoneNum);
@@ -7296,7 +7302,6 @@ namespace HeatBalanceSurfaceManager {
         QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
         QHeatEmiReport(SurfNum) =
             Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
-
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {
 

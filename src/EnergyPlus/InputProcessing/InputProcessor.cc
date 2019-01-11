@@ -1478,7 +1478,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1498,7 +1498,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1525,7 +1525,7 @@ void InputProcessor::preScanReportingVariables()
                         addVariablesForMonthlyReport(report_name);
                     }
                 } catch (...) {
-                    continue;  // blank or erroneous fields should be warned about during actual get input routines
+                    continue; // blank or erroneous fields should be warned about during actual get input routines
                 }
             }
         }
@@ -1877,8 +1877,11 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
         // Place holder
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-
+        addRecordToOutputVariableStructure("*", "Site Total Surface Heat Emission to Air");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exfiltration Heat Loss");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exhaust Air Heat Loss");
+        addRecordToOutputVariableStructure("*", "Air System Relief Air Total Heat Loss Energy");
+        addRecordToOutputVariableStructure("*", "HVAC System Total Heat Rejection Energy");
     } else {
     }
 }
@@ -1909,9 +1912,11 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
+        std::unordered_map<std::string,
+                           DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
-                           UtilityRoutines::case_insensitive_comparator> data;
+                           UtilityRoutines::case_insensitive_comparator>
+            data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));

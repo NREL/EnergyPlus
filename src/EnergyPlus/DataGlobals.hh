@@ -115,6 +115,8 @@ namespace DataGlobals {
     extern Real64 const StefanBoltzmann;   // Stefan-Boltzmann constant in W/(m2*K4)
     extern Real64 const UniversalGasConst; // (J/mol*K)
 
+    extern Real64 const convertJtoGJ; // Conversion factor for J to GJ
+
     // Parameters for EMS Calling Points
     extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
     extern int const emsCallFromSystemSizing;                         // Identity where EMS called from

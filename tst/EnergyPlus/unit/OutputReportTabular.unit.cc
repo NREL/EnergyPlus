@@ -56,17 +56,21 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -77,13 +81,13 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -315,53 +319,54 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
 
-    std::vector<std::string> units = {"[ ]",
-                                      "[%]",
-                                      "[]",
-                                      "[A]",
-                                      "[ach]",
-                                      "[Ah]",
-                                      "[C]",
-                                      "[cd/m2]",
-                                      "[clo]",
-                                      "[deg]",
-                                      "[deltaC]",
-                                      "[hr]",
-                                      "[J/kg]",
-                                      "[J/kg-K]",
-                                      "[J/kgWater]",
-                                      "[J/m2]",
-                                      "[J]",
-                                      "[K/m]",
-                                      "[kg/kg]",
-                                      "[kg/m3]",
-                                      "[kg/s]",
-                                      "[kg]",
-                                      "[kgWater/kgDryAir]",
-                                      "[kgWater/s]",
-                                      "[kmol/s]",
-                                      "[L]",
-                                      "[lum/W]",
-                                      "[lux]",
-                                      "[m/s]",
-                                      "[m]",
-                                      "[m2]",
-                                      "[m3/s]",
-                                      "[m3]",
-                                      "[min]",
-                                      "[Pa]",
-                                      "[ppm]",
-                                      "[rad]",
-                                      "[rev/min]",
-                                      "[s]",
-                                      "[V]",
-                                      "[W/K]",
-                                      "[W/m2]",
-                                      "[W/m2-C]",
-                                      "[W/m2-K]",
-                                      "[W/W]",
-                                      "[W]",
-                                      "[person/m2]",
+    std::vector<std::string> units = {
+        "[ ]",
+        "[%]",
+        "[]",
+        "[A]",
+        "[ach]",
+        "[Ah]",
+        "[C]",
+        "[cd/m2]",
+        "[clo]",
+        "[deg]",
+        "[deltaC]",
+        "[hr]",
+        "[J/kg]",
+        "[J/kg-K]",
+        "[J/kgWater]",
+        "[J/m2]",
+        "[J]",
+        "[K/m]",
+        "[kg/kg]",
+        "[kg/m3]",
+        "[kg/s]",
+        "[kg]",
+        "[kgWater/kgDryAir]",
+        "[kgWater/s]",
+        "[kmol/s]",
+        "[L]",
+        "[lum/W]",
+        "[lux]",
+        "[m/s]",
+        "[m]",
+        "[m2]",
+        "[m3/s]",
+        "[m3]",
+        "[min]",
+        "[Pa]",
+        "[ppm]",
+        "[rad]",
+        "[rev/min]",
+        "[s]",
+        "[V]",
+        "[W/K]",
+        "[W/m2]",
+        "[W/m2-C]",
+        "[W/m2-K]",
+        "[W/W]",
+        "[W]",
+        "[person/m2]",
     };
 
     for (auto u : units) {
@@ -1429,7 +1434,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     EXPECT_NEAR(10.0, (DXCoils::DXCoil(2).RatedTotCap(1) / DXCoils::DXCoil(1).RatedTotCap(1)), 0.00001);
     EXPECT_NEAR(10.0, (DXCoils::DXCoil(2).RatedAirVolFlowRate(1) / DXCoils::DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
     EXPECT_NEAR(
-        10.0, (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
+        10.0,
+        (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
         0.00001);
 
     DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
@@ -3467,12 +3473,36 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 0.25;
@@ -3507,12 +3537,36 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 1.0;
@@ -3662,11 +3716,70 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     gatherDemandIndEndUseSub.deallocate();
 }
 
+TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
+{
+
+    displayHeatEmissionsSummary = true;
+    DoWeathSim = true;
+    DataGlobals::TimeStepZoneSec = 600.0;
+    DataEnvironment::OutHumRat = 0.005;
+    DataEnvironment::OutDryBulbTemp = 25.0;
+
+    MixedAir::NumOAControllers = 2;
+    MixedAir::OAController.allocate(2);
+    MixedAir::OAController(1).RelTotalLossRate = 1.0;
+    MixedAir::OAController(2).RelTotalLossRate = 1.0;
+    CondenserLoopTowers::NumSimpleTowers = 1;
+    CondenserLoopTowers::SimpleTowerReport.allocate(1);
+    CondenserLoopTowers::SimpleTowerReport(1).Qactual = 1.0;
+    CondenserLoopTowers::SimpleTowerReport(1).FanEnergy = 50.0;
+
+    Real64 reliefEnergy = 2.0 * DataGlobals::TimeStepZoneSec * DataGlobals::convertJtoGJ;
+    Real64 condenserReject = (1.0 * DataGlobals::TimeStepZoneSec + 50.0) * DataGlobals::convertJtoGJ;
+
+    GatherHeatEmissionReport(ZoneTSReporting);
+
+    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(reliefEnergy, BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(condenserReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(condenserReject, BuildingPreDefRep.emiHVACReject);
+
+    DXCoils::NumDXCoils = 2;
+    DXCoils::DXCoil.allocate(2);
+    DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    DXCoils::DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    DXCoils::DXCoil(1).FuelType = DXCoils::FuelTypeNaturalGas;
+    DXCoils::DXCoil(1).ElecCoolingConsumption = 100.0;
+    DXCoils::DXCoil(1).TotalCoolingEnergy = 100.0;
+    DXCoils::DXCoil(1).MSFuelWasteHeat = 1.0;
+    DXCoils::DXCoil(1).DefrostConsumption = 0.0;
+    DXCoils::DXCoil(1).CrankcaseHeaterConsumption = 0.0;
+    DXCoils::DXCoil(2).DXCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+    DXCoils::DXCoil(2).ElecHeatingConsumption = 50.0;
+    DXCoils::DXCoil(2).TotalHeatingEnergy = 40.0;
+    DXCoils::DXCoil(2).DefrostConsumption = 0.0;
+    DXCoils::DXCoil(2).FuelConsumed = 0.0;
+    DXCoils::DXCoil(2).CrankcaseHeaterConsumption = 0.0;
+
+    Real64 coilReject = (1.0 * DataGlobals::TimeStepZoneSec + 200.0 + 10.0) * DataGlobals::convertJtoGJ;
+
+    GatherHeatEmissionReport(ZoneTSReporting);
+    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(2 * reliefEnergy, BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(2 * condenserReject + coilReject, BuildingPreDefRep.emiHVACReject);
+}
+
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 {
-    std::string const idf_objects = delimited_string(
-        {"Version,8.3;", "Output:Table:TimeBins,", "System1, !- Key Value", "Some Temperature Variable, !- Variable Name", "0.00, !- Interval Start",
-         "0.20, !- Interval Size", "5,                       !- Interval Count", "Always1; !- Schedule Name"});
+    std::string const idf_objects = delimited_string({"Version,8.3;",
+                                                      "Output:Table:TimeBins,",
+                                                      "System1, !- Key Value",
+                                                      "Some Temperature Variable, !- Variable Name",
+                                                      "0.00, !- Interval Start",
+                                                      "0.20, !- Interval Size",
+                                                      "5,                       !- Interval Count",
+                                                      "Always1; !- Schedule Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -6068,12 +6181,36 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 0.25;
@@ -6495,17 +6632,36 @@ TEST(OutputReportTabularTest, GetDelaySequencesTwice_test)
 
     netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
 
-    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
-                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
+    GetDelaySequences(coolDesSelected,
+                      true,
+                      iZone,
+                      peopleDelaySeqCool,
+                      equipDelaySeqCool,
+                      hvacLossDelaySeqCool,
+                      powerGenDelaySeqCool,
+                      lightDelaySeqCool,
+                      feneSolarDelaySeqCool,
+                      feneCondInstantSeq,
+                      surfDelaySeqCool);
 
     EXPECT_EQ(0.83, feneCondInstantSeq(coolDesSelected, 1, 1)); // the first time the subtraction operation should have occurred
 
-    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
-                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
+    GetDelaySequences(coolDesSelected,
+                      true,
+                      iZone,
+                      peopleDelaySeqCool,
+                      equipDelaySeqCool,
+                      hvacLossDelaySeqCool,
+                      powerGenDelaySeqCool,
+                      lightDelaySeqCool,
+                      feneSolarDelaySeqCool,
+                      feneCondInstantSeq,
+                      surfDelaySeqCool);
 
     EXPECT_EQ(0.83,
               feneCondInstantSeq(
-                  coolDesSelected, 1,
+                  coolDesSelected,
+                  1,
                   1)); // the second time the subtraction should not have happened since it is only adjusted once so the value should be the same.
 }
 
@@ -6543,33 +6699,33 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
 {
     std::string const idf_objects = delimited_string({
-  "SizingPeriod:DesignDay,",
-  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
-  "  1,                       !- Month",
-  "  21,                      !- Day of Month",
-  "  WinterDesignDay,         !- Day Type",
-  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
-  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-  "  Wetbulb,                 !- Humidity Condition Type",
-  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-  "  ,                        !- Humidity Condition Day Schedule Name",
-  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-  "  99063.,                  !- Barometric Pressure {Pa}",
-  "  4.9,                     !- Wind Speed {m/s}",
-  "  270,                     !- Wind Direction {deg}",
-  "  No,                      !- Rain Indicator",
-  "  No,                      !- Snow Indicator",
-  "  No,                      !- Daylight Saving Time Indicator",
-  "  ASHRAEClearSky,          !- Solar Model Indicator",
-  "  ,                        !- Beam Solar Day Schedule Name",
-  "  ,                        !- Diffuse Solar Day Schedule Name",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-  "  0.0;                     !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "  1,                       !- Month",
+        "  21,                      !- Day of Month",
+        "  WinterDesignDay,         !- Day Type",
+        "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Wetbulb,                 !- Humidity Condition Type",
+        "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                        !- Humidity Condition Day Schedule Name",
+        "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  99063.,                  !- Barometric Pressure {Pa}",
+        "  4.9,                     !- Wind Speed {m/s}",
+        "  270,                     !- Wind Direction {deg}",
+        "  No,                      !- Rain Indicator",
+        "  No,                      !- Snow Indicator",
+        "  No,                      !- Daylight Saving Time Indicator",
+        "  ASHRAEClearSky,          !- Solar Model Indicator",
+        "  ,                        !- Beam Solar Day Schedule Name",
+        "  ,                        !- Diffuse Solar Day Schedule Name",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "  0.0;                     !- Sky Clearness",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -6580,16 +6736,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
 {
     std::string const idf_objects = delimited_string({
-  "SizingPeriod:WeatherFileDays,",
-  "  Summer including Extreme Summer days,  !- Name",
-  "  7,                       !- Begin Month",
-  "  18,                      !- Begin Day of Month",
-  "  7,                       !- End Month",
-  "  25,                      !- End Day of Month",
-  "  SummerDesignDay,         !- Day of Week for Start Day",
-  "  No,                      !- Use Weather File Daylight Saving Period",
-  "  No;                      !- Use Weather File Rain and Snow Indicators",
-        });
+        "SizingPeriod:WeatherFileDays,",
+        "  Summer including Extreme Summer days,  !- Name",
+        "  7,                       !- Begin Month",
+        "  18,                      !- Begin Day of Month",
+        "  7,                       !- End Month",
+        "  25,                      !- End Day of Month",
+        "  SummerDesignDay,         !- Day of Week for Start Day",
+        "  No,                      !- Use Weather File Daylight Saving Period",
+        "  No;                      !- Use Weather File Rain and Snow Indicators",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -6599,13 +6755,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileConditionType)
 {
     std::string const idf_objects = delimited_string({
-  "SizingPeriod:WeatherFileConditionType,",
-  "  Hot,                     !- Name",
-  "  SummerExtreme,           !- Period Selection",
-  "  Monday,                  !- Day of Week for Start Day",
-  "  Yes,                     !- Use Weather File Daylight Saving Period",
-  "  Yes;                     !- Use Weather File Rain and Snow Indicators",
-        });
+        "SizingPeriod:WeatherFileConditionType,",
+        "  Hot,                     !- Name",
+        "  SummerExtreme,           !- Period Selection",
+        "  Monday,                  !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  Yes;                     !- Use Weather File Rain and Snow Indicators",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -6616,7 +6772,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 // This tests aims to ensure that the needed Output:Variables for the Predefined Monthly table
 // are indeeed set up, and that as a result the numTables is good.
 // https://github.com/NREL/EnergyPlus/issues/7019
-TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputVars) {
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputVars)
+{
 
     std::string const idf_objects = delimited_string({
         "Output:Table:SummaryReports,",
@@ -6641,39 +6798,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     Real64 timeNotMet;
     std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
 
-
-    for (int i=0; i < 2; ++i) {
+    for (int i = 0; i < 2; ++i) {
         SetupOutputVariable("Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
 
-        SetupOutputVariable("Zone Heating Setpoint Not Met Time",
-                                OutputProcessor::Unit::hr,
-                                timeNotMet,
-                                "Zone",
-                                "Sum",
-                                ZoneNames[i]);
-        SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time",
-                                OutputProcessor::Unit::hr,
-                                timeNotMet,
-                                "Zone",
-                                "Sum",
-                                ZoneNames[i]);
-        SetupOutputVariable("Zone Cooling Setpoint Not Met Time",
-                                OutputProcessor::Unit::hr,
-                                timeNotMet,
-                                "Zone",
-                                "Sum",
-                                ZoneNames[i]);
-        SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time",
-                                OutputProcessor::Unit::hr,
-                                timeNotMet,
-                                "Zone",
-                                "Sum",
-                                ZoneNames[i]);
+        SetupOutputVariable("Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+        SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
     }
 
-
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
-    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput();
     OutputReportTabular::GetInputOutputTableSummaryReports();
@@ -6698,5 +6833,4 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
     // and so the numTables was zero
     EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
-
 }

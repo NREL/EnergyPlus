@@ -249,6 +249,8 @@ namespace DataHeatBalSurface {
     Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
     bool InterZoneWindow(false);       // True if there is an interzone window
 
+    Real64 SumSurfaceHeatEmission(0.0); // Heat emission from all surfaces
+
     // Functions
 
     // Clears the global data in DataHeatBalSurface.
@@ -344,6 +346,7 @@ namespace DataHeatBalSurface {
         FractDifShortZtoZ.deallocate();
         RecDifShortFromZ.deallocate();
         InterZoneWindow = false;
+        SumSurfaceHeatEmission = 0;
     }
 
 } // namespace DataHeatBalSurface
