@@ -516,7 +516,7 @@ namespace HeatBalanceAirManager {
                     "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, ZnAirRpt(Loop).imBalance, "System", "Average", Zone(Loop).Name);
             }
 
-            if (!DisplayAdvancedReportVariables) {
+            if (DisplayAdvancedReportVariables) {
                 SetupOutputVariable("Zone Exfiltration Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExfilTotalLoss,

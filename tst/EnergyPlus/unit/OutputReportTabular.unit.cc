@@ -3794,6 +3794,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     EXPECT_EQ(2 * reliefEnergy, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(2 * condenserReject + coilReject, BuildingPreDefRep.emiHVACReject);
+
+    MixedAir::clear_state();
+    DXCoils::clear_state();
+    CondenserLoopTowers::clear_state();
 }
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
@@ -6896,12 +6900,13 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 
     auto units = queryResult("Select Units From TabularDataWithStrings "
                              "WHERE ReportName = \"EquipmentSummary\" "
-                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"",
+                             "TabularDataWithStrings");
     auto values = queryResult("Select Value From TabularDataWithStrings "
-                             "WHERE ReportName = \"EquipmentSummary\" "
-                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+                              "WHERE ReportName = \"EquipmentSummary\" "
+                              "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"",
+                              "TabularDataWithStrings");
     EnergyPlus::sqlite->sqliteCommit();
-
 
     EXPECT_EQ(1u, units.size());
     // Because the table has 8 cols
@@ -6913,7 +6918,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     // 10000 W equavals 2.843 tons, rounded to 1 decimal gives 2.8
     std::string s = values[0][0];
     // Trim the string, it has leading spaces
-    s.erase( std::remove_if( s.begin(), s.end(), ::isspace ), s.end() );
+    s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 
     EXPECT_EQ("2.8", s);
 }
