@@ -4822,7 +4822,6 @@ namespace OutputReportTabular {
         using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
         using CondenserLoopTowers::SimpleTowerReport;
-        using DataEnvironment::OutEnthalpy;
         using DataEnvironment::WeatherFileLocationTitle;
         using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
@@ -4835,9 +4834,7 @@ namespace OutputReportTabular {
         using DataHeatBalSurface::SumSurfaceHeatEmission;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
-        using DataHVACGlobals::FanType_ZoneExhaust;
         using DataHVACGlobals::WaterCooled;
-        using DataSurfaces::ExternalEnvironment;
         using DXCoils::DXCoil;
         using DXCoils::NumDXCoils;
         using EvaporativeCoolers::EvapCond;
@@ -4866,9 +4863,6 @@ namespace OutputReportTabular {
         using PlantChillers::NumElectricChillers;
         using PlantChillers::NumEngineDrivenChillers;
         using PlantChillers::NumGTChillers;
-        using RefrigeratedCase::AirChillerSet;
-        using RefrigeratedCase::Condenser;
-        using RefrigeratedCase::GasCooler;
         using RefrigeratedCase::RefrigRack;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
