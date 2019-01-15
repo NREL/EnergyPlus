@@ -47,7 +47,7 @@ unsigned int getVariables(const unsigned int valueReferences[],
 unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
                               const char *log);
 
-unsigned int terminate(const char *log);
+unsigned int terminateSim(const char *log);
 
 }
 

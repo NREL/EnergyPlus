@@ -239,6 +239,10 @@ unsigned int getVariables(const unsigned int valueReferences[],
                           const char *log)
 {
   UNUSED(log);
+  std::cout << "begin getVariables" << std::endl;
+  //for ( const auto & var : valueReferences ) {
+  //  std::cout << var << std::endl;
+  //}
 
   for ( size_t i = 0; i < nVars2; ++i ) {
     auto valueRef = valueReferences[i];
@@ -247,6 +251,7 @@ unsigned int getVariables(const unsigned int valueReferences[],
 
     getter(variablePointer);
   }
+  std::cout << "end getVariables" << std::endl;
 
   return 0;
 }
@@ -262,7 +267,7 @@ unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
   return 0;
 }
 
-unsigned int terminate(const char *log) {
+unsigned int terminateSim(const char *log) {
   UNUSED(log);
 
   {
