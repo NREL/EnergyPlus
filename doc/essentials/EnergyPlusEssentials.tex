@@ -29,7 +29,7 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 08, 2019}
+\date{January 17, 2019}
 \maketitle
 
 \section{Introduction}
@@ -81,6 +81,33 @@ and \href{https://www.youtube.com/results?search_query=building+energy+modeling}
 videos
 \item And numerous \href{https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias\%3Daps&field-keywords=building+energy+modeling}{books}
 \end{itemize}
+Building enery modeling is necessary to understand the overall energy
+consumption in buildings because the energy flows in buildings can
+be very complicated. The heat flow through walls is determined not
+just by the area and the temperatures but the mass characteristics
+of the walls may result in heat flowing out of a wall several hours
+after it has flowed in. The constantly changing temperature on the
+outside of the wall and the less frequent but often large step changes
+in thermostat setpoints between day and night operation for the inside
+of the building make the direction of the heat flow vary over time.
+Solar enery being absorbed on the exterior wall and roof surfaces
+as well as entering windows varies by the sun position for each period
+of time over the day and over the year. Heat sources within the building
+including people, office and other equipment, and lighting include
+both heat that immediately impacts the air within (convective heat)
+and heat that is absorbed by the sufaces and released slowly over
+time (radiant heat). Lighting may be controlled by a sensor that turns
+it on or off or changes its intensity based on the amount of natural
+daylight that is entering the space through windows and skylights
+making the heat generated from the lighting system change over time.
+Air conditioning and heating systems come in a huge number of configurations
+and each one can be used with many different controls configurations
+based on the temperature or other conditions within each space in
+the building and ultimately their operation accounts for a large portion
+of the energy consumed in a building. For these reasons and more,
+what might first appear as something that can be calcuated with just
+a few formulas in a spreadsheet is instead a software program and,
+in the case of EnergyPlus, with over 500,000 lines of code. 
 
 \section*{Questions that BEM can answer}
 
@@ -192,6 +219,15 @@ the effect of undersizing fans and equipment and what impact that
 might have on the thermal comfort of occupants within the building 
 \item EnergyPlus runs on Windows, MacOS, and Linux computers. 
 \end{itemize}
+Integration of Loads, Systems, and Plants: One of the strong points
+of EnergyPlus is the integration of all aspects of the simulation---loads,
+systems, and plants. System and plant output is allowed to directly
+impact the building thermal response rather than calculating all loads
+first, then simulating systems and plants. The simulation is coupled
+allowing the designer to more accurately investigate the effect of
+undersizing fans and equipment and what impact that might have on
+the thermal comfort of occupants within the building. 
+
 <need to balance overview with enough details to help people, I think
 a list of what can be modeled might be more helpful>
 
@@ -630,7 +666,9 @@ they need to run.
 
 EnergyPlus has two different input file formats that can be used to
 describe the building and system that is simulated. The file extensions
-for the two formats are IDF and epJSON.
+for the two formats are IDF and epJSON. For both input files, the
+numeric inputs are in SI units (International System of Units often
+called metric units). 
 
 \subsubsection*{IDF}
 
@@ -741,10 +779,11 @@ Another editing choice for IDF file is the IDF Editor which comes
 with EnergyPlus in the \textbackslash PreProcess\textbackslash IDFEditor
 directory. It is a Windows only program and is was not designed to
 run on Linux or MacOS. It is specially designed for editing IDF files
-and includes many features to simplify the process. The main screen
-of the IDF editor is shown below. Full details of the IDF Editor can
-be found in the Auxiliary Programs document under the ``Creating
-Input Files'' section.
+and includes many features to simplify the process. It performs unit
+conversions so either SI (metric) or IP (inch-pound) units can be
+used. The main screen of the IDF editor is shown below. Full details
+of the IDF Editor can be found in the Auxiliary Programs document
+under the ``Creating Input Files'' section.
 
 \includegraphics[width=6in]{idfeditor}
 
@@ -949,19 +988,22 @@ HTML format or XML format
 Almost of these output files are documented in the Output Files chapter
 of the OutputDetailsAndExamples document.
 
-Don't be intemindated by the long list of files, you can do a lot
+Don't be intimindated by the long list of files, you can do a lot
 in EnergyPlus with just the IDF input file, the TABLE.HTML file and
-the ERR file.
+the ERR file. The building description, the detecting and solving
+of errors, and the most common primary outputs are found between these
+three files. Starting with these three files and branching out to
+others as needed is a good strategy for using EnergyPlus.
 
 \subsection*{Versions and Updating}
 
 When using the IDF input file format with EnergyPlus, each release
-(which are generally twice per year) is likely to have small changes
-to the file format. Included with EnergyPlus are a number of ways
-to update files so that they are compatible with the release. Each
-method ultimately uses the TransitionVx-x-x-ToVx-x-x.exe files that
-are located in the Preprocess\textbackslash IDFVersionUpdater folder.
-The ways to update your IDF files are:
+(which are generally twice per year in March and September) is likely
+to have small changes to the file format. Included with EnergyPlus
+are a number of ways to update files so that they are compatible with
+the release. Each method ultimately uses the TransitionVx-x-x-ToVx-x-x.exe
+files that are located in the Preprocess\textbackslash IDFVersionUpdater
+folder. The ways to update your IDF files are:
 \begin{itemize}
 \item IDFVersionUpdater program (shown below) is included in the installation
 and works on multiple platforms. It is located in the Preprocess\textbackslash IDFVersionUpdater
@@ -1025,11 +1067,26 @@ are used during the design process>
 
 \section{Introduction to Example Building Models}
 
+<do I need this chapter or maybe should just reference specific example
+files instead of a tutorial>
+
+\section{Simulation Control}
+
+<describe objects that need to be in any input file>
+
 \section{Envelope and Geometry }
 
 \subsection*{Coordinate System}
 
 <maybe take this from existing documentation>
+
+An input called Building North Axis in the Building object, simplifies
+building geometry specification by designating how the building is
+oriented relative to true North. Buildings frequently do not line
+up with true north. For convenience, one may enter surfaces in a \textquotedblleft regular\textquotedblright{}
+coordinate system and then shift them via the use of the North Axis.
+The value is specified in degrees from \textquotedblleft true north\textquotedblright{}
+(clockwise is positive). 
 
 \subsection*{Surfaces and Zones}
 
@@ -1092,9 +1149,60 @@ file contained in the DataSets folder. The file contains typical materials
 and constructionsand is based on the 2005 version of the ASHRAE Handbook
 - Fundamentals.
 
+When the building was zoned, our objective was to define as few zones
+as possible. Now we would like to extend this objective to include
+defining as few surfaces as possible without significantly compromising
+the integrity of the simulation. We reduce the number and complexity
+of surfaces in our input file by defining equivalent surfaces. 
+
+Before dealing with equivalent surfaces, it is appropriate to take
+the concept of a thermal zone one step further. EnergyPlus performs
+heat balances on individual zone surfaces and on the zone air. For
+purposes of the heat transfer calculations, a geometrically correct
+rendering of the zone surfaces is not required. The surfaces do not
+even have to be connected. As long as the program knows to which thermal
+zone (mass of air) each surface transfers heat, it will calculate
+all heat balances correctly. For example, all heat storage surfaces
+of the same construction within a zone may be defined as a single
+rectangular surface. The size of this equivalent surface will equal
+the sum of all the areas of all the heat storage surfaces in the zone.
+A few simple rules will further explain what we mean by equivalent
+surfaces and how these surfaces may be used. Remember that these are
+guidelines for optional simplification of input. Each simplification
+must be evaluated to determine if it would significantly impact certain
+shading, interior solar gains, or daylighting features. The goal is
+to seek an adequate level of detail to capture the key features of
+the building envelope without spending excess time describing and
+computing results for details that are insignificant. 
+\begin{enumerate}
+\item Define all roofs and floors as rectangles regardless of the shape
+of the zone. Each zone may have one rectangular roof and one rectangular
+floor of a given construction. 
+\item Define all heat storage surfaces of the same construction within a
+zone as a single surface. The size of the single surface is obtained
+by summing the individual surface areas exposed to the zone. Thus,
+if a partition is completely within a zone (both sides of the partition
+are exposed to the zone), the area of each side must be added to the
+area of the equivalent surface. On the other hand, if the partition
+separates two zones, the area of only one side should be added to
+the equivalent surface. 
+\item Combine all windows on a given exterior surface into a single window.
+Usually each exterior surface should have only one window of each
+type. Overhangs or other shading devices may require that more windows
+be specified or combined together. By using the WindowMaterial:Glazing
+con- struction for your glass door, they will be correctly modeled
+in EnergyPlus with sunlight transferring into the zone. 
+\end{enumerate}
+
 \subsection*{Heat Transfer to the Ground}
 
 \section{Internal Loads }
+
+People, lights, equipment, outside air infiltration and ventilation
+all constitute \textquotedblleft internal gains\textquotedblright{}
+for the thermal zone. These gains are described to EnergyPlus as a
+design or peak level with a schedule that specifies a fraction of
+the peak for each hour. 
 
 \subsection*{Lights and Equipment}
 
@@ -1109,6 +1217,14 @@ and constructionsand is based on the 2005 version of the ASHRAE Handbook
 \subsection*{Ideal Loads}
 
 \subsection*{HVAC Templates}
+
+HVAC Template objects are available. These are intended to allow for
+several \textquotedblleft usual\textquotedblright{} HVAC types to
+be expanded into EnergyPlus HVAC inputs with minimal user entries.
+These are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
+document under the Group \textquotedblleft HVACTemplates\textquotedblright{}
+and the expansion process is described in the Auxiliary Programs document
+under \textquotedblleft ExpandObjects\textquotedblright .
 
 \subsection*{Zone Equipment}
 
@@ -1133,4 +1249,33 @@ and constructionsand is based on the 2005 version of the ASHRAE Handbook
 \subsection*{Emissions and TDV}
 
 \section{Specific Tips }
+
+\subsection*{Data Sets}
+
+EnergyPlus uses snippets of IDF files to create the library of data
+that may be useful for you. Two folders are created upon installation:
+DataSets -- which contains IDF snippets and MacroDataSets -- which
+also contain IDF snippets but are in a form such that they can be
+easily used with the EPMacro program. 
+
+\subsection*{Other Useful Utility Programs}
+
+The EnergyPlus install includes a variety of tools to help with various
+aspectis of converting data or displaying information to help with
+using EnergyPlus
+\begin{itemize}
+\item Coefficient Curve Generation - The CoeffConv and CoeffConv utility
+programs can be used to convert DOE-2 temperature depen- dent curves
+(Fahrenheit) to EnergyPlus temperature curves (Centigrade/Celsius).
+These programs are described in the Auxiliary Programs document.
+\item HVAC-Diagram - Another post processing program is the HVAC-Diagram
+application. It reads one of the EnergyPlus output files (eplusout.bnd)
+and produces a Scalable Vector Graphics (SVG) file. More information
+on the HVAC Diagram program is found in the Auxiliary Programs document.
+\item convertESOMTR - This simple post processing program can be used seamlessly
+with EP-Launch to provide IP (inch- pound) unit output files rather
+than SI units. This program is described more fully in the Auxiliary
+Programs document.
+\end{itemize}
+
 \end{document}
