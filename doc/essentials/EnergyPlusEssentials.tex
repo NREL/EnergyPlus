@@ -323,7 +323,8 @@ user interface such as \href{https://www.openstudio.net/}{OpenStudio},
 \href{https://www.designbuilder.com/}{DesignBuilder}, \href{https://d-alchemy.com/products/simergy}{Simergy},
 \href{https://bigladdersoftware.com/projects/euclid/}{Euclid}, \href{https://www.ladybug.tools/}{Ladybug},
 \href{https://www.autodesk.com/products/insight/overview}{Insight},
-and \href{https://www.bentley.com/en/products/brands/aecosim}{AECOsim}.
+\href{https://www.bentley.com/en/products/brands/aecosim}{AECOsim},
+and \href{https://bigladdersoftware.com/projects/euclid/}{Euclid}.
 Other interfaces are also available. 
 
 \subsection*{Approaches to Implement Measures }
@@ -673,15 +674,16 @@ called metric units).
 \subsubsection*{IDF}
 
 The legacy file format is a text based format that describes each
-object in series. The name of the type of objects starts the object
-and each value for each field follows separated by commas. The end
-of the object is indicated by a semi-colon. Comments are indicated
-by a exclamation point ``!'' and anything after this is ignored
-by EnergyPlus. Commonly, an object is spread over many lines in the
-file with one value for each field per line. The names of each field
-are not required but are usually shown after the value and the comma
-or semicolon as a special comment using ``!-'' as an indicator.
-The objects can be in any order. A small piece of an IDF file 
+input object in series. The name of the type of input object starts
+the input object and each value for each field follows separated by
+commas. The end of the input object is indicated by a semi-colon.
+Comments are indicated by a exclamation point ``!'' and anything
+after this is ignored by EnergyPlus. Commonly, an input object is
+spread over many lines in the file with one value for each field per
+line. The names of each field are not required but are usually shown
+after the value and the comma or semicolon as a special comment using
+``!-'' as an indicator. The input objects can be in any order. A
+small piece of an IDF file 
 \begin{lyxcode}
 Building,
 
@@ -701,11 +703,12 @@ Building,
 
 ~~6;~~~~~~~~~~~~~~~~~!-~Minimum~Number~of~Warmup~Days
 \end{lyxcode}
-The details of this example object are not important but the use of
-commas, exclamation points, and the closing semi-colon are important.
-The IDF format is currently the most commonly used format throughout
-the EnergyPlus ecosystem of utilities and GUIs. The list of possible
-objects and fields is documented in the Energy+.idd file.
+The details of this example input object are not important but the
+use of commas, exclamation points, and the closing semi-colon are
+important. The IDF format is currently the most commonly used format
+throughout the EnergyPlus ecosystem of utilities and GUIs. The list
+of possible input objects and fields is documented in the Energy+.idd
+file.
 
 A variation on the IDF file format is the IMF file format which includes
 macros that can be used for parametric analysis or file management
@@ -720,10 +723,11 @@ It is a text based file format. The JSON format has wide industy usage
 and is supported in just about every modern programming langauge.
 It is a field-value style format using brackets and colons to indicate
 the heirarchy and commas to separate each field and value pair. The
-objects must appear grouped by the type of object. The list of possible
-objects and fields is documented in the Energy+.schema.epJSON file
-which uses \href{http://json-schema.org/}{json-schema}. The same
-object shown above in IDF format is shown below in epJSON format:
+input objects must appear grouped by the type of input object. The
+list of possible input objects and fields is documented in the Energy+.schema.epJSON
+file which uses \href{http://json-schema.org/}{json-schema}. The
+same input object shown above in IDF format is shown below in epJSON
+format:
 \begin{lyxcode}
 \{
 
@@ -858,10 +862,10 @@ The following sections highlight some key concepts in EnergyPlus
 
 Exterior and interior walls in real buildings have thickness as specified
 on building plans by detailed cross sections. For EnergyPlus, the
-Construction object is made up of a list of names for the Material
-objects that make up the wall or roof or floor. Each material is shown
-with a thickness along with the conductivity, density, specific heat
-and other factors. These thicknesses should match the the thicknesses
+Construction input object is made up of a list of names for the Material
+input objects that make up the wall or roof or floor. Each material
+is shown with a thickness along with the conductivity, density, specific
+heat and other factors. These thicknesses should match the the thicknesses
 shown in the detailed cross sections. But when it comes to specifying
 the walls themselves in three dimensional space, the walls should
 be entered assuming zero thickness. Once each surface has been placed,
@@ -877,6 +881,13 @@ thermal mass considerations. If you use the outside edges there will
 be too much mass, inside will be too little. Again, centerline will
 split the difference and will be very close to the correct amount
 of thermal mass (possibly losing some corner mass).
+
+\subsection*{One Construction Per Surface}
+
+Only one type of construction can be associated with each surface
+so if the top half of a wall is made up of a different construction
+than the bottom half of the wall, the top half and the bottom half
+each need to be represented by separate surfaces.
 
 \subsubsection*{Always Plan Ahead}
 
@@ -916,23 +927,24 @@ Many of these folders include valuable resources for using and learning
 EnergyPlus. The main folder includes the EnergyPlus executable which
 can be used on the command line and EP-Launch 2, a program that makes
 it easier to use EnergyPlus and the Energy+.IDD that describes each
-possible EnergyPlus object and the default, minimum, maximum, and
-options for each field within each object. The Documentation folder
-includes this document as well as the InputOutputReference, EngineeringReference,
-AuxiliaryPrograms, OutputDetailsAndExamples which are very imporant
-to understand. If you haven't looked through the documentation yet,
-take a few minutes and get familiar with them. The DataSets and MacroDataSets
-folders include files containing libraries of objects that may be
-useful in constructing your own input files. The ASHRAE\_2005\_HOF\_Materials.idf
-and WindowConstructs.idf files, for example, will help with defining
-walls and windows. The ExampleFiles folder includes a huge number
-of example files that are indexed in the two HYML files in that folder
-or can be searched through using most text editors. The Preprocess
-and PostProcess folders include many utilities that can be used directly
-or as part of EP-Launch that can aid in the setting up input files
-or or extracting or converting results. The WeatherData folder includes
-a small sample of the many weather files that are available. For other
-weather files, please see the previous section on \ref{subsec:Weather-Files}. 
+possible EnergyPlus input object and the default, minimum, maximum,
+and options for each field within each input object. The Documentation
+folder includes this document as well as the InputOutputReference,
+EngineeringReference, AuxiliaryPrograms, OutputDetailsAndExamples
+which are very imporant to understand. If you haven't looked through
+the documentation yet, take a few minutes and get familiar with them.
+The DataSets and MacroDataSets folders include files containing libraries
+of input objects that may be useful in constructing your own input
+files. The ASHRAE\_2005\_HOF\_Materials.idf and WindowConstructs.idf
+files, for example, will help with defining walls and windows. The
+ExampleFiles folder includes a huge number of example files that are
+indexed in the two HYML files in that folder or can be searched through
+using most text editors. The Preprocess and PostProcess folders include
+many utilities that can be used directly or as part of EP-Launch that
+can aid in the setting up input files or or extracting or converting
+results. The WeatherData folder includes a small sample of the many
+weather files that are available. For other weather files, please
+see the previous section on \ref{subsec:Weather-Files}. 
 
 \subsection*{What Are All These Output Files?}
 
@@ -980,7 +992,7 @@ HTML format or XML format
 \item Delight OUT -- Detailed DElight output
 \item Delight ELDMP -- DElight reference point illuminance per time step
 \item Delight DFDMP -- DElight warning and error messages
-\item EXPIDF -- Expanded IDF when using HVACTemplate objects
+\item EXPIDF -- Expanded IDF when using HVACTemplate input objects
 \item Group Error -- combined error files for a group run
 \item VCpErr -- Transition program error file
 \item Proc.CSV -- Simple statistiscs generated from CSVProc
@@ -1065,28 +1077,108 @@ are used during the design process>
 
 <MAYBE SOMETHING FROM PROJECT STASIO>
 
-\section{Introduction to Example Building Models}
+\section{Simulation Parameters}
 
-<do I need this chapter or maybe should just reference specific example
-files instead of a tutorial>
+EnergyPlus includes a group of input objects used to set general parameters
+related to how the simulation in performed. Some of these input objects
+are controlling different options that are allowed within EnergyPlus
+such as the selection of algorithms to use or parameters related to
+how an algorithm is used. For a new modeler, these objects should
+be included with their default field values. Later when additional
+control is necessary to model a specific type of measure, the field
+values can be re-evaluated. These input objects should appear in your
+file and appear in almost all of the example files:
+\begin{itemize}
+\item Timestep - the number of timesteps each hour and usually set to 6.
+\item HeatBalanceAlgorithm - selects the algorithm used for simulating heat
+and moisture transfer through the buildings surfaces and usually set
+to ConductionTransferFunction.
+\item SurfaceConvectionAlgorithm:Inside - selects the algorithm used for
+inside face of the building surfaces and is usuallly set to TARP.
+\item SurfaceConvectionAlgorithm:Outside - selects the algorithm use for
+the outside face of the building surfaces between interior and exterior
+conditions and is usually set to DOE-2.
+\end{itemize}
+Another input object allows you to control how you want the simulation
+to be performed. The input objects should appear in your file and
+appear in almost all of the example files:
+\begin{itemize}
+\item SimulationControl - controls if the simulation is run for the weather
+file period and if sizing calculations are performed. You should become
+familiar with this object since you may find it one that you frequently
+change during the Run-Check-Edit cycle.
+\end{itemize}
+Finally two other input objects should appear in your input file and
+are included in almost all example files:
+\begin{itemize}
+\item Version - indicates what version of EnergyPlus is being used.
+\item Building - includes fields for the name of the building, and the angle
+of the entire building compared to true north, as well as parameters
+related to the simulation that, in general, should be allowed to default.
+\end{itemize}
+These objects and more are further explained in the InputOutputReference
+under the heading ``Group-Simulation Parameters.''
 
-\section{Simulation Control}
+\section{Climate and Location}
 
-<describe objects that need to be in any input file>
+Many of the fields in the group of input objects related to location,
+climate and the weather file are ones that will be set once for each
+specific project.
+\begin{itemize}
+\item Site:Location - describes the name, latitude, longitude and other
+parameters related to the location of the building. When using a weather
+file, the values from the weather file will be used instead.
+\item SizingPeriod:DesignDay - the high and low temperature and humidities
+describing a design day that is used for sizing equipment. Two (or
+more) instances of this object are frequently in a file, one for heating
+and one for cooling.
+\item RunPeriod - the start and stop dates of the simulation and often set
+to the full year. When debugging a file, a shorter period of time
+can be used to speed up the simulation portion of the Run-Check-Edit
+cycle.
+\item RunPeriodControl:SpecialDays - allows specfication of holidays and
+a good example can be seen in 5ZoneCostEst.idf. 
+\item RunPeriodControl:DaylightSavingTime - allows the specification of
+the start and ending period for daylight savings time. This will impact
+when schedules operate but please note that output reporting timesteps
+ignore this and are always shown in standard time and a good example
+can be seen in 5ZoneCostEst.idf.
+\item Site:GroundTemperature:BuildingSurface - for the most common ground
+temperature algorith, specifies the average temperature for each month
+of the year.
+\item Site:WaterMainsTemperature - input for the water temperatures supplied
+to the building from underground water mains and should be specified
+whenever water heaters are described. A good example can be seen in
+5ZoneVAV-ChilledWaterStorage-Mixed.idf. If not specified, some default
+assumptions are used for the water temperature supplied to the building.
+\end{itemize}
+Other input objects in this group can help performing sizing using
+the weather file, override the sky temperature, impact the variation
+of outdoor conditions with building height (especially important for
+tall buildings), work with ground temperatures and ground heat transfer,
+override the precipitation in weather files, specify the irrigatation
+for a green roof, and some advanced properties related to the light
+spectrum for window performance. These objects and more are further
+explained in the InputOutputReference under the heading ``Group-Location
+and Climate.''
 
 \section{Envelope and Geometry }
+
+One input object that must appear in every file is the GlobalGeometryRules
+input object
 
 \subsection*{Coordinate System}
 
 <maybe take this from existing documentation>
 
-An input called Building North Axis in the Building object, simplifies
-building geometry specification by designating how the building is
-oriented relative to true North. Buildings frequently do not line
-up with true north. For convenience, one may enter surfaces in a \textquotedblleft regular\textquotedblright{}
-coordinate system and then shift them via the use of the North Axis.
-The value is specified in degrees from \textquotedblleft true north\textquotedblright{}
-(clockwise is positive). 
+An input called Building North Axis in the Building input object,
+simplifies building geometry specification by designating how the
+building is oriented relative to true North. Buildings frequently
+do not line up with true north. For convenience, one may enter surfaces
+in a \textquotedblleft regular\textquotedblright{} coordinate system
+and then shift them via the use of the North Axis. The value is specified
+in degrees from \textquotedblleft true north\textquotedblright{} (clockwise
+is positive). 
 
 \subsection*{Surfaces and Zones}
 
@@ -1218,9 +1310,9 @@ the peak for each hour.
 
 \subsection*{HVAC Templates}
 
-HVAC Template objects are available. These are intended to allow for
-several \textquotedblleft usual\textquotedblright{} HVAC types to
-be expanded into EnergyPlus HVAC inputs with minimal user entries.
+HVAC Template input objects are available. These are intended to allow
+for several \textquotedblleft usual\textquotedblright{} HVAC types
+to be expanded into EnergyPlus HVAC inputs with minimal user entries.
 These are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
 document under the Group \textquotedblleft HVACTemplates\textquotedblright{}
 and the expansion process is described in the Auxiliary Programs document
