@@ -8447,7 +8447,7 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
-        const Real64 maxDt = 300.;
+        const Real64 maxDt = 60.0;
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
@@ -8657,7 +8657,7 @@ namespace WaterThermalTanks {
                     // Use side plant connection
                     const Real64 use_e_mdot_cp = tank_node.UseMassFlowRate * Cp;
                     A[i] += -use_e_mdot_cp;
-                    B[i] += use_e_mdot_cp * Tank.SourceInletTemp;
+                    B[i] += use_e_mdot_cp * Tank.UseInletTemp;
 
                     // Source side heat transfer rate
                     if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
@@ -8693,7 +8693,7 @@ namespace WaterThermalTanks {
 
                 // Calculate the average and final temperatures over the interval
                 Real64 TfinalDiff = 0.0;
-                for (int i=0; i < nTankNodes; i++) {
+                for (int i=0; i < nTankNodes; ++i) {
                     const Real64 Tstart = Tank.Node[i].Temp;
                     const Real64 b_a = B[i] / A[i];
                     const Real64 e_a_dt = exp(A[i] * dt);
@@ -8709,7 +8709,7 @@ namespace WaterThermalTanks {
             inversion_mixing(dt);
 
         };
-
+/*
         auto calc_time_until_temperature = [&Tank, &A, &B](Real64 Tf, int NodeNum) -> Real64 {
             const int i = NodeNum - 1;
             const Real64 b_a = B[i] / A[i];
@@ -8741,7 +8741,7 @@ namespace WaterThermalTanks {
             }
             return dt;
         };
-
+*/
         while(TimeRemaining > 0.0) {
 
             if (Tank.InletMode == InletModeSeeking) CalcNodeMassFlows(WaterThermalTankNum, InletModeSeeking);
@@ -8807,6 +8807,7 @@ namespace WaterThermalTanks {
             Real64 dt = min(TimeRemaining, maxDt);
             converge_temperatures(dt);
 
+/*
             bool reconvergeTemperatures = false;
             if (Tank.HeaterOn1) {
                 if (Tfinal[Tank.HeaterNode1-1] > Tank.SetPointTemp) {
@@ -8852,6 +8853,7 @@ namespace WaterThermalTanks {
             }
 
             if (reconvergeTemperatures) converge_temperatures(dt);
+*/
 
             // Increment to next internal time step
             TimeRemaining -= dt;

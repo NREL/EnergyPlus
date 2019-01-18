@@ -1969,6 +1969,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
     EXPECT_GT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp - Tank.DeadBandDeltaTemp);
     EXPECT_GT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2);
 
+
+    // Run a test where the tank turns on a heater during the timestep.
     for (auto &node : Tank.Node) {
         node.Temp = 58.05;
         node.SavedTemp = 58.05;
@@ -1976,6 +1978,36 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
 
     WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
 
-    ASSERT_TRUE(false);
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
+    }
+    
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+
+    // Run a test with a use flow rate
+    for (auto &node : Tank.Node) {
+        node.Temp = 60.0;
+        node.SavedTemp = 60.0;
+    }
+
+    Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
+    }
+
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+
+    EXPECT_TRUE(Tank.HeaterOn1);
+    EXPECT_FALSE(Tank.HeaterOn2);
+
 
 }
