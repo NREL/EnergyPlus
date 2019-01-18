@@ -7923,10 +7923,12 @@ namespace WaterThermalTanks {
     void CalcWaterThermalTankStratified(int const WaterThermalTankNum)
     {
         const static char* env_p{ std::getenv("NEWTANKMODEL") };
-        static bool useNewModel{ false };
+        static bool useNewModel{ true };
         if (env_p) {
             if ( env_p[0] == '1' )
                 useNewModel = true;
+            else
+                useNewModel = false;
         }
         if (useNewModel) {
             CalcWaterThermalTankStratifiedNew(WaterThermalTankNum);
