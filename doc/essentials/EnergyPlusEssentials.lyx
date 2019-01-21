@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-January 17, 2019
+January 21, 2019
 \end_layout
 
 \begin_layout Section
@@ -2877,6 +2877,68 @@ Group-Location and Climate.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Schedules
+\end_layout
+
+\begin_layout Standard
+Many aspects of building operation are characterized by timing whether it
+ is the hours that a building is occupied or when the control systems are
+ in various modes.
+ Due to this, specifying when something occurs using the Schedule input
+ objects becomes one of the most common things to do.
+ It is important to coordinate schedules properly.
+ The operation of office equipment in a space usually corresponds to occupancy
+ of that space as does the thermostat set points and fan operation.
+ Because schedules are such a key input for so many features of a building,
+ a great deal of flexibility exists in EnergyPlus to specfiy them.
+\end_layout
+
+\begin_layout Itemize
+Schedule:Compact - The most commonly used method of specifying schedules
+ and uses 
+\begin_inset Quotes eld
+\end_inset
+
+Through
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+For
+\begin_inset Quotes erd
+\end_inset
+
+ to reduce the amount of input required.
+\end_layout
+
+\begin_layout Itemize
+ScheduleTypeLimits - Every schedule object includes a field that helps validate
+ the limiting values for the schedule and this input object describes the
+ upper and lower limit
+\end_layout
+
+\begin_layout Itemize
+Schedule:Constant - If the value of the schedule is the same every hour
+ of the year, this object is the easiest way to specify that value.
+\end_layout
+
+\begin_layout Itemize
+Schedule:File - At times, data is available from a building being monitored
+ or for factors that change throughout the year.
+ This input object allows a column of data from an external file to be reference
+d as the values of the schedule.
+ A variation of this object allows input specifically for shading.
+\end_layout
+
+\begin_layout Standard
+Other input objects in this input group allow specification of schedule
+ values to be in different formats.
 \end_layout
 
 \begin_layout Section
