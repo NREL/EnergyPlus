@@ -2225,6 +2225,25 @@ The following sections highlight some key concepts in EnergyPlus
 \end_layout
 
 \begin_layout Subsubsection*
+Everything Included
+\end_layout
+
+\begin_layout Standard
+One principal that EnergyPlus uses is that (almost) everything is specified
+ in the input file.
+ This means that instead of referencing an external library for materials,
+ schedules, equipment performance, etc., the input objects that fully describe
+ those items should be included directly in the input file.
+ The DataSets folder distributed with EnergyPlus contains these kind of
+ details and to use them, the input objects should be copied into the input
+ file that you are developing.
+ This approach does make the file include more specification than you might
+ be used to, and typically results in a large input file, but you will have
+ the assurance of knowing that all the inputs related to your building are
+ in the input file you have developed.
+\end_layout
+
+\begin_layout Subsubsection*
 Wall Thickness
 \end_layout
 
@@ -2256,7 +2275,7 @@ Exterior and interior walls in real buildings have thickness as specified
  correct amount of thermal mass (possibly losing some corner mass).
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsubsection*
 One Construction Per Surface
 \end_layout
 
@@ -2939,6 +2958,193 @@ d as the values of the schedule.
 \begin_layout Standard
 Other input objects in this input group allow specification of schedule
  values to be in different formats.
+\end_layout
+
+\begin_layout Section
+Surface Construction Elements
+\end_layout
+
+\begin_layout Standard
+Specifying the physical properties of the building envelope is something
+ every building model includes.
+ The input objects in this group allow the specification of the materials
+ 
+\end_layout
+
+\begin_layout Standard
+Material
+\end_layout
+
+\begin_layout Standard
+Material:NoMass
+\end_layout
+
+\begin_layout Standard
+Material:InfraredTransparent
+\end_layout
+
+\begin_layout Standard
+Material:AirGap
+\end_layout
+
+\begin_layout Standard
+Material:RoofVegetation
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:SimpleGlazingSystem
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Glazing
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:GlazingGroup:Thermochromic
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Glazing:RefractionExtinctionMethod
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Gas
+\end_layout
+
+\begin_layout Standard
+WindowGap:SupportPillar
+\end_layout
+
+\begin_layout Standard
+WindowGap:DeflectionState
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:GasMixture
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Gap
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Shade
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:ComplexShade
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Blind
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Screen
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Shade:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Drape:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Blind:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Screen:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Glazing:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+WindowMaterial:Gap:EquivalentLayer
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:MoisturePenetrationDepth:Settings
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:PhaseChange
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:PhaseChangeHysteresis
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:VariableThermalConductivity
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:Settings
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:Suction
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:Redistribution
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:Diffusion
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+\end_layout
+
+\begin_layout Standard
+MaterialProperty:GlazingSpectralData
+\end_layout
+
+\begin_layout Standard
+Construction
+\end_layout
+
+\begin_layout Standard
+Construction:CfactorUndergroundWall
+\end_layout
+
+\begin_layout Standard
+Construction:FfactorGroundFloor
+\end_layout
+
+\begin_layout Standard
+Construction:InternalSource
+\end_layout
+
+\begin_layout Standard
+WindowThermalModel:Params
+\end_layout
+
+\begin_layout Standard
+WindowsCalculationEngine
+\end_layout
+
+\begin_layout Standard
+Construction:ComplexFenestrationState
+\end_layout
+
+\begin_layout Standard
+Construction:WindowEquivalentLayer
+\end_layout
+
+\begin_layout Standard
+Construction:WindowDataFile
 \end_layout
 
 \begin_layout Section
