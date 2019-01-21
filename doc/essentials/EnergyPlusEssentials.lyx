@@ -2967,184 +2967,84 @@ Surface Construction Elements
 \begin_layout Standard
 Specifying the physical properties of the building envelope is something
  every building model includes.
- The input objects in this group allow the specification of the materials
+ The input objects in this group allow the specification of the different
+ layers that make up exterior and interior walls, roofs, floors, windows,
+ and skylights as well as the order of the materials in these surfaces.
+ A large number of input objects appear in this group since there are many
+ special features that need to be modeled for certain energy efficiency
+ measures.
+ The following is a list only the most commonly used input objects.
+\end_layout
+
+\begin_layout Itemize
+Material - the most common input object to describe the materials used in
+ opaque constructions in walls, roofs, and floors and includes input for
+ the thickness, conductivity, density and specific heat as well as absorptances.
+ See examples in ASHRAE_2005_HOF_Materials.idf located in the DataSets folder.
+\end_layout
+
+\begin_layout Itemize
+Material:NoMass - used when the material only has thermal resistance and
+ little thermal mass such as insulation.
+ It should not be used to describe materials that do have signficant thermal
+ mass.
+\end_layout
+
+\begin_layout Itemize
+Material:AirGap - used to describe when walls or roofs have an air gaps.
+ Note it cannot be used for windows.
+\end_layout
+
+\begin_layout Itemize
+WindowMaterial:Glazing - describes the material used in the glass (or other
+ transparent material) portion of the fenestration (windows and skylights).
+ See WindowGlassMaterials.idf in the DataSets folder for examples.
+\end_layout
+
+\begin_layout Itemize
+WindowMaterial:Gas - the type of gas used between layers of glass in windows
+ and skylights have a signficant impact on the heat transfer performance.
+ See WindowGasMaterials.idf in the DataSets folder for examples.
+\end_layout
+
+\begin_layout Itemize
+Construction - a list of materials (any from the list above plus many more)
+ in order from the outside to the inside making up the wall, roof, floor,
+ window or skylight.
+ Every input file will have several of these input objects.
+ Examples of constructions for wall, roofs and floors can be found in ASHRAE_200
+5_HOF_Materials.idf located in the DataSets folder while examples for windows
+ and skylights can be found in WindowConstructs.idf in the same folder.
+\end_layout
+
+\begin_layout Itemize
+WindowMaterial:SimpleGlazingSystem - the best way to describe a window is
+ with a construction that references WindowMaterial:Glazing and WindowMaterial:G
+as input objects but if all you have is the U-Factor and Solar Heat Gain
+ Coefficient they can be specified in this object.
+\end_layout
+
+\begin_layout Standard
+A large variety of input objects in this group are not as commonly used
+ but are key to modeling specific types of walls and windows so if what
+ you are trying to model does not fall into the neat categories for the
+ objects described so far, there is still a good chance that EnergyPlus
+ has an input object that will work.
+ These other input objects include ones for wals and roof that can be used
+ when modeling combined heat and moisture transfer, modeling material which
+ undergo a phase change to store heat in the wall or when the material propertie
+s change with temperature, when the material allows infrared radiation to
+ flow through it, when modeling green (vegetated) roofs, for simplified
+ C or F-factor modeling, or when the wall includes resistance or hydronic
+ tubing to provide heat.
+ The other input object to describe windows and skylights include input
+ objects that can be used to describe thermochromic and electochomic glazing,
+ mixtures of gases between layers of glass, vacuum glazing, movable portions
+ of the window assembly such as shades and blinds and screens, alternative
+ ways of specifying fenestration such as equivalent layers or refraction
+ extinction method or ASHWAT model or from a WINDOW program export/data
+ file or specifying wavelength-by-wavelength properties.
  
-\end_layout
-
-\begin_layout Standard
-Material
-\end_layout
-
-\begin_layout Standard
-Material:NoMass
-\end_layout
-
-\begin_layout Standard
-Material:InfraredTransparent
-\end_layout
-
-\begin_layout Standard
-Material:AirGap
-\end_layout
-
-\begin_layout Standard
-Material:RoofVegetation
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:SimpleGlazingSystem
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Glazing
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:GlazingGroup:Thermochromic
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Glazing:RefractionExtinctionMethod
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Gas
-\end_layout
-
-\begin_layout Standard
-WindowGap:SupportPillar
-\end_layout
-
-\begin_layout Standard
-WindowGap:DeflectionState
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:GasMixture
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Gap
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Shade
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:ComplexShade
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Blind
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Screen
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Shade:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Drape:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Blind:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Screen:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Glazing:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-WindowMaterial:Gap:EquivalentLayer
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:MoisturePenetrationDepth:Settings
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:PhaseChange
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:PhaseChangeHysteresis
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:VariableThermalConductivity
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:Settings
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:Suction
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:Redistribution
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:Diffusion
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
-\end_layout
-
-\begin_layout Standard
-MaterialProperty:GlazingSpectralData
-\end_layout
-
-\begin_layout Standard
-Construction
-\end_layout
-
-\begin_layout Standard
-Construction:CfactorUndergroundWall
-\end_layout
-
-\begin_layout Standard
-Construction:FfactorGroundFloor
-\end_layout
-
-\begin_layout Standard
-Construction:InternalSource
-\end_layout
-
-\begin_layout Standard
-WindowThermalModel:Params
-\end_layout
-
-\begin_layout Standard
-WindowsCalculationEngine
-\end_layout
-
-\begin_layout Standard
-Construction:ComplexFenestrationState
-\end_layout
-
-\begin_layout Standard
-Construction:WindowEquivalentLayer
-\end_layout
-
-\begin_layout Standard
-Construction:WindowDataFile
 \end_layout
 
 \begin_layout Section
