@@ -3666,34 +3666,6 @@ Heat Transfer to the Ground
 \end_layout
 
 \begin_layout Section
-Internal Loads 
-\end_layout
-
-\begin_layout Standard
-People, lights, equipment, outside air infiltration and ventilation all
- constitute “internal gains” for the thermal zone.
- These gains are described to EnergyPlus as a design or peak level with
- a schedule that specifies a fraction of the peak for each hour.
- 
-\end_layout
-
-\begin_layout Subsection*
-Lights and Equipment
-\end_layout
-
-\begin_layout Subsection*
-Daylighting
-\end_layout
-
-\begin_layout Subsection*
-People and Comfort
-\end_layout
-
-\begin_layout Subsection*
-Infiltration and Airflow
-\end_layout
-
-\begin_layout Section
 HVAC 
 \end_layout
 

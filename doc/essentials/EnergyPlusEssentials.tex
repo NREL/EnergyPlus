@@ -29,8 +29,10 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 17, 2019}
+\date{January 21, 2019}
+
 \maketitle
+<\textcompwordmark <TO DO: GRAMMARLY, ADDITIONAL GRAPHICS, >\textcompwordmark >
 
 \section{Introduction}
 
@@ -858,6 +860,20 @@ an annual simulation for the first time.
 
 The following sections highlight some key concepts in EnergyPlus
 
+\subsubsection*{Everything Included}
+
+One principal that EnergyPlus uses is that (almost) everything is
+specified in the input file. This means that instead of referencing
+an external library for materials, schedules, equipment performance,
+etc., the input objects that fully describe those items should be
+included directly in the input file. The DataSets folder distributed
+with EnergyPlus contains these kind of details and to use them, the
+input objects should be copied into the input file that you are developing.
+This approach does make the file include more specification than you
+might be used to, and typically results in a large input file, but
+you will have the assurance of knowing that all the inputs related
+to your building are in the input file you have developed.
+
 \subsubsection*{Wall Thickness}
 
 Exterior and interior walls in real buildings have thickness as specified
@@ -882,7 +898,13 @@ be too much mass, inside will be too little. Again, centerline will
 split the difference and will be very close to the correct amount
 of thermal mass (possibly losing some corner mass).
 
-\subsection*{One Construction Per Surface}
+\subsubsection*{Zones Are Not the Same as Rooms}
+
+A zone, sometimes called a ``thermal zone'' is a theoretical construct
+that usually describes a group of rooms that can be treated as a single
+thermal entity. One way to thi
+
+\subsubsection*{One Construction Per Surface}
 
 Only one type of construction can be associated with each surface
 so if the top half of a wall is made up of a different construction
@@ -1162,7 +1184,257 @@ spectrum for window performance. These objects and more are further
 explained in the InputOutputReference under the heading ``Group-Location
 and Climate.''
 
-\section{Envelope and Geometry }
+\section{Schedules}
+
+Many aspects of building operation are characterized by timing whether
+it is the hours that a building is occupied or when the control systems
+are in various modes. Due to this, specifying when something occurs
+using the Schedule input objects becomes one of the most common things
+to do. It is important to coordinate schedules properly. The operation
+of office equipment in a space usually corresponds to occupancy of
+that space as does the thermostat set points and fan operation. Because
+schedules are such a key input for so many features of a building,
+a great deal of flexibility exists in EnergyPlus to specfiy them.
+\begin{itemize}
+\item Schedule:Compact - The most commonly used method of specifying schedules
+and uses ``Through'' and ``For'' to reduce the amount of input
+required.
+\item ScheduleTypeLimits - Every schedule object includes a field that helps
+validate the limiting values for the schedule and this input object
+describes the upper and lower limit
+\item Schedule:Constant - If the value of the schedule is the same every
+hour of the year, this object is the easiest way to specify that value.
+\item Schedule:File - At times, data is available from a building being
+monitored or for factors that change throughout the year. This input
+object allows a column of data from an external file to be referenced
+as the values of the schedule. A variation of this object allows input
+specifically for shading.
+\end{itemize}
+Other input objects in this input group allow specification of schedule
+values to be in different formats. These objects and more are further
+explained in the InputOutputReference under the heading ``Group-Schedules.''
+
+\section{Surface Construction Elements}
+
+Specifying the physical properties of the building envelope is something
+every building model includes. The input objects in this group allow
+the specification of the different layers that make up exterior and
+interior walls, roofs, floors, windows, and skylights as well as the
+order of the materials in these surfaces. A large number of input
+objects appear in this group since there are many special features
+that need to be modeled for certain energy efficiency measures. The
+following is a list only the most commonly used input objects.
+\begin{itemize}
+\item Material - the most common input object to describe the materials
+used in opaque constructions in walls, roofs, and floors and includes
+input for the thickness, conductivity, density and specific heat as
+well as absorptances. See examples in ASHRAE\_2005\_HOF\_Materials.idf
+located in the DataSets folder.
+\item Material:NoMass - used when the material only has thermal resistance
+and little thermal mass such as insulation. It should not be used
+to describe materials that do have signficant thermal mass.
+\item Material:AirGap - used to describe when walls or roofs have an air
+gaps. Note it cannot be used for windows.
+\item WindowMaterial:Glazing - describes the material used in the glass
+(or other transparent material) portion of the fenestration (windows
+and skylights). See WindowGlassMaterials.idf in the DataSets folder
+for examples.
+\item WindowMaterial:Gas - the type of gas used between layers of glass
+in windows and skylights have a signficant impact on the heat transfer
+performance. See WindowGasMaterials.idf in the DataSets folder for
+examples.
+\item Construction - a list of materials (any from the list above plus many
+more) in order from the outside to the inside making up the wall,
+roof, floor, window or skylight. Every input file will have several
+of these input objects. Examples of constructions for wall, roofs
+and floors can be found in ASHRAE\_2005\_HOF\_Materials.idf located
+in the DataSets folder while examples for windows and skylights can
+be found in WindowConstructs.idf in the same folder.
+\item WindowMaterial:SimpleGlazingSystem - the best way to describe a window
+is with a construction that references WindowMaterial:Glazing and
+WindowMaterial:Gas input objects but if all you have is the U-Factor
+and Solar Heat Gain Coefficient they can be specified in this input
+object.
+\end{itemize}
+A large variety of input objects in this group are not as commonly
+used but are key to modeling specific types of walls and windows so
+if what you are trying to model does not fall into the neat categories
+for the objects described so far, there is still a good chance that
+EnergyPlus has an input object that will work. These other input objects
+include ones for wals and roof that can be used when modeling combined
+heat and moisture transfer, modeling material which undergo a phase
+change to store heat in the wall or when the material properties change
+with temperature, when the material allows infrared radiation to flow
+through it, when modeling green (vegetated) roofs, for simplified
+C or F-factor modeling, or when the wall includes resistance or hydronic
+tubing to provide heat. The other input object to describe windows
+and skylights include input objects that can be used to describe thermochromic
+and electochomic glazing, mixtures of gases between layers of glass,
+vacuum glazing, movable portions of the window assembly such as shades
+and blinds and screens, alternative ways of specifying fenestration
+such as equivalent layers or refraction extinction method or ASHWAT
+model or from a WINDOW program export/data file or specifying wavelength-by-wavelength
+properties. 
+
+The input objects described in this section are further explained
+in the InputOutputReference under the heading ``Group-Surface Construction
+Elements.''
+
+\section{Thermal Zones and Surfaces}
+
+Central
+\begin{itemize}
+\item GlobalGeometryRules
+\item Zone
+\item BuildingSurface:Detailed
+\item FenestrationSurface:Detailed
+\end{itemize}
+Shading related
+\begin{itemize}
+\item Shading:Site:Detailed
+\item Shading:Building:Detailed
+\item Shading:Zone:Detailed
+\end{itemize}
+And some varient
+\begin{itemize}
+\item Wall:Detailed
+\item RoofCeiling:Detailed
+\item Floor:Detailed
+\item Wall:Exterior
+\item Wall:Adiabatic
+\item Wall:Underground
+\item Wall:Interzone
+\item Roof
+\item Ceiling:Adiabatic
+\item Ceiling:Interzone
+\item Floor:GroundContact
+\item Floor:Adiabatic
+\item Floor:Interzone
+\item Window
+\item Door
+\item GlazedDoor
+\item Window:Interzone
+\item Door:Interzone
+\item GlazedDoor:Interzone
+\item Shading:Site
+\item Shading:Building
+\item Shading:Overhang
+\item Shading:Overhang:Projection
+\item Shading:Fin
+\item Shading:Fin:Projection
+\item ShadingProperty:Reflectance
+\end{itemize}
+Other object
+\begin{itemize}
+\item WindowShadingControl
+\item WindowProperty:FrameAndDivider (why here?)
+\item WindowProperty:AirflowControl (why here?)
+\item WindowProperty:StormWindow (why here?)
+\item InternalMass
+\end{itemize}
+Rarely used:
+\begin{itemize}
+\item ZoneList
+\item ZoneGroup
+\item GeometryTransform
+\end{itemize}
+
+\section{Internal Gains }
+
+Most things inside a building produce heat and that includes people,
+appliances, office equipment, and lighting. The combination of all
+these items that produce heat within a building are called internal
+gains and represent a significant contribution, sometimes the largest
+contribution, to the cooling requirements for a building. In addition,
+they offset the amount of heat from the HVAC system that is needed
+at a given time. Typically, the peak value is entered in these input
+objects for this group such as the maximum number of people, the total
+power of equipment, or the total lighting power and then a schedule
+is used to modify that value each hour of the year. It is just as
+critical that the schedule values are realistic for your building
+as is the peak value. For almost all buildings, it is rare that the
+peak occupancy occurs for more than a few hours per year if at all
+and this is especially the case for retail stores, theaters, and sports
+complexes. Even office buildings when counting vacations and people
+out of the building for meetings will rarely have peak occupancy. 
+
+The most common internal gain input objects are: 
+\begin{itemize}
+\item People -- specifies not only the sensible, latent and radiant heat
+from people but also includes ways of reporting the comfort of occupants
+using a variety of thermal comfort models 
+\item Lights -- describes the heat related to lighting systems 
+\item ElectricEquipment -- describes the heat related to electrical appliances,
+office equipment, and other heat sources that are powered by electricity 
+\end{itemize}
+Less common internal gains input objects include: 
+\begin{itemize}
+\item GasEquipment 
+\item HotWaterEquipment 
+\item SteamEquipment 
+\item OtherEquipment 
+\item ElectricEquipment:ITE:AirCooled 
+\item SwimmingPool:Indoor 
+\end{itemize}
+Other 
+\begin{itemize}
+\item ComfortViewFactorAngles -- allows the specification of how different
+surfaces impact the thermal comfort calculations for the occupants 
+\item ZoneBaseboard:OutdoorTemperatureControlled -- specifies how the outside
+air temperature impacts the control of zone baseboard systems. 
+\end{itemize}
+The Internal Gains group also contains input objects related to zone
+contaminant sources and sinks. The input objects include modeling
+components that impact contaminant concentrations which are scheduled,
+pressure driven, use a cut off model, assume a decaying source, surface
+diffusion, or using a deposition velocity model.
+
+The input objects described in this section are further explained
+in the InputOutputReference under the heading ``Group-Internal Gains.''
+
+\section{Daylighting }
+
+Reducing the amount of powered lighting that is used when sufficient
+natural daylight illuminates the interior building through windows
+and skylights is called daylighting. It is a very common energy efficiency
+measure in buildings and is often required for new building designs
+depending on the energy code that applies to the building location.
+The most common input objects related to daylighting are: 
+\begin{itemize}
+\item Daylighting:Controls -- specifies the algorithm used for daylighting,
+the dimming of lights is continuous or stepped, and how glare calculations
+are performed. 
+\item Daylighting:ReferencePoint -- specifies the location of the sensors
+for the daylighting control system 
+\end{itemize}
+The input output reference includes not only a description of these
+objects but also extra guidance on how they should be applied. 
+
+Three different devices can be used with day 
+\begin{itemize}
+\item DaylightingDevice:Tubular 
+\item DaylightingDevice:Shelf 
+\item DaylightingDevice:LightWell 
+\end{itemize}
+An object called Daylighting:DELight:ComplexFenestration is used with
+one of the two control methods specified in the Daylighting:Controls
+input object when used in conjunction with complex fenestration systems
+such as prismatic and holographic glass. 
+
+Some flexibility is given to provide extra output related to daylighting
+and includes 
+\begin{itemize}
+\item Output:DaylightFactors -- creates a special report on the 
+\item Output:IlluminanceMap -- allows the generation of maps of illuminance
+values within each interior zone that uses daylighting controls. The
+exact file format can be set using the OutputControl:IlluminanceMap:Style
+input object 
+\end{itemize}
+More details of these output options can be found in the OutputDetailsAndExamples
+document. The input objects described in this section are further
+explained in the InputOutputReference under the heading ``Group-Daylighting.''
+
+\section{<DEPRECATED>Envelope and Geometry }
 
 One input object that must appear in every file is the GlobalGeometryRules
 input object
@@ -1287,22 +1559,6 @@ in EnergyPlus with sunlight transferring into the zone.
 \end{enumerate}
 
 \subsection*{Heat Transfer to the Ground}
-
-\section{Internal Loads }
-
-People, lights, equipment, outside air infiltration and ventilation
-all constitute \textquotedblleft internal gains\textquotedblright{}
-for the thermal zone. These gains are described to EnergyPlus as a
-design or peak level with a schedule that specifies a fraction of
-the peak for each hour. 
-
-\subsection*{Lights and Equipment}
-
-\subsection*{Daylighting}
-
-\subsection*{People and Comfort}
-
-\subsection*{Infiltration and Airflow}
 
 \section{HVAC }
 
