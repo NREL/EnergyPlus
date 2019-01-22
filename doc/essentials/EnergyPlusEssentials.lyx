@@ -101,6 +101,10 @@ EnergyPlus Essentials
 January 21, 2019
 \end_layout
 
+\begin_layout Standard
+<<TO DO: GRAMMARLY, ADDITIONAL GRAPHICS, >>
+\end_layout
+
 \begin_layout Section
 Introduction
 \end_layout
@@ -2276,6 +2280,24 @@ Exterior and interior walls in real buildings have thickness as specified
 \end_layout
 
 \begin_layout Subsubsection*
+Zones Are Not the Same as Rooms
+\end_layout
+
+\begin_layout Standard
+A zone, sometimes called a 
+\begin_inset Quotes eld
+\end_inset
+
+thermal zone
+\begin_inset Quotes erd
+\end_inset
+
+ is a theoretical construct that usually describes a group of rooms that
+ can be treated as a single thermal entity.
+ One way to thi
+\end_layout
+
+\begin_layout Subsubsection*
 One Construction Per Surface
 \end_layout
 
@@ -2958,6 +2980,16 @@ d as the values of the schedule.
 \begin_layout Standard
 Other input objects in this input group allow specification of schedule
  values to be in different formats.
+ These objects and more are further explained in the InputOutputReference
+ under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Schedules.
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -3021,7 +3053,7 @@ Construction - a list of materials (any from the list above plus many more)
 WindowMaterial:SimpleGlazingSystem - the best way to describe a window is
  with a construction that references WindowMaterial:Glazing and WindowMaterial:G
 as input objects but if all you have is the U-Factor and Solar Heat Gain
- Coefficient they can be specified in this object.
+ Coefficient they can be specified in this input object.
 \end_layout
 
 \begin_layout Standard
@@ -3047,8 +3079,406 @@ s change with temperature, when the material allows infrared radiation to
  
 \end_layout
 
+\begin_layout Standard
+The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Surface Construction Elements.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
-Envelope and Geometry 
+Thermal Zones and Surfaces
+\end_layout
+
+\begin_layout Standard
+Central
+\end_layout
+
+\begin_layout Itemize
+GlobalGeometryRules
+\end_layout
+
+\begin_layout Itemize
+Zone
+\end_layout
+
+\begin_layout Itemize
+BuildingSurface:Detailed
+\end_layout
+
+\begin_layout Itemize
+FenestrationSurface:Detailed
+\end_layout
+
+\begin_layout Standard
+Shading related
+\end_layout
+
+\begin_layout Itemize
+Shading:Site:Detailed
+\end_layout
+
+\begin_layout Itemize
+Shading:Building:Detailed
+\end_layout
+
+\begin_layout Itemize
+Shading:Zone:Detailed
+\end_layout
+
+\begin_layout Standard
+And some varient
+\end_layout
+
+\begin_layout Itemize
+Wall:Detailed
+\end_layout
+
+\begin_layout Itemize
+RoofCeiling:Detailed
+\end_layout
+
+\begin_layout Itemize
+Floor:Detailed
+\end_layout
+
+\begin_layout Itemize
+Wall:Exterior
+\end_layout
+
+\begin_layout Itemize
+Wall:Adiabatic
+\end_layout
+
+\begin_layout Itemize
+Wall:Underground
+\end_layout
+
+\begin_layout Itemize
+Wall:Interzone
+\end_layout
+
+\begin_layout Itemize
+Roof
+\end_layout
+
+\begin_layout Itemize
+Ceiling:Adiabatic
+\end_layout
+
+\begin_layout Itemize
+Ceiling:Interzone
+\end_layout
+
+\begin_layout Itemize
+Floor:GroundContact
+\end_layout
+
+\begin_layout Itemize
+Floor:Adiabatic
+\end_layout
+
+\begin_layout Itemize
+Floor:Interzone
+\end_layout
+
+\begin_layout Itemize
+Window
+\end_layout
+
+\begin_layout Itemize
+Door
+\end_layout
+
+\begin_layout Itemize
+GlazedDoor
+\end_layout
+
+\begin_layout Itemize
+Window:Interzone
+\end_layout
+
+\begin_layout Itemize
+Door:Interzone
+\end_layout
+
+\begin_layout Itemize
+GlazedDoor:Interzone
+\end_layout
+
+\begin_layout Itemize
+Shading:Site
+\end_layout
+
+\begin_layout Itemize
+Shading:Building
+\end_layout
+
+\begin_layout Itemize
+Shading:Overhang
+\end_layout
+
+\begin_layout Itemize
+Shading:Overhang:Projection
+\end_layout
+
+\begin_layout Itemize
+Shading:Fin
+\end_layout
+
+\begin_layout Itemize
+Shading:Fin:Projection
+\end_layout
+
+\begin_layout Itemize
+ShadingProperty:Reflectance
+\end_layout
+
+\begin_layout Standard
+Other object
+\end_layout
+
+\begin_layout Itemize
+WindowShadingControl
+\end_layout
+
+\begin_layout Itemize
+WindowProperty:FrameAndDivider (why here?)
+\end_layout
+
+\begin_layout Itemize
+WindowProperty:AirflowControl (why here?)
+\end_layout
+
+\begin_layout Itemize
+WindowProperty:StormWindow (why here?)
+\end_layout
+
+\begin_layout Itemize
+InternalMass
+\end_layout
+
+\begin_layout Standard
+Rarely used:
+\end_layout
+
+\begin_layout Itemize
+ZoneList
+\end_layout
+
+\begin_layout Itemize
+ZoneGroup
+\end_layout
+
+\begin_layout Itemize
+GeometryTransform
+\end_layout
+
+\begin_layout Section
+Internal Gains 
+\end_layout
+
+\begin_layout Standard
+Most things inside a building produce heat and that includes people, appliances,
+ office equipment, and lighting.
+ The combination of all these items that produce heat within a building
+ are called internal gains and represent a significant contribution, sometimes
+ the largest contribution, to the cooling requirements for a building.
+ In addition, they offset the amount of heat from the HVAC system that is
+ needed at a given time.
+ Typically, the peak value is entered in these input objects for this group
+ such as the maximum number of people, the total power of equipment, or
+ the total lighting power and then a schedule is used to modify that value
+ each hour of the year.
+ It is just as critical that the schedule values are realistic for your
+ building as is the peak value.
+ For almost all buildings, it is rare that the peak occupancy occurs for
+ more than a few hours per year if at all and this is especially the case
+ for retail stores, theaters, and sports complexes.
+ Even office buildings when counting vacations and people out of the building
+ for meetings will rarely have peak occupancy.
+ 
+\end_layout
+
+\begin_layout Standard
+The most common internal gain input objects are: 
+\end_layout
+
+\begin_layout Itemize
+People – specifies not only the sensible, latent and radiant heat from people
+ but also includes ways of reporting the comfort of occupants using a variety
+ of thermal comfort models 
+\end_layout
+
+\begin_layout Itemize
+Lights – describes the heat related to lighting systems 
+\end_layout
+
+\begin_layout Itemize
+ElectricEquipment – describes the heat related to electrical appliances,
+ office equipment, and other heat sources that are powered by electricity
+ 
+\end_layout
+
+\begin_layout Standard
+Less common internal gains input objects include: 
+\end_layout
+
+\begin_layout Itemize
+GasEquipment 
+\end_layout
+
+\begin_layout Itemize
+HotWaterEquipment 
+\end_layout
+
+\begin_layout Itemize
+SteamEquipment 
+\end_layout
+
+\begin_layout Itemize
+OtherEquipment 
+\end_layout
+
+\begin_layout Itemize
+ElectricEquipment:ITE:AirCooled 
+\end_layout
+
+\begin_layout Itemize
+SwimmingPool:Indoor 
+\end_layout
+
+\begin_layout Standard
+Other 
+\end_layout
+
+\begin_layout Itemize
+ComfortViewFactorAngles – allows the specification of how different surfaces
+ impact the thermal comfort calculations for the occupants 
+\end_layout
+
+\begin_layout Itemize
+ZoneBaseboard:OutdoorTemperatureControlled – specifies how the outside air
+ temperature impacts the control of zone baseboard systems.
+ 
+\end_layout
+
+\begin_layout Standard
+The Internal Gains group also contains input objects related to zone contaminant
+ sources and sinks.
+ The input objects include modeling components that impact contaminant concentra
+tions which are scheduled, pressure driven, use a cut off model, assume
+ a decaying source, surface diffusion, or using a deposition velocity model.
+\end_layout
+
+\begin_layout Standard
+The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Internal Gains.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Daylighting 
+\end_layout
+
+\begin_layout Standard
+Reducing the amount of powered lighting that is used when sufficient natural
+ daylight illuminates the interior building through windows and skylights
+ is called daylighting.
+ It is a very common energy efficiency measure in buildings and is often
+ required for new building designs depending on the energy code that applies
+ to the building location.
+ The most common input objects related to daylighting are: 
+\end_layout
+
+\begin_layout Itemize
+Daylighting:Controls – specifies the algorithm used for daylighting, the
+ dimming of lights is continuous or stepped, and how glare calculations
+ are performed.
+ 
+\end_layout
+
+\begin_layout Itemize
+Daylighting:ReferencePoint – specifies the location of the sensors for the
+ daylighting control system 
+\end_layout
+
+\begin_layout Standard
+The input output reference includes not only a description of these objects
+ but also extra guidance on how they should be applied.
+ 
+\end_layout
+
+\begin_layout Standard
+Three different devices can be used with day 
+\end_layout
+
+\begin_layout Itemize
+DaylightingDevice:Tubular 
+\end_layout
+
+\begin_layout Itemize
+DaylightingDevice:Shelf 
+\end_layout
+
+\begin_layout Itemize
+DaylightingDevice:LightWell 
+\end_layout
+
+\begin_layout Standard
+An object called Daylighting:DELight:ComplexFenestration is used with one
+ of the two control methods specified in the Daylighting:Controls input
+ object when used in conjunction with complex fenestration systems such
+ as prismatic and holographic glass.
+ 
+\end_layout
+
+\begin_layout Standard
+Some flexibility is given to provide extra output related to daylighting
+ and includes 
+\end_layout
+
+\begin_layout Itemize
+Output:DaylightFactors – creates a special report on the 
+\end_layout
+
+\begin_layout Itemize
+Output:IlluminanceMap – allows the generation of maps of illuminance values
+ within each interior zone that uses daylighting controls.
+ The exact file format can be set using the OutputControl:IlluminanceMap:Style
+ input object 
+\end_layout
+
+\begin_layout Standard
+More details of these output options can be found in the OutputDetailsAndExample
+s document.
+ The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Daylighting.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+<DEPRECATED>Envelope and Geometry 
 \end_layout
 
 \begin_layout Standard
