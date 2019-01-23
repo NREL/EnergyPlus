@@ -101,19 +101,20 @@ function( ADD_SIMULATION_TEST )
    set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
   endif()
 
-  # DO_REGRESSION_TESTING shouldn't really occur here since EnergyPlus/CMakeLists.txt will throw an error if BUILD_FORTRAN isn't enabled
-  if( DO_REGRESSION_TESTING OR ADD_SIM_TEST_PERFORMANCE)
-    # For these, we add -r, but need to check if BUILD_FORTRAN
-    if (BUILD_FORTRAN)
-      set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
-    else()
-      if( ADD_SIM_TEST_PERFORMANCE )
-        # For performance testing, it's more problematic, because that'll cut on the ReadVarEso time
-        message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
-      else()
-        # Not that bad, just a dev warning
-        message(AUTHOR_WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
-      endif()
+  # Add -r flag if BUILD_FORTRAN is on, regardless of whether we run regression/performance tests
+  # So that it'll produce the CSV output automatically for convenience
+  if (BUILD_FORTRAN)
+    set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
+  else()
+    # Now, if you don't have BUILD_FORTRAN, but you actually need that because of regression/performance testing, we issue messages
+
+    if( ADD_SIM_TEST_PERFORMANCE )
+      # For performance testing, it's more problematic, because that'll cut on the ReadVarEso time
+      message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
+    elseif(DO_REGRESSION_TESTING)
+      # DO_REGRESSION_TESTING shouldn't really occur here since EnergyPlus/CMakeLists.txt will throw an error if BUILD_FORTRAN isn't enabled
+      # Not that bad, just a dev warning
+      message(AUTHOR_WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
     endif()
   endif()
 
