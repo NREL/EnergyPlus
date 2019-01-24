@@ -50,11 +50,9 @@ Q<sub>exf, zone, sensible</sub> = m<sub>exf</sub> * c * (T<sub>zone</sub> - T<su
 
 Q<sub>exh, zone, sensible</sub> = m<sub>exh</sub> * c * (T<sub>zone</sub> - T<sub>out</sub>) &nbsp;&nbsp; Eq. (5),
 
-where **c** is the specific heat of air, **T<sub>zone</sub>** and **T<sub>out</sub>** are the zone and outdoor air temperature. And the latent parts are determined by taking the difference between the total and the sensible rate.
+where **c** is the specific heat of air, **T<sub>zone</sub>** and **T<sub>out</sub>** are the zone and outdoor air temperature. And the latent parts are determined by taking the difference between the total and the sensible rate. For each zone, we calculate its exfiltration rate by solving a mass flow balance on the zone including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes.
 
-In EnergyPlus, for models without airflow network objects, when a _ZoneAirBalance:OutdoorAir_ object is assigned, the sensible and latent heat loss and gain due to OA air balance for each zone are reported and we will count these as part of the zone heat emission. When no _ZoneAirBalance:OutdoorAir_ object is assigned, we will count the reported sensible and latent heat loss and gain for both infiltration and ventilation at each zone for this part. For airflow network models, the infiltration and ventilation heat loss and gain are also reported for each zone.
-
-This part of zone exhaust only includes the exhaust heat at the zone level (defined by _Fan:ZoneExhaust_ or _AirflowNetwork:MultiZone:Component:ZoneExhaustFan_). The exhaust heat from Zone HVAC system nodes is included in the next item. Besides, other part of air exchange with outdoors at system node level, balanced along with AirLoopHVAC, is considered in the next item.
+This part of zone exhaust only includes the exhaust heat at the zone level (defined by _Fan:ZoneExhaust_ or _AirflowNetwork:MultiZone:Component:ZoneExhaustFan_). For each zone, we aggregated this part by searching its exhaust fans. The exhaust heat from Zone HVAC system nodes is included in the next item. Besides, other part of air exchange with outdoors at system node level, balanced along with AirLoopHVAC, is considered in the next item.
 
 **3.	Heat emission from HVAC systems through relief air**
 
@@ -67,7 +65,7 @@ Q<sub>exh, sys, sensible</sub> = m<sub>exh</sub> * c * (T<sub>zone</sub> - T<sub
 
 And the latent parts are determined by taking the difference between the total and sensible rate.
 
-The air exchange with outdoor is represented with an _OutdoorAir:Mixer_ object in the  _AirLoopHVAC:OutdoorAirSystem_ object. 
+The air exchange with outdoor is represented with an _OutdoorAir:Mixer_ object in the  _AirLoopHVAC:OutdoorAirSystem_ object. We aggregate and report this part by each 　_Controller:OutdoorAir_ object.
 
 **4.	Heat rejection from HVAC system equipment**
 
@@ -87,22 +85,22 @@ Detailed calculation of HVAC rejected heat varies with different HVAC object gro
 
 Object Group | Component | Calculation Methods
 -------------  | -------------  | -------------
-Coils | Chilled water cooling coil | Emit heat in condensing unit defined in Condenser Equipment
- |  | Hot water heating coil          | Emit heat in plant source defined in Plant Heating and Cooling Equipment
- |  | DX cooling coil (air-cooled)    | Cooling Coil Source Side Heat Transfer Rate + Cooling Coil Electric Power
- |  | DX cooling coil (water-cooled)  | Emit heat in condensing unit defined in Condenser Equipment
+Coils | Chilled water cooling coil    | Emit heat in condensing unit defined in Condenser Equipment
+ |  | Heating coil (fuel heated)      | Fuel Consumed + Heating Coil Defrost Electric Consumption + Heating Coil Crankcase Heater Electric Consumption – Heating Coil Total Heating Energy
+ |  | Hot water/steam heating coil    | Emit heat in plant source defined in Plant Heating and Cooling Equipment
+ |  | DX cooling coil (air-cooled)    | Cooling Coil Source Side Heat Transfer Rate + Cooling Coil Electric Power + Cooling Coil Crankcase Heater Electric Energy + Fuel Waste Heat
+ |  | DX cooling coil (Evaporatively-cooled)     | Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (∆H<sub>we</sub>)
  |  | DX VRF cooling coil             | Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment
- |  | DX heating coil (air-cooled)    | Heating Coil Electric Power + Heating Coil Defrost Electric Power + Heating Coil Crankcase Heater Electric Power – Heating Coil Total Heating Rate
- |  | DX heating coil (water-cooled)  | Emit heat in condensing unit defined in Condenser Equipment
- |  | DX VRF heating coil             | Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment
- |  | Evaporative Coolers	Direct evaporative cooler | Evaporative Cooler Water Volume *  ρ<sub>water</sub> * evaporation heat of water (∆H<sub>we</sub>)
- |  | Indirect evaporative cooler | Evaporative Cooler Water Volume * ρ<sub>water</sub> * evaporation heat of water (∆H<sub>we</sub>)
-Variable Refrigerant Flow Equipment | VRF air-to-air heat pump condensing unit (air-cooled) | VRF Heat Pump Total Cooling Rate + VRF Heat Pump Total Electric Power (cooling mode)<br>VRF Heat Pump Total Heating Electric Power / Fuel Rate - VRF Heat Pump Total Heating Rate (heating mode)
- |  | VRF air-to-air heat pump condensing unit (evaporative-cooled) | VRF Heat Pump Total Cooling Rate + VRF Heat Pump Total Electric Power + VRF Heat Pump Evaporative Condenser Pump Electric Power (cooling mode) <br>VRF Heat Pump Total Heating Electric Power / Fuel Rate + VRF Heat Pump Evaporative Condenser Pump Electric Power - VRF Heat Pump Total Heating Rate (heating mode)
+ |  | DX heating coil (air-cooled)    | Heating Coil Electric Power / Fuel Consumed + Heating Coil Defrost Electric Power + Heating Coil Crankcase Heater Electric Power – Heating Coil Total Heating Rate
+ |  | Water to air heat pump (cooling / heating) | Emit heat in condensing unit defined in Condenser Equipment
+ |  | DX VRF cooling /heating coil               | Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment
+Evaporative Coolers	|                 | Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (∆H<sub>we</sub>)
+Variable Refrigerant Flow Equipment   | VRF air-to-air heat pump condensing unit (air-cooled) | VRF Heat Pump Total Cooling Rate + VRF Heat Pump Total Electric Power (cooling mode)<br>VRF Heat Pump Total Heating Electric Power / Fuel Rate - VRF Heat Pump Total Heating Rate (heating mode)
+ |  | VRF air-to-air heat pump condensing unit (evaporative-cooled) | Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (∆H<sub>we</sub>)
  |  | VRF air-to-air heat pump condensing unit (water-cooled) | VRF Heat Pump Condenser Heat Transfer Rate
-Plant Heating and Cooling Equipment | Hot water/Steam boiler | Boiler <Fuel Type> Rate - Boiler Heating Rate
+Plant Heating and Cooling Equipment | Hot water/Steam boiler | Boiler <Fuel Type> Rate + Boiler Ancillary Electric Energy - Boiler Heating Rate
  |  | Chiller water-cooled | Emit heat in Condenser Equipment
- |  | Chiller air-cooled   | Chiller Condenser Heat Transfer Rate
+ |  | Chiller air-cooled / evap-cooled   | Chiller Condenser Heat Transfer Rate
 Condenser Equipment | Cooling Tower | Cooling Tower Heat Transfer Rate + Cooling Tower Fan Electric Power
 Water Heaters and Thermal Storage | Water heater | Water Heater <Fuel Type> Rate - Water Heater Heating Rate
 Zone HVAC Forced Air Units | Window air conditioner / Packaged terminal air conditioner (PTAC) / Packaged terminal heat pump (PTHP); Energy recovery ventilator (ERV); Unit ventilator/heater; Zone outdoor air unit | <unit type> Total Cooling Rate + <unit type> Electric Energy (cooling mode)<br><unit type> Heating Electric Power / Fuel Rate + <unit type> Electric Power - <unit type> Total Heating Rate (heating mode)
@@ -110,7 +108,10 @@ Zone HVAC Forced Air Units | Window air conditioner / Packaged terminal air cond
  |  | Zone evaporative cooler | Emit heat in condensing unit defined in Evaporative Coolers
  |  | Hybrid Unitary HVAC | System dependent; Calculated according to the equipment specification as above
 
-User defined systems have a variety of possible sources of heat emission including outdoor air relief for exhaust or a condenser outlet for heat rejection. These parts can be counted by tracing the condensing unit linked to the air connection inlet and outlet (for user defined zone HVAC and plant component). For user defined coil, this part depends on how the coil is designed and equipped.
+There are several parts of heat rejection that the system are not clear defined, and we do not consider the following part into calculation:
+1.	User defined systems have a variety of possible sources of heat emission including outdoor air relief for exhaust or a condenser outlet for heat rejection. These parts can be counted by tracing the condensing unit linked to the air connection inlet and outlet (for user defined zone HVAC and plant component). 
+2.	For user defined coil, this part depends on how the coil is designed and equipped. We do not count this in report.
+3.	ThermalStorage:Ice:* do not indicate where losses go, so we neglect this.
 
 By summing up these components, we can calculate and report the heat emissions from buildings by systems and components as well as in total.
 
@@ -122,14 +123,9 @@ Report: **Annual Heat Emissions Summary**
 
 For: **Entire Facility**
 
-Components | Heat Emissions [GJ]
--------------  | ------------- 
-Envelope Convection | 	
-Zone Exfiltration	| 
-Zone Exhaust Air    | 	
-HVAC Relief Air	    | 
-HVAC Reject Heat    | 	
-Total 	            | 
+Components | Envelope Convection | Zone Exfiltration | Zone Exhaust Air | HVAC Relief Air | HVAC Reject Heat | Total
+---------  | ------------------  | ----------------  | ---------------  | --------------  | ---------------  | -----
+Heat Emissions [GJ] | ---------  | ----------------  | ---------------  | --------------  | ---------------  | -----
 
 A new monthly report will be created also:
 
@@ -183,12 +179,13 @@ N/A
 The following new report variables will be added:
 
 - Surface, Average, Surface Outside Face Thermal Radiation to Air Heat Transfer Rate
+- Surface, Average, Surface Outside Face Heat Emission to Air Rate
 - Zone, Average, Zone Exfiltration Heat Transfer Rate
 - Zone, Average, Zone Exfiltration Sensible Heat Transfer Rate
 - Zone, Average, Zone Exfiltration Latent Heat Transfer Rate
-- Zone, Average, Zone Relief Air Heat Transfer Rate
-- Zone, Average, Zone Relief Air Sensible Heat Transfer Rate
-- Zone, Average, Zone Relief Air Latent Heat Transfer Rate
+- Zone, Average, Zone Exhaust Air Heat Transfer Rate
+- Zone, Average, Zone Exhaust Air Sensible Heat Transfer Rate
+- Zone, Average, Zone Exhaust Air Latent Heat Transfer Rate
 - HVAC, Average, HVAC Relief Air Heat Transfer Rate
 - HVAC, Average, HVAC Relief Air Sensible Heat Transfer Rate
 - HVAC, Average, HVAC Relief Air Latent Heat Transfer Rate

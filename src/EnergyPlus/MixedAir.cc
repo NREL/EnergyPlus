@@ -3792,7 +3792,7 @@ namespace MixedAir {
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
         this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
-        this->RelTotalLossRate = this->RelMassFlow * (this->RetEnth - OutEnthalpy);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 

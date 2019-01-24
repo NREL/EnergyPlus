@@ -11191,7 +11191,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D_string columnHead(2);
+        Array1D_string columnHead(6);
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
@@ -11203,27 +11203,27 @@ namespace OutputReportTabular {
             WriteReportHeaders("Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             WriteSubtitle("Heat Emission by Components");
 
-            columnWidth.allocate(1);
+            columnWidth.allocate(6);
             columnWidth = 10;
 
-            rowHead.allocate(6);
-            tableBody.allocate(1, 6);
+            rowHead.allocate(1);
+            tableBody.allocate(6, 1);
 
-            columnHead(1) = "Heat Emissions [GJ]";
-            rowHead(1) = "Envelope Convection";
-            rowHead(2) = "Zone Exfiltration";
-            rowHead(3) = "Zone Exhaust Air";
-            rowHead(4) = "HVAC Relief Air";
-            rowHead(5) = "HVAC Reject Heat";
-            rowHead(6) = "Total";
+            rowHead(1) = "Heat Emissions [GJ]";
+            columnHead(1) = "Envelope Convection";
+            columnHead(2) = "Zone Exfiltration";
+            columnHead(3) = "Zone Exhaust Air";
+            columnHead(4) = "HVAC Relief Air";
+            columnHead(5) = "HVAC Reject Heat";
+            columnHead(6) = "Total";
 
             tableBody = "";
             tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv, 2);
-            tableBody(1, 2) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
-            tableBody(1, 3) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
-            tableBody(1, 4) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
-            tableBody(1, 5) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
-            tableBody(1, 6) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
+            tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
+            tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
+            tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
+            tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
+            tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
 
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
