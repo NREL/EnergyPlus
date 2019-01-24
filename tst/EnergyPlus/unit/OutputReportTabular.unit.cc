@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,6 +47,8 @@
 
 // EnergyPlus::OutputReportTabular Unit Tests
 
+#include <tuple>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -66,6 +68,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -76,6 +79,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -195,11 +199,18 @@ TEST(OutputReportTabularTest, splitCommaString)
 TEST(OutputReportTabularTest, unitsFromHeading)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+
     std::string unitString;
+    int indexUnitConv;
+    std::string curUnits;
+    Real64 curConversionFactor;
+    Real64 curConversionOffset;
+
     SetupUnitConversions();
     unitsStyle = unitsStyleInchPound;
+
     unitString = "";
-    EXPECT_EQ(96, unitsFromHeading(unitString));
+    EXPECT_EQ(97, unitsFromHeading(unitString));
     EXPECT_EQ("", unitString);
     unitString = "Zone Floor Area {m2}";
     EXPECT_EQ(46, unitsFromHeading(unitString));
@@ -207,6 +218,25 @@ TEST(OutputReportTabularTest, unitsFromHeading)
     unitString = "Fictional field {nonsense}";
     EXPECT_EQ(0, unitsFromHeading(unitString));
     EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+    // Check a few report column headings too
+    unitString = "Standard Rated Net Cooling Capacity [W]";
+    indexUnitConv = unitsFromHeading(unitString);
+    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    // We expect W to convert to tons because it's cooling
+    EXPECT_EQ(70, indexUnitConv);
+    EXPECT_EQ("ton", curUnits);
+    EXPECT_EQ(0.0002843333, curConversionFactor);
+    EXPECT_EQ(0.0, curConversionOffset);
+
+    unitString = "Rated Net Cooling Capacity Test A [W]";
+    indexUnitConv = unitsFromHeading(unitString);
+    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    // We expect W to convert to tons because it's cooling
+    EXPECT_EQ(70, indexUnitConv);
+    EXPECT_EQ("ton", curUnits);
+    EXPECT_EQ(0.0002843333, curConversionFactor);
+    EXPECT_EQ(0.0, curConversionOffset);
 }
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
@@ -292,7 +322,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(95, indexUnitConv);
+    EXPECT_EQ(96, indexUnitConv);
     EXPECT_EQ("Invalid/Undefined", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -308,7 +338,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    EXPECT_EQ(96, indexUnitConv);
+    EXPECT_EQ(97, indexUnitConv);
     EXPECT_EQ("", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
     EXPECT_EQ(0.0, curConversionOffset);
@@ -385,12 +415,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
 
     varNameWithUnits = "Electric Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(85, indexUnitConv);
+    EXPECT_EQ(86, indexUnitConv);
     EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
-    EXPECT_EQ(94, indexUnitConv);
+    EXPECT_EQ(95, indexUnitConv);
     EXPECT_EQ("Electricty [kWh/m2]", curUnits);
 }
 
@@ -6046,6 +6076,242 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     EXPECT_EQ("      114.72", tabularData[103][10]); // window opening area
 }
 
+// Test for #6350 and #6469
+TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    displayTabularVeriSum = true;
+    Latitude = 12.3;
+    Longitude = 45.6;
+
+    TotSurfaces = 4;
+    Surface.allocate(TotSurfaces);
+
+    // walls
+    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).HeatTransSurf = true;
+    Surface(1).ExtBoundCond = ExternalEnvironment;
+    Surface(1).Azimuth = 0.;
+    Surface(1).GrossArea = 200.; // 20 x 10
+    Surface(1).Tilt = 90.;
+    Surface(1).Zone = 1;
+
+    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).HeatTransSurf = true;
+    Surface(2).ExtBoundCond = ExternalEnvironment;
+    Surface(2).Azimuth = 90.;
+    Surface(2).GrossArea = 300.; // 30 x 10
+    Surface(2).Tilt = 90.;
+    Surface(2).Zone = 2;
+
+    // windows
+    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).HeatTransSurf = true;
+    Surface(3).ExtBoundCond = ExternalEnvironment;
+    Surface(3).Azimuth = 0.;
+    Surface(3).GrossArea = 40.;
+    Surface(3).Height = 5;
+    Surface(3).Width = 8;
+    Surface(3).Tilt = 90.;
+    Surface(3).Zone = 1;
+
+    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).HeatTransSurf = true;
+    Surface(4).ExtBoundCond = ExternalEnvironment;
+    Surface(4).Azimuth = 90.;
+    Surface(4).GrossArea = 60.;
+    Surface(4).Height = 6;
+    Surface(4).Width = 10;
+    Surface(4).Tilt = 90.;
+    Surface(4).Zone = 2;
+
+    // Loads
+    DataHeatBalance::TotLights = 3;
+    Lights.allocate(DataHeatBalance::TotLights);
+
+    DataHeatBalance::TotPeople = 3;
+    People.allocate(DataHeatBalance::TotPeople);
+
+    DataHeatBalance::TotElecEquip = 3;
+    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+
+    Lights(1).ZonePtr = 1;
+    Lights(1).DesignLevel = 1000.0;
+    Lights(2).ZonePtr = 2;
+    Lights(2).DesignLevel = 100.0;
+    Lights(3).ZonePtr = 3;
+    Lights(3).DesignLevel = 10.0;
+
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 10.0;
+    People(2).ZonePtr = 2;
+    People(2).NumberOfPeople = 5.0;
+    People(3).ZonePtr = 3;
+    People(3).NumberOfPeople = 1.0;
+
+    ZoneElectric(1).ZonePtr = 1;
+    ZoneElectric(1).DesignLevel = 500.0;
+    ZoneElectric(2).ZonePtr = 2;
+    ZoneElectric(2).DesignLevel = 50.0;
+    ZoneElectric(3).ZonePtr = 3;
+    ZoneElectric(3).DesignLevel = 5.0;
+
+    // zone
+    DataGlobals::NumOfZones = 3;
+    Zone.allocate(DataGlobals::NumOfZones);
+    Zone(1).Name = "PartofTot Conditioned Zone";
+    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    Zone(1).isPartOfTotalArea = true;
+    Zone(1).Multiplier = 1.;
+    Zone(1).ListMultiplier = 1.;
+    // 10x10x2
+    Zone(1).FloorArea = 1000.;
+    Zone(1).Volume = 2000.;
+    Zone(1).ExtGrossWallArea = 800.;
+    Zone(1).ExteriorTotalGroundSurfArea = 0;
+    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+
+    Zone(2).Name = "PartofTot Unconditioned Zone";
+    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    Zone(2).isPartOfTotalArea = true;
+    Zone(2).Multiplier = 1.;
+    Zone(2).ListMultiplier = 1.;
+     // 10x10x2
+    Zone(2).FloorArea = 100.;
+    Zone(2).Volume = 200.;
+    Zone(2).ExtGrossWallArea = 80.;
+    Zone(2).ExteriorTotalGroundSurfArea = 0;
+    Zone(2).ExtWindowArea = 0.0;
+
+    Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    Zone(3).isPartOfTotalArea = false;
+    Zone(3).Multiplier = 1.;
+    Zone(3).ListMultiplier = 1.;
+      // 10x10x2
+    Zone(3).FloorArea = 10.;
+    Zone(3).Volume = 20.;
+    Zone(3).ExtGrossWallArea = 8.;
+    Zone(3).ExteriorTotalGroundSurfArea = 0;
+    Zone(3).ExtWindowArea = 0.0;
+
+    WriteVeriSumTable();
+
+    /***********************************************************************************************************************************************
+    *                                                              Check Yes/No flag                                                              *
+    ***********************************************************************************************************************************************/
+
+    // RowName, ColumnName, value
+    std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
+        {Zone(1).Name, "Conditioned (Y/N)", "Yes"},
+        {Zone(1).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+
+        {Zone(2).Name, "Conditioned (Y/N)", "No"},
+        {Zone(2).Name, "Part of Total Floor Area (Y/N)", "Yes"},
+
+        {Zone(3).Name, "Conditioned (Y/N)", "Yes"},
+        {Zone(3).Name, "Part of Total Floor Area (Y/N)", "No"},
+    });
+
+    // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
+    std::string rowName;
+    std::string columnName;
+
+    for (auto v: results_strings) {
+
+        rowName = std::get<0>(v);
+        columnName = std::get<1>(v);
+
+        std::string query(
+            "SELECT Value From TabularDataWithStrings"
+            "  WHERE ReportName = 'InputVerificationandResultsSummary'"
+            "  AND TableName = 'Zone Summary'"
+            "  AND RowName = '" + rowName + "'"
+            + "  AND ColumnName = '" + columnName + "'"
+        );
+
+        std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
+        // Not needed, we're just querying, not inside a transaction
+        // EnergyPlus::sqlite->sqliteCommit();
+
+        // Add informative message if failed
+        EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
+    }
+
+
+    /***********************************************************************************************************************************************
+    *                                                       Check each zone and total rows                                                        *
+    ***********************************************************************************************************************************************/
+
+    // RowName, ColumnName, value
+    std::vector<std::tuple<std::string, std::string, Real64>> results({
+            {Zone(1).Name, "Area", Zone(1).FloorArea},
+            {Zone(2).Name, "Area", Zone(2).FloorArea},
+            {Zone(3).Name, "Area", Zone(3).FloorArea},
+            {"Total", "Area", Zone(1).FloorArea + Zone(2).FloorArea},
+            {"Conditioned Total", "Area", Zone(1).FloorArea},
+            {"Unconditioned Total", "Area", Zone(2).FloorArea},
+            {"Not Part of Total", "Area", Zone(3).FloorArea},
+
+            {Zone(1).Name, "Volume", Zone(1).Volume},
+            {Zone(2).Name, "Volume", Zone(2).Volume},
+            {Zone(3).Name, "Volume", Zone(3).Volume},
+            {"Total", "Volume", Zone(1).Volume + Zone(2).Volume},
+            {"Conditioned Total", "Volume", Zone(1).Volume},
+            {"Unconditioned Total", "Volume", Zone(2).Volume},
+            {"Not Part of Total", "Volume", Zone(3).Volume},
+
+            {Zone(1).Name, "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
+            {Zone(2).Name, "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
+            {Zone(3).Name, "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
+            {"Total", "Lighting", (Lights(1).DesignLevel + Lights(2).DesignLevel) /  ( Zone(1).FloorArea + Zone(2).FloorArea )},
+            {"Conditioned Total", "Lighting", Lights(1).DesignLevel /  Zone(1).FloorArea},
+            {"Unconditioned Total", "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
+            {"Not Part of Total", "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
+
+            // People/m^2
+            {Zone(1).Name, "People", Zone(1).FloorArea / People(1).NumberOfPeople},
+            {Zone(2).Name, "People", Zone(2).FloorArea / People(2).NumberOfPeople},
+            {Zone(3).Name, "People", Zone(3).FloorArea / People(3).NumberOfPeople},
+            {"Total", "People", ( Zone(1).FloorArea + Zone(2).FloorArea ) / (People(1).NumberOfPeople + People(2).NumberOfPeople)},
+            {"Conditioned Total", "People", Zone(1).FloorArea / People(1).NumberOfPeople},
+            {"Unconditioned Total", "People", Zone(2).FloorArea / People(2).NumberOfPeople},
+            {"Not Part of Total", "People", Zone(3).FloorArea / People(3).NumberOfPeople},
+
+            {Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
+            {Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
+            {Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
+            {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel) /  ( Zone(1).FloorArea + Zone(2).FloorArea )},
+            {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel /  Zone(1).FloorArea},
+            {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
+            {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
+    });
+
+    // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
+    for (auto v: results) {
+
+        rowName = std::get<0>(v);
+        columnName = std::get<1>(v);
+
+        std::string query(
+            "SELECT Value From TabularDataWithStrings"
+            "  WHERE ReportName = 'InputVerificationandResultsSummary'"
+            "  AND TableName = 'Zone Summary'"
+            "  AND RowName = '" + rowName + "'"
+            + "  AND ColumnName = '" + columnName + "'"
+        );
+
+        Real64 return_val = execAndReturnFirstDouble(query);
+        // EnergyPlus::sqlite->sqliteCommit();
+
+        // Add informative message if failed
+        EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
+    }
+
+}
+
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 {
     std::string const idf_objects = delimited_string({
@@ -6611,3 +6877,147 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
     EXPECT_FALSE(hasSizingPeriodsDays());
 }
 
+// This tests aims to ensure that the needed Output:Variables for the Predefined Monthly table
+// are indeeed set up, and that as a result the numTables is good.
+// https://github.com/NREL/EnergyPlus/issues/7019
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputVars) {
+
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " SetpointsNotMetWithTemperaturesMonthly; !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_EQ(1, inputProcessor->getNumObjectsFound("Output:Table:SummaryReports"));
+    EXPECT_EQ(0, inputProcessor->getNumObjectsFound("Output:Variable"));
+
+    // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
+    // for the SetpointsNotMetWithTemperatureMonthly report
+    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+
+    // The Variables needed for the report are initialized (=SetupOutputVariable)
+    // Inside ThermalComfort::InitThermalComfort();
+    // Except Zone Mean Air Temperature, which is in HeatBalanceAirManager::GetSimpleAirModelInputs()
+    // Instead of calling these
+    // Fake the setup of the OutputVariables needed for two different zones
+    Real64 zoneTemp;
+    Real64 timeNotMet;
+    std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
+
+
+    for (int i=0; i < 2; ++i) {
+        SetupOutputVariable("Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
+
+        SetupOutputVariable("Zone Heating Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+        SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                timeNotMet,
+                                "Zone",
+                                "Sum",
+                                ZoneNames[i]);
+    }
+
+
+    // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
+    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+
+    OutputProcessor::GetReportVariableInput();
+    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::InitializeTabularMonthly();
+
+    // We check that the Predefined Table is actually set to show
+    EXPECT_EQ("SetpointsNotMetWithTemperaturesMonthly", namedMonthly(31).title);
+    EXPECT_TRUE(namedMonthly(31).show);
+
+    // Check that it's the only one that's shown
+    for (int i = 1; i <= OutputReportTabular::numNamedMonthly; ++i) {
+        if (i != 31) {
+            EXPECT_FALSE(OutputReportTabular::namedMonthly(i).show);
+        }
+    }
+
+    // Variables aren't going to be output to SQL/ESO anyways
+    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 0);
+
+    EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+    // If everything worked, we should have 2 tables, one for each zone.
+    // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
+    // and so the numTables was zero
+    EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
+
+}
+// https://github.com/NREL/EnergyPlus/issues/6442
+TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    WriteTabularFiles = true;
+
+    SetupUnitConversions();
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
+
+    SetPredefinedTables();
+    std::string CompName = "My DX Coil with 10000W cooling";
+
+    PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
+    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompName, 16000., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompName, 3300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompName, 4300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompName, 5300., 1);
+    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompName, 6300., 1);
+
+    EXPECT_EQ("10000.0", RetrievePreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompName));
+
+    // We enable the report we care about, making sure it's the right one
+    EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
+    OutputReportPredefined::reportName(5).show = true;
+
+    WritePredefinedTables();
+    EnergyPlus::sqlite->sqliteCommit();
+    EnergyPlus::sqlite->initializeIndexes();
+
+    auto units = queryResult("Select Units From TabularDataWithStrings "
+                             "WHERE ReportName = \"EquipmentSummary\" "
+                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+    auto values = queryResult("Select Value From TabularDataWithStrings "
+                             "WHERE ReportName = \"EquipmentSummary\" "
+                             "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"", "TabularDataWithStrings");
+    EnergyPlus::sqlite->sqliteCommit();
+
+
+    EXPECT_EQ(1u, units.size());
+    // Because the table has 8 cols
+    EXPECT_EQ(8u, units[0].size());
+
+    EXPECT_EQ("ton", units[0][0]);
+
+    EXPECT_EQ(1u, values.size());
+    // 10000 W equavals 2.843 tons, rounded to 1 decimal gives 2.8
+    std::string s = values[0][0];
+    // Trim the string, it has leading spaces
+    s.erase( std::remove_if( s.begin(), s.end(), ::isspace ), s.end() );
+
+    EXPECT_EQ("2.8", s);
+}

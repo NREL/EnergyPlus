@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -569,6 +569,12 @@ namespace Pumps {
                 PumpEquip(PumpNum).MinVolFlowRateFrac = rNumericArgs(15);
             }
 
+            if (NumAlphas > 14) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(15);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
             // Is this really necessary for each pump GetInput loop?
             PumpEquip(PumpNum).Energy = 0.0;
             PumpEquip(PumpNum).Power = 0.0;
@@ -704,6 +710,13 @@ namespace Pumps {
             if (!lNumericFieldBlanks(10)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(10);
             }
+
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
         }
 
         // pumps for steam system pumping condensate
@@ -807,6 +820,12 @@ namespace Pumps {
 
             if (!lNumericFieldBlanks(12)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(12);
+            }
+
+            if (NumAlphas > 6) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(7);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
             }
         }
 
@@ -923,6 +942,12 @@ namespace Pumps {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(14);
             }
 
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
             PumpEquip(PumpNum).Energy = 0.0;
             PumpEquip(PumpNum).Power = 0.0;
         }
@@ -1037,6 +1062,13 @@ namespace Pumps {
             if (!lNumericFieldBlanks(9)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(9);
             }
+
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
             PumpEquip(PumpNum).MinVolFlowRate = 0.0;
             PumpEquip(PumpNum).Energy = 0.0;
             PumpEquip(PumpNum).Power = 0.0;
@@ -1059,7 +1091,7 @@ namespace Pumps {
                                     _,
                                     "Electric",
                                     "Pumps",
-                                    _,
+                                    PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
                     "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
@@ -1102,7 +1134,7 @@ namespace Pumps {
                                     _,
                                     "Electric",
                                     "Pumps",
-                                    _,
+                                    PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
                     "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
@@ -2313,6 +2345,7 @@ namespace Pumps {
         } else {
             PreDefTableEntry(pdchPumpPwrPerFlow, equipName, "-");
         }
+        PreDefTableEntry(pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
         PreDefTableEntry(pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
     }
 

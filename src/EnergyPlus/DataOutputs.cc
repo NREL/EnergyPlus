@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -162,7 +162,11 @@ namespace DataOutputs {
     int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
 
     // Object Data
-    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables>> OutputVariablesForSimulation;
+    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                      UtilityRoutines::case_insensitive_hasher,
+                                                      UtilityRoutines::case_insensitive_comparator>,
+                       UtilityRoutines::case_insensitive_hasher,
+                       UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
     // Functions
 
     OutputReportingVariables::OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName)
