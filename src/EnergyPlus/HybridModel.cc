@@ -59,6 +59,7 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -216,9 +217,14 @@ namespace HybridModel {
                         AirModel(ZonePtr).AirModelType = RoomAirModel_Mixing;
                         ShowWarningError("Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
+                    SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
+                                        OutputProcessor::Unit::ach,
+                                        Zone(ZonePtr).InfilOAAirChangeRateHM,
+                                        "Zone",
+                                        "Average",
+                                        Zone(ZonePtr).Name);
                 }
             }
-
             if (ErrorsFound) {
                 ShowFatalError("Errors getting Hybrid Model input data. Preceding condition(s) cause termination.");
             }

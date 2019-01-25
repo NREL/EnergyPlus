@@ -5137,15 +5137,6 @@ namespace HeatBalanceManager {
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
         SetupOutputVariable(
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
-
-        if (FlagHybridModel) {
-            SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
-                                OutputProcessor::Unit::ach,
-                                Zone(ZoneLoop).InfilOAAirChangeRateHM,
-                                "Zone",
-                                "Average",
-                                Zone(ZoneLoop).Name);
-        }
     }
 
     // End of Get Input subroutines for the HB Module
