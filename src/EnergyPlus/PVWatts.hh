@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -153,7 +153,6 @@ namespace PVWatts {
         std::unique_ptr<pvwatts_celltemp> m_tccalc;
 
         // State variables
-        Real64 m_TimeElapsed;                // total time elapsed, to keep track of system time steps
         Real64 m_lastCellTemperature;        // last cell temperature
         Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
         Real64 m_cellTemperature;
