@@ -29,7 +29,7 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 21, 2019}
+\date{January 24, 2019}
 
 \maketitle
 <\textcompwordmark <TO DO: GRAMMARLY, ADDITIONAL GRAPHICS, >\textcompwordmark >
@@ -1282,20 +1282,107 @@ Elements.''
 
 \section{Thermal Zones and Surfaces}
 
-Central
+The physical aspects of the building such as the walls, roof, and
+windows, is one of the most important and often challenging aspect
+of creating a bulding energy model. In EnergyPlus, the surfaces define
+the geomtry of each zone and thus for the entire building. For many,
+a graphical user interface will be used to help define the geometric
+aspects of the building energy model and so many of the input objects
+described in this section will be directly created by that interface
+program. It is still important to understand some of the details for
+these input objects because it is likely that you will be reviewing
+them as part of debugging error messages. EnergyPlus uses the three
+dimensional position of each corner of a surface to define the position
+and orientation of that surface so for a typical rectagular wall that
+represents 12 numbers and for a typical building with hundreds of
+surfaces that means thousands of numbers are used to define the geometry
+of a building so you can see why using an interface is so common.
+
+EnergyPlus uses a right hand coordinate system as shown in Figure
+X with three dimensions. The X-axis points east, the Y-axis points
+north, and the Z-axis points up.
+
+\includegraphics{coordinatesystem}Figure X. EnergyPlus Coordinate
+System.
 \begin{itemize}
-\item GlobalGeometryRules
-\item Zone
-\item BuildingSurface:Detailed
-\item FenestrationSurface:Detailed
+\item Zone - defines the name of the thermal zone as well as the ceiling
+height, floor area and volume. For most zones that are fully enclosed
+these three entrees can be calculated automatically be EnergyPlus
+and do not need to be entered. A zone multiplier allows a single zone
+to represent many identical zones (such as all the enclosed offices
+on one side of a building). The name of the zone will be referenced
+in many places in the input file so it should be clear what it is
+describing. When defining a zone, it is important for the entire area
+to be thermally similar both in heat being transfered through exterior
+walls as well and interior heat gains. But using as few zones as possible
+(and thus as few surfaces) also can result in faster simulations so
+there is no reason to slow down the simulation just so two (or more)
+essentially identical are each simulated. The coordinates can be just
+set to zero if world coordinate system is used (see GlobalGeometryRules
+below).
+\item BuildingSurface:Detailed - lists the three dimensional coordinates
+that define each corner as well as referencing the zone that is surface
+is attached to and what the construction of the wall (list of materials)
+is. In addition, defines what is on the other side of the surface
+from the zone, whether that is outside, another zone in the building,
+or the ground. Other inputs indicate if the outside of the surface
+is exposed to the sun or the wind. 
+\item FenestrationSurface:Detailed - describes windows, doors, and special
+daylighting tubes and is references the wall that it is part of. It
+also requires the specification of vertices (usually four) to describe
+the corners of the window or door as well as the construction (in
+this case, usually layers of glass and the gas fill between the layers).
+It has a field for a multipier although usually the multiplier is
+set to one since the position of windows matters to many of the algorithms
+used. In order to describe the frame of the window and any dividers
+that it might have a separate input object use used and is also referenced.
+A good example file is the WindowsTests.idf file to look at. To understand
+how to model the many options for windows, a section and a table in
+the Input Output Reference called ``Window Modeling Options'' should
+be examined.
 \end{itemize}
-Shading related
+
+\subsubsection*{Shading Related}
+
+Casting shadows on the building, especially on to windows, can signficantly
+impact the energy use of a building and EnergyPlus includes several
+input objects to model this effect. The largest impact of shading
+surfaces is to reduce solar gain though windows that are shaded. There
+are two kinds of shading surfaces in EnergyPlus detached and attached.
+A detached shading surface, such as a tree or neighboring building,
+is not connected to the building. An attached shading surface is typically
+an overhang or fin that is attached to a particular base surface of
+the building, usually a wall; attached shading surfaces are usually
+designed to shade specific windows.
 \begin{itemize}
-\item Shading:Site:Detailed
-\item Shading:Building:Detailed
-\item Shading:Zone:Detailed
+\item Shading:Site:Detailed - describes something near but not attached
+to the building that casts a shadow on the building such as nearby
+buildings or mountains and includes the vertex of one corner as well
+as the length and width. For deciduous trees and other situations
+that shading changes depending on the time the schedule for the transmittance
+can vary otherwise it should always set to zero. If using relative
+coordinates (see GlobalGeometryRules) you may also want to use the
+Shading:Building:Detailed input object since it will ``rotate''
+with the building.
+\item Shading:Zone:Detailed - describes an attachment to the building that
+casts a shadow such as an overhang or fin. It also includes a reference
+to a transmittance schedule. The wall that the fin or overhang is
+attached to is also specified.
 \end{itemize}
-And some varient
+
+\subsubsection*{Input Object Variations}
+
+EnergyPlus include a bunch of variations on these basic surface input
+objects to help map them closer to mental representation of real surfaces
+in buildings. These input objects are effectively just different ways
+to represent the same information as the BuildingSurface:Detailed,
+FenestrationSurface:Detailed, and Shading:Zone:Detailed input objects.
+These objects are seldom created by graphical user interfaces so it
+is unlikely that you will see them. Some of these objects also have
+simpler methods for specifying geometry, such as using a single vertex,
+height, width, tilt and azimuth or just specifying the fin location
+relative to the window edge. The following is a list of these input
+object variations for surfaces:
 \begin{itemize}
 \item Wall:Detailed
 \item RoofCeiling:Detailed
@@ -1322,22 +1409,48 @@ And some varient
 \item Shading:Overhang:Projection
 \item Shading:Fin
 \item Shading:Fin:Projection
-\item ShadingProperty:Reflectance
 \end{itemize}
-Other object
+
+\subsubsection*{Other related input objects}
 \begin{itemize}
-\item WindowShadingControl
-\item WindowProperty:FrameAndDivider (why here?)
-\item WindowProperty:AirflowControl (why here?)
-\item WindowProperty:StormWindow (why here?)
-\item InternalMass
+\item GlobalGeometryRules - A required input object that should be in all
+files. It sets the way geometry is specified for all of the surface
+input objects. The most common approach is that the order of coordinates
+for each surface should start with the upper left corner (when viewed
+from ``outside'' the zone with the surface) and that the coordinates
+should be proceed in a counter clock wise order. In addition, most
+common is to use a world coordinate system where all the vertices
+are based on a single coordinate system for the entire building rather
+than one that changes relative to each zone.
+\item WindowShadingControl - for a window, describes the kind of shading
+type (interior shade, interior blind, between glass shade, exterior
+blind, etc..) as well as how it is controlled and the physical material
+of the shade or window construction with the shade.
+\item WindowProperty:FrameAndDivider - defines the frame material around
+a window and any dividers between separate lites of the window (see
+Figure X). While a windows does not necessarily need to define the
+frame, it is a more accurate approach since the heat transfer through
+the frame usually signifantly impacts the overall performance of a
+window.
 \end{itemize}
-Rarely used:
+\includegraphics{window_frame_and_divider}Figure X - A window with
+frame and divider
 \begin{itemize}
-\item ZoneList
-\item ZoneGroup
-\item GeometryTransform
+\item WindowProperty:AirflowControl - defines windows that have forced air
+flow between the panes of glass, also called heat-extract windows
+or climate windows.
+\item WindowProperty:StormWindow - allows the definition of a movable storm
+window that is usually applied to a window in the winter.
+\item InternalMass - used to define thermal mass that is not described anywhere
+else in the model. Often used to capture the affect of interior floors
+that are not being modeled.
+\item ShadingProperty:Reflectance - specifying the reflectance properites
+for shading and is only needed if the input object Building specfies
+the ``with reflections'' option
 \end{itemize}
+Other less common input objects include ZoneList and ZoneGroup that
+can be used when doing multi-story simulations, and GeometryTransform
+which allows a building model to be stretched with just a few inputs.
 
 \section{Internal Gains }
 
@@ -1433,130 +1546,6 @@ input object
 More details of these output options can be found in the OutputDetailsAndExamples
 document. The input objects described in this section are further
 explained in the InputOutputReference under the heading ``Group-Daylighting.''
-
-\section{<DEPRECATED>Envelope and Geometry }
-
-One input object that must appear in every file is the GlobalGeometryRules
-input object
-
-\subsection*{Coordinate System}
-
-<maybe take this from existing documentation>
-
-An input called Building North Axis in the Building input object,
-simplifies building geometry specification by designating how the
-building is oriented relative to true North. Buildings frequently
-do not line up with true north. For convenience, one may enter surfaces
-in a \textquotedblleft regular\textquotedblright{} coordinate system
-and then shift them via the use of the North Axis. The value is specified
-in degrees from \textquotedblleft true north\textquotedblright{} (clockwise
-is positive). 
-
-\subsection*{Surfaces and Zones}
-
-A building \textquotedblleft surface\textquotedblright{} is the fundamental
-element in the building model. In the general sense, there are two
-types of \textquotedblleft surfaces\textquotedblright{} in EnergyPlus.
-These are: 
-\begin{itemize}
-\item heat transfer surfaces
-\item heat storage surfaces 
-\end{itemize}
-A good rule to follow for EnergyPlus modeling of surfaces is: \textquotedblleft Always
-define a surface as a heat storage surface unless it must be defined
-as a heat transfer surface.\textquotedblright{} Any surface, which
-is expected to separate spaces of significantly different temperatures,
-must be defined as a heat transfer surface. Thus, exterior surfaces,
-such as outside walls, roofs and floors, are heat transfer surfaces.
-Interior surfaces (partitions) are heat storage surfaces if they separate
-spaces maintained at the same temperature and heat transfer surfaces
-if they separate spaces maintained at different temperatures. A discussion
-of how to define heat transfer and heat storage surfaces will occur
-in later steps. In order to correctly \textquotedblleft zone\textquotedblright{}
-the building it is necessary only to distinguish between the two. 
-
-\subsection*{Zoning}
-
-A \textquotedblleft zone\textquotedblright{} is a thermal, not a geometric,
-concept. A \textquotedblleft zone\textquotedblright{} is an air volume
-at a uniform temperature plus all the heat transfer and heat storage
-surfaces bounding or inside of that air volume. EnergyPlus calculates
-the energy required to maintain each zone at a specified temperature
-for each hour of the day. Since EnergyPlus performs a zone heat balance,
-the first step in preparing a building description is to break the
-building into zones. The objective of this exercise is to define as
-few zones as possible without significantly compromising the integrity
-of the simulation. 
-
-Although defining building zones is somewhat of an art, a few general
-rules will keep the new simulation user out of trouble. <\textcompwordmark <Consider
-the following figure, which shows the floor plan of an Adult Education
-Center. >\textcompwordmark >
-
-The question is, \textquotedblleft How many thermal zones should be
-used to model this building?\textquotedblright{} The inexperienced
-building modeler may be tempted to define each room in the building
-as a zone, but the thermal zone is defined as a volume of air at a
-uniform temperature. The general rule then is to use the number of
-fan systems (and radiant systems) not the number of rooms to determine
-the number of zones in the building. The minimum number of zones in
-a general simulation model will usually be equal to the number of
-systems serving the building. The collection of heat transfer and
-heat storage surfaces defined within each zone will include all surfaces
-bounding or inside of the space conditioned by the system. 
-
-\subsection*{Materials and Constructions}
-
-When you don't know the specific materials and constructions for the
-builidng being modeled, you may want to review the ASHRAE\_2005\_HOF\_Materials.idf
-file contained in the DataSets folder. The file contains typical materials
-and constructionsand is based on the 2005 version of the ASHRAE Handbook
-- Fundamentals.
-
-When the building was zoned, our objective was to define as few zones
-as possible. Now we would like to extend this objective to include
-defining as few surfaces as possible without significantly compromising
-the integrity of the simulation. We reduce the number and complexity
-of surfaces in our input file by defining equivalent surfaces. 
-
-Before dealing with equivalent surfaces, it is appropriate to take
-the concept of a thermal zone one step further. EnergyPlus performs
-heat balances on individual zone surfaces and on the zone air. For
-purposes of the heat transfer calculations, a geometrically correct
-rendering of the zone surfaces is not required. The surfaces do not
-even have to be connected. As long as the program knows to which thermal
-zone (mass of air) each surface transfers heat, it will calculate
-all heat balances correctly. For example, all heat storage surfaces
-of the same construction within a zone may be defined as a single
-rectangular surface. The size of this equivalent surface will equal
-the sum of all the areas of all the heat storage surfaces in the zone.
-A few simple rules will further explain what we mean by equivalent
-surfaces and how these surfaces may be used. Remember that these are
-guidelines for optional simplification of input. Each simplification
-must be evaluated to determine if it would significantly impact certain
-shading, interior solar gains, or daylighting features. The goal is
-to seek an adequate level of detail to capture the key features of
-the building envelope without spending excess time describing and
-computing results for details that are insignificant. 
-\begin{enumerate}
-\item Define all roofs and floors as rectangles regardless of the shape
-of the zone. Each zone may have one rectangular roof and one rectangular
-floor of a given construction. 
-\item Define all heat storage surfaces of the same construction within a
-zone as a single surface. The size of the single surface is obtained
-by summing the individual surface areas exposed to the zone. Thus,
-if a partition is completely within a zone (both sides of the partition
-are exposed to the zone), the area of each side must be added to the
-area of the equivalent surface. On the other hand, if the partition
-separates two zones, the area of only one side should be added to
-the equivalent surface. 
-\item Combine all windows on a given exterior surface into a single window.
-Usually each exterior surface should have only one window of each
-type. Overhangs or other shading devices may require that more windows
-be specified or combined together. By using the WindowMaterial:Glazing
-con- struction for your glass door, they will be correctly modeled
-in EnergyPlus with sunlight transferring into the zone. 
-\end{enumerate}
 
 \subsection*{Heat Transfer to the Ground}
 

@@ -1424,7 +1424,6 @@ t Guide.
 \end_layout
 
 \begin_layout Verbatim
-
 energyplus --help 
 \end_layout
 
@@ -1434,124 +1433,100 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
-
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
-
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
-
 Options:
 \end_layout
 
 \begin_layout Verbatim
-
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
-
                                input file type
 \end_layout
 
 \begin_layout Verbatim
-
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
-
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
-
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
-
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
-
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
-
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
-
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1659,7 +1634,6 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1668,7 +1642,6 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1677,7 +1650,6 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -D input.idf
 \end_layout
 
@@ -1687,7 +1659,6 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -3129,10 +3100,6 @@ EnergyPlus uses a right hand coordinate system as shown in Figure X with
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 Figure X.
  EnergyPlus Coordinate System.
 \end_layout
@@ -3162,30 +3129,95 @@ BuildingSurface:Detailed - lists the three dimensional coordinates that
  to and what the construction of the wall (list of materials) is.
  In addition, defines what is on the other side of the surface from the
  zone, whether that is outside, another zone in the building, or the ground.
+ Other inputs indicate if the outside of the surface is exposed to the sun
+ or the wind.
+ 
 \end_layout
 
 \begin_layout Itemize
-FenestrationSurface:Detailed
+FenestrationSurface:Detailed - describes windows, doors, and special daylighting
+ tubes and is references the wall that it is part of.
+ It also requires the specification of vertices (usually four) to describe
+ the corners of the window or door as well as the construction (in this
+ case, usually layers of glass and the gas fill between the layers).
+ It has a field for a multipier although usually the multiplier is set to
+ one since the position of windows matters to many of the algorithms used.
+ In order to describe the frame of the window and any dividers that it might
+ have a separate input object use used and is also referenced.
+ A good example file is the WindowsTests.idf file to look at.
+ To understand how to model the many options for windows, a section and
+ a table in the Input Output Reference called 
+\begin_inset Quotes eld
+\end_inset
+
+Window Modeling Options
+\begin_inset Quotes erd
+\end_inset
+
+ should be examined.
+\end_layout
+
+\begin_layout Subsubsection*
+Shading Related
 \end_layout
 
 \begin_layout Standard
-Shading related
+Casting shadows on the building, especially on to windows, can signficantly
+ impact the energy use of a building and EnergyPlus includes several input
+ objects to model this effect.
+ The largest impact of shading surfaces is to reduce solar gain though windows
+ that are shaded.
+ There are two kinds of shading surfaces in EnergyPlus detached and attached.
+ A detached shading surface, such as a tree or neighboring building, is
+ not connected to the building.
+ An attached shading surface is typically an overhang or fin that is attached
+ to a particular base surface of the building, usually a wall; attached
+ shading surfaces are usually designed to shade specific windows.
 \end_layout
 
 \begin_layout Itemize
-Shading:Site:Detailed
+Shading:Site:Detailed - describes something near but not attached to the
+ building that casts a shadow on the building such as nearby buildings or
+ mountains and includes the vertex of one corner as well as the length and
+ width.
+ For deciduous trees and other situations that shading changes depending
+ on the time the schedule for the transmittance can vary otherwise it should
+ always set to zero.
+ If using relative coordinates (see GlobalGeometryRules) you may also want
+ to use the Shading:Building:Detailed input object since it will 
+\begin_inset Quotes eld
+\end_inset
+
+rotate
+\begin_inset Quotes erd
+\end_inset
+
+ with the building.
 \end_layout
 
 \begin_layout Itemize
-Shading:Building:Detailed
+Shading:Zone:Detailed - describes an attachment to the building that casts
+ a shadow such as an overhang or fin.
+ It also includes a reference to a transmittance schedule.
+ The wall that the fin or overhang is attached to is also specified.
 \end_layout
 
-\begin_layout Itemize
-Shading:Zone:Detailed
+\begin_layout Subsubsection*
+Input Object Variations
 \end_layout
 
 \begin_layout Standard
-And some varient
+EnergyPlus include a bunch of variations on these basic surface input objects
+ to help map them closer to mental representation of real surfaces in buildings.
+ These input objects are effectively just different ways to represent the
+ same information as the BuildingSurface:Detailed, FenestrationSurface:Detailed,
+ and Shading:Zone:Detailed input objects.
+ These objects are seldom created by graphical user interfaces so it is
+ unlikely that you will see them.
+ Some of these objects also have simpler methods for specifying geometry,
+ such as using a single vertex, height, width, tilt and azimuth or just
+ specifying the fin location relative to the window edge.
+ The following is a list of these input object variations for surfaces:
 \end_layout
 
 \begin_layout Itemize
@@ -3288,12 +3320,8 @@ Shading:Fin
 Shading:Fin:Projection
 \end_layout
 
-\begin_layout Itemize
-ShadingProperty:Reflectance
-\end_layout
-
-\begin_layout Standard
-Other object
+\begin_layout Subsubsection*
+Other related input objects
 \end_layout
 
 \begin_layout Itemize
@@ -3316,39 +3344,64 @@ outside
 \end_layout
 
 \begin_layout Itemize
-WindowShadingControl
+WindowShadingControl - for a window, describes the kind of shading type
+ (interior shade, interior blind, between glass shade, exterior blind, etc..)
+ as well as how it is controlled and the physical material of the shade
+ or window construction with the shade.
 \end_layout
 
 \begin_layout Itemize
-WindowProperty:FrameAndDivider (why here?)
-\end_layout
-
-\begin_layout Itemize
-WindowProperty:AirflowControl (why here?)
-\end_layout
-
-\begin_layout Itemize
-WindowProperty:StormWindow (why here?)
-\end_layout
-
-\begin_layout Itemize
-InternalMass
+WindowProperty:FrameAndDivider - defines the frame material around a window
+ and any dividers between separate lites of the window (see Figure X).
+ While a windows does not necessarily need to define the frame, it is a
+ more accurate approach since the heat transfer through the frame usually
+ signifantly impacts the overall performance of a window.
 \end_layout
 
 \begin_layout Standard
-Rarely used:
+\begin_inset Graphics
+	filename window_frame_and_divider.png
+
+\end_inset
+
+Figure X - A window with frame and divider
 \end_layout
 
 \begin_layout Itemize
-ZoneList
+WindowProperty:AirflowControl - defines windows that have forced air flow
+ between the panes of glass, also called heat-extract windows or climate
+ windows.
 \end_layout
 
 \begin_layout Itemize
-ZoneGroup
+WindowProperty:StormWindow - allows the definition of a movable storm window
+ that is usually applied to a window in the winter.
 \end_layout
 
 \begin_layout Itemize
-GeometryTransform
+InternalMass - used to define thermal mass that is not described anywhere
+ else in the model.
+ Often used to capture the affect of interior floors that are not being
+ modeled.
+\end_layout
+
+\begin_layout Itemize
+ShadingProperty:Reflectance - specifying the reflectance properites for
+ shading and is only needed if the input object Building specfies the 
+\begin_inset Quotes eld
+\end_inset
+
+with reflections
+\begin_inset Quotes erd
+\end_inset
+
+ option
+\end_layout
+
+\begin_layout Standard
+Other less common input objects include ZoneList and ZoneGroup that can
+ be used when doing multi-story simulations, and GeometryTransform which
+ allows a building model to be stretched with just a few inputs.
 \end_layout
 
 \begin_layout Section
@@ -3546,190 +3599,6 @@ Group-Daylighting.
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-<DEPRECATED>Envelope and Geometry 
-\end_layout
-
-\begin_layout Standard
-One input object that must appear in every file is the GlobalGeometryRules
- input object
-\end_layout
-
-\begin_layout Subsection*
-Coordinate System
-\end_layout
-
-\begin_layout Standard
-<maybe take this from existing documentation>
-\end_layout
-
-\begin_layout Standard
-An input called Building North Axis in the Building input object, simplifies
- building geometry specification by designating how the building is oriented
- relative to true North.
- Buildings frequently do not line up with true north.
- For convenience, one may enter surfaces in a “regular” coordinate system
- and then shift them via the use of the North Axis.
- The value is specified in degrees from “true north” (clockwise is positive).
- 
-\end_layout
-
-\begin_layout Subsection*
-Surfaces and Zones
-\end_layout
-
-\begin_layout Standard
-A building “surface” is the fundamental element in the building model.
- In the general sense, there are two types of “surfaces” in EnergyPlus.
- These are: 
-\end_layout
-
-\begin_layout Itemize
-heat transfer surfaces
-\end_layout
-
-\begin_layout Itemize
-heat storage surfaces 
-\end_layout
-
-\begin_layout Standard
-A good rule to follow for EnergyPlus modeling of surfaces is: “Always define
- a surface as a heat storage surface unless it must be defined as a heat
- transfer surface.” Any surface, which is expected to separate spaces of
- significantly different temperatures, must be defined as a heat transfer
- surface.
- Thus, exterior surfaces, such as outside walls, roofs and floors, are heat
- transfer surfaces.
- Interior surfaces (partitions) are heat storage surfaces if they separate
- spaces maintained at the same temperature and heat transfer surfaces if
- they separate spaces maintained at different temperatures.
- A discussion of how to define heat transfer and heat storage surfaces will
- occur in later steps.
- In order to correctly “zone” the building it is necessary only to distinguish
- between the two.
- 
-\end_layout
-
-\begin_layout Subsection*
-Zoning
-\end_layout
-
-\begin_layout Standard
-A “zone” is a thermal, not a geometric, concept.
- A “zone” is an air volume at a uniform temperature plus all the heat transfer
- and heat storage surfaces bounding or inside of that air volume.
- EnergyPlus calculates the energy required to maintain each zone at a specified
- temperature for each hour of the day.
- Since EnergyPlus performs a zone heat balance, the first step in preparing
- a building description is to break the building into zones.
- The objective of this exercise is to define as few zones as possible without
- significantly compromising the integrity of the simulation.
- 
-\end_layout
-
-\begin_layout Standard
-Although defining building zones is somewhat of an art, a few general rules
- will keep the new simulation user out of trouble.
- <<Consider the following figure, which shows the floor plan of an Adult
- Education Center.
- >>
-\end_layout
-
-\begin_layout Standard
-The question is, “How many thermal zones should be used to model this building?”
- The inexperienced building modeler may be tempted to define each room in
- the building as a zone, but the thermal zone is defined as a volume of
- air at a uniform temperature.
- The general rule then is to use the number of fan systems (and radiant
- systems) not the number of rooms to determine the number of zones in the
- building.
- The minimum number of zones in a general simulation model will usually
- be equal to the number of systems serving the building.
- The collection of heat transfer and heat storage surfaces defined within
- each zone will include all surfaces bounding or inside of the space conditioned
- by the system.
- 
-\end_layout
-
-\begin_layout Subsection*
-Materials and Constructions
-\end_layout
-
-\begin_layout Standard
-When you don't know the specific materials and constructions for the builidng
- being modeled, you may want to review the ASHRAE_2005_HOF_Materials.idf
- file contained in the DataSets folder.
- The file contains typical materials and constructionsand is based on the
- 2005 version of the ASHRAE Handbook - Fundamentals.
-\end_layout
-
-\begin_layout Standard
-When the building was zoned, our objective was to define as few zones as
- possible.
- Now we would like to extend this objective to include defining as few surfaces
- as possible without significantly compromising the integrity of the simulation.
- We reduce the number and complexity of surfaces in our input file by defining
- equivalent surfaces.
- 
-\end_layout
-
-\begin_layout Standard
-Before dealing with equivalent surfaces, it is appropriate to take the concept
- of a thermal zone one step further.
- EnergyPlus performs heat balances on individual zone surfaces and on the
- zone air.
- For purposes of the heat transfer calculations, a geometrically correct
- rendering of the zone surfaces is not required.
- The surfaces do not even have to be connected.
- As long as the program knows to which thermal zone (mass of air) each surface
- transfers heat, it will calculate all heat balances correctly.
- For example, all heat storage surfaces of the same construction within
- a zone may be defined as a single rectangular surface.
- The size of this equivalent surface will equal the sum of all the areas
- of all the heat storage surfaces in the zone.
- A few simple rules will further explain what we mean by equivalent surfaces
- and how these surfaces may be used.
- Remember that these are guidelines for optional simplification of input.
- Each simplification must be evaluated to determine if it would significantly
- impact certain shading, interior solar gains, or daylighting features.
- The goal is to seek an adequate level of detail to capture the key features
- of the building envelope without spending excess time describing and computing
- results for details that are insignificant.
- 
-\end_layout
-
-\begin_layout Enumerate
-Define all roofs and floors as rectangles regardless of the shape of the
- zone.
- Each zone may have one rectangular roof and one rectangular floor of a
- given construction.
- 
-\end_layout
-
-\begin_layout Enumerate
-Define all heat storage surfaces of the same construction within a zone
- as a single surface.
- The size of the single surface is obtained by summing the individual surface
- areas exposed to the zone.
- Thus, if a partition is completely within a zone (both sides of the partition
- are exposed to the zone), the area of each side must be added to the area
- of the equivalent surface.
- On the other hand, if the partition separates two zones, the area of only
- one side should be added to the equivalent surface.
- 
-\end_layout
-
-\begin_layout Enumerate
-Combine all windows on a given exterior surface into a single window.
- Usually each exterior surface should have only one window of each type.
- Overhangs or other shading devices may require that more windows be specified
- or combined together.
- By using the WindowMaterial:Glazing con- struction for your glass door,
- they will be correctly modeled in EnergyPlus with sunlight transferring
- into the zone.
- 
 \end_layout
 
 \begin_layout Subsection*
