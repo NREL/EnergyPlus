@@ -3727,7 +3727,7 @@ Group-Advanced Surface Concepts.
 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Section
 Exterior Equipment
 \end_layout
 
@@ -3767,8 +3767,94 @@ Group-Exterior Energy Use Equipment.
 
 \end_layout
 
-\begin_layout Subsection*
-Heat Transfer to the Ground
+\begin_layout Section
+Zone Airflow
+\end_layout
+
+\begin_layout Standard
+The Zone Airflow input outpu group provides a way to model the airflow between
+ zones and airflow due to natural ventilation (e.g., open windows) or mechanically
+-induced ventilation (e.g., exhaust air fans).
+\end_layout
+
+\begin_layout Itemize
+ZoneInfiltration:DesignFlowRate - provides a way to describe the air infiltratio
+n into a building through leaks in the envelope including around windows
+ or the normal operation of doors.
+ The leakage can be a function of temperature and windspeed and can be expressed
+ as either a total flow rate, a flow rate per floor area, per wall area,
+ or as an airchange rate.
+\end_layout
+
+\begin_layout Itemize
+ZoneInfiltration:EffectiveLeakageArea - similar to the previous input object
+ but uses a different equation to express the infiltration rate.
+\end_layout
+
+\begin_layout Itemize
+ZoneInfiltration:FlowCoefficient - also similar to the ZoneInfiltration:DesignFl
+owRate input object but uses yet a different equation
+\end_layout
+
+\begin_layout Itemize
+ZoneVentilation:DesignFlowRate - a method to add outside air to a zone with
+ similar imputs to the ZoneInfiltration:DesignFlowRate but this would represent
+ a purposeful introduction of outdoor air into the space.
+\end_layout
+
+\begin_layout Itemize
+ZoneVentilation:WindandStackOpenArea - describes the natural ventilation
+ driven introduction of outdoor air into the zone using a simpler method
+ than an AirflowNetwork model.
+ The inputs include the opening area and effectiveness as well as simple
+ controls based on zone or outdoor temperature or the difference between
+ the two or wind speed.
+\end_layout
+
+\begin_layout Itemize
+ZoneMixing, ZoneCrossMixing, and ZoneRefrigerationDoorMixing - these three
+ input objects provide simplified treatments of air exchange between zones.
+\end_layout
+
+\begin_layout Itemize
+ZoneEarthtube - provides a way to model an earth tube which is a way to
+ draw outdoor into the zone through a underground pipe in order to cool
+ the air in the summer and heat it in the winter
+\end_layout
+
+\begin_layout Itemize
+ZoneCoolTower:Shower - models a passive downdraught evaporative cooling
+ tower (sometimes also called a shower cooling tower or a wind tower) using
+ natural ventilation and water evaporation to providing cooling in typically
+ arid climates
+\end_layout
+
+\begin_layout Itemize
+ZoneThermalChimney - models a passive solar driven thermal chimney that
+ utilize the bouyancy of air heated by the sun to provide ventilation
+\end_layout
+
+\begin_layout Itemize
+ZoneAirBalance:OutdoorAir - calculates the combined outdoor airflow including
+ the interactions bwteeen mechanical ventiation, infiltration and duct leakage
+ and is usually applied to residential buildings
+\end_layout
+
+\begin_layout Standard
+The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Airflow.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Section
