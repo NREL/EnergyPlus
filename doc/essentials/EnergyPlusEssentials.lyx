@@ -3728,6 +3728,46 @@ Group-Advanced Surface Concepts.
 \end_layout
 
 \begin_layout Subsection*
+Exterior Equipment
+\end_layout
+
+\begin_layout Standard
+While equipment that is outside of a building does not impact the thermal
+ performance of the building, the accounting of all end-uses including those
+ outside of the building is important for many compliance and incentive
+ programs that require building energy modeling.
+\end_layout
+
+\begin_layout Itemize
+Exterior:Lights - describes the external site lighting for the building
+ grounds, entrances, and facades which are either controlled by a schedule
+ or when the sun is set.
+\end_layout
+
+\begin_layout Itemize
+Exterior:FuelEquipment - describes other energy consumption on the site
+ that is external to the building other than lighting
+\end_layout
+
+\begin_layout Itemize
+Exterior:WaterEquipment - describes the flow rate of water use on the building
+ site outside of the building
+\end_layout
+
+\begin_layout Standard
+The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Exterior Energy Use Equipment.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
 Heat Transfer to the Ground
 \end_layout
 
