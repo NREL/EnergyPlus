@@ -7048,34 +7048,34 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     };
 
     // Allocate some needed arrays
-    Zone.allocate(1);
-    Zone(1).ListMultiplier = 1;
-    Construct.allocate(1);
-    Construct(1).Name = "A Construction";
-    NominalU.allocate(1);
-    NominalU(1) = 0.2;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Construct.allocate(1);
+    DataHeatBalance::Construct(1).Name = "A Construction";
+    DataHeatBalance::NominalU.allocate(1);
+    DataHeatBalance::NominalU(1) = 0.2;
 
     // Create one surface with each azimuth from expectedAzimuthToCards
-    TotSurfaces = expectedAzimuthToCards.size();
-    Surface.allocate(TotSurfaces);
+    DataSurfaces::TotSurfaces = expectedAzimuthToCards.size();
+    DataSurfaces::Surface.allocate(TotSurfaces);
 
     int i = 1;
     for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
-        Surface(i).Class = SurfaceClass_Wall;
-        Surface(i).HeatTransSurf = true;
-        Surface(i).ExtBoundCond = ExternalEnvironment;
-        Surface(i).GrossArea = 200.;
-        Surface(i).Tilt = 90.;
-        Surface(i).Zone = 1;
-        Surface(i).Construction = 1;
+        DataSurfaces::Surface(i).Class = SurfaceClass_Wall;
+        DataSurfaces::Surface(i).HeatTransSurf = true;
+        DataSurfaces::Surface(i).ExtBoundCond = ExternalEnvironment;
+        DataSurfaces::Surface(i).GrossArea = 200.;
+        DataSurfaces::Surface(i).Tilt = 90.;
+        DataSurfaces::Surface(i).Zone = 1;
+        DataSurfaces::Surface(i).Construction = 1;
 
-        Surface(i).Azimuth = expectedAzimuthToCard.first;
-        Surface(i).Name = "Surface_" + std::to_string(i);
+        DataSurfaces::Surface(i).Azimuth = expectedAzimuthToCard.first;
+        DataSurfaces::Surface(i).Name = "Surface_" + std::to_string(i);
         ++i;
     }
 
     // Setup pre def tables
-    SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
     HeatBalanceSurfaceManager::GatherForPredefinedReport();
@@ -7089,10 +7089,10 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
     // Note: Unused because we don't need SQL
     //// We enable the report we care about, making sure it's the right one
-    //EXPECT_EQ("EnvelopeSummary", reportName(2).name);
-    //reportName(2).show = true;
+    //EXPECT_EQ("EnvelopeSummary", OutputReportPredefined::reportName(2).name);
+    //OutputReportPredefined::reportName(2).show = true;
     //// Write the Predef Tables
-    //WritePredefinedTables();
+    //OutputReportTabular::WritePredefinedTables();
 
     // Reset i
     i = 1;
@@ -7105,13 +7105,14 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
                   General::RoundSigDigits(oriAzimuth, 2));
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(RetrievePreDefTableEntry(pdchOpAzimuth,
-                                           Surface(i).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth,
+                                                                   DataSurfaces::Surface(i).Name),
                   General::RoundSigDigits(expectedAzimuthToCard.first, 2));
         // Check that we do get the expected cardinal direction
-        EXPECT_EQ(RetrievePreDefTableEntry(pdchOpDir,
-                                           Surface(i).Name),
-                  cardinalDir) << "Azimuth was " << expectedAzimuthToCard.first;
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpDir,
+                                                                   DataSurfaces::Surface(i).Name),
+                  cardinalDir)
+            << "Azimuth was " << expectedAzimuthToCard.first;
         ++i;
     }
 }
