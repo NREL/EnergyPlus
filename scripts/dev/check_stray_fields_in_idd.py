@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import json
 import re
+import os
 
-IDD_PATH = '../../idd/Energy+.idd.in'
+IDD_PATH = os.path.abspath('../../idd/Energy+.idd.in')
 
 
 def check_for_stray_fields(idd_path):
@@ -16,8 +18,8 @@ def check_for_stray_fields(idd_path):
 
     Returns:
     --------
-    offending_lines (list of tuple): list of tuples = (line number, field)
-    that are offending
+    offending_lines (list of dict): one entry per offending line,
+    each entry is a dict that can be consumed by decent_ci
     """
 
     with open(idd_path, 'r') as f:
@@ -34,7 +36,13 @@ def check_for_stray_fields(idd_path):
         if m:
             field = m.groups()[0]
             if field not in exclude:
-                offending_lines.append((i, field))
+                offending_lines.append({'tool': 'check_stray_fields_in_idd',
+                                        'filename': idd_path,
+                                        'line': i + 1,
+                                        'messagetype': 'error',
+                                        'message': ('Stray field '
+                                                    r'\{}'.format(field))
+                                        })
 
     return offending_lines
 
@@ -42,11 +50,5 @@ def check_for_stray_fields(idd_path):
 if __name__ == '__main__':
 
     offending_lines = check_for_stray_fields(idd_path=IDD_PATH)
-    if offending_lines:
-        msg = ""
-        for (i, field) in offending_lines:
-            msg += ("Line {}: \\{}\n".format(i+1, field))
-        raise ValueError("There are {} stray fields:\n"
-                         "{}".format(len(offending_lines), msg))
-    else:
-        print("OK.")
+    for offending_line in offending_lines:
+        print(json.dumps(offending_line))
