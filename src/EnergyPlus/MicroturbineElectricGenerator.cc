@@ -1252,12 +1252,12 @@ namespace MicroturbineElectricGenerator {
                                     MTGenerator(GenNum).HRLoopSideNum,
                                     MTGenerator(GenNum).HRBranchNum,
                                     MTGenerator(GenNum).HRCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitMTGenerators: Program terminated due to previous condition(s).");
             }

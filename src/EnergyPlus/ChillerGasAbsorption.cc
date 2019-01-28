@@ -838,12 +838,12 @@ namespace ChillerGasAbsorption {
                                     GasAbsorber(ChillNum).CWLoopSideNum,
                                     GasAbsorber(ChillNum).CWBranchNum,
                                     GasAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     GasAbsorber(ChillNum).CHWLowLimitTemp,
                                     _,
                                     _,
                                     GasAbsorber(ChillNum).ChillReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
@@ -854,12 +854,12 @@ namespace ChillerGasAbsorption {
                                     GasAbsorber(ChillNum).HWLoopSideNum,
                                     GasAbsorber(ChillNum).HWBranchNum,
                                     GasAbsorber(ChillNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GasAbsorber(ChillNum).HeatReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
@@ -871,12 +871,12 @@ namespace ChillerGasAbsorption {
                                         GasAbsorber(ChillNum).CDLoopSideNum,
                                         GasAbsorber(ChillNum).CDBranchNum,
                                         GasAbsorber(ChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GasAbsorber(ChillNum).CondReturnNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
                 }
