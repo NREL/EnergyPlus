@@ -535,7 +535,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(10) == '') THEN
             NVert=(CurArgs-10)/3
           ELSE
-            READ(OutArgs(10),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(10),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-10)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
           VArg=11
           DO Arg=1,NVert
@@ -568,7 +576,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(3) == '') THEN
             NVert=(CurArgs-3)/3
           ELSE
-            READ(OutArgs(3),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(3),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-3)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
           VArg=4
           DO Arg=1,NVert
@@ -597,7 +613,16 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(4) == '') THEN
             NVert=(CurArgs-4)/3
           ELSE
-            READ(OutArgs(4),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(4),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-4)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
+
           ENDIF
           VArg=5
           DO Arg=1,NVert
@@ -757,7 +782,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(10) == '') THEN
             NVert=(CurArgs-10)/3
           ELSE
-            READ(OutArgs(10),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(10),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-10)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
           VArg=11
           DO Arg=1,NVert
@@ -787,7 +820,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ELSEIF (OutArgs(10) == '') THEN
               NVert=(CurArgs-10)/3
             ELSE
-              READ(OutArgs(10),*) NVert
+              ! Try to read the number of vertices as an integer
+              READ(OutArgs(10),*,IOStat=ReadStatus) NVert
+              IF (ReadStatus /= 0) THEN
+                ! If failed, default to autocalculate instead
+                NVert=(CurArgs-10)/3
+                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                    ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                    TRIM(TrimSigDigits(NVert)) //')')
+              ENDIF
             ENDIF
             VArg=11
             DO Arg=1,NVert
@@ -815,7 +856,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ELSEIF (OutArgs(9) == '') THEN
               NVert=(CurArgs-9)/3
             ELSE
-              READ(OutArgs(9),*) NVert
+              ! Try to read the number of vertices as an integer
+              READ(OutArgs(9),*,IOStat=ReadStatus) NVert
+              IF (ReadStatus /= 0) THEN
+                ! If failed, default to autocalculate instead
+                NVert=(CurArgs-9)/3
+                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                   TRIM(TrimSigDigits(NVert)) //')')
+              ENDIF
             ENDIF
             VArg=10
             DO Arg=1,NVert
@@ -845,7 +894,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(9) == '') THEN
             NVert=(CurArgs-9)/3
           ELSE
-            READ(OutArgs(9),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(9),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-9)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
           VArg=10
           DO Arg=1,NVert
@@ -874,14 +931,14 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(3) == '') THEN
             NVert=(CurArgs-3)/3
           ELSE
-            ! Try the number of vertices as an integer
-            READ(OutArgs(3),*, IOStat=ReadStatus) NVert
-            If (ReadStatus /= 0) THEN
-                ! If failed, default to autocalculate instead
-                NVert=(CurArgs-3)/3
-                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
-                    ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
-                    TRIM(TrimSigDigits(NVert)) //')')
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(3),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-3)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
           VArg=4
@@ -911,7 +968,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(4) == '') THEN
             NVert=(CurArgs-4)/3
           ELSE
-            READ(OutArgs(4),*) NVert
+            ! Try to read the number of vertices as an integer
+            READ(OutArgs(4),*,IOStat=ReadStatus) NVert
+            IF (ReadStatus /= 0) THEN
+              ! If failed, default to autocalculate instead
+              NVert=(CurArgs-4)/3
+              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                  ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                  TRIM(TrimSigDigits(NVert)) //')')
+          ENDIF
           ENDIF
           VArg=5
           DO Arg=1,NVert
