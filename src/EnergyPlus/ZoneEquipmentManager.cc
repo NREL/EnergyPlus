@@ -4943,17 +4943,6 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
-        static Array1D_bool fixedReturn;
-        static bool AllocateFlag = true;
-        if (AllocateFlag) {
-            AllocateFlag = false;
-            int maxReturnNodes = 0;
-            for (auto & z : ZoneEquipConfig) {
-                maxReturnNodes = max(maxReturnNodes, z.NumReturnNodes);
-            }
-            std::cout << "***ALLOCATION AT : " << __FILE__ << ":" << __LINE__ << std::endl;
-            fixedReturn.allocate(maxReturnNodes);
-        }
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
