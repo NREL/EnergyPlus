@@ -408,6 +408,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
 
           ! USE STATEMENTS:
   USE InputProcessor, ONLY: MakeUPPERCase,SameString
+  USE General, ONLY: TrimSigDigits
 
   IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
@@ -447,6 +448,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
     CHARACTER(len=4) :: VString=' '
     INTEGER iCurArgs
     LOGICAL compactwarning
+    INTEGER :: ReadStatus
 
     Written=.true.
     compactwarning=.false.
@@ -872,7 +874,15 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ELSEIF (OutArgs(3) == '') THEN
             NVert=(CurArgs-3)/3
           ELSE
-            READ(OutArgs(3),*) NVert
+            ! Try the number of vertices as an integer
+            READ(OutArgs(3),*, IOStat=ReadStatus) NVert
+            If (ReadStatus /= 0) THEN
+                ! If failed, default to autocalculate instead
+                NVert=(CurArgs-3)/3
+                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                    ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
+                    TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
           VArg=4
           DO Arg=1,NVert
