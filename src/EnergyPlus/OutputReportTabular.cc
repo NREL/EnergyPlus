@@ -10221,6 +10221,8 @@ namespace OutputReportTabular {
                 if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
                     (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
                     curAzimuth = Surface(iSurf).Azimuth;
+                    // Round to two decimals, like the display in tables
+                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
                     curArea = Surface(iSurf).GrossArea;
                     if (Surface(iSurf).FrameDivider != 0) {
                         frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
