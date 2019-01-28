@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-January 24, 2019
+January 28, 2019
 \end_layout
 
 \begin_layout Standard
@@ -2313,6 +2313,18 @@ Only one type of construction can be associated with each surface so if
 \end_layout
 
 \begin_layout Subsubsection*
+Available Ouputs Created by First Simulation
+\end_layout
+
+\begin_layout Standard
+Since EnergyPlus creates a custom list of possible output variables during
+ each simulation, you need to perform a simulation first before you can
+ see them.
+ To create the list use the Output:VariableDictionary input object and then
+ check the .RDD and .MDD files that are created.
+\end_layout
+
+\begin_layout Subsubsection*
 Always Plan Ahead
 \end_layout
 
@@ -4113,12 +4125,242 @@ In addition, this group of input objects includes three plant objects that
  allow the referencing of chillers, towers and boilers respectively so that
  additional details can be described in those objects.
  All of these are described in the “Input/Output Reference” document under
- the Group “HVACTemplates” and the expansion process is described in the
- Auxiliary Programs document under “ExpandObjects”.
+ the Group “HVACTemplates” and please note that this group is described
+ in Chapter 2 while most of the other groups of input objects are described
+ in Chapter 1.
+ The expansion process is described in the Auxiliary Programs document under
+ “ExpandObjects.”
 \end_layout
 
 \begin_layout Section
-Economics and Emissions
+Output Reporting
+\end_layout
+
+\begin_layout Standard
+No model is worth doing without seeing the results of the model which are
+ contained in the output reporting.
+ EnergyPlus has several different types of outputs but initially the most
+ important to understand are probably the tabular output reports that summarize
+ the results of the simulation.
+ The two input object described below are the only two necessary to start
+ generating the tabular output reports:
+\end_layout
+
+\begin_layout Itemize
+Output:Table:SummaryReports - allows the specification of different tabular
+ reports but usually just specifying AllSummary is necessary.
+ Additional reports can be shown by specifying AllSummaryAndMonthly, AllSummaryM
+onthlyAndSizingPeriod.
+\end_layout
+
+\begin_layout Itemize
+OutputControl:Table:Style - specifying the output format for the tabular
+ reports which is most commonly HTML but comma, tab, fixed width, and XML
+ options are also available.
+ Depending on what is specified the output reports can have different file
+ extensions and the file name usually has the word 
+\begin_inset Quotes eld
+\end_inset
+
+Table
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+tbl
+\begin_inset Quotes erd
+\end_inset
+
+ in it.
+\end_layout
+
+\begin_layout Standard
+You can also create your own custom tabular reports by using one of the
+ following input objects:
+\end_layout
+
+\begin_layout Itemize
+Output:Table:TimeBins - shows the amount of time in hours that occurs in
+ different bins for the single specific output variable or meter specified
+\end_layout
+
+\begin_layout Itemize
+Output:Table:Monthly - shows a series of output variables or output meters
+ on a monthly basis using different aggregation schemes.
+ For output variables that reoccur for each zone or other input object,
+ the monthly report will be repeated for each one.
+\end_layout
+
+\begin_layout Itemize
+Output:Table:Annual - hows a series of output variables or output meters
+ on a annual basis using different aggregation schemes.
+ For output variables that reoccur for each zone or other input object additiona
+l rows of results will be displayed
+\end_layout
+
+\begin_layout Itemize
+Output:VariableDictionary - provides a list of available output variables
+ for use with these custom tabular reports as well as the time step reporting
+ described next.
+ The list of output variables that are available for specific simulation
+ appear in a file with a .rdd extension and the output meters appears in
+ a file with an .mdd extension.
+\end_layout
+
+\begin_layout Standard
+When you need to dive deeper into the results for a specific output variable
+ or output meters, time step outputs allow you too see the values of an
+ output for each timestep or other time period.
+ This approach lets you more deeply understand the way the item is simulated
+ by seeing how output variables and related driving output variables are
+ related.
+\end_layout
+
+\begin_layout Itemize
+Output:Variable - these input objects are added one for each output variable
+ desired.
+ Usually an asterisk is used for the 
+\begin_inset Quotes eld
+\end_inset
+
+key value
+\begin_inset Quotes erd
+\end_inset
+
+ field so that all instances of the output variable are included.
+\end_layout
+
+\begin_layout Itemize
+Output:Meter and Output:Meter:MeterFileOnly - these input objects specify
+ the output meters (think of them as very detailed submeters)
+\end_layout
+
+\begin_layout Itemize
+Output:SQLite - use this object if you want to output in the SQLite database
+ format.
+ Not only can the output variables and meters be in SQLite format but the
+ tabular reports are also included
+\end_layout
+
+\begin_layout Standard
+EnergyPlus also includes a number of special reports that usually appear
+ in different output files or in the .eio output file
+\end_layout
+
+\begin_layout Itemize
+Output:Surfaces:List - provides report on all the surfaces in a file and
+ the output appears in a file with the .sln extension
+\end_layout
+
+\begin_layout Itemize
+Output:Surfaces:Drawing - provides a DXF drawing that can be opened in some
+ CAD programs 
+\end_layout
+
+\begin_layout Itemize
+OutputControl:SurfaceColorScheme - controls the colors used in the DXF file
+\end_layout
+
+\begin_layout Itemize
+Output:Schedules - provides a summary of the schedules in the input file
+ and appears as part of the file with the .eio extension 
+\end_layout
+
+\begin_layout Itemize
+Output:Constructions - provides a summary of constructions in the input
+ file and appears as part of the file with the .eio extension
+\end_layout
+
+\begin_layout Itemize
+Output:EnergyManagementSystem - creates a list of detailed output related
+ to the energy management system in a file with the .edd extension
+\end_layout
+
+\begin_layout Itemize
+OutputControl:ReportingTolerances - provides more control over the amount
+ of time reported for the setpoints not being met
+\end_layout
+
+\begin_layout Itemize
+Output:Diagnostics - provides additional detail in the output messages in
+ the .err file .
+ Normally this extra detail is not shown to reduce confusion for new users
+\end_layout
+
+\begin_layout Itemize
+Output:DebuggingData - provides additional detailed output related to HVAC
+ nodes in a file with a .dbg extension
+\end_layout
+
+\begin_layout Standard
+Environental
+\end_layout
+
+\begin_layout Itemize
+Output:EnvironmentalImpactFactors
+\end_layout
+
+\begin_layout Itemize
+EnvironmentalImpactFactors
+\end_layout
+
+\begin_layout Itemize
+FuelFactors
+\end_layout
+
+\begin_layout Standard
+Other object in this input object group
+\end_layout
+
+\begin_layout Itemize
+Output:Meter:Cumulative
+\end_layout
+
+\begin_layout Itemize
+Output:Meter:Cumulative:MeterFileOnly
+\end_layout
+
+\begin_layout Itemize
+Meter:Custom
+\end_layout
+
+\begin_layout Itemize
+Meter:CustomDecrement
+\end_layout
+
+\begin_layout Itemize
+Output:PreprocessorMessage
+\end_layout
+
+\begin_layout Standard
+All of these are described in the “Input/Output Reference” but note that
+ this group is described in Chapter 5 
+\begin_inset Quotes eld
+\end_inset
+
+Input for Output
+\begin_inset Quotes erd
+\end_inset
+
+ and Chapter 7 
+\begin_inset Quotes eld
+\end_inset
+
+Standard Output Reports
+\begin_inset Quotes erd
+\end_inset
+
+ while most of the other groups of input objects are described in Chapter
+ 1.
+ Several other output related input objects appear in other areas such as
+ Output:DaylightFactors input objecct in the Daylighting group.
+\end_layout
+
+\begin_layout Section
+Economics
 \end_layout
 
 \begin_layout Subsection*

@@ -29,7 +29,7 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 24, 2019}
+\date{January 28, 2019}
 
 \maketitle
 <\textcompwordmark <TO DO: GRAMMARLY, ADDITIONAL GRAPHICS, >\textcompwordmark >
@@ -272,7 +272,10 @@ utilize it.
 The EnergyPlus documentation is currently included the installation
 in the ``Documenation'' folder as PDFs. It is also available as
 \href{https://energyplus.net/documentation}{PDFs online} and as \href{https://bigladdersoftware.com/epx/docs/}{browsable HTML}.
-The documentation includes:
+Using search in the documentation is critical to finding the information
+needed. Some of the documentation PDFs are very large so searching
+is a good way to find the specific information about a topic or an
+input object. The documentation includes:
 \begin{itemize}
 \item Input and Output Reference: Contains a thorough description of the
 various input and output files related to EnergyPlus, the format of
@@ -911,6 +914,13 @@ so if the top half of a wall is made up of a different construction
 than the bottom half of the wall, the top half and the bottom half
 each need to be represented by separate surfaces.
 
+\subsubsection*{Available Ouputs Created by First Simulation}
+
+Since EnergyPlus creates a custom list of possible output variables
+during each simulation, you need to perform a simulation first before
+you can see them. To create the list use the Output:VariableDictionary
+input object and then check the .RDD and .MDD files that are created.
+
 \subsubsection*{Always Plan Ahead}
 
 Some preliminary steps will facilitate the construction of your input
@@ -1547,37 +1557,345 @@ More details of these output options can be found in the OutputDetailsAndExample
 document. The input objects described in this section are further
 explained in the InputOutputReference under the heading ``Group-Daylighting.''
 
-\subsection*{Heat Transfer to the Ground}
+\section{Advanced Construction, Surface, Zone Concepts}
 
-\section{HVAC }
+The group of input objects contains many special cases for more sophisticated
+modeling for constructions, surfaces and zones. As part of this, one
+of the ways to model building foundations called Kiva is described. 
+\begin{itemize}
+\item Foundation:Kiva - describes the insulation depth and width for interior
+and exterior horizontal and vertical insulated foundations as well
+as the construction for the wall footing, see Figure X .
+\item Foundation:Kiva:Settings - sets the soil conditions and other parameters
+related to the Foundation:Kiva input object.
+\item SurfaceProperty:ExposedFoundationPerimeter - used to set the portion
+of the foundation that is along the exterior perimeter of the building
+that undergoes heat transfer with the environment. Edges of underground
+surfaces that are fully under the building and not along the perimeter
+are not expected to have any heat transfer with the environment.
+\end{itemize}
+\includegraphics{kiva-2d-elements}
 
-\subsection*{Ideal Loads}
+Figure X: Structural and insulation components of Foundation:Kiva
+input objects.
 
-\subsection*{HVAC Templates}
+Input objects of interest in this group not related to Kiva include
+\begin{itemize}
+\item SurfaceControl:MovableInsulation - allows the modeling of insulation
+panels that are removable for walls, floors and roofs but not windows. 
+\item SurfaceProperty:Underwater - allows the outside of the building to
+be modeled as underwater and even as moving through the water allowing
+EnergyPlus to model vessels.
+\item SurfaceProperty:ExteriorNaturalVentedCavity - provides a method to
+include the modeling of baffles in the multi-skin exteriors
+\end{itemize}
+Other objects in this group set the heat transfer algorithms for specific
+surfaces when the building level heat tranfer algorithm should not
+be used for that surface, when other models are used to describe the
+variation in temperature on the outside of a surface, override the
+algorithm used for modeling convection heat transfer between the air
+inside or outside of a zone and the surface, vapor transfer coefficients
+when using algorithms that include moisture modeling of surfaces,
+override the algorithm that distributes the solar radiation on interior
+surfaces, overrides the solar energy absorbed by different layers
+for complex windows, a way to override the long wave radiation with
+other surfaces in the zone, allows overriding the external environment
+for a surface or a zone including solar shading or air speed or temperature
+or humidity, overrides the source term for the heat balance, override
+the view factors for a zone. The input objects described in this section
+are further explained in the InputOutputReference under the heading
+``Group-Advanced Surface Concepts.''
 
-HVAC Template input objects are available. These are intended to allow
-for several \textquotedblleft usual\textquotedblright{} HVAC types
-to be expanded into EnergyPlus HVAC inputs with minimal user entries.
-These are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
+\section{Exterior Equipment}
+
+While equipment that is outside of a building does not impact the
+thermal performance of the building, the accounting of all end-uses
+including those outside of the building is important for many compliance
+and incentive programs that require building energy modeling.
+\begin{itemize}
+\item Exterior:Lights - describes the external site lighting for the building
+grounds, entrances, and facades which are either controlled by a schedule
+or when the sun is set.
+\item Exterior:FuelEquipment - describes other energy consumption on the
+site that is external to the building other than lighting
+\item Exterior:WaterEquipment - describes the flow rate of water use on
+the building site outside of the building
+\end{itemize}
+The input objects described in this section are further explained
+in the InputOutputReference under the heading ``Group-Exterior Energy
+Use Equipment.''
+
+\section{Zone Airflow}
+
+The Zone Airflow input outpu group provides a way to model the airflow
+between zones and airflow due to natural ventilation (e.g., open windows)
+or mechanically-induced ventilation (e.g., exhaust air fans).
+\begin{itemize}
+\item ZoneInfiltration:DesignFlowRate - provides a way to describe the air
+infiltration into a building through leaks in the envelope including
+around windows or the normal operation of doors. The leakage can be
+a function of temperature and windspeed and can be expressed as either
+a total flow rate, a flow rate per floor area, per wall area, or as
+an airchange rate.
+\item ZoneInfiltration:EffectiveLeakageArea - similar to the previous input
+object but uses a different equation to express the infiltration rate.
+\item ZoneInfiltration:FlowCoefficient - also similar to the ZoneInfiltration:DesignFlowRate
+input object but uses yet a different equation
+\item ZoneVentilation:DesignFlowRate - a method to add outside air to a
+zone with similar imputs to the ZoneInfiltration:DesignFlowRate but
+this would represent a purposeful introduction of outdoor air into
+the space.
+\item ZoneVentilation:WindandStackOpenArea - describes the natural ventilation
+driven introduction of outdoor air into the zone using a simpler method
+than an AirflowNetwork model. The inputs include the opening area
+and effectiveness as well as simple controls based on zone or outdoor
+temperature or the difference between the two or wind speed.
+\item ZoneMixing, ZoneCrossMixing, and ZoneRefrigerationDoorMixing - these
+three input objects provide simplified treatments of air exchange
+between zones.
+\item ZoneEarthtube - provides a way to model an earth tube which is a way
+to draw outdoor into the zone through a underground pipe in order
+to cool the air in the summer and heat it in the winter
+\item ZoneCoolTower:Shower - models a passive downdraught evaporative cooling
+tower (sometimes also called a shower cooling tower or a wind tower)
+using natural ventilation and water evaporation to providing cooling
+in typically arid climates
+\item ZoneThermalChimney - models a passive solar driven thermal chimney
+that utilize the bouyancy of air heated by the sun to provide ventilation
+\item ZoneAirBalance:OutdoorAir - calculates the combined outdoor airflow
+including the interactions bwteeen mechanical ventiation, infiltration
+and duct leakage and is usually applied to residential buildings
+\end{itemize}
+The input objects described in this section are further explained
+in the InputOutputReference under the heading ``Group-Airflow.''
+
+\section{HVAC Templates}
+
+New users to EnergyPlus need to learn many things to understand how
+to create the proper input objects for modeling an HVAC system. In
+order to reduce this initial effort, HVACTemplates were created. Unlike
+other input objects, the HVACTemplate objects are not directly processed
+by EnergyPlus, instead a preprocessor called ExpandObjects turns these
+HVACTemplate input objects into the standard input objects. This can
+be used as a learning tool, since you can review the .expidf file
+that contains the standard input objects or it can be used for long
+term modeling especially if you focus is not on HVAC related energy
+efficiency measures. The primary disadvantage to using the HVACTemplate
+input objects is that only a small subset of possible configurations
+can be modeled using them. The subset of configurations that can be
+used was carefully chosen to be some of the most common HVAC configurations.
+If the HVACTemplate input objects does not support the HVAC configuraiton
+you are considering, you need to model it with the standard EnergyPlus
+input objects. When using HVACTemplate input objects, no regular standard
+EnergyPlus input objects related to HVAC should be used (see the InputOutputReference
+for some exceptions to this). The HVACTemplates can model:
+\begin{itemize}
+\item Baseboard heating systems with optional hot water boiler
+\item Fan coil systems with boilers and chillers
+\item Packaged terminal air conditioner (PTAC) system with optional hot
+water boiler
+\item Packaged terminal air-to-air heat pump (PTHP) systems
+\item Water to air heat pumps with boiler and cooling tower
+\item Variable refrigerant flow heat pumps (air-to-air)
+\item Variable refrigerant flow heat pumps (water-to-air) with boiler and
+cooling tower
+\item Direct-expansion (DX) cooling, package and split systems
+\item Direct-expansion (DX) heat pump systems
+\item Packaged variable air volume system useing direct-expansion cooling
+\item Variable air volume systems with boilers and air-cooled chillers
+\item Variable air volume systems with boilers and water-cooled chillers
+\item Constant air volume systems with boilers and water-cooled chillers
+\item Dual-duct systems (constant or variable air volume) with boilers and
+water-cooled chillers
+\item Dedicated outdoor air systems (DOAS) combined with zonal template
+systems
+\end{itemize}
+The Input Ouput Reference includes a list of exactly which objects
+are needed for each of these configurations 
+\begin{itemize}
+\item HVACTemplate:Thermostat - describes the heating and cooling setpoints
+for a thermostat. Can be referenced by multiple HVACTemplate:Zone
+objects if all the zones have the same setpoints
+\item HVACTemplate:Zone:IdealLoadsAirSystem - provides an idealized system
+that supplies air to the zone that meets all loads and uses no energy.
+Best used for load calculations.
+\item HVACTemplate:Zone:BaseboardHeat - allows the simulation of electric
+or hot water thermostatically controlled baseboard heaters
+\item HVACTemplate:Zone:FanCoil - describes a four-pipe fan coil system
+with outdoor air intake
+\item HVACTemplate:Zone:PTAC - models a packaged terminal air conditioner
+with either an electric, gas or hot water heating coil most commonly
+used in residential or hotel applications
+\item HVACTemplate:Zone:PTHP - models a packaged terminal heat pump system
+most commonly used in residential or hotel applications with either
+electric or gas supplementary heater
+\item HVACTemplate:Zone:WaterToAirHeatPump - describes the distributed portion
+of a system which uses a medium temperature loop and heat pumps to
+provide heating and cooling to the building (also see HVACTemplate:Plant:MixedWaterLoop)
+\item HVACTemplate:Zone:VRF - provides input for variable refrigerant flow
+terminal units
+\item HVACTemplate:Zone:Unitary - describes a constant volume direct-expansion
+sytem such as a rooftop system or split system. Often paired with
+a single HVACTemplate:System:Unitary for a single zone system but
+can also be part of a multizone system
+\item HVACTemplate:Zone:VAV - simulates the terminal of a variable air volume
+system with reheat
+\item HVACTemplate:Zone:VAV:FanPowered - simulates either a parallel or
+series fan power terminal of a variable air volume system
+\item HVACTemplate:Zone:VAV:HeatAndCool - simulates the terminal of a variable
+air volume system
+\item HVACTemplate:Zone:ConstantVolume - simulates the terminal of a constant
+air volume system
+\item HVACTemplate:Zone:DualDuct - simulates the zone portion of a constant
+volume or variable volume dual-duct HVAC system
+\item HVACTemplate:System:VRF - simulates the variable refrigerant flow
+system
+\item HVACTemplate:System:Unitary - describes the system portion of a rooftop
+or split DX cooling system with electric, gas or hot water heating
+\item HVACTemplate:System:UnitaryHeatPump:AirToAir - details the system
+portion of a rooftop or split DX air-to-air heat pump system
+\item HVACTemplate:System:UnitarySystem - models the system portion of a
+rooftop or split system and has more flexibiltity than the previous
+two input objects
+\item HVACTemplate:System:VAV - simulates the system portion of a variable
+air volume HVAC configuration with chilled water cooling and several
+different heating options
+\item HVACTemplate:System:PackagedVAV - describes the system portion of
+a packaged direct-expansion (DX) based variable air volume HVAC configuration
+with several different heating options
+\item HVACTemplate:System:ConstantVolume - provides input for the system
+portion of a constant air volume HVAC configuration with option chilled
+water cooling and several different heating options
+\item HVACTemplate:System:DualDuct - models the system portion of a constant
+air volume or variable air volume dualduct HVAC configuration with
+optional chilled water cooling and several different heating options
+\item HVACTemplate:System:DedicatedOutdoorAir - adds a dedicated outdoor
+air system (DOAS) which can be used with several of the HVACTemplate:Zone
+input objects and contains heating and cooling coils and heat recovery
+\item HVACTemplate:Plant:ChilledWaterLoop - models the chilled water loop
+connecting chillers to chilled water coils as well as the condenser
+water loop that connects chillers with cooling towers
+\item HVACTemplate:Plant:Chiller - describes a vapor-compression chiller
+that provides chilled water to the loop
+\item HVACTemplate:Plant:Tower - models an evaporative cooling tower used
+to reject heat from chilllers
+\item HVACTemplate:Plant:HotWaterLoop - models the hot water loop connecting
+boilers to hot water coils
+\item HVACTemplate:Plant:Boiler - models a boiler that provides hot water
+to the loop
+\item HVACTemplate:Plant:MixedWaterLoop - models the medium temperature
+loop that serves water-to-air heat pumps as well as cooling towers
+and boilers
+\end{itemize}
+In addition, this group of input objects includes three plant objects
+that allow the referencing of chillers, towers and boilers respectively
+so that additional details can be described in those objects. All
+of these are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
 document under the Group \textquotedblleft HVACTemplates\textquotedblright{}
-and the expansion process is described in the Auxiliary Programs document
-under \textquotedblleft ExpandObjects\textquotedblright .
+and please note that this group is described in Chapter 2 while most
+of the other groups of input objects are described in Chapter 1. The
+expansion process is described in the Auxiliary Programs document
+under \textquotedblleft ExpandObjects.\textquotedblright{}
 
-\subsection*{Zone Equipment}
+\section{Output Reporting}
 
-\subsection*{Air Loops}
+No model is worth doing without seeing the results of the model which
+are contained in the output reporting. EnergyPlus has several different
+types of outputs but initially the most important to understand are
+probably the tabular output reports that summarize the results of
+the simulation. The two input object described below are the only
+two necessary to start generating the tabular output reports:
+\begin{itemize}
+\item Output:Table:SummaryReports - allows the specification of different
+tabular reports but usually just specifying AllSummary is necessary.
+Additional reports can be shown by specifying AllSummaryAndMonthly,
+AllSummaryMonthlyAndSizingPeriod.
+\item OutputControl:Table:Style - specifying the output format for the tabular
+reports which is most commonly HTML but comma, tab, fixed width, and
+XML options are also available. Depending on what is specified the
+output reports can have different file extensions and the file name
+usually has the word ``Table'' or ``tbl'' in it.
+\end{itemize}
+You can also create your own custom tabular reports by using one of
+the following input objects:
+\begin{itemize}
+\item Output:Table:TimeBins - shows the amount of time in hours that occurs
+in different bins for the single specific output variable or meter
+specified
+\item Output:Table:Monthly - shows a series of output variables or output
+meters on a monthly basis using different aggregation schemes. For
+output variables that reoccur for each zone or other input object,
+the monthly report will be repeated for each one.
+\item Output:Table:Annual - hows a series of output variables or output
+meters on a annual basis using different aggregation schemes. For
+output variables that reoccur for each zone or other input object
+additional rows of results will be displayed
+\item Output:VariableDictionary - provides a list of available output variables
+for use with these custom tabular reports as well as the time step
+reporting described next. The list of output variables that are available
+for specific simulation appear in a file with a .rdd extension and
+the output meters appears in a file with an .mdd extension.
+\end{itemize}
+When you need to dive deeper into the results for a specific output
+variable or output meters, time step outputs allow you too see the
+values of an output for each timestep or other time period. This approach
+lets you more deeply understand the way the item is simulated by seeing
+how output variables and related driving output variables are related.
+\begin{itemize}
+\item Output:Variable - these input objects are added one for each output
+variable desired. Usually an asterisk is used for the ``key value''
+field so that all instances of the output variable are included.
+\item Output:Meter and Output:Meter:MeterFileOnly - these input objects
+specify the output meters (think of them as very detailed submeters)
+\item Output:SQLite - use this object if you want to output in the SQLite
+database format. Not only can the output variables and meters be in
+SQLite format but the tabular reports are also included
+\end{itemize}
+EnergyPlus also includes a number of special reports that usually
+appear in different output files or in the .eio output file
+\begin{itemize}
+\item Output:Surfaces:List - provides report on all the surfaces in a file
+and the output appears in a file with the .sln extension
+\item Output:Surfaces:Drawing - provides a DXF drawing that can be opened
+in some CAD programs 
+\item OutputControl:SurfaceColorScheme - controls the colors used in the
+DXF file
+\item Output:Schedules - provides a summary of the schedules in the input
+file and appears as part of the file with the .eio extension 
+\item Output:Constructions - provides a summary of constructions in the
+input file and appears as part of the file with the .eio extension
+\item Output:EnergyManagementSystem - creates a list of detailed output
+related to the energy management system in a file with the .edd extension
+\item OutputControl:ReportingTolerances - provides more control over the
+amount of time reported for the setpoints not being met
+\item Output:Diagnostics - provides additional detail in the output messages
+in the .err file . Normally this extra detail is not shown to reduce
+confusion for new users
+\item Output:DebuggingData - provides additional detailed output related
+to HVAC nodes in a file with a .dbg extension
+\end{itemize}
+Environental
+\begin{itemize}
+\item Output:EnvironmentalImpactFactors
+\item EnvironmentalImpactFactors
+\item FuelFactors
+\end{itemize}
+Other object in this input object group
+\begin{itemize}
+\item Output:Meter:Cumulative
+\item Output:Meter:Cumulative:MeterFileOnly
+\item Meter:Custom
+\item Meter:CustomDecrement
+\item Output:PreprocessorMessage
+\end{itemize}
+All of these are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
+but note that this group is described in Chapter 5 ``Input for Output''
+and Chapter 7 ``Standard Output Reports'' while most of the other
+groups of input objects are described in Chapter 1. Several other
+output related input objects appear in other areas such as Output:DaylightFactors
+input objecct in the Daylighting group.
 
-\subsection*{Coils}
-
-\subsection*{Plant Loops}
-
-\subsection*{Plant Equipment}
-
-\subsection*{Controls}
-
-\subsection*{EMS}
-
-\section{Economics and Emissions}
+\section{Economics}
 
 \subsection*{Tariffs}
 
@@ -1615,4 +1933,8 @@ than SI units. This program is described more fully in the Auxiliary
 Programs document.
 \end{itemize}
 
+\subsection*{Measures to Object Map}
+
+A map of common energy efficiency measures to the input objects that
+need to be modified or included to support them.
 \end{document}
