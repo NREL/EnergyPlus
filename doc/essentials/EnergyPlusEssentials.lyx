@@ -3853,57 +3853,268 @@ Group-Airflow.
 
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Section
-HVAC 
-\end_layout
-
-\begin_layout Subsection*
-Ideal Loads
-\end_layout
-
-\begin_layout Subsection*
 HVAC Templates
 \end_layout
 
 \begin_layout Standard
-HVAC Template input objects are available.
- These are intended to allow for several “usual” HVAC types to be expanded
- into EnergyPlus HVAC inputs with minimal user entries.
- These are described in the “Input/Output Reference” document under the
- Group “HVACTemplates” and the expansion process is described in the Auxiliary
- Programs document under “ExpandObjects”.
+New users to EnergyPlus need to learn many things to understand how to create
+ the proper input objects for modeling an HVAC system.
+ In order to reduce this initial effort, HVACTemplates were created.
+ Unlike other input objects, the HVACTemplate objects are not directly processed
+ by EnergyPlus, instead a preprocessor called ExpandObjects turns these
+ HVACTemplate input objects into the standard input objects.
+ This can be used as a learning tool, since you can review the .expidf file
+ that contains the standard input objects or it can be used for long term
+ modeling especially if you focus is not on HVAC related energy efficiency
+ measures.
+ The primary disadvantage to using the HVACTemplate input objects is that
+ only a small subset of possible configurations can be modeled using them.
+ The subset of configurations that can be used was carefully chosen to be
+ some of the most common HVAC configurations.
+ If the HVACTemplate input objects does not support the HVAC configuraiton
+ you are considering, you need to model it with the standard EnergyPlus
+ input objects.
+ When using HVACTemplate input objects, no regular standard EnergyPlus input
+ objects related to HVAC should be used (see the InputOutputReference for
+ some exceptions to this).
+ The HVACTemplates can model:
 \end_layout
 
-\begin_layout Subsection*
-Zone Equipment
+\begin_layout Itemize
+Baseboard heating systems with optional hot water boiler
 \end_layout
 
-\begin_layout Subsection*
-Air Loops
+\begin_layout Itemize
+Fan coil systems with boilers and chillers
 \end_layout
 
-\begin_layout Subsection*
-Coils
+\begin_layout Itemize
+Packaged terminal air conditioner (PTAC) system with optional hot water
+ boiler
 \end_layout
 
-\begin_layout Subsection*
-Plant Loops
+\begin_layout Itemize
+Packaged terminal air-to-air heat pump (PTHP) systems
 \end_layout
 
-\begin_layout Subsection*
-Plant Equipment
+\begin_layout Itemize
+Water to air heat pumps with boiler and cooling tower
 \end_layout
 
-\begin_layout Subsection*
-Controls
+\begin_layout Itemize
+Variable refrigerant flow heat pumps (air-to-air)
 \end_layout
 
-\begin_layout Subsection*
-EMS
+\begin_layout Itemize
+Variable refrigerant flow heat pumps (water-to-air) with boiler and cooling
+ tower
+\end_layout
+
+\begin_layout Itemize
+Direct-expansion (DX) cooling, package and split systems
+\end_layout
+
+\begin_layout Itemize
+Direct-expansion (DX) heat pump systems
+\end_layout
+
+\begin_layout Itemize
+Packaged variable air volume system useing direct-expansion cooling
+\end_layout
+
+\begin_layout Itemize
+Variable air volume systems with boilers and air-cooled chillers
+\end_layout
+
+\begin_layout Itemize
+Variable air volume systems with boilers and water-cooled chillers
+\end_layout
+
+\begin_layout Itemize
+Constant air volume systems with boilers and water-cooled chillers
+\end_layout
+
+\begin_layout Itemize
+Dual-duct systems (constant or variable air volume) with boilers and water-coole
+d chillers
+\end_layout
+
+\begin_layout Itemize
+Dedicated outdoor air systems (DOAS) combined with zonal template systems
+\end_layout
+
+\begin_layout Standard
+The Input Ouput Reference includes a list of exactly which objects are needed
+ for each of these configurations 
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Thermostat - describes the heating and cooling setpoints for
+ a thermostat.
+ Can be referenced by multiple HVACTemplate:Zone objects if all the zones
+ have the same setpoints
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:IdealLoadsAirSystem - provides an idealized system that
+ supplies air to the zone that meets all loads and uses no energy.
+ Best used for load calculations.
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:BaseboardHeat - allows the simulation of electric or hot
+ water thermostatically controlled baseboard heaters
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:FanCoil - describes a four-pipe fan coil system with outdoor
+ air intake
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:PTAC - models a packaged terminal air conditioner with
+ either an electric, gas or hot water heating coil most commonly used in
+ residential or hotel applications
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:PTHP - models a packaged terminal heat pump system most
+ commonly used in residential or hotel applications with either electric
+ or gas supplementary heater
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:WaterToAirHeatPump - describes the distributed portion
+ of a system which uses a medium temperature loop and heat pumps to provide
+ heating and cooling to the building (also see HVACTemplate:Plant:MixedWaterLoop
+)
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:VRF - provides input for variable refrigerant flow terminal
+ units
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:Unitary - describes a constant volume direct-expansion
+ sytem such as a rooftop system or split system.
+ Often paired with a single HVACTemplate:System:Unitary for a single zone
+ system but can also be part of a multizone system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:VAV - simulates the terminal of a variable air volume
+ system with reheat
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:VAV:FanPowered - simulates either a parallel or series
+ fan power terminal of a variable air volume system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:VAV:HeatAndCool - simulates the terminal of a variable
+ air volume system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:ConstantVolume - simulates the terminal of a constant
+ air volume system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Zone:DualDuct - simulates the zone portion of a constant volume
+ or variable volume dual-duct HVAC system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:VRF - simulates the variable refrigerant flow system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:Unitary - describes the system portion of a rooftop
+ or split DX cooling system with electric, gas or hot water heating
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:UnitaryHeatPump:AirToAir - details the system portion
+ of a rooftop or split DX air-to-air heat pump system
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:UnitarySystem - models the system portion of a rooftop
+ or split system and has more flexibiltity than the previous two input objects
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:VAV - simulates the system portion of a variable air
+ volume HVAC configuration with chilled water cooling and several different
+ heating options
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:PackagedVAV - describes the system portion of a packaged
+ direct-expansion (DX) based variable air volume HVAC configuration with
+ several different heating options
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:ConstantVolume - provides input for the system portion
+ of a constant air volume HVAC configuration with option chilled water cooling
+ and several different heating options
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:DualDuct - models the system portion of a constant air
+ volume or variable air volume dualduct HVAC configuration with optional
+ chilled water cooling and several different heating options
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:System:DedicatedOutdoorAir - adds a dedicated outdoor air system
+ (DOAS) which can be used with several of the HVACTemplate:Zone input objects
+ and contains heating and cooling coils and heat recovery
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:ChilledWaterLoop - models the chilled water loop connecting
+ chillers to chilled water coils as well as the condenser water loop that
+ connects chillers with cooling towers
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:Chiller - describes a vapor-compression chiller that
+ provides chilled water to the loop
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:Tower - models an evaporative cooling tower used to reject
+ heat from chilllers
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:HotWaterLoop - models the hot water loop connecting boilers
+ to hot water coils
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:Boiler - models a boiler that provides hot water to the
+ loop
+\end_layout
+
+\begin_layout Itemize
+HVACTemplate:Plant:MixedWaterLoop - models the medium temperature loop that
+ serves water-to-air heat pumps as well as cooling towers and boilers
+\end_layout
+
+\begin_layout Standard
+In addition, this group of input objects includes three plant objects that
+ allow the referencing of chillers, towers and boilers respectively so that
+ additional details can be described in those objects.
+ All of these are described in the “Input/Output Reference” document under
+ the Group “HVACTemplates” and the expansion process is described in the
+ Auxiliary Programs document under “ExpandObjects”.
 \end_layout
 
 \begin_layout Section
