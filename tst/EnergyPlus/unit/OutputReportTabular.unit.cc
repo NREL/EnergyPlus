@@ -7047,21 +7047,30 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         {315.00001, "N"},
     };
 
+    int nTests = expectedAzimuthToCards.size();
+
     // Allocate some needed arrays
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).ListMultiplier = 1;
     DataHeatBalance::Construct.allocate(1);
     DataHeatBalance::Construct(1).Name = "A Construction";
+    // Avoid trigerring CalcNominalWindowCond
+    DataHeatBalance::Construct(1).SummerSHGC = 0.70;
+    DataHeatBalance::Construct(1).VisTransNorm = 0.80;
+
     DataHeatBalance::NominalU.allocate(1);
     DataHeatBalance::NominalU(1) = 0.2;
 
-    // Create one surface with each azimuth from expectedAzimuthToCards
-    DataSurfaces::TotSurfaces = expectedAzimuthToCards.size();
-    DataSurfaces::Surface.allocate(TotSurfaces);
+    // Create one wall and one window with each azimuth from expectedAzimuthToCards
+    // Azimuth & Cardinal entries happen in two separate blocks,
+    // so test both to increase coverage and make sure both are correct
 
-    int i = 1;
-    for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
-        DataSurfaces::Surface(i).Class = SurfaceClass_Wall;
+    DataSurfaces::TotSurfaces = 2 * nTests ;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+
+    for (int i = 1; i <= nTests * 2; ++i) {
+
         DataSurfaces::Surface(i).HeatTransSurf = true;
         DataSurfaces::Surface(i).ExtBoundCond = ExternalEnvironment;
         DataSurfaces::Surface(i).GrossArea = 200.;
@@ -7069,9 +7078,23 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         DataSurfaces::Surface(i).Zone = 1;
         DataSurfaces::Surface(i).Construction = 1;
 
-        DataSurfaces::Surface(i).Azimuth = expectedAzimuthToCard.first;
-        DataSurfaces::Surface(i).Name = "Surface_" + std::to_string(i);
-        ++i;
+        // Actual interesting stuff
+        int entryIndex = (i-1) / 2;
+        double azimuth = expectedAzimuthToCards[entryIndex].first;
+        DataSurfaces::Surface(i).Azimuth = azimuth;
+
+        if (i % 2 == 1) {
+            // It's a wall
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Name = "ExtWall_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+        } else {
+            // It's a window
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Window;
+            DataSurfaces::Surface(i).Name = "ExtWindow_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+            // Window references the previous wall
+            DataSurfaces::Surface(i).BaseSurf = i - 1;
+        }
+
     }
 
     // Setup pre def tables
@@ -7094,25 +7117,51 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     //// Write the Predef Tables
     //OutputReportTabular::WritePredefinedTables();
 
-    // Reset i
-    i = 1;
+    // Integer to find surfaces
+    int i = 1;
     for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
         double oriAzimuth = expectedAzimuthToCard.first;
         std::string cardinalDir = expectedAzimuthToCard.second;
 
-        // Just to ensure that we gets the same one with round
+        // Internal: Just to ensure that we gets the same one with round
         EXPECT_EQ(General::RoundSigDigits(round(oriAzimuth * 100.0) / 100.0, 2),
                   General::RoundSigDigits(oriAzimuth, 2));
+
+        /****************************************************************************
+        *                            Wall (odd entries)                             *
+        *****************************************************************************/
+
+        // Internal: Dumb check to ensure we didn't mess up in the indexation
+        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth,
                                                                    DataSurfaces::Surface(i).Name),
-                  General::RoundSigDigits(expectedAzimuthToCard.first, 2));
+                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpDir,
                                                                    DataSurfaces::Surface(i).Name),
                   cardinalDir)
-            << "Azimuth was " << expectedAzimuthToCard.first;
-        ++i;
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i).Name << "'.";
+
+
+        /****************************************************************************
+        *                           Window (even entries)                           *
+        *****************************************************************************/
+
+        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+
+        // Check that the azimuth entry is the rounded version indeed
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth,
+                                                                   DataSurfaces::Surface(i+1).Name),
+                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        // Check that we do get the expected cardinal direction
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenDir,
+                                                                   DataSurfaces::Surface(i+1).Name),
+                  cardinalDir)
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i+1).Name << "'.";
+
+        // Increment twice
+        i = i + 2;
     }
 }
