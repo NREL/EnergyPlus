@@ -67,7 +67,9 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -7020,4 +7022,96 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     s.erase( std::remove_if( s.begin(), s.end(), ::isspace ), s.end() );
 
     EXPECT_EQ("2.8", s);
+}
+
+
+// Test for #7046
+// Ensures that we get consistency between the displayed Azimuth and its cardinal classification
+TEST_F(EnergyPlusFixture, AzimuthToCardinal)
+{
+    // >= 45 and < 135 => E
+    // >= 135 and < 225 => S
+    // >= 225 and < 315 => W
+    // >= 315 and < 45 => N
+    std::vector<std::pair<double, std::string> > expectedAzimuthToCards {
+        {45.0, "E"},
+        {45.01, "E"},
+        {134.991, "E"}, // Rounds to 134.99, so classified as E
+        {134.99978, "S"}, // Gets rounded to 135.00, so classified as S
+        {135.0, "S"},
+        {135.001, "S"},
+        {136, "S"},
+        {314.991, "W"},
+        {314.9999, "N"},
+        {315.0, "N"},
+        {315.00001, "N"},
+    };
+
+    // Allocate some needed arrays
+    Zone.allocate(1);
+    Zone(1).ListMultiplier = 1;
+    Construct.allocate(1);
+    Construct(1).Name = "A Construction";
+    NominalU.allocate(1);
+    NominalU(1) = 0.2;
+
+    // Create one surface with each azimuth from expectedAzimuthToCards
+    TotSurfaces = expectedAzimuthToCards.size();
+    Surface.allocate(TotSurfaces);
+
+    int i = 1;
+    for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
+        Surface(i).Class = SurfaceClass_Wall;
+        Surface(i).HeatTransSurf = true;
+        Surface(i).ExtBoundCond = ExternalEnvironment;
+        Surface(i).GrossArea = 200.;
+        Surface(i).Tilt = 90.;
+        Surface(i).Zone = 1;
+        Surface(i).Construction = 1;
+
+        Surface(i).Azimuth = expectedAzimuthToCard.first;
+        Surface(i).Name = "Surface_" + std::to_string(i);
+        ++i;
+    }
+
+    // Setup pre def tables
+    SetPredefinedTables();
+
+    // Call the routine that fills up the table we care about
+    HeatBalanceSurfaceManager::GatherForPredefinedReport();
+
+
+    // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
+    // SubTable 'Opaque Exterior' (pdstOpaque)
+    // Entry 'Azimuth [deg]' (pdchOpAzimuth)
+    // Entry 'Cardinal Direction' (pdchOpDir)
+
+
+    // Note: Unused because we don't need SQL
+    //// We enable the report we care about, making sure it's the right one
+    //EXPECT_EQ("EnvelopeSummary", reportName(2).name);
+    //reportName(2).show = true;
+    //// Write the Predef Tables
+    //WritePredefinedTables();
+
+    // Reset i
+    i = 1;
+    for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
+        double oriAzimuth = expectedAzimuthToCard.first;
+        std::string cardinalDir = expectedAzimuthToCard.second;
+
+        // Just to ensure that we gets the same one with round
+        EXPECT_EQ(General::RoundSigDigits(round(oriAzimuth * 100.0) / 100.0, 2),
+                  General::RoundSigDigits(oriAzimuth, 2));
+
+        // Check that the azimuth entry is the rounded version indeed
+        EXPECT_EQ(RetrievePreDefTableEntry(pdchOpAzimuth,
+                                           Surface(i).Name),
+                  General::RoundSigDigits(expectedAzimuthToCard.first, 2));
+        // Check that we do get the expected cardinal direction
+        EXPECT_EQ(RetrievePreDefTableEntry(pdchOpDir,
+                                           Surface(i).Name),
+                  cardinalDir) << "Azimuth was " << expectedAzimuthToCard.first;
+        ++i;
+    }
 }
