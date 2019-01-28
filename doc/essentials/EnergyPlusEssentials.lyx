@@ -725,6 +725,10 @@ literal "false"
 \end_inset
 
 .
+ Using search in the documentation is critical to finding the information
+ needed.
+ Some of the documentation PDFs are very large so searching is a good way
+ to find the specific information about a topic or an input object.
  The documentation includes:
 \end_layout
 
@@ -1424,6 +1428,7 @@ t Guide.
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus --help 
 \end_layout
 
@@ -1433,100 +1438,124 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
+
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
+
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
+
 Options:
 \end_layout
 
 \begin_layout Verbatim
+
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
+
                                input file type
 \end_layout
 
 \begin_layout Verbatim
+
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
+
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
+
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
+
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
+
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
+
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
+
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1634,6 +1663,7 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1642,6 +1672,7 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1650,6 +1681,7 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -D input.idf
 \end_layout
 
@@ -1659,6 +1691,7 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim*
+
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -3601,6 +3634,99 @@ Group-Daylighting.
 
 \end_layout
 
+\begin_layout Section
+Advanced Construction, Surface, Zone Concepts
+\end_layout
+
+\begin_layout Standard
+The group of input objects contains many special cases for more sophisticated
+ modeling for constructions, surfaces and zones.
+ As part of this, one of the ways to model building foundations called Kiva
+ is described.
+ 
+\end_layout
+
+\begin_layout Itemize
+Foundation:Kiva - describes the insulation depth and width for interior
+ and exterior horizontal and vertical insulated foundations as well as the
+ construction for the wall footing, see Figure X .
+\end_layout
+
+\begin_layout Itemize
+Foundation:Kiva:Settings - sets the soil conditions and other parameters
+ related to the Foundation:Kiva input object.
+\end_layout
+
+\begin_layout Itemize
+SurfaceProperty:ExposedFoundationPerimeter - used to set the portion of
+ the foundation that is along the exterior perimeter of the building that
+ undergoes heat transfer with the environment.
+ Edges of underground surfaces that are fully under the building and not
+ along the perimeter are not expected to have any heat transfer with the
+ environment.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename kiva-2d-elements.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure X: Structural and insulation components of Foundation:Kiva input
+ objects.
+\end_layout
+
+\begin_layout Standard
+Input objects of interest in this group not related to Kiva include
+\end_layout
+
+\begin_layout Itemize
+SurfaceControl:MovableInsulation - allows the modeling of insulation panels
+ that are removable for walls, floors and roofs but not windows.
+ 
+\end_layout
+
+\begin_layout Itemize
+SurfaceProperty:Underwater - allows the outside of the building to be modeled
+ as underwater and even as moving through the water allowing EnergyPlus
+ to model vessels.
+\end_layout
+
+\begin_layout Itemize
+SurfaceProperty:ExteriorNaturalVentedCavity - provides a method to include
+ the modeling of baffles in the multi-skin exteriors
+\end_layout
+
+\begin_layout Standard
+Other objects in this group set the heat transfer algorithms for specific
+ surfaces when the building level heat tranfer algorithm should not be used
+ for that surface, when other models are used to describe the variation
+ in temperature on the outside of a surface, override the algorithm used
+ for modeling convection heat transfer between the air inside or outside
+ of a zone and the surface, vapor transfer coefficients when using algorithms
+ that include moisture modeling of surfaces, override the algorithm that
+ distributes the solar radiation on interior surfaces, overrides the solar
+ energy absorbed by different layers for complex windows, a way to override
+ the long wave radiation with other surfaces in the zone, allows overriding
+ the external environment for a surface or a zone including solar shading
+ or air speed or temperature or humidity, overrides the source term for
+ the heat balance, override the view factors for a zone.
+ The input objects described in this section are further explained in the
+ InputOutputReference under the heading 
+\begin_inset Quotes eld
+\end_inset
+
+Group-Advanced Surface Concepts.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection*
 Heat Transfer to the Ground
 \end_layout
@@ -3717,6 +3843,15 @@ convertESOMTR - This simple post processing program can be used seamlessly
  with EP-Launch to provide IP (inch- pound) unit output files rather than
  SI units.
  This program is described more fully in the Auxiliary Programs document.
+\end_layout
+
+\begin_layout Subsection*
+Measures to Object Map
+\end_layout
+
+\begin_layout Standard
+A map of common energy efficiency measures to the input objects that need
+ to be modified or included to support them.
 \end_layout
 
 \end_body
