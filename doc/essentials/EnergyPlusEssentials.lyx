@@ -1428,7 +1428,6 @@ t Guide.
 \end_layout
 
 \begin_layout Verbatim
-
 energyplus --help 
 \end_layout
 
@@ -1438,124 +1437,100 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
-
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
-
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
-
 Options:
 \end_layout
 
 \begin_layout Verbatim
-
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
-
                                input file type
 \end_layout
 
 \begin_layout Verbatim
-
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
-
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
-
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
-
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
-
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
-
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
-
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1663,7 +1638,6 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1672,7 +1646,6 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1681,7 +1654,6 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -D input.idf
 \end_layout
 
@@ -1691,7 +1663,6 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim*
-
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -4231,11 +4202,17 @@ key value
 \end_inset
 
  field so that all instances of the output variable are included.
+ The output show up in the .eso file which is generally converted to a .csv
+ file for use with a spreadsheet.
 \end_layout
 
 \begin_layout Itemize
 Output:Meter and Output:Meter:MeterFileOnly - these input objects specify
- the output meters (think of them as very detailed submeters)
+ the output meters (think of them as very detailed submeters).
+ The output from this input objects show up in the .mtr file which is generally
+ converted to a Meter.csv file for use with a spreadsheet.
+ Also note that the .mtd file shows the exact relationship between specific
+ end-use output report variables and each output meter.
 \end_layout
 
 \begin_layout Itemize
@@ -4296,47 +4273,33 @@ Output:DebuggingData - provides additional detailed output related to HVAC
 \end_layout
 
 \begin_layout Standard
-Environental
+Environental reporting which adds new meters showing the related to emissions
+ is triggered by the use of the following three input objects
 \end_layout
 
 \begin_layout Itemize
-Output:EnvironmentalImpactFactors
+Output:EnvironmentalImpactFactors - specifies the frequency of the output
+ variables related to emissions
 \end_layout
 
 \begin_layout Itemize
-EnvironmentalImpactFactors
+EnvironmentalImpactFactors - specifies the efficiency of district heating
+ and cooling systems as well as the carbon equivalent emission factors for
+ N20, CH4 and CO2
 \end_layout
 
 \begin_layout Itemize
-FuelFactors
+FuelFactors - for each type of energy resource (electricity, natural gas,
+ etc..) provides a way to enter factors related to source energy and emissions
+ of CO2, CO, CH4, NOx, N20, SO2, PM, NH3, NMVOC, Hg, Pb, and other factors.
 \end_layout
 
 \begin_layout Standard
-Other object in this input object group
-\end_layout
-
-\begin_layout Itemize
-Output:Meter:Cumulative
-\end_layout
-
-\begin_layout Itemize
-Output:Meter:Cumulative:MeterFileOnly
-\end_layout
-
-\begin_layout Itemize
-Meter:Custom
-\end_layout
-
-\begin_layout Itemize
-Meter:CustomDecrement
-\end_layout
-
-\begin_layout Itemize
-Output:PreprocessorMessage
-\end_layout
-
-\begin_layout Standard
-All of these are described in the “Input/Output Reference” but note that
+Other input objects in this group allow the accumulation of metered results,
+ the combination of output variables or meters to create custom meters,
+ and a method for preprocessors to include error messages in the normal
+ error file.
+ All of these are described in the “Input/Output Reference” but note that
  this group is described in Chapter 5 
 \begin_inset Quotes eld
 \end_inset
@@ -4355,6 +4318,8 @@ Standard Output Reports
 
  while most of the other groups of input objects are described in Chapter
  1.
+ The OutputDetailsAndExamples documentation provides even more details on
+ the outputs created by each of thes input objects.
  Several other output related input objects appear in other areas such as
  Output:DaylightFactors input objecct in the Daylighting group.
 \end_layout
