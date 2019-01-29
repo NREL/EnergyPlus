@@ -282,7 +282,7 @@ on in buildings because the energy flows in buildings can be very complicated.
  less frequent but often large step changes in thermostat setpoints between
  day and night operation for the inside of the building make the direction
  of the heat flow vary over time.
- Solar energy being absorbed on the exterior wall and roof surfaces as well
+ Solar energy is absorbed on the exterior wall and roof surfaces as well
  as entering a window varies by the sun position for each period of time
  over the day and over the year.
  Heat sources within the building including people, office and other equipment,
@@ -521,13 +521,14 @@ In addition:
 \begin_layout Itemize
 ASCII text-based weather, input, and output files that include hourly or
  sub-hourly environmental conditions, and standard and user definable reports,
- respectively 
+ respectively.
+ 
 \end_layout
 
 \begin_layout Itemize
 Transient heat conduction through building elements such as walls, roofs,
  floors, etc.
- using conduction transfer functions
+ using conduction transfer functions.
 \end_layout
 
 \begin_layout Itemize
@@ -537,13 +538,13 @@ Thermal comfort models based on activity, inside dry-bulb temperature, humidity,
 
 \begin_layout Itemize
 Anisotropic sky model for improved calculation of diffuse solar on tilted
- surfaces
+ surfaces.
 \end_layout
 
 \begin_layout Itemize
 Atmospheric pollution calculations that predict CO2, SOx, NOx, CO, particulate
  matter, and hydrocarbon production for both on-site and remote energy conversio
-n
+n.
 \end_layout
 
 \begin_layout Itemize
@@ -551,7 +552,7 @@ System and plant output is allowed to directly impact the building thermal
  response rather than calculating all loads first, then simulating systems
  and plants which allows the designer to more accurately investigate the
  effect of undersizing fans and equipment and what impact that might have
- on the thermal comfort of occupants within the building 
+ on the thermal comfort of occupants within the building.
 \end_layout
 
 \begin_layout Itemize
@@ -570,11 +571,6 @@ s is the integration of all aspects of the simulation—loads, systems, and
  the effect of undersizing fans and equipment and what impact that might
  have on the thermal comfort of occupants within the building.
  
-\end_layout
-
-\begin_layout Standard
-<need to balance overview with enough details to help people, I think a
- list of what can be modeled might be more helpful>
 \end_layout
 
 \begin_layout Subsection
@@ -785,7 +781,7 @@ External Interface(s) Application Guide: Contains information about external
 \begin_layout Itemize
 Tips & Tricks for Using EnergyPlus: Contains short tips and tricks for using
  various parts of EnergyPlus.
- <MAYBE THIS SHOULD BE ELIMINATED AND PORTIONS INCLUDED IN THIS DOCUMENT>
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1093,7 +1089,7 @@ When just implementing a simple measure or even a series of measures is
  These tools allow the exploration of throughout the range of variables
  (such as the thickness of insulation in the roof or the efficiency of a
  boiler) to see the impacts of optimization.
- While any of the approaches used to implement measures described previously
+ While many of the approaches used to implement measures described previously
  may also be used for parametric analysis, a few specific tools have been
  developed.
  
@@ -1700,7 +1696,7 @@ EP-Launch
 For users that want a simple way of selecting files and running EnergyPlus,
  EP-Launch provides this and more.
  In addition, EP-Launch can help open a text editor for the input and output
- files, open a spreadsheet for the postprocessor results files, a web browser
+ files, open a spreadsheet for the postprocessor result files, a web browser
  for the tabular results file, and start up a viewer for the selected drawing
  file.
  There are two different versions of EP-Launch currently part of the EnergyPlus
@@ -2170,7 +2166,7 @@ A fatal error means that EnergyPlus has stopped during the simulation and
  Since the .ERR file is a text file; you can usually keep it open in a text
  editor program.
  Many (but not all) text editor programs will detect that the .ERR file has
- been updated after each EnergyPlus simulation and let you load the most
+ been updated after each EnergyPlus simulation and lets you load the most
  recent version.
 \end_layout
 
@@ -2526,7 +2522,7 @@ TABLE.HTML, TABLE.TXT, TABLE.TAB, TABLE.CSV, TABLE.XML – tabulated report of
 \end_layout
 
 \begin_layout Itemize
-RVAUDIT - output from the ReadVarsESO post- processing program
+RVAUDIT - output from the ReadVarsESO post-processing program
 \end_layout
 
 \begin_layout Itemize
@@ -2915,7 +2911,7 @@ For
 \begin_layout Itemize
 ScheduleTypeLimits - Every schedule object includes a field that helps validate
  the limiting values for the schedule, and this input object describes the
- upper and lower limit
+ upper and lower limit.
 \end_layout
 
 \begin_layout Itemize
@@ -2998,9 +2994,10 @@ Construction - a list of materials (any from the list above plus many more)
  in order from the outside to the inside making up the wall, roof, floor,
  window or skylight.
  Every input file will have several of these input objects.
- Examples of constructions for wall, roofs, and floors can be found in ASHRAE_20
-05_HOF_Materials.idf located in the DataSets folder while examples for windows
- and skylights can be found in WindowConstructs.idf in the same folder.
+ Examples of constructions for walls, roofs, and floors can be found in
+ ASHRAE_2005_HOF_Materials.idf located in the DataSets folder while examples
+ for windows and skylights can be found in WindowConstructs.idf in the same
+ folder.
 \end_layout
 
 \begin_layout Itemize
@@ -3323,7 +3320,7 @@ outside
 \end_inset
 
  the zone with the surface) and that the coordinates should proceed in a
- counter clockwise order.
+ counter-clockwise order.
  In addition, most common is to use a world coordinate system where all
  the vertices are based on a single coordinate system for the entire building
  rather than one that changes relative to each zone.
@@ -3381,7 +3378,7 @@ with reflections
 \begin_inset Quotes erd
 \end_inset
 
- option
+ option.
 \end_layout
 
 \begin_layout Standard
@@ -3423,16 +3420,18 @@ The most common internal gain input objects are:
 \begin_layout Itemize
 People – specifies not only the sensible, latent and radiant heat from people
  but also includes ways of reporting the comfort of occupants using a variety
- of thermal comfort models 
+ of thermal comfort models.
+ 
 \end_layout
 
 \begin_layout Itemize
-Lights – describes the heat related to lighting systems 
+Lights – describes the heat related to lighting systems.
+ 
 \end_layout
 
 \begin_layout Itemize
 ElectricEquipment – describes the heat related to electrical appliances,
- office equipment, and other heat sources that are powered by electricity
+ office equipment, and other heat sources that are powered by electricity.
  
 \end_layout
 
@@ -3470,7 +3469,8 @@ Other
 
 \begin_layout Itemize
 ComfortViewFactorAngles – allows the specification of how different surfaces
- impact the thermal comfort calculations for the occupants 
+ impact the thermal comfort calculations for the occupants.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -3523,7 +3523,7 @@ Daylighting:Controls – specifies the algorithm used for daylighting, the
 
 \begin_layout Itemize
 Daylighting:ReferencePoint – specifies the location of the sensors for the
- daylighting control system 
+ daylighting control system.
 \end_layout
 
 \begin_layout Standard
@@ -3653,7 +3653,7 @@ SurfaceProperty:Underwater - allows the outside of the building to be modeled
 
 \begin_layout Itemize
 SurfaceProperty:ExteriorNaturalVentedCavity - provides a method to include
- the modeling of baffles in the multi-skin exteriors
+ the modeling of baffles in the multi-skin exteriors.
 \end_layout
 
 \begin_layout Standard
@@ -3701,12 +3701,12 @@ Exterior:Lights - describes the external site lighting for the building
 
 \begin_layout Itemize
 Exterior:FuelEquipment - describes other energy consumption on the site
- that is external to the building other than lighting
+ that is external to the building other than lighting.
 \end_layout
 
 \begin_layout Itemize
 Exterior:WaterEquipment - describes the flow rate of water use on the building
- site outside of the building
+ site outside of the building.
 \end_layout
 
 \begin_layout Standard
@@ -3748,7 +3748,7 @@ ZoneInfiltration:EffectiveLeakageArea - similar to the previous input object
 
 \begin_layout Itemize
 ZoneInfiltration:FlowCoefficient - also similar to the ZoneInfiltration:DesignFl
-owRate input object but uses yet a different equation
+owRate input object but uses yet a different equation.
 \end_layout
 
 \begin_layout Itemize
@@ -3773,26 +3773,26 @@ ZoneMixing, ZoneCrossMixing, and ZoneRefrigerationDoorMixing - these three
 
 \begin_layout Itemize
 ZoneEarthtube - provides a way to model an earth tube which is a way to
- draw outdoor into the zone through a underground pipe in order to cool
- the air in the summer and heat it in the winter
+ draw outdoor into the zone through an underground pipe in order to cool
+ the air in the summer and heat it in the winter.
 \end_layout
 
 \begin_layout Itemize
 ZoneCoolTower:Shower - models a passive downdraught evaporative cooling
  tower (sometimes also called a shower cooling tower or a wind tower) using
  natural ventilation and water evaporation to providing cooling in typically
- arid climates
+ arid climates.
 \end_layout
 
 \begin_layout Itemize
 ZoneThermalChimney - models a passive solar driven thermal chimney that
- utilize the bouyancy of air heated by the sun to provide ventilation
+ utilize the buoyancy of air heated by the sun to provide ventilation.
 \end_layout
 
 \begin_layout Itemize
 ZoneAirBalance:OutdoorAir - calculates the combined outdoor airflow including
- the interactions bwteeen mechanical ventiation, infiltration and duct leakage
- and is usually applied to residential buildings
+ the interactions between mechanical ventilation, infiltration, and duct
+ leakage and is usually applied to residential buildings.
 \end_layout
 
 \begin_layout Standard
@@ -3919,148 +3919,148 @@ HVACTemplate:Zone:IdealLoadsAirSystem - provides an idealized system that
 
 \begin_layout Itemize
 HVACTemplate:Zone:BaseboardHeat - allows the simulation of electric or hot
- water thermostatically controlled baseboard heaters
+ water thermostatically controlled baseboard heaters.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:FanCoil - describes a four-pipe fan coil system with outdoor
- air intake
+ air intake.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:PTAC - models a packaged terminal air conditioner with
  either electric, gas or hot water heating coil most commonly used in residentia
-l or hotel applications
+l or hotel applications.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:PTHP - models a packaged terminal heat pump system most
  commonly used in residential or hotel applications with either electric
- or gas supplementary heater
+ or gas supplementary heater.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:WaterToAirHeatPump - describes the distributed portion
  of a system which uses a medium temperature loop and heat pumps to provide
  heating and cooling to the building (also see HVACTemplate:Plant:MixedWaterLoop
-)
+).
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:VRF - provides input for variable refrigerant flow terminal
- units
+ units.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:Unitary - describes a constant volume direct-expansion
  system such as a rooftop system or split system.
  Often paired with a single HVACTemplate:System:Unitary for a single zone
- system but can also be part of a multizone system
+ system but can also be part of a multizone system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:VAV - simulates the terminal of a variable air volume
- system with reheat
+ system with reheat.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:VAV:FanPowered - simulates either a parallel or series
- fan power terminal of a variable air volume system
+ fan power terminal of a variable air volume system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:VAV:HeatAndCool - simulates the terminal of a variable
- air volume system
+ air volume system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:ConstantVolume - simulates the terminal of a constant
- air volume system
+ air volume system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Zone:DualDuct - simulates the zone portion of a constant volume
- or variable volume dual-duct HVAC system
+ or variable volume dual-duct HVAC system.
 \end_layout
 
 \begin_layout Itemize
-HVACTemplate:System:VRF - simulates the variable refrigerant flow system
+HVACTemplate:System:VRF - simulates the variable refrigerant flow system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:Unitary - describes the system portion of a rooftop
- or split DX cooling system with electric, gas or hot water heating
+ or split DX cooling system with electric, gas or hot water heating.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:UnitaryHeatPump:AirToAir - details the system portion
- of a rooftop or split DX air-to-air heat pump system
+ of a rooftop or split DX air-to-air heat pump system.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:UnitarySystem - models the system portion of a rooftop
- or split system and has more flexibility than the previous two input objects
+ or split system and has more flexibility than the previous two input objects.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:VAV - simulates the system portion of a variable air
  volume HVAC configuration with chilled water cooling and several different
- heating options
+ heating options.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:PackagedVAV - describes the system portion of a packaged
  direct-expansion (DX) based variable air volume HVAC configuration with
- several different heating options
+ several different heating options.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:ConstantVolume - provides input for the system portion
  of a constant air volume HVAC configuration with option chilled water cooling
- and several different heating options
+ and several different heating options.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:DualDuct - models the system portion of a constant air
  volume or variable air volume dual-duct HVAC configuration with optional
- chilled water cooling and several different heating options
+ chilled water cooling and several different heating options.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:System:DedicatedOutdoorAir - adds a dedicated outdoor air system
  (DOAS) which can be used with several of the HVACTemplate:Zone input objects
- and contains heating and cooling coils and heat recovery
+ and contains heating and cooling coils and heat recovery.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:ChilledWaterLoop - models the chilled water loop connecting
  chillers to chilled water coils as well as the condenser water loop that
- connects chillers with cooling towers
+ connects chillers with cooling towers.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:Chiller - describes a vapor-compression chiller that
- provides chilled water to the loop
+ provides chilled water to the loop.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:Tower - models an evaporative cooling tower used to reject
- heat from chillers
+ heat from chillers.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:HotWaterLoop - models the hot water loop connecting boilers
- to hot water coils
+ to hot water coils.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:Boiler - models a boiler that provides hot water to the
- loop
+ loop.
 \end_layout
 
 \begin_layout Itemize
 HVACTemplate:Plant:MixedWaterLoop - models the medium temperature loop that
- serves water-to-air heat pumps as well as cooling towers and boilers
+ serves water-to-air heat pumps as well as cooling towers and boilers.
 \end_layout
 
 \begin_layout Standard
@@ -4220,7 +4220,7 @@ Zone HVAC Controls and Thermostats - input objects related to thermostats
 \begin_layout Itemize
 Zone HVAC Forced Air Units - defines input related to zone forced air equipment
  like window air conditioners, unit heaters, fan coil systems, and outdoor
- air units as well as other related input objects
+ air units as well as other related input objects.
 \end_layout
 
 \begin_layout Itemize
@@ -4231,38 +4231,38 @@ Zone HVAC Radiative/Convective Units - models baseboard systems, low- and
 \begin_layout Itemize
 Zone HVAC Air Loop Terminal Units - describes air terminals including constant
  volume, variable volume, series and parallel powered induction units, and
- duel duct terminals
+ duel duct terminals.
 \end_layout
 
 \begin_layout Itemize
 Zone HVAC Equipment Connections - used to describe the HVAC equipment connection
-s at the zone level
+s at the zone level.
 \end_layout
 
 \begin_layout Itemize
 Fans - describes constant volume, variable volume, exhaust fans as well
- as more system and component model fans
+ as more system and component model fans.
 \end_layout
 
 \begin_layout Itemize
 Coils - contains a long list of input objects to model heating and cooling
  water coils; heating and cooling DX coils including two-, multiple-, and
  variable-speed units; variable refrigerant coils; fuel and gas coils; desuperhe
-ater coils; air to water heat pump coils; and other coil input objects
+ater coils; air to water heat pump coils; and other coil input objects.
 \end_layout
 
 \begin_layout Itemize
-Evaporative Coolers - describes direct and indirect evaporative coolers
+Evaporative Coolers - describes direct and indirect evaporative coolers.
 \end_layout
 
 \begin_layout Itemize
 Humidifiers and Dehumidifiers - for electric and gas steam humidifiers as
- well as desiccant dehumidifiers
+ well as desiccant dehumidifiers.
 \end_layout
 
 \begin_layout Itemize
 Heat Recovery - models for air-to-air flat plate and combined sensible and
- latent heat exchangers as well as heat exchangers coupled with desiccants
+ latent heat exchangers as well as heat exchangers coupled with desiccants.
 \end_layout
 
 \begin_layout Itemize
@@ -4273,7 +4273,7 @@ Unitary Equipment - describes unitary input objects that are generally placed
 
 \begin_layout Itemize
 Variable Refrigerant Flow Equipment - input objects to describe variable
- refrigerant flow (VRF) equipment as well as the controls
+ refrigerant flow (VRF) equipment as well as the controls.
 \end_layout
 
 \begin_layout Standard
@@ -4283,14 +4283,14 @@ The following is a list of control systems in EnergyPlus related to HVAC
 \begin_layout Itemize
 Controllers - input objects for simple controllers that look at a single
  node and compare it with the setpoint and includes controllers for water
- coils, outdoor air, and mechanical ventilation
+ coils, outdoor air, and mechanical ventilation.
 \end_layout
 
 \begin_layout Itemize
 System Availability Managers - these input objects can take an input from
  any node and control whether an entire portion of the HVAC system is active
  and can be based on temperature, differential temperature, schedules, night
- cycle and ventilation
+ cycle and ventilation.
 \end_layout
 
 \begin_layout Itemize
@@ -4304,12 +4304,12 @@ Setpoint Managers - these take input from any node or nodes and calculate
 Plant-Condenser Control - provides control for the plant loop primarily
  controlling the operation of the loop and which equipment is available
  and includes control based on heating or cooling load and in reference
- to outdoor conditions such as dry bulb or wet-bulb temperature.
+ to outdoor conditions such as dry-bulb or wet-bulb temperature.
 \end_layout
 
 \begin_layout Itemize
 Plant-Condenser Flow Control - describes the TemperingValve input object
- for the special case of flor control with thermal storage systems
+ for the special case of flor control with thermal storage systems.
 \end_layout
 
 \begin_layout Standard
@@ -4324,7 +4324,7 @@ Pumps - describes constant speed and variable speed pumps and headered multiple
 
 \begin_layout Itemize
 Plant-Condenser Loops - describes the supply and demand side of the loops
- the operating temperatures and flow rates
+ the operating temperatures and flow rates.
 \end_layout
 
 \begin_layout Itemize
@@ -4338,18 +4338,18 @@ Plant Heating and Cooling Equipment - used to input the central plant equipment
 Condenser Equipment and Heat Exchangers - describes single-, two, and variable
  speed cooling towers; single and two speed evaporative and non-evaporative
  fluid coolers; vertical, surface, trench and slinky ground heat exchangers;
- and fluid-to-fluid heat exchangers
+ and fluid-to-fluid heat exchangers.
 \end_layout
 
 \begin_layout Itemize
 Non-Zone Equipment - describe the LoadProfile:Plant input object that allows
- the load on the plant to be specified by schedule if already known
+ the load on the plant to be specified by schedule if already known.
 \end_layout
 
 \begin_layout Itemize
 User Defined HVAC and Plant Component Models - a group that allows the user
  to define custom models for zonal systems, air terminals, coils, and plant
- equipment
+ equipment.
 \end_layout
 
 \begin_layout Standard
@@ -4423,7 +4423,7 @@ Output:Table:Monthly - shows a series of output variables or output meters
 Output:Table:Annual - hows a series of output variables or output meters
  on an annual basis using different aggregation schemes.
  For output variables that reoccur for each zone or other input objects,
- additional rows of results will be displayed
+ additional rows of results will be displayed.
 \end_layout
 
 \begin_layout Itemize
@@ -4431,7 +4431,7 @@ Output:VariableDictionary - provides a list of available output variables
  for use with these custom tabular reports as well as the time step reporting
  described next.
  The list of output variables that are available for specific simulation
- appear in a file with a .rdd extension, and the output meters appears in
+ appear in a file with a .rdd extension, and the output meters appear in
  a file with a .mdd extension.
 \end_layout
 
@@ -4473,7 +4473,7 @@ Output:Meter and Output:Meter:MeterFileOnly - these input objects specify
 Output:SQLite - use this object if you want to output in the SQLite database
  format.
  Not only can the output variables and meters be in SQLite format but the
- tabular reports are also included
+ tabular reports are also included.
 \end_layout
 
 \begin_layout Standard
@@ -4483,63 +4483,63 @@ EnergyPlus also includes a number of special reports that usually appear
 
 \begin_layout Itemize
 Output:Surfaces:List - provides a report on all the surfaces in a file and
- the output appears in a file with the .sln extension
+ the output appears in a file with the .sln extension.
 \end_layout
 
 \begin_layout Itemize
 Output:Surfaces:Drawing - provides a DXF drawing that can be opened in some
- CAD programs 
+ CAD programs .
 \end_layout
 
 \begin_layout Itemize
-OutputControl:SurfaceColorScheme - controls the colors used in the DXF file
+OutputControl:SurfaceColorScheme - controls the colors used in the DXF file.
 \end_layout
 
 \begin_layout Itemize
 Output:Schedules - provides a summary of the schedules in the input file
- and appears as part of the file with the .eio extension 
+ and appears as part of the file with the .eio extension.
 \end_layout
 
 \begin_layout Itemize
 Output:Constructions - provides a summary of constructions in the input
- file and appears as part of the file with the .eio extension
+ file and appears as part of the file with the .eio extension.
 \end_layout
 
 \begin_layout Itemize
 Output:EnergyManagementSystem - creates a list of detailed output related
- to the energy management system in a file with the .edd extension
+ to the energy management system in a file with the .edd extension.
 \end_layout
 
 \begin_layout Itemize
 OutputControl:ReportingTolerances - provides more control over the amount
- of time reported for the setpoints not being met
+ of time reported for the setpoints not being met.
 \end_layout
 
 \begin_layout Itemize
 Output:Diagnostics - provides additional detail in the output messages in
  the .err file .
- Normally this extra detail is not shown to reduce confusion for new users
+ Normally this extra detail is not shown to reduce confusion for new users.
 \end_layout
 
 \begin_layout Itemize
 Output:DebuggingData - provides an additional detailed output related to
- HVAC nodes in a file with a .dbg extension
+ HVAC nodes in a file with a .dbg extension.
 \end_layout
 
 \begin_layout Standard
 Environmental reporting which adds new meters showing the related to emissions
- is triggered by the use of the following three input objects
+ is triggered by the use of the following three input objects.
 \end_layout
 
 \begin_layout Itemize
 Output:EnvironmentalImpactFactors - specifies the frequency of the output
- variables related to emissions
+ variables related to emissions.
 \end_layout
 
 \begin_layout Itemize
 EnvironmentalImpactFactors - specifies the efficiency of district heating
  and cooling systems as well as the carbon equivalent emission factors for
- N20, CH4, and CO2
+ N20, CH4, and CO2.
 \end_layout
 
 \begin_layout Itemize
@@ -4611,13 +4611,13 @@ ComponentCost:Adjustments - allows the specification of adjustments including
 
 \begin_layout Itemize
 ComponentCost:Reference - entry of reference building costs so that the
- current model can be compared to the reference building
+ current model can be compared to the reference building.
 \end_layout
 
 \begin_layout Standard
 For many building projects, while energy estimates are important, the computatio
 n of estimated utility bills allows an understanding of how much money is
- going to be saved to help offset higher initial costs of high-performance
+ going to be saved to help offset higher initial costs of a high-performance
  building.
  Due to the many different utility companies and regulatory agencies, the
  approach used to compute monthly utility bills has become widely varied
@@ -4639,7 +4639,7 @@ UtilityCost:Tariff - sets the parameters for the overall tariff such as
 \begin_layout Itemize
 UtilityCost:Qualify - provides a method to qualify if a tariff applies to
  the building being modeled since utilities provide limits usually based
- on peak demand or energy consumption for each tariff
+ on peak demand or energy consumption for each tariff.
 \end_layout
 
 \begin_layout Itemize
@@ -4660,7 +4660,7 @@ UtilityCost:Charge:Block - defines a most complicated but common type of
 \begin_layout Itemize
 UtilityCost:Ratchet - some utilities charge not only for the current month's
  demand but also compensate for the highest demand in recent months, and
- this input object allows the specification of such a structure
+ this input object allows the specification of such a structure.
 \end_layout
 
 \begin_layout Standard
@@ -4679,7 +4679,7 @@ The following two input objects are uncommon to use:
 
 \begin_layout Itemize
 UtilityCost:Variable - allows the specific specification of a monthly variable
- to be used in the calculation of the tariff
+ to be used in the calculation of the tariff.
 \end_layout
 
 \begin_layout Itemize
@@ -4702,17 +4702,17 @@ Life-cycle costing allows the combination of initial and future costs (typically
 LifeCycleCost:Parameters - describes the discount, tax, and inflation rates,
  the approach used for inflation and discounting, as well as the base date
  and length of the study period and other parameters related to life-cycle
- costing
+ costing.
 \end_layout
 
 \begin_layout Itemize
 LifeCycleCost:RecurringCosts - used to enter reoccurring costs other than
- costs related to energy and water usage since those are included automatically
+ costs related to energy and water usage since those are included automatically.
 \end_layout
 
 \begin_layout Itemize
 LifeCycleCost:NonrecurringCost - used to enter costs that occur only once
- during the study period
+ during the study period.
 \end_layout
 
 \begin_layout Itemize
@@ -4731,7 +4731,7 @@ Two less commonly used input objects are
 
 \begin_layout Itemize
 LifeCycleCost:UseAdjustment - allows manual adjustment of energy or water
- costs in future years
+ costs in future years.
 \end_layout
 
 \begin_layout Itemize
@@ -4795,7 +4795,7 @@ External Interface - allows the connection of EnergyPlus using co-simulation
 \begin_layout Itemize
 Operational Faults - provides for the modeling of operation problems in
  sensors, controllers, meters, equipment, and systems and is commonly used
- with existing buildings
+ with existing buildings.
 \end_layout
 
 \begin_layout Itemize
@@ -4805,22 +4805,22 @@ General Data Entry - contains the Matrix:TwoDimension input object used
 
 \begin_layout Itemize
 Performance Curves - allows the specification of polynomial curves used
- to characterize the performance of HVAC equipment
+ to characterize the performance of HVAC equipment.
 \end_layout
 
 \begin_layout Itemize
 Performance Tables - allows the specification of tables used to characterize
- the performance of HVAC equipment
+ the performance of HVAC equipment.
 \end_layout
 
 \begin_layout Itemize
 Fluid Properties - describes the detailed properties of refrigerants and
- glycols
+ glycols.
 \end_layout
 
 \begin_layout Itemize
 Demand Limiting Controls - provides a way of implementing management of
- the systems of the building to regulate the peak demand 
+ the systems of the building to regulate the peak demand.
 \end_layout
 
 \begin_layout Itemize
@@ -4831,12 +4831,12 @@ Natural Ventilation and Duct Leakage - provides a way to model multizone
 
 \begin_layout Itemize
 Room Air Models - allows the description of non-uniform room air temperatures
- (not fully mixed)
+ (not fully mixed).
 \end_layout
 
 \begin_layout Itemize
 Compliance Objects - provides an input object that allows rotation of the
- building when used for compliance purposes
+ building when used for compliance purposes.
 \end_layout
 
 \begin_layout Itemize
@@ -4848,28 +4848,28 @@ Parametrics - allows for simple parametric cases to be defined within an
 \end_layout
 
 \begin_layout Itemize
-Refrigeration - describes supermarket refrigeration systems 
+Refrigeration - describes supermarket refrigeration systems.
 \end_layout
 
 \begin_layout Itemize
 Electric Load Center-Generator Specifications - allows the specification
  of fuel and photovoltaic generators and controls on when they should be
- used to provide power to the facility 
+ used to provide power to the facility.
 \end_layout
 
 \begin_layout Itemize
 Water Systems - contains input objects to describe the use of water in the
- building including from wells, rain, and storage
+ building including from wells, rain, and storage.
 \end_layout
 
 \begin_layout Itemize
 Solar Collectors - describes various systems that convert solar energy into
- thermal energy including those that are integrated with photovoltaic systems
+ thermal energy including those that are integrated with photovoltaic systems.
 \end_layout
 
 \begin_layout Itemize
 Water Heaters and Thermal Storage - describes systems that provide water
- heating and storage as well as ice and chilled water storage
+ heating and storage as well as ice and chilled water storage.
 \end_layout
 
 \begin_layout Section
@@ -4916,7 +4916,7 @@ HVAC-Diagram - Another post-processing program is the HVAC-Diagram application.
 
 \begin_layout Itemize
 convertESOMTR - This simple post processing program can be used seamlessly
- with EP-Launch to provide IP (inch- pound) unit output files rather than
+ with EP-Launch to provide IP (inch-pound) unit output files rather than
  SI units.
  This program is described more fully in the Auxiliary Programs document.
 \end_layout

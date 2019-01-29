@@ -90,8 +90,8 @@ after it has flowed in. The constantly changing temperature on the
 outside of the wall and the less frequent but often large step changes
 in thermostat setpoints between day and night operation for the inside
 of the building make the direction of the heat flow vary over time.
-Solar energy being absorbed on the exterior wall and roof surfaces
-as well as entering a window varies by the sun position for each period
+Solar energy is absorbed on the exterior wall and roof surfaces as
+well as entering a window varies by the sun position for each period
 of time over the day and over the year. Heat sources within the building
 including people, office and other equipment, and lighting include
 both heat that immediately impacts the air within (convective heat)
@@ -202,21 +202,21 @@ In addition:
 \begin{itemize}
 \item ASCII text-based weather, input, and output files that include hourly
 or sub-hourly environmental conditions, and standard and user definable
-reports, respectively 
+reports, respectively. 
 \item Transient heat conduction through building elements such as walls,
-roofs, floors, etc. using conduction transfer functions
+roofs, floors, etc. using conduction transfer functions.
 \item Thermal comfort models based on activity, inside dry-bulb temperature,
 humidity, etc.
 \item Anisotropic sky model for improved calculation of diffuse solar on
-tilted surfaces
+tilted surfaces.
 \item Atmospheric pollution calculations that predict CO2, SOx, NOx, CO,
 particulate matter, and hydrocarbon production for both on-site and
-remote energy conversion
+remote energy conversion.
 \item System and plant output is allowed to directly impact the building
 thermal response rather than calculating all loads first, then simulating
 systems and plants which allows the designer to more accurately investigate
 the effect of undersizing fans and equipment and what impact that
-might have on the thermal comfort of occupants within the building 
+might have on the thermal comfort of occupants within the building.
 \item EnergyPlus runs on Windows, MacOS, and Linux computers. 
 \end{itemize}
 Integration of Loads, Systems, and Plants: One of the strong points
@@ -227,9 +227,6 @@ first, then simulating systems and plants. The simulation is coupled
 allowing the designer to more accurately investigate the effect of
 undersizing fans and equipment and what impact that might have on
 the thermal comfort of occupants within the building. 
-
-<need to balance overview with enough details to help people, I think
-a list of what can be modeled might be more helpful>
 
 \subsection{Open Source}
 
@@ -303,8 +300,7 @@ to using EnergyPlus in Compliance and Standard Rating systems.
 external interfaces (through the Building Controls Virtual Test Bed
 link) to EnergyPlus.
 \item Tips \& Tricks for Using EnergyPlus: Contains short tips and tricks
-for using various parts of EnergyPlus. <MAYBE THIS SHOULD BE ELIMINATED
-AND PORTIONS INCLUDED IN THIS DOCUMENT>
+for using various parts of EnergyPlus. 
 \end{itemize}
 The example files are a great resource to learn more about how to
 use EnergyPlus The example files are in the directory ExampleFiles.
@@ -409,7 +405,7 @@ When just implementing a simple measure or even a series of measures
 is not enough, a parametric analysis tool may be appropriate. These
 tools allow the exploration of throughout the range of variables (such
 as the thickness of insulation in the roof or the efficiency of a
-boiler) to see the impacts of optimization. While any of the approaches
+boiler) to see the impacts of optimization. While many of the approaches
 used to implement measures described previously may also be used for
 parametric analysis, a few specific tools have been developed. \href{http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/}{OpenStudio Parametric Analysis}
 tool works with OpenStudio measures and allows the simulation of a
@@ -623,7 +619,7 @@ on the command line.
 For users that want a simple way of selecting files and running EnergyPlus,
 EP-Launch provides this and more. In addition, EP-Launch can help
 open a text editor for the input and output files, open a spreadsheet
-for the postprocessor results files, a web browser for the tabular
+for the postprocessor result files, a web browser for the tabular
 results file, and start up a viewer for the selected drawing file.
 There are two different versions of EP-Launch currently part of the
 EnergyPlus system. 
@@ -826,7 +822,7 @@ points out something that is not as intended and should be fixed or
 addressed. Since the .ERR file is a text file; you can usually keep
 it open in a text editor program. Many (but not all) text editor programs
 will detect that the .ERR file has been updated after each EnergyPlus
-simulation and let you load the most recent version.
+simulation and lets you load the most recent version.
 
 The next files to be examined are ones that show output results from
 the simulation. Either the tabular output file (usually an HTML file
@@ -1004,7 +1000,7 @@ postprocessor)
 \item TABLE.HTML, TABLE.TXT, TABLE.TAB, TABLE.CSV, TABLE.XML -- tabulated
 report of bin and monthly data in a comma, tab, or space delimited
 or HTML format or XML format
-\item RVAUDIT - output from the ReadVarsESO post- processing program
+\item RVAUDIT - output from the ReadVarsESO post-processing program
 \item SVG - HVAC Diagram related to the arrangement of HVAC components
 \item SCI - surface cost information report
 \item WRL -- drawing file in VRML (Virtual Reality Markup Language) format
@@ -1178,7 +1174,7 @@ and uses ``Through'' and ``For'' to reduce the amount of input
 required.
 \item ScheduleTypeLimits - Every schedule object includes a field that helps
 validate the limiting values for the schedule, and this input object
-describes the upper and lower limit
+describes the upper and lower limit.
 \item Schedule:Constant - If the value of the schedule is the same every
 hour of the year, this object is the easiest way to specify that value.
 \item Schedule:File - At times, data is available from a building being
@@ -1223,7 +1219,7 @@ examples.
 \item Construction - a list of materials (any from the list above plus many
 more) in order from the outside to the inside making up the wall,
 roof, floor, window or skylight. Every input file will have several
-of these input objects. Examples of constructions for wall, roofs,
+of these input objects. Examples of constructions for walls, roofs,
 and floors can be found in ASHRAE\_2005\_HOF\_Materials.idf located
 in the DataSets folder while examples for windows and skylights can
 be found in WindowConstructs.idf in the same folder.
@@ -1396,7 +1392,7 @@ files. It sets the way geometry is specified for all of the surface
 input objects. The most common approach is that the order of coordinates
 for each surface should start with the upper left corner (when viewed
 from ``outside'' the zone with the surface) and that the coordinates
-should proceed in a counter clockwise order. In addition, most common
+should proceed in a counter-clockwise order. In addition, most common
 is to use a world coordinate system where all the vertices are based
 on a single coordinate system for the entire building rather than
 one that changes relative to each zone.
@@ -1424,7 +1420,7 @@ else in the model - often used to capture the effect of interior floors
 that are not being modeled.
 \item ShadingProperty:Reflectance - specifying the reflectance properties
 for shading and is only needed if the input object Building specifies
-the ``with reflections'' option
+the ``with reflections'' option.
 \end{itemize}
 Other less common input objects include ZoneList and ZoneGroup that
 can be used when doing multi-story simulations and GeometryTransform
@@ -1453,10 +1449,10 @@ The most common internal gain input objects are:
 \begin{itemize}
 \item People -- specifies not only the sensible, latent and radiant heat
 from people but also includes ways of reporting the comfort of occupants
-using a variety of thermal comfort models 
-\item Lights -- describes the heat related to lighting systems 
+using a variety of thermal comfort models. 
+\item Lights -- describes the heat related to lighting systems. 
 \item ElectricEquipment -- describes the heat related to electrical appliances,
-office equipment, and other heat sources that are powered by electricity 
+office equipment, and other heat sources that are powered by electricity. 
 \end{itemize}
 Less common internal gains input objects include: 
 \begin{itemize}
@@ -1470,7 +1466,7 @@ Less common internal gains input objects include:
 Other 
 \begin{itemize}
 \item ComfortViewFactorAngles -- allows the specification of how different
-surfaces impact the thermal comfort calculations for the occupants 
+surfaces impact the thermal comfort calculations for the occupants. 
 \item ZoneBaseboard:OutdoorTemperatureControlled -- specifies how the outside
 air temperature impacts the control of zone baseboard systems. 
 \end{itemize}
@@ -1496,7 +1492,7 @@ The most common input objects related to daylighting are:
 the dimming of lights is continuous or stepped, and how glare calculations
 are performed. 
 \item Daylighting:ReferencePoint -- specifies the location of the sensors
-for the daylighting control system 
+for the daylighting control system.
 \end{itemize}
 The InputOutputReference includes not only a description of these
 objects but also extra guidance on how they should be applied. 
@@ -1556,7 +1552,7 @@ panels that are removable for walls, floors, and roofs but not windows.
 be modeled as underwater and even as moving through the water allowing
 EnergyPlus to model vessels.
 \item SurfaceProperty:ExteriorNaturalVentedCavity - provides a method to
-include the modeling of baffles in the multi-skin exteriors
+include the modeling of baffles in the multi-skin exteriors.
 \end{itemize}
 Other objects in this group set the heat transfer algorithms for specific
 surfaces when the building level heat transfer algorithm should not
@@ -1586,9 +1582,9 @@ and incentive programs that require building energy modeling.
 grounds, entrances, and facades which are either controlled by a schedule
 or when the sun is set.
 \item Exterior:FuelEquipment - describes other energy consumption on the
-site that is external to the building other than lighting
+site that is external to the building other than lighting.
 \item Exterior:WaterEquipment - describes the flow rate of water use on
-the building site outside of the building
+the building site outside of the building.
 \end{itemize}
 The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Exterior Energy
@@ -1609,7 +1605,7 @@ an air change rate.
 \item ZoneInfiltration:EffectiveLeakageArea - similar to the previous input
 object but uses a different equation to express the infiltration rate.
 \item ZoneInfiltration:FlowCoefficient - also similar to the ZoneInfiltration:DesignFlowRate
-input object but uses yet a different equation
+input object but uses yet a different equation.
 \item ZoneVentilation:DesignFlowRate - a method to add outside air to a
 zone with similar inputs to the ZoneInfiltration:DesignFlowRate but
 this would represent a purposeful introduction of outdoor air into
@@ -1623,17 +1619,17 @@ temperature or the difference between the two or wind speed.
 three input objects provide simplified treatments of air exchange
 between zones.
 \item ZoneEarthtube - provides a way to model an earth tube which is a way
-to draw outdoor into the zone through a underground pipe in order
-to cool the air in the summer and heat it in the winter
+to draw outdoor into the zone through an underground pipe in order
+to cool the air in the summer and heat it in the winter.
 \item ZoneCoolTower:Shower - models a passive downdraught evaporative cooling
 tower (sometimes also called a shower cooling tower or a wind tower)
 using natural ventilation and water evaporation to providing cooling
-in typically arid climates
+in typically arid climates.
 \item ZoneThermalChimney - models a passive solar driven thermal chimney
-that utilize the bouyancy of air heated by the sun to provide ventilation
+that utilize the buoyancy of air heated by the sun to provide ventilation.
 \item ZoneAirBalance:OutdoorAir - calculates the combined outdoor airflow
-including the interactions bwteeen mechanical ventiation, infiltration
-and duct leakage and is usually applied to residential buildings
+including the interactions between mechanical ventilation, infiltration,
+and duct leakage and is usually applied to residential buildings.
 \end{itemize}
 The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Airflow.''
@@ -1690,72 +1686,72 @@ objects if all the zones have the same setpoints
 that supplies air to the zone that meets all loads and uses no energy.
 Best used for load calculations.
 \item HVACTemplate:Zone:BaseboardHeat - allows the simulation of electric
-or hot water thermostatically controlled baseboard heaters
+or hot water thermostatically controlled baseboard heaters.
 \item HVACTemplate:Zone:FanCoil - describes a four-pipe fan coil system
-with outdoor air intake
+with outdoor air intake.
 \item HVACTemplate:Zone:PTAC - models a packaged terminal air conditioner
 with either electric, gas or hot water heating coil most commonly
-used in residential or hotel applications
+used in residential or hotel applications.
 \item HVACTemplate:Zone:PTHP - models a packaged terminal heat pump system
 most commonly used in residential or hotel applications with either
-electric or gas supplementary heater
+electric or gas supplementary heater.
 \item HVACTemplate:Zone:WaterToAirHeatPump - describes the distributed portion
 of a system which uses a medium temperature loop and heat pumps to
-provide heating and cooling to the building (also see HVACTemplate:Plant:MixedWaterLoop)
+provide heating and cooling to the building (also see HVACTemplate:Plant:MixedWaterLoop).
 \item HVACTemplate:Zone:VRF - provides input for variable refrigerant flow
-terminal units
+terminal units.
 \item HVACTemplate:Zone:Unitary - describes a constant volume direct-expansion
 system such as a rooftop system or split system. Often paired with
 a single HVACTemplate:System:Unitary for a single zone system but
-can also be part of a multizone system
+can also be part of a multizone system.
 \item HVACTemplate:Zone:VAV - simulates the terminal of a variable air volume
-system with reheat
+system with reheat.
 \item HVACTemplate:Zone:VAV:FanPowered - simulates either a parallel or
-series fan power terminal of a variable air volume system
+series fan power terminal of a variable air volume system.
 \item HVACTemplate:Zone:VAV:HeatAndCool - simulates the terminal of a variable
-air volume system
+air volume system.
 \item HVACTemplate:Zone:ConstantVolume - simulates the terminal of a constant
-air volume system
+air volume system.
 \item HVACTemplate:Zone:DualDuct - simulates the zone portion of a constant
-volume or variable volume dual-duct HVAC system
+volume or variable volume dual-duct HVAC system.
 \item HVACTemplate:System:VRF - simulates the variable refrigerant flow
-system
+system.
 \item HVACTemplate:System:Unitary - describes the system portion of a rooftop
-or split DX cooling system with electric, gas or hot water heating
+or split DX cooling system with electric, gas or hot water heating.
 \item HVACTemplate:System:UnitaryHeatPump:AirToAir - details the system
-portion of a rooftop or split DX air-to-air heat pump system
+portion of a rooftop or split DX air-to-air heat pump system.
 \item HVACTemplate:System:UnitarySystem - models the system portion of a
 rooftop or split system and has more flexibility than the previous
-two input objects
+two input objects.
 \item HVACTemplate:System:VAV - simulates the system portion of a variable
 air volume HVAC configuration with chilled water cooling and several
-different heating options
+different heating options.
 \item HVACTemplate:System:PackagedVAV - describes the system portion of
 a packaged direct-expansion (DX) based variable air volume HVAC configuration
-with several different heating options
+with several different heating options.
 \item HVACTemplate:System:ConstantVolume - provides input for the system
 portion of a constant air volume HVAC configuration with option chilled
-water cooling and several different heating options
+water cooling and several different heating options.
 \item HVACTemplate:System:DualDuct - models the system portion of a constant
 air volume or variable air volume dual-duct HVAC configuration with
-optional chilled water cooling and several different heating options
+optional chilled water cooling and several different heating options.
 \item HVACTemplate:System:DedicatedOutdoorAir - adds a dedicated outdoor
 air system (DOAS) which can be used with several of the HVACTemplate:Zone
-input objects and contains heating and cooling coils and heat recovery
+input objects and contains heating and cooling coils and heat recovery.
 \item HVACTemplate:Plant:ChilledWaterLoop - models the chilled water loop
 connecting chillers to chilled water coils as well as the condenser
-water loop that connects chillers with cooling towers
+water loop that connects chillers with cooling towers.
 \item HVACTemplate:Plant:Chiller - describes a vapor-compression chiller
-that provides chilled water to the loop
+that provides chilled water to the loop.
 \item HVACTemplate:Plant:Tower - models an evaporative cooling tower used
-to reject heat from chillers
+to reject heat from chillers.
 \item HVACTemplate:Plant:HotWaterLoop - models the hot water loop connecting
-boilers to hot water coils
+boilers to hot water coils.
 \item HVACTemplate:Plant:Boiler - models a boiler that provides hot water
-to the loop
+to the loop.
 \item HVACTemplate:Plant:MixedWaterLoop - models the medium temperature
 loop that serves water-to-air heat pumps as well as cooling towers
-and boilers
+and boilers.
 \end{itemize}
 In addition, this group of input objects includes three plant objects
 that allow the referencing of chillers, towers, and boilers respectively
@@ -1859,44 +1855,44 @@ mixers, and plenums.
 and humidistats used to control the conditions in a zone.
 \item Zone HVAC Forced Air Units - defines input related to zone forced
 air equipment like window air conditioners, unit heaters, fan coil
-systems, and outdoor air units as well as other related input objects
+systems, and outdoor air units as well as other related input objects.
 \item Zone HVAC Radiative/Convective Units - models baseboard systems, low-
 and high-temperature radiant systems, and active portion of ventilated
 slabs.
 \item Zone HVAC Air Loop Terminal Units - describes air terminals including
 constant volume, variable volume, series and parallel powered induction
-units, and duel duct terminals
+units, and duel duct terminals.
 \item Zone HVAC Equipment Connections - used to describe the HVAC equipment
-connections at the zone level
+connections at the zone level.
 \item Fans - describes constant volume, variable volume, exhaust fans as
-well as more system and component model fans
+well as more system and component model fans.
 \item Coils - contains a long list of input objects to model heating and
 cooling water coils; heating and cooling DX coils including two-,
 multiple-, and variable-speed units; variable refrigerant coils; fuel
 and gas coils; desuperheater coils; air to water heat pump coils;
-and other coil input objects
-\item Evaporative Coolers - describes direct and indirect evaporative coolers
+and other coil input objects.
+\item Evaporative Coolers - describes direct and indirect evaporative coolers.
 \item Humidifiers and Dehumidifiers - for electric and gas steam humidifiers
-as well as desiccant dehumidifiers
+as well as desiccant dehumidifiers.
 \item Heat Recovery - models for air-to-air flat plate and combined sensible
 and latent heat exchangers as well as heat exchangers coupled with
-desiccants
+desiccants.
 \item Unitary Equipment - describes unitary input objects that are generally
 placed in the primary air loop and includes heating only, heating
 and cooling, and air-to-air heat pump input objects.
 \item Variable Refrigerant Flow Equipment - input objects to describe variable
-refrigerant flow (VRF) equipment as well as the controls
+refrigerant flow (VRF) equipment as well as the controls.
 \end{itemize}
 The following is a list of control systems in EnergyPlus related to
 HVAC
 \begin{itemize}
 \item Controllers - input objects for simple controllers that look at a
 single node and compare it with the setpoint and includes controllers
-for water coils, outdoor air, and mechanical ventilation
+for water coils, outdoor air, and mechanical ventilation.
 \item System Availability Managers - these input objects can take an input
 from any node and control whether an entire portion of the HVAC system
 is active and can be based on temperature, differential temperature,
-schedules, night cycle and ventilation
+schedules, night cycle and ventilation.
 \item Setpoint Managers - these take input from any node or nodes and calculate
 a setpoint at another node and include controls for single zone heating,
 cooling, or reheat; humidity control; mixed air; warmest or coldest;
@@ -1904,9 +1900,9 @@ and many other scenarios.
 \item Plant-Condenser Control - provides control for the plant loop primarily
 controlling the operation of the loop and which equipment is available
 and includes control based on heating or cooling load and in reference
-to outdoor conditions such as dry bulb or wet-bulb temperature.
+to outdoor conditions such as dry-bulb or wet-bulb temperature.
 \item Plant-Condenser Flow Control - describes the TemperingValve input
-object for the special case of flor control with thermal storage systems
+object for the special case of flor control with thermal storage systems.
 \end{itemize}
 The following is a list of input objects related to primary systems
 and equipment:
@@ -1914,7 +1910,7 @@ and equipment:
 \item Pumps - describes constant speed and variable speed pumps and headered
 multiple pump systems.
 \item Plant-Condenser Loops - describes the supply and demand side of the
-loops the operating temperatures and flow rates
+loops the operating temperatures and flow rates.
 \item Plant Heating and Cooling Equipment - used to input the central plant
 equipment such as steam and hot water boilers; electric, absorption,
 engine driven, and turbine chillers; and water-to-water heat pumps;
@@ -1922,13 +1918,13 @@ as well as connections to district heating and cooling sources.
 \item Condenser Equipment and Heat Exchangers - describes single-, two,
 and variable speed cooling towers; single and two speed evaporative
 and non-evaporative fluid coolers; vertical, surface, trench and slinky
-ground heat exchangers; and fluid-to-fluid heat exchangers
+ground heat exchangers; and fluid-to-fluid heat exchangers.
 \item Non-Zone Equipment - describe the LoadProfile:Plant input object that
 allows the load on the plant to be specified by schedule if already
-known
+known.
 \item User Defined HVAC and Plant Component Models - a group that allows
 the user to define custom models for zonal systems, air terminals,
-coils, and plant equipment
+coils, and plant equipment.
 \end{itemize}
 The input object groups described in this section are further explained
 in the InputOutputReference.
@@ -1965,12 +1961,12 @@ the monthly report will be repeated for each one.
 \item Output:Table:Annual - hows a series of output variables or output
 meters on an annual basis using different aggregation schemes. For
 output variables that reoccur for each zone or other input objects,
-additional rows of results will be displayed
+additional rows of results will be displayed.
 \item Output:VariableDictionary - provides a list of available output variables
 for use with these custom tabular reports as well as the time step
 reporting described next. The list of output variables that are available
 for specific simulation appear in a file with a .rdd extension, and
-the output meters appears in a file with a .mdd extension.
+the output meters appear in a file with a .mdd extension.
 \end{itemize}
 When you need to dive deeper into the results for a specific output
 variable or output meters, time step outputs allow you to see the
@@ -1992,40 +1988,40 @@ Also, note that the .mtd file shows the exact relationship between
 specific end-use output report variables and each output meter.
 \item Output:SQLite - use this object if you want to output in the SQLite
 database format. Not only can the output variables and meters be in
-SQLite format but the tabular reports are also included
+SQLite format but the tabular reports are also included.
 \end{itemize}
 EnergyPlus also includes a number of special reports that usually
 appear in different output files or in the .eio output file
 \begin{itemize}
 \item Output:Surfaces:List - provides a report on all the surfaces in a
-file and the output appears in a file with the .sln extension
+file and the output appears in a file with the .sln extension.
 \item Output:Surfaces:Drawing - provides a DXF drawing that can be opened
-in some CAD programs 
+in some CAD programs .
 \item OutputControl:SurfaceColorScheme - controls the colors used in the
-DXF file
+DXF file.
 \item Output:Schedules - provides a summary of the schedules in the input
-file and appears as part of the file with the .eio extension 
+file and appears as part of the file with the .eio extension.
 \item Output:Constructions - provides a summary of constructions in the
-input file and appears as part of the file with the .eio extension
+input file and appears as part of the file with the .eio extension.
 \item Output:EnergyManagementSystem - creates a list of detailed output
-related to the energy management system in a file with the .edd extension
+related to the energy management system in a file with the .edd extension.
 \item OutputControl:ReportingTolerances - provides more control over the
-amount of time reported for the setpoints not being met
+amount of time reported for the setpoints not being met.
 \item Output:Diagnostics - provides additional detail in the output messages
 in the .err file . Normally this extra detail is not shown to reduce
-confusion for new users
+confusion for new users.
 \item Output:DebuggingData - provides an additional detailed output related
-to HVAC nodes in a file with a .dbg extension
+to HVAC nodes in a file with a .dbg extension.
 \end{itemize}
 Environmental reporting which adds new meters showing the related
 to emissions is triggered by the use of the following three input
-objects
+objects.
 \begin{itemize}
 \item Output:EnvironmentalImpactFactors - specifies the frequency of the
-output variables related to emissions
+output variables related to emissions.
 \item EnvironmentalImpactFactors - specifies the efficiency of district
 heating and cooling systems as well as the carbon equivalent emission
-factors for N20, CH4, and CO2
+factors for N20, CH4, and CO2.
 \item FuelFactors - for each type of energy resource (electricity, natural
 gas, etc..) provides a way to enter factors related to source energy
 and emissions of CO2, CO, CH4, NOx, N20, SO2, PM, NH3, NMVOC, Hg,
@@ -2062,12 +2058,12 @@ including miscellaneous costs per conditioned area, design and engineering
 fees, contractor fees, contingency, permitting, bonding, and insurance
 as well as commissioning and regional adjustment fees.
 \item ComponentCost:Reference - entry of reference building costs so that
-the current model can be compared to the reference building
+the current model can be compared to the reference building.
 \end{itemize}
 For many building projects, while energy estimates are important,
 the computation of estimated utility bills allows an understanding
 of how much money is going to be saved to help offset higher initial
-costs of high-performance building. Due to the many different utility
+costs of a high-performance building. Due to the many different utility
 companies and regulatory agencies, the approach used to compute monthly
 utility bills has become widely varied and, at times, quite complicated
 depending not only on energy and demand but the timing of each and
@@ -2082,7 +2078,7 @@ monthly charges, and minimum charges, and schedule names for the time
 of use periods, seasons, billing cycle, and real-time pricing.
 \item UtilityCost:Qualify - provides a method to qualify if a tariff applies
 to the building being modeled since utilities provide limits usually
-based on peak demand or energy consumption for each tariff
+based on peak demand or energy consumption for each tariff.
 \item UtilityCost:Charge:Simple - defines cost per unit value for a charge
 based on energy or demand or other charges for a specific season.
 The charges are arranged in a hierarchy shown in Figure X Hierarchy
@@ -2095,7 +2091,7 @@ a third cost). Like UtilityCost:Charge:Simple, the charges use the
 same hierarchy.
 \item UtilityCost:Ratchet - some utilities charge not only for the current
 month's demand but also compensate for the highest demand in recent
-months, and this input object allows the specification of such a structure
+months, and this input object allows the specification of such a structure.
 \end{itemize}
 \includegraphics[width=5in]{tariff-charges}Figure X Hierarchy of
 Economic Charges
@@ -2103,7 +2099,7 @@ Economic Charges
 The following two input objects are uncommon to use:
 \begin{itemize}
 \item UtilityCost:Variable - allows the specific specification of a monthly
-variable to be used in the calculation of the tariff
+variable to be used in the calculation of the tariff.
 \item UtilityCost:Computation - provides the step-by-step specification
 of the steps needed to compute the tariff. The output report tariff
 summary includes the default computation steps for the input objects
@@ -2118,12 +2114,12 @@ objects used for performing a life-cycle cost analysis are:
 \item LifeCycleCost:Parameters - describes the discount, tax, and inflation
 rates, the approach used for inflation and discounting, as well as
 the base date and length of the study period and other parameters
-related to life-cycle costing
+related to life-cycle costing.
 \item LifeCycleCost:RecurringCosts - used to enter reoccurring costs other
 than costs related to energy and water usage since those are included
-automatically
+automatically.
 \item LifeCycleCost:NonrecurringCost - used to enter costs that occur only
-once during the study period
+once during the study period.
 \item LifeCycleCost:UsePriceEscalation - specifies the annual escalation
 of energy costs in future years and is generally based on government
 predictions. The increases in energy costs for future years are assuming
@@ -2135,7 +2131,7 @@ in the DataSets directory and is based on supplements to the NIST
 Two less commonly used input objects are
 \begin{itemize}
 \item LifeCycleCost:UseAdjustment - allows manual adjustment of energy or
-water costs in future years
+water costs in future years.
 \item CurrencyType - specifies the currency symbol of the monetary unit.
 If it is not included a dollar sign '\$' is used in all reports.
 \end{itemize}
@@ -2162,38 +2158,38 @@ by the import of Functional Mockup Units (FMUs) and is also documented
 in the ExternalInterfacesApplicationGuide.
 \item Operational Faults - provides for the modeling of operation problems
 in sensors, controllers, meters, equipment, and systems and is commonly
-used with existing buildings
+used with existing buildings.
 \item General Data Entry - contains the Matrix:TwoDimension input object
 used with the Construction:ComplexFenestrationState input object.
 \item Performance Curves - allows the specification of polynomial curves
-used to characterize the performance of HVAC equipment
+used to characterize the performance of HVAC equipment.
 \item Performance Tables - allows the specification of tables used to characterize
-the performance of HVAC equipment
+the performance of HVAC equipment.
 \item Fluid Properties - describes the detailed properties of refrigerants
-and glycols
+and glycols.
 \item Demand Limiting Controls - provides a way of implementing management
-of the systems of the building to regulate the peak demand 
+of the systems of the building to regulate the peak demand.
 \item Natural Ventilation and Duct Leakage - provides a way to model multizone
 airflows driven by wind and forced air systems (shown under Group-Airflow
 Network in the InputOutputReference).
 \item Room Air Models - allows the description of non-uniform room air temperatures
-(not fully mixed)
+(not fully mixed).
 \item Compliance Objects - provides an input object that allows rotation
-of the building when used for compliance purposes
+of the building when used for compliance purposes.
 \item Parametrics - allows for simple parametric cases to be defined within
 an input file using input objects. Makes use of the ParametricPreprocessor
 as described in the AuxiliaryPrograms document. 
-\item Refrigeration - describes supermarket refrigeration systems 
+\item Refrigeration - describes supermarket refrigeration systems.
 \item Electric Load Center-Generator Specifications - allows the specification
 of fuel and photovoltaic generators and controls on when they should
-be used to provide power to the facility 
+be used to provide power to the facility.
 \item Water Systems - contains input objects to describe the use of water
-in the building including from wells, rain, and storage
+in the building including from wells, rain, and storage.
 \item Solar Collectors - describes various systems that convert solar energy
 into thermal energy including those that are integrated with photovoltaic
-systems
+systems.
 \item Water Heaters and Thermal Storage - describes systems that provide
-water heating and storage as well as ice and chilled water storage
+water heating and storage as well as ice and chilled water storage.
 \end{itemize}
 
 \section{Specific Tips }
@@ -2221,7 +2217,7 @@ application. It reads one of the EnergyPlus output files (eplusout.bnd)
 and produces a Scalable Vector Graphics (SVG) file. More information
 on the HVAC Diagram program is found in the Auxiliary Programs document.
 \item convertESOMTR - This simple post processing program can be used seamlessly
-with EP-Launch to provide IP (inch- pound) unit output files rather
+with EP-Launch to provide IP (inch-pound) unit output files rather
 than SI units. This program is described more fully in the Auxiliary
 Programs document.
 \end{itemize}
