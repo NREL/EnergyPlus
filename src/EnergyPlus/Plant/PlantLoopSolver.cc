@@ -172,10 +172,7 @@ namespace PlantLoopSolver {
             PlantCondLoopOperation::InitLoadDistribution(FirstHVACIteration);
 
             // Now that the op scheme types are updated, do LoopSide validation
-            auto IsLoopSideValid = thisPlantLoop.loopSolver.ValidateFlowControlPaths(LoopNum, ThisSide);
-            if (!IsLoopSideValid.Valid) {
-                ShowFatalError("ERROR:" + IsLoopSideValid.Reason);
-            }
+            thisPlantLoop.loopSolver.ValidateFlowControlPaths(LoopNum, ThisSide);
 
             // Set the flag to false so we won't do these again this time step
             thisLoopSide.OncePerTimeStepOperations = false;
@@ -268,7 +265,7 @@ namespace PlantLoopSolver {
     void PlantLoopSolverClass::DoFlowAndLoadSolutionPass(int LoopNum, int ThisSide, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration)
     {
 
-        // I don't think we need this actually
+        // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
         bool LoopShutDownFlag = false;
 
         // First thing is to setup mass flow request information
@@ -378,7 +375,7 @@ namespace PlantLoopSolver {
         return ThisLoopSideFlow;
     }
 
-    PlantLoopSolverClass::m_FlowControlValidator PlantLoopSolverClass::ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum)
+    void PlantLoopSolverClass::ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum)
     {
 
         // FUNCTION INFORMATION:
@@ -425,9 +422,6 @@ namespace PlantLoopSolver {
         using DataPlant::PumpOpSchemeType;
         using DataPlant::UnknownStatusOpSchemeType;
 
-        // Return value
-        m_FlowControlValidator ValidLoopSide;
-
         // FUNCTION PARAMETER DEFINITIONS:
         int const Parallel(1);
         int const Outlet(2);
@@ -436,7 +430,6 @@ namespace PlantLoopSolver {
         auto &this_loop_side(PlantLoop(LoopNum).LoopSide(LoopSideNum));
 
         //~ Initialze
-        ValidLoopSide.Valid = true;
         bool EncounteredLRB = false;
         bool EncounteredNonLRBAfterLRB = false;
         int NumParallelPaths = this_loop_side.TotalBranches - 2;
@@ -447,10 +440,10 @@ namespace PlantLoopSolver {
         // If we have parallel branches, then start looping through each flow path to
         //  decide if it is a valid path.
         // If any one path is invalid then all is wrong
-        int BranchIndex = 1;
-        for (int CompIndex = 1; CompIndex <= this_loop_side.Branch(BranchIndex).TotalComponents; ++CompIndex) {
+        int firstBranchIndex = 1;
+        for (int CompIndex = 1; CompIndex <= this_loop_side.Branch(firstBranchIndex).TotalComponents; ++CompIndex) {
 
-            auto &this_component(this_loop_side.Branch(BranchIndex).Comp(CompIndex));
+            auto &this_component(this_loop_side.Branch(firstBranchIndex).Comp(CompIndex));
 
             {
                 auto const SELECT_CASE_var(this_component.CurOpSchemeType);
@@ -458,14 +451,9 @@ namespace PlantLoopSolver {
                 if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                        ValidLoopSide.Valid = false;
-                        ValidLoopSide.ErrorPoint.LoopNum = LoopNum;
-                        ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
-                        ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
-                        ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-                        ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load Range "
-                                               "Based should be grouped together on each flow path.";
-                        return ValidLoopSide;
+                        ShowSevereError("Plant Topology Problem: Load range based components are separated by other control type components.");
+                        ShowContinueError("Load Range Based should be grouped together on each flow path.");
+                        ShowFatalError("Plant topology issue causes program termination");
                     } else {
                         EncounteredLRB = true;
                     }
@@ -493,7 +481,7 @@ namespace PlantLoopSolver {
         }
 
         // Return early if we only needed to do the one branch
-        if (NumParallelPaths <= 0) return ValidLoopSide;
+        if (NumParallelPaths <= 0) return;
 
         // Now, if we have multiple parallel branches, I think the easiest way is to go all the way from the inlet node
         //  of each parallel branch to the loop outlet node and check the flow path
@@ -523,14 +511,9 @@ namespace PlantLoopSolver {
                         if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                                ValidLoopSide.Valid = false;
-                                ValidLoopSide.ErrorPoint.LoopNum = LoopNum;
-                                ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
-                                ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
-                                ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-                                ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load "
-                                                       "Range Based should be grouped together on each flow path.";
-                                return ValidLoopSide;
+                                ShowSevereError("Plant Topology Problem: Load range based components are separated by other control type components.");
+                                ShowContinueError("Load Range Based should be grouped together on each flow path.");
+                                ShowFatalError("Plant topology issue causes program termination");
                             } else {
                                 EncounteredLRB = true;
                             }
@@ -562,8 +545,6 @@ namespace PlantLoopSolver {
             } //~ Parallel and Outlet Branches
 
         } //~ Parallel Paths
-
-        return ValidLoopSide;
     }
 
     Real64 PlantLoopSolverClass::SetupLoopFlowRequest(int const LoopNum, int const ThisSide, int const OtherSide)

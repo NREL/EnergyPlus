@@ -85,20 +85,7 @@ namespace PlantLoopSolver {
     struct PlantLoopSolverClass
     {
 
-        struct m_FlowControlValidator
-        {
-            // Members
-            bool Valid;          // Assume true
-            Location ErrorPoint; // Branch where the error was thrown
-            std::string Reason;  // Brief description of error
-
-            // Default Constructor
-            m_FlowControlValidator() : Valid(true)
-            {
-            }
-        };
-
-        m_FlowControlValidator ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
+        void ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
 
         Real64 SetupLoopFlowRequest(int const LoopNum, int const ThisSide, int const OtherSide);
 
