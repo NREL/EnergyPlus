@@ -572,7 +572,7 @@ namespace PlantUtilities {
         return FlowVal;
     }
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum, int const MixNum)
+    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -586,12 +586,11 @@ namespace PlantUtilities {
         // this is expected to only be called for loops with a mixer
 
         // Find mixer outlet node number
-        int const MixerOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).NodeNumOut;
+        int const MixerOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
 
         // Find corresponding splitter inlet node number--correspondence, but currently
         //  hard code things to a single split/mix setting it to the mixer number
-        int const SplitterNum = MixNum;
-        int const SplitterInNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitterNum).NodeNumIn;
+        int const SplitterInNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
         // Initialize Mixer outlet temp and mass flow rate
         Real64 MixerOutletTemp = 0.0;
         Real64 MixerOutletMassFlow = 0.0;
@@ -601,14 +600,14 @@ namespace PlantUtilities {
         Real64 MixerOutletQuality = 0.0;
 
         // Calculate Mixer outlet mass flow rate
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).NodeNumIn(InletNodeNum);
+        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
+            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
             MixerOutletMassFlow += DataLoopNode::Node(MixerInletNode).MassFlowRate;
         }
 
         // Calculate Mixer outlet temperature
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).NodeNumIn(InletNodeNum);
+        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
+            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
             if (MixerOutletMassFlow > 0.0) {
                 Real64 const MixerInletMassFlow = DataLoopNode::Node(MixerInletNode).MassFlowRate;
                 Real64 const MassFrac = MixerInletMassFlow / MixerOutletMassFlow;
@@ -660,12 +659,12 @@ namespace PlantUtilities {
         for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
             for (int LoopSide = DataPlant::DemandSide; LoopSide <= DataPlant::SupplySide; ++LoopSide) {
                 if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).SplitterExists) {
-                    int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter(1).NodeNumIn;
+                    int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.NodeNumIn;
                     // loop across branch outlet nodes and check mass continuity
-                    int const NumSplitterOutlets = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter(1).TotalOutletNodes;
+                    int const NumSplitterOutlets = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.TotalOutletNodes;
                     Real64 SumOutletFlow = 0.0;
                     for (int OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
-                        int const BranchNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter(1).BranchNumOut(OutletNum);
+                        int const BranchNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.BranchNumOut(OutletNum);
                         int const LastNodeOnBranch = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).NodeNumOut;
                         SumOutletFlow += DataLoopNode::Node(LastNodeOnBranch).MassFlowRate;
                     }
@@ -680,7 +679,7 @@ namespace PlantUtilities {
     }
 
     void
-    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, int const SplitNum, int const MixNum, bool const FirstHVACIteration)
+    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -719,9 +718,9 @@ namespace PlantUtilities {
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
             if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).MixerExists && !FirstHVACIteration) {
                 // Find mixer outlet node number
-                MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).NodeNumOut;
+                MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number
-                SplitterInletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumIn;
+                SplitterInletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
                 AbsDifference = std::abs(Node(SplitterInletNode).MassFlowRate - Node(MixerOutletNode).MassFlowRate);
                 if (AbsDifference > MassFlowTolerance) {
@@ -729,9 +728,9 @@ namespace PlantUtilities {
                         ShowSevereMessage("Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp("");
                         ShowContinueError("PlantLoop name= " + PlantLoop(LoopNum).Name);
-                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).Name);
+                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
                         ShowContinueError("Mixer outlet mass flow rate= " + RoundSigDigits(Node(MixerOutletNode).MassFlowRate, 6) + " {kg/s}");
-                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).Name);
+                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
                         ShowContinueError("Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError("Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
@@ -747,9 +746,9 @@ namespace PlantUtilities {
                         ShowSevereError("Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp("");
                         ShowContinueError("PlantLoop name= " + PlantLoop(LoopNum).Name);
-                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).Name);
+                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
                         ShowContinueError("Mixer outlet mass flow rate= " + RoundSigDigits(Node(MixerOutletNode).MassFlowRate, 6) + " {kg/s}");
-                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).Name);
+                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
                         ShowContinueError("Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError("Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                         ShowFatalError("CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver");
@@ -759,11 +758,11 @@ namespace PlantUtilities {
                 // now check inside s/m to see if there are problems
 
                 // loop across branch outlet nodes and check mass continuity
-                NumSplitterOutlets = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes;
+                NumSplitterOutlets = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                 SumOutletFlow = 0.0;
                 //  SumInletFlow = 0.0;
                 for (OutletNum = 1; OutletNum <= NumSplitterOutlets; ++OutletNum) {
-                    BranchNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).BranchNumOut(OutletNum);
+                    BranchNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut(OutletNum);
                     LastNodeOnBranch = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
                     SumOutletFlow += Node(LastNodeOnBranch).MassFlowRate;
                     //  FirstNodeOnBranch= PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%NodeNumIn
@@ -775,9 +774,9 @@ namespace PlantUtilities {
                         ShowSevereMessage("Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows");
                         ShowContinueErrorTimeStamp("");
                         ShowContinueError("PlantLoop name= " + PlantLoop(LoopNum).Name);
-                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer(MixNum).Name);
+                        ShowContinueError("Plant Connector:Mixer name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
                         ShowContinueError("Sum of Branch outlet mass flow rates= " + RoundSigDigits(SumOutletFlow, 6) + " {kg/s}");
-                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).Name);
+                        ShowContinueError("Plant Connector:Splitter name= " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
                         ShowContinueError("Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError("Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
@@ -972,7 +971,7 @@ namespace PlantUtilities {
         }
     }
 
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum, int const SplitNum)
+    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -988,11 +987,11 @@ namespace PlantUtilities {
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).SplitterExists) {
 
             // Set branch number at splitter inlet
-            int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumIn;
+            int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
             // Loop over outlet nodes
-            for (int CurNode = 1; CurNode <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes; ++CurNode) {
-                int const SplitterOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumOut(CurNode);
+            for (int CurNode = 1; CurNode <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++CurNode) {
+                int const SplitterOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut(CurNode);
 
                 // Inlet Temp equals exit Temp to all outlet branches
                 DataLoopNode::Node(SplitterOutletNode).Temp = DataLoopNode::Node(SplitterInletNode).Temp;
@@ -1017,7 +1016,7 @@ namespace PlantUtilities {
                 // min flow rate, and it is causing problems because this routine passes zero down.  Perhaps if
                 // it is a single parallel branch, we are safe to assume we need to just pass it down.
                 // But need to test for multiple branches (or at least think about it), to see what we need to do...
-                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes == 1) {
+                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes == 1) {
                     DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = DataLoopNode::Node(SplitterInletNode).MassFlowRateMinAvail;
                 }
             }

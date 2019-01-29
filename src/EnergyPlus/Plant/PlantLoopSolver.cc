@@ -1063,11 +1063,11 @@ namespace PlantLoopSolver {
                 } else if (SELECT_CASE_var ==
                            ParallelBranchSet) { // This group is the parallel set of branches, or the single branch between the mix/split
 
-                    PlantUtilities::UpdatePlantSplitter(LoopNum, LoopSideNum, 1);
+                    PlantUtilities::UpdatePlantSplitter(LoopNum, LoopSideNum);
 
                     DataPlant::PlantLoop(LoopNum).loopSolver.SimulateLoopSideBranchGroup(
                         LoopNum, LoopSideNum, 2, thisLoopSide.TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
-                    PlantUtilities::UpdatePlantMixer(LoopNum, LoopSideNum, 1);
+                    PlantUtilities::UpdatePlantMixer(LoopNum, LoopSideNum);
 
                 } else if (SELECT_CASE_var == OutletBranch) { // This group is the outlet branch
                     DataPlant::PlantLoop(LoopNum).loopSolver.SimulateLoopSideBranchGroup(LoopNum,
@@ -1846,7 +1846,6 @@ namespace PlantLoopSolver {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
-        int const SplitNum(1);             // Only one splitter/mixer combination is allowed
         int const LoopSideSingleBranch(1); // For readability
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1917,7 +1916,7 @@ namespace PlantLoopSolver {
 
             // Zero out local variables
             TotParallelBranchFlowReq = 0.0;
-            NumSplitOutlets = this_loopside.Splitter(SplitNum).TotalOutletNodes;
+            NumSplitOutlets = this_loopside.Splitter.TotalOutletNodes;
             if (NumSplitOutlets < 1) {
                 ShowSevereError("Plant topology problem for PlantLoop: " + PlantLoop(LoopNum).Name + ", " + LoopSideName(LoopSideNum) + " side.");
                 ShowContinueError("Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
@@ -1930,9 +1929,9 @@ namespace PlantLoopSolver {
             ParallelBranchMinAvail = 0.0;
             for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
 
-                BranchNum = this_loopside.Splitter(SplitNum).BranchNumOut(iBranch);
+                BranchNum = this_loopside.Splitter.BranchNumOut(iBranch);
                 auto &this_branch(this_loopside.Branch(BranchNum));
-                SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(iBranch);
+                SplitterBranchOut = this_loopside.Splitter.BranchNumOut(iBranch);
                 auto &this_splitter_outlet_branch(this_loopside.Branch(SplitterBranchOut));
                 LastNodeOnBranch = this_branch.NodeNumOut;
                 FirstNodeOnBranch = this_branch.NodeNumIn;
@@ -1972,13 +1971,13 @@ namespace PlantLoopSolver {
                 ParallelBranchMinAvail += BranchMinAvail;
             }
             //            ! Find branch number and flow rates at splitter inlet
-            SplitterBranchIn = this_loopside.Splitter(SplitNum).BranchNumIn;
+            SplitterBranchIn = this_loopside.Splitter.BranchNumIn;
             LastNodeOnBranch = this_loopside.Branch(SplitterBranchIn).NodeNumOut;
             FirstNodeOnBranchIn = this_loopside.Branch(SplitterBranchIn).NodeNumIn;
             InletBranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
             InletBranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
             //            ! Find branch number and flow rates at mixer outlet
-            MixerBranchOut = this_loopside.Mixer(SplitNum).BranchNumOut;
+            MixerBranchOut = this_loopside.Mixer.BranchNumOut;
             LastNodeOnBranch = this_loopside.Branch(MixerBranchOut).NodeNumOut;
             FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
             OutletBranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
@@ -2009,7 +2008,7 @@ namespace PlantLoopSolver {
             // Initialize flow on passive, bypass and uncontrolled parallel branches to zero.  For these branches
             // MinAvail is not enforced
             for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                 FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                 if (this_loopside.Branch(SplitterBranchOut).ControlType != ControlType_Active &&
                     this_loopside.Branch(SplitterBranchOut).ControlType != ControlType_SeriesActive) {
@@ -2022,7 +2021,7 @@ namespace PlantLoopSolver {
             // IF SUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
             if (FlowRemaining < MassFlowTolerance) { // no flow available at all for splitter
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                    SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                     for (CompCounter = 1; CompCounter <= this_loopside.Branch(SplitterBranchOut).TotalComponents; ++CompCounter) {
 
                         FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
@@ -2039,7 +2038,7 @@ namespace PlantLoopSolver {
 
                 // 1) Satisfy flow demand of ACTIVE splitter outlet branches
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                    SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                     if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
                         this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
@@ -2058,7 +2057,7 @@ namespace PlantLoopSolver {
                 // 2) Distribute remaining flow to PASSIVE branches
                 totalMax = 0.0;
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                    SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                     if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Passive) {
                         // Calculate the total max available
@@ -2068,7 +2067,7 @@ namespace PlantLoopSolver {
 
                 if (totalMax > 0) {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                        SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                         if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Passive) {
                             FracFlow = FlowRemaining / totalMax;
@@ -2093,8 +2092,8 @@ namespace PlantLoopSolver {
                 if (FlowRemaining == 0.0) return;
 
                 // 3) Distribute remaining flow to the BYPASS
-                for (OutletNum = 1; OutletNum <= this_loopside.Splitter(SplitNum).TotalOutletNodes; ++OutletNum) {
-                    SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                for (OutletNum = 1; OutletNum <= this_loopside.Splitter.TotalOutletNodes; ++OutletNum) {
+                    SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                     if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Bypass) {
                         Node(FirstNodeOnBranch).MassFlowRate = min(FlowRemaining, Node(FirstNodeOnBranch).MassFlowRateMaxAvail);
@@ -2110,7 +2109,7 @@ namespace PlantLoopSolver {
                 if (NumActiveBranches > 0) {
                     ActiveFlowRate = FlowRemaining / NumActiveBranches;
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                        SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                         if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
                             this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
@@ -2132,7 +2131,7 @@ namespace PlantLoopSolver {
 
                     // 5)  Step 4) could have left ACTIVE branches < MaxAvail.  Check to makes sure all ACTIVE branches are at MaxAvail
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                        SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                         if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
                             this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
@@ -2152,18 +2151,18 @@ namespace PlantLoopSolver {
                 // DSU? do we need this logic?   or should we fatal on a diagnostic error
                 TotParallelBranchFlowReq = 0.0;
                 for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
-                    BranchNum = this_loopside.Splitter(SplitNum).BranchNumOut(iBranch);
+                    BranchNum = this_loopside.Splitter.BranchNumOut(iBranch);
                     FirstNodeOnBranch = this_loopside.Branch(BranchNum).NodeNumIn;
                     // calculate parallel branch flow rate
                     TotParallelBranchFlowReq += Node(FirstNodeOnBranch).MassFlowRate;
                 }
                 // Reset the flow on the splitter inlet branch
-                SplitterBranchIn = this_loopside.Splitter(SplitNum).BranchNumIn;
+                SplitterBranchIn = this_loopside.Splitter.BranchNumIn;
                 FirstNodeOnBranchIn = this_loopside.Branch(SplitterBranchIn).NodeNumIn;
                 Node(FirstNodeOnBranchIn).MassFlowRate = TotParallelBranchFlowReq;
                 PushBranchFlowCharacteristics(LoopNum, LoopSideNum, SplitterBranchIn, Node(FirstNodeOnBranchIn).MassFlowRate, FirstHVACIteration);
                 // Reset the flow on the Mixer outlet branch
-                MixerBranchOut = this_loopside.Mixer(SplitNum).BranchNumOut;
+                MixerBranchOut = this_loopside.Mixer.BranchNumOut;
                 FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
                 Node(FirstNodeOnBranchOut).MassFlowRate = TotParallelBranchFlowReq;
                 PushBranchFlowCharacteristics(LoopNum, LoopSideNum, MixerBranchOut, Node(FirstNodeOnBranchOut).MassFlowRate, FirstHVACIteration);
@@ -2176,7 +2175,7 @@ namespace PlantLoopSolver {
                 // 1) apportion flow based on requested fraction of total
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
 
-                    SplitterBranchOut = this_loopside.Splitter(SplitNum).BranchNumOut(OutletNum);
+                    SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                     ThisBranchRequest = DetermineBranchFlowRequest(LoopNum, LoopSideNum, SplitterBranchOut);
                     FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                     auto &this_splitter_outlet_branch(this_loopside.Branch(SplitterBranchOut));
@@ -2220,7 +2219,7 @@ namespace PlantLoopSolver {
                 }
 
                 // 2)  ! Reset the flow on the Mixer outlet branch
-                MixerBranchOut = this_loopside.Mixer(SplitNum).BranchNumOut;
+                MixerBranchOut = this_loopside.Mixer.BranchNumOut;
                 FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
                 Node(FirstNodeOnBranchOut).MassFlowRate = TotParallelBranchFlowReq;
                 DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(

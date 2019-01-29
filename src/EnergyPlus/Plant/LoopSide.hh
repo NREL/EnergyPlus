@@ -86,8 +86,6 @@ namespace DataPlant {
         std::string NodeNameIn;  // Node name for the inlet to this loop
         int NodeNumOut;          // Node number for the outlet to this loop
         std::string NodeNameOut; // Node name for the outlet to this loop
-        int NumSplitters;        // Number of splitters in the half loop
-        int NumMixers;           // Number of mixers in the half loop
         bool SplitterExists;     // Logical Flag indication splitter exists in the half loop
         bool MixerExists;        // Logical Flag indication mixer exists in the half loop
         int TotalPumps;          // total number of pumps on the half loop
@@ -105,8 +103,8 @@ namespace DataPlant {
         int TotalConnected;                   // total number of other loops connected to this loop side
         Array1D<ConnectedLoopData> Connected; // DSU Other loops connected to this Loop side
         Array1D<BranchData> Branch;           // Branch data
-        Array1D<SplitterData> Splitter;       // Data for splitter on branch (if any)
-        Array1D<MixerData> Mixer;             // Data for splitter on branch (if any)
+        SplitterData Splitter;       // Data for splitter on branch (if any)
+        MixerData Mixer;             // Data for splitter on branch (if any)
         bool HasPressureComponents;
         bool HasParallelPressComps;
         Real64 PressureDrop;
@@ -130,7 +128,7 @@ namespace DataPlant {
               OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
               TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
               TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
-              NodeNumIn(0), NodeNumOut(0), NumSplitters(0), NumMixers(0), SplitterExists(false), MixerExists(false), TotalPumps(0),
+              NodeNumIn(0), NodeNumOut(0), SplitterExists(false), MixerExists(false), TotalPumps(0),
               BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false), OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0),
               FlowRestrictionFlag(false), FlowLock(0), TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false),
               PressureDrop(0.0), PressureEffectiveK(0.0), errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0),

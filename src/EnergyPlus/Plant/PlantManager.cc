@@ -1398,24 +1398,14 @@ namespace PlantManager {
                     }
                 }
 
-                if (NumofSplitters > 0) {
-                    TempLoop.SplitterExists = true;
-                } else {
-                    TempLoop.SplitterExists = false;
-                }
-
-                if (NumofMixers > 0) {
-                    TempLoop.MixerExists = true;
-                } else {
-                    TempLoop.MixerExists = false;
-                }
+                TempLoop.SplitterExists = NumofSplitters > 0;
+                TempLoop.MixerExists = NumofMixers > 0;
 
                 if (ErrorsFound) {
                     ShowFatalError("GetPlantInput: Previous Severe errors cause termination.");
                 }
 
                 NumConnectorsInLoop = NumofSplitters + NumofMixers;
-                TempLoop.Splitter.allocate(NumofSplitters);
                 SplitNum = 1;
                 for (ConnNum = 1; ConnNum <= NumConnectorsInLoop; ++ConnNum) {
 
@@ -1424,11 +1414,11 @@ namespace PlantManager {
                     OutletNodeNumbers.allocate(MaxNumAlphas);
                     GetLoopSplitter(TempLoop.Name,
                                     TempLoop.ConnectList,
-                                    TempLoop.Splitter(SplitNum).Name,
-                                    TempLoop.Splitter(SplitNum).Exists,
-                                    TempLoop.Splitter(SplitNum).NodeNameIn,
-                                    TempLoop.Splitter(SplitNum).NodeNumIn,
-                                    TempLoop.Splitter(SplitNum).TotalOutletNodes,
+                                    TempLoop.Splitter.Name,
+                                    TempLoop.Splitter.Exists,
+                                    TempLoop.Splitter.NodeNameIn,
+                                    TempLoop.Splitter.NodeNumIn,
+                                    TempLoop.Splitter.TotalOutletNodes,
                                     OutletNodeNames,
                                     OutletNodeNumbers,
                                     ErrorsFound,
@@ -1442,48 +1432,48 @@ namespace PlantManager {
                     }
 
                     // Map the inlet node to the splitter to a branch number
-                    if (TempLoop.Splitter(SplitNum - 1).Exists) {
+                    if (TempLoop.Splitter.Exists) {
                         // Map the inlet node to the splitter to a branch number
                         SplitInBranch = false;
                         for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
                             CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                            if (TempLoop.Splitter(SplitNum - 1).NodeNumIn == TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                TempLoop.Splitter(SplitNum - 1).BranchNumIn = BranchNum;
+                            if (TempLoop.Splitter.NodeNumIn == TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
+                                TempLoop.Splitter.BranchNumIn = BranchNum;
                                 SplitInBranch = true;
                                 break; // BranchNum DO loop
                             }
                         }
                         if (!SplitInBranch) {
-                            ShowSevereError("Splitter Inlet Branch not found, Splitter=" + TempLoop.Splitter(SplitNum - 1).Name);
-                            ShowContinueError("Splitter Branch Inlet name=" + TempLoop.Splitter(SplitNum - 1).NodeNameIn);
+                            ShowSevereError("Splitter Inlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
+                            ShowContinueError("Splitter Branch Inlet name=" + TempLoop.Splitter.NodeNameIn);
                             ShowContinueError("In Loop=" + TempLoop.Name);
                             ErrorsFound = true;
                         }
 
-                        TempLoop.Splitter(SplitNum - 1).NodeNameOut.allocate(TempLoop.Splitter(SplitNum - 1).TotalOutletNodes);
-                        TempLoop.Splitter(SplitNum - 1).NodeNumOut.dimension(TempLoop.Splitter(SplitNum - 1).TotalOutletNodes, 0);
-                        TempLoop.Splitter(SplitNum - 1).BranchNumOut.dimension(TempLoop.Splitter(SplitNum - 1).TotalOutletNodes, 0);
+                        TempLoop.Splitter.NodeNameOut.allocate(TempLoop.Splitter.TotalOutletNodes);
+                        TempLoop.Splitter.NodeNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
+                        TempLoop.Splitter.BranchNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
 
-                        SplitOutBranch.allocate(TempLoop.Splitter(SplitNum - 1).TotalOutletNodes);
+                        SplitOutBranch.allocate(TempLoop.Splitter.TotalOutletNodes);
                         SplitOutBranch = false;
-                        for (NodeNum = 1; NodeNum <= TempLoop.Splitter(SplitNum - 1).TotalOutletNodes; ++NodeNum) {
-                            TempLoop.Splitter(SplitNum - 1).NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
-                            TempLoop.Splitter(SplitNum - 1).NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
+                        for (NodeNum = 1; NodeNum <= TempLoop.Splitter.TotalOutletNodes; ++NodeNum) {
+                            TempLoop.Splitter.NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
+                            TempLoop.Splitter.NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
                             // The following DO loop series is intended to store the branch number for each outlet
                             // branch of the splitter
                             for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                if (TempLoop.Splitter(SplitNum - 1).NodeNumOut(NodeNum) == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                    TempLoop.Splitter(SplitNum - 1).BranchNumOut(NodeNum) = BranchNum;
+                                if (TempLoop.Splitter.NodeNumOut(NodeNum) == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
+                                    TempLoop.Splitter.BranchNumOut(NodeNum) = BranchNum;
                                     SplitOutBranch(NodeNum) = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                         }
 
-                        for (Outlet = 1; Outlet <= TempLoop.Splitter(SplitNum - 1).TotalOutletNodes; ++Outlet) {
+                        for (Outlet = 1; Outlet <= TempLoop.Splitter.TotalOutletNodes; ++Outlet) {
                             if (SplitOutBranch(Outlet)) continue;
-                            ShowSevereError("Splitter Outlet Branch not found, Splitter=" + TempLoop.Splitter(SplitNum - 1).Name);
-                            ShowContinueError("Splitter Branch Outlet node name=" + TempLoop.Splitter(SplitNum - 1).NodeNameOut(Outlet));
+                            ShowSevereError("Splitter Outlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
+                            ShowContinueError("Splitter Branch Outlet node name=" + TempLoop.Splitter.NodeNameOut(Outlet));
                             ShowContinueError("In Loop=" + TempLoop.Name);
                             ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
                             ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
@@ -1497,7 +1487,6 @@ namespace PlantManager {
                     OutletNodeNumbers.deallocate();
                 }
 
-                TempLoop.Mixer.allocate(NumofMixers);
                 MixNum = 1;
                 for (ConnNum = 1; ConnNum <= NumConnectorsInLoop; ++ConnNum) {
 
@@ -1506,11 +1495,11 @@ namespace PlantManager {
                     InletNodeNumbers.allocate(MaxNumAlphas);
                     GetLoopMixer(TempLoop.Name,
                                  TempLoop.ConnectList,
-                                 TempLoop.Mixer(MixNum).Name,
-                                 TempLoop.Mixer(MixNum).Exists,
-                                 TempLoop.Mixer(MixNum).NodeNameOut,
-                                 TempLoop.Mixer(MixNum).NodeNumOut,
-                                 TempLoop.Mixer(MixNum).TotalInletNodes,
+                                 TempLoop.Mixer.Name,
+                                 TempLoop.Mixer.Exists,
+                                 TempLoop.Mixer.NodeNameOut,
+                                 TempLoop.Mixer.NodeNumOut,
+                                 TempLoop.Mixer.TotalInletNodes,
                                  InletNodeNames,
                                  InletNodeNumbers,
                                  ErrorsFound,
@@ -1523,46 +1512,46 @@ namespace PlantManager {
                         continue;
                     }
                     // Map the outlet node of the mixer to a branch number
-                    if (TempLoop.Mixer(MixNum - 1).Exists) {
+                    if (TempLoop.Mixer.Exists) {
                         // Map the outlet node of the mixer to a branch number
                         MixerOutBranch = false;
                         for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                            if (TempLoop.Mixer(MixNum - 1).NodeNumOut == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                TempLoop.Mixer(MixNum - 1).BranchNumOut = BranchNum;
+                            if (TempLoop.Mixer.NodeNumOut == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
+                                TempLoop.Mixer.BranchNumOut = BranchNum;
                                 MixerOutBranch = true;
                                 break; // BranchNum DO loop
                             }
                         }
                         if (!MixerOutBranch) {
-                            ShowSevereError("Mixer Outlet Branch not found, Mixer=" + TempLoop.Mixer(MixNum - 1).Name);
+                            ShowSevereError("Mixer Outlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
                             ErrorsFound = true;
                         }
 
-                        TempLoop.Mixer(MixNum - 1).NodeNameIn.allocate(TempLoop.Mixer(MixNum - 1).TotalInletNodes);
-                        TempLoop.Mixer(MixNum - 1).NodeNumIn.dimension(TempLoop.Mixer(MixNum - 1).TotalInletNodes, 0);
-                        TempLoop.Mixer(MixNum - 1).BranchNumIn.dimension(TempLoop.Mixer(MixNum - 1).TotalInletNodes, 0);
+                        TempLoop.Mixer.NodeNameIn.allocate(TempLoop.Mixer.TotalInletNodes);
+                        TempLoop.Mixer.NodeNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
+                        TempLoop.Mixer.BranchNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
 
-                        MixerInBranch.allocate(TempLoop.Mixer(MixNum - 1).TotalInletNodes);
+                        MixerInBranch.allocate(TempLoop.Mixer.TotalInletNodes);
                         MixerInBranch = false;
-                        for (NodeNum = 1; NodeNum <= TempLoop.Mixer(MixNum - 1).TotalInletNodes; ++NodeNum) {
-                            TempLoop.Mixer(MixNum - 1).NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
-                            TempLoop.Mixer(MixNum - 1).NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
+                        for (NodeNum = 1; NodeNum <= TempLoop.Mixer.TotalInletNodes; ++NodeNum) {
+                            TempLoop.Mixer.NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
+                            TempLoop.Mixer.NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
                             // The following DO loop series is intended to store the branch number for each inlet
                             // branch of the mixer
                             for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
                                 CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                                if (TempLoop.Mixer(MixNum - 1).NodeNumIn(NodeNum) == TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                    TempLoop.Mixer(MixNum - 1).BranchNumIn(NodeNum) = BranchNum;
+                                if (TempLoop.Mixer.NodeNumIn(NodeNum) == TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
+                                    TempLoop.Mixer.BranchNumIn(NodeNum) = BranchNum;
                                     MixerInBranch(NodeNum) = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                         }
 
-                        for (Inlet = 1; Inlet <= TempLoop.Mixer(MixNum - 1).TotalInletNodes; ++Inlet) {
+                        for (Inlet = 1; Inlet <= TempLoop.Mixer.TotalInletNodes; ++Inlet) {
                             if (MixerInBranch(Inlet)) continue;
-                            ShowSevereError("Mixer Inlet Branch not found, Mixer=" + TempLoop.Mixer(MixNum - 1).Name);
-                            ShowContinueError("Mixer Branch Inlet name=" + TempLoop.Mixer(MixNum - 1).NodeNameIn(Inlet));
+                            ShowSevereError("Mixer Inlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
+                            ShowContinueError("Mixer Branch Inlet name=" + TempLoop.Mixer.NodeNameIn(Inlet));
                             ShowContinueError("In Loop=" + TempLoop.Name);
                             ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
                             ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
@@ -1583,19 +1572,12 @@ namespace PlantManager {
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches = TempLoop.TotalBranches;
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch = TempLoop.Branch;
 
-                PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.allocate(NumofSplitters);
-                PlantLoop(LoopNum).LoopSide(LoopSideNum).NumSplitters = NumofSplitters;
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter = TempLoop.Splitter;
-
-                PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.allocate(NumofMixers);
-                PlantLoop(LoopNum).LoopSide(LoopSideNum).NumMixers = NumofMixers;
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer = TempLoop.Mixer;
 
                 //   Add condenser CASE statement when required.
 
                 TempLoop.Branch.deallocate();
-                TempLoop.Splitter.deallocate();
-                TempLoop.Mixer.deallocate();
 
             } // ... end LoopSideNum=DemandSide,SupplySide
 
@@ -2823,26 +2805,8 @@ namespace PlantManager {
         //       then another branch in the s/m needs to be active
         //  other checks could/should be added!
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using DataErrorTracking::AskForPlantCheckOnAbort;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopNum;           // DO loop counter for loops
@@ -2852,7 +2816,6 @@ namespace PlantManager {
         int BranchNum2;        // used to search for active control branches in parallel with bypass branches
         int SideNum;
         int numLoopSides;
-        int SplitNum;
         int BranchNum; // DO loop counter for branches
         int CompNum;   // do loop for multiple components on a branch
         bool ShouldBeACTIVE;
@@ -2861,103 +2824,103 @@ namespace PlantManager {
             return;
         }
 
-        if (!(TotNumLoops > 0)) return;
+        if (TotNumLoops <= 0) return;
         if (!(allocated(PlantLoop))) return;
 
         for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
             numLoopSides = 2;
             for (SideNum = 1; SideNum <= numLoopSides; ++SideNum) {
                 if (!(PlantLoop(LoopNum).LoopSide(SideNum).SplitterExists)) continue;
-                for (SplitNum = 1; SplitNum <= PlantLoop(LoopNum).LoopSide(SideNum).NumSplitters; ++SplitNum) {
-                    for (ParalBranchNum = 1; ParalBranchNum <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter(SplitNum).TotalOutletNodes;
-                         ++ParalBranchNum) {
-                        BranchNum = PlantLoop(LoopNum).LoopSide(SideNum).Splitter(SplitNum).BranchNumOut(ParalBranchNum);
-                        if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).IsBypass) { // we know there is a bypass
-                            // check that there is at least one 'Active' control type in parallel with bypass branch
-                            ActiveCntrlfound = false;
-                            for (ParalBranchNum2 = 1; ParalBranchNum2 <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter(SplitNum).TotalOutletNodes;
-                                 ++ParalBranchNum2) {
-                                BranchNum2 = PlantLoop(LoopNum).LoopSide(SideNum).Splitter(SplitNum).BranchNumOut(ParalBranchNum2);
-                                if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum2).ControlType == ControlType_Active) {
-                                    ActiveCntrlfound = true;
+
+                for (ParalBranchNum = 1; ParalBranchNum <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
+                     ++ParalBranchNum) {
+                    BranchNum = PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(ParalBranchNum);
+                    if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).IsBypass) { // we know there is a bypass
+                        // check that there is at least one 'Active' control type in parallel with bypass branch
+                        ActiveCntrlfound = false;
+                        for (ParalBranchNum2 = 1; ParalBranchNum2 <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
+                             ++ParalBranchNum2) {
+                            BranchNum2 = PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(ParalBranchNum2);
+                            if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum2).ControlType == ControlType_Active) {
+                                ActiveCntrlfound = true;
+                            }
+                        }
+                        if (!(ActiveCntrlfound)) {
+                            ShowWarningError("Check control types on branches between splitter and mixer in PlantLoop=" +
+                                             PlantLoop(LoopNum).Name);
+                            ShowContinueError("Found a BYPASS branch with no ACTIVE branch in parallel with it");
+                            ShowContinueError("In certain (but not all) situations, this can cause problems; please verify your inputs");
+                            ShowContinueError("Bypass branch named: " + PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                        }
+                    } // bypass present
+
+                    // check for possible components on demand side that should be ACTIVE but are not
+                    if (SideNum == DemandSide) {
+                        // check for presences of the following components whose branch control type should be active
+                        // WATER HEATER:MIXED
+                        // WATER HEATER:STRATIFIED
+                        // WATER USE CONNECTIONS
+                        // COIL:WATER:COOLING
+                        // COIL:WATER:SIMPLEHEATING
+                        // COIL:STEAM:AIRHEATING
+                        // SOLAR COLLECTOR:FLAT PLATE
+                        // PLANT LOAD PROFILE
+                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                            ShouldBeACTIVE = false;
+                            {
+                                auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
+
+                                if (SELECT_CASE_var == TypeOf_WtrHeaterMixed) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_WtrHeaterStratified) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_WaterUseConnection) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_CoilWaterCooling) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_CoilSteamAirHeating) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_SolarCollectorFlatPlate) {
+                                    ShouldBeACTIVE = true;
+                                } else if (SELECT_CASE_var == TypeOf_PlantLoadProfile) {
+                                    ShouldBeACTIVE = true;
+                                } else {
+                                    // not a demand side component that we know needs to be active, do nothing
                                 }
                             }
-                            if (!(ActiveCntrlfound)) {
-                                ShowWarningError("Check control types on branches between splitter and mixer in PlantLoop=" +
-                                                 PlantLoop(LoopNum).Name);
-                                ShowContinueError("Found a BYPASS branch with no ACTIVE branch in parallel with it");
-                                ShowContinueError("In certain (but not all) situations, this can cause problems; please verify your inputs");
-                                ShowContinueError("Bypass branch named: " + PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                            }
-                        } // bypass present
 
-                        // check for possible components on demand side that should be ACTIVE but are not
-                        if (SideNum == DemandSide) {
-                            // check for presences of the following components whose branch control type should be active
-                            // WATER HEATER:MIXED
-                            // WATER HEATER:STRATIFIED
-                            // WATER USE CONNECTIONS
-                            // COIL:WATER:COOLING
-                            // COIL:WATER:SIMPLEHEATING
-                            // COIL:STEAM:AIRHEATING
-                            // SOLAR COLLECTOR:FLAT PLATE
-                            // PLANT LOAD PROFILE
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                ShouldBeACTIVE = false;
+                            if (ShouldBeACTIVE) {
                                 {
-                                    auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
+                                    auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).ControlType);
 
-                                    if (SELECT_CASE_var == TypeOf_WtrHeaterMixed) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_WtrHeaterStratified) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_WaterUseConnection) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_CoilWaterCooling) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_CoilSteamAirHeating) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_SolarCollectorFlatPlate) {
-                                        ShouldBeACTIVE = true;
-                                    } else if (SELECT_CASE_var == TypeOf_PlantLoadProfile) {
-                                        ShouldBeACTIVE = true;
-                                    } else {
-                                        // not a demand side component that we know needs to be active, do nothing
+                                    if (SELECT_CASE_var == ControlType_Unknown) {
+                                        ShowWarningError("Found potential problem with Control Type for Branch named: " +
+                                                         PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                        ShowContinueError("This branch should (probably) be ACTIVE but has control type unknown");
+                                    } else if (SELECT_CASE_var == ControlType_Active) {
+                                        // do nothing, this is correct control type.
+                                    } else if (SELECT_CASE_var == ControlType_Passive) {
+                                        ShowWarningError("Found potential problem with Control Type for Branch named: " +
+                                                         PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                        ShowContinueError("This branch should (probably) be ACTIVE but has control type PASSIVE");
+                                    } else if (SELECT_CASE_var == ControlType_SeriesActive) {
+                                        // do nothing, should be okay. (? don't really understand SeriesActive though)
+                                    } else if (SELECT_CASE_var == ControlType_Bypass) {
+                                        ShowWarningError("Found potential problem with Control Type for Branch named: " +
+                                                         PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                        ShowContinueError("This branch should (probably) be ACTIVE but has control type Bypass");
                                     }
                                 }
+                            } // should be active
+                        }     // comp num loop
+                    }         // demand side
 
-                                if (ShouldBeACTIVE) {
-                                    {
-                                        auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).ControlType);
+                } // splitter outlet nodes
 
-                                        if (SELECT_CASE_var == ControlType_Unknown) {
-                                            ShowWarningError("Found potential problem with Control Type for Branch named: " +
-                                                             PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError("This branch should (probably) be ACTIVE but has control type unknown");
-                                        } else if (SELECT_CASE_var == ControlType_Active) {
-                                            // do nothing, this is correct control type.
-                                        } else if (SELECT_CASE_var == ControlType_Passive) {
-                                            ShowWarningError("Found potential problem with Control Type for Branch named: " +
-                                                             PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError("This branch should (probably) be ACTIVE but has control type PASSIVE");
-                                        } else if (SELECT_CASE_var == ControlType_SeriesActive) {
-                                            // do nothing, should be okay. (? don't really understand SeriesActive though)
-                                        } else if (SELECT_CASE_var == ControlType_Bypass) {
-                                            ShowWarningError("Found potential problem with Control Type for Branch named: " +
-                                                             PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError("This branch should (probably) be ACTIVE but has control type Bypass");
-                                        }
-                                    }
-                                } // should be active
-                            }     // comp num loop
-                        }         // demand side
-
-                    } // splitter outlet nodes
-                }     // splitters
                 // check to see if bypass exists in demand side. If not warn error of possible flow problems
                 if (!PlantLoop(LoopNum).LoopSide(SideNum).BypassExists) {
                     if (SideNum == DemandSide) {
