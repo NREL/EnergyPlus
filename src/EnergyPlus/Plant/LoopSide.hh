@@ -131,7 +131,7 @@ namespace DataPlant {
               TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
               TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
               NodeNumIn(0), NodeNumOut(0), NumSplitters(0), NumMixers(0), SplitterExists(false), MixerExists(false), TotalPumps(0),
-              BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false), OutletNodeSetPt(false), EMSCtrl(false),
+              BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false), OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0),
               FlowRestrictionFlag(false), FlowLock(0), TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false),
               PressureDrop(0.0), PressureEffectiveK(0.0), errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0),
               errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0), LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0),

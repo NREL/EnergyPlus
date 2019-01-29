@@ -173,18 +173,21 @@ namespace DataLoopNode {
         Real64 GenContamSetPoint;  // {ppm}
         bool SPMNodeWetBulbRepReq; // Set to true when node has SPM which follows wetbulb
 
+        // error message flag
+        bool plantNodeErrorMsgIssued;
+
         // Default Constructor
         NodeData()
             : FluidType(0), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue), TempLastTimestep(0.0),
               MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue), MassFlowRateMinAvail(0.0),
               MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0), EnthalpyLastTimestep(0.0), HumRat(0.0),
               HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue), HumRatSetPoint(SensedNodeFlagValue),
-              TempSetPointHi(SensedNodeFlagValue), TempSetPointLo(SensedNodeFlagValue), Height(-1.0), IsLocalNode(false), OutAirDryBulbSchedNum(0.0),
-              OutAirWetBulbSchedNum(0.0), OutAirWindSpeedSchedNum(0.0), OutAirWindDirSchedNum(0.0), OutAirDryBulb(0.0),
+              TempSetPointHi(SensedNodeFlagValue), TempSetPointLo(SensedNodeFlagValue), Height(-1.0), IsLocalNode(false), OutAirDryBulbSchedNum(0),
+              OutAirWetBulbSchedNum(0), OutAirWindSpeedSchedNum(0), OutAirWindDirSchedNum(0), OutAirDryBulb(0.0),
               EMSOverrideOutAirDryBulb(false), EMSValueForOutAirDryBulb(0.0), OutAirWetBulb(0.0), EMSOverrideOutAirWetBulb(false),
               EMSValueForOutAirWetBulb(0.0), OutAirWindSpeed(0.0), EMSOverrideOutAirWindSpeed(false), EMSValueForOutAirWindSpeed(0.0),
               OutAirWindDir(0.0), EMSOverrideOutAirWindDir(false), EMSValueForOutAirWindDir(0.0), CO2(0.0), CO2SetPoint(0.0), GenContam(0.0),
-              GenContamSetPoint(0.0), SPMNodeWetBulbRepReq(false)
+              GenContamSetPoint(0.0), SPMNodeWetBulbRepReq(false), plantNodeErrorMsgIssued(false)
         {
         }
 
