@@ -29,17 +29,15 @@
 
 \begin{document}
 \title{EnergyPlus Essentials}
-\date{January 28, 2019}
-
+\date{January 29, 2019}
 \maketitle
-<\textcompwordmark <TO DO: GRAMMARLY, ADDITIONAL GRAPHICS, >\textcompwordmark >
 
 \section{Introduction}
 
 The following background on building energy modeling (BEM) will provide
 a foundation before learning the essentials of EnergyPlus. 
 
-\section*{What is BEM?}
+\subsection{What is BEM?}
 
 According to the \href{https://www.bemlibrary.com/index.php/owners-managers/introduction/what-bem/}{BEM Library}:
 \begin{quotation}
@@ -83,42 +81,42 @@ and \href{https://www.youtube.com/results?search_query=building+energy+modeling}
 videos
 \item And numerous \href{https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias\%3Daps&field-keywords=building+energy+modeling}{books}
 \end{itemize}
-Building enery modeling is necessary to understand the overall energy
+Building energy modeling is necessary to understand the overall energy
 consumption in buildings because the energy flows in buildings can
 be very complicated. The heat flow through walls is determined not
-just by the area and the temperatures but the mass characteristics
+just by the area and the temperatures, but the mass characteristics
 of the walls may result in heat flowing out of a wall several hours
 after it has flowed in. The constantly changing temperature on the
 outside of the wall and the less frequent but often large step changes
 in thermostat setpoints between day and night operation for the inside
 of the building make the direction of the heat flow vary over time.
-Solar enery being absorbed on the exterior wall and roof surfaces
-as well as entering windows varies by the sun position for each period
+Solar energy being absorbed on the exterior wall and roof surfaces
+as well as entering a window varies by the sun position for each period
 of time over the day and over the year. Heat sources within the building
 including people, office and other equipment, and lighting include
 both heat that immediately impacts the air within (convective heat)
-and heat that is absorbed by the sufaces and released slowly over
+and heat that is absorbed by the surfaces and released slowly over
 time (radiant heat). Lighting may be controlled by a sensor that turns
 it on or off or changes its intensity based on the amount of natural
 daylight that is entering the space through windows and skylights
 making the heat generated from the lighting system change over time.
-Air conditioning and heating systems come in a huge number of configurations
+Air conditioning and heating systems come in a huge number of configurations,
 and each one can be used with many different controls configurations
 based on the temperature or other conditions within each space in
-the building and ultimately their operation accounts for a large portion
-of the energy consumed in a building. For these reasons and more,
-what might first appear as something that can be calcuated with just
-a few formulas in a spreadsheet is instead a software program and,
-in the case of EnergyPlus, with over 500,000 lines of code. 
+the building, and ultimately their operation accounts for a large
+portion of the energy consumed in a building. For these reasons and
+more, what might first appear as something that can be calculated
+with just a few formulas in a spreadsheet is instead a software program
+and, in the case of EnergyPlus, with over 500,000 lines of code. 
 
-\section*{Questions that BEM can answer}
+\subsection{Questions that BEM can answer}
 
 The most common questions that BEM can answer are:
 \begin{itemize}
 \item If my building was made or operated differently, how would the energy
 consumption change?
 \item Does my building comply with a building energy code or standard?
-\item What kind of rating or how many points can I get in a environmental
+\item What kind of rating or how many points can I get in an environmental
 certification program?
 \item Is my building operating as it was designed to?
 \item What is a good target for energy consumption for my building?
@@ -127,19 +125,19 @@ These questions can take place at different times during the life-cycle
 of a building from before schematic design all through the rest of
 the design process, and into the operation of the building
 
-\subsection*{The Design Process and BEM }
+\subsection{The Design Process and BEM }
 
 Building energy modeling can be used throughout the design process
 for a new building or when considering updates to existing buildings.
 It can also be used later in the life-cycle of a building related
-to comparing actual operation of the building with predicted operation.
+to comparing actual operation of the building with the predicted operation.
 ASHRAE \href{https://www.techstreet.com/ashrae/standards/ashrae-209-2018?gateway_code=ashrae&product_id=2010483}{Standard 209}
 titled ``Energy Simulation Aided Design for Buildings Except Low-Rise
 Residential Buildings'' is a critical document to in how to apply
-building energy modeling. It describes a methodology to apply building
+building energy modeling. It described a methodology to apply building
 energy modeling to the design and was created to define reliable and
 consistent procedures that advance the use of timely energy modeling
-to quanifty the impact of design decision s at the point in time which
+to quantify the impact of design decision s at the point in time which
 they are made. The standard includes different \textquotedblleft Modeling
 Cycles\textquotedblright{} for different stages of using building
 energy modeling during the life-cycle of the building:
@@ -156,12 +154,12 @@ energy modeling during the life-cycle of the building:
 \item Modeling Cycle \#10 -- As-Built Energy Performance
 \item Modeling Cycle \#11 -- Postoccupancy Energy Comparison
 \end{itemize}
-In addition it has information about how to integrate climate and
+In addition, it has information about how to integrate climate and
 site analysis, benchmarking, energy charrettes, the energy performance
-goals of the owners project requirements in to the design process
-when using building energy modeling.
+goals of the owners project requirements into the design process when
+using building energy modeling.
 
-\subsection*{EnergyPlus Capabilities}
+\subsection{EnergyPlus Capabilities}
 
 According to the \href{https://energyplus.net/}{energyplus.net web site}
 (as of January 2019):
@@ -202,17 +200,17 @@ all with energy source multipliers.''
 \end{itemize}
 In addition:
 \begin{itemize}
-\item ASCII text based weather, input, and output files that include hourly
+\item ASCII text-based weather, input, and output files that include hourly
 or sub-hourly environmental conditions, and standard and user definable
 reports, respectively 
 \item Transient heat conduction through building elements such as walls,
 roofs, floors, etc. using conduction transfer functions
-\item Thermal comfort models based on activity, inside dry bulb, humidity,
-etc.
+\item Thermal comfort models based on activity, inside dry-bulb temperature,
+humidity, etc.
 \item Anisotropic sky model for improved calculation of diffuse solar on
 tilted surfaces
 \item Atmospheric pollution calculations that predict CO2, SOx, NOx, CO,
-particulate matter, and hydrocarbon production for both on site and
+particulate matter, and hydrocarbon production for both on-site and
 remote energy conversion
 \item System and plant output is allowed to directly impact the building
 thermal response rather than calculating all loads first, then simulating
@@ -223,7 +221,7 @@ might have on the thermal comfort of occupants within the building
 \end{itemize}
 Integration of Loads, Systems, and Plants: One of the strong points
 of EnergyPlus is the integration of all aspects of the simulation---loads,
-systems, and plants. System and plant output is allowed to directly
+systems, and plants. System and plant output are allowed to directly
 impact the building thermal response rather than calculating all loads
 first, then simulating systems and plants. The simulation is coupled
 allowing the designer to more accurately investigate the effect of
@@ -233,7 +231,7 @@ the thermal comfort of occupants within the building.
 <need to balance overview with enough details to help people, I think
 a list of what can be modeled might be more helpful>
 
-\subsection*{Open Source}
+\subsection{Open Source}
 
 \href{https://energyplus.net/}{EnergyPlus}is an \href{https://opensource.org/}{Open Source}
 program so all the \href{https://github.com/NREL/EnergyPlus}{source code}
@@ -245,16 +243,16 @@ code itself. \href{https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus}{I
 in source code repository wiki if you see something that needs to
 be enhanced or fixed. 
 
-\subsection*{Brief History}
+\subsection{Brief History}
 
 EnergyPlus has been under development since 1997 and was first released
 in 2001. EnergyPlus has its roots in both the BLAST and DOE--2 programs.
 BLAST (Building Loads Analysis and System Thermodynamics) and DOE--2
 were both developed and released in the late 1970s and early 1980s
-as energy and load simulation tools. BLAST was developed by \href{https://www.erdc.usace.army.mil/Locations/CERL/}{Construction Engineering Researrch Laboratory (CERL)}
-and \href{https://illinois.edu/}{University of Illinois} which DOE-2
-was developed by \href{https://www.lbl.gov/}{Berkeley Lab} and many
-others. Their intended audience is a design engineer or architect
+as energy and load simulation tools. BLAST was developed by \href{https://www.erdc.usace.army.mil/Locations/CERL/}{Construction Engineering Research Laboratory (CERL)}
+and \href{https://illinois.edu/}{the University of Illinois} which
+DOE-2 was developed by \href{https://www.lbl.gov/}{Berkeley Lab}
+and many others. Their intended audience is a design engineer or architect
 that wishes to size appropriate HVAC equipment, develop retrofit studies
 for life cycling cost analyses, optimize energy performance, etc.
 Born out of concerns driven by the energy crisis of the early 1970s
@@ -264,18 +262,18 @@ to solve the same problem from two slightly different perspectives.
 Both programs had their merits and shortcomings, their supporters
 and detractors, and solid user bases both nationally and internationally.
 Originally written in Fortran, in 2014 it was converted to C++. It
-was developed as a simulation engine and many graphical user interfaces
+was developed as a simulation engine, and many graphical user interfaces
 utilize it.
 
-\subsection*{Documentation and Other Resources}
+\subsection{Documentation and Other Resources}
 
 The EnergyPlus documentation is currently included the installation
-in the ``Documenation'' folder as PDFs. It is also available as
+in the ``Documentation'' folder as PDFs. It is also available as
 \href{https://energyplus.net/documentation}{PDFs online} and as \href{https://bigladdersoftware.com/epx/docs/}{browsable HTML}.
 Using search in the documentation is critical to finding the information
-needed. Some of the documentation PDFs are very large so searching
-is a good way to find the specific information about a topic or an
-input object. The documentation includes:
+needed. Some of the documentation PDFs are very large, so searching
+is a good way to find specific information about a topic or an input
+object. The documentation includes:
 \begin{itemize}
 \item Input and Output Reference: Contains a thorough description of the
 various input and output files related to EnergyPlus, the format of
@@ -293,7 +291,7 @@ theoretical basis behind the various calculations contained in the
 program including algorithm descriptions.
 \item EMS Application Guide: Contains information useful to use the advanced
 feature of EnergyPlus: Energy Management System tweaks. The Erl language
-is described and examples for use are given.
+is described, and examples for use are given.
 \item External Interface Application Guide: Contains information specific
 to using the external interface feature of EnergyPlus to connect other
 simulation systems.
@@ -308,20 +306,19 @@ link) to EnergyPlus.
 for using various parts of EnergyPlus. <MAYBE THIS SHOULD BE ELIMINATED
 AND PORTIONS INCLUDED IN THIS DOCUMENT>
 \end{itemize}
-To learn more about how to use EnergyPlus, the example files are a
-great resource. The example files are in the directory ExampleFiles
-and 
+The example files are a great resource to learn more about how to
+use EnergyPlus The example files are in the directory ExampleFiles.
 
 \section{The EnergyPlus Ecosystem }
 
-\subsection*{Current Interfaces }
+\subsection{Current Interfaces }
 
 EnergyPlus is often used directly using the text file input (IDF or
 epJSON) and various output file formats along with the utilities that
 come with the installation package. More information on that can be
 found in the Using EnergyPlus section. In addition, EnergyPlus is
 often the simulation engine for graphical user interfaces. To see
-comprehensive list, see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Directory}
+a comprehensive list, see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Directory}
 that is operated by \href{https://www.ibpsa.us/}{IBPSA-USA}. At the
 time of writing, many people use EnergyPlus inside an existing graphical
 user interface such as \href{https://www.openstudio.net/}{OpenStudio},
@@ -332,7 +329,7 @@ user interface such as \href{https://www.openstudio.net/}{OpenStudio},
 and \href{https://bigladdersoftware.com/projects/euclid/}{Euclid}.
 Other interfaces are also available. 
 
-\subsection*{Approaches to Implement Measures }
+\subsection{Approaches to Implement Measures }
 
 In the terminology used within the building energy modeling industry
 ``measures,'' sometimes called energy conservation measures (ECMs)
@@ -342,25 +339,26 @@ building model. Measures include added wall or roof insulation, lower
 internal lighting power, higher efficiency heating and cooling equipment,
 and many others. When using EnergyPlus within a graphical user interface,
 that interface often provides a way to implement various measures.
-When not working within a graphically user interface, users have several
+When not working within a graphical user interface, users have several
 options for implementing measures:
 
 For a specific building input file, a copy of the input file can be
 made and then modified to reflect the measure. This is an easy approach
-initially but since the original building model might change, it means
-making the change in the file that reflects the measure. When many
-measures are being considered, this duplicative editing can be inefficient
-and prone to errors. In addition, the measure cannot be easily applied
-to a different building energy model without again editing another
-set of files duplicating the original effort. Due to this, it is very
-common for some type of scripting to be used so that measures can
-be applied to the original building model and other models of other
-buildings reliably and quickly. Scripting in this approach means to
-apply some type of programming language to the task of modifying files.
+initially, but since the original building model might change, it
+means making the change in the file that reflects the measure. When
+many measures are being considered, this duplicative editing can be
+inefficient and prone to errors. In addition, the measure cannot be
+easily applied to a different building energy model without again
+editing another set of files duplicating the original effort. Due
+to this, it is very common for some type of scripting to be used so
+that measures can be applied to the original building model and other
+models of other buildings reliably and quickly. Scripting in this
+approach means to apply some type of programming language to the task
+of modifying files.
 
 EnergyPlus includes, with the installation package, two methods of
 implementing measures EP-Macro and the ParametricPreprocessor. EP-Macro
-is similar to the C langauge pre-processor and allows for portions
+is similar to the C language pre-processor and allows for portions
 of the file to be included or excluded, for portions of other files
 to be included when desired, and for specific entries that are normally
 fixed values to change programmatically. EP-Macro is documented int
@@ -370,21 +368,20 @@ EP-Macro files.
 
 The EnergyPlus ParametricPreprocessor uses special input objects in
 EnergyPlus to set values for any field in any other input object for
-a series of simple options <OBJECTS HAVE NOT BEEN DEFINED YET>. This
-is briefly described in the AuxiliaryPrograms documentation and more
-details are present in the InputOutputReference under the section
-on ``Parametric Objects.'' The ParametricPreprocessor approach is
-very simple but limited in the flexibility that it affords. It is
-suitable for implementing measures related to internal loads, constructions,
-and simple efficiency changes but is probably not the appropriate
-tool for more complicated measures.
+a series of simple options. This is briefly described in the AuxiliaryPrograms
+documentation, and more details are present in the InputOutputReference
+under the section on ``Parametric Objects.'' The ParametricPreprocessor
+approach is very simple but limited in the flexibility that it affords.
+It is suitable for implementing measures related to internal loads,
+constructions, and simple efficiency changes but is probably not the
+appropriate tool for more complicated measures.
 
 Another approach to writing measures and using measures written by
 others is to use \href{https://www.openstudio.net/}{OpenStudio} and
 its \href{http://nrel.github.io/OpenStudio-user-documentation/}{documentation}.
 OpenStudio is closely aligned with EnergyPlus but has a different
 data model and file format. It is an application programming interface
-for EnergyPlus and some graphical user interfaces are using it to
+for EnergyPlus, and some graphical user interfaces are using it to
 work with EnergyPlus. It has two categories of measures: native OpenStudio
 measures and EnergyPlus measures. Both types of measures are usually
 written in the Ruby programming language. Many measures are already
@@ -400,21 +397,21 @@ open source project.
 Another option based on the Ruby programming language is \href{https://bigladdersoftware.com/projects/modelkit/}{Modelkit}
 which similar to EP-Macro consists of embedding scripting within normal
 EnergyPlus input files but since it is using Ruby has a great deal
-more flexility.
+more flexibility.
 
 A \href{https://www.ashrae.org/File\%20Library/Conferences/Specialty\%20Conferences/2018\%20Building\%20Performance\%20Analysis\%20Conference\%20and\%20SimBuild/Papers/C043.pdf}{paper}
-that describes these approaches to scripting and more was made during
-the 2018 ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
+that describes these approaches to scripting was made during the 2018
+ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
 
-\subsection*{Parametric Analysis Tools }
+\subsection{Parametric Analysis Tools }
 
 When just implementing a simple measure or even a series of measures
 is not enough, a parametric analysis tool may be appropriate. These
 tools allow the exploration of throughout the range of variables (such
 as the thickness of insulation in the roof or the efficiency of a
 boiler) to see the impacts of optimization. While any of the approaches
-to implement measures described previously may be used for parametric
-analysis, a few specific tools have been developed. \href{http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/}{OpenStudio Parametric Analysis}
+used to implement measures described previously may also be used for
+parametric analysis, a few specific tools have been developed. \href{http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/}{OpenStudio Parametric Analysis}
 tool works with OpenStudio measures and allows the simulation of a
 large number of options using cloud computing services and is part
 of the \href{https://www.openstudio.net/}{OpenStudio} suite. JEPlus
@@ -422,16 +419,16 @@ is a simulation manager for parametrics that includes optimization
 and leverages both the EP-Macro style of implementing measures as
 well as Eppy for implementing measures in the Python programming language.
 \href{https://simulationresearch.lbl.gov/GO/summary.html}{GenOpt}
-is a Java based generic optimization program that can use EnergyPlus.
+is a Java-based generic optimization program that can use EnergyPlus.
 \href{https://beopt.nrel.gov/}{BEopt} is a building optimization
 tool focused on residential applications.
 
-\subsection*{Weather Files \label{subsec:Weather-Files}}
+\subsection{Weather Files \label{subsec:Weather-Files}}
 
 Weather files are available for many locations throughout the world.
 Finding the right file that represents the weather in your specific
 location can sometimes be a challenge. Often the closest weather location
-is the best one to choose but sometimes a site that is further away
+is the best one to choose, but sometimes a site that is further away
 may actually have the most similar weather. This is especially the
 case in terrain that varies in elevation or when near large bodies
 of water. Many weather files are available from both public and private
@@ -440,15 +437,7 @@ web site has many weather files with \href{https://energyplus.net/weather/source
 That web site also has a \href{https://energyplus.net/weather/simulation}{page with links}
 to many other sites that provide weather files.
 
-\subsection*{Co-simulation and Linked Software}
-
-<\textcompwordmark <NEED CONTENT>\textcompwordmark >
-
-\subsection*{Interoperability }
-
-<\textcompwordmark <NEED CONTENT>\textcompwordmark >
-
-\subsection*{Example Files }
+\subsection{Example Files }
 
 Many hundreds of example files come with EnergyPlus are in the ExampleFiles
 folder from the installation. The \textbackslash ExampleFiles\textbackslash ExampleFiles.html
@@ -463,7 +452,7 @@ that many other files also use a particular input object so if the
 first three files do not help, a text search of files in the ExampleFiles
 folder may find some more. 
 
-\subsection*{Getting Help \label{subsec:Getting-Help}}
+\subsection{Getting Help \label{subsec:Getting-Help}}
 
 Several resources are available for getting help when using EnergyPlus:
 \begin{itemize}
@@ -476,7 +465,7 @@ Please do not post questions as issues on the EnergyPlus Github website.
 Of course, if you are using a graphical user interface with EnergyPlus,
 the vendor will provide direct support.
 
-After reviewing this document and other pertinant documents that come
+After reviewing this document and other pertinent documents that come
 with EnergyPlus like the InputOutputReference, if additional training
 is required, several sources are available:
 \begin{itemize}
@@ -491,19 +480,19 @@ probably also provides training.
 
 \section{Using EnergyPlus }
 
-\subsection*{Installing EnergyPlus}
+\subsection{Installing EnergyPlus}
 
 Please see the EnergyPlus QuickStart Guide for instructions on how
 to install EnergyPlus for your system.
 
-\subsection*{Running EnergyPlus}
+\subsection{Running EnergyPlus}
 
 EnergyPlus is a simulation program designed for modeling buildings
 with all their associated heating, ventilating, and air conditioning
 equipment. EnergyPlus is a simulation engine: it was designed to be
 an element within a system of programs that would include a graphical
-user interface to describe the building. However, it can be run stand
-alone without such an interface. There are several option for performing
+user interface to describe the building. However, it can be run standalone
+without such an interface. There are several options for performing
 a simulation with EnergyPlus:
 \begin{itemize}
 \item Graphical user interface
@@ -518,13 +507,13 @@ a weather file from the appropriate building location.
 When running an EnergyPlus simulation within a graphical user interface,
 the exact method will vary depending on the specific program being
 used. You should read the documentation for that software to understand
-how to perfom a simulation. 
+how to perform a simulation. 
 
 \subsubsection*{Command Line}
 
 EnergyPlus can be used as a command line tool within a Terminal window
 in Linux or MacOS or with the CMD prompt or PowerShell window under
-Windows. Basic usage using the command line approach is will documented
+Windows. Basic usage using the command line approach is well documented
 in the QuickStart Guide. To learn more about the command line mode,
 you can type:
 \begin{verbatim}
@@ -644,31 +633,31 @@ The main screen of EP-Launch 2 is shown below:
 \includegraphics{eplaunch2}
 
 It is a Windows program only. EP-Launch 2 is included in the EnergyPlus
-installation package when installing on Windows so no additional steps
-are needed to run it. It is located in the main ``root'' folder
-of EnergyPlus, usually a folder named EnergyPlusVx-x-x, where the
+installation package when installing on Windows, so no additional
+steps are needed to run it. It is located in the main ``root'' folder
+of EnergyPlus, usually, a folder named EnergyPlusVx-x-x, where the
 x's are the version number. 
 
-In 2018, EP-Launch 3 was developed and its main screen is shown below:
+In 2018, EP-Launch 3 was developed, and its main screen is shown below:
 
-\includegraphics{eplaunch3}
+\includegraphics[width=6in]{eplaunch3}
 
 EP-Launch 3 is not part of the EnergyPlus installation package and
 needs to be installed separately. It is also open source and is available
-from \href{https://github.com/NREL/EP-Launch}{GitHub} and it is documented
-on \href{https://ep-launch.readthedocs.io/en/}{readthedocs} or in
-the docs folder on GitHub. EP-Launch works on Windows, MacOS, and
-Linux systems and is written in Python.
+from \href{https://github.com/NREL/EP-Launch}{GitHub}, and it is
+documented on \href{https://ep-launch.readthedocs.io/en/}{readthedocs}
+or in the docs folder on GitHub. EP-Launch works on Windows, MacOS,
+and Linux systems and is written in Python.
 
-While both EP-Launch 2 and EP-Launch 3 do many of the same functions
+While both EP-Launch 2 and EP-Launch 3 do many of the same functions,
 the interface is quite different. For now, EP-Launch 2 allows groups
 of files to be run together and has access to some utilities that
 the newer version does not. EP-Launch works across multiple platforms
 and is a built from the ground up to be flexible and extensible so
-that individuals can make their own workflows that run what ever programs
+that individuals can make their own workflows that run whatever programs
 they need to run.
 
-\subsection*{IDF and JSON syntax}
+\subsection{IDF and JSON syntax}
 
 EnergyPlus has two different input file formats that can be used to
 describe the building and system that is simulated. The file extensions
@@ -678,17 +667,17 @@ called metric units).
 
 \subsubsection*{IDF}
 
-The legacy file format is a text based format that describes each
+The legacy file format is a text-based format that describes each
 input object in series. The name of the type of input object starts
-the input object and each value for each field follows separated by
-commas. The end of the input object is indicated by a semi-colon.
-Comments are indicated by a exclamation point ``!'' and anything
-after this is ignored by EnergyPlus. Commonly, an input object is
-spread over many lines in the file with one value for each field per
-line. The names of each field are not required but are usually shown
-after the value and the comma or semicolon as a special comment using
-``!-'' as an indicator. The input objects can be in any order. A
-small piece of an IDF file 
+the input object, and each value for each field follows while being
+separated by commas. The end of the input object is indicated by a
+semi-colon. Comments are indicated by an exclamation point ``!''
+and anything after this is ignored by EnergyPlus. Commonly, an input
+object is spread over many lines in the file with one value for each
+field per line. The names of each field are not required but are usually
+shown after the value and the comma or semicolon as a special comment
+using ``!-'' as an indicator. The input objects can be in any order.
+A small piece of an IDF file 
 \begin{lyxcode}
 Building,
 
@@ -708,7 +697,7 @@ Building,
 
 ~~6;~~~~~~~~~~~~~~~~~!-~Minimum~Number~of~Warmup~Days
 \end{lyxcode}
-The details of this example input object are not important but the
+The details of this example input object are not important, but the
 use of commas, exclamation points, and the closing semi-colon are
 important. The IDF format is currently the most commonly used format
 throughout the EnergyPlus ecosystem of utilities and GUIs. The list
@@ -724,10 +713,10 @@ chapter of the AuxiliaryPrograms document.
 
 A new file format based on the industry standard \href{https://www.json.org/}{JSON}
 format most often used to transmit extra data to web applications.
-It is a text based file format. The JSON format has wide industy usage
-and is supported in just about every modern programming langauge.
+It is a text-based file format. The JSON format has wide industry
+usage and is supported in just about every modern programming language.
 It is a field-value style format using brackets and colons to indicate
-the heirarchy and commas to separate each field and value pair. The
+the hierarchy and commas to separate each field and value pair. The
 input objects must appear grouped by the type of input object. The
 list of possible input objects and fields is documented in the Energy+.schema.epJSON
 file which uses \href{http://json-schema.org/}{json-schema}. The
@@ -766,28 +755,28 @@ format:
 
 \}
 \end{lyxcode}
-While the IDF and epJSON file formats are quite different they contain
-the same information and either may be used. In general, if producing
-EnergyPlus input files using a programming langauge, the epJSON format
+While the IDF and epJSON file formats are quite different, they contain
+the same information, and either may be used. In general, if producing
+EnergyPlus input files using a programming language, the epJSON format
 might make more sense while, at this point, if producing IDF files
 using a GUI, they are likely to use the IDF format. EnergyPlus, when
 used on the command line, can convert from IDF to epJSON and from
 epJSON to IDF using the -c or -{}-convert option.
 
-\subsection*{Creating and Editing Input Files}
+\subsection{Creating and Editing Input Files}
 
 Since both the IDF and epJSON file formats are text formats, a simple
 text editor may be used to edit them. Even if not regularly used,
 a good text editor is an important application to have when working
-with EnergyPlus. There are many different \href{https://en.wikipedia.org/wiki/Comparison_of_text_editors}{text editors}
+with EnergyPlus. There are many different \href{https://en.wikipedia.org/wiki/Comparison_of_text_editors}{text editors},
 and a few have special features related to the IDF format such as
 syntax highlighting including \href{https://github.com/bigladder/atom-language-energyplus}{Atom},
 \href{https://github.com/jmarrec/notepad}{Notepad++}, and \href{http://energyplus.helpserve.com/knowledgebase/article/View/102/47/ultraedit-syntax-highlighting-file---v80}{UltraEdit}.
 
 Another editing choice for IDF file is the IDF Editor which comes
 with EnergyPlus in the \textbackslash PreProcess\textbackslash IDFEditor
-directory. It is a Windows only program and is was not designed to
-run on Linux or MacOS. It is specially designed for editing IDF files
+directory. It is a Windows-only program and was not designed to run
+on Linux or MacOS. It is specially designed for editing IDF files
 and includes many features to simplify the process. It performs unit
 conversions so either SI (metric) or IP (inch-pound) units can be
 used. The main screen of the IDF editor is shown below. Full details
@@ -796,11 +785,11 @@ under the ``Creating Input Files'' section.
 
 \includegraphics[width=6in]{idfeditor}
 
-A cross platform program called \href{https://bitbucket.org/mattdoiron/idfplus/src/default/}{IDF+}
-is currently being developed independantly and will have many of the
+A cross-platform program called \href{https://bitbucket.org/mattdoiron/idfplus/src/default/}{IDF+}
+is currently being developed independently and will have many of the
 same features as the IDF Editor when complete.
 
-\subsection*{Run-Check-Edit Repeat \label{subsec:Run-Check-Edit-Repeat}}
+\subsection{Run-Check-Edit Repeat \label{subsec:Run-Check-Edit-Repeat}}
 
 For most building energy modeling projects, whether assisting in early
 design, refining a design, selecting a control method, or calibrating
@@ -812,7 +801,7 @@ cycle. The cycle will probably be in the form of:
 \item Fixing the input file
 \item Repeat
 \end{itemize}
-Don't expect that an initial model is ever correct, it is probably
+Don't expect that an initial model is ever correct; it is probably
 not. Initially, errors are likely to exist. The .ERR file should be
 the first file checked each time EnergyPlus is run. The .ERR file
 has several levels of messages: 
@@ -827,14 +816,14 @@ run to completion. Fatal errors should be the first thing fixed. Some
 Fatal messages reference previous Severe messages so in that case
 those should be fixed. Since the entire simulation was not performed,
 it is likely that once the fatal errors are fixed that new Severe
-and Warning messages will be shown. After all Fatal messages are eliminated
-you should work on Severe messages. They should be fixed also. Finally,
+and Warning messages will be shown. After all Fatal messages are eliminated,
+you should work on Severe messages; they should also be fixed. Finally,
 Warning messages should be reviewed. Often Warning messages are informative
 and point out unusual configurations, conditions, or choices. If what
 is being described by the Warning message is as intended by you, then
 the Warning message can be ignored. More often, the Warning message
 points out something that is not as intended and should be fixed or
-addressed. Since the .ERR file is a text file, you can usually keep
+addressed. Since the .ERR file is a text file; you can usually keep
 it open in a text editor program. Many (but not all) text editor programs
 will detect that the .ERR file has been updated after each EnergyPlus
 simulation and let you load the most recent version.
@@ -845,21 +834,19 @@ see Output:Table:SummaryReports and OutputControl:Table:Style) or
 CSV file (see Output:Variable and Output:Meter) should be examined
 depending on what you want to look at. Upon examination of the output
 results, it is very likely that an aspect of the building and its
-systems is not behaving as expected. With an input file representing
+systems are not behaving as expected. With an input file representing
 many thousands of assumptions, some assumptions made by you or as
 a default of EnergyPlus is likely to be incorrect. Revising the EnergyPlus
 input file to address this may cause new issues to be shown in the
 .ERR file so it should \emph{always} be examined after each change.
 
-To speed the process of running the simulations, you may want to only
-run a design day (see SizingPeriod:DesignDay) or a subset of the year
-(see RunPeriod). This approach speeds up the simulation time itself
-and if used, please remember to recheck the .ERR file when running
-an annual simulation for the first time.
+To speed the process of running the simulations, you may want only
+to run a design day (see SizingPeriod:DesignDay) or a subset of the
+year (see RunPeriod). This approach speeds up the simulation time
+itself, and if used, please remember to recheck the .ERR file when
+running an annual simulation for the first time.
 
-\subsection*{Common Input Objects}
-
-\subsection*{Key Concepts}
+\subsection{Key Concepts}
 
 The following sections highlight some key concepts in EnergyPlus
 
@@ -870,7 +857,7 @@ specified in the input file. This means that instead of referencing
 an external library for materials, schedules, equipment performance,
 etc., the input objects that fully describe those items should be
 included directly in the input file. The DataSets folder distributed
-with EnergyPlus contains these kind of details and to use them, the
+with EnergyPlus contains these kinds of details and to use them, the
 input objects should be copied into the input file that you are developing.
 This approach does make the file include more specification than you
 might be used to, and typically results in a large input file, but
@@ -879,33 +866,33 @@ to your building are in the input file you have developed.
 
 \subsubsection*{Wall Thickness}
 
-Exterior and interior walls in real buildings have thickness as specified
-on building plans by detailed cross sections. For EnergyPlus, the
-Construction input object is made up of a list of names for the Material
-input objects that make up the wall or roof or floor. Each material
-is shown with a thickness along with the conductivity, density, specific
-heat and other factors. These thicknesses should match the the thicknesses
-shown in the detailed cross sections. But when it comes to specifying
-the walls themselves in three dimensional space, the walls should
-be entered assuming zero thickness. Once each surface has been placed,
-changing the material thickness will have no impact on zone volume,
-ceiling height, floor area, shading, or daylighting. For most modern
-buildings the choice of inside vs outside vs centerline should have
-little impact on results so many modelers just pick one a let the
-volumes be off a little. Using centerlines throughout the model splits
-the difference. Or some modelers use outer edges for exterior walls
-and then use centerlines for interior walls. If you are modeling a
-very thick wall, such as an old stone building, then you also have
-thermal mass considerations. If you use the outside edges there will
-be too much mass, inside will be too little. Again, centerline will
-split the difference and will be very close to the correct amount
-of thermal mass (possibly losing some corner mass).
+Exterior and interior walls in real buildings have a thickness as
+specified on building plans by detailed cross-sections. For EnergyPlus,
+the Construction input object is made up of a list of names for the
+Material input objects that make up the wall or roof or floor. Each
+material is shown with a thickness along with the conductivity, density,
+specific heat and other factors. These thicknesses should match the
+thicknesses shown in the detailed cross-sections. But when it comes
+to specifying the walls themselves in three-dimensional space, the
+walls should be entered assuming zero thickness. Once each surface
+has been placed, changing the material thickness will have no impact
+on zone volume, ceiling height, floor area, shading, or daylighting.
+For most modern buildings the choice of inside vs. outside vs. centerline
+should have little impact on results so many modelers just pick one
+a let the volumes be off a little. Using centerlines throughout the
+model splits the difference. Or some modelers use outer edges for
+exterior walls and then use centerlines for interior walls. If you
+are modeling a very thick wall, such as an old stone building, then
+you also have thermal mass considerations. If you use the outside
+edges there will be too much mass, inside will be too little. Again,
+centerline will split the difference and will be very close to the
+correct amount of thermal mass (possibly losing some corner mass).
 
 \subsubsection*{Zones Are Not the Same as Rooms}
 
-A zone, sometimes called a ``thermal zone'' is a theoretical construct
+A zone sometimes called a ``thermal zone'' is a theoretical construct
 that usually describes a group of rooms that can be treated as a single
-thermal entity. One way to thi
+thermal entity. 
 
 \subsubsection*{One Construction Per Surface}
 
@@ -914,7 +901,7 @@ so if the top half of a wall is made up of a different construction
 than the bottom half of the wall, the top half and the bottom half
 each need to be represented by separate surfaces.
 
-\subsubsection*{Available Ouputs Created by First Simulation}
+\subsubsection*{Available Outputs Created by First Simulation}
 
 Since EnergyPlus creates a custom list of possible output variables
 during each simulation, you need to perform a simulation first before
@@ -935,9 +922,9 @@ available for your weather period run.
 \item Obtain sufficient building construction information to allow specification
 of overall building geometry and surface constructions (including
 exterior walls, interior walls, partitions, floors, ceilings, roofs,
-windows and doors).
+windows, and doors).
 \item Obtain sufficient building use information to allow specification
-of the lighting and other equipment (e.g. electric, gas, etc.) and
+of the lighting and other equipment (e.g., electric, gas, etc.) and
 the number of people in each area of the building.
 \item Obtain sufficient building thermostatic control information to allow
 specification of the temperature control strategy for each area of
@@ -948,7 +935,7 @@ and scheduling of the fan systems.
 and scheduling of the boilers, chillers and other plant equipment.
 \end{itemize}
 
-\subsection*{What Are All These Folders?}
+\subsection{What Are All These Folders?}
 
 The installation of EnergyPlus includes a lot of different files in
 different folders:
@@ -963,22 +950,22 @@ possible EnergyPlus input object and the default, minimum, maximum,
 and options for each field within each input object. The Documentation
 folder includes this document as well as the InputOutputReference,
 EngineeringReference, AuxiliaryPrograms, OutputDetailsAndExamples
-which are very imporant to understand. If you haven't looked through
+which are very important to understand. If you haven't looked through
 the documentation yet, take a few minutes and get familiar with them.
 The DataSets and MacroDataSets folders include files containing libraries
 of input objects that may be useful in constructing your own input
 files. The ASHRAE\_2005\_HOF\_Materials.idf and WindowConstructs.idf
 files, for example, will help with defining walls and windows. The
 ExampleFiles folder includes a huge number of example files that are
-indexed in the two HYML files in that folder or can be searched through
+indexed in the two HTML files in that folder or can be searched through
 using most text editors. The Preprocess and PostProcess folders include
 many utilities that can be used directly or as part of EP-Launch that
-can aid in the setting up input files or or extracting or converting
+can aid in the setting up input files or extracting or converting
 results. The WeatherData folder includes a small sample of the many
 weather files that are available. For other weather files, please
 see the previous section on \ref{subsec:Weather-Files}. 
 
-\subsection*{What Are All These Output Files?}
+\subsection{What Are All These Output Files?}
 
 When running EnergyPlus using EP-Launch or from the command line,
 depending on the options selected, many different output files may
@@ -1002,23 +989,24 @@ original file name prior to the file extension are shown below:
 \item MDD -- list of output meters available from the run 
 \item SHD -- output related to shading
 \item SLN -- output from \textquotedblleft report, surfaces, lines\textquotedblright{}
-\item SQL - sqlite3 oiutput database format
-\item SSZ -- system sizing details in comma, tab or space delimited format
-\item ZSZ -- zone sizing details in comma, tab or space delimited format
-\item CSV, TAB, or TXT -- tabulated results in comma, tab or space delimited
+\item SQL - sqlite3 output database format
+\item SSZ -- system sizing details in a comma, tab, or space delimited
+format
+\item ZSZ -- zone sizing details in a comma, tab, or space delimited format
+\item CSV, TAB, or TXT -- tabulated results in a comma, tab, or space delimited
 format (generated by the ReadVarsESO postprocessor) 
 \item METER.CSV, METER.TAB, or METER.CSV File -- tabulated meter report
-in comma, tab or space delimited format (generated by the ReadVarsESO
+in a comma, tab, or space delimited format (generated by the ReadVarsESO
 postprocessor)
 \item MAP -- daylighting illuminance map
 \item DFS - daylighting factors report
 \item Screen.CSV - window screen transmittance map report
 \item TABLE.HTML, TABLE.TXT, TABLE.TAB, TABLE.CSV, TABLE.XML -- tabulated
-report of bin and monthly data in comma, tab or space delimited or
-HTML format or XML format
-\item RVAUDIT - output from the ReadVarsESO post processing program
+report of bin and monthly data in a comma, tab, or space delimited
+or HTML format or XML format
+\item RVAUDIT - output from the ReadVarsESO post- processing program
 \item SVG - HVAC Diagram related to the arrangement of HVAC components
-\item SCI - surface cost information repor
+\item SCI - surface cost information report
 \item WRL -- drawing file in VRML (Virtual Reality Markup Language) format
 \item Delight IN - DElight input generated from EnergyPlus processed input
 \item Delight OUT -- Detailed DElight output
@@ -1027,19 +1015,19 @@ HTML format or XML format
 \item EXPIDF -- Expanded IDF when using HVACTemplate input objects
 \item Group Error -- combined error files for a group run
 \item VCpErr -- Transition program error file
-\item Proc.CSV -- Simple statistiscs generated from CSVProc
+\item Proc.CSV -- Simple statistics generated from CSVProc
 \end{itemize}
-Almost of these output files are documented in the Output Files chapter
+Most of these output files are documented in the Output Files chapter
 of the OutputDetailsAndExamples document.
 
-Don't be intimindated by the long list of files, you can do a lot
-in EnergyPlus with just the IDF input file, the TABLE.HTML file and
+Don't be intimidated by the long list of files; you can do a lot in
+EnergyPlus with just the IDF input file, the TABLE.HTML file, and
 the ERR file. The building description, the detecting and solving
 of errors, and the most common primary outputs are found between these
 three files. Starting with these three files and branching out to
 others as needed is a good strategy for using EnergyPlus.
 
-\subsection*{Versions and Updating}
+\subsection{Versions and Updating}
 
 When using the IDF input file format with EnergyPlus, each release
 (which are generally twice per year in March and September) is likely
@@ -1051,68 +1039,47 @@ folder. The ways to update your IDF files are:
 \begin{itemize}
 \item IDFVersionUpdater program (shown below) is included in the installation
 and works on multiple platforms. It is located in the Preprocess\textbackslash IDFVersionUpdater
-folder. It can convert from EnergyPlus 7.2 to the most recent version
+folder. It can convert from EnergyPlus 7.2 to the most recent version,
 and even older versions can be converted if the proper files are downloaded
 from the \href{http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files}{helpdesk}.
 It can also update a group of files. It is documented in the Chapter
-titled ``Using Older Version Input Files - Tranision'' in the AuxiliaryPrograms
+titled ``Using Older Version Input Files - Transition'' in the AuxiliaryPrograms
 document.
 \end{itemize}
-\includegraphics{IDFVersionUpdater}
+\includegraphics[width=5in]{IDFVersionUpdater}
 \begin{itemize}
 \item EP-Launch 2 - The windows only program that comes with the EnergyPlus
 installation can update a single file from the just previous version
-of EnergyPlus only by using the File..Transition command.
+of EnergyPlus only by using the File...Transition command.
 \item EP-Launch 3 - The program for Windows, Linux, and MacOS can update
 a single file across multiple versions using the Transition workflow.
 \item Command line Transition - This allows updating files using the command
 line such as the Terminal for MacOS and Linux or the CMD or PowerShell
 for Windows. It is documented in the Chapter titled ``Using Older
-Version Input Files - Tranision'' in the AuxiliaryPrograms document.
+Version Input Files - Transition'' in the AuxiliaryPrograms document.
 \end{itemize}
 
-\subsection*{Errors and How to Fix Them}
+\subsection{Errors and How to Fix Them}
 
 As described in the \nameref{subsec:Run-Check-Edit-Repeat} section
 dealing with errors described in the ERR file are part of creating
-files with EnergyPlus. Resovling erros is something that both new
-and very experienced users have to do. Most of the, the error message
-itself, if carefully reviewed will point to the problem. Some error
-messages will also reference earlier messages that should also be
-checked. Careful review of the ERR file and the input file will often
-reveal solutions to the most common errors. 
+files with EnergyPlus. Resolving errors is something that both new
+and very experienced users have to do. Most of the error message itself,
+if carefully reviewed will point to the problem. Some error messages
+will also reference earlier messages that should also be checked.
+A careful review of the ERR file and the input file will often reveal
+solutions to the most common errors. Also, see the \nameref{subsec:Getting-Help}
+section.
 
-Also see the \nameref{subsec:Getting-Help} section
+\section{Input Object Groups}
 
-<IT WOULD BE GOOD TO ADD A LIST OF COMMON ERRORS AND SOLUTIONS HERE> 
+The following sections provide an overview of the input objects based
+on groups described in the energy+.idd file and the InputOutputReference.
 
-<MAYBE ADD LINK TO OTHER RESOURCES THAT CAN BE USED TO RESOLVE ERRORS
-- UNMETHOURS, MAILING LISTS>
-
-<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
-
-\subsection*{Modeling Simply}
-
-<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
-
-\subsection*{Quality Control}
-
-<MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
-
-\subsection*{Choosing a Baseline}
-
-<The importance of deciding on the baseline model that is used as
-a basis of comparison for various energy efficiency measures that
-are used during the design process>
-
-\subsection*{Presenting Results to Others}
-
-<MAYBE SOMETHING FROM PROJECT STASIO>
-
-\section{Simulation Parameters}
+\subsection{Simulation Parameters}
 
 EnergyPlus includes a group of input objects used to set general parameters
-related to how the simulation in performed. Some of these input objects
+related to how the simulation is performed. Some of these input objects
 are controlling different options that are allowed within EnergyPlus
 such as the selection of algorithms to use or parameters related to
 how an algorithm is used. For a new modeler, these objects should
@@ -1123,11 +1090,11 @@ file and appear in almost all of the example files:
 \begin{itemize}
 \item Timestep - the number of timesteps each hour and usually set to 6.
 \item HeatBalanceAlgorithm - selects the algorithm used for simulating heat
-and moisture transfer through the buildings surfaces and usually set
-to ConductionTransferFunction.
+and moisture transfer through the surfaces of the building and usually
+set to ConductionTransferFunction.
 \item SurfaceConvectionAlgorithm:Inside - selects the algorithm used for
-inside face of the building surfaces and is usuallly set to TARP.
-\item SurfaceConvectionAlgorithm:Outside - selects the algorithm use for
+the inside face of the building surfaces and is usually set to TARP.
+\item SurfaceConvectionAlgorithm:Outside - selects the algorithm used for
 the outside face of the building surfaces between interior and exterior
 conditions and is usually set to DOE-2.
 \end{itemize}
@@ -1140,8 +1107,8 @@ file period and if sizing calculations are performed. You should become
 familiar with this object since you may find it one that you frequently
 change during the Run-Check-Edit cycle.
 \end{itemize}
-Finally two other input objects should appear in your input file and
-are included in almost all example files:
+Finally, two other input objects should appear in your input file
+and are included in almost all example files:
 \begin{itemize}
 \item Version - indicates what version of EnergyPlus is being used.
 \item Building - includes fields for the name of the building, and the angle
@@ -1151,10 +1118,10 @@ related to the simulation that, in general, should be allowed to default.
 These objects and more are further explained in the InputOutputReference
 under the heading ``Group-Simulation Parameters.''
 
-\section{Location and Climate}
+\subsection{Location and Climate}
 
 Many of the fields in the group of input objects related to location,
-climate and the weather file are ones that will be set once for each
+climate, and the weather file are ones that will be set once for each
 specific project.
 \begin{itemize}
 \item Site:Location - describes the name, latitude, longitude and other
@@ -1176,8 +1143,8 @@ when schedules operate but please note that output reporting timesteps
 ignore this and are always shown in standard time and a good example
 can be seen in 5ZoneCostEst.idf.
 \item Site:GroundTemperature:BuildingSurface - for the most common ground
-temperature algorith, specifies the average temperature for each month
-of the year.
+temperature algorithm, specifies the average temperature for each
+month of the year.
 \item Site:WaterMainsTemperature - input for the water temperatures supplied
 to the building from underground water mains and should be specified
 whenever water heaters are described. A good example can be seen in
@@ -1188,13 +1155,13 @@ Other input objects in this group can help performing sizing using
 the weather file, override the sky temperature, impact the variation
 of outdoor conditions with building height (especially important for
 tall buildings), work with ground temperatures and ground heat transfer,
-override the precipitation in weather files, specify the irrigatation
+override the precipitation in weather files, specify the irrigation
 for a green roof, and some advanced properties related to the light
 spectrum for window performance. These objects and more are further
 explained in the InputOutputReference under the heading ``Group-Location
 and Climate.''
 
-\section{Schedules}
+\subsection{Schedules}
 
 Many aspects of building operation are characterized by timing whether
 it is the hours that a building is occupied or when the control systems
@@ -1204,13 +1171,13 @@ to do. It is important to coordinate schedules properly. The operation
 of office equipment in a space usually corresponds to occupancy of
 that space as does the thermostat set points and fan operation. Because
 schedules are such a key input for so many features of a building,
-a great deal of flexibility exists in EnergyPlus to specfiy them.
+a great deal of flexibility exists in EnergyPlus to specify them.
 \begin{itemize}
 \item Schedule:Compact - The most commonly used method of specifying schedules
 and uses ``Through'' and ``For'' to reduce the amount of input
 required.
 \item ScheduleTypeLimits - Every schedule object includes a field that helps
-validate the limiting values for the schedule and this input object
+validate the limiting values for the schedule, and this input object
 describes the upper and lower limit
 \item Schedule:Constant - If the value of the schedule is the same every
 hour of the year, this object is the easiest way to specify that value.
@@ -1224,7 +1191,7 @@ Other input objects in this input group allow specification of schedule
 values to be in different formats. These objects and more are further
 explained in the InputOutputReference under the heading ``Group-Schedules.''
 
-\section{Surface Construction Elements}
+\subsection{Surface Construction Elements}
 
 Specifying the physical properties of the building envelope is something
 every building model includes. The input objects in this group allow
@@ -1237,32 +1204,32 @@ following is a list only the most commonly used input objects.
 \begin{itemize}
 \item Material - the most common input object to describe the materials
 used in opaque constructions in walls, roofs, and floors and includes
-input for the thickness, conductivity, density and specific heat as
-well as absorptances. See examples in ASHRAE\_2005\_HOF\_Materials.idf
+inputs for the thickness, conductivity, density, and specific heat
+as well as absorptances. See examples in ASHRAE\_2005\_HOF\_Materials.idf
 located in the DataSets folder.
 \item Material:NoMass - used when the material only has thermal resistance
 and little thermal mass such as insulation. It should not be used
-to describe materials that do have signficant thermal mass.
+to describe materials that do have significant thermal mass.
 \item Material:AirGap - used to describe when walls or roofs have an air
-gaps. Note it cannot be used for windows.
+gap. Note it cannot be used for windows.
 \item WindowMaterial:Glazing - describes the material used in the glass
 (or other transparent material) portion of the fenestration (windows
 and skylights). See WindowGlassMaterials.idf in the DataSets folder
 for examples.
 \item WindowMaterial:Gas - the type of gas used between layers of glass
-in windows and skylights have a signficant impact on the heat transfer
+in windows and skylights have a significant impact on the heat transfer
 performance. See WindowGasMaterials.idf in the DataSets folder for
 examples.
 \item Construction - a list of materials (any from the list above plus many
 more) in order from the outside to the inside making up the wall,
 roof, floor, window or skylight. Every input file will have several
-of these input objects. Examples of constructions for wall, roofs
+of these input objects. Examples of constructions for wall, roofs,
 and floors can be found in ASHRAE\_2005\_HOF\_Materials.idf located
 in the DataSets folder while examples for windows and skylights can
 be found in WindowConstructs.idf in the same folder.
 \item WindowMaterial:SimpleGlazingSystem - the best way to describe a window
-is with a construction that references WindowMaterial:Glazing and
-WindowMaterial:Gas input objects but if all you have is the U-Factor
+is with a construction input object that references WindowMaterial:Glazing
+and WindowMaterial:Gas input objects but if all you have is the U-Factor
 and Solar Heat Gain Coefficient they can be specified in this input
 object.
 \end{itemize}
@@ -1271,7 +1238,7 @@ used but are key to modeling specific types of walls and windows so
 if what you are trying to model does not fall into the neat categories
 for the objects described so far, there is still a good chance that
 EnergyPlus has an input object that will work. These other input objects
-include ones for wals and roof that can be used when modeling combined
+include ones for walls and roof that can be used when modeling combined
 heat and moisture transfer, modeling material which undergo a phase
 change to store heat in the wall or when the material properties change
 with temperature, when the material allows infrared radiation to flow
@@ -1279,7 +1246,7 @@ through it, when modeling green (vegetated) roofs, for simplified
 C or F-factor modeling, or when the wall includes resistance or hydronic
 tubing to provide heat. The other input object to describe windows
 and skylights include input objects that can be used to describe thermochromic
-and electochomic glazing, mixtures of gases between layers of glass,
+and electrochromic glazing, mixtures of gases between layers of glass,
 vacuum glazing, movable portions of the window assembly such as shades
 and blinds and screens, alternative ways of specifying fenestration
 such as equivalent layers or refraction extinction method or ASHWAT
@@ -1290,47 +1257,48 @@ The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Surface Construction
 Elements.''
 
-\section{Thermal Zones and Surfaces}
+\subsection{Thermal Zones and Surfaces}
 
 The physical aspects of the building such as the walls, roof, and
-windows, is one of the most important and often challenging aspect
-of creating a bulding energy model. In EnergyPlus, the surfaces define
-the geomtry of each zone and thus for the entire building. For many,
+windows, is one of the most important and often challenging aspects
+of creating a building energy model. In EnergyPlus, the surfaces define
+the geometry of each zone and thus for the entire building. For many,
 a graphical user interface will be used to help define the geometric
-aspects of the building energy model and so many of the input objects
+aspects of the building energy model, and so many of the input objects
 described in this section will be directly created by that interface
 program. It is still important to understand some of the details for
 these input objects because it is likely that you will be reviewing
 them as part of debugging error messages. EnergyPlus uses the three
 dimensional position of each corner of a surface to define the position
-and orientation of that surface so for a typical rectagular wall that
-represents 12 numbers and for a typical building with hundreds of
-surfaces that means thousands of numbers are used to define the geometry
-of a building so you can see why using an interface is so common.
+and orientation of that surface so for a typical rectangular wall
+that represents 12 numbers and for a typical building with hundreds
+of surfaces that means thousands of numbers are used to define the
+geometry of a building so you can see why using an interface is so
+common.
 
-EnergyPlus uses a right hand coordinate system as shown in Figure
+EnergyPlus uses a right-hand coordinate system as shown in Figure
 X with three dimensions. The X-axis points east, the Y-axis points
 north, and the Z-axis points up.
 
-\includegraphics{coordinatesystem}Figure X. EnergyPlus Coordinate
-System.
+\includegraphics[width=6in]{coordinatesystem}Figure X. EnergyPlus
+Coordinate System.
 \begin{itemize}
 \item Zone - defines the name of the thermal zone as well as the ceiling
-height, floor area and volume. For most zones that are fully enclosed
+height, floor area, and volume. For most zones that are fully enclosed
 these three entrees can be calculated automatically be EnergyPlus
 and do not need to be entered. A zone multiplier allows a single zone
 to represent many identical zones (such as all the enclosed offices
 on one side of a building). The name of the zone will be referenced
 in many places in the input file so it should be clear what it is
 describing. When defining a zone, it is important for the entire area
-to be thermally similar both in heat being transfered through exterior
+to be thermally similar both in heat being transferred through exterior
 walls as well and interior heat gains. But using as few zones as possible
-(and thus as few surfaces) also can result in faster simulations so
-there is no reason to slow down the simulation just so two (or more)
-essentially identical are each simulated. The coordinates can be just
-set to zero if world coordinate system is used (see GlobalGeometryRules
+(and thus as few surfaces) also can result in faster simulations,
+so there is no reason to slow down the simulation just so two (or
+more) essentially identical are each simulated. The coordinates can
+be just set to zero if the world coordinate system is used (see GlobalGeometryRules
 below).
-\item BuildingSurface:Detailed - lists the three dimensional coordinates
+\item BuildingSurface:Detailed - lists the three-dimensional coordinates
 that define each corner as well as referencing the zone that is surface
 is attached to and what the construction of the wall (list of materials)
 is. In addition, defines what is on the other side of the surface
@@ -1338,11 +1306,11 @@ from the zone, whether that is outside, another zone in the building,
 or the ground. Other inputs indicate if the outside of the surface
 is exposed to the sun or the wind. 
 \item FenestrationSurface:Detailed - describes windows, doors, and special
-daylighting tubes and is references the wall that it is part of. It
+daylighting tubes and it references the wall that it is part of. It
 also requires the specification of vertices (usually four) to describe
 the corners of the window or door as well as the construction (in
 this case, usually layers of glass and the gas fill between the layers).
-It has a field for a multipier although usually the multiplier is
+It has a field for a multiplier although usually the multiplier is
 set to one since the position of windows matters to many of the algorithms
 used. In order to describe the frame of the window and any dividers
 that it might have a separate input object use used and is also referenced.
@@ -1354,24 +1322,24 @@ be examined.
 
 \subsubsection*{Shading Related}
 
-Casting shadows on the building, especially on to windows, can signficantly
+Casting shadows on the building, especially on to windows, can significantly
 impact the energy use of a building and EnergyPlus includes several
 input objects to model this effect. The largest impact of shading
-surfaces is to reduce solar gain though windows that are shaded. There
-are two kinds of shading surfaces in EnergyPlus detached and attached.
-A detached shading surface, such as a tree or neighboring building,
-is not connected to the building. An attached shading surface is typically
-an overhang or fin that is attached to a particular base surface of
-the building, usually a wall; attached shading surfaces are usually
-designed to shade specific windows.
+surfaces is to reduce solar gain through windows that are shaded.
+There are two kinds of shading surfaces in EnergyPlus detached and
+attached. A detached shading surface, such as a tree or neighboring
+building, is not connected to the building. An attached shading surface
+is typically an overhang or fin that is attached to a particular base
+surface of the building, usually a wall; attached shading surfaces
+are usually designed to shade specific windows.
 \begin{itemize}
 \item Shading:Site:Detailed - describes something near but not attached
 to the building that casts a shadow on the building such as nearby
 buildings or mountains and includes the vertex of one corner as well
 as the length and width. For deciduous trees and other situations
 that shading changes depending on the time the schedule for the transmittance
-can vary otherwise it should always set to zero. If using relative
-coordinates (see GlobalGeometryRules) you may also want to use the
+can vary otherwise, it should always set to zero. If using relative
+coordinates (see GlobalGeometryRules), you may also want to use the
 Shading:Building:Detailed input object since it will ``rotate''
 with the building.
 \item Shading:Zone:Detailed - describes an attachment to the building that
@@ -1383,16 +1351,16 @@ attached to is also specified.
 \subsubsection*{Input Object Variations}
 
 EnergyPlus include a bunch of variations on these basic surface input
-objects to help map them closer to mental representation of real surfaces
-in buildings. These input objects are effectively just different ways
-to represent the same information as the BuildingSurface:Detailed,
+objects to help map them closer to the mental representation of real
+surfaces in buildings. These input objects are effectively just different
+ways to represent the same information as the BuildingSurface:Detailed,
 FenestrationSurface:Detailed, and Shading:Zone:Detailed input objects.
-These objects are seldom created by graphical user interfaces so it
-is unlikely that you will see them. Some of these objects also have
-simpler methods for specifying geometry, such as using a single vertex,
-height, width, tilt and azimuth or just specifying the fin location
-relative to the window edge. The following is a list of these input
-object variations for surfaces:
+These objects are seldom created by graphical user interfaces, so
+it is unlikely that you will see them. Some of these objects also
+have simpler methods for specifying geometry, such as using a single
+vertex, height, width, tilt, and azimuth or just specifying the fin
+location relative to the window edge. The following is a list of these
+input object variations for surfaces:
 \begin{itemize}
 \item Wall:Detailed
 \item RoofCeiling:Detailed
@@ -1428,23 +1396,23 @@ files. It sets the way geometry is specified for all of the surface
 input objects. The most common approach is that the order of coordinates
 for each surface should start with the upper left corner (when viewed
 from ``outside'' the zone with the surface) and that the coordinates
-should be proceed in a counter clock wise order. In addition, most
-common is to use a world coordinate system where all the vertices
-are based on a single coordinate system for the entire building rather
-than one that changes relative to each zone.
+should proceed in a counter clockwise order. In addition, most common
+is to use a world coordinate system where all the vertices are based
+on a single coordinate system for the entire building rather than
+one that changes relative to each zone.
 \item WindowShadingControl - for a window, describes the kind of shading
 type (interior shade, interior blind, between glass shade, exterior
 blind, etc..) as well as how it is controlled and the physical material
 of the shade or window construction with the shade.
 \item WindowProperty:FrameAndDivider - defines the frame material around
 a window and any dividers between separate lites of the window (see
-Figure X). While a windows does not necessarily need to define the
+Figure X). While a window does not necessarily need to define the
 frame, it is a more accurate approach since the heat transfer through
-the frame usually signifantly impacts the overall performance of a
-window.
+the frame usually significantly impacts the overall performance of
+a window.
 \end{itemize}
-\includegraphics{window_frame_and_divider}Figure X - A window with
-frame and divider
+\includegraphics[width=5in]{window_frame_and_divider}Figure X - A
+window with frame and divider
 \begin{itemize}
 \item WindowProperty:AirflowControl - defines windows that have forced air
 flow between the panes of glass, also called heat-extract windows
@@ -1452,21 +1420,21 @@ or climate windows.
 \item WindowProperty:StormWindow - allows the definition of a movable storm
 window that is usually applied to a window in the winter.
 \item InternalMass - used to define thermal mass that is not described anywhere
-else in the model. Often used to capture the affect of interior floors
+else in the model - often used to capture the effect of interior floors
 that are not being modeled.
-\item ShadingProperty:Reflectance - specifying the reflectance properites
-for shading and is only needed if the input object Building specfies
+\item ShadingProperty:Reflectance - specifying the reflectance properties
+for shading and is only needed if the input object Building specifies
 the ``with reflections'' option
 \end{itemize}
 Other less common input objects include ZoneList and ZoneGroup that
-can be used when doing multi-story simulations, and GeometryTransform
+can be used when doing multi-story simulations and GeometryTransform
 which allows a building model to be stretched with just a few inputs.
 
-\section{Internal Gains }
+\subsection{Internal Gains }
 
-Most things inside a building produce heat and that includes people,
+Most things inside a building produce heat, and that includes people,
 appliances, office equipment, and lighting. The combination of all
-these items that produce heat within a building are called internal
+these items that produce heat within a building is called internal
 gains and represent a significant contribution, sometimes the largest
 contribution, to the cooling requirements for a building. In addition,
 they offset the amount of heat from the HVAC system that is needed
@@ -1515,7 +1483,7 @@ diffusion, or using a deposition velocity model.
 The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Internal Gains.''
 
-\section{Daylighting }
+\subsection{Daylighting }
 
 Reducing the amount of powered lighting that is used when sufficient
 natural daylight illuminates the interior building through windows
@@ -1530,7 +1498,7 @@ are performed.
 \item Daylighting:ReferencePoint -- specifies the location of the sensors
 for the daylighting control system 
 \end{itemize}
-The input output reference includes not only a description of these
+The InputOutputReference includes not only a description of these
 objects but also extra guidance on how they should be applied. 
 
 Three different devices can be used with day 
@@ -1545,23 +1513,24 @@ input object when used in conjunction with complex fenestration systems
 such as prismatic and holographic glass. 
 
 Some flexibility is given to provide extra output related to daylighting
-and includes 
+and includes: 
 \begin{itemize}
-\item Output:DaylightFactors -- creates a special report on the 
+\item Output:DaylightFactors -- creates a special report on the factors
+used in daylighting.
 \item Output:IlluminanceMap -- allows the generation of maps of illuminance
 values within each interior zone that uses daylighting controls. The
 exact file format can be set using the OutputControl:IlluminanceMap:Style
-input object 
+input object. 
 \end{itemize}
 More details of these output options can be found in the OutputDetailsAndExamples
 document. The input objects described in this section are further
 explained in the InputOutputReference under the heading ``Group-Daylighting.''
 
-\section{Advanced Construction, Surface, Zone Concepts}
+\subsection{Advanced Construction, Surface, Zone Concepts}
 
 The group of input objects contains many special cases for more sophisticated
-modeling for constructions, surfaces and zones. As part of this, one
-of the ways to model building foundations called Kiva is described. 
+modeling for constructions, surfaces, and zones. As part of this,
+one of the ways to model building foundations called Kiva is described. 
 \begin{itemize}
 \item Foundation:Kiva - describes the insulation depth and width for interior
 and exterior horizontal and vertical insulated foundations as well
@@ -1582,7 +1551,7 @@ input objects.
 Input objects of interest in this group not related to Kiva include
 \begin{itemize}
 \item SurfaceControl:MovableInsulation - allows the modeling of insulation
-panels that are removable for walls, floors and roofs but not windows. 
+panels that are removable for walls, floors, and roofs but not windows. 
 \item SurfaceProperty:Underwater - allows the outside of the building to
 be modeled as underwater and even as moving through the water allowing
 EnergyPlus to model vessels.
@@ -1590,7 +1559,7 @@ EnergyPlus to model vessels.
 include the modeling of baffles in the multi-skin exteriors
 \end{itemize}
 Other objects in this group set the heat transfer algorithms for specific
-surfaces when the building level heat tranfer algorithm should not
+surfaces when the building level heat transfer algorithm should not
 be used for that surface, when other models are used to describe the
 variation in temperature on the outside of a surface, override the
 algorithm used for modeling convection heat transfer between the air
@@ -1598,15 +1567,15 @@ inside or outside of a zone and the surface, vapor transfer coefficients
 when using algorithms that include moisture modeling of surfaces,
 override the algorithm that distributes the solar radiation on interior
 surfaces, overrides the solar energy absorbed by different layers
-for complex windows, a way to override the long wave radiation with
+for complex windows, a way to override the longwave radiation with
 other surfaces in the zone, allows overriding the external environment
-for a surface or a zone including solar shading or air speed or temperature
+for a surface or a zone including solar shading or airspeed or temperature
 or humidity, overrides the source term for the heat balance, override
 the view factors for a zone. The input objects described in this section
 are further explained in the InputOutputReference under the heading
 ``Group-Advanced Surface Concepts.''
 
-\section{Exterior Equipment}
+\subsection{Exterior Equipment}
 
 While equipment that is outside of a building does not impact the
 thermal performance of the building, the accounting of all end-uses
@@ -1625,24 +1594,24 @@ The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Exterior Energy
 Use Equipment.''
 
-\section{Zone Airflow}
+\subsection{Zone Airflow}
 
-The Zone Airflow input outpu group provides a way to model the airflow
+The Zone Airflow input output group provides a way to model the airflow
 between zones and airflow due to natural ventilation (e.g., open windows)
 or mechanically-induced ventilation (e.g., exhaust air fans).
 \begin{itemize}
 \item ZoneInfiltration:DesignFlowRate - provides a way to describe the air
 infiltration into a building through leaks in the envelope including
 around windows or the normal operation of doors. The leakage can be
-a function of temperature and windspeed and can be expressed as either
+a function of temperature and wind speed and can be expressed as either
 a total flow rate, a flow rate per floor area, per wall area, or as
-an airchange rate.
+an air change rate.
 \item ZoneInfiltration:EffectiveLeakageArea - similar to the previous input
 object but uses a different equation to express the infiltration rate.
 \item ZoneInfiltration:FlowCoefficient - also similar to the ZoneInfiltration:DesignFlowRate
 input object but uses yet a different equation
 \item ZoneVentilation:DesignFlowRate - a method to add outside air to a
-zone with similar imputs to the ZoneInfiltration:DesignFlowRate but
+zone with similar inputs to the ZoneInfiltration:DesignFlowRate but
 this would represent a purposeful introduction of outdoor air into
 the space.
 \item ZoneVentilation:WindandStackOpenArea - describes the natural ventilation
@@ -1669,26 +1638,27 @@ and duct leakage and is usually applied to residential buildings
 The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Airflow.''
 
-\section{HVAC Templates}
+\subsection{HVAC Templates}
 
 New users to EnergyPlus need to learn many things to understand how
 to create the proper input objects for modeling an HVAC system. In
 order to reduce this initial effort, HVACTemplates were created. Unlike
 other input objects, the HVACTemplate objects are not directly processed
-by EnergyPlus, instead a preprocessor called ExpandObjects turns these
-HVACTemplate input objects into the standard input objects. This can
-be used as a learning tool, since you can review the .expidf file
-that contains the standard input objects or it can be used for long
-term modeling especially if you focus is not on HVAC related energy
-efficiency measures. The primary disadvantage to using the HVACTemplate
-input objects is that only a small subset of possible configurations
-can be modeled using them. The subset of configurations that can be
-used was carefully chosen to be some of the most common HVAC configurations.
-If the HVACTemplate input objects does not support the HVAC configuraiton
-you are considering, you need to model it with the standard EnergyPlus
-input objects. When using HVACTemplate input objects, no regular standard
-EnergyPlus input objects related to HVAC should be used (see the InputOutputReference
-for some exceptions to this). The HVACTemplates can model:
+by EnergyPlus; instead, a preprocessor called ExpandObjects turns
+these HVACTemplate input objects into the standard input objects.
+This can be used as a learning tool since you can review the .expidf
+file that contains the standard input objects or it can be used for
+long term modeling especially if you focus is not on HVAC related
+energy efficiency measures. The primary disadvantage of using the
+HVACTemplate input objects is that only a small subset of possible
+configurations can be modeled using them. The subset of configurations
+that can be used was carefully chosen to be some of the most common
+HVAC configurations. If the HVACTemplate input objects do not support
+the HVAC configuration you are considering; you need to model it with
+the standard EnergyPlus input objects. When using HVACTemplate input
+objects, no regular standard EnergyPlus input objects related to HVAC
+should be used (see the InputOutputReference for some exceptions to
+this). The HVACTemplates can model:
 \begin{itemize}
 \item Baseboard heating systems with optional hot water boiler
 \item Fan coil systems with boilers and chillers
@@ -1701,7 +1671,7 @@ water boiler
 cooling tower
 \item Direct-expansion (DX) cooling, package and split systems
 \item Direct-expansion (DX) heat pump systems
-\item Packaged variable air volume system useing direct-expansion cooling
+\item Packaged variable air volume system using direct-expansion cooling
 \item Variable air volume systems with boilers and air-cooled chillers
 \item Variable air volume systems with boilers and water-cooled chillers
 \item Constant air volume systems with boilers and water-cooled chillers
@@ -1710,7 +1680,7 @@ water-cooled chillers
 \item Dedicated outdoor air systems (DOAS) combined with zonal template
 systems
 \end{itemize}
-The Input Ouput Reference includes a list of exactly which objects
+The Input Output Reference includes a list of exactly which objects
 are needed for each of these configurations 
 \begin{itemize}
 \item HVACTemplate:Thermostat - describes the heating and cooling setpoints
@@ -1724,7 +1694,7 @@ or hot water thermostatically controlled baseboard heaters
 \item HVACTemplate:Zone:FanCoil - describes a four-pipe fan coil system
 with outdoor air intake
 \item HVACTemplate:Zone:PTAC - models a packaged terminal air conditioner
-with either an electric, gas or hot water heating coil most commonly
+with either electric, gas or hot water heating coil most commonly
 used in residential or hotel applications
 \item HVACTemplate:Zone:PTHP - models a packaged terminal heat pump system
 most commonly used in residential or hotel applications with either
@@ -1735,7 +1705,7 @@ provide heating and cooling to the building (also see HVACTemplate:Plant:MixedWa
 \item HVACTemplate:Zone:VRF - provides input for variable refrigerant flow
 terminal units
 \item HVACTemplate:Zone:Unitary - describes a constant volume direct-expansion
-sytem such as a rooftop system or split system. Often paired with
+system such as a rooftop system or split system. Often paired with
 a single HVACTemplate:System:Unitary for a single zone system but
 can also be part of a multizone system
 \item HVACTemplate:Zone:VAV - simulates the terminal of a variable air volume
@@ -1755,7 +1725,7 @@ or split DX cooling system with electric, gas or hot water heating
 \item HVACTemplate:System:UnitaryHeatPump:AirToAir - details the system
 portion of a rooftop or split DX air-to-air heat pump system
 \item HVACTemplate:System:UnitarySystem - models the system portion of a
-rooftop or split system and has more flexibiltity than the previous
+rooftop or split system and has more flexibility than the previous
 two input objects
 \item HVACTemplate:System:VAV - simulates the system portion of a variable
 air volume HVAC configuration with chilled water cooling and several
@@ -1767,7 +1737,7 @@ with several different heating options
 portion of a constant air volume HVAC configuration with option chilled
 water cooling and several different heating options
 \item HVACTemplate:System:DualDuct - models the system portion of a constant
-air volume or variable air volume dualduct HVAC configuration with
+air volume or variable air volume dual-duct HVAC configuration with
 optional chilled water cooling and several different heating options
 \item HVACTemplate:System:DedicatedOutdoorAir - adds a dedicated outdoor
 air system (DOAS) which can be used with several of the HVACTemplate:Zone
@@ -1778,7 +1748,7 @@ water loop that connects chillers with cooling towers
 \item HVACTemplate:Plant:Chiller - describes a vapor-compression chiller
 that provides chilled water to the loop
 \item HVACTemplate:Plant:Tower - models an evaporative cooling tower used
-to reject heat from chilllers
+to reject heat from chillers
 \item HVACTemplate:Plant:HotWaterLoop - models the hot water loop connecting
 boilers to hot water coils
 \item HVACTemplate:Plant:Boiler - models a boiler that provides hot water
@@ -1788,7 +1758,7 @@ loop that serves water-to-air heat pumps as well as cooling towers
 and boilers
 \end{itemize}
 In addition, this group of input objects includes three plant objects
-that allow the referencing of chillers, towers and boilers respectively
+that allow the referencing of chillers, towers, and boilers respectively
 so that additional details can be described in those objects. All
 of these are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
 document under the Group \textquotedblleft HVACTemplates\textquotedblright{}
@@ -1797,11 +1767,177 @@ of the other groups of input objects are described in Chapter 1. The
 expansion process is described in the Auxiliary Programs document
 under \textquotedblleft ExpandObjects.\textquotedblright{}
 
-\section{Output Reporting}
+\subsection{Detailed HVAC}
+
+In buildings, HVAC systems are comprised of components such as fans,
+pumps, coils, chillers and boilers connected by ducts or pipes and
+controlled by systems using sensors strategically located in the distribution
+systems and in the zones. In many respects, EnergyPlus mirrors this
+topology by having a large number of components and a means to describe
+their connections with one another and their control systems. The
+previous section described the HVACTemplates which simplify the HVAC
+input for EnergyPlus for common configurations. 
+
+An EnergyPlus HVAC simulation consists of various components that
+are connected physically in the actual system by ducts, piping, etc.
+Every component in an HVAC system must have an inlet and outlet \textquotedblleft node.\textquotedblright{}
+In the actual system, a node might be a point in the system at which
+fluid properties can be measured. In an EnergyPlus simulation, the
+nodes are points at which fluid properties are evaluated and passed
+on to subsequent equipment. Components are linked together to form
+various loops within the simulation. Thus, the output node from one
+component also serves as the inlet node to the next component. Loops
+are constructed by defining these loops and also defining the components
+on the loops. The figure below shows a generic example of the loop-node
+concept. Loop nodes are a key defining feature in EnergyPlus. As a
+result, it is recommended that one of the first steps taken in defining
+an HVAC system in EnergyPlus be the definition of a node diagram or
+map. This is helpful for visualization of the entire system. 
+
+\includegraphics[width=6in]{NodeDiagram}
+
+Figure X: Example Node Diagram
+
+So that these loops are manageable and more clearly defined both in
+the input and in the simulation, four different loop sections can
+be defined in an EnergyPlus input file. In general, these four types
+are in essence two pairs of loop sections that make up two distinct
+types of loops: a zone/air loop and a plant loop.
+\begin{itemize}
+\item Air Loop Supply Side: The air loop is defined by the section of the
+zone/air loop that starts after the zone return streams are combined
+and continues on until just before any air stream(s) are branched
+off to individual zones. The starting point of the air loop is fairly
+straightforward. The ending point is slightly more complex but can
+be understood with some examples. For instance, in a terminal reheat
+system, the end of the air loop would typically be considered the
+node following the cooling coil. In a dual duct system, the air loop
+would have two ending points that would correspond to the nodes after
+the cooling coil and after the heating coil/humidifier. In most cases,
+the air loop has a single starting point and up to two ending points
+(for a 2 deck system). An outdoor air subsystem can be included in
+the supply side for ventilation and relief air.
+\item Air Loop Zone Equipment: The zone equipment section of the input file
+is defined as more or less the rest of the zone/air loop (outside
+air is handled separately as a subset of the air loop). This includes
+everything from where the ducts are split to serve various zones up
+through where the return ducts from various zones are mixed into a
+single return duct. Zone equipment can include dampers and reheat
+coils as well as zone-specific conditioning systems such as thermostatic
+baseboard or a window air conditioner. Most control issues are typically
+dealt with in the zone equipment section of the simulation.
+\item Plant Loop Demand Side: One side of the plant is where energy is \textquotedblleft demanded\textquotedblright{}
+by various components that make up the air loop or zone equipment.
+Typically, this is the water side of equipment such as coils, baseboard,
+radiant heating and cooling, etc. In the case of a condenser loop,
+energy is typically \textquotedblleft demanded\textquotedblright{}
+by a chiller condenser or other water source heat pump. The demand
+side of this loop can also include mixers, flow splitters, and a bypass.
+\item Plant Loop Supply Side: The other side of the plant loop is where
+energy is \textquotedblleft supplied\textquotedblright{} by various
+components. The components typically found on the supply side include
+pumps, boilers, chillers, purchased heating and cooling, ice storage,
+etc. In the case of a condenser, the components would be a cooling
+tower, fluid cooler, or ground source heat exchanger, etc. As with
+the demand side, this loop can also include mixers, flow splitters,
+and a bypass.
+\end{itemize}
+The following is a list of groups of input objects related to specifying
+detailed HVAC systems in EnergyPlus related to zone equipment and
+secondary systems:
+\begin{itemize}
+\item HVAC Design Objects - describes input objects related to how EnergyPlus
+performs autosizing for air terminals, zone equipment, systems, and
+plant components as well as for outdoor air systems.
+\item Node-Branch Management - used to describe some of the topological
+features of EnergyPlus such as nodes, pipes, and ducts as well as
+branches (pieces of loops) and connectors.
+\item Air Distribution - describes the arrangement of the components in
+an air distribution system includes the outdoor air system, splitters,
+mixers, and plenums.
+\item Zone HVAC Controls and Thermostats - input objects related to thermostats
+and humidistats used to control the conditions in a zone.
+\item Zone HVAC Forced Air Units - defines input related to zone forced
+air equipment like window air conditioners, unit heaters, fan coil
+systems, and outdoor air units as well as other related input objects
+\item Zone HVAC Radiative/Convective Units - models baseboard systems, low-
+and high-temperature radiant systems, and active portion of ventilated
+slabs.
+\item Zone HVAC Air Loop Terminal Units - describes air terminals including
+constant volume, variable volume, series and parallel powered induction
+units, and duel duct terminals
+\item Zone HVAC Equipment Connections - used to describe the HVAC equipment
+connections at the zone level
+\item Fans - describes constant volume, variable volume, exhaust fans as
+well as more system and component model fans
+\item Coils - contains a long list of input objects to model heating and
+cooling water coils; heating and cooling DX coils including two-,
+multiple-, and variable-speed units; variable refrigerant coils; fuel
+and gas coils; desuperheater coils; air to water heat pump coils;
+and other coil input objects
+\item Evaporative Coolers - describes direct and indirect evaporative coolers
+\item Humidifiers and Dehumidifiers - for electric and gas steam humidifiers
+as well as desiccant dehumidifiers
+\item Heat Recovery - models for air-to-air flat plate and combined sensible
+and latent heat exchangers as well as heat exchangers coupled with
+desiccants
+\item Unitary Equipment - describes unitary input objects that are generally
+placed in the primary air loop and includes heating only, heating
+and cooling, and air-to-air heat pump input objects.
+\item Variable Refrigerant Flow Equipment - input objects to describe variable
+refrigerant flow (VRF) equipment as well as the controls
+\end{itemize}
+The following is a list of control systems in EnergyPlus related to
+HVAC
+\begin{itemize}
+\item Controllers - input objects for simple controllers that look at a
+single node and compare it with the setpoint and includes controllers
+for water coils, outdoor air, and mechanical ventilation
+\item System Availability Managers - these input objects can take an input
+from any node and control whether an entire portion of the HVAC system
+is active and can be based on temperature, differential temperature,
+schedules, night cycle and ventilation
+\item Setpoint Managers - these take input from any node or nodes and calculate
+a setpoint at another node and include controls for single zone heating,
+cooling, or reheat; humidity control; mixed air; warmest or coldest;
+and many other scenarios.
+\item Plant-Condenser Control - provides control for the plant loop primarily
+controlling the operation of the loop and which equipment is available
+and includes control based on heating or cooling load and in reference
+to outdoor conditions such as dry bulb or wet-bulb temperature.
+\item Plant-Condenser Flow Control - describes the TemperingValve input
+object for the special case of flor control with thermal storage systems
+\end{itemize}
+The following is a list of input objects related to primary systems
+and equipment:
+\begin{itemize}
+\item Pumps - describes constant speed and variable speed pumps and headered
+multiple pump systems.
+\item Plant-Condenser Loops - describes the supply and demand side of the
+loops the operating temperatures and flow rates
+\item Plant Heating and Cooling Equipment - used to input the central plant
+equipment such as steam and hot water boilers; electric, absorption,
+engine driven, and turbine chillers; and water-to-water heat pumps;
+as well as connections to district heating and cooling sources.
+\item Condenser Equipment and Heat Exchangers - describes single-, two,
+and variable speed cooling towers; single and two speed evaporative
+and non-evaporative fluid coolers; vertical, surface, trench and slinky
+ground heat exchangers; and fluid-to-fluid heat exchangers
+\item Non-Zone Equipment - describe the LoadProfile:Plant input object that
+allows the load on the plant to be specified by schedule if already
+known
+\item User Defined HVAC and Plant Component Models - a group that allows
+the user to define custom models for zonal systems, air terminals,
+coils, and plant equipment
+\end{itemize}
+The input object groups described in this section are further explained
+in the InputOutputReference.
+
+\subsection{Output Reporting}
 
 No model is worth doing without seeing the results of the model which
 are contained in the output reporting. EnergyPlus has several different
-types of outputs but initially the most important to understand are
+types of outputs, but initially the most important to understand is
 probably the tabular output reports that summarize the results of
 the simulation. The two input object described below are the only
 two necessary to start generating the tabular output reports:
@@ -1811,10 +1947,10 @@ tabular reports but usually just specifying AllSummary is necessary.
 Additional reports can be shown by specifying AllSummaryAndMonthly,
 AllSummaryMonthlyAndSizingPeriod.
 \item OutputControl:Table:Style - specifying the output format for the tabular
-reports which is most commonly HTML but comma, tab, fixed width, and
-XML options are also available. Depending on what is specified the
-output reports can have different file extensions and the file name
-usually has the word ``Table'' or ``tbl'' in it.
+reports which is most commonly HTML but a comma, tab, fixed width,
+and XML options are also available. Depending on what is specified
+the output reports can have different file extensions and the file
+name usually has the word ``Table'' or ``tbl'' in it.
 \end{itemize}
 You can also create your own custom tabular reports by using one of
 the following input objects:
@@ -1824,29 +1960,36 @@ in different bins for the single specific output variable or meter
 specified
 \item Output:Table:Monthly - shows a series of output variables or output
 meters on a monthly basis using different aggregation schemes. For
-output variables that reoccur for each zone or other input object,
+output variables that reoccur for each zone or other input objects,
 the monthly report will be repeated for each one.
 \item Output:Table:Annual - hows a series of output variables or output
-meters on a annual basis using different aggregation schemes. For
-output variables that reoccur for each zone or other input object
+meters on an annual basis using different aggregation schemes. For
+output variables that reoccur for each zone or other input objects,
 additional rows of results will be displayed
 \item Output:VariableDictionary - provides a list of available output variables
 for use with these custom tabular reports as well as the time step
 reporting described next. The list of output variables that are available
-for specific simulation appear in a file with a .rdd extension and
-the output meters appears in a file with an .mdd extension.
+for specific simulation appear in a file with a .rdd extension, and
+the output meters appears in a file with a .mdd extension.
 \end{itemize}
 When you need to dive deeper into the results for a specific output
-variable or output meters, time step outputs allow you too see the
-values of an output for each timestep or other time period. This approach
-lets you more deeply understand the way the item is simulated by seeing
-how output variables and related driving output variables are related.
+variable or output meters, time step outputs allow you to see the
+values of an output variable for each timestep or other time periods.
+This approach lets you more deeply understand the way the item is
+simulated by seeing how output variables and related driving output
+variables are related.
 \begin{itemize}
 \item Output:Variable - these input objects are added one for each output
-variable desired. Usually an asterisk is used for the ``key value''
-field so that all instances of the output variable are included.
+variable desired. Usually, an asterisk is used for the ``key value''
+field so that all instances of the output variable are included. The
+output shows up in the .eso file which is generally converted to a
+.csv file for use with a spreadsheet.
 \item Output:Meter and Output:Meter:MeterFileOnly - these input objects
-specify the output meters (think of them as very detailed submeters)
+specify the output meters (think of them as very detailed submeters).
+The output from this input objects shows up in the .mtr file which
+is generally converted to a Meter.csv file for use with a spreadsheet.
+Also, note that the .mtd file shows the exact relationship between
+specific end-use output report variables and each output meter.
 \item Output:SQLite - use this object if you want to output in the SQLite
 database format. Not only can the output variables and meters be in
 SQLite format but the tabular reports are also included
@@ -1854,8 +1997,8 @@ SQLite format but the tabular reports are also included
 EnergyPlus also includes a number of special reports that usually
 appear in different output files or in the .eio output file
 \begin{itemize}
-\item Output:Surfaces:List - provides report on all the surfaces in a file
-and the output appears in a file with the .sln extension
+\item Output:Surfaces:List - provides a report on all the surfaces in a
+file and the output appears in a file with the .sln extension
 \item Output:Surfaces:Drawing - provides a DXF drawing that can be opened
 in some CAD programs 
 \item OutputControl:SurfaceColorScheme - controls the colors used in the
@@ -1871,41 +2014,191 @@ amount of time reported for the setpoints not being met
 \item Output:Diagnostics - provides additional detail in the output messages
 in the .err file . Normally this extra detail is not shown to reduce
 confusion for new users
-\item Output:DebuggingData - provides additional detailed output related
+\item Output:DebuggingData - provides an additional detailed output related
 to HVAC nodes in a file with a .dbg extension
 \end{itemize}
-Environental
+Environmental reporting which adds new meters showing the related
+to emissions is triggered by the use of the following three input
+objects
 \begin{itemize}
-\item Output:EnvironmentalImpactFactors
-\item EnvironmentalImpactFactors
-\item FuelFactors
+\item Output:EnvironmentalImpactFactors - specifies the frequency of the
+output variables related to emissions
+\item EnvironmentalImpactFactors - specifies the efficiency of district
+heating and cooling systems as well as the carbon equivalent emission
+factors for N20, CH4, and CO2
+\item FuelFactors - for each type of energy resource (electricity, natural
+gas, etc..) provides a way to enter factors related to source energy
+and emissions of CO2, CO, CH4, NOx, N20, SO2, PM, NH3, NMVOC, Hg,
+Pb, and other factors.
 \end{itemize}
-Other object in this input object group
+Other input objects in this group allow the accumulation of metered
+results, the combination of output variables or meters to create custom
+meters, and a method for preprocessors to include error messages in
+the normal error file. All of these are described in the \textquotedblleft Input/Output
+Reference\textquotedblright{} but note that this group is described
+in Chapter 5 ``Input for Output'' and Chapter 7 ``Standard Output
+Reports'' while most of the other groups of input objects are described
+in Chapter 1. The OutputDetailsAndExamples documentation provides
+even more details on the outputs created by each of these input objects.
+Several other output related input objects appear in other areas such
+as Output:DaylightFactors input object in the Daylighting group.
+
+\subsection{Economics}
+
+EnergyPlus contains several input objects that allow economic analysis
+to be performed. 
+
+The input objects used by EnergyPlus for cost estimating calculations
+are as follows:
 \begin{itemize}
-\item Output:Meter:Cumulative
-\item Output:Meter:Cumulative:MeterFileOnly
-\item Meter:Custom
-\item Meter:CustomDecrement
-\item Output:PreprocessorMessage
+\item ComponentCost:LineItem - provides inputs related to determining the
+construction cost and can be associated with several different objects
+and the cost estimate is based on factors such as cost per area or
+cost per unit of output capacity. It has not been applied to all types
+of input objects so for many scenarios; construction costing would
+need to be performed outside of EnergyPlus.
+\item ComponentCost:Adjustments - allows the specification of adjustments
+including miscellaneous costs per conditioned area, design and engineering
+fees, contractor fees, contingency, permitting, bonding, and insurance
+as well as commissioning and regional adjustment fees.
+\item ComponentCost:Reference - entry of reference building costs so that
+the current model can be compared to the reference building
+\end{itemize}
+For many building projects, while energy estimates are important,
+the computation of estimated utility bills allows an understanding
+of how much money is going to be saved to help offset higher initial
+costs of high-performance building. Due to the many different utility
+companies and regulatory agencies, the approach used to compute monthly
+utility bills has become widely varied and, at times, quite complicated
+depending not only on energy and demand but the timing of each and
+the relationship between the two. Overall, the goals of the UtilityCost
+input objects of EnergyPlus are to make simple tariffs easy to model
+and complex tariffs possible to model. The input objects used by EnergyPlus
+for the calculation of monthly and annual utility bill are as follows:
+\begin{itemize}
+\item UtilityCost:Tariff - sets the parameters for the overall tariff such
+as the name, associated output meter, conversion factors, demand computation,
+monthly charges, and minimum charges, and schedule names for the time
+of use periods, seasons, billing cycle, and real-time pricing.
+\item UtilityCost:Qualify - provides a method to qualify if a tariff applies
+to the building being modeled since utilities provide limits usually
+based on peak demand or energy consumption for each tariff
+\item UtilityCost:Charge:Simple - defines cost per unit value for a charge
+based on energy or demand or other charges for a specific season.
+The charges are arranged in a hierarchy shown in Figure X Hierarchy
+of Economic Charges.
+\item UtilityCost:Charge:Block - defines a most complicated but common type
+of charge for energy or demand where the costs are defined in the
+tariff with blocks of charges (i.e., the first 1000 kWh is one cost
+per kWh, the next 5000 kWh is a second cost, and remaining kWh is
+a third cost). Like UtilityCost:Charge:Simple, the charges use the
+same hierarchy.
+\item UtilityCost:Ratchet - some utilities charge not only for the current
+month's demand but also compensate for the highest demand in recent
+months, and this input object allows the specification of such a structure
+\end{itemize}
+\includegraphics[width=5in]{tariff-charges}Figure X Hierarchy of
+Economic Charges
+
+The following two input objects are uncommon to use:
+\begin{itemize}
+\item UtilityCost:Variable - allows the specific specification of a monthly
+variable to be used in the calculation of the tariff
+\item UtilityCost:Computation - provides the step-by-step specification
+of the steps needed to compute the tariff. The output report tariff
+summary includes the default computation steps for the input objects
+specified. 
+\end{itemize}
+Life-cycle costing allows the combination of initial and future costs
+(typically energy bills) to be understood using a single metric so
+that multiple building energy models can be compared even if they
+all have different initial and reoccurring future costs. The input
+objects used for performing a life-cycle cost analysis are:
+\begin{itemize}
+\item LifeCycleCost:Parameters - describes the discount, tax, and inflation
+rates, the approach used for inflation and discounting, as well as
+the base date and length of the study period and other parameters
+related to life-cycle costing
+\item LifeCycleCost:RecurringCosts - used to enter reoccurring costs other
+than costs related to energy and water usage since those are included
+automatically
+\item LifeCycleCost:NonrecurringCost - used to enter costs that occur only
+once during the study period
+\item LifeCycleCost:UsePriceEscalation - specifies the annual escalation
+of energy costs in future years and is generally based on government
+predictions. The increases in energy costs for future years are assuming
+they change differently than inflation. A file that is updated each
+year begins with the name LCCusePriceEscalationDataSet is included
+in the DataSets directory and is based on supplements to the NIST
+135 handbook.
+\end{itemize}
+Two less commonly used input objects are
+\begin{itemize}
+\item LifeCycleCost:UseAdjustment - allows manual adjustment of energy or
+water costs in future years
+\item CurrencyType - specifies the currency symbol of the monetary unit.
+If it is not included a dollar sign '\$' is used in all reports.
 \end{itemize}
 All of these are described in the \textquotedblleft Input/Output Reference\textquotedblright{}
-but note that this group is described in Chapter 5 ``Input for Output''
-and Chapter 7 ``Standard Output Reports'' while most of the other
-groups of input objects are described in Chapter 1. Several other
-output related input objects appear in other areas such as Output:DaylightFactors
-input objecct in the Daylighting group.
+but note that this group is described in Chapter 3 ``EnergyPlus Economics''
+while most of the other groups of input objects are described in Chapter
+1. The OutputDetailsAndExamples documentation provides even more details
+on the tabular outputs created in the section labeled ``eplustbl.<ext>''. 
 
-\section{Economics}
+\subsection{Other Groups of Input Objects}
 
-\subsection*{Tariffs}
-
-\subsection*{Life Cycle Costs}
-
-\subsection*{Emissions and TDV}
+The previous sections describe major groups of input objects. This
+section briefly covers some of the remaining input object groups.
+\begin{itemize}
+\item Detailed Ground Heat Transfer - provides an alternative way of describing
+ground heat transfer through basement walls and floors and slabs using
+objects that are then processed by the SLAB and BASEMENT programs
+and is also documented in AuxiliaryPrograms.
+\item Energy Management System (EMS) - a high-level control method that
+connects sensors and actuators with a simple control programming language
+and is also documented in the EMSApplicationGuide.
+\item External Interface - allows the connection of EnergyPlus using co-simulation
+by the import of Functional Mockup Units (FMUs) and is also documented
+in the ExternalInterfacesApplicationGuide.
+\item Operational Faults - provides for the modeling of operation problems
+in sensors, controllers, meters, equipment, and systems and is commonly
+used with existing buildings
+\item General Data Entry - contains the Matrix:TwoDimension input object
+used with the Construction:ComplexFenestrationState input object.
+\item Performance Curves - allows the specification of polynomial curves
+used to characterize the performance of HVAC equipment
+\item Performance Tables - allows the specification of tables used to characterize
+the performance of HVAC equipment
+\item Fluid Properties - describes the detailed properties of refrigerants
+and glycols
+\item Demand Limiting Controls - provides a way of implementing management
+of the systems of the building to regulate the peak demand 
+\item Natural Ventilation and Duct Leakage - provides a way to model multizone
+airflows driven by wind and forced air systems (shown under Group-Airflow
+Network in the InputOutputReference).
+\item Room Air Models - allows the description of non-uniform room air temperatures
+(not fully mixed)
+\item Compliance Objects - provides an input object that allows rotation
+of the building when used for compliance purposes
+\item Parametrics - allows for simple parametric cases to be defined within
+an input file using input objects. Makes use of the ParametricPreprocessor
+as described in the AuxiliaryPrograms document. 
+\item Refrigeration - describes supermarket refrigeration systems 
+\item Electric Load Center-Generator Specifications - allows the specification
+of fuel and photovoltaic generators and controls on when they should
+be used to provide power to the facility 
+\item Water Systems - contains input objects to describe the use of water
+in the building including from wells, rain, and storage
+\item Solar Collectors - describes various systems that convert solar energy
+into thermal energy including those that are integrated with photovoltaic
+systems
+\item Water Heaters and Thermal Storage - describes systems that provide
+water heating and storage as well as ice and chilled water storage
+\end{itemize}
 
 \section{Specific Tips }
 
-\subsection*{Data Sets}
+\subsection{Data Sets}
 
 EnergyPlus uses snippets of IDF files to create the library of data
 that may be useful for you. Two folders are created upon installation:
@@ -1913,17 +2206,17 @@ DataSets -- which contains IDF snippets and MacroDataSets -- which
 also contain IDF snippets but are in a form such that they can be
 easily used with the EPMacro program. 
 
-\subsection*{Other Useful Utility Programs}
+\subsection{Other Useful Utility Programs}
 
 The EnergyPlus install includes a variety of tools to help with various
-aspectis of converting data or displaying information to help with
+aspects of converting data or displaying information to help with
 using EnergyPlus
 \begin{itemize}
 \item Coefficient Curve Generation - The CoeffConv and CoeffConv utility
-programs can be used to convert DOE-2 temperature depen- dent curves
-(Fahrenheit) to EnergyPlus temperature curves (Centigrade/Celsius).
-These programs are described in the Auxiliary Programs document.
-\item HVAC-Diagram - Another post processing program is the HVAC-Diagram
+programs can be used to convert DOE-2 temperature dependent curves
+(Fahrenheit) to EnergyPlus temperature curves (Celsius). These programs
+are described in the Auxiliary Programs document.
+\item HVAC-Diagram - Another post-processing program is the HVAC-Diagram
 application. It reads one of the EnergyPlus output files (eplusout.bnd)
 and produces a Scalable Vector Graphics (SVG) file. More information
 on the HVAC Diagram program is found in the Auxiliary Programs document.
@@ -1933,8 +2226,4 @@ than SI units. This program is described more fully in the Auxiliary
 Programs document.
 \end{itemize}
 
-\subsection*{Measures to Object Map}
-
-A map of common energy efficiency measures to the input objects that
-need to be modified or included to support them.
 \end{document}
