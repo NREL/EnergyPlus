@@ -407,7 +407,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ! na
 
           ! USE STATEMENTS:
-  USE InputProcessor, ONLY: MakeUPPERCase,SameString
+  USE InputProcessor, ONLY: MakeUPPERCase,SameString,ProcessNumber
   USE General, ONLY: TrimSigDigits
 
   IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
@@ -448,7 +448,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
     CHARACTER(len=4) :: VString=' '
     INTEGER iCurArgs
     LOGICAL compactwarning
-    INTEGER :: ReadStatus
+    LOGICAL :: ErrFlag
 
     Written=.true.
     compactwarning=.false.
@@ -529,22 +529,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           CALL WriteOutIDFLinesAsSingleLine(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,FieldUnits)
 
         CASE('SURFACE:HEATTRANSFER','SURFACE:HEATTRANSFER:SUB')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-10)/3
           ELSEIF (OutArgs(10) == '') THEN
             NVert=(CurArgs-10)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(10),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(10),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-10)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(10) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
+
           VArg=11
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -566,26 +571,31 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           WRITE(DifUnit,fmta) ''
 
         CASE('SURFACE:SHADING:DETACHED','SURFACE:SHADING:DETACHED:FIXED','SURFACE:SHADING:DETACHED:BUILDING')
-          IF (ObjectName == 'SURFACE:SHADING:DETACHED') THEN
-            CALL WriteOutPartialIDFLines(DifUnit,'SURFACE:SHADING:DETACHED:FIXED',3,OutArgs,FieldNames,FieldUnits)
-          ELSE
-            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,3,OutArgs,FieldNames,FieldUnits)
-          ENDIF
           IF (MakeUPPERCase(OutArgs(3)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-3)/3
           ELSEIF (OutArgs(3) == '') THEN
             NVert=(CurArgs-3)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(3),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(3),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-3)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(3) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
+
+          ! Now we write the first few fields
+          IF (ObjectName == 'SURFACE:SHADING:DETACHED') THEN
+            CALL WriteOutPartialIDFLines(DifUnit,'SURFACE:SHADING:DETACHED:FIXED',3,OutArgs,FieldNames,FieldUnits)
+          ELSE
+            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,3,OutArgs,FieldNames,FieldUnits)
+          ENDIF
+
           VArg=4
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -607,23 +617,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           WRITE(DifUnit,fmta) ''
 
         CASE('SURFACE:SHADING:ATTACHED')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(4)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-4)/3
           ELSEIF (OutArgs(4) == '') THEN
             NVert=(CurArgs-4)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(4),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(4),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-4)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(4) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
-
           ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
+
           VArg=5
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -776,22 +790,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           CALL WriteOutIDFLinesAsSingleLine(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,FieldUnits)
 
         CASE('BUILDINGSURFACE:DETAILED')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-10)/3
           ELSEIF (OutArgs(10) == '') THEN
             NVert=(CurArgs-10)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(10),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(10),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-10)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(10) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
+
           VArg=11
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -814,22 +833,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
 
         CASE('FENESTRATIONSURFACE:DETAILED')
           IF (VersionNum < 9.0) THEN
-            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
             IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
               NVert=(CurArgs-10)/3
             ELSEIF (OutArgs(10) == '') THEN
               NVert=(CurArgs-10)/3
             ELSE
               ! Try to read the number of vertices as an integer
-              READ(OutArgs(10),*,IOStat=ReadStatus) NVert
-              IF (ReadStatus /= 0) THEN
+              NVert = ProcessNumber(OutArgs(10),ErrFlag)
+              IF (ErrFlag) THEN
                 ! If failed, default to autocalculate instead
                 NVert=(CurArgs-10)/3
+                ! Replace in existing with Autocalculate
+                OutArgs(10) = 'Autocalculate'
                 CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                     ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                     TRIM(TrimSigDigits(NVert)) //')')
               ENDIF
             ENDIF
+
+            ! Now we write the first few fields
+            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
+
             VArg=11
             DO Arg=1,NVert
               IF (Arg /= NVert) THEN
@@ -850,22 +874,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDDO
             WRITE(DifUnit,fmta) ''
           ELSE
-            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
             IF (MakeUPPERCase(OutArgs(9)) == 'AUTOCALCULATE') THEN
               NVert=(CurArgs-9)/3
             ELSEIF (OutArgs(9) == '') THEN
               NVert=(CurArgs-9)/3
             ELSE
               ! Try to read the number of vertices as an integer
-              READ(OutArgs(9),*,IOStat=ReadStatus) NVert
-              IF (ReadStatus /= 0) THEN
+              NVert = ProcessNumber(OutArgs(9),ErrFlag)
+              IF (ErrFlag) THEN
                 ! If failed, default to autocalculate instead
                 NVert=(CurArgs-9)/3
+                ! Replace in existing with Autocalculate
+                OutArgs(9) = 'Autocalculate'
                 CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                    ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                    TRIM(TrimSigDigits(NVert)) //')')
               ENDIF
             ENDIF
+
+            ! Now we write the first few fields
+            CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
+
             VArg=10
             DO Arg=1,NVert
               IF (Arg /= NVert) THEN
@@ -888,22 +917,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ENDIF
 
         CASE('WALL:DETAILED','ROOFCEILING:DETAILED','FLOOR:DETAILED')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(9)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-9)/3
           ELSEIF (OutArgs(9) == '') THEN
             NVert=(CurArgs-9)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(9),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(9),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-9)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(9) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
+
           VArg=10
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -925,22 +959,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           WRITE(DifUnit,fmta) ''
 
         CASE('SHADING:SITE:DETAILED','SHADING:BUILDING:DETAILED')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,3,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(3)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-3)/3
           ELSEIF (OutArgs(3) == '') THEN
             NVert=(CurArgs-3)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(3),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(3),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-3)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(3) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
             ENDIF
           ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,3,OutArgs,FieldNames,FieldUnits)
+
           VArg=4
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
@@ -962,22 +1001,27 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           WRITE(DifUnit,fmta) ''
 
         CASE('SHADING:ZONE:DETAILED')
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(4)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-4)/3
           ELSEIF (OutArgs(4) == '') THEN
             NVert=(CurArgs-4)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            READ(OutArgs(4),*,IOStat=ReadStatus) NVert
-            IF (ReadStatus /= 0) THEN
+            NVert = ProcessNumber(OutArgs(4),ErrFlag)
+            IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
               NVert=(CurArgs-4)/3
+              ! Replace in existing with Autocalculate
+              OutArgs(4) = 'Autocalculate'
               CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ENDIF
           ENDIF
-          ENDIF
+
+          ! Now we write the first few fields
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
+
           VArg=5
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
