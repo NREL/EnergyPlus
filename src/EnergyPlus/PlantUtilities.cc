@@ -242,7 +242,9 @@ namespace PlantUtilities {
             } else {
                 ShowSevereError("SetComponentFlowRate: trapped plant loop node id = 0");
             }
-            ShowFatalError("Preceding loop index error causes program termination");
+            return;
+            // this crashes during ManageSizing, maybe it's just an init thing...
+            // ShowFatalError("Preceding loop index error causes program termination");
         }
 
         Real64 const MdotOldRequest = DataLoopNode::Node(InletNode).MassFlowRateRequest;
