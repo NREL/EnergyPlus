@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-January 28, 2019
+January 29, 2019
 \end_layout
 
 \begin_layout Standard
@@ -115,7 +115,7 @@ The following background on building energy modeling (BEM) will provide
  
 \end_layout
 
-\begin_layout Section*
+\begin_layout Subsection
 What is BEM?
 \end_layout
 
@@ -308,7 +308,7 @@ n in buildings because the energy flows in buildings can be very complicated.
  
 \end_layout
 
-\begin_layout Section*
+\begin_layout Subsection
 Questions that BEM can answer
 \end_layout
 
@@ -344,7 +344,7 @@ These questions can take place at different times during the life-cycle
  design process, and into the operation of the building
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 The Design Process and BEM 
 \end_layout
 
@@ -431,7 +431,7 @@ In addition it has information about how to integrate climate and site analysis,
  modeling.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 EnergyPlus Capabilities
 \end_layout
 
@@ -580,7 +580,7 @@ s is the integration of all aspects of the simulation—loads, systems, and
  list of what can be modeled might be more helpful>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Open Source
 \end_layout
 
@@ -638,7 +638,7 @@ literal "false"
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Brief History
 \end_layout
 
@@ -691,7 +691,7 @@ s, and solid user bases both nationally and internationally.
  utilize it.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Documentation and Other Resources
 \end_layout
 
@@ -801,7 +801,7 @@ To learn more about how to use EnergyPlus, the example files are a great
 The EnergyPlus Ecosystem 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Current Interfaces 
 \end_layout
 
@@ -909,7 +909,7 @@ literal "false"
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Approaches to Implement Measures 
 \end_layout
 
@@ -1087,7 +1087,7 @@ literal "false"
  2018 ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Parametric Analysis Tools 
 \end_layout
 
@@ -1144,7 +1144,7 @@ literal "false"
  is a building optimization tool focused on residential applications.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Weather Files 
 \begin_inset CommandInset label
 LatexCommand label
@@ -1195,7 +1195,7 @@ literal "false"
  to many other sites that provide weather files.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Co-simulation and Linked Software
 \end_layout
 
@@ -1203,7 +1203,7 @@ Co-simulation and Linked Software
 <<NEED CONTENT>>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Interoperability 
 \end_layout
 
@@ -1211,7 +1211,7 @@ Interoperability
 <<NEED CONTENT>>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Example Files 
 \end_layout
 
@@ -1240,7 +1240,7 @@ ExampleFiles-ObjectsLink.html file which lists every type of input object
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Getting Help 
 \begin_inset CommandInset label
 LatexCommand label
@@ -1362,7 +1362,7 @@ In addition, if you are using a graphical user interface, the vendor probably
 Using EnergyPlus 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Installing EnergyPlus
 \end_layout
 
@@ -1371,7 +1371,7 @@ Please see the EnergyPlus QuickStart Guide for instructions on how to install
  EnergyPlus for your system.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Running EnergyPlus
 \end_layout
 
@@ -1806,7 +1806,7 @@ While both EP-Launch 2 and EP-Launch 3 do many of the same functions the
  workflows that run what ever programs they need to run.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 IDF and JSON syntax
 \end_layout
 
@@ -2017,7 +2017,7 @@ While the IDF and epJSON file formats are quite different they contain the
  and from epJSON to IDF using the -c or --convert option.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Creating and Editing Input Files
 \end_layout
 
@@ -2116,7 +2116,7 @@ literal "false"
  features as the IDF Editor when complete.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Run-Check-Edit Repeat 
 \begin_inset CommandInset label
 LatexCommand label
@@ -2220,11 +2220,7 @@ To speed the process of running the simulations, you may want to only run
  the first time.
 \end_layout
 
-\begin_layout Subsection*
-Common Input Objects
-\end_layout
-
-\begin_layout Subsection*
+\begin_layout Subsection
 Key Concepts
 \end_layout
 
@@ -2371,7 +2367,7 @@ Obtain sufficient central plant information to allow specification and schedulin
 g of the boilers, chillers and other plant equipment.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 What Are All These Folders?
 \end_layout
 
@@ -2428,7 +2424,7 @@ noprefix "false"
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 What Are All These Output Files?
 \end_layout
 
@@ -2609,7 +2605,7 @@ Don't be intimindated by the long list of files, you can do a lot in EnergyPlus
  a good strategy for using EnergyPlus.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Versions and Updating
 \end_layout
 
@@ -2689,7 +2685,7 @@ Using Older Version Input Files - Tranision
  in the AuxiliaryPrograms document.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Errors and How to Fix Them
 \end_layout
 
@@ -2744,7 +2740,7 @@ noprefix "false"
 <MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Modeling Simply
 \end_layout
 
@@ -2752,7 +2748,7 @@ Modeling Simply
 <MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Quality Control
 \end_layout
 
@@ -2760,7 +2756,7 @@ Quality Control
 <MAYBE SOMETHING FROM GUIDELINES FOR ENERGY SIMULATION PDF>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Choosing a Baseline
 \end_layout
 
@@ -2770,7 +2766,7 @@ Choosing a Baseline
  the design process>
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Presenting Results to Others
 \end_layout
 
@@ -2779,6 +2775,15 @@ Presenting Results to Others
 \end_layout
 
 \begin_layout Section
+Input Object Groups
+\end_layout
+
+\begin_layout Standard
+The following sections provides an overview of the input objects based on
+ groups described in the energy+.idd file and the InputOutputReference.
+\end_layout
+
+\begin_layout Subsection
 Simulation Parameters
 \end_layout
 
@@ -2859,7 +2864,7 @@ Group-Simulation Parameters.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Location and Climate
 \end_layout
 
@@ -2936,7 +2941,7 @@ Group-Location and Climate.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Schedules
 \end_layout
 
@@ -3008,7 +3013,7 @@ Group-Schedules.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Surface Construction Elements
 \end_layout
 
@@ -3108,7 +3113,7 @@ Group-Surface Construction Elements.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Thermal Zones and Surfaces
 \end_layout
 
@@ -3449,7 +3454,7 @@ Other less common input objects include ZoneList and ZoneGroup that can
  allows a building model to be stretched with just a few inputs.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Internal Gains 
 \end_layout
 
@@ -3559,7 +3564,7 @@ Group-Internal Gains.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Daylighting 
 \end_layout
 
@@ -3646,7 +3651,7 @@ Group-Daylighting.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Advanced Construction, Surface, Zone Concepts
 \end_layout
 
@@ -3739,7 +3744,7 @@ Group-Advanced Surface Concepts.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Exterior Equipment
 \end_layout
 
@@ -3779,7 +3784,7 @@ Group-Exterior Energy Use Equipment.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Zone Airflow
 \end_layout
 
@@ -3865,7 +3870,7 @@ Group-Airflow.
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 HVAC Templates
 \end_layout
 
@@ -4132,7 +4137,7 @@ In addition, this group of input objects includes three plant objects that
  “ExpandObjects.”
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Output Reporting
 \end_layout
 
@@ -4353,7 +4358,7 @@ Standard Output Reports
  Output:DaylightFactors input objecct in the Daylighting group.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Economics
 \end_layout
 
@@ -4512,11 +4517,144 @@ CurrencyType - specifies the currency symbol of the monetary unit.
  If it is not included a dollar sign '$' is used in all reports.
 \end_layout
 
+\begin_layout Standard
+All of these are described in the “Input/Output Reference” but note that
+ this group is described in Chapter 3 
+\begin_inset Quotes eld
+\end_inset
+
+EnergyPlus Economics
+\begin_inset Quotes erd
+\end_inset
+
+ while most of the other groups of input objects are described in Chapter
+ 1.
+ The OutputDetailsAndExamples documentation provides even more details on
+ the tabular outputs created in the section labled 
+\begin_inset Quotes eld
+\end_inset
+
+eplustbl.<ext>
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Other Groups of Input Objects
+\end_layout
+
+\begin_layout Standard
+The previous sections describe major groups of input objects.
+ This section briefly covers some of the remaining input object groups.
+\end_layout
+
+\begin_layout Itemize
+Detailed Ground Heat Transfer - provides an alternative way of describing
+ ground heat transfer through basement walls and floors and slabs using
+ objects that are than processed by the SLAB and BASEMENT programs and is
+ also documented in AuxiliaryPrograms.
+\end_layout
+
+\begin_layout Itemize
+Energy Management System (EMS) - a high level control method that connects
+ sensors and actuators with a simple control programming langauge and is
+ also documented in the EMSApplicationGuide.
+\end_layout
+
+\begin_layout Itemize
+External Interface - allows the connection of EnergyPlus using co-simulation
+ by the import of Functional Mockup Units (FMUs) and is also documented
+ in the ExternalInterfacesApplicationGuide.
+\end_layout
+
+\begin_layout Itemize
+Operational Faults - provides for the modeling of operation problems in
+ sensors, controllers, meters, equipment and systems and is commonly used
+ with existing buildings
+\end_layout
+
+\begin_layout Itemize
+General Data Entry - contains the Matrix:TwoDimension input object used
+ with the Construction:ComplexFenestrationState input object.
+\end_layout
+
+\begin_layout Itemize
+Performance Curves - allows the specification of polynomial curves used
+ to characterize the performance of HVAC equipment
+\end_layout
+
+\begin_layout Itemize
+Performance Tables - allows the specification of tables used to characterize
+ the performance of HVAC equipment
+\end_layout
+
+\begin_layout Itemize
+Fluid Properties - describes the detailed properities of refrigerants and
+ glycols
+\end_layout
+
+\begin_layout Itemize
+Demand Limiting Controls - provides a way of implementing management of
+ the systems of the building to regulate the peak demand 
+\end_layout
+
+\begin_layout Itemize
+Natural Ventilation and Duct Leakage - provides a way to model multizone
+ airflows driven by wind and forced air systems (shown under Group-Airflow
+ Network in the InputOutputReference).
+\end_layout
+
+\begin_layout Itemize
+Room Air Models - allows the description of non-uniform room air temperatures
+ (not fully mixed)
+\end_layout
+
+\begin_layout Itemize
+Compliance Objects - provides an input object that allows rotation of the
+ building when used for compliance purposes
+\end_layout
+
+\begin_layout Itemize
+Parametrics - allows for simple parametric cases to be defined within an
+ input file using input objects.
+ Makes use of the ParametricPreprocessor described in the AuxiliaryPrograms
+ document.
+ 
+\end_layout
+
+\begin_layout Itemize
+Refrigeration - describes supermarket refrigeration systems 
+\end_layout
+
+\begin_layout Itemize
+Electric Load Center-Generator Specifications - allows the specification
+ of fuel and photovoltaic generators and controls on when they should be
+ used to provide power to the facility 
+\end_layout
+
+\begin_layout Itemize
+Water Systems - contains input objects to describe the use of water in the
+ building including from wells, rain, and storage
+\end_layout
+
+\begin_layout Itemize
+Solar Collectors - describes various systems that convert solar energy into
+ thermal energy including those that are integrated with photovoltaic systems
+\end_layout
+
+\begin_layout Itemize
+Water Heaters and Thermal Storage - describes systems that provide water
+ heating and storage as well as ice and chilled water storage
+\end_layout
+
 \begin_layout Section
 Specific Tips 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Data Sets
 \end_layout
 
@@ -4529,7 +4667,7 @@ EnergyPlus uses snippets of IDF files to create the library of data that
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Other Useful Utility Programs
 \end_layout
 
@@ -4561,13 +4699,13 @@ convertESOMTR - This simple post processing program can be used seamlessly
  This program is described more fully in the Auxiliary Programs document.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsection
 Measures to Object Map
 \end_layout
 
 \begin_layout Standard
-A map of common energy efficiency measures to the input objects that need
- to be modified or included to support them.
+<A map of common energy efficiency measures to the input objects that need
+ to be modified or included to support them.>
 \end_layout
 
 \end_body
