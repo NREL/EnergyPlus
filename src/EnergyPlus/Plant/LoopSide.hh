@@ -121,6 +121,11 @@ namespace DataPlant {
         Real64 LoopSideInlet_TotalTime;
         PlantConvergencePoint InletNode;
         PlantConvergencePoint OutletNode;
+        Real64 flowRequestNeedIfOn;
+        Real64 flowRequestNeedAndTurnOn;
+        Real64 flowRequestFinal;
+        bool hasConstSpeedBranchPumps;
+        Array1D<Real64> noLoadConstantSpeedBranchFlowRateSteps;
 
         // Default Constructor
         HalfLoopData()
@@ -134,7 +139,8 @@ namespace DataPlant {
               PressureDrop(0.0), PressureEffectiveK(0.0), errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0),
               errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0), LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0),
               LoopSideInlet_CapExcessStorageTime(0.0), LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0),
-              InletNode(0.0, 0.0), OutletNode(0.0, 0.0)
+              InletNode(0.0, 0.0), OutletNode(0.0, 0.0), flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0),
+              hasConstSpeedBranchPumps(false)
         {
         }
     };

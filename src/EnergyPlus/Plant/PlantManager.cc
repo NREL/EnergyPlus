@@ -1575,6 +1575,8 @@ namespace PlantManager {
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter = TempLoop.Splitter;
                 PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer = TempLoop.Mixer;
 
+                PlantLoop(LoopNum).LoopSide(LoopSideNum).noLoadConstantSpeedBranchFlowRateSteps.allocate(TempLoop.TotalBranches-2);
+
                 //   Add condenser CASE statement when required.
 
                 TempLoop.Branch.deallocate();
@@ -1583,11 +1585,17 @@ namespace PlantManager {
 
             PlantLoop(LoopNum).LoopHasConnectionComp = TempLoop.LoopHasConnectionComp;
 
-            // CR 7883 check for missing demand side pump if common pipe set.
-            if ((PlantLoop(LoopNum).CommonPipeType != CommonPipe_No) && (!DemandSideHasPump)) {
-                ShowSevereError("Input Error: a common pipe arrangement was selected but there is no pump for the secondary loop.");
-                ShowContinueError("Occurs in PlantLoop = " + TempLoop.Name);
-                ShowContinueError("Add a pump to the demand side of this plant loop.");
+            bool const ThisSideHasPumps = (PlantLoop(LoopNum).LoopSide(1).TotalPumps > 0);
+            bool const OtherSideHasPumps = (PlantLoop(LoopNum).LoopSide(2).TotalPumps > 0);
+            if ((PlantLoop(LoopNum).CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
+                ShowSevereError("Input Error: Common Pipe configurations must have pumps on both sides of loop");
+                ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+                ShowContinueError("Make sure both demand and supply sides have a pump");
+                ErrorsFound = true;
+            } else if (!ThisSideHasPumps && !OtherSideHasPumps) {
+                ShowSevereError("SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
+                ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+                ShowContinueError("All plant loops require at least one pump");
                 ErrorsFound = true;
             }
 
@@ -3569,7 +3577,7 @@ namespace PlantManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine reallocates the pumps data structure in the LoopSide data structure
-        //  and adds the pump data passed in as the next pumpe
+        //  and adds the pump data passed in as the next pump
 
         // METHODOLOGY EMPLOYED:
         // Fills the following location items in the pump data structure which resides on the LoopSide
@@ -3580,35 +3588,11 @@ namespace PlantManager {
         //   INTEGER                          :: CompNum               = 0
         //   ...
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataPlant::LoopSidePumpInformation; // , SimPlantEquipTypes
-        // USE InputProcessor, ONLY: UtilityRoutines::FindItemInList(
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // Object Data
-
         auto &loop_side(PlantLoop(LoopNum).LoopSide(LoopSideNum));
         auto &pumps(loop_side.Pumps);
         int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
         pumps.redimension(nPumpsAfterIncrement);
         pumps(nPumpsAfterIncrement).PumpName = PumpName;
-        // pumps( nPumpsAfterIncrement ).PumpTypeOf = UtilityRoutines::FindItemInList( PumpType, SimPlantEquipTypes );
         pumps(nPumpsAfterIncrement).BranchNum = BranchNum;
         pumps(nPumpsAfterIncrement).CompNum = CompNum;
         pumps(nPumpsAfterIncrement).PumpOutletNode = PumpOutletNode;
