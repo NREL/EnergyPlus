@@ -1988,9 +1988,13 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
     }
 
     // Run a test with a use flow rate
-    for (auto &node : Tank.Node) {
+    std::vector<Real64> PrevNodeTemps;
+    PrevNodeTemps.resize(Tank.Nodes);
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
         node.Temp = 60.0;
         node.SavedTemp = 60.0;
+        PrevNodeTemps[i] = node.Temp;
     }
 
     Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
@@ -2005,6 +2009,17 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
     }
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobals::SecInHour;
+    int DummyIndex = 1;
+    Real64 TankNodeEnergy = 0;
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
+        TankNodeEnergy += node.Mass * (NodeTemps[i] - PrevNodeTemps[i]);
+    }
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    TankNodeEnergy *= Cp;
+    EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
+
 
     EXPECT_TRUE(Tank.HeaterOn1);
     EXPECT_FALSE(Tank.HeaterOn2);

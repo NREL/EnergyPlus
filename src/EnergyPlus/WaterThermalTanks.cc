@@ -8874,14 +8874,20 @@ namespace WaterThermalTanks {
             }
             // More bookkeeping for reporting variables
             Eloss += Qloss * dt;
-            const Real64 Quse = Tank.UseEffectiveness * Tank.UseMassFlowRate * Cp * (Tank.UseInletTemp - Tavg[Tank.UseInletStratNode - 1]);
+            const Real64 Quse = Tank.UseEffectiveness * Tank.UseMassFlowRate * Cp * (Tank.UseInletTemp - Tavg[Tank.UseOutletStratNode - 1]);
             Euse += Quse * dt;
-            Real64 Qsource;
-            if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
-                Qsource = Qheatpump;
-            } else {
-                Qsource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[Tank.SourceInletStratNode - 1]);
-            }
+            const Real64 Qsource = [&]{
+                if (Tank.HeatPumpNum > 0) {
+                    if (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped) {
+                        return Qheatpump;
+                    } else {
+                        assert(HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped);
+                        return 0.0;
+                    }
+                } else {
+                    return Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[Tank.SourceOutletStratNode - 1]);
+                }
+            }();
             Esource += Qsource * dt;
             if (Tank.HeaterOn1) Runtime1 += dt;
             if (Tank.HeaterOn2) Runtime2 += dt;
@@ -8891,7 +8897,7 @@ namespace WaterThermalTanks {
             Real64 Qneeded = -(Quse + Qsource + Qloss);
             Qneeded -= (Tank.HeaterOn1 || Tank.HeaterOn2) ? Tank.OnCycParaLoad * Tank.OnCycParaFracToTank : Tank.OffCycParaLoad * Tank.OffCycParaFracToTank;
             Qneeded = max(Qneeded, 0.0);
-            const Real64 Qunmet = max(Qneeded - Qheater1 - Qheater2, 0.0);
+            const Real64 Qunmet = max(Qneeded - Qheater1 - Qheater2 - Qheatpump, 0.0);
             Eunmet += Qunmet * dt;
 
         } // end while TimeRemaining > 0.0
@@ -8943,24 +8949,26 @@ namespace WaterThermalTanks {
 
         Tank.LossRate = Eloss / SecInTimeStep;
         Tank.UseRate = Euse / SecInTimeStep;
+        Real64 WrappedCondenserHeatPumpRate = 0.0;
         if ((Tank.HeatPumpNum > 0) && (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped)) {
             Tank.SourceRate = Qheatpump;
         } else {
             Tank.SourceRate = Esource / SecInTimeStep;
+            WrappedCondenserHeatPumpRate = Qheatpump;
         }
 
         Tank.OffCycParaFuelRate = Tank.OffCycParaLoad * (SecInTimeStep - Runtime) / SecInTimeStep;
         Tank.OnCycParaFuelRate = Tank.OnCycParaLoad * Runtime / SecInTimeStep;
         Tank.OffCycParaRateToTank = Tank.OffCycParaFuelRate * Tank.OffCycParaFracToTank;
         Tank.OnCycParaRateToTank = Tank.OnCycParaFuelRate * Tank.OnCycParaFracToTank;
-        Tank.TotalDemandRate = -Tank.UseRate - Tank.SourceRate - Tank.LossRate - Tank.OffCycParaRateToTank - Tank.OnCycParaRateToTank;
+        Tank.TotalDemandRate = -Tank.UseRate - Tank.SourceRate - Tank.LossRate - Tank.OffCycParaRateToTank - Tank.OnCycParaRateToTank - WrappedCondenserHeatPumpRate;
         Tank.HeaterRate1 = Eheater1 / SecInTimeStep;
         Tank.HeaterRate2 = Eheater2 / SecInTimeStep;
         Tank.HeaterRate = Tank.HeaterRate1 + Tank.HeaterRate2;
 
         Tank.UnmetRate = Eunmet / SecInTimeStep;
         Tank.VentRate = 0.0; // TODO: Calculate vent rate
-        Tank.NetHeatTransferRate = Tank.UseRate + Tank.SourceRate + Tank.LossRate + Tank.OffCycParaRateToTank + Tank.OnCycParaRateToTank + Tank.HeaterRate + Tank.VentRate;
+        Tank.NetHeatTransferRate = Tank.UseRate + Tank.SourceRate + Tank.LossRate + Tank.OffCycParaRateToTank + Tank.OnCycParaRateToTank + Tank.HeaterRate + Tank.VentRate + WrappedCondenserHeatPumpRate;
 
         Tank.CycleOnCount = CycleOnCount1 + CycleOnCount2;
         Tank.CycleOnCount1 = CycleOnCount1;
