@@ -860,27 +860,40 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    int CompNum = 2;
-    std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
-    // Ensure we have the right component (the TES tank)
-    EXPECT_EQ(compName, "ICE THERMAL STORAGE");
-
-    int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
-
-    // Could just test this, but want to improve reporting
-    // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
-
-    std::string ctrlType = "Unknown";
-    if (CtrlTypeNum == PlantCondLoopOperation::CoolingOp) {
-        ctrlType = "CoolingOp";
-    } else if (CtrlTypeNum == PlantCondLoopOperation::HeatingOp) {
-        ctrlType = "HeatingOp";
-    } else if (CtrlTypeNum == PlantCondLoopOperation::DualOp) {
-        ctrlType = "DualOp";
+    // Might as well check that the Chiller is also Ok
+    {
+        int CompNum = 1;
+        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        EXPECT_EQ(compName, "CHILLER");
+        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::CoolingOp);
     }
 
-    EXPECT_EQ(ctrlType, "DualOp") << compName << " has a wrong control type = '" << ctrlType << "'.";
+    {
+        int CompNum = 2;
+        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        // Ensure we have the right component (the TES tank)
+        EXPECT_EQ(compName, "ICE THERMAL STORAGE");
 
+        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
 
+        // Could just test this, but want to improve reporting
+        // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
+
+        std::string ctrlType = "Unknown";
+        if (CtrlTypeNum == PlantCondLoopOperation::CoolingOp) {
+            ctrlType = "CoolingOp";
+        } else if (CtrlTypeNum == PlantCondLoopOperation::HeatingOp) {
+            ctrlType = "HeatingOp";
+        } else if (CtrlTypeNum == PlantCondLoopOperation::DualOp) {
+            ctrlType = "DualOp";
+        }
+
+        EXPECT_EQ(ctrlType, "DualOp") << compName << " has a wrong control type = '" << ctrlType << "'.";
+    }
+
+    // We should now alos have two TES SPMs created, and that's all of them
+    EXPECT_EQ(SetPointManager::NumSchTESSetPtMgrs, 2);
+    EXPECT_EQ(SetPointManager::NumAllSetPtMgrs, 2);
 
 }
