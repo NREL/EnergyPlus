@@ -263,6 +263,7 @@ unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
 
   eventInfo->nextEventTime = EnergyPlus::DataGlobals::NextSimTime;
   eventInfo->nextEventTimeDefined = fmi2True;
+  eventInfo->terminateSimulation = fmi2False;
 
   return 0;
 }
