@@ -8871,8 +8871,6 @@ namespace SetPointManager {
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes(1) = SchTESSetPtMgr(NumSchTESSetPtMgrs).CtrlNodeNum;
         // Give it a Name just in case it's used for error reporting
         AllSetPtMgr(NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(NumSchTESSetPtMgrs);
-        // TODO: That's wrong!
-        // AllSetPtMgr(NumAllSetPtMgrs).Name = SchSetPtMgr(NumSchTESSetPtMgrs).Name;
         AllSetPtMgr(NumAllSetPtMgrs).SPMType = iSPMType_TESScheduled;
         AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType_Temp;
         AllSetPtMgr(NumAllSetPtMgrs).NumCtrlNodes = 1;
