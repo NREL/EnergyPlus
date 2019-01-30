@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
         "	Version,8.3;",
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
         "	IndRDD Evap Cooler,  !- Name",
-        "	ALWAYS_ON,			 !- Availability Schedule Name",
+        "	,			         !- Availability Schedule Name",
         "	0.750,				 !- Cooler Wetbulb Design Effectiveness",
         "	,					 !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name",
         "	,					 !- Cooler Drybulb Design Effectiveness",
@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
         "	Version,8.3;",
         "	EvaporativeCooler:Direct:ResearchSpecial,",
         "	DirectEvapCooler,    !- Name",
-        "	ALWAYS_ON,			 !- Availability Schedule Name",
+        "	,			         !- Availability Schedule Name",
         "	0.7,				 !- Cooler Design Effectiveness",
         "	,					 !- Effectiveness Flow Ratio Modifier Curve Name",
         "	autosize,			 !- Primary Air Design Flow Rate",
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
         "	Version,8.4;",
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
         "	IndRDD Evap Cooler,  !- Name",
-        "	ALWAYS_ON,			 !- Availability Schedule Name",
+        "	,			         !- Availability Schedule Name",
         "	0.750,				 !- Cooler Wetbulb Design Effectiveness",
         "	,					 !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name",
         "	,					 !- Cooler Drybulb Design Effectiveness",
@@ -657,6 +657,11 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
         "	,					 !- Water Supply Storage Tank Name",
         "	0.0,				 !- Drift Loss Fraction",
         "	3;                   !- Blowdown Concentration Ratio",
+
+        "Schedule:Constant,",
+        "  ALWAYS_ON,    !- Name",
+        "  ,             !- Schedule Type Limits Name",
+        "  1.0;          !- Hourly Value",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -722,7 +727,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
         "	Version,8.4;",
         "	EvaporativeCooler:Direct:ResearchSpecial,",
         "	DirectEvapCooler,    !- Name",
-        "	ALWAYS_ON,			 !- Availability Schedule Name",
+        "	,			         !- Availability Schedule Name",
         "	0.7,				 !- Cooler Design Effectiveness",
         "	,					 !- Effectiveness Flow Ratio Modifier Curve Name",
         "	,          			 !- Primary Air Design Flow Rate",
