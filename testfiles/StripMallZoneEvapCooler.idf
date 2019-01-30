@@ -5083,6 +5083,9 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
+  Output:JSON,
+    TimeSeries;    !- Option Type
+
   EnvironmentalImpactFactors,
     0.663,                   !- District Heating Efficiency
     4.18,                    !- District Cooling COP {W/W}
