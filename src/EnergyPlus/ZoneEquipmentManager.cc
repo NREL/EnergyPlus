@@ -5034,9 +5034,14 @@ namespace ZoneEquipmentManager {
                 int retNode = thisZoneEquip.ReturnNode(returnNum);
                 Real64 curReturnFlow = DataLoopNode::Node(retNode).MassFlowRate;
                 if (retNode > 0) {
-                    newReturnFlow = curReturnFlow * returnAdjFactor;
-                    FinalTotalReturnMassFlow += newReturnFlow;
-                    DataLoopNode::Node(retNode).MassFlowRate = newReturnFlow;
+                    if (!fixedReturn(returnNum)) {
+                        newReturnFlow = curReturnFlow * returnAdjFactor;
+                        FinalTotalReturnMassFlow += newReturnFlow;
+                        DataLoopNode::Node(retNode).MassFlowRate = newReturnFlow;
+                    }
+                    else {
+                        FinalTotalReturnMassFlow += curReturnFlow;
+                    }
                 }
             }
         } else {
