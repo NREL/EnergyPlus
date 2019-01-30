@@ -3021,10 +3021,10 @@ namespace HVACManager {
                         ShowSevereError("CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
                             " is unbalanced. Supply is > return plus outdoor air.");
                         ShowContinueErrorTimeStamp("");
-                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" + General::RoundSigDigits(thisAirLoopFlow.SupFlow * DataEnvironment::StdRhoAir, 6) +
-                            "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow*DataEnvironment::StdRhoAir, 6) +
-                            "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow*DataEnvironment::StdRhoAir, 6));
-                        ShowContinueError("  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta*DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" + General::RoundSigDigits(thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir, 6) +
+                            "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir, 6) +
+                            "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta / DataEnvironment::StdRhoAir, 6));
                         ShowContinueError("  This error will only be reported once per system.");
                         thisAirLoopFlow.FlowError = true;
                     }
