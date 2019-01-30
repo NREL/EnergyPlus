@@ -100,13 +100,14 @@ namespace PlantLoopSolver {
                                          int const LastBranchNum,
                                          Real64 const FlowRequest,
                                          bool const FirstHVACIteration,
-                                         bool &LoopShutDownFlag,
-                                         bool const StartingNewLoopSidePass = false);
+                                         bool &LoopShutDownFlag);
 
         void SimulateAllLoopSidePumps(int const LoopNum,
                                       int const ThisSide,
                                       Optional<Location const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
+
+        void SimulateSinglePump(Location const SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         Real64 CalcOtherSideDemand(int const LoopNum, int const ThisSide, Real64 ThisLoopSideFlow);
 

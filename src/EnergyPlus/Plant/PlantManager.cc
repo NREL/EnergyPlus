@@ -1585,6 +1585,7 @@ namespace PlantManager {
 
             PlantLoop(LoopNum).LoopHasConnectionComp = TempLoop.LoopHasConnectionComp;
 
+            // a nice little spot to report out bad pump/common-pipe configurations
             bool const ThisSideHasPumps = (PlantLoop(LoopNum).LoopSide(1).TotalPumps > 0);
             bool const OtherSideHasPumps = (PlantLoop(LoopNum).LoopSide(2).TotalPumps > 0);
             if ((PlantLoop(LoopNum).CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
@@ -1597,6 +1598,15 @@ namespace PlantManager {
                 ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
                 ShowContinueError("All plant loops require at least one pump");
                 ErrorsFound = true;
+            }
+
+            // set up some pump indexing for convenience later
+            for (int LoopSideCounter = 1; LoopSideCounter <= 2; ++LoopSideCounter) {
+                for (int PumpCounter = 1; PumpCounter <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).TotalPumps; ++PumpCounter) {
+                    int const PumpBranchNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(PumpCounter).BranchNum;
+                    int const PumpCompNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(PumpCounter).CompNum;
+                    DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps = PumpCounter;
+                }
             }
 
         } // ...end of demand side loops DO loop
