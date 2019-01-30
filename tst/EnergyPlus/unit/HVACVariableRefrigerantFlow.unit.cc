@@ -2143,7 +2143,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     std::string const idf_objects =
         delimited_string({" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
                           " 	 TU1 VRF DX Cooling Coil, !- Name							   ",
-                          " 	 VRFAvailSched,           !- Availability Schedule Name		   ",
+                          " 	 ,                        !- Availability Schedule Name		   ",
                           " 	 TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node		   ",
                           " 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
                           " 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
