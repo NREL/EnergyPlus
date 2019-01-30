@@ -8517,6 +8517,15 @@ namespace WaterThermalTanks {
         const Real64 MinTemp1 = Tank.SetPointTemp - Tank.DeadBandDeltaTemp;
         const Real64 MinTemp2 = Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2;
 
+        const Real64 UseOutletExpectedTemp = [&]{
+            Real64 MaxMinTemp = max(MinTemp1, MinTemp2);
+            if (Tank.HeatPumpNum > 0) {
+                HeatPumpWaterHeaterData const &HPWH = HPWaterHeater(Tank.HeatPumpNum);
+                MaxMinTemp = max(HPWH.SetPointTemp - HPWH.DeadBandTempDiff, MaxMinTemp);
+            }
+            return MaxMinTemp;
+        }();
+
         // Specific Heat of water (J/kg K)
         static int DummyWaterIndex = 1;
         const Real64 Cp = [&]{
@@ -8806,11 +8815,7 @@ namespace WaterThermalTanks {
             if (Tank.HeaterOn1 || Tank.HeaterOn2) Runtime += dt;
             Eheater1 += Qheater1 * dt;
             Eheater2 += Qheater2 * dt;
-            Real64 Qneeded = -(Quse + Qsource + Qloss);
-            Qneeded -= (Tank.HeaterOn1 || Tank.HeaterOn2) ? Tank.OnCycParaLoad * Tank.OnCycParaFracToTank : Tank.OffCycParaLoad * Tank.OffCycParaFracToTank;
-            Qneeded = max(Qneeded, 0.0);
-            const Real64 Qunmet = max(Qneeded - Qheater1 - Qheater2 - Qheatpump, 0.0);
-            Eunmet += Qunmet * dt;
+            Eunmet += max(Tank.UseEffectiveness * Tank.UseMassFlowRate * (UseOutletExpectedTemp - Tavg[Tank.UseOutletStratNode - 1]), 0.0) * dt;
 
         } // end while TimeRemaining > 0.0
 
