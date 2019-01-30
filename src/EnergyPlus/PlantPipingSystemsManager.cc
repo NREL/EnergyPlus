@@ -1758,13 +1758,13 @@ namespace PlantPipingSystemsManager {
             PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia = rNumericArgs(5);
             if (PipingSystemCircuits(PipeCircuitCounter).PipeSize.InnerDia >= PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia) {
                 CurIndex = 5;
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
-                                                      ObjName_Circuit,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex),
-                                                      "Outer diameter must be greater than inner diameter.",
-                                                      ErrorsFound);
+                IssueSevereInputFieldErrorRealEntry(RoutineName,
+                                                    ObjName_Circuit,
+                                                    cAlphaArgs(1),
+                                                    cNumericFieldNames(CurIndex),
+                                                    rNumericArgs(CurIndex),
+                                                    "Outer diameter must be greater than inner diameter.",
+                                                    ErrorsFound);
             }
 
             // Read design flow rate, validated positive by IP
