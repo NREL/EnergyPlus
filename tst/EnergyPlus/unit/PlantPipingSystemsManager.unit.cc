@@ -57,6 +57,7 @@
 #include "EnergyPlus/SurfaceGeometry.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
@@ -1819,3 +1820,185 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     DataGlobals::BeginEnvrnFlag = true;
     PlantPipingSystemsManager::SimulateGroundDomains(false);
 }
+
+/*
+ * Asserts that all objects that defined both an inside and an outside diameters have correct input (inside < outside)
+ * - PipingSystem:Underground:PipeCircuit
+ * - GroundHeatExchanger:HorizontalTrench
+ */
+
+TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters) {
+
+    std::string const idf_objects = delimited_string({
+
+        "Version, 9.0;"
+
+        "PipingSystem:Underground:Domain,",
+        "  My Piping System,        !- Name",
+        "  4,                       !- Xmax {m}",
+        "  2.5,                     !- Ymax {m}",
+        "  75,                      !- Zmax {m}",
+        "  2,                       !- X-Direction Mesh Density Parameter",
+        "  Uniform,                 !- X-Direction Mesh Type",
+        "  ,                        !- X-Direction Geometric Coefficient",
+        "  2,                       !- Y-Direction Mesh Density Parameter",
+        "  Uniform,                 !- Y-Direction Mesh Type",
+        "  ,                        !- Y-Direction Geometric Coefficient",
+        "  6,                       !- Z-Direction Mesh Density Parameter",
+        "  Uniform,                 !- Z-Direction Mesh Type",
+        "  ,                        !- Z-Direction Geometric Coefficient",
+        "  1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+        "  962,                     !- Soil Density {kg/m3}",
+        "  2576,                    !- Soil Specific Heat {J/kg-K}",
+        "  30,                      !- Soil Moisture Content Volume Fraction {percent}",
+        "  50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}",
+        "  Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "  KATemps,                 !- Undisturbed Ground Temperature Model Name",
+        "  No,                      !- This Domain Includes Basement Surface Interaction",
+        "  ,                        !- Width of Basement Floor in Ground Domain {m}",
+        "  ,                        !- Depth of Basement Wall In Ground Domain {m}",
+        "  ,                        !- Shift Pipe X Coordinates By Basement Width",
+        "  ,                        !- Name of Basement Wall Boundary Condition Model",
+        "  ,                        !- Name of Basement Floor Boundary Condition Model",
+        "  0.005,                   !- Convergence Criterion for the Outer Cartesian Domain Iteration Loop {deltaC}",
+        "  100,                     !- Maximum Iterations in the Outer Cartesian Domain Iteration Loop",
+        "  0.408,                   !- Evapotranspiration Ground Cover Parameter",
+        "  1,                       !- Number of Pipe Circuits Entered for this Domain",
+        "  My Pipe Circuit;         !- Pipe Circuit 1",
+
+        "PipingSystem:Underground:PipeCircuit,",
+        "  My Pipe Circuit,         !- Name",
+        "  0.3895,                  !- Pipe Thermal Conductivity {W/m-K}",
+        "  641,                     !- Pipe Density {kg/m3}",
+        "  2405,                    !- Pipe Specific Heat {J/kg-K}",
+
+        // HERE we define wrong diameters
+        "  0.016,                   !- Pipe Inner Diameter {m}",
+        "  0.012,                   !- Pipe Outer Diameter {m}",
+
+        "  0.004,                   !- Design Flow Rate {m3/s}",
+        "  Plant Supply PipeCircuit Inlet Node,  !- Circuit Inlet Node",
+        "  Plant Supply PipeCircuit Outlet Node,!- Circuit Outlet Node",
+        "  0.001,                   !- Convergence Criterion for the Inner Radial Iteration Loop {deltaC}",
+        "  100,                     !- Maximum Iterations in the Inner Radial Iteration Loop",
+        "  2,                       !- Number of Soil Nodes in the Inner Radial Near Pipe Mesh Region",
+        "  0.03,                    !- Radial Thickness of Inner Radial Near Pipe Mesh Region",
+        "  2,                       !- Number of Pipe Segments Entered for this Pipe Circuit",
+        "  Segment 1,               !- Pipe Segment 1",
+        "  Segment 2;               !- Pipe Segment 2",
+
+        "PipingSystem:Underground:PipeSegment,",
+        "  Segment 1,               !- Name",
+        "  1.95,                    !- X Position {m}",
+        "  1.25,                    !- Y Position {m}",
+        "  IncreasingZ;             !- Flow Direction",
+
+        "PipingSystem:Underground:PipeSegment,",
+        "  Segment 2,               !- Name",
+        "  2.05,                    !- X Position {m}",
+        "  1.25,                    !- Y Position {m}",
+        "  DecreasingZ;             !- Flow Direction",
+
+
+        "GroundHeatExchanger:HorizontalTrench,",
+        "  GHX Horizontal Trench,   !- Name",
+        "  Plant Supply Trench Inlet Node,  !- Inlet Node Name",
+        "  Plant Supply Trench Outlet Node,!- Outlet Node Name",
+        "  0.004,                   !- Design Flow Rate {m3/s}",
+        "  75,                      !- Trench Length in Pipe Axial Direction {m}",
+        "  2,                       !- Number of Trenches",
+        "  2.0,                     !- Horizontal Spacing Between Pipes {m}",
+
+        // HERE we define wrong diameters
+        "  0.015,                   !- Pipe Inner Diameter {m}",
+        "  0.011,                   !- Pipe Outer Diameter {m}",
+
+        "  1.25,                    !- Burial Depth {m}",
+        "  1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+        "  962,                     !- Soil Density {kg/m3}",
+        "  2576,                    !- Soil Specific Heat {J/kg-K}",
+        "  0.3895,                  !- Pipe Thermal Conductivity {W/m-K}",
+        "  641,                     !- Pipe Density {kg/m3}",
+        "  2405,                    !- Pipe Specific Heat {J/kg-K}",
+        "  30,                      !- Soil Moisture Content Percent {percent}",
+        "  50,                      !- Soil Moisture Content Percent at Saturation {percent}",
+        "  Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "  KATemps,                 !- Undisturbed Ground Temperature Model Name",
+        "  0.408;                   !- Evapotranspiration Ground Cover Parameter",
+
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "  KATemps,                 !- Name",
+        "  1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+        "  962,                     !- Soil Density {kg/m3}",
+        "  2576,                    !- Soil Specific Heat {J/kg-K}",
+        "  15.5,                    !- Average Soil Surface Temperature {C}",
+        "  12.8,                    !- Average Amplitude of Surface Temperature {deltaC}",
+        "  17.3;                    !- Phase Shift of Minimum Surface Temperature {days}",
+
+    });
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // NeighborFieldCells.allocate(6);
+    // NeighborBoundaryCells.allocate(6);
+
+    // Domains
+    int NumGeneralizedDomains = 1;
+    int NumHorizontalTrenches = 1;
+    int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches;
+    PlantPipingSystemsManager::PipingSystemDomains.allocate(TotalNumDomains);
+
+    // Then circuits
+    int NumPipeCircuits = 1;
+    int TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
+    PlantPipingSystemsManager::PipingSystemCircuits.allocate(TotalNumCircuits);
+
+    // Then Segments
+    // int NumPipeSegmentsInInput = 2; // Actual 'PipingSystem:Underground:PipeSegment' defined above
+    int NumPipeSegmentsInInput = EnergyPlus::inputProcessor->getNumObjectsFound(PlantPipingSystemsManager::ObjName_Segment);
+    EXPECT_EQ(NumPipeSegmentsInInput, 2);
+
+    // int NumSegmentsInHorizontalTrenches = 2; // Total of 'Number of Trenches'
+    int NumSegmentsInHorizontalTrenches = PlantPipingSystemsManager::GetNumSegmentsForHorizontalTrenches(NumHorizontalTrenches);
+    EXPECT_EQ(NumSegmentsInHorizontalTrenches, 2);
+
+    int TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
+    PlantPipingSystemsManager::PipingSystemSegments.allocate(TotalNumSegments);
+
+    {
+        bool ErrorsFound = false;
+
+        // This one is not necessary, but might as well increase code coverage
+        PlantPipingSystemsManager::ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
+        EXPECT_FALSE(ErrorsFound);
+
+        // Ok, now read the pipe circuit, and we expect the diameter mismatch to be caught
+        PlantPipingSystemsManager::ReadPipeCircuitInputs(NumPipeCircuits, ErrorsFound);
+
+        std::string error_string = delimited_string({
+             "   ** Severe  ** ReadPipeCircuitInputs:PipingSystem:Underground:PipeCircuit=\"MY PIPE CIRCUIT\", invalid Pipe Outer Diameter=\"1.200E-002\", Condition: Outer diameter must be greater than inner diameter.",
+        });
+
+        EXPECT_TRUE(ErrorsFound);
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+    }
+
+
+    // Clear the error stream now, so we can only compare the Horizontal Trench stuff
+    DataGlobals::err_stream->clear();
+
+    {
+        bool ErrorsFound = false;
+        PlantPipingSystemsManager::ReadHorizontalTrenchInputs(NumGeneralizedDomains + 1, NumPipeCircuits + 1, NumPipeSegmentsInInput + 1, NumHorizontalTrenches, ErrorsFound);
+
+        std::string error_string = delimited_string({
+             "   ** Severe  ** ReadHorizontalTrenchInputs: GroundHeatExchanger:HorizontalTrench=\"GHX HORIZONTAL TRENCH\" has invalid pipe diameters.",
+             "   **   ~~~   ** Outer diameter [1.100E-002] must be greater than inner diameter [1.500E-002].",
+        });
+
+        EXPECT_TRUE(ErrorsFound);
+        EXPECT_TRUE(compare_err_stream(error_string, true));
+    }
+}
+
