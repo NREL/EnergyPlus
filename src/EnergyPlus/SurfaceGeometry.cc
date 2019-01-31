@@ -9570,7 +9570,7 @@ namespace SurfaceGeometry {
                 InslType = 0;
                 ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\", invalid data.");
                 ShowContinueError(" invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\", [should be Inside or Outside]");
-                ErrorsFound = false;
+                ErrorsFound = true;
             }
             if (SurfNum == 0) {
                 ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\", invalid data.");
@@ -10571,7 +10571,7 @@ namespace SurfaceGeometry {
         Real64 DivArea;      // Divider area for exterior windows (m2)
         Real64 DivFrac;      // Fraction of divider area without overlaps
         bool ErrorInSurface; // false/true, depending on pass through routine
-        bool SError;
+        bool SError;         // Bool used for return value of calls to PlaneEquation
         bool HeatTransSurf;
         bool IsCoPlanar;
         Real64 OutOfLine;
