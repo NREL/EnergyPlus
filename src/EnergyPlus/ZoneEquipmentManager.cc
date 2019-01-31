@@ -4621,7 +4621,6 @@ namespace ZoneEquipmentManager {
         Real64 TotInletAirMassFlowRateMaxAvail;
         Real64 TotInletAirMassFlowRateMin;
         Real64 TotInletAirMassFlowRateMinAvail;
-        Real64 TotExhaustAirMassFlowRate;
         Real64 TotSupplyAirMassFlowRate;
 
         Real64 ZoneMixingAirMassFlowRate;
@@ -4698,7 +4697,7 @@ namespace ZoneEquipmentManager {
                 TotInletAirMassFlowRateMaxAvail = 0.0;
                 TotInletAirMassFlowRateMin = 0.0;
                 TotInletAirMassFlowRateMinAvail = 0.0;
-                TotExhaustAirMassFlowRate = 0.0;
+                ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate = 0.0;
 
                 ZoneMixingAirMassFlowRate = 0.0;
                 ZoneMixingNetAirMassFlowRate = 0.0;
@@ -4720,7 +4719,7 @@ namespace ZoneEquipmentManager {
 
                 for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
 
-                    if (AirflowNetworkNumOfExhFan == 0) TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    if (AirflowNetworkNumOfExhFan == 0) ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
                 }
 
                 // Include zone mixing mass flow rate
@@ -4737,7 +4736,7 @@ namespace ZoneEquipmentManager {
                         ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
                     } else {
                         ZoneMixingAirMassFlowRate = max(0.0,
-                                                        ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate +
+                                                        ZoneReturnAirMassFlowRate + ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate +
                                                             MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
                     CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
@@ -4752,7 +4751,7 @@ namespace ZoneEquipmentManager {
 
                 // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
                 StdTotalReturnMassFlow =
-                    ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+                    ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate - (ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
@@ -4774,7 +4773,7 @@ namespace ZoneEquipmentManager {
                 if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
                     if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
                         if (MassConservation(ZoneNum).IsOnlySourceZone || (ZoneAirMassFlow.InfiltrationZoneType == AllZones)) {
-                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate +
+                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate + ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate +
                                                            ZoneReturnAirMassFlowRate - ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                             if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                                 if (abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
@@ -4816,12 +4815,12 @@ namespace ZoneEquipmentManager {
                     }
 
                     MassConservation(ZoneNum).InMassFlowRate = ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                    MassConservation(ZoneNum).ExhMassFlowRate = TotExhaustAirMassFlowRate;
+                    MassConservation(ZoneNum).ExhMassFlowRate = ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
                 //
 
-                TotSupplyAirMassFlowRate = ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) -
+                TotSupplyAirMassFlowRate = ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate - (ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) -
                                            ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
@@ -4874,7 +4873,7 @@ namespace ZoneEquipmentManager {
                     !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
-                        Real64 unbalancedFlow = (TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced) + totalZoneReturnMassFlow -
+                        Real64 unbalancedFlow = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced) + totalZoneReturnMassFlow -
                             thisZoneEquip.TotInletAirMassFlowRate;
                         int actualZone = thisZoneEquip.ActualZoneNum;
                         // Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
@@ -4887,7 +4886,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueErrorTimeStamp("");
                             ShowContinueError("  Flows [kg/s]: Inlets: " + General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate, 6) +
                                 "  Unbalanced exhausts: " +
-                                General::RoundSigDigits((TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced), 6) +
+                                General::RoundSigDigits((thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced), 6) +
                                 "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow, 6));
                             ShowContinueError("  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone), 6) +
                                 "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone), 6) +
