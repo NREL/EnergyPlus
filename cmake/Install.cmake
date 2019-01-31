@@ -243,6 +243,8 @@ endif()
 
 if( APPLE )
   set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
+  set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+  
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EP-Launch-Lite/EP-Launch-Lite.app" DESTINATION "PreProcess")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Mac/IDFVersionUpdater.app" DESTINATION "PreProcess/IDFVersionUpdater")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Mac/Uninstall EnergyPlus.app" DESTINATION "./")
