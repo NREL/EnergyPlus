@@ -2020,9 +2020,30 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     TankNodeEnergy *= Cp;
     EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
 
-
     EXPECT_TRUE(Tank.HeaterOn1);
     EXPECT_FALSE(Tank.HeaterOn2);
+
+    Tank.TankTempLimit = 80.0;
+    Tank.UseMassFlowRate = 0.0;
+
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
+        if (i <= 4) {
+            node.Temp = 81.0;
+        } else {
+            node.Temp = 60.0;
+        }
+        node.SavedTemp = node.Temp;
+    }
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    for (auto &node : Tank.Node) {
+        EXPECT_LE(node.Temp, Tank.TankTempLimit);
+    }
+    EXPECT_LT(Tank.VentRate, 0.0);
+    const Real64 ExpectedVentedEnergy = Tank.Node[0].Mass * Cp * 5.0 / SecInTimeStep;
+    EXPECT_NEAR(ExpectedVentedEnergy, -Tank.VentRate, fabs(ExpectedVentedEnergy) * 0.05);
 
 
 }

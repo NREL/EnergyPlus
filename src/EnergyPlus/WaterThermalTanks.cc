@@ -8542,6 +8542,7 @@ namespace WaterThermalTanks {
         Real64 Eheater1 = 0.0;              // Energy change due to heater 1 over the timestep (J)
         Real64 Eheater2 = 0.0;              // Energy change due to heater 2 over the timestep (J)
         Real64 Eunmet = 0.0;                // Energy change unmet over the timestep (J)
+        Real64 Event = 0.0;                 // Energy change due to venting over the timestep (J)
         int CycleOnCount1 = 0;              // Number of times heater 1 cycles on in the current time step
         int CycleOnCount2 = 0;              // Number of times heater 2 cycles on in the current time step
         Real64 Runtime = 0.0;               // Time that either heater is running (s)
@@ -8702,9 +8703,6 @@ namespace WaterThermalTanks {
                     if (NodeNum > 1) B[i] += tank_node.MassFlowFromUpper * Cp * Tavg[i-1];
                     if (NodeNum < nTankNodes) B[i] += tank_node.MassFlowFromLower * Cp * Tavg[i+1];
 
-                    // Venting
-                    // TODO: Figure out what to do with venting.
-
                     // Divide by mass and specific heat
                     // m * cp * dT/dt = q_net  =>  dT/dt = a * T + b
                     A[i] /= tank_node.Mass * Cp;
@@ -8777,6 +8775,16 @@ namespace WaterThermalTanks {
                     }
                 }
             } while ( HasInversion );
+
+            // Venting
+            if (Tfinal[0] > Tank.TankTempLimit) {
+                for (int i = 0; i < nTankNodes; ++i) {
+                    if (Tfinal[i] > Tank.TankTempLimit) {
+                        Event += Tank.Node[i].Mass * Cp * (Tank.TankTempLimit - Tfinal[i]);
+                        Tfinal[i] = Tank.TankTempLimit;
+                    }
+                }
+            }
 
             // Increment to next internal time step
             TimeRemaining -= dt;
@@ -8884,7 +8892,7 @@ namespace WaterThermalTanks {
         Tank.HeaterRate = Tank.HeaterRate1 + Tank.HeaterRate2;
 
         Tank.UnmetRate = Eunmet / SecInTimeStep;
-        Tank.VentRate = 0.0; // TODO: Calculate vent rate
+        Tank.VentRate = Event / SecInTimeStep;
         Tank.NetHeatTransferRate = Tank.UseRate + Tank.SourceRate + Tank.LossRate + Tank.OffCycParaRateToTank + Tank.OnCycParaRateToTank + Tank.HeaterRate + Tank.VentRate + WrappedCondenserHeatPumpRate;
 
         Tank.CycleOnCount = CycleOnCount1 + CycleOnCount2;
