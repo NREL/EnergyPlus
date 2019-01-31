@@ -227,13 +227,13 @@ CHECKED_AND_OKED = {
             "InitErrorsFound"
         ]
     },
-    # "MixedAir.cc": {
-        # "SimOAComponent": [
-            # "OAHeatingCoil",
-            # "OACoolingCoil",
-            # "OAHX"
-        # ]
-    # },
+    "MixedAir.cc": {
+        "SimOAComponent": [
+            "OAHeatingCoil",
+            "OACoolingCoil",
+            "OAHX"
+        ]
+    },
     # "NodeInputManager.cc": {
         # "GetNodeList": [
             # "errFlag"
@@ -242,148 +242,142 @@ CHECKED_AND_OKED = {
             # "ErrorsFound"
         # ]
     # },
-    # "NonZoneEquipmentManager.cc": {
-        # "ManageNonZoneEquipment": [
-            # "SimNonZoneEquipment"
-        # ]
-    # },
-    # "OutAirNodeManager.cc": {
-        # "CheckAndAddAirNodeNumber": [
-            # "Okay",
-            # "Okay",
-            # "Okay"
-        # ]
-    # },
-    # "OutputProcessor.cc": {
-        # "DetermineMeterIPUnits": [
-            # "ErrorsFound"
-        # ],
-        # "GetCustomMeterInput": [
-            # "ErrorsFound"
-        # ],
-        # "GetStandardMeterResourceType": [
-            # "ErrorsFound"
-        # ],
-        # "ReportTSMeters": [
-            # "PrintESOTimeStamp"
-        # ]
-    # },
-    # "OutputReportTabular.cc": {
-        # "ComputeTableBodyUsingMovingAvg": [
-            # "resCellsUsd"
-        # ]
-    # },
+    "NonZoneEquipmentManager.cc": {
+        "ManageNonZoneEquipment": [
+            "SimNonZoneEquipment"
+        ]
+    },
+    "OutAirNodeManager.cc": {
+        # Always used with a dedicated bool as return value
+        "CheckAndAddAirNodeNumber": [
+            "Okay"
+        ]
+    },
+    "OutputProcessor.cc": {
+        "DetermineMeterIPUnits": [
+            "ErrorsFound"
+        ],
+        "GetStandardMeterResourceType": [
+            "ErrorsFound"
+        ],
+        "ReportTSMeters": [
+            "PrintESOTimeStamp"
+        ]
+    },
+    "OutputReportTabular.cc": {
+        "ComputeTableBodyUsingMovingAvg": [
+            "resCellsUsd"
+        ]
+    },
     "PackagedTerminalHeatPump.cc": {
         "HeatPumpRunFrac": [
             "errFlag"
         ]
     },
-    # "PlantCondLoopOperation.cc": {
-        # "ActivateEMSControls": [
-            # "LoopShutDownFlag",
-            # "LoopShutDownFlag"
-        # ],
-        # "GetPlantOperationInput": [
-            # "GetInputOK"
-        # ]
-    # },
+    "PlantCondLoopOperation.cc": {
+        "ActivateEMSControls": [
+            "LoopShutDownFlag",
+        ],
+        # Used only once with dedicated flag as return value
+        # and processed right after
+        "GetPlantOperationInput": [
+            "GetInputOK"
+        ]
+    },
+
+    # TODO: definitely problematic
     # "PlantUtilities.cc": {
         # "MyPlantSizingIndex": [
             # "ErrorsFound"
         # ]
     # },
-    # "RoomAirModelManager.cc": {
-        # "GetRAFNNodeNum": [
-            # "Errorfound"
-        # ]
-    # },
-    # "RootFinder.cc": {
-        # "IterateRootFinder": [
-            # "IsDoneFlag"
-        # ]
-    # },
-    # "SimAirServingZones.cc": {
-        # "SolveAirLoopControllers": [
-            # "AirLoopConvergedFlag"
-        # ]
-    # },
-    # "SolarShading.cc": {
-        # "CHKGSS": [
-            # "CannotShade"
-        # ]
-    # },
-    # "SurfaceGeometry.cc": {
-        # "GetMovableInsulationData": [
-            # "ErrorsFound"
-        # ]
-    # },
-    # "SwimmingPool.cc": {
-        # "InitSwimmingPoolPlantLoopIndex": [
-            # "MyPlantScanFlagPool",
-            # "MyPlantScanFlagPool"
-        # ]
-    # },
-    # "SystemReports.cc": {
-        # "FindDemandSideMatch": [
-            # "MatchFound"
-        # ],
-        # "FindFirstLastPtr": [
-            # "ConnectionFlag"
-        # ]
-    # },
-    # "UserDefinedComponents.cc": {
-        # "SimCoilUserDefined": [
-            # "HeatingActive",
-            # "CoolingActive"
-        # ]
-    # },
-    # "UtilityRoutines.cc": {
-        # "ProcessNumber": [
-            # "ErrorFlag",
-            # "ErrorFlag"
-        # ],
-        # "VerifyName": [
-            # "ErrorFound",
-            # "IsBlank",
-            # "ErrorFound",
-            # "IsBlank"
-        # ]
-    # },
-    # "Vectors.cc": {
-        # "CalcCoPlanarNess": [
-            # "IsCoPlanar"
-        # ],
-        # "CompareTwoVectors": [
-            # "areSame",
-            # "areSame",
-            # "areSame"
-        # ],
-        # "PlaneEquation": [
-            # "error"
-        # ]
-    # },
-    # "WaterCoils.cc": {
-        # "CheckActuatorNode": [
-            # "NodeNotFound"
-        # ],
-        # "CheckForSensorAndSetPointNode": [
-            # "NodeNotFound"
-        # ]
-    # },
-    # "WaterThermalTanks.cc": {
-        # "ValidatePLFCurve": [
-            # "IsValid",
-            # "IsValid"
-        # ]
-    # },
+
+    # The boolean is useless since RAFNNodeNum would return 0 if not found
+    "RoomAirModelManager.cc": {
+        "GetRAFNNodeNum": [
+            "Errorfound"
+        ]
+    },
+    "RootFinder.cc": {
+        # Used with dedicated bool as return value
+        "IterateRootFinder": [
+            "IsDoneFlag"
+        ]
+    },
+    "SimAirServingZones.cc": {
+        "SolveAirLoopControllers": [
+            "AirLoopConvergedFlag"
+        ]
+    },
+    "SolarShading.cc": {
+        # Used with a dedicated bool as return value
+        "CHKGSS": [
+            "CannotShade"
+        ]
+    },
+    "SwimmingPool.cc": {
+        # This is an inverse one-way toggle (can only set it to false if true
+        # when passed)
+        "InitSwimmingPoolPlantLoopIndex": [
+            "MyPlantScanFlagPool",
+            "MyPlantScanFlagPool"
+        ]
+    },
+    "SystemReports.cc": {
+        # Processed right after
+        "FindDemandSideMatch": [
+            "MatchFound"
+        ],
+        "FindFirstLastPtr": [
+            "ConnectionFlag"
+        ]
+    },
+    "UserDefinedComponents.cc": {
+        "SimCoilUserDefined": [
+            "HeatingActive",
+            "CoolingActive"
+        ]
+    },
+    "UtilityRoutines.cc": {
+        "ProcessNumber": [
+            "ErrorFlag",
+        ],
+        "VerifyName": [
+            "ErrorFound",
+            "IsBlank",
+        ]
+    },
+    "Vectors.cc": {
+        "CalcCoPlanarNess": [
+            "IsCoPlanar"
+        ],
+        "CompareTwoVectors": [
+            "areSame"
+        ],
+        # Dedicated bool used, Error treated right away after
+        "PlaneEquation": [
+            "error"
+        ]
+    },
+    "WaterCoils.cc": {
+        # Used once, with dedicated bool, and error treater right away
+        "CheckActuatorNode": [
+            "NodeNotFound"
+        ],
+        # Used once, with dedicated bool, and error treater right away
+        "CheckForSensorAndSetPointNode": [
+            "NodeNotFound"
+        ]
+    },
+    "WaterThermalTanks.cc": {
+        # Used once, with dedicated bool, and error treater right away
+        "ValidatePLFCurve": [
+            "IsValid"
+        ]
+    },
     # "WeatherManager.cc": {
         # "GetNextEnvironment": [
             # "Available",
-            # "Available",
-            # "Available",
-            # "Available",
-            # "Available",
-            # "Available"
         # ],
         # "InterpretWeatherDataLine": [
             # "ErrorFound"
@@ -395,17 +389,16 @@ CHECKED_AND_OKED = {
             # "PrintEnvrnStamp"
         # ]
     # },
-    # "WindowAC.cc": {
-        # "ControlCycWindACOutput": [
-            # "HXUnitOn",
-            # "HXUnitOn"
-        # ]
-    # },
-    # "WindowComplexManager.cc": {
-        # "CheckGasCoefs": [
-            # "feedData"
-        # ]
-    # },
+    "WindowAC.cc": {
+        "ControlCycWindACOutput": [
+            "HXUnitOn",
+        ]
+    },
+    "WindowComplexManager.cc": {
+        "CheckGasCoefs": [
+            "feedData"
+        ]
+    },
     # "ZoneEquipmentManager.cc": {
         # "ManageZoneEquipment": [
             # "SimZone"
@@ -616,7 +609,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
                     # print("Skipped")
                     continue
 
-                pat = r'{b}\s*=\s*false;'.format(b=b)
+                pat = r'\b{b}\s*=\s*false;'.format(b=b)
                 re_this_bool = re.compile(pat)
                 if re_this_bool.search(line):
                     b_info = "{}{}".format(b_dict['booltype'],

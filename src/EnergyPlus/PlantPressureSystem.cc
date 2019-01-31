@@ -552,6 +552,9 @@ namespace PlantPressureSystem {
                 if (allocated(ParallelBranchInletPressures)) ParallelBranchInletPressures.deallocate();
                 ParallelBranchInletPressures.allocate(NumBranches - 2);
                 ParallelBranchCounter = 0;
+
+                // Reset Pump found flag to false, to check if actually found on one of the parallel branches
+                FoundAPumpOnBranch = false;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
                     DistributePressureOnBranch(
@@ -687,7 +690,6 @@ namespace PlantPressureSystem {
         // Initialize
         TempBranchPressureDrop = 0.0;
         BranchPressureDrop = 0.0;
-        PumpFound = false;
         NumCompsOnBranch = size(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp);
 
         // Retrieve temporary branch pressure drop

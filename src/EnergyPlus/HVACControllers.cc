@@ -1699,8 +1699,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
         int SensedNode;
-        // TRUE if root finder needs to continue iterating, FALSE otherwise.
-        bool IsDoneFlag;
+        bool IsDoneFlag; // TRUE if root finder needs to continue iterating, FALSE otherwise.
         bool ReusePreviousSolutionFlag;
         int PreviousSolutionIndex;
         bool PreviousSolutionDefinedFlag;

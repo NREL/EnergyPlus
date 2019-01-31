@@ -473,8 +473,8 @@ namespace HeatBalanceIntRadExchange {
         MovableInsulationChange = false;
         if (Surface(SurfNum).MaterialMovInsulInt > 0) {
             Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-            Real64
-                AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is present)
+            Real64 AbsInt; // Absorptivity of movable insulation material
+                           // (supercedes that of the construction if interior movable insulation is present)
             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
         } else {
             Surface(SurfNum).MovInsulIntPresent = false;
@@ -483,7 +483,9 @@ namespace HeatBalanceIntRadExchange {
             auto const &thissurf(Surface(SurfNum));
             Real64 AbsorpDiff;
             AbsorpDiff = abs(Construct(thissurf.Construction).InsideAbsorpThermal - Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
-            if (AbsorpDiff > 0.01) MovableInsulationChange = true;
+            if (AbsorpDiff > 0.01) {
+                MovableInsulationChange = true;
+            }
         }
     }
 

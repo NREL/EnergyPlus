@@ -2641,7 +2641,6 @@ namespace PlantUtilities {
 
         MyPltLoopNum = 0;
         MyPltSizNum = 0;
-        ErrorsFound = false;
         if (present(SupressErrors)) {
             PrintErrorFlag = SupressErrors;
         } else {
