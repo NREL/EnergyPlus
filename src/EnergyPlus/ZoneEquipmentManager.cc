@@ -4840,7 +4840,35 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-                // Check zone flow balance - only for zones not served by an airloop with OA - and not when zone air mass balance is active
+                // adjust the zone return air flow rates to match any excess zone exhaust flows
+                for (int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
+                    auto &thisAirLoopFlow(AirLoopFlow(airLoopNum));
+                    Real64 adjZoneRetFlow = max(0.0, thisAirLoopFlow.ZoneRetFlow - thisAirLoopFlow.ExcessZoneExhFlow);
+                    if (thisAirLoopFlow.ZoneRetFlow > 0.0) {
+                        thisAirLoopFlow.ZoneRetFlowRatio = adjZoneRetFlow / thisAirLoopFlow.ZoneRetFlow;
+                    }
+                    else {
+                        thisAirLoopFlow.ZoneRetFlowRatio = 1.0;
+                    }
+                    thisAirLoopFlow.ZoneRetFlow = 0.0; // reset to zero and re-accumulate below
+                }
+
+                for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+                    auto &thisZoneEquip(ZoneEquipConfig(zoneNum));
+                    if (!thisZoneEquip.IsControlled) continue;
+                    int numRetNodes = thisZoneEquip.NumReturnNodes;
+                    for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
+                        int retNode = thisZoneEquip.ReturnNode(returnNum);
+                        int airLoopNum = thisZoneEquip.ReturnNodeAirLoopNum(returnNum);
+                        if ((retNode > 0) && (airLoopNum > 0)) {
+                            auto &thisAirLoopFlow(AirLoopFlow(airLoopNum));
+                            Node(retNode).MassFlowRate *= thisAirLoopFlow.ZoneRetFlowRatio;
+                            thisAirLoopFlow.ZoneRetFlow += Node(retNode).MassFlowRate;
+                        }
+                    }
+                }
+
+                // Check zone flow balance - but not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
                     !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
                     if (!ZoneEquipConfig(ZoneNum).FlowError) {
@@ -4868,33 +4896,6 @@ namespace ZoneEquipmentManager {
                             ShowContinueError("  This error will only be reported once per zone.");
                             ZoneEquipConfig(ZoneNum).FlowError = true;
                         }
-                    }
-                }
-            }
-
-            // adjust the zone return air flow rates to match any excess zone exhaust flows
-            for (int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
-                auto &thisAirLoopFlow(AirLoopFlow(airLoopNum));
-                Real64 adjZoneRetFlow = max(0.0, thisAirLoopFlow.ZoneRetFlow - thisAirLoopFlow.ExcessZoneExhFlow);
-                if (thisAirLoopFlow.ZoneRetFlow > 0.0) {
-                    thisAirLoopFlow.ZoneRetFlowRatio = adjZoneRetFlow / thisAirLoopFlow.ZoneRetFlow;
-                } else {
-                    thisAirLoopFlow.ZoneRetFlowRatio = 1.0;
-                }
-                thisAirLoopFlow.ZoneRetFlow = 0.0; // reset to zero and re-accumulate below
-            }
-
-            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
-                auto &thisZoneEquip(ZoneEquipConfig(zoneNum));
-                if (!thisZoneEquip.IsControlled) continue;
-                int numRetNodes = thisZoneEquip.NumReturnNodes;
-                for (int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
-                    int retNode = thisZoneEquip.ReturnNode(returnNum);
-                    int airLoopNum = thisZoneEquip.ReturnNodeAirLoopNum(returnNum);
-                    if ((retNode > 0) && (airLoopNum > 0)) {
-                        auto &thisAirLoopFlow(AirLoopFlow(airLoopNum));
-                        Node(retNode).MassFlowRate *= thisAirLoopFlow.ZoneRetFlowRatio;
-                        thisAirLoopFlow.ZoneRetFlow += Node(retNode).MassFlowRate;
                     }
                 }
             }
