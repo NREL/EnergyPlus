@@ -4869,7 +4869,7 @@ namespace ZoneEquipmentManager {
                         totalZoneReturnMassFlow += Node(retNode).MassFlowRate;
                     }
                 }
-                // Check zone flow balance - only for zones not served by an airloop with OA - and not when zone air mass balance is active
+                // Check zone flow balance but not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
                     !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
