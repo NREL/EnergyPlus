@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     // check source inlet and outlet temperatures are different
     EXPECT_EQ(Tank.SourceInletTemp, 5.0);
-    EXPECT_NEAR(Tank.SourceOutletTemp, 10.347, 0.001);
+    EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 
 
@@ -1843,7 +1843,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     EXPECT_NEAR(Tank.AmbientZoneGain, TankSkinHeatLossRate, 0.000001);
 }
 
-TEST_F(EnergyPlusFixture, StratifiedTankCalcNoDraw)
+TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
