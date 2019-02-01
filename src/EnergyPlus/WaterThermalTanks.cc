@@ -8777,11 +8777,13 @@ namespace WaterThermalTanks {
             } while ( HasInversion );
 
             // Venting
-            if (Tfinal[0] > Tank.TankTempLimit) {
-                for (int i = 0; i < nTankNodes; ++i) {
-                    if (Tfinal[i] > Tank.TankTempLimit) {
-                        Event += Tank.Node[i].Mass * Cp * (Tank.TankTempLimit - Tfinal[i]);
-                        Tfinal[i] = Tank.TankTempLimit;
+            if (!Tank.IsChilledWaterTank) {
+                if (Tfinal[0] > Tank.TankTempLimit) {
+                    for (int i = 0; i < nTankNodes; ++i) {
+                        if (Tfinal[i] > Tank.TankTempLimit) {
+                            Event += Tank.Node[i].Mass * Cp * (Tank.TankTempLimit - Tfinal[i]);
+                            Tfinal[i] = Tank.TankTempLimit;
+                        }
                     }
                 }
             }
