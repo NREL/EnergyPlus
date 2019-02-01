@@ -49,27 +49,30 @@ CHECKED_AND_OKED = {
             "ResimulateAirZone"
         ]
     },
-    # "BranchInputManager.cc": {
-        # "GetBranchFanTypeName": [
-            # "ErrFound"
-        # ],
-        # "GetLoopMixer": [
-            # "IsMixer",
-            # "IsMixer"
-        # ],
-        # "GetLoopSplitter": [
-            # "IsSplitter",
-            # "IsSplitter"
-        # ],
-        # "TestBranchIntegrity": [
-            # "ErrFound"
-        # ]
-    # },
-    # "BranchNodeConnections.cc": {
-        # "GetComponentData": [
-            # "IsParent"
-        # ]
-    # },
+    "BranchInputManager.cc": {
+        # Updated docstring
+        "GetBranchFanTypeName": [
+            "ErrFound"
+        ],
+        # Updated docstring
+        "GetLoopMixer": [
+            "IsMixer"
+        ],
+        # Updated docstring
+        "GetLoopSplitter": [
+            "IsSplitter",
+        ],
+        # Singular makes it pretty clear + docstring
+        "TestBranchIntegrity": [
+            "ErrFound"
+        ]
+    },
+    "BranchNodeConnections.cc": {
+        # Docstring
+        "GetComponentData": [
+            "IsParent"
+        ]
+    },
     "DElightManagerF.cc": {
         "CheckForGeometricTransform": [
             "doTransform",
@@ -153,10 +156,11 @@ CHECKED_AND_OKED = {
             "ConstrainedDecreasingMdot"
         ]
     },
-    # "GlobalNames.cc": {
-        # "VerifyUniqueADUName": [
-            # "ErrorFound"
-        # ],
+    # All updated to set to true, never false
+    "GlobalNames.cc": {
+        #"VerifyUniqueADUName": [
+        #    "ErrorFound"
+        #],
         # "VerifyUniqueBaseboardName": [
             # "ErrorFound"
         # ],
@@ -169,33 +173,35 @@ CHECKED_AND_OKED = {
         # "VerifyUniqueCoilName": [
             # "ErrorFound"
         # ]
-    # },
-    # "HVACControllers.cc": {
-        # "CheckCoilWaterInletNode": [
-            # "NodeNotFound"
-        # ],
-        # "CheckSimpleController": [
-            # "IsConvergedFlag"
-        # ],
-        # "ExitCalcController": [
-            # "IsUpToDateFlag"
-        # ],
-        # "FindRootSimpleController": [
-            # "IsConvergedFlag"
-        # ],
-        # "GetControllerActuatorNodeNum": [
-            # "NodeNotFound"
-        # ],
-        # "InitController": [
-            # "IsConvergedFlag"
-        # ],
-        # "ManageControllers": [
-            # "AllowWarmRestartFlag"
-        # ],
-        # "ResetController": [
-            # "IsConvergedFlag"
-        # ]
-    # },
+    },
+    "HVACControllers.cc": {
+        # Always processed right after, + docstring
+        "CheckCoilWaterInletNode": [
+            "NodeNotFound"
+        ],
+        "CheckSimpleController": [
+            "IsConvergedFlag"
+        ],
+        "ExitCalcController": [
+            "IsUpToDateFlag"
+        ],
+        "FindRootSimpleController": [
+            "IsConvergedFlag"
+        ],
+        # docstring, and used only once with dedicated unused bool
+        "GetControllerActuatorNodeNum": [
+            "NodeNotFound"
+        ],
+        "InitController": [
+            "IsConvergedFlag"
+        ],
+        "ManageControllers": [
+            "AllowWarmRestartFlag"
+        ],
+        "ResetController": [
+            "IsConvergedFlag"
+        ]
+    },
     "HVACDXSystem.cc": {
         "ControlDXSystem": [
             "HXUnitOn"
@@ -235,9 +241,11 @@ CHECKED_AND_OKED = {
         ]
     },
     # "NodeInputManager.cc": {
+        # # Not used anywhere anyway, but removed the assignment to false
         # "GetNodeList": [
             # "errFlag"
         # ],
+        # # Modified in #7144
         # "GetNodeListsInput": [
             # "ErrorsFound"
         # ]
@@ -360,35 +368,40 @@ CHECKED_AND_OKED = {
         ]
     },
     "WaterCoils.cc": {
-        # Used once, with dedicated bool, and error treater right away
+        # Used once, with dedicated bool, and error treated right away
         "CheckActuatorNode": [
             "NodeNotFound"
         ],
-        # Used once, with dedicated bool, and error treater right away
+        # Used once, with dedicated bool, and error treated right away
         "CheckForSensorAndSetPointNode": [
             "NodeNotFound"
         ]
     },
     "WaterThermalTanks.cc": {
-        # Used once, with dedicated bool, and error treater right away
+        # Used once, with dedicated bool, and error treated right away
         "ValidatePLFCurve": [
             "IsValid"
         ]
     },
-    # "WeatherManager.cc": {
-        # "GetNextEnvironment": [
-            # "Available",
-        # ],
-        # "InterpretWeatherDataLine": [
-            # "ErrorFound"
-        # ],
+    "WeatherManager.cc": {
+        # Docstring is explicit that this is a return value True/False
+        "GetNextEnvironment": [
+            "Available",
+        ],
+        # ErrorFound being singular, that's ok. Plus, used with a dedicated
+        # bool (which happens to be never checked for after call)
+        "InterpretWeatherDataLine": [
+            "ErrorFound"
+        ],
+        # Revamped
         # "ProcessEPWHeader": [
             # "ErrorsFound"
         # ],
-        # "ReportWeatherAndTimeInformation": [
-            # "PrintEnvrnStamp"
-        # ]
-    # },
+        # Docstring is explicit
+        "ReportWeatherAndTimeInformation": [
+            "PrintEnvrnStamp"
+        ]
+    },
     "WindowAC.cc": {
         "ControlCycWindACOutput": [
             "HXUnitOn",
@@ -399,11 +412,12 @@ CHECKED_AND_OKED = {
             "feedData"
         ]
     },
-    # "ZoneEquipmentManager.cc": {
-        # "ManageZoneEquipment": [
-            # "SimZone"
-        # ]
-    # }
+    "ZoneEquipmentManager.cc": {
+        # Updated docstring
+        "ManageZoneEquipment": [
+            "SimZone"
+        ]
+    }
 }
 
 
@@ -439,7 +453,6 @@ def format_found_function(found_function, one_line=False):
                                  found_function['function_name'],
                                  args,
                                  found_function['post_qualifiers']))
-
 
 def parse_function_signatures_in_header(header_file):
     """
@@ -486,12 +499,24 @@ def parse_function_signatures_in_header(header_file):
         with open(header_file, 'r', encoding='latin-1') as f:
             content = f.read()
 
+    # Try to indentify namespace name
+    found_namespaces = []
+    re_namespace = re.compile(r'^\s*(?:namespace|struct|class)\s+'
+                              r'(?P<namespace>\w+)')
+    for line in content.splitlines():
+        m = re_namespace.search(line)
+        if m:
+            found_namespaces.append(m.groupdict()['namespace'])
+
+    if not found_namespaces:
+        raise ValueError("Cannot find namespace for {}".format(header_file))
     found_functions = []
     for m in signature_re.finditer(content):
         d = m.groupdict()
         bools = [m2.groupdict() for m2 in RE_BOOL.finditer(d['args'])]
         if bools:
             d['bools'] = bools
+            d['namespaces'] = found_namespaces
             found_functions.append(d)
     return found_functions
 
@@ -552,13 +577,15 @@ def lookup_errors_in_source_file(source_file, found_functions):
     errors = []
 
     # We look for the opening of the function in question
-    cc_pat = r'{r}\s+{n}\s*\((?P<args>.*?)\)\s*{{'
+    cc_pat = r'{r}\s+(?:(?:{m})::)?{n}\s*\((?P<args>.*?)\)\s*{{'
 
     for i, found_function in enumerate(found_functions):
 
         fname = found_function['function_name']
 
         signature_pattern = cc_pat.format(r=found_function['return_type'],
+                                          m="|".join(
+                                              found_function['namespaces']),
                                           n=fname)
         re_signature = re.compile(signature_pattern, re.MULTILINE | re.DOTALL)
         m = re_signature.search(content)
@@ -627,9 +654,6 @@ def lookup_errors_in_source_file(source_file, found_functions):
                                    'line_num': line_num,
                                    'line': line,
                                    'msg': msg})
-
-                    if not IS_CI:
-                        print(msg)
 
     return errors
 
@@ -707,19 +731,22 @@ def get_all_errors(source_files):
     return all_errors
 
 
-def output_errors_for_decent_ci(all_errors):
+def output_errors_to_console(all_errors):
     for error in all_errors:
-        ci_msg = {'tool': 'find_byref_bool_overide',
-                  'filename': error['file'],
-                  'line': error['line_num'],
-                  'messagetype': 'error',
-                  'message': error['msg']
-                  }
-        print(json.dumps(ci_msg))
+        if IS_CI:
+            ci_msg = {'tool': 'find_byref_bool_overide',
+                      'filename': error['file'],
+                      'line': error['line_num'],
+                      'messagetype': 'error',
+                      'message': error['msg']
+                      }
+            print(json.dumps(ci_msg))
+        else:
+            print(error['msg'])
 
 
 if __name__ == '__main__':
     # Glob all .cc files
     source_files = gb.glob(os.path.join(SRC_DIR, '*.cc'))
     all_errors = get_all_errors(source_files)
-    output_errors_for_decent_ci(all_errors)
+    output_errors_to_console(all_errors)
