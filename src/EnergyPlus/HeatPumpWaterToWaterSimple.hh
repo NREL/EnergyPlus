@@ -199,11 +199,11 @@ namespace HeatPumpWaterToWaterSimple {
         Real64 QSource;                // Source Side Heat Transfer Rate [W]
         Real64 QSourceEnergy;          // Source Side Heat Transfer [J]
         Real64 LoadSideMassFlowRate;   // Load side volumetric flow rate m3/s
-        Real64 LoadSideInletTemp;      // Load Side outlet temperature 캜
-        Real64 LoadSideOutletTemp;     // Load Side outlet temperature 캜
+        Real64 LoadSideInletTemp;      // Load Side outlet temperature 째C
+        Real64 LoadSideOutletTemp;     // Load Side outlet temperature 째C
         Real64 SourceSideMassFlowRate; // Source side volumetric flow rate m3/s
-        Real64 SourceSideInletTemp;    // Source Side outlet temperature 캜
-        Real64 SourceSideOutletTemp;   // Source Side outlet temperature 캜
+        Real64 SourceSideInletTemp;    // Source Side outlet temperature 째C
+        Real64 SourceSideOutletTemp;   // Source Side outlet temperature 째C
 
         // Default Constructor
         ReportVars()

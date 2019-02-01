@@ -84,10 +84,10 @@ namespace HeatPumpWaterToWaterCOOLING {
     extern Real64 Power;                       // power consumption Watts
     extern Real64 QLoad;                       // heat rejection from Load Side coil Watts
     extern Real64 QSource;                     // cooling capacity Watts
-    extern Real64 SourceSideWaterOutletTemp;   // Source Side outlet temperature 캜
-    extern Real64 SourceSideWaterInletTemp;    // Source Side outlet temperature 캜
-    extern Real64 LoadSideWaterOutletTemp;     // Source Side outlet temperature 캜
-    extern Real64 LoadSideWaterInletTemp;      // Source Side outlet temperature 캜
+    extern Real64 SourceSideWaterOutletTemp;   // Source Side outlet temperature 째C
+    extern Real64 SourceSideWaterInletTemp;    // Source Side outlet temperature 째C
+    extern Real64 LoadSideWaterOutletTemp;     // Source Side outlet temperature 째C
+    extern Real64 LoadSideWaterInletTemp;      // Source Side outlet temperature 째C
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -162,10 +162,10 @@ namespace HeatPumpWaterToWaterCOOLING {
         Real64 QLoadEnergy;               // Load Side heat transfer Joules
         Real64 QSource;                   // Source Side heat transfer rate Watts
         Real64 QSourceEnergy;             // Source Side heat transfer Joules
-        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature 캜
-        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature 캜
-        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature 캜
-        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature 캜
+        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature 째C
+        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature 째C
+        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature 째C
+        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature 째C
         Real64 LoadSidemdot;              // Mass flow rate of the cooling water in Load Side kg/s
         Real64 SourceSidemdot;            // Mass flow rate of chilled water in Eavporator kg/s
         int Running;                      // On reporting Flag
