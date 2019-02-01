@@ -329,12 +329,12 @@ namespace PlantValves {
                                                 TemperValve(CompNum).LoopSideNum,
                                                 TemperValve(CompNum).BranchNum,
                                                 TemperValve(CompNum).CompNum,
+                                                errFlag,
                                                 _,
                                                 _,
                                                 _,
                                                 _,
-                                                _,
-                                                errFlag);
+                                                _);
 
                         if (errFlag) {
                             ShowFatalError("InitPlantValves: Program terminated due to previous condition(s).");

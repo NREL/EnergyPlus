@@ -1146,12 +1146,12 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
                                             HydrRadSys(RadSysNum).HWLoopSide,
                                             HydrRadSys(RadSysNum).HWBranchNum,
                                             HydrRadSys(RadSysNum).HWCompNum,
+                                            ErrorsFound,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            ErrorsFound);
+                                            _);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -1161,12 +1161,12 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
                                             HydrRadSys(RadSysNum).CWLoopSide,
                                             HydrRadSys(RadSysNum).CWBranchNum,
                                             HydrRadSys(RadSysNum).CWCompNum,
+                                            ErrorsFound,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            ErrorsFound);
+                                            _);
     EXPECT_FALSE(ErrorsFound);
 
     DataSizing::CurZoneEqNum = 1;
