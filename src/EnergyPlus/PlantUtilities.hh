@@ -186,12 +186,12 @@ namespace PlantUtilities {
                                  int &LoopSideNum,
                                  int &BranchNum,
                                  int &CompNum,
+                                 bool &errFlag,
                                  Optional<Real64 const> LowLimitTemp = _,
                                  Optional<Real64 const> HighLimitTemp = _,
                                  Optional_int CountMatchPlantLoops = _,
                                  Optional_int_const InletNodeNumber = _,
-                                 Optional_int_const SingleLoopSearch = _,
-                                 Optional_bool errFlag = _);
+                                 Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(std::string const &CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned

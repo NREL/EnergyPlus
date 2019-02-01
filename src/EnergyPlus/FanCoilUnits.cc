@@ -1154,12 +1154,12 @@ namespace FanCoilUnits {
                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
                                         FanCoil(FanCoilNum).HeatCoilCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
 
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
@@ -1186,12 +1186,12 @@ namespace FanCoilUnits {
                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
                                         FanCoil(FanCoilNum).CoolCoilCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError("InitFanCoilUnits: Program terminated for previous conditions.");
