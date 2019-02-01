@@ -340,7 +340,6 @@ namespace BaseboardRadiator {
         int NumNums;
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
 
@@ -376,10 +375,10 @@ namespace BaseboardRadiator {
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
-                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                if (errFlag) {
-                    ErrorsFound = true;
-                }
+
+                // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                 ++BaseboardNum;
                 Baseboard(BaseboardNum).EquipID = cAlphaArgs(1); // name of this baseboard
                 Baseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Conv_Water;

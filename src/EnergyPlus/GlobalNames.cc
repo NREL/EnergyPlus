@@ -203,7 +203,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -216,12 +216,11 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // Baseboards.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = BaseboardNames.find(NameToVerify);
         if (iter != BaseboardNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumBaseboards = static_cast<int>(BaseboardNames.size());

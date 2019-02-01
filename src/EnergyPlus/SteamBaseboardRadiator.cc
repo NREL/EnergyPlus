@@ -379,6 +379,7 @@ namespace SteamBaseboardRadiator {
             SteamBaseboardNumericFields(BaseboardNum).FieldNames = "";
             SteamBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueBaseboardName(cCMO_BBRadiator_Steam, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Steam + " Name");
 
             SteamBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of the baseboard

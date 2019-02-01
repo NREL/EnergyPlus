@@ -335,7 +335,6 @@ namespace HWBaseboardRadiator {
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
 
         NumHWBaseboards = inputProcessor->getNumObjectsFound(cCMO_BBRadiator_Water);
 
@@ -366,10 +365,8 @@ namespace HWBaseboardRadiator {
             HWBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueBaseboardName(cCMO_BBRadiator_Water, cAlphaArgs(1), errFlag, cCMO_BBRadiator_Water + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBaseboardName(cCMO_BBRadiator_Water, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of this baseboard
             HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
