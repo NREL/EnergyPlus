@@ -177,7 +177,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -190,12 +190,11 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // chillers.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = ChillerNames.find(NameToVerify);
         if (iter != ChillerNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumChillers = static_cast<int>(ChillerNames.size());

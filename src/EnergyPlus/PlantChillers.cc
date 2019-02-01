@@ -661,7 +661,6 @@ namespace PlantChillers {
         //  CHARACTER(len=MaxNameLength),DIMENSION(9)   :: AlphArray !character string data
         //  REAL(r64),                        DIMENSION(22)  :: NumArray  !numeric data
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
         //  CHARACTER(len=MaxNameLength) :: cCurrentModuleObject  ! for ease in renaming.
 
@@ -696,10 +695,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             ElectricChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             if (cAlphaArgs(2) == "AIRCOOLED") {
