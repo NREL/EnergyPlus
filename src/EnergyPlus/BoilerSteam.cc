@@ -282,7 +282,6 @@ namespace BoilerSteam {
         int IOStat;          // IO Status when calling get input subroutine
         int SteamFluidIndex; // Fluid Index for Steam
         static bool ErrorsFound(false);
-        bool errFlag;
         Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         SteamFluidIndex = 0;
@@ -309,10 +308,8 @@ namespace BoilerSteam {
             inputProcessor->getObjectItem(
                 cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = cAlphaArgs(1);
 
             {

@@ -229,7 +229,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -242,12 +242,11 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // Boilers.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = BoilerNames.find(NameToVerify);
         if (iter != BoilerNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumBoilers = static_cast<int>(BoilerNames.size());

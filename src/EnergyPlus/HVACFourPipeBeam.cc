@@ -153,6 +153,7 @@ namespace FourPipeBeam {
             ErrorsFound = true;
         }
 
+        errFlag = false;
         GlobalNames::VerifyUniqueADUName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
         if (errFlag) {
             ErrorsFound = true;
