@@ -34,7 +34,9 @@ INCLUDE_WARNINGS = True
 IS_CI = True
 
 # Files for which to ignore missing header warning
-EXPECT_MISSING_HEADER = ['main.cc', 'test_ep_as_library.cc', 'EnergyPlusPgm.cc']
+EXPECT_MISSING_HEADER = ['main.cc',
+                         'test_ep_as_library.cc',
+                         'EnergyPlusPgm.cc']
 
 # Finds a boolean argument passed by reference
 # Optional_bool acts like one, Array_XD_bool is another possibility
@@ -238,16 +240,6 @@ CHECKED_AND_OKED = {
             "EconomizerOperationFlag",
         ]
     },
-    # "NodeInputManager.cc": {
-        # # Not used anywhere anyway, but removed the assignment to false
-        # "GetNodeList": [
-            # "errFlag"
-        # ],
-        # # Modified in #7144
-        # "GetNodeListsInput": [
-            # "ErrorsFound"
-        # ]
-    # },
     "NonZoneEquipmentManager.cc": {
         "ManageNonZoneEquipment": [
             "SimNonZoneEquipment"
@@ -290,14 +282,6 @@ CHECKED_AND_OKED = {
             "GetInputOK"
         ]
     },
-
-    # TODO: definitely problematic
-    # "PlantUtilities.cc": {
-        # "MyPlantSizingIndex": [
-            # "ErrorsFound"
-        # ]
-    # },
-
     # The boolean is useless since RAFNNodeNum would return 0 if not found
     "RoomAirModelManager.cc": {
         "GetRAFNNodeNum": [
@@ -411,10 +395,6 @@ CHECKED_AND_OKED = {
         "InterpretWeatherDataLine": [
             "ErrorFound"
         ],
-        # Revamped
-        # "ProcessEPWHeader": [
-            # "ErrorsFound"
-        # ],
         # Docstring is explicit
         "ReportWeatherAndTimeInformation": [
             "PrintEnvrnStamp"
