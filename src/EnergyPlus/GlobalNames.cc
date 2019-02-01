@@ -251,7 +251,7 @@ namespace GlobalNames {
         }
     }
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -266,18 +266,16 @@ namespace GlobalNames {
 
         if (NameToVerify.empty()) {
             ShowSevereError("\"" + TypeToVerify + "\" cannot have a blank field");
-            ErrorFound = true;
+            ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
         }
 
-        // TODO: should probably not do that either
-        ErrorFound = false;
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Coil Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumCoils = static_cast<int>(CoilNames.size());

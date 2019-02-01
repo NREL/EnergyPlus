@@ -278,7 +278,6 @@ namespace PackagedThermalStorageCoil {
         int NumNumbers;                 // Number of numeric items in input
         int IOStatus;                   // Input status returned from GetObjectItem
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        bool errFlag;
         Real64 TminRho;
         Real64 TmaxRho;
         Real64 TminCp;
@@ -305,10 +304,9 @@ namespace PackagedThermalStorageCoil {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
                 TESCoil(item).AvailSchedNum = ScheduleAlwaysOn;

@@ -143,7 +143,11 @@ namespace GlobalNames {
                            bool &ErrorsFound,                    // returns true if duplicate name found, unchanged otherwise
                            std::string const &StringToDisplay);
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    void
+    VerifyUniqueCoilName(std::string const &TypeToVerify,
+                         std::string &NameToVerify,
+                         bool &ErrorsFound,                      // returns true if duplicate name found, unchanged otherwise
+                         std::string const &StringToDisplay);
 
     void
     VerifyUniqueADUName(std::string const &TypeToVerify,
