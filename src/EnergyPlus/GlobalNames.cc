@@ -287,14 +287,13 @@ namespace GlobalNames {
         }
     }
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-        ErrorFound = false;
         auto const iter = aDUNames.find(NameToVerify);
         if (iter != aDUNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             numAirDistUnits = static_cast<int>(aDUNames.size());

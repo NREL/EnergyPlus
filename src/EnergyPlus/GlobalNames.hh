@@ -136,7 +136,11 @@ namespace GlobalNames {
 
     void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    void
+    VerifyUniqueADUName(std::string const &TypeToVerify,
+                        std::string const &NameToVerify,
+                        bool &ErrorsFound,                       // returns true if duplicate name found, unchanged otherwise
+                        std::string const &StringToDisplay);
 
     // Clears the global data in GlobalNames.
     // Needed for unit tests, should not be normally called.
