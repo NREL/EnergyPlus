@@ -419,7 +419,7 @@ namespace HVACControllers {
     void CheckControllerListOrder();
 
     void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
-                                 bool &NodeNotFound           // true if matching actuator node not found
+                                 bool &NodeNotFound           // true if matching actuator node not found, false if found
     );
 
     void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
@@ -430,7 +430,7 @@ namespace HVACControllers {
 
     void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
-                                      bool &NodeNotFound                 // true if matching actuator node not found
+                                      bool &NodeNotFound                 // true if matching actuator node not found, false if found
     );
 
     int GetControllerIndex(std::string const &ControllerName // name of coil controller

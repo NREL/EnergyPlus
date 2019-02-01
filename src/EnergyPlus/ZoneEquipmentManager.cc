@@ -217,7 +217,10 @@ namespace ZoneEquipmentManager {
         reportDOASZoneSizingHeader = true;
     }
 
-    void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir)
+    void ManageZoneEquipment(bool const FirstHVACIteration,
+                             bool &SimZone,             // Set to false at the end of the routine
+                             bool &SimAir               // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
+    )
     {
 
         // SUBROUTINE INFORMATION:

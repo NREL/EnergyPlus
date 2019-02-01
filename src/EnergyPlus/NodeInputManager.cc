@@ -290,7 +290,7 @@ namespace NodeInputManager {
     void GetNodeList(std::string const &Name,             // Node List Name for which information is obtained
                      int &NumNodes,                       // Number of nodes accompanying this Name
                      Array1S_int NodeNumbers,             // NodeNumbers accompanying this Name
-                     bool &errFlag,                       // Set to true when requested Node List not found
+                     bool &errFlag,                       // Set to true when requested Node List not found, unchanged otherwise
                      int const NodeFluidType,             // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,   // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,   // Node Object Name (i.e. "MyChiller")
@@ -347,7 +347,6 @@ namespace NodeInputManager {
 
         NumNodes = 0;
         NodeNumbers(1) = 0;
-        errFlag = false;
 
         Try = 0;
         if (NumOfNodeLists > 0) {
@@ -655,7 +654,7 @@ namespace NodeInputManager {
         }
     }
 
-    void GetNodeListsInput(bool &ErrorsFound)
+    void GetNodeListsInput(bool &ErrorsFound)       // Set to true when requested Node List not found, unchanged otherwise
     {
 
         // SUBROUTINE INFORMATION:
@@ -702,7 +701,7 @@ namespace NodeInputManager {
         Array1D_string cAlphas;
         Array1D<Real64> rNumbers;
 
-        bool localErrorsFound = false;
+        bool localErrorsFound(false);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
@@ -1034,7 +1033,7 @@ namespace NodeInputManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool errFlag;
+        bool errFlag(false);
 
         // Begin set up of Uniqueness context
 
