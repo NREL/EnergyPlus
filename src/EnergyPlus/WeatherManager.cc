@@ -8724,7 +8724,7 @@ namespace WeatherManager {
         int NumGrndTemps;
         int TropExtremeCount; // because these can show up as "no dry" need to count and separate.
         int actcount;
-        bool errflag1;
+        bool errflag1; // Local ErrFlag for call to ProcessDateString
 
         // Strip off Header value from Line
         Pos = index(Line, ',');
@@ -9121,13 +9121,11 @@ namespace WeatherManager {
                             }
 
                         } else if (SELECT_CASE_var1 == 2) {
-                            // TODO: DateType is -1 (InvalidDate) <=> ErrorsFound=true
-                            // Save the status of ErrorsFound
-                            errflag1 = ErrorsFound;
-                            // set it to False
-                            ErrorsFound = false;
-                            // call ProcessDateString
-                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
+                            // In this section, we call ProcessDateString, and if that fails, we can recover from it
+                            // by setting DST to false, so we don't affect ErrorsFound
+
+                            // call ProcessDateString with local bool (unused)
+                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, errflag1);
                             if (DateType != InvalidDate) {
                                 // ErrorsFound is still false after ProcessDateString
                                 if (PMonth == 0 && PDay == 0) {
@@ -9140,9 +9138,7 @@ namespace WeatherManager {
                                     EPWDST.StWeekDay = PWeekDay;
                                 }
                             } else {
-                                // ErrorsFound was set to true in ProcessDateString
-                                // restore ErrorsFound to previous
-                                ErrorsFound = errflag1;
+                                // ErrorsFound is untouched
                                 ShowContinueError("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" +
                                                   Line.substr(0, Pos));
                                 ShowContinueError("...invalid header=" + HeaderString);
