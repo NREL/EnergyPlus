@@ -31,10 +31,10 @@ import warnings
 
 SRC_DIR = '../../src/EnergyPlus'
 INCLUDE_WARNINGS = True
-IS_CI = False
+IS_CI = True
 
 # Files for which to ignore missing header warning
-EXPECT_MISSING_HEADER = ['main.cc', 'test_ep_as_library.cc']
+EXPECT_MISSING_HEADER = ['main.cc', 'test_ep_as_library.cc', 'EnergyPlusPgm.cc']
 
 # Finds a boolean argument passed by reference
 # Optional_bool acts like one, Array_XD_bool is another possibility
@@ -119,6 +119,16 @@ CHECKED_AND_OKED = {
             "CanReduceDemand"
         ]
     },
+    "ElectricPowerServiceManager.cc": {
+        "simulateKineticBatteryModel": [
+            "charging",
+            "discharging"
+        ],
+        "simulateSimpleBucketModel": [
+            "charging",
+            "discharging"
+        ]
+    },
     "EMSManager.cc": {
         "ManageEMS": [
             "anyProgramRan"
@@ -155,24 +165,6 @@ CHECKED_AND_OKED = {
             "ConstrainedIncreasingMdot",
             "ConstrainedDecreasingMdot"
         ]
-    },
-    # All updated to set to true, never false
-    "GlobalNames.cc": {
-        #"VerifyUniqueADUName": [
-        #    "ErrorFound"
-        #],
-        # "VerifyUniqueBaseboardName": [
-            # "ErrorFound"
-        # ],
-        # "VerifyUniqueBoilerName": [
-            # "ErrorFound"
-        # ],
-        # "VerifyUniqueChillerName": [
-            # "ErrorFound"
-        # ],
-        # "VerifyUniqueCoilName": [
-            # "ErrorFound"
-        # ]
     },
     "HVACControllers.cc": {
         # Always processed right after, + docstring
@@ -238,6 +230,12 @@ CHECKED_AND_OKED = {
             "OAHeatingCoil",
             "OACoolingCoil",
             "OAHX"
+        ],
+        "CalcOAEconomizer": [
+            "HighHumidityOperationFlag",
+        ],
+        "Checksetpoints": [
+            "EconomizerOperationFlag",
         ]
     },
     # "NodeInputManager.cc": {
@@ -312,6 +310,13 @@ CHECKED_AND_OKED = {
             "IsDoneFlag"
         ]
     },
+    "SetPointManager.cc": {
+        "setupSetPointAndFlags": [
+            "RunSubOptCondEntTemp",
+            "RunOptCondEntTemp",
+            "RunFinalOptCondEntTemp",
+        ]
+    },
     "SimAirServingZones.cc": {
         "SolveAirLoopControllers": [
             "AirLoopConvergedFlag"
@@ -338,6 +343,19 @@ CHECKED_AND_OKED = {
         ],
         "FindFirstLastPtr": [
             "ConnectionFlag"
+        ]
+    },
+    "UnitarySystem.cc": {
+        "controlCoolingSystemToSP": [
+            "HXUnitOn"
+        ],
+        # Used with dedicated bool
+        "heatPumpRunFrac": [
+            "errFlag"
+        ],
+        "simulate": [
+            "CoolActive",
+            "HeatActive"
         ]
     },
     "UserDefinedComponents.cc": {
@@ -453,6 +471,7 @@ def format_found_function(found_function, one_line=False):
                                  found_function['function_name'],
                                  args,
                                  found_function['post_qualifiers']))
+
 
 def parse_function_signatures_in_header(header_file):
     """
@@ -624,7 +643,8 @@ def lookup_errors_in_source_file(source_file, found_functions):
                 line_num += 1
         while n_braces > 0:
             line_num += 1
-            line = lines[line_num].strip()
+            # Remove the comment portion
+            line = lines[line_num].split('//')[0].strip()
             n_braces += line.count('{') - line.count('}')
 
             for b_dict in bools:
