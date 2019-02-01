@@ -3748,7 +3748,7 @@ namespace WeatherManager {
     }
 
     void InterpretWeatherDataLine(std::string &Line,
-                                  bool &ErrorFound,
+                                  bool &ErrorFound,      // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
                                   int &WDay,
@@ -9121,10 +9121,15 @@ namespace WeatherManager {
                             }
 
                         } else if (SELECT_CASE_var1 == 2) {
+                            // TODO: DateType is -1 (InvalidDate) <=> ErrorsFound=true
+                            // Save the status of ErrorsFound
                             errflag1 = ErrorsFound;
+                            // set it to False
                             ErrorsFound = false;
+                            // call ProcessDateString
                             ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
                             if (DateType != InvalidDate) {
+                                // ErrorsFound is still false after ProcessDateString
                                 if (PMonth == 0 && PDay == 0) {
                                     EPWDaylightSaving = false;
                                 } else {
@@ -9135,6 +9140,8 @@ namespace WeatherManager {
                                     EPWDST.StWeekDay = PWeekDay;
                                 }
                             } else {
+                                // ErrorsFound was set to true in ProcessDateString
+                                // restore ErrorsFound to previous
                                 ErrorsFound = errflag1;
                                 ShowContinueError("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" +
                                                   Line.substr(0, Pos));
