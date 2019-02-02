@@ -8496,9 +8496,7 @@ namespace WaterThermalTanks {
 
         // Heat rate from the heat pump (W)
         const Real64 Qheatpump = [&Tank]{
-            if (!(Tank.HeatPumpNum > 0)) {
-                return 0.0;
-            }
+            if (Tank.HeatPumpNum == 0) return 0.0;
             HeatPumpWaterHeaterData const &HPWH = HPWaterHeater(Tank.HeatPumpNum);
             Real64 CoilTotalHeatingEnergyRate;
             if (HPWH.NumofSpeed > 0) {
