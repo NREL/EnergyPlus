@@ -1,52 +1,66 @@
-%% LyX 2.3.1-1 created this file.  For more info, see http://www.lyx.org/.
-%% Do not edit unless you really know what you are doing.
-\documentclass[english]{article}
-\usepackage[T1]{fontenc}
-\usepackage[letterpaper]{geometry}
-\geometry{verbose,tmargin=0.5in,bmargin=0.5in,lmargin=0.5in,rmargin=0.5in,headheight=0.5in,headsep=0.5in,footskip=0.5in}
-\usepackage{babel}
-\usepackage{refstyle}
-\usepackage{textcomp}
-\usepackage{graphicx}
-\usepackage[unicode=true,pdfusetitle,
- bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
- breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
- {hyperref}
+\input{../header}
 
-\makeatletter
+\title{EnergyPlus Essentials}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\hypersetup{unicode=true,
+pdftitle={Getting Started},
+pdfauthor={U.S. Department of Energy},
+colorlinks=true,
+linkcolor=Maroon,
+citecolor=Blue,
+urlcolor=Blue,
+breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
 
-\AtBeginDocument{\providecommand\secref[1]{\ref{sec:#1}}}
-\RS@ifundefined{subsecref}
-  {\newref{subsec}{name = \RSsectxt}}
-  {}
-\RS@ifundefined{thmref}
-  {\def\RSthmtxt{theorem~}\newref{thm}{name = \RSthmtxt}}
-  {}
-\RS@ifundefined{lemref}
-  {\def\RSlemtxt{lemma~}\newref{lem}{name = \RSlemtxt}}
-  {}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
-\newenvironment{lyxcode}
-	{\par\begin{list}{}{
-		\setlength{\rightmargin}{\leftmargin}
-		\setlength{\listparindent}{0pt}% needed for AMS classes
-		\raggedright
-		\setlength{\itemsep}{0pt}
-		\setlength{\parsep}{0pt}
-		\normalfont\ttfamily}%
-	 \item[]}
-	{\end{list}}
-
-\makeatother
+%
+%%% LyX 2.3.1-1 created this file.  For more info, see http://www.lyx.org/.
+%%% Do not edit unless you really know what you are doing.
+%\documentclass[english]{article}
+%\usepackage[T1]{fontenc}
+%\usepackage[letterpaper]{geometry}
+%\geometry{verbose,tmargin=0.5in,bmargin=0.5in,lmargin=0.5in,rmargin=0.5in,headheight=0.5in,headsep=0.5in,footskip=0.5in}
+%\usepackage{babel}
+%\usepackage{refstyle}
+%\usepackage{textcomp}
+%\usepackage{graphicx}
+%\usepackage[unicode=true,pdfusetitle,
+% bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+% breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+% {hyperref}
+%
+%\makeatletter
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%
+%\AtBeginDocument{\providecommand\secref[1]{\ref{sec:#1}}}
+%\RS@ifundefined{subsecref}
+%  {\newref{subsec}{name = \RSsectxt}}
+%  {}
+%\RS@ifundefined{thmref}
+%  {\def\RSthmtxt{theorem~}\newref{thm}{name = \RSthmtxt}}
+%  {}
+%\RS@ifundefined{lemref}
+%  {\def\RSlemtxt{lemma~}\newref{lem}{name = \RSlemtxt}}
+%  {}
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+%\newenvironment{lyxcode}
+%	{\par\begin{list}{}{
+%		\setlength{\rightmargin}{\leftmargin}
+%		\setlength{\listparindent}{0pt}% needed for AMS classes
+%		\raggedright
+%		\setlength{\itemsep}{0pt}
+%		\setlength{\parsep}{0pt}
+%		\normalfont\ttfamily}%
+%	 \item[]}
+%	{\end{list}}
+%
+%\makeatother
 
 \begin{document}
-\title{EnergyPlus Essentials}
-\date{January 30, 2019}
-\maketitle
+
+\input{src/title}
 
 \section{Introduction}
 
