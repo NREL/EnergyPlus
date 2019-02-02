@@ -1608,12 +1608,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).CWLoopSideNum,
                                     Wrapper(WrapperNum).CWBranchNum,
                                     Wrapper(WrapperNum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).CHWInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             ScanPlantLoopsForObject(Wrapper(WrapperNum).Name,
                                     TypeOf_CentralGroundSourceHeatPump,
@@ -1621,12 +1621,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).HWLoopSideNum,
                                     Wrapper(WrapperNum).HWBranchNum,
                                     Wrapper(WrapperNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).HWInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             ScanPlantLoopsForObject(Wrapper(WrapperNum).Name,
                                     TypeOf_CentralGroundSourceHeatPump,
@@ -1634,12 +1634,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).GLHELoopSideNum,
                                     Wrapper(WrapperNum).GLHEBranchNum,
                                     Wrapper(WrapperNum).GLHECompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).GLHEInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             InterConnectTwoPlantLoopSides(Wrapper(WrapperNum).CWLoopNum,
                                           Wrapper(WrapperNum).CWLoopSideNum,

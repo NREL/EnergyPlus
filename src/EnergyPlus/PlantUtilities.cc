@@ -300,15 +300,15 @@ namespace PlantUtilities {
                     bool EMSLoadOverride = false;
 
                     for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                        int const CompInletNodeNum = comp.NodeNumIn;
-                        SeriesBranchHighFlowRequest = max(DataLoopNode::Node(CompInletNodeNum).MassFlowRateRequest, SeriesBranchHighFlowRequest);
-                        SeriesBranchHardwareMaxLim = min(DataLoopNode::Node(CompInletNodeNum).MassFlowRateMax, SeriesBranchHardwareMaxLim);
-                        SeriesBranchHardwareMinLim = max(DataLoopNode::Node(CompInletNodeNum).MassFlowRateMin, SeriesBranchHardwareMinLim);
-                        SeriesBranchMaxAvail = min(DataLoopNode::Node(CompInletNodeNum).MassFlowRateMaxAvail, SeriesBranchMaxAvail);
-                        SeriesBranchMinAvail = max(DataLoopNode::Node(CompInletNodeNum).MassFlowRateMinAvail, SeriesBranchMinAvail);
-
+                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));  
+                        int const CompInletNodeNum = thisComp.NodeNumIn;
+                        auto &thisInletNode(DataLoopNode::Node(CompInletNodeNum));
+                        SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
+                        SeriesBranchHardwareMaxLim = min(thisInletNode.MassFlowRateMax, SeriesBranchHardwareMaxLim);
+                        SeriesBranchHardwareMinLim = max(thisInletNode.MassFlowRateMin, SeriesBranchHardwareMinLim);
+                        SeriesBranchMaxAvail = min(thisInletNode.MassFlowRateMaxAvail, SeriesBranchMaxAvail);
+                        SeriesBranchMinAvail = max(thisInletNode.MassFlowRateMinAvail, SeriesBranchMinAvail);
                         // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
                         if (thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                     }
 
@@ -329,8 +329,9 @@ namespace PlantUtilities {
                     DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
                     DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
                     for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                        int const CompInletNodeNum = comp.NodeNumIn;
-                        int const CompOutletNodeNum = comp.NodeNumOut;
+                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                        int const CompInletNodeNum = thisComp.NodeNumIn;
+                        int const CompOutletNodeNum = thisComp.NodeNumOut;
                         DataLoopNode::Node(CompInletNodeNum).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
                         DataLoopNode::Node(CompOutletNodeNum).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
                     }
@@ -1925,12 +1926,12 @@ namespace PlantUtilities {
                                  int &LoopSideNum,
                                  int &BranchNum,
                                  int &CompNum,
+                                 bool &errFlag,
                                  Optional<Real64 const> LowLimitTemp,
                                  Optional<Real64 const> HighLimitTemp,
                                  Optional_int CountMatchPlantLoops,
                                  Optional_int_const InletNodeNumber,
-                                 Optional_int_const SingleLoopSearch,
-                                 Optional_bool errFlag // TODO: I think callers are expecting this to be passed by reference...
+                                 Optional_int_const SingleLoopSearch
     )
     {
 
@@ -2039,7 +2040,7 @@ namespace PlantUtilities {
                     ShowContinueError("Look at Branches and Components on the Loop.");
                     ShowBranchesOnLoop(SingleLoopSearch);
                 }
-                if (present(errFlag)) errFlag = true;
+                errFlag = true;
             } else {
                 ShowSevereError("ScanPlantLoopsForObject: Invalid CompType passed [" + RoundSigDigits(CompType) + "], Name=" + CompName);
                 ShowContinueError("Valid CompTypes are in the range [1 - " + RoundSigDigits(DataPlant::NumSimPlantEquipTypes) + "].");

@@ -4956,8 +4956,7 @@ namespace ZoneEquipmentManager {
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
-        Real64 totVarReturnFlow =
-            0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
+        Real64 totVarReturnFlow = 0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
         Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(thisZoneEquip.ReturnFlowSchedPtrNum);
 //        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
 //        fixedReturn.allocate(numRetNodes);

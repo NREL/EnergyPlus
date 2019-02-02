@@ -6198,12 +6198,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         UseInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
@@ -6232,12 +6232,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         UseInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
@@ -6265,12 +6265,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         SourceInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (UseInletNode > 0) {
                     InterConnectTwoPlantLoopSides(WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopNum,
                                                   WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,

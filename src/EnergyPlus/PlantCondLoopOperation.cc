@@ -1877,12 +1877,12 @@ namespace PlantCondLoopOperation {
                                                                     LoopSideNum,
                                                                     BranchNum,
                                                                     CompNum,
+                                                                    errFlag1,
                                                                     _,
                                                                     _,
                                                                     NumSearchResults,
                                                                     _,
-                                                                    LoopNum,
-                                                                    errFlag1);
+                                                                    LoopNum);
 
                             if (errFlag1) {
                                 ShowSevereError("InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");

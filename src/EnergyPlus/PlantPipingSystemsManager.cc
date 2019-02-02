@@ -2334,12 +2334,12 @@ namespace PlantPipingSystemsManager {
                                                     thisCircuit.LoopSideNum,
                                                     thisCircuit.BranchNum,
                                                     thisCircuit.CompNum,
+                                                    errFlag,
                                                     _,
                                                     _,
                                                     _,
                                                     _,
-                                                    _,
-                                                    errFlag);
+                                                    _);
             if (errFlag) {
                 ShowFatalError("PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
             }

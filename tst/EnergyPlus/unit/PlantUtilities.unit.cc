@@ -435,3 +435,37 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     }
     EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
 }
+
+TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
+
+    // test out some stuff on the scan plant loops function, for now just verifying errFlag is passed by reference
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataLoopNode::Node.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).NodeNumIn = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).NodeNumOut = 2;
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "comp_name";
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 0;  // just skip the supply side search
+
+    int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
+    bool errorFlag = false;
+
+    // test simple searching first
+    PlantUtilities::ScanPlantLoopsForObject("comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    EXPECT_EQ(1, loopNum);
+    EXPECT_EQ(1, loopSideNum);
+    EXPECT_EQ(1, branchNum);
+    EXPECT_EQ(1, compNum);
+    EXPECT_FALSE(errorFlag);
+
+    // then test to make sure errorFlag is passed by reference
+    PlantUtilities::ScanPlantLoopsForObject("comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    EXPECT_TRUE(errorFlag);
+
+}

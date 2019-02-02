@@ -1165,12 +1165,12 @@ namespace WaterCoils {
                                     WaterCoil(CoilNum).WaterLoopSide,
                                     WaterCoil(CoilNum).WaterLoopBranchNum,
                                     WaterCoil(CoilNum).WaterLoopCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitWaterCoil: Program terminated for previous conditions.");
             }

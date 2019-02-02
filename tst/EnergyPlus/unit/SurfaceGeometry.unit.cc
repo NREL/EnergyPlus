@@ -3564,5 +3564,88 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. Simulation continues.",
         });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    
+
+}
+
+// Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
+// instead of throwing an assert 'contains' error
+TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Version, 9.0;",
+        "",
+        "Material,",
+        "  8 in.Concrete Block Basement Wall,      !- Name",
+        "  MediumRough,                            !- Roughness",
+        "  0.2032,                                 !- Thickness{ m }",
+        "  1.326,                                  !- Conductivity{ W / m - K }",
+        "  1841.99999999999,                       !- Density{ kg / m3 }",
+        "  911.999999999999,                       !- Specific Heat{ J / kg - K }",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+        "",
+        "Construction,",
+        "   Typical,   !- Name",
+        "   8 in.Concrete Block Basement Wall;     !- Layer 1",
+
+        "BuildingSurface:Detailed,                                   ",
+        "  Surface A,               !- Name",
+        "  Wall,                    !- Surface Type",
+        "  Typical,                 !- Construction Name",
+        "  ZONE 1,                  !- Zone Name",
+        "  Surface,                 !- Outside Boundary Condition",
+        "  Surface B,               !- Outside Boundary Condition Object", // Surface B doesn't exist!
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  ,                        !- View Factor to Ground",
+        "  ,                        !- Number of Vertices",
+        "  251.4600375, 3.5052, 0, !- X, Y, Z Vertex 1 {m}",
+        "  251.4600375, 0, 0, !- X, Y, Z Vertex 2 {m}",
+        "  249.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
+        "  248.5215375, 1.0, 0, !- X, Y, Z Vertex 4 {m}",
+        "  248.5215375, 3.5052, 0;                 !- X, Y, Z Vertex 5 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Read Material and Construction, and expect no errors
+    GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    GetConstructData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataGlobals::NumOfZones = 2;
+    Zone.allocate(2);
+    Zone(1).Name = "ZONE 1";
+    Zone(2).Name = "ZONE 2";
+    SurfaceTmp.allocate(1);
+    int SurfNum = 0;
+    int TotHTSurfs = 1;
+    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
+    int NeedToAddSurfaces;
+
+    GetGeometryParameters(ErrorsFound);
+    CosZoneRelNorth.allocate(1);
+    SinZoneRelNorth.allocate(1);
+
+    CosZoneRelNorth = 1.0;
+    SinZoneRelNorth = 0.0;
+    SinBldgRelNorth = 0.0;
+    CosBldgRelNorth = 1.0;
+
+    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+
+    // We expect one surface, but an error since Surface B cannot be located
+    EXPECT_EQ(1, SurfNum);
+    EXPECT_TRUE(ErrorsFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** RoofCeiling:Detailed=\"SURFACE A\" references an outside boundary surface that cannot be found:SURFACE B"
+                        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
