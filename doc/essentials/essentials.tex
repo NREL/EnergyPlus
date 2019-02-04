@@ -106,7 +106,7 @@ following resources:
 \item \href{http://www.ibpsa.org/?page_id=695}{IBPSA}, \href{https://www.ibpsa.us/videos/all}{IBPSA-USA},
 and \href{https://www.youtube.com/results?search_query=building+energy+modeling}{YouTube}
 videos
-\item Numerous \href{https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias\%3Daps&field-keywords=building+energy+modeling}{books}
+\item \href{https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias\%3Daps&field-keywords=building+energy+modeling}{Numerous books}
 \item ASHRAE \href{https://www.techstreet.com/ashrae/standards/ashrae-209-2018?gateway_code=ashrae&product_id=2010483}{Standard 209}
 Energy Simulation Aided Design for Buildings Except Low-Rise Residential
 Buildings
@@ -273,7 +273,7 @@ the thermal comfort of occupants within the building.
 
 \subsection{Open Source}
 
-\href{https://energyplus.net/}{EnergyPlus}is an \href{https://opensource.org/}{Open Source}
+\href{https://energyplus.net/}{EnergyPlus} is an \href{https://opensource.org/}{Open Source}
 program so all the \href{https://github.com/NREL/EnergyPlus}{source code}
 is available to inspect and modify. If you are interested in how calculations
 are performed and the \href{https://energyplus.net/documentation}{Engineering Reference}
@@ -354,9 +354,9 @@ use EnergyPlus The example files are in the directory ExampleFiles.
 EnergyPlus is often used directly using the text file input (IDF or
 epJSON) and various output file formats along with the utilities that
 come with the installation package. More information on that can be
-found in the \secref{Using-EnergyPlus} section. In addition, EnergyPlus
-is often the simulation engine for graphical user interfaces. To see
-a comprehensive list, see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Directory}
+found in \secref{Using-EnergyPlus}. In addition, EnergyPlus is often
+the simulation engine for graphical user interfaces. To see a comprehensive
+list, see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Directory}
 that is operated by \href{https://www.ibpsa.us/}{IBPSA-USA}. At the
 time of writing, many people use EnergyPlus inside an existing graphical
 user interface such as \href{https://www.openstudio.net/}{OpenStudio},
@@ -431,6 +431,8 @@ Using the \href{https://www.python.org/}{Python} scripting language,
 to any of the input objects in EnergyPlus as if they were native Python
 objects. It is very flexible and an especially good choice if you
 are already familiar with Python. It is also an open source project.
+Other ways to manipulate EnergyPlus with Python include \href{https://github.com/rbuffat/pyidf}{pyidf}
+and \href{https://github.com/Myoldmopar/py-idd-idf}{py-idd-idf}. 
 
 Another option based on the Ruby programming language is \href{https://bigladdersoftware.com/projects/modelkit/}{Modelkit}
 which similar to EP-Macro, consists of embedding scripting within
@@ -599,22 +601,22 @@ and readvars options. The following are some examples of using the
 command line options. 
 
 Using a custom IDD file:
-\begin{verbatim*}
+\begin{verbatim}
 energyplus -i custom.idd -w weather.epw input.idf
-\end{verbatim*}
+\end{verbatim}
 Pre-processing using EPMacro and ExpandObjects:
-\begin{verbatim*}
+\begin{verbatim}
 energyplus -w weather.epw -m -x input.imf
-\end{verbatim*}
+\end{verbatim}
 Forcing design-day only simulations:
-\begin{verbatim*}
+\begin{verbatim}
 energyplus -D input.idf
-\end{verbatim*}
+\end{verbatim}
 Giving all output files the prefix being the same as the input file
 (building.idf) and placing them in a directory called output:
-\begin{verbatim*}
+\begin{verbatim}
 energyplus -w weather -p building -d output building.idf
-\end{verbatim*}
+\end{verbatim}
 The command line interface is a new feature as of EnergyPlus 8.3.
 Prior to version 8.3, the EnergyPlus executable took no command line
 arguments, and instead expected the IDD (Input Data Dictionary) file
@@ -683,25 +685,17 @@ line. The names of each field are not required but are usually shown
 after the value and the comma or semicolon as a special comment using
 ``!-'' as an indicator. The input objects can be in any order. An
 example of an input object in an IDF file is shown below: 
-\begin{lyxcode}
-Building,
-
-~~Simple~One~Zone,~~~!-~Name
-
-~~0,~~~~~~~~~~~~~~~~~!-~North~Axis~\{deg\}
-
-~~Suburbs,~~~~~~~~~~~!-~Terrain
-
-~~0.04,~~~~~~~~~~~~~~!-~Loads~Convergence~Tolerance~Value
-
-~~0.004,~~~~~~~~~~~~~!-~Temperature~Convergence~Tolerance~Value~\{deltaC\}
-
-~~MinimalShadowing,~~!-~Solar~Distribution
-
-~~30,~~~~~~~~~~~~~~~~!-~Maximum~Number~of~Warmup~Days
-
-~~6;~~~~~~~~~~~~~~~~~!-~Minimum~Number~of~Warmup~Days
-\end{lyxcode}
+\begin{verbatim}
+  Building,
+    Simple One Zone,   !- Name
+    0,                 !- North Axis {deg}
+    Suburbs,           !- Terrain
+    0.04,              !- Loads Convergence Tolerance Value
+    0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,  !- Solar Distribution
+    30,                !- Maximum Number of Warmup Days
+    6;                 !- Minimum Number of Warmup Days
+\end{verbatim}
 The details of this example input object are not important, but the
 use of commas, exclamation points, and the closing semi-colon are
 important. The IDF format is currently the most commonly used format
@@ -727,39 +721,24 @@ appear grouped by the type of input object. The list of possible input
 objects and fields is documented in the Energy+.schema.epJSON file
 which uses \href{http://json-schema.org/}{json-schema}. The same
 input object shown above in IDF format is shown below in epJSON format:
-\begin{lyxcode}
-\{
-
-~~~~\textquotedbl Building\textquotedbl :~\{
-
-~~~~~~~~\textquotedbl Simple~One~Zone:~\{
-
-~~~~~~~~~~~~\textquotedbl idf\_max\_extensible\_fields\textquotedbl :~0,
-
-~~~~~~~~~~~~\textquotedbl idf\_max\_fields\textquotedbl :~8,
-
-~~~~~~~~~~~~\textquotedbl idf\_order\textquotedbl :~3,
-
-~~~~~~~~~~~~\textquotedbl loads\_convergence\_tolerance\_value\textquotedbl :~0.04,
-
-~~~~~~~~~~~~\textquotedbl maximum\_number\_of\_warmup\_days\textquotedbl :~30,
-
-~~~~~~~~~~~~\textquotedbl minimum\_number\_of\_warmup\_days\textquotedbl :~6,
-
-~~~~~~~~~~~~\textquotedbl north\_axis\textquotedbl :~0,
-
-~~~~~~~~~~~~\textquotedbl solar\_distribution\textquotedbl :~\textquotedbl MinimalShadowing\textquotedbl ,
-
-~~~~~~~~~~~~\textquotedbl temperature\_convergence\_tolerance\_value\textquotedbl :~0.004,
-
-~~~~~~~~~~~~\textquotedbl terrain\textquotedbl :~\textquotedbl Suburbs\textquotedbl{}
-
-~~~~~~~~\}
-
-~~~~\}
-
-\}
-\end{lyxcode}
+\begin{verbatim}
+{
+    "Building": {
+        "Simple One Zone: {
+            "idf_max_extensible_fields": 0,
+            "idf_max_fields": 8,
+            "idf_order": 3,
+            "loads_convergence_tolerance_value": 0.04,
+            "maximum_number_of_warmup_days": 30,
+            "minimum_number_of_warmup_days": 6,
+            "north_axis": 0,
+            "solar_distribution": "MinimalShadowing",
+            "temperature_convergence_tolerance_value": 0.004,
+            "terrain": "Suburbs"
+        }
+    }
+}
+\end{verbatim}
 While the IDF and epJSON file formats are quite different, they contain
 the same information, and either may be used. In general, if producing
 EnergyPlus input files using a programming language, the epJSON format
@@ -888,7 +867,7 @@ has been placed, changing the material thickness will have no impact
 on zone volume, ceiling height, floor area, shading, or daylighting.
 For most modern buildings the choice of where to locate the wall:
 inside vs. outside vs. centerline should have little impact on results,
-so many modelers just pick one a let the volumes be slighting off.
+so many modelers just pick one and let the volumes be slightly off.
 Using centerlines throughout the model splits the difference. Or some
 modelers use outer edges for exterior walls and then use centerlines
 for interior walls. If you are modeling a very thick wall, such as
@@ -948,6 +927,8 @@ the building.
 and scheduling of the fan systems.
 \item Obtain sufficient central plant information to allow specification
 and scheduling of the boilers, chillers and other plant equipment.
+\item Obtain utility tariff information when expressing the results as costs.
+\item Obtain component cost information when performing life-cycle costs.
 \end{itemize}
 
 \subsection{What Are All These Folders?}
