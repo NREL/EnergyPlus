@@ -98,7 +98,7 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-January 30, 2019
+February 4, 2019
 \end_layout
 
 \begin_layout Section
@@ -247,10 +247,9 @@ literal "false"
 \end_layout
 
 \begin_layout Itemize
-Numerous 
 \begin_inset CommandInset href
 LatexCommand href
-name "books"
+name "Numerous books"
 target "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Daps&field-keywords=building+energy+modeling"
 literal "false"
 
@@ -620,7 +619,7 @@ literal "false"
 
 \end_inset
 
-is an 
+ is an 
 \begin_inset CommandInset href
 LatexCommand href
 name "Open Source"
@@ -836,7 +835,7 @@ Current Interfaces
 EnergyPlus is often used directly using the text file input (IDF or epJSON)
  and various output file formats along with the utilities that come with
  the installation package.
- More information on that can be found in the 
+ More information on that can be found in 
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "sec:Using-EnergyPlus"
@@ -846,7 +845,7 @@ noprefix "false"
 
 \end_inset
 
- section.
+.
  In addition, EnergyPlus is often the simulation engine for graphical user
  interfaces.
  To see a comprehensive list, see the 
@@ -1102,6 +1101,26 @@ literal "false"
  It is very flexible and an especially good choice if you are already familiar
  with Python.
  It is also an open source project.
+ Other ways to manipulate EnergyPlus with Python include 
+\begin_inset CommandInset href
+LatexCommand href
+name "pyidf"
+target "https://github.com/rbuffat/pyidf"
+literal "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "py-idd-idf"
+target "https://github.com/Myoldmopar/py-idd-idf"
+literal "false"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1483,7 +1502,6 @@ t Guide.
 \end_layout
 
 \begin_layout Verbatim
-
 energyplus --help 
 \end_layout
 
@@ -1493,124 +1511,100 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
-
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
-
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
-
 Options:
 \end_layout
 
 \begin_layout Verbatim
-
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
-
                                input file type
 \end_layout
 
 \begin_layout Verbatim
-
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
-
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
-
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
-
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
-
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
-
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
-
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
-
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
-
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
-
                                directory)
 \end_layout
 
 \begin_layout Verbatim
-
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
-
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1633,8 +1627,7 @@ EnergyPlus can be run by specifying a number of options followed by the
 Using a custom IDD file:
 \end_layout
 
-\begin_layout Verbatim*
-
+\begin_layout Verbatim
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1642,8 +1635,7 @@ energyplus -i custom.idd -w weather.epw input.idf
 Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
-\begin_layout Verbatim*
-
+\begin_layout Verbatim
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1651,8 +1643,7 @@ energyplus -w weather.epw -m -x input.imf
 Forcing design-day only simulations:
 \end_layout
 
-\begin_layout Verbatim*
-
+\begin_layout Verbatim
 energyplus -D input.idf
 \end_layout
 
@@ -1661,8 +1652,7 @@ Giving all output files the prefix being the same as the input file (building.id
 ) and placing them in a directory called output:
 \end_layout
 
-\begin_layout Verbatim*
-
+\begin_layout Verbatim
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -1821,40 +1811,40 @@ The legacy file format is a text-based format that describes each input
  An example of an input object in an IDF file is shown below: 
 \end_layout
 
-\begin_layout LyX-Code
-Building,
+\begin_layout Verbatim
+  Building,
 \end_layout
 
-\begin_layout LyX-Code
-  Simple One Zone,   !- Name
+\begin_layout Verbatim
+    Simple One Zone,   !- Name
 \end_layout
 
-\begin_layout LyX-Code
-  0,                 !- North Axis {deg}
+\begin_layout Verbatim
+    0,                 !- North Axis {deg}
 \end_layout
 
-\begin_layout LyX-Code
-  Suburbs,           !- Terrain
+\begin_layout Verbatim
+    Suburbs,           !- Terrain
 \end_layout
 
-\begin_layout LyX-Code
-  0.04,              !- Loads Convergence Tolerance Value
+\begin_layout Verbatim
+    0.04,              !- Loads Convergence Tolerance Value
 \end_layout
 
-\begin_layout LyX-Code
-  0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+\begin_layout Verbatim
+    0.004,             !- Temperature Convergence Tolerance Value {deltaC}
 \end_layout
 
-\begin_layout LyX-Code
-  MinimalShadowing,  !- Solar Distribution
+\begin_layout Verbatim
+    MinimalShadowing,  !- Solar Distribution
 \end_layout
 
-\begin_layout LyX-Code
-  30,                !- Maximum Number of Warmup Days
+\begin_layout Verbatim
+    30,                !- Maximum Number of Warmup Days
 \end_layout
 
-\begin_layout LyX-Code
-  6;                 !- Minimum Number of Warmup Days
+\begin_layout Verbatim
+    6;                 !- Minimum Number of Warmup Days
 \end_layout
 
 \begin_layout Standard
@@ -1911,67 +1901,67 @@ literal "false"
  format:
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
 {
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
     "Building": {
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
         "Simple One Zone: {
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "idf_max_extensible_fields": 0,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "idf_max_fields": 8,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "idf_order": 3,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "loads_convergence_tolerance_value": 0.04,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "maximum_number_of_warmup_days": 30,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "minimum_number_of_warmup_days": 6,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "north_axis": 0,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "solar_distribution": "MinimalShadowing",
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "temperature_convergence_tolerance_value": 0.004,
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
             "terrain": "Suburbs"
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
         }
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
     }
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verbatim
 }
 \end_layout
 
@@ -2240,7 +2230,7 @@ ions.
  vs.
  outside vs.
  centerline should have little impact on results, so many modelers just
- pick one a let the volumes be slighting off.
+ pick one and let the volumes be slightly off.
  Using centerlines throughout the model splits the difference.
  Or some modelers use outer edges for exterior walls and then use centerlines
  for interior walls.
@@ -2343,6 +2333,14 @@ Obtain sufficient HVAC operation information to allow specification and
 \begin_layout Itemize
 Obtain sufficient central plant information to allow specification and schedulin
 g of the boilers, chillers and other plant equipment.
+\end_layout
+
+\begin_layout Itemize
+Obtain utility tariff information when expressing the results as costs.
+\end_layout
+
+\begin_layout Itemize
+Obtain component cost information when performing life-cycle costs.
 \end_layout
 
 \begin_layout Subsection
