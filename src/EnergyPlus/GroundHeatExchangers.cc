@@ -1044,7 +1044,7 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (!gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (!ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
             // if the file doesn't exist, there are no data to read
             return;
         } else {
@@ -1121,7 +1121,7 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
             // file exists -- add data
 
             // open file

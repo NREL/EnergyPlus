@@ -262,7 +262,7 @@ namespace WaterThermalTanks {
     Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
 
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     // MODULE SUBROUTINES:
 
@@ -1107,18 +1107,18 @@ namespace WaterThermalTanks {
         Array1D<WaterHeaterSaveNodes> CoilSaveNodeNames; // temporary for coil node names used in later checks
 
         // Formats
-        static gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
+        static ObjexxFCL::gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
                                    "','Standard Rated Energy Factor')");
-        static gio::Fmt Format_721("('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery "
+        static ObjexxFCL::gio::Fmt Format_721("('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery "
                                    "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')");
-        static gio::Fmt Format_722("('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity "
+        static ObjexxFCL::gio::Fmt Format_722("('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity "
                                    "{W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')");
-        static gio::Fmt Format_725(
+        static ObjexxFCL::gio::Fmt Format_725(
             "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')");
-        static gio::Fmt Format_726("('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of "
+        static ObjexxFCL::gio::Fmt Format_726("('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of "
                                    "Inlets,Number Of Outlets')");
-        static gio::Fmt Format_723("('Water Heater Stratified Node Information',8(',',A))");
-        static gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
+        static ObjexxFCL::gio::Fmt Format_723("('Water Heater Stratified Node Information',8(',',A))");
+        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
 
         // FLOW:
 
@@ -1137,11 +1137,11 @@ namespace WaterThermalTanks {
 
             if (NumWaterThermalTank > 0) {
                 // Write water heater header for EIO
-                if ((NumWaterHeaterMixed > 0) || (NumWaterHeaterStratified > 0)) gio::write(OutputFileInits, Format_720);
-                if (NumHeatPumpWaterHeater > 0) gio::write(OutputFileInits, Format_721);
-                if (NumWaterHeaterStratified > 0) gio::write(OutputFileInits, Format_722);
-                if (NumChilledWaterMixed > 0) gio::write(OutputFileInits, Format_725);
-                if (NumChilledWaterStratified > 0) gio::write(OutputFileInits, Format_726);
+                if ((NumWaterHeaterMixed > 0) || (NumWaterHeaterStratified > 0)) ObjexxFCL::gio::write(OutputFileInits, Format_720);
+                if (NumHeatPumpWaterHeater > 0) ObjexxFCL::gio::write(OutputFileInits, Format_721);
+                if (NumWaterHeaterStratified > 0) ObjexxFCL::gio::write(OutputFileInits, Format_722);
+                if (NumChilledWaterMixed > 0) ObjexxFCL::gio::write(OutputFileInits, Format_725);
+                if (NumChilledWaterStratified > 0) ObjexxFCL::gio::write(OutputFileInits, Format_726);
             }
 
             if (NumWaterThermalTank > 0) {
@@ -5595,7 +5595,7 @@ namespace WaterThermalTanks {
                         if (WaterThermalTank(WaterThermalTankNum).TypeNum == StratifiedWaterHeater) {
 
                             for (NodeNum = 1; NodeNum <= WaterThermalTank(WaterThermalTankNum).Nodes; ++NodeNum) {
-                                gio::write(OutputFileInits, Format_723)
+                                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                                     << TrimSigDigits(NodeNum) << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Height, 4)
                                     << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Volume, 4)
                                     << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).MaxCapacity, 3)
@@ -5728,7 +5728,7 @@ namespace WaterThermalTanks {
                         if (WaterThermalTank(WaterThermalTankNum).TypeNum == StratifiedChilledWaterStorage) {
 
                             for (NodeNum = 1; NodeNum <= WaterThermalTank(WaterThermalTankNum).Nodes; ++NodeNum) {
-                                gio::write(OutputFileInits, Format_724)
+                                ObjexxFCL::gio::write(OutputFileInits, Format_724)
                                     << TrimSigDigits(NodeNum) << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Height, 4)
                                     << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Volume, 4)
                                     << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).OffCycLossCoeff, 4)
@@ -8854,7 +8854,7 @@ namespace WaterThermalTanks {
                                       WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
                                       Par);
                             if (SolFla == -1) {
-                                gio::write(IterNum, fmtLD) << MaxIte;
+                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
                                 if (!WarmupFlag) {
                                     ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1;
@@ -8962,7 +8962,7 @@ namespace WaterThermalTanks {
                                           WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
                                           Par);
                                 if (SolFla == -1) {
-                                    gio::write(IterNum, fmtLD) << MaxIte;
+                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                     strip(IterNum);
                                     if (!WarmupFlag) {
                                         ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2;
@@ -9327,7 +9327,7 @@ namespace WaterThermalTanks {
             if (!WarmupFlag && !DoingSizing && !KickOffSimulation) {
                 if ((SetPointTemp - DeadBandTempDiff) <= Tank.SetPointTemp) {
                     HPMinTemp = SetPointTemp - DeadBandTempDiff;
-                    gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
+                    ObjexxFCL::gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
                     ++HeatPump.HPSetPointError;
                     //! add logic for warmup, kickoffsimulation and doing sizing here
                     if (HeatPump.HPSetPointError == 1) {
@@ -9641,7 +9641,7 @@ namespace WaterThermalTanks {
                 if (zeroResidual > 0.0) { // then iteration
                     SolveRoot(Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualHPWH, 0.0, 1.0, Par);
                     if (SolFla == -1) {
-                        gio::write(IterNum, fmtLD) << MaxIte;
+                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                         strip(IterNum);
                         if (!WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum2;
@@ -9826,7 +9826,7 @@ namespace WaterThermalTanks {
                         SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS);
 
                         if (SolFla == -1) {
-                            gio::write(IterNum, fmtLD) << MaxIte;
+                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
                             if (!WarmupFlag) {
                                 ++HeatPump.IterLimitExceededNum1;
@@ -12653,8 +12653,8 @@ namespace WaterThermalTanks {
         std::string VSCoilName = "";
 
         // Formats
-        static gio::Fmt Format_720("('Water Heater Information',6(',',A))");
-        static gio::Fmt Format_721("('Heat Pump Water Heater Information',7(',',A))");
+        static ObjexxFCL::gio::Fmt Format_720("('Water Heater Information',6(',',A))");
+        static ObjexxFCL::gio::Fmt Format_721("('Heat Pump Water Heater Information',7(',',A))");
 
         if (AlreadyRated(WaterThermalTankNum)) { // bail we already did this one
             return;
@@ -13027,11 +13027,11 @@ namespace WaterThermalTanks {
                 MaxCapacity = WaterThermalTank(WaterThermalTankNum).MaxCapacity;
             }
 
-            gio::write(OutputFileInits, Format_720) << WaterThermalTank(WaterThermalTankNum).Type << WaterThermalTank(WaterThermalTankNum).Name
+            ObjexxFCL::gio::write(OutputFileInits, Format_720) << WaterThermalTank(WaterThermalTankNum).Type << WaterThermalTank(WaterThermalTankNum).Name
                                                     << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Volume, 4) << TrimSigDigits(MaxCapacity, 1)
                                                     << TrimSigDigits(RecoveryEfficiency, 3) << TrimSigDigits(EnergyFactor, 4);
         } else {
-            gio::write(OutputFileInits, Format_721)
+            ObjexxFCL::gio::write(OutputFileInits, Format_721)
                 << HPWaterHeater(WaterThermalTank(WaterThermalTankNum).HeatPumpNum).Type
                 << HPWaterHeater(WaterThermalTank(WaterThermalTankNum).HeatPumpNum).Name
                 << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Volume, 4) << TrimSigDigits(HPWHHeatingCapacity, 1)
@@ -13079,7 +13079,7 @@ namespace WaterThermalTanks {
         static Array1D_bool AlreadyReported;  // control so we don't repeat again
 
         // Formats
-        static gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
+        static ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
 
         if (MyOneTimeSetupFlag) {
             AlreadyReported.dimension(NumWaterThermalTank, false);
@@ -13090,7 +13090,7 @@ namespace WaterThermalTanks {
             return;
         }
 
-        gio::write(OutputFileInits, Format_728) << WaterThermalTank(WaterThermalTankNum).Type << WaterThermalTank(WaterThermalTankNum).Name
+        ObjexxFCL::gio::write(OutputFileInits, Format_728) << WaterThermalTank(WaterThermalTankNum).Type << WaterThermalTank(WaterThermalTankNum).Name
                                                 << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Volume, 4)
                                                 << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).UseDesignVolFlowRate, 4)
                                                 << TrimSigDigits(WaterThermalTank(WaterThermalTankNum).SourceDesignVolFlowRate, 4);

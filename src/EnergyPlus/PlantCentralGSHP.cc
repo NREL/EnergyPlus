@@ -1226,8 +1226,8 @@ namespace PlantCentralGSHP {
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
 
         // Formats
-        static gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
-        static gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
 
         cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
         NumChillerHeaters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -1456,11 +1456,11 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + cCurrentModuleObject + "= " + cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Curve Output = '");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     CHErrorsFound = true;
                 }
@@ -1510,11 +1510,11 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + cCurrentModuleObject + "= " + cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Curve Output = '");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     CHErrorsFound = true;
                 }

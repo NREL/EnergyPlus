@@ -497,9 +497,9 @@ namespace ZoneTempPredictorCorrector {
         Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
         // Formats
-        static gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
+        static ObjexxFCL::gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
                                    "','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')");
-        static gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
+        static ObjexxFCL::gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(iZC_TStat);
@@ -1890,8 +1890,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        gio::write(OutputFileInits, Format_700);
-        gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
+        ObjexxFCL::gio::write(OutputFileInits, Format_700);
+        ObjexxFCL::gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -2522,7 +2522,7 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2550,7 +2550,7 @@ namespace ZoneTempPredictorCorrector {
         readStat = 0;
         {
             IOFlags flags;
-            gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+            ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
             epwFileExists = flags.exists();
         }
 
@@ -2560,7 +2560,7 @@ namespace ZoneTempPredictorCorrector {
             {
                 IOFlags flags;
                 flags.ACTION("READ");
-                gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
                 readStat = flags.ios();
             }
             if (readStat != 0) {
@@ -2569,7 +2569,7 @@ namespace ZoneTempPredictorCorrector {
             for (i = 1; i <= 9; ++i) { // Headers
                 {
                     IOFlags flags;
-                    gio::read(epwFile, fmtA, flags);
+                    ObjexxFCL::gio::read(epwFile, fmtA, flags);
                     readStat = flags.ios();
                 }
             }
@@ -2578,7 +2578,7 @@ namespace ZoneTempPredictorCorrector {
                 for (j = 1; j <= 24; ++j) {
                     {
                         IOFlags flags;
-                        gio::read(epwFile, fmtA, flags) >> epwLine;
+                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                         readStat = flags.ios();
                     }
                     for (ind = 1; ind <= 6; ++ind) {
@@ -2591,7 +2591,7 @@ namespace ZoneTempPredictorCorrector {
                 }
                 dailyDryTemp(i) = avgDryBulb;
             }
-            gio::close(epwFile);
+            ObjexxFCL::gio::close(epwFile);
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;

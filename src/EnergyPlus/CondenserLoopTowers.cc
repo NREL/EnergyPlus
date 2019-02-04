@@ -424,7 +424,7 @@ namespace CondenserLoopTowers {
         using WaterManager::SetupTankDemandComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt OutputFormat("(F5.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TowerNum;                   // Tower number, reference counter for SimpleTower data array
@@ -1649,9 +1649,9 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).DesignInletWB = NumArray(1);
             if (NumArray(1) < VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp ||
                 NumArray(1) > VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
-                gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignInletWB;
-                gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
-                gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignInletWB;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
                 ShowSevereError(cCurrentModuleObject + ", \"" + SimpleTower(TowerNum).Name + "\" the design inlet air wet-bulb temperature of " +
                                 OutputChar + " must be within the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C");
                 ErrorsFound = true;
@@ -1660,9 +1660,9 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).DesignApproach = NumArray(2);
             if (NumArray(2) < VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp ||
                 NumArray(2) > VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
-                gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignApproach;
-                gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
-                gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignApproach;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
                 ShowSevereError(cCurrentModuleObject + ", \"" + SimpleTower(TowerNum).Name + "\" the design approach temperature of " + OutputChar +
                                 " must be within the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C");
                 ErrorsFound = true;
@@ -1671,9 +1671,9 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).DesignRange = NumArray(3);
             if (NumArray(3) < VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp ||
                 NumArray(3) > VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
-                gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignRange;
-                gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
-                gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignRange;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
                 ShowSevereError(cCurrentModuleObject + ", \"" + SimpleTower(TowerNum).Name + "\" the design range temperature of " + OutputChar +
                                 " must be within the model limits of " + OutputCharLo + " and " + OutputCharHi + " degrees C");
                 ErrorsFound = true;
@@ -2908,8 +2908,8 @@ namespace CondenserLoopTowers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt OutputFormat("(F6.2)");
-        static gio::Fmt OutputFormat2("(F9.6)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat2("(F9.6)");
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("SizeTower");
@@ -3811,8 +3811,8 @@ namespace CondenserLoopTowers {
                     ShowFatalError("Cooling tower calibration failed for tower " + SimpleTower(TowerNum).Name + '.');
                 }
             } else {
-                gio::write(OutputChar2, OutputFormat2) << WaterFlowRateRatio;
-                gio::write(OutputChar, OutputFormat) << Tapproach;
+                ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRateRatio;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Tapproach;
                 ShowSevereError("Bad starting values for cooling tower water flow rate ratio calibration.");
                 ShowContinueError("Design inlet air wet-bulb or range temperature must be modified to achieve the design approach");
                 ShowContinueError("A water flow rate ratio of " + OutputChar2 + " was calculated to yield an approach temperature of " + OutputChar +
@@ -3824,9 +3824,9 @@ namespace CondenserLoopTowers {
 
             if (WaterFlowRatio < VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
                 WaterFlowRatio > VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
-                gio::write(OutputChar2, OutputFormat2) << WaterFlowRatio;
-                gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
-                gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
+                ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRatio;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
                 ShowWarningError("CoolingTower:VariableSpeed, \"" + SimpleTower(TowerNum).Name +
                                  "\" the calibrated water flow rate ratio is determined to be " + OutputChar2 +
                                  ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.');
@@ -5968,8 +5968,8 @@ namespace CondenserLoopTowers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt OutputFormat("(F5.2)");
-        static gio::Fmt OutputFormat2("(F8.5)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat2("(F8.5)");
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("CalcVariableSpeedTower");
@@ -6202,11 +6202,11 @@ namespace CondenserLoopTowers {
                         //           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
                     } else if (SolFla == -2) {
                         if (!WarmupFlag) {
-                            gio::write(OutputChar, OutputFormat) << TwbCapped;
-                            gio::write(OutputChar2, OutputFormat) << Tr;
-                            gio::write(OutputChar3, OutputFormat) << Ta;
-                            gio::write(OutputChar4, OutputFormat) << WaterFlowRateRatioCapped;
-                            gio::write(OutputChar5, OutputFormat) << SimpleTower(TowerNum).MinimumVSAirFlowFrac;
+                            ObjexxFCL::gio::write(OutputChar, OutputFormat) << TwbCapped;
+                            ObjexxFCL::gio::write(OutputChar2, OutputFormat) << Tr;
+                            ObjexxFCL::gio::write(OutputChar3, OutputFormat) << Ta;
+                            ObjexxFCL::gio::write(OutputChar4, OutputFormat) << WaterFlowRateRatioCapped;
+                            ObjexxFCL::gio::write(OutputChar5, OutputFormat) << SimpleTower(TowerNum).MinimumVSAirFlowFrac;
                             if (SimpleTower(TowerNum).CoolingTowerAFRRFailedCount < 1) {
                                 ++SimpleTower(TowerNum).CoolingTowerAFRRFailedCount;
                                 ShowWarningError("CoolingTower:VariableSpeed \"" + SimpleTower(TowerNum).Name +
@@ -6289,8 +6289,8 @@ namespace CondenserLoopTowers {
                     //          Report warnings only during actual simulation
                     if (!WarmupFlag) {
                         VSTower(SimpleTower(TowerNum).VSTower).PrintLGMessage = true;
-                        gio::write(OutputChar, OutputFormat) << FlowFraction;
-                        gio::write(OutputChar2, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio;
+                        ObjexxFCL::gio::write(OutputChar, OutputFormat) << FlowFraction;
+                        ObjexxFCL::gio::write(OutputChar2, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio;
                         VSTower(SimpleTower(TowerNum).VSTower).LGBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                            "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
                         VSTower(SimpleTower(TowerNum).VSTower).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 +
@@ -7333,7 +7333,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt LowTempFmt("(' ',F6.2)");
+        static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7378,8 +7378,8 @@ namespace CondenserLoopTowers {
         LoopMinTemp = PlantLoop(LoopNum).MinTemp;
         if (OutletWaterTemp < LoopMinTemp && WaterMassFlowRate > 0.0) {
             ++SimpleTower(TowerNum).OutletWaterTempErrorCount;
-            gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
+            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
             strip(CharErrOut);
             if (SimpleTower(TowerNum).OutletWaterTempErrorCount < 2) {
                 ShowWarningError(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name + "\"");

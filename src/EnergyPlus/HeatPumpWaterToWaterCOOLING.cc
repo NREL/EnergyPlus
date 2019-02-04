@@ -723,7 +723,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1066,19 +1066,19 @@ namespace HeatPumpWaterToWaterCOOLING {
                     ShowWarningError("HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + GSHP(GSHPNum).Name);
-                    gio::write(ErrString, fmtLD) << std::abs(100.0 * (QSource - initialQSource) / (initialQSource + SmallNum));
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (QSource - initialQSource) / (initialQSource + SmallNum));
                     ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QLoad;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QLoad;
                     ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QSource;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QSource;
                     ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
                     ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
                     ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
                     ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
                     ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
                 }
                 goto LOOPSourceEnth_exit;

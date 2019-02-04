@@ -233,7 +233,7 @@ namespace EMSManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags);
+                    ObjexxFCL::gio::open(OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -1354,22 +1354,22 @@ namespace EMSManager {
         // note this executes after final processing and sizing-related calling points may already execute Erl programs
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (OutputEMSActuatorAvailFull) {
 
-            gio::write(OutputEMSFileUnitNum, fmtA)
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
                 << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units";
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
-                gio::write(OutputEMSFileUnitNum, fmtA)
+                ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
                     << "EnergyManagementSystem:Actuator Available," + EMSActuatorAvailable(ActuatorLoop).UniqueIDName + ',' +
                            EMSActuatorAvailable(ActuatorLoop).ComponentTypeName + ',' + EMSActuatorAvailable(ActuatorLoop).ControlTypeName + ',' +
                            EMSActuatorAvailable(ActuatorLoop).Units;
             }
         } else if (OutputEMSActuatorAvailSmall) {
-            gio::write(OutputEMSFileUnitNum, fmtA) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
             int FoundTypeName;
             int FoundControlType;
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
@@ -1387,7 +1387,7 @@ namespace EMSManager {
                     FoundControlType = 1;
                 }
                 if ((FoundTypeName == 0) || (FoundControlType == 0)) {
-                    gio::write(OutputEMSFileUnitNum, fmtA)
+                    ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
                         << "EnergyManagementSystem:Actuator Available, *," + EMSActuatorAvailable(ActuatorLoop).ComponentTypeName + ',' +
                                EMSActuatorAvailable(ActuatorLoop).ControlTypeName + ',' + EMSActuatorAvailable(ActuatorLoop).Units;
                 }
@@ -1411,22 +1411,22 @@ namespace EMSManager {
         // mine structure and write to eio file
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (OutputEMSInternalVarsFull) {
 
-            gio::write(OutputEMSFileUnitNum, fmtA)
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
                 << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units ";
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
-                gio::write(OutputEMSFileUnitNum, fmtA)
+                ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
                     << "EnergyManagementSystem:InternalVariable Available," + EMSInternalVarsAvailable(InternalDataLoop).UniqueIDName + ',' +
                            EMSInternalVarsAvailable(InternalDataLoop).DataTypeName + ',' + EMSInternalVarsAvailable(InternalDataLoop).Units;
             }
 
         } else if (OutputEMSInternalVarsSmall) {
-            gio::write(OutputEMSFileUnitNum, fmtA) << "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type";
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type";
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
                 int Found(0);
                 if (InternalDataLoop + 1 <= numEMSInternalVarsAvailable) {
@@ -1436,7 +1436,7 @@ namespace EMSManager {
                                                             numEMSInternalVarsAvailable - (InternalDataLoop + 1));
                 }
                 if (Found == 0) {
-                    gio::write(OutputEMSFileUnitNum, fmtA) << "EnergyManagementSystem:InternalVariable Available, *," +
+                    ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "EnergyManagementSystem:InternalVariable Available, *," +
                                                                   EMSInternalVarsAvailable(InternalDataLoop).DataTypeName + ',' +
                                                                   EMSInternalVarsAvailable(InternalDataLoop).Units;
                 }

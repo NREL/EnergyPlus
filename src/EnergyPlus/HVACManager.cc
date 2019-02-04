@@ -305,9 +305,9 @@ namespace HVACManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -334,11 +334,11 @@ namespace HVACManager {
         bool DummyLogical;
 
         // Formats
-        static gio::Fmt Format_10("('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
+        static ObjexxFCL::gio::Fmt Format_10("('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
                                   "       Enthal     HumRat Fluid Type')");
-        static gio::Fmt Format_11("('node #   Name')");
-        static gio::Fmt Format_20("(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)");
-        static gio::Fmt Format_30("(1x,I3,5x,A)");
+        static ObjexxFCL::gio::Fmt Format_11("('node #   Name')");
+        static ObjexxFCL::gio::Fmt Format_20("(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)");
+        static ObjexxFCL::gio::Fmt Format_30("(1x,I3,5x,A)");
 
         // SYSTEM INITIALIZATION
         if (TriggerGetAFN) {
@@ -552,15 +552,15 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        gio::write(OutputFileStandard, EndOfHeaderFormat);
-                        gio::write(OutputFileMeters, EndOfHeaderFormat);
+                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        gio::write(OutputFileStandard, EnvironmentStampFormat)
+                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                             << "1"
                             << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                        gio::write(OutputFileMeters, EnvironmentStampFormat)
+                        ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
                             << "1"
                             << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
                         PrintEnvrnStampWarmup = false;
@@ -580,15 +580,15 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        gio::write(OutputFileStandard, EndOfHeaderFormat);
-                        gio::write(OutputFileMeters, EndOfHeaderFormat);
+                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        gio::write(OutputFileStandard, EnvironmentStampFormat)
+                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                             << "1"
                             << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                        gio::write(OutputFileMeters, EnvironmentStampFormat)
+                        ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
                             << "1"
                             << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
                         PrintEnvrnStampWarmup = false;
@@ -622,21 +622,21 @@ namespace HVACManager {
             }
             if ((ReportDebug) && (DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
-                    gio::write(OutputFileDebug, Format_11);
+                    ObjexxFCL::gio::write(OutputFileDebug, Format_11);
                     for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        gio::write(OutputFileDebug, Format_30) << NodeNum << NodeID(NodeNum);
+                        ObjexxFCL::gio::write(OutputFileDebug, Format_30) << NodeNum << NodeID(NodeNum);
                     }
                     DebugNamesReported = true;
                 }
                 if (size(Node) > 0) {
-                    gio::write(OutputFileDebug, fmtLD);
-                    gio::write(OutputFileDebug, fmtLD);
-                    gio::write(OutputFileDebug, fmtLD) << "Day of Sim     Hour of Day    Time";
-                    gio::write(OutputFileDebug, fmtLD) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
-                    gio::write(OutputFileDebug, Format_10);
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "Day of Sim     Hour of Day    Time";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
+                    ObjexxFCL::gio::write(OutputFileDebug, Format_10);
                 }
                 for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                    gio::write(OutputFileDebug, Format_20)
+                    ObjexxFCL::gio::write(OutputFileDebug, Format_20)
                         << NodeNum << Node(NodeNum).Temp << Node(NodeNum).MassFlowRateMinAvail << Node(NodeNum).MassFlowRateMaxAvail
                         << Node(NodeNum).TempSetPoint << Node(NodeNum).MassFlowRate << Node(NodeNum).MassFlowRateMin << Node(NodeNum).MassFlowRateMax
                         << Node(NodeNum).MassFlowRateSetPoint << Node(NodeNum).Press << Node(NodeNum).Enthalpy << Node(NodeNum).HumRat
@@ -968,7 +968,7 @@ namespace HVACManager {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
-                gio::write(CharErrOut, "(I5)") << MaxIter;
+                ObjexxFCL::gio::write(CharErrOut, "(I5)") << MaxIter;
                 strip(CharErrOut);
                 ShowWarningError("SimHVAC: Maximum iterations (" + CharErrOut + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
                                  CurMnDy + ' ' + CreateSysTimeIntervalString());

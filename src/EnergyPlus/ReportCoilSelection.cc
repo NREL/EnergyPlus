@@ -1795,7 +1795,7 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
                 hourPrint = hourCounter - 1;
             }
             if (timeStepIndex == timeStepAtPeak) {
-                gio::write(hrMinString, DataSizing::PeakHrMinFmt) << hourPrint << minutes;
+                ObjexxFCL::gio::write(hrMinString, DataSizing::PeakHrMinFmt) << hourPrint << minutes;
                 returnString = hrMinString;
             }
         }

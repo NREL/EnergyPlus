@@ -255,9 +255,9 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool WriteEIOFlag(true); // Set to false once eio information is written
 
-        static gio::Fmt DomainCellsToEIOHeader(
+        static ObjexxFCL::gio::Fmt DomainCellsToEIOHeader(
             "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
-        static gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
+        static ObjexxFCL::gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
 
         // int ZoneNum( 0 );
         int SurfCtr(0);
@@ -439,12 +439,12 @@ namespace PlantPipingSystemsManager {
 
         if (WriteEIOFlag) {
             // Write eio header
-            gio::write(OutputFileInits, DomainCellsToEIOHeader);
+            ObjexxFCL::gio::write(OutputFileInits, DomainCellsToEIOHeader);
 
             // Write eio data
             for (int DomainNum = 1; DomainNum <= isize(PipingSystemDomains); ++DomainNum) {
                 auto &thisDomain(PipingSystemDomains(DomainNum));
-                gio::write(OutputFileInits, DomainCellsToEIO)
+                ObjexxFCL::gio::write(OutputFileInits, DomainCellsToEIO)
                     << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells << thisDomain.NumInsulationCells;
             }
             WriteEIOFlag = false;
@@ -2018,7 +2018,7 @@ namespace PlantPipingSystemsManager {
             //******* We'll first set up the domain ********
             // the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing
             PipingSystemDomains(DomainCtr).IsActuallyPartOfAHorizontalTrench = true;
-            gio::write(PipingSystemDomains(DomainCtr).Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
+            ObjexxFCL::gio::write(PipingSystemDomains(DomainCtr).Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
             PipingSystemDomains(DomainCtr).Extents.Xmax = (double(HGHX(HorizontalGHXCtr).NumPipes) + 1.0) * HGHX(HorizontalGHXCtr).InterPipeSpacing;
             PipingSystemDomains(DomainCtr).Extents.Ymax = 2.0 * HGHX(HorizontalGHXCtr).BurialDepth;
             PipingSystemDomains(DomainCtr).Extents.Zmax = HGHX(HorizontalGHXCtr).AxialLength;
@@ -2127,7 +2127,7 @@ namespace PlantPipingSystemsManager {
 
             // Hard-code the segments
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
-                gio::write(PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter),
+                ObjexxFCL::gio::write(PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter),
                            "( 'HorizontalTrenchCircuit',I4,'Segment',I4 )")
                     << HorizontalGHXCtr << ThisCircuitPipeSegmentCounter;
             }
@@ -2135,7 +2135,7 @@ namespace PlantPipingSystemsManager {
             //******* Then we'll do the segments *******!
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 ++SegmentCtr;
-                gio::write(PipingSystemSegments(SegmentCtr).Name, "( 'HorizontalTrenchCircuit',I4,'Segment',I4 )")
+                ObjexxFCL::gio::write(PipingSystemSegments(SegmentCtr).Name, "( 'HorizontalTrenchCircuit',I4,'Segment',I4 )")
                     << HorizontalGHXCtr << ThisCircuitPipeSegmentCounter;
 
                 PipingSystemSegments(SegmentCtr).IsActuallyPartOfAHorizontalTrench = true;

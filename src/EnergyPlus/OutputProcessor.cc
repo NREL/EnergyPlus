@@ -158,12 +158,12 @@ namespace OutputProcessor {
     int const MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
     int const MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
 
-    static gio::Fmt fmtLD("*");
-    static gio::Fmt fmtA("(A)");
-    static gio::Fmt TimeStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)");
-    static gio::Fmt DailyStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',A)");
-    static gio::Fmt MonthlyStampFormat("(A,',',A,',',i2)");
-    static gio::Fmt RunPeriodStampFormat("(A,',',A)");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt TimeStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)");
+    static ObjexxFCL::gio::Fmt DailyStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',A)");
+    static ObjexxFCL::gio::Fmt MonthlyStampFormat("(A,',',A,',',i2)");
+    static ObjexxFCL::gio::Fmt RunPeriodStampFormat("(A,',',A)");
     Array1D_string const DayTypes(12,
                                   {"Sunday",
                                    "Monday",
@@ -529,7 +529,7 @@ namespace OutputProcessor {
             TimeValue(Index).CurMinute = 0.0;
 
         } else {
-            gio::write(cValue, fmtLD) << Index;
+            ObjexxFCL::gio::write(cValue, fmtLD) << Index;
             ShowSevereError("Illegal value passed to SetupTimePointers, must be 1 or 2 == " + cValue, OutputFileStandard);
         }
     }
@@ -879,8 +879,8 @@ namespace OutputProcessor {
         Array1D_bool lNumericFieldBlanks(1);
 
         // Formats
-        static gio::Fmt Format_800("('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')");
-        static gio::Fmt Format_801("(' Minimum Reporting Frequency, ',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_800("('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')");
+        static ObjexxFCL::gio::Fmt Format_801("(' Minimum Reporting Frequency, ',A,',',A)");
 
         // Bail out if the input has already been read in
         if (!GetOutputInputFlag) {
@@ -891,8 +891,8 @@ namespace OutputProcessor {
         // First check environment variable to see of possible override for minimum reporting frequency
         if (MinReportFrequency != "") {
             minimumReportFrequency = determineFrequency(MinReportFrequency);
-            gio::write(OutputFileInits, Format_800);
-            gio::write(OutputFileInits, Format_801) << frequencyNotice(StoreType::Averaged, minimumReportFrequency) << MinReportFrequency;
+            ObjexxFCL::gio::write(OutputFileInits, Format_800);
+            ObjexxFCL::gio::write(OutputFileInits, Format_801) << frequencyNotice(StoreType::Averaged, minimumReportFrequency) << MinReportFrequency;
         }
 
         cCurrentModuleObject = "Output:Variable";
@@ -979,9 +979,9 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt DayFormat("(A,',',I2,',',I2)");
-        static gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2)");
-        static gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2)");
+        static ObjexxFCL::gio::Fmt DayFormat("(A,',',I2,',',I2)");
+        static ObjexxFCL::gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2)");
+        static ObjexxFCL::gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1000,16 +1000,16 @@ namespace OutputProcessor {
 
         switch (ReportFreq) {
         case ReportingFrequency::Daily:
-            gio::write(StrOut, DayFormat) << strip(String) << Hour << Minute;
+            ObjexxFCL::gio::write(StrOut, DayFormat) << strip(String) << Hour << Minute;
             break;
         case ReportingFrequency::Monthly:
-            gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << Minute;
+            ObjexxFCL::gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << Minute;
             break;
         case ReportingFrequency::Yearly:
-            gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
+            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
             break;
         case ReportingFrequency::Simulation:
-            gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
+            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
             break;
         default: // Each, TimeStep, Hourly dont have this
             StrOut = BlankString;
@@ -1050,10 +1050,10 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt HrFormat("(A,',',I2.2,':',I2.2)");
-        static gio::Fmt DayFormat("(A,',',I2,',',I2.2,':',I2.2)");
-        static gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2.2,':',I2.2)");
-        static gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt HrFormat("(A,',',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt DayFormat("(A,',',I2,',',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2.2,':',I2.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1074,27 +1074,27 @@ namespace OutputProcessor {
         switch (ReportFreq) {
         case ReportingFrequency::Hourly: // Hourly -- used in meters
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            gio::write(StrOut, HrFormat) << strip(String) << StartMinute << Minute;
+            ObjexxFCL::gio::write(StrOut, HrFormat) << strip(String) << StartMinute << Minute;
             break;
 
         case ReportingFrequency::Daily: // Daily
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            gio::write(StrOut, DayFormat) << strip(String) << Hour << StartMinute << Minute;
+            ObjexxFCL::gio::write(StrOut, DayFormat) << strip(String) << Hour << StartMinute << Minute;
             break;
 
         case ReportingFrequency::Monthly: // Monthly
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << StartMinute << Minute;
+            ObjexxFCL::gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << StartMinute << Minute;
             break;
 
         case ReportingFrequency::Yearly: // Yearly
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
+            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
             break;
 
         case ReportingFrequency::Simulation: // Environment
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
+            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
             break;
 
         default: // Each, TimeStep, Hourly dont have this
@@ -1350,7 +1350,7 @@ namespace OutputProcessor {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags);
+            ObjexxFCL::gio::open(OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags);
             write_stat = flags.ios();
         }
         if (write_stat != 0) {
@@ -2125,7 +2125,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptTS = false;
             EnergyMeters(NumEnergyMeters).RptTSFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).TSRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).TSRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).TSRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).TSRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).TSRptNum;
             strip(EnergyMeters(NumEnergyMeters).TSRptNumChr);
             EnergyMeters(NumEnergyMeters).HRValue = 0.0;
             EnergyMeters(NumEnergyMeters).HRMaxVal = MaxSetValue;
@@ -2135,7 +2135,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptHR = false;
             EnergyMeters(NumEnergyMeters).RptHRFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).HRRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).HRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).HRRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).HRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).HRRptNum;
             strip(EnergyMeters(NumEnergyMeters).HRRptNumChr);
             EnergyMeters(NumEnergyMeters).DYValue = 0.0;
             EnergyMeters(NumEnergyMeters).DYMaxVal = MaxSetValue;
@@ -2145,7 +2145,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptDY = false;
             EnergyMeters(NumEnergyMeters).RptDYFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).DYRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).DYRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).DYRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).DYRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).DYRptNum;
             strip(EnergyMeters(NumEnergyMeters).DYRptNumChr);
             EnergyMeters(NumEnergyMeters).MNValue = 0.0;
             EnergyMeters(NumEnergyMeters).MNMaxVal = MaxSetValue;
@@ -2155,7 +2155,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptMN = false;
             EnergyMeters(NumEnergyMeters).RptMNFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).MNRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).MNRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).MNRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).MNRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).MNRptNum;
             strip(EnergyMeters(NumEnergyMeters).MNRptNumChr);
             EnergyMeters(NumEnergyMeters).YRValue = 0.0;
             EnergyMeters(NumEnergyMeters).YRMaxVal = MaxSetValue;
@@ -2165,7 +2165,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptYR = false;
             EnergyMeters(NumEnergyMeters).RptYRFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).YRRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).YRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).YRRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).YRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).YRRptNum;
             strip(EnergyMeters(NumEnergyMeters).YRRptNumChr);
             EnergyMeters(NumEnergyMeters).SMValue = 0.0;
             EnergyMeters(NumEnergyMeters).SMMaxVal = MaxSetValue;
@@ -2175,7 +2175,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptSM = false;
             EnergyMeters(NumEnergyMeters).RptSMFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).SMRptNum);
-            gio::write(EnergyMeters(NumEnergyMeters).SMRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).SMRptNum;
+            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).SMRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).SMRptNum;
             strip(EnergyMeters(NumEnergyMeters).SMRptNumChr);
             AssignReportNumber(EnergyMeters(NumEnergyMeters).TSAccRptNum);
             AssignReportNumber(EnergyMeters(NumEnergyMeters).HRAccRptNum);
@@ -3123,7 +3123,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccTS) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).TSAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).TSAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).TSAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccTSFO);
             }
@@ -3232,7 +3232,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccHR) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).HRAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).HRAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).HRAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccHRFO);
                 ResultsFramework::OutputSchema->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
@@ -3332,7 +3332,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccDY) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).DYAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).DYAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).DYAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccDYFO);
                 ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
@@ -3421,7 +3421,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccMN) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).MNAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).MNAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).MNAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccMNFO);
                 ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
@@ -3495,7 +3495,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccYR) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).YRAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).YRAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).YRAccRptNum, cReportID, EnergyMeters(Loop).YRValue, EnergyMeters(Loop).RptAccYRFO);
             }
@@ -3584,7 +3584,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccSM) {
-                gio::write(cReportID, fmtLD) << EnergyMeters(Loop).SMAccRptNum;
+                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).SMAccRptNum;
                 strip(cReportID);
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).SMAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccSMFO);
                 ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
@@ -3708,7 +3708,7 @@ namespace OutputProcessor {
 
         if (codedDate == 0) return "-";
 
-        static gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
 
         // ((month*100 + day)*100 + hour)*100 + minute
         int Month;  // month in integer format (1-12)
@@ -3770,7 +3770,7 @@ namespace OutputProcessor {
         }
 
         std::string StringOut;
-        gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
+        ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
 
         return StringOut;
     }
@@ -3830,24 +3830,24 @@ namespace OutputProcessor {
             ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
 
             if (ZoneMult > 1 || ZoneListMult > 1) {
-                gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
+                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
                 Multipliers = " * " + stripped(String);
-                gio::write(String, fmtLD) << ZoneMult;
+                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
                 Multipliers += "  (Zone Multiplier = " + stripped(String);
-                gio::write(String, fmtLD) << ZoneListMult;
+                ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
                 Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
             }
 
-            gio::write(OutputFileMeterDetails, "(/,A)")
+            ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)")
                 << " Meters for " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ReportIDChr + ',' +
                        RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + mtrUnitString + Multipliers;
 
             for (I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
-                gio::write(OutputFileMeterDetails, fmtA) << "  OnMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name + mtrUnitString;
+                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA) << "  OnMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name + mtrUnitString;
             }
 
             for (I = 1; I <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++I) {
-                gio::write(OutputFileMeterDetails, fmtA)
+                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
                     << "  OnCustomMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnCustomMeters(I)).Name + mtrUnitString;
             }
         }
@@ -3856,25 +3856,25 @@ namespace OutputProcessor {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileMeterDetails, "(/,A)", flags)
+                ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)", flags)
                     << " For Meter=" + EnergyMeters(Meter).Name + unitEnumToStringBrackets(EnergyMeters(Meter).Units);
             }
             if (EnergyMeters(Meter).ResourceType != "") {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileMeterDetails, fmtA, flags) << ", ResourceType=" + EnergyMeters(Meter).ResourceType;
+                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", ResourceType=" + EnergyMeters(Meter).ResourceType;
             };
             if (EnergyMeters(Meter).EndUse != "") {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileMeterDetails, fmtA, flags) << ", EndUse=" + EnergyMeters(Meter).EndUse;
+                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", EndUse=" + EnergyMeters(Meter).EndUse;
             };
             if (EnergyMeters(Meter).Group != "") {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileMeterDetails, fmtA, flags) << ", Group=" + EnergyMeters(Meter).Group;
+                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", Group=" + EnergyMeters(Meter).Group;
             };
-            gio::write(OutputFileMeterDetails, fmtA) << ", contents are:";
+            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA) << ", contents are:";
 
             CustDecWritten = false;
 
@@ -3889,15 +3889,15 @@ namespace OutputProcessor {
                             ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
 
                             if (ZoneMult > 1 || ZoneListMult > 1) {
-                                gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
+                                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
                                 Multipliers = " * " + stripped(String);
-                                gio::write(String, fmtLD) << ZoneMult;
+                                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
                                 Multipliers += "  (Zone Multiplier = " + stripped(String);
-                                gio::write(String, fmtLD) << ZoneListMult;
+                                ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
                                 Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
                             }
 
-                            gio::write(OutputFileMeterDetails, fmtA)
+                            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
                                 << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
                         }
                     }
@@ -3906,7 +3906,7 @@ namespace OutputProcessor {
                     if (VarMeterArrays(VarMeter).NumOnCustomMeters > 0) {
                         if (any_eq(VarMeterArrays(VarMeter).OnCustomMeters, Meter)) {
                             if (!CustDecWritten && EnergyMeters(Meter).TypeOfMeter == MeterType_CustomDec) {
-                                gio::write(OutputFileMeterDetails, fmtA)
+                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
                                     << " Values for this meter will be Source Meter=" + EnergyMeters(EnergyMeters(Meter).SourceMeter).Name +
                                            "; but will be decremented by:";
                                 CustDecWritten = true;
@@ -3919,15 +3919,15 @@ namespace OutputProcessor {
                                 ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
 
                                 if (ZoneMult > 1 || ZoneListMult > 1) {
-                                    gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
+                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
                                     Multipliers = " * " + stripped(String);
-                                    gio::write(String, fmtLD) << ZoneMult;
+                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
                                     Multipliers += "  (Zone Multiplier = " + stripped(String);
-                                    gio::write(String, fmtLD) << ZoneListMult;
+                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
                                     Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
                                 }
 
-                                gio::write(OutputFileMeterDetails, fmtA)
+                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
                                     << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
                             }
                         }
@@ -5066,13 +5066,13 @@ namespace OutputProcessor {
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            gio::write(NumberOut, fmtLD) << repVal;
+            ObjexxFCL::gio::write(NumberOut, fmtLD) << repVal;
             strip_trailing_zeros(strip(NumberOut));
         }
 
         // Append the min and max strings with date information
-        gio::write(MinOut, fmtLD) << minValue;
-        gio::write(MaxOut, fmtLD) << MaxValue;
+        ObjexxFCL::gio::write(MinOut, fmtLD) << minValue;
+        ObjexxFCL::gio::write(MaxOut, fmtLD) << MaxValue;
         ProduceMinMaxString(MinOut, minValueDate, reportingInterval);
         ProduceMinMaxString(MaxOut, maxValueDate, reportingInterval);
 
@@ -5716,7 +5716,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             RVariableTypes(CV).unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(CurrentReportNumber);
-        gio::write(IDOut, fmtLD) << CurrentReportNumber;
+        ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
         RVariable.allocate();
         RVariable().Value = 0.0;
@@ -5904,7 +5904,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         IVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(IVariableTypes(CV).VarName);
         IVariableTypes(CV).units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
-        gio::write(IDOut, fmtLD) << CurrentReportNumber;
+        ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
 
         IVariable.allocate();
@@ -6017,7 +6017,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -6030,7 +6030,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     // Not checking for valid number
 
-    gio::write(IDOut, fmtLD) << KeyedValue;
+    ObjexxFCL::gio::write(IDOut, fmtLD) << KeyedValue;
     strip(IDOut);
 
     SetupOutputVariable(VariableName,

@@ -1326,7 +1326,7 @@ namespace PlantCondLoopOperation {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
         int const Condenser(2); // Used to identify whether the current loop is Condenser
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1437,7 +1437,7 @@ namespace PlantCondLoopOperation {
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            gio::write(EquipNum, fmtLD) << Num;
+                            ObjexxFCL::gio::write(EquipNum, fmtLD) << Num;
                             ReportSizingOutput(CurrentModuleObject,
                                                PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                                "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum),

@@ -1345,10 +1345,10 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static gio::Fmt Format_700("('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+        static ObjexxFCL::gio::Fmt Format_700("('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
                                    "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
                                    "Name,DSZAD Name')");
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
         if (GetOASysInputFlag) { // Gets input for object  first time Sim routine is called
@@ -1945,103 +1945,103 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            gio::write(OutputFileInits, Format_700);
+            ObjexxFCL::gio::write(OutputFileInits, Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," + VentilationMechanical(VentMechNum).Name + ',' +
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," + VentilationMechanical(VentMechNum).Name + ',' +
                                                                     VentilationMechanical(VentMechNum).SchName + ',';
                 }
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "Yes,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Yes,";
                     }
                 } else {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "No,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "No,";
                     }
                 }
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
                     }
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
                     }
                 } else {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
                     }
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
                 }
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("NO");
-                            gio::write(OutputFileInits, fmtA, flags) << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
                                                                             VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
                                                                             VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
                         }
                     } else {
-                        gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
                                                                  VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
                                                                  VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
                     }

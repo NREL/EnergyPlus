@@ -281,7 +281,7 @@ namespace SolarShading {
     Array1D<SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SurfaceErrorTracking> TrackBaseSubSurround;
 
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     // MODULE SUBROUTINES:
 
@@ -583,7 +583,7 @@ namespace SolarShading {
         using ScheduleManager::ScheduleFileShadingProcessed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -863,11 +863,11 @@ namespace SolarShading {
             }
         }
 
-        gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
                                              "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
                                              "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
                                              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
-        gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
                                                  RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' + cAlphaArgs(2) + ',' +
                                                  cAlphaArgs(3) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
                                                  cAlphaArgs(7);
@@ -2538,7 +2538,7 @@ namespace SolarShading {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt ValFmt("(F20.4)");
+        static ObjexxFCL::gio::Fmt ValFmt("(F20.4)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2576,11 +2576,11 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                gio::write(VTString, "(I4)") << N;
+                ObjexxFCL::gio::write(VTString, "(I4)") << N;
                 strip(VTString);
                 ShowContinueError("   because vertex " + VTString + " of back surface=" + Surface(NBS).Name +
                                   " is in front of receiving surface=" + Surface(NRS).Name);
-                gio::write(CharDotP, ValFmt) << DOTP;
+                ObjexxFCL::gio::write(CharDotP, ValFmt) << DOTP;
                 strip(CharDotP);
                 ShowContinueError("   (Dot Product indicator=" + CharDotP + ')');
                 ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead.");
@@ -4498,11 +4498,11 @@ namespace SolarShading {
         int iHour;   // Hour index number
         int TS;      // TimeStep Loop Counter
         int SurfNum; // Do loop counter
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static gio::Fmt ShdFracFmt2("(f6.2,',')");
-        static gio::Fmt fmtN("('\n')");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
+        static ObjexxFCL::gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
+        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f6.2,',')");
+        static ObjexxFCL::gio::Fmt fmtN("('\n')");
         static bool Once(true);
 
         if (Once) InitComplexWindows();
@@ -4572,20 +4572,20 @@ namespace SolarShading {
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
                                 << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * (TS - 1);
                         }
                         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
-                                gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
+                                ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
                             }
                         }
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, fmtN, flags);
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtN, flags);
                         }
                     }
                 }
@@ -4870,7 +4870,7 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -11145,7 +11145,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowWarningError("Base surface does not surround subsurface (CHKSBS), Overlap Status=" +
@@ -11163,7 +11163,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The base surround errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }
@@ -11185,7 +11185,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
@@ -11205,7 +11205,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The too many vertices errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }
@@ -11226,7 +11226,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
@@ -11246,7 +11246,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The too many figures errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }

@@ -975,14 +975,14 @@ namespace ZoneEquipmentManager {
         int DSOAPtr;                     // index to DesignSpecification:OutdoorAir object
 
         // Formats
-        static gio::Fmt Format_890("('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')");
-        static gio::Fmt Format_891("(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)");
-        static gio::Fmt Format_990("('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')");
-        static gio::Fmt Format_991("(' Heating Sizing Factor Information, Global, ',G12.5)");
-        static gio::Fmt Format_992("(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)");
-        static gio::Fmt Format_993("('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')");
-        static gio::Fmt Format_994("(' Cooling Sizing Factor Information, Global, ',G12.5)");
-        static gio::Fmt Format_995("(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)");
+        static ObjexxFCL::gio::Fmt Format_890("('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')");
+        static ObjexxFCL::gio::Fmt Format_891("(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)");
+        static ObjexxFCL::gio::Fmt Format_990("('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')");
+        static ObjexxFCL::gio::Fmt Format_991("(' Heating Sizing Factor Information, Global, ',G12.5)");
+        static ObjexxFCL::gio::Fmt Format_992("(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)");
+        static ObjexxFCL::gio::Fmt Format_993("('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')");
+        static ObjexxFCL::gio::Fmt Format_994("(' Cooling Sizing Factor Information, Global, ',G12.5)");
+        static ObjexxFCL::gio::Fmt Format_995("(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)");
 
         for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex) {
             ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, Zone);
@@ -1746,22 +1746,22 @@ namespace ZoneEquipmentManager {
             }
         }
 
-        gio::write(OutputFileInits, Format_890);
-        gio::write(OutputFileInits, Format_891) << NumTimeStepsInAvg;
-        gio::write(OutputFileInits, Format_990);
-        gio::write(OutputFileInits, Format_991) << GlobalHeatSizingFactor;
+        ObjexxFCL::gio::write(OutputFileInits, Format_890);
+        ObjexxFCL::gio::write(OutputFileInits, Format_891) << NumTimeStepsInAvg;
+        ObjexxFCL::gio::write(OutputFileInits, Format_990);
+        ObjexxFCL::gio::write(OutputFileInits, Format_991) << GlobalHeatSizingFactor;
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).HeatSizingFactor != 1.0) {
-                gio::write(OutputFileInits, Format_992) << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).HeatSizingFactor;
+                ObjexxFCL::gio::write(OutputFileInits, Format_992) << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).HeatSizingFactor;
             }
         }
-        gio::write(OutputFileInits, Format_993);
-        gio::write(OutputFileInits, Format_994) << GlobalCoolSizingFactor;
+        ObjexxFCL::gio::write(OutputFileInits, Format_993);
+        ObjexxFCL::gio::write(OutputFileInits, Format_994) << GlobalCoolSizingFactor;
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).CoolSizingFactor != 1.0) {
-                gio::write(OutputFileInits, Format_995) << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).CoolSizingFactor;
+                ObjexxFCL::gio::write(OutputFileInits, Format_995) << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).CoolSizingFactor;
             }
         }
     }
@@ -2222,15 +2222,15 @@ namespace ZoneEquipmentManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt ZSizeFmt10("('Time')");
-        static gio::Fmt ZSizeFmt11("(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )");
-        static gio::Fmt ZSizeFmt20("(I2.2,':',I2.2,':00')");
-        static gio::Fmt ZSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
-        static gio::Fmt ZSizeFmt30("('Peak')");
-        static gio::Fmt ZSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static gio::Fmt ZSizeFmt40("(/'Peak Vol Flow (m3/s)')");
-        static gio::Fmt ZSizeFmt41("(A1,A1,A1,ES12.6,A1,ES12.6)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt ZSizeFmt10("('Time')");
+        static ObjexxFCL::gio::Fmt ZSizeFmt11("(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )");
+        static ObjexxFCL::gio::Fmt ZSizeFmt20("(I2.2,':',I2.2,':00')");
+        static ObjexxFCL::gio::Fmt ZSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
+        static ObjexxFCL::gio::Fmt ZSizeFmt30("('Peak')");
+        static ObjexxFCL::gio::Fmt ZSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
+        static ObjexxFCL::gio::Fmt ZSizeFmt40("(/'Peak Vol Flow (m3/s)')");
+        static ObjexxFCL::gio::Fmt ZSizeFmt41("(A1,A1,A1,ES12.6,A1,ES12.6)");
         static std::string const RoutineName("UpdateZoneSizing");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2579,14 +2579,14 @@ namespace ZoneEquipmentManager {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileZoneSizing, ZSizeFmt10, flags);
+                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt10, flags);
                     }
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileZoneSizing, ZSizeFmt11, flags)
+                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt11, flags)
                                 << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName << CalcFinalZoneSizing(I).HeatDesDay << ":Des Heat Load [W]"
                                 << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName << CalcFinalZoneSizing(I).CoolDesDay
                                 << ":Des Sens Cool Load [W]" << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName
@@ -2682,7 +2682,7 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    gio::write(OutputFileZoneSizing);
+                    ObjexxFCL::gio::write(OutputFileZoneSizing);
                     //      HourFrac = 0.0
                     Minutes = 0;
                     TimeStepIndex = 0;
@@ -2699,68 +2699,68 @@ namespace ZoneEquipmentManager {
                             for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
                                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                                 if (TimeStepIndex == CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax) {
-                                    gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
+                                    ObjexxFCL::gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
                                     HeatPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cHeatDDDate + ' ' + HrMinString;
                                 }
                                 if (TimeStepIndex == CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax) {
-                                    gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
+                                    ObjexxFCL::gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
                                     CoolPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate + ' ' + HrMinString;
                                 }
                             }
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
-                                gio::write(OutputFileZoneSizing, ZSizeFmt20, flags) << HourPrint << Minutes;
+                                ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt20, flags) << HourPrint << Minutes;
                             }
                             for (I = 1; I <= NumOfZones; ++I) {
                                 if (!ZoneEquipConfig(I).IsControlled) continue;
                                 {
                                     IOFlags flags;
                                     flags.ADVANCE("No");
-                                    gio::write(OutputFileZoneSizing, ZSizeFmt21, flags)
+                                    ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt21, flags)
                                         << SizingFileColSep << CalcFinalZoneSizing(I).HeatLoadSeq(TimeStepIndex) << SizingFileColSep
                                         << CalcFinalZoneSizing(I).CoolLoadSeq(TimeStepIndex) << SizingFileColSep
                                         << CalcFinalZoneSizing(I).HeatFlowSeq(TimeStepIndex) << SizingFileColSep
                                         << CalcFinalZoneSizing(I).CoolFlowSeq(TimeStepIndex);
                                 }
                             }
-                            gio::write(OutputFileZoneSizing);
+                            ObjexxFCL::gio::write(OutputFileZoneSizing);
                         }
                     }
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileZoneSizing, ZSizeFmt30, flags);
+                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt30, flags);
                     }
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileZoneSizing, ZSizeFmt31, flags)
+                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt31, flags)
                                 << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatLoad << SizingFileColSep << CalcFinalZoneSizing(I).DesCoolLoad
                                 << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatMassFlow << SizingFileColSep
                                 << CalcFinalZoneSizing(I).DesCoolMassFlow;
                         }
                     }
-                    gio::write(OutputFileZoneSizing);
+                    ObjexxFCL::gio::write(OutputFileZoneSizing);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileZoneSizing, ZSizeFmt40, flags);
+                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt40, flags);
                     }
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileZoneSizing, ZSizeFmt41, flags)
+                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt41, flags)
                                 << SizingFileColSep << SizingFileColSep << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatVolFlow
                                 << SizingFileColSep << CalcFinalZoneSizing(I).DesCoolVolFlow;
                         }
                     }
-                    gio::write(OutputFileZoneSizing);
-                    gio::close(OutputFileZoneSizing);
+                    ObjexxFCL::gio::write(OutputFileZoneSizing);
+                    ObjexxFCL::gio::close(OutputFileZoneSizing);
                 }
 
                 // Move data from Calc arrays to user modified arrays
@@ -6649,16 +6649,16 @@ namespace ZoneEquipmentManager {
         using General::RoundSigDigits;
 
         // Formats
-        static gio::Fmt Format_990("('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
+        static ObjexxFCL::gio::Fmt Format_990("('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
                                    "{C}, DOAS Design High Setpoint Temperature {C} ')");
-        static gio::Fmt Format_991("(' Zone Sizing DOAS Inputs',4(', ',A))");
+        static ObjexxFCL::gio::Fmt Format_991("(' Zone Sizing DOAS Inputs',4(', ',A))");
 
         if (reportDOASZoneSizingHeader) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             reportDOASZoneSizingHeader = false;
         }
 
-        gio::write(OutputFileInits, Format_991) << ZoneName << DOASCtrlStrategy << RoundSigDigits(DOASLowTemp, 3) << RoundSigDigits(DOASHighTemp, 3);
+        ObjexxFCL::gio::write(OutputFileInits, Format_991) << ZoneName << DOASCtrlStrategy << RoundSigDigits(DOASLowTemp, 3) << RoundSigDigits(DOASHighTemp, 3);
 
         // BSLLC Start
         // if ( sqlite ) {

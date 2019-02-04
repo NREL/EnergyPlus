@@ -285,7 +285,7 @@ namespace HeatBalanceAirManager {
         using ScheduleManager::GetScheduleIndex;
 
         // Formats
-        static gio::Fmt Format_720("('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)");
+        static ObjexxFCL::gio::Fmt Format_720("('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -293,7 +293,7 @@ namespace HeatBalanceAirManager {
 
         GetSimpleAirModelInputs(ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
-            gio::write(OutputFileInits, Format_720) << "Simple";
+            ObjexxFCL::gio::write(OutputFileInits, Format_720) << "Simple";
         }
     }
 
@@ -369,7 +369,7 @@ namespace HeatBalanceAirManager {
         using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const VentilTempLimit(100.0);                               // degrees Celsius
         Real64 const MixingTempLimit(100.0);                               // degrees Celsius
         Real64 const VentilWSLimit(40.0);                                  // m/s
@@ -428,11 +428,11 @@ namespace HeatBalanceAirManager {
         int IsSourceZone;
 
         // Formats
-        static gio::Fmt Format_720("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')");
-        static gio::Fmt Format_721("('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)");
-        static gio::Fmt Format_722("(' ',A,', ',A)");
-        static gio::Fmt Format_723("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static gio::Fmt Format_724("('! <',A,' Airflow Stats Nominal>, ',A)");
+        static ObjexxFCL::gio::Fmt Format_720("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')");
+        static ObjexxFCL::gio::Fmt Format_721("('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)");
+        static ObjexxFCL::gio::Fmt Format_722("(' ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_723("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_724("('! <',A,' Airflow Stats Nominal>, ',A)");
 
         RepVarSet.dimension(NumOfZones, true);
 
@@ -3460,7 +3460,7 @@ namespace HeatBalanceAirManager {
 
         for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "ZoneInfiltration"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/Exterior Surface Area {m3/s-m2},ACH - "
                        "Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - "
@@ -3468,14 +3468,14 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Infiltration(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Infiltration-Illegal Zone specified" << Infiltration(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Infiltration-Illegal Zone specified" << Infiltration(Loop).Name;
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Infiltration(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "ZoneInfiltration" << Infiltration(Loop).Name << GetScheduleName(Infiltration(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3483,7 +3483,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3493,7 +3493,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).ExteriorTotalSurfArea > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel / Zone(ZoneNum).ExteriorTotalSurfArea, 3);
@@ -3503,7 +3503,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3513,28 +3513,28 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).ConstantTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).TemperatureTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).VelocityTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).VelocitySQTermCoef, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -3546,7 +3546,7 @@ namespace HeatBalanceAirManager {
 
         for (Loop = 1; Loop <= TotVentilation; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "ZoneVentilation"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa},Fan Efficiency {},Equation A - Constant Term "
@@ -3557,14 +3557,14 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Ventilation(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Ventilation-Illegal Zone specified" << Ventilation(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Ventilation-Illegal Zone specified" << Ventilation(Loop).Name;
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Ventilation(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "ZoneVentilation" << Ventilation(Loop).Name << GetScheduleName(Ventilation(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3572,7 +3572,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3582,7 +3582,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3592,7 +3592,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3602,7 +3602,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).FanType == ExhaustVentilation) {
                 StringOut = "Exhaust";
@@ -3616,43 +3616,43 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).FanPressure, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).FanEfficiency, 1);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).ConstantTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).TemperatureTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).VelocityTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).VelocitySQTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MinIndoorTempSchedPtr > 0) {
                 StringOut = GetScheduleName(Ventilation(Loop).MinIndoorTempSchedPtr);
@@ -3662,7 +3662,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MaxIndoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MaxIndoorTempSchedPtr);
@@ -3672,7 +3672,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).DeltaTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).DeltaTempSchedPtr);
@@ -3682,7 +3682,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MinOutdoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MinOutdoorTempSchedPtr);
@@ -3692,7 +3692,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MaxOutdoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MaxOutdoorTempSchedPtr);
@@ -3702,30 +3702,30 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).MaxWindSpeed, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         TotMixingFlow.dimension(NumOfZones, 0.0);
         for (Loop = 1; Loop <= TotMixing; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "Mixing"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = Mixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Mixing-Illegal Zone specified" << Mixing(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Mixing-Illegal Zone specified" << Mixing(Loop).Name;
                 continue;
             }
             TotMixingFlow(ZoneNum) += Mixing(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "Mixing" << Mixing(Loop).Name << GetScheduleName(Mixing(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3733,7 +3733,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3743,7 +3743,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3753,7 +3753,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3763,34 +3763,34 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << Zone(Mixing(Loop).FromZone).Name + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(Mixing(Loop).FromZone).Name + ',';
             }
             StringOut = RoundSigDigits(Mixing(Loop).DeltaTemperature, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "CrossMixing"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = CrossMixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "CrossMixing-Illegal Zone specified" << CrossMixing(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "CrossMixing-Illegal Zone specified" << CrossMixing(Loop).Name;
                 continue;
             }
             TotMixingFlow(ZoneNum) += CrossMixing(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "CrossMixing" << CrossMixing(Loop).Name << GetScheduleName(CrossMixing(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3798,7 +3798,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3808,7 +3808,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3818,7 +3818,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3828,19 +3828,19 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << Zone(CrossMixing(Loop).FromZone).Name + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(CrossMixing(Loop).FromZone).Name + ',';
             }
             StringOut = RoundSigDigits(CrossMixing(Loop).DeltaTemperature, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         if (TotRefDoorMixing > 0) {
-            gio::write(OutputFileInits, Format_724)
+            ObjexxFCL::gio::write(OutputFileInits, Format_724)
                 << "RefrigerationDoorMixing "
                 << "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type";
             for (ZoneNumA = 1; ZoneNumA <= (NumOfZones - 1); ++ZoneNumA) {
@@ -3848,7 +3848,7 @@ namespace HeatBalanceAirManager {
                 for (ConnectionNumber = 1; ConnectionNumber <= RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
                     ZoneNumB = RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
                     // TotMixingFlow(ZoneNum)=TotMixingFlow(ZoneNum)+RefDoorMixing(Loop)%!DesignLevel
-                    gio::write(OutputFileInits, Format_723)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_723)
                         << "RefrigerationDoorMixing" << RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) << Zone(ZoneNumA).Name
                         << Zone(ZoneNumB).Name << GetScheduleName(RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber))
                         << RoundSigDigits(RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber), 3)
@@ -3976,8 +3976,8 @@ namespace HeatBalanceAirManager {
         using DataRoomAirModel::UserDefinedUsed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt RoomAirHeader("('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')");
-        static gio::Fmt RoomAirZoneFmt("('RoomAir Model,',A,',',A)");
+        static ObjexxFCL::gio::Fmt RoomAirHeader("('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')");
+        static ObjexxFCL::gio::Fmt RoomAirZoneFmt("('RoomAir Model,',A,',',A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -4141,26 +4141,26 @@ namespace HeatBalanceAirManager {
         }
 
         // Write RoomAir Model details onto EIO file
-        gio::write(OutputFileInits, RoomAirHeader);
+        ObjexxFCL::gio::write(OutputFileInits, RoomAirHeader);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             {
                 auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
                 if (SELECT_CASE_var == RoomAirModel_Mixing) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "Mixing/Well-Stirred";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "Mixing/Well-Stirred";
                 } else if (SELECT_CASE_var == RoomAirModel_Mundt) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "OneNodeDisplacementVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "OneNodeDisplacementVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "ThreeNodeDisplacementVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "ThreeNodeDisplacementVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "CrossVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "CrossVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionInterior";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionInterior";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionExterior";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionExterior";
                 } else if (SELECT_CASE_var == RoomAirModel_UserDefined) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UserDefined";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UserDefined";
                 } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "AirflowNetwork";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "AirflowNetwork";
                 }
             }
         }

@@ -5998,10 +5998,10 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingCapacity )
 
         // Formats
-        static gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
+        static ObjexxFCL::gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
                                    "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                                    "Correction Factor')");
-        static gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
+        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
         IsAutoSize = false;
@@ -6876,10 +6876,10 @@ namespace HVACVariableRefrigerantFlow {
 
                 // Report to eio other information not related to autosizing
                 if (MyOneTimeEIOFlag) {
-                    gio::write(OutputFileInits, Format_990);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) << VRF(VRFCond).Name << RoundSigDigits(VRF(VRFCond).CoolingCombinationRatio, 5)
                     << RoundSigDigits(VRF(VRFCond).HeatingCombinationRatio, 5) << RoundSigDigits(VRF(VRFCond).PipingCorrectionCooling, 5)
                     << RoundSigDigits(VRF(VRFCond).PipingCorrectionHeating, 5);
@@ -7060,7 +7060,7 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;      // unit full output when compressor is operating [W]
@@ -7231,7 +7231,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (VRFTU(VRFTUNum).IterLimitExceeded == 0) {
-                            gio::write(IterNum, fmtLD) << MaxIte;
+                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
                             ShowWarningMessage(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name + "\"");
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
@@ -10110,7 +10110,7 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -10254,7 +10254,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (this->IterLimitExceeded == 0) {
-                            gio::write(IterNum, fmtLD) << MaxIte;
+                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
                             ShowWarningMessage(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
