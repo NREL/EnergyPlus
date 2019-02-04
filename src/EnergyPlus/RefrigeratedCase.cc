@@ -9470,12 +9470,12 @@ namespace RefrigeratedCase {
                                         Condenser(RefCondLoop).PlantLoopSideNum,
                                         Condenser(RefCondLoop).PlantBranchNum,
                                         Condenser(RefCondLoop).PlantCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitRefrigerationPlantConnections: Program terminated due to previous condition(s).");
                 }
@@ -9502,12 +9502,12 @@ namespace RefrigeratedCase {
                                         RefrigRack(RefCompRackLoop).PlantLoopSideNum,
                                         RefrigRack(RefCompRackLoop).PlantBranchNum,
                                         RefrigRack(RefCompRackLoop).PlantCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitRefrigerationPlantConnections: Program terminated due to previous condition(s).");
                 }

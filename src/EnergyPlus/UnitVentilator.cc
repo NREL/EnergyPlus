@@ -1343,12 +1343,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).HWLoopSide,
                                         UnitVent(UnitVentNum).HWBranchNum,
                                         UnitVent(UnitVentNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");
@@ -1369,12 +1369,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).CWLoopSide,
                                         UnitVent(UnitVentNum).CWBranchNum,
                                         UnitVent(UnitVentNum).CWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");

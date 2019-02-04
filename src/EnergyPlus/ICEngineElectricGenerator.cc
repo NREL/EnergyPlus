@@ -1035,12 +1035,12 @@ namespace ICEngineElectricGenerator {
                                     ICEngineGenerator(GeneratorNum).HRLoopSideNum,
                                     ICEngineGenerator(GeneratorNum).HRBranchNum,
                                     ICEngineGenerator(GeneratorNum).HRCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitICEngineGenerators: Program terminated due to previous condition(s).");
             }

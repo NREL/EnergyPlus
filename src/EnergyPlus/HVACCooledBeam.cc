@@ -563,12 +563,12 @@ namespace HVACCooledBeam {
                                     CoolBeam(CBNum).CWLoopSideNum,
                                     CoolBeam(CBNum).CWBranchNum,
                                     CoolBeam(CBNum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitCoolBeam: Program terminated for previous conditions.");
             }

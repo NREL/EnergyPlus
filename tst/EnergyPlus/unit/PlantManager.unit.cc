@@ -93,7 +93,7 @@ namespace PlantManager {
 
         std::string const idf_objects = delimited_string({
 
-            "  Version,9.0;",
+            "  Version,9.1;",
 
             "  PlantLoop,",
             "    Chilled Water Loop,      !- Name",
