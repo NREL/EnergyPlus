@@ -479,7 +479,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = true;
     } else {
         output.first = field_value;
-        output.second = field_value.empty();
+        output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
         output.first = UtilityRoutines::MakeUPPERCase(output.first);

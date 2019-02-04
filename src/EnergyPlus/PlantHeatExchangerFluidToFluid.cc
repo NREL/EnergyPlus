@@ -686,12 +686,12 @@ namespace PlantHeatExchangerFluidToFluid {
                                                     FluidHX(CompNum).DemandSideLoop.LoopSideNum,
                                                     FluidHX(CompNum).DemandSideLoop.BranchNum,
                                                     FluidHX(CompNum).DemandSideLoop.CompNum,
+                                                    errFlag,
                                                     _,
                                                     _,
                                                     _,
                                                     FluidHX(CompNum).DemandSideLoop.InletNodeNum,
-                                                    _,
-                                                    errFlag);
+                                                    _);
 
             if (FluidHX(CompNum).DemandSideLoop.LoopSideNum != DemandSide) { // throw error
                 ShowSevereError(RoutineName + " Invalid connections for " + ccSimPlantEquipTypes(TypeOf_FluidToFluidPlantHtExchg) + " name = \"" +
@@ -706,12 +706,12 @@ namespace PlantHeatExchangerFluidToFluid {
                                                     FluidHX(CompNum).SupplySideLoop.LoopSideNum,
                                                     FluidHX(CompNum).SupplySideLoop.BranchNum,
                                                     FluidHX(CompNum).SupplySideLoop.CompNum,
+                                                    errFlag,
                                                     _,
                                                     _,
                                                     _,
                                                     FluidHX(CompNum).SupplySideLoop.InletNodeNum,
-                                                    _,
-                                                    errFlag);
+                                                    _);
 
             if (FluidHX(CompNum).SupplySideLoop.LoopSideNum != SupplySide) { // throw error
                 ShowSevereError(RoutineName + " Invalid connections for " + ccSimPlantEquipTypes(TypeOf_FluidToFluidPlantHtExchg) + " name = \"" +
@@ -792,12 +792,12 @@ namespace PlantHeatExchangerFluidToFluid {
                                                             FluidHX(CompNum).OtherCompSupplySideLoop.LoopSideNum,
                                                             FluidHX(CompNum).OtherCompSupplySideLoop.BranchNum,
                                                             FluidHX(CompNum).OtherCompSupplySideLoop.CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,
                                                             FluidHX(CompNum).OtherCompSupplySideLoop.InletNodeNum,
-                                                            _,
-                                                            errFlag);
+                                                            _);
                 }
                 if (FluidHX(CompNum).OtherCompDemandSideLoop.InletNodeNum > 0) {
                     PlantUtilities::ScanPlantLoopsForObject(FluidHX(CompNum).ComponentUserName,
@@ -806,12 +806,12 @@ namespace PlantHeatExchangerFluidToFluid {
                                                             FluidHX(CompNum).OtherCompDemandSideLoop.LoopSideNum,
                                                             FluidHX(CompNum).OtherCompDemandSideLoop.BranchNum,
                                                             FluidHX(CompNum).OtherCompDemandSideLoop.CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,
                                                             FluidHX(CompNum).OtherCompDemandSideLoop.InletNodeNum,
-                                                            _,
-                                                            errFlag);
+                                                            _);
                 }
             }
 

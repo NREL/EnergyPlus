@@ -4942,14 +4942,23 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
+        static Array1D_bool fixedReturn;
+        static bool AllocateFlag = true;
+        if (AllocateFlag) {
+            AllocateFlag = false;
+            int maxReturnNodes = 0;
+            for (auto & z : ZoneEquipConfig) {
+                maxReturnNodes = max(maxReturnNodes, z.NumReturnNodes);
+            }
+            fixedReturn.allocate(maxReturnNodes);
+        }
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
-        Real64 totVarReturnFlow =
-            0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
+        Real64 totVarReturnFlow = 0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
         Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(thisZoneEquip.ReturnFlowSchedPtrNum);
-        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
-        fixedReturn.allocate(numRetNodes);
+//        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
+//        fixedReturn.allocate(numRetNodes);
         fixedReturn = false;
         FinalTotalReturnMassFlow = 0.0;
 

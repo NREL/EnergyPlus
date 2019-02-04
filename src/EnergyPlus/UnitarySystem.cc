@@ -635,12 +635,12 @@ namespace UnitarySystems {
                                                         this->m_HRLoopSideNum,
                                                         this->m_HRBranchNum,
                                                         this->m_HRCompNum,
+                                                        initUnitarySystemsErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        initUnitarySystemsErrFlag);
+                                                        _);
                 if (initUnitarySystemsErrFlag) {
                     ShowFatalError("InitUnitarySystems: Program terminated for previous conditions.");
                 }
@@ -679,12 +679,12 @@ namespace UnitarySystems {
                                                         this->CoolCoilLoopSide,
                                                         this->CoolCoilBranchNum,
                                                         this->CoolCoilCompNum,
+                                                        initUnitarySystemsErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        initUnitarySystemsErrFlag);
+                                                        _);
                 if (initUnitarySystemsErrFlag) {
                     ShowFatalError("InitUnitarySystem: Program terminated for previous conditions.");
                 }
@@ -726,12 +726,12 @@ namespace UnitarySystems {
                                                         this->HeatCoilLoopSide,
                                                         this->HeatCoilBranchNum,
                                                         this->HeatCoilCompNum,
+                                                        initUnitarySystemsErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        initUnitarySystemsErrFlag);
+                                                        _);
                 if (initUnitarySystemsErrFlag) {
                     ShowFatalError("InitUnitarySystem: Program terminated for previous conditions.");
                 }
@@ -780,12 +780,12 @@ namespace UnitarySystems {
                                                         this->m_SuppCoilLoopSide,
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
+                                                        initUnitarySystemsErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        initUnitarySystemsErrFlag);
+                                                        _);
                 WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
                                            this->m_SuppHeatCoilName,
                                            this->m_MaxHeatAirVolFlow,
@@ -820,12 +820,12 @@ namespace UnitarySystems {
                                                         this->m_SuppCoilLoopSide,
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
+                                                        initUnitarySystemsErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        initUnitarySystemsErrFlag);
+                                                        _);
                 if (initUnitarySystemsErrFlag) {
                     ShowFatalError("InitUnitarySystems: Program terminated for previous conditions.");
                 }

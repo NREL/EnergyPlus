@@ -3269,7 +3269,13 @@ namespace SurfaceGeometry {
         for (int i = 1; i <= SurfNum; i++) {
             if (SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface && SurfaceTmp(i).ExtBoundCondName != "") {
                 ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
-                if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                // If we cannot find the referenced surface
+                if (ExtSurfNum == 0) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name
+                                    + "\" references an outside boundary surface that cannot be found:" + SurfaceTmp(i).ExtBoundCondName);
+                    ErrorsFound = true;
+                // If vertex size mistmatch
+                } else if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name + "\", Vertex size mismatch between base surface :" +
                                     SurfaceTmp(i).Name + " and outside boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
                     ShowContinueError("The vertex sizes are " + TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and " +

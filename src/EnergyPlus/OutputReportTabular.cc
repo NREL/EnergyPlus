@@ -10578,6 +10578,7 @@ namespace OutputReportTabular {
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 rowHead(iZone) = Zone(iZone).Name;
+                // Conditioned or not
                 if (Zone(iZone).SystemZoneNodeNumber > 0) {
                     tableBody(2, iZone) = "Yes";
                     zoneIsCond = true;
@@ -10585,6 +10586,7 @@ namespace OutputReportTabular {
                     tableBody(2, iZone) = "No";
                     zoneIsCond = false;
                 }
+                // Part of Total Floor Area or not
                 if (Zone(iZone).isPartOfTotalArea) {
                     tableBody(3, iZone) = "Yes";
                     usezoneFloorArea = true;
@@ -10615,7 +10617,7 @@ namespace OutputReportTabular {
                         totLightPower += Lights(iLight).DesignLevel;
                     }
                 }
-                if (Zone(iZone).FloorArea > 0 && usezoneFloorArea) {
+                if (Zone(iZone).FloorArea > 0) {
                     tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
                 }
                 // people density
@@ -10650,12 +10652,26 @@ namespace OutputReportTabular {
                         totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
                     }
                 }
-                if (Zone(iZone).FloorArea > 0 && usezoneFloorArea) {
+                if (Zone(iZone).FloorArea > 0) {
                     tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
                 }
 
-                // total rows for conditioned, unconditioned, and total
-                if (usezoneFloorArea) {
+                // total rows for Total / Not Part of Total
+                // In "Total": break between conditioned/unconditioned
+
+                // If not part of total, goes directly to this row
+                if (!usezoneFloorArea) {
+                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
+                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
+                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
+                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
+                    zstLight(notpartTotal) += mult * totLightPower;
+                    zstPeople(notpartTotal) += mult * totNumPeople;
+                    zstPlug(notpartTotal) += mult * totPlugProcess;
+                } else {
+                    // Add it to the 'Total'
                     zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
                     zstVolume(grandTotal) += mult * Zone(iZone).Volume;
                     zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
@@ -10665,47 +10681,29 @@ namespace OutputReportTabular {
                     zstLight(grandTotal) += mult * totLightPower;
                     zstPeople(grandTotal) += mult * totNumPeople;
                     zstPlug(grandTotal) += mult * totPlugProcess;
-                } else {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
-                }
-                if (zoneIsCond && usezoneFloorArea) {
-                    zstArea(condTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(condTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(condTotal) += mult * totLightPower;
-                    zstPeople(condTotal) += mult * totNumPeople;
-                    zstPlug(condTotal) += mult * totPlugProcess;
-                } else if (!zoneIsCond) {
-                    zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(uncondTotal) += mult * totLightPower;
-                    zstPeople(uncondTotal) += mult * totNumPeople;
-                    zstPlug(uncondTotal) += mult * totPlugProcess;
-                } else {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
+
+                    // Subtotal between cond/unconditioned
+                    if (zoneIsCond) {
+                        zstArea(condTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(condTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(condTotal) += mult * totLightPower;
+                        zstPeople(condTotal) += mult * totNumPeople;
+                        zstPlug(condTotal) += mult * totPlugProcess;
+                    } else if (!zoneIsCond) {
+                        zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(uncondTotal) += mult * totLightPower;
+                        zstPeople(uncondTotal) += mult * totNumPeople;
+                        zstPlug(uncondTotal) += mult * totPlugProcess;
+                    }
                 }
             }
             for (iTotal = 1; iTotal <= 4; ++iTotal) {
@@ -15522,7 +15520,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 116;
+        UnitConvSize = 117;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15602,44 +15600,45 @@ namespace OutputReportTabular {
         UnitConv(76).siName = "W/M2-C";
         UnitConv(77).siName = "W/M2-K";
         UnitConv(78).siName = "W/W";
-        UnitConv(79).siName = "deltaC";
-        UnitConv(80).siName = "KJ/KG";
-        UnitConv(81).siName = "W-S/M3";
+        UnitConv(79).siName = "W/W";
+        UnitConv(80).siName = "deltaC";
+        UnitConv(81).siName = "KJ/KG";
         UnitConv(82).siName = "W-S/M3";
-        UnitConv(83).siName = "~~$~~/m2";
-        UnitConv(84).siName = "GJ";
+        UnitConv(83).siName = "W-S/M3";
+        UnitConv(84).siName = "~~$~~/m2";
         UnitConv(85).siName = "GJ";
         UnitConv(86).siName = "GJ";
         UnitConv(87).siName = "GJ";
         UnitConv(88).siName = "GJ";
         UnitConv(89).siName = "GJ";
         UnitConv(90).siName = "GJ";
-        UnitConv(91).siName = "MJ/m2";
+        UnitConv(91).siName = "GJ";
         UnitConv(92).siName = "MJ/m2";
         UnitConv(93).siName = "MJ/m2";
         UnitConv(94).siName = "MJ/m2";
-        UnitConv(95).siName = "Invalid/Undefined";
-        UnitConv(96).siName = "";
-        UnitConv(97).siName = "W/C";
-        UnitConv(98).siName = "DAY";
-        UnitConv(99).siName = "MIN";
-        UnitConv(100).siName = "HR/WK";
-        UnitConv(101).siName = "$";
-        UnitConv(102).siName = "$/UNIT ENERGY";
-        UnitConv(103).siName = "KW";
-        UnitConv(104).siName = "KGWATER/KGDRYAIR";
-        UnitConv(105).siName = " ";
-        UnitConv(106).siName = "AH";
-        UnitConv(107).siName = "CLO";
-        UnitConv(108).siName = "J/KG-K";
-        UnitConv(109).siName = "J/KGWATER";
-        UnitConv(110).siName = "KGWATER/S";
-        UnitConv(111).siName = "PPM";
-        UnitConv(112).siName = "RAD";
-        UnitConv(113).siName = "REV/MIN";
-        UnitConv(114).siName = "NM";
-        UnitConv(115).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(116).siName = "PERSON/M2";
+        UnitConv(95).siName = "MJ/m2";
+        UnitConv(96).siName = "Invalid/Undefined";
+        UnitConv(97).siName = "";
+        UnitConv(98).siName = "W/C";
+        UnitConv(99).siName = "DAY";
+        UnitConv(100).siName = "MIN";
+        UnitConv(101).siName = "HR/WK";
+        UnitConv(102).siName = "$";
+        UnitConv(103).siName = "$/UNIT ENERGY";
+        UnitConv(104).siName = "KW";
+        UnitConv(105).siName = "KGWATER/KGDRYAIR";
+        UnitConv(106).siName = " ";
+        UnitConv(107).siName = "AH";
+        UnitConv(108).siName = "CLO";
+        UnitConv(109).siName = "J/KG-K";
+        UnitConv(110).siName = "J/KGWATER";
+        UnitConv(111).siName = "KGWATER/S";
+        UnitConv(112).siName = "PPM";
+        UnitConv(113).siName = "RAD";
+        UnitConv(114).siName = "REV/MIN";
+        UnitConv(115).siName = "NM";
+        UnitConv(116).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(117).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -15719,44 +15718,45 @@ namespace OutputReportTabular {
         UnitConv(76).ipName = "Btu/h-ft2-F";
         UnitConv(77).ipName = "Btu/h-ft2-F";
         UnitConv(78).ipName = "Btuh/Btuh";
-        UnitConv(79).ipName = "deltaF";
-        UnitConv(80).ipName = "Btu/lb";
-        UnitConv(81).ipName = "W-min/ft3";
-        UnitConv(82).ipName = "W-min/gal";
-        UnitConv(83).ipName = "~~$~~/ft2";
-        UnitConv(84).ipName = "kBtu";
-        UnitConv(85).ipName = "kWh";
+        UnitConv(79).ipName = "W/W";
+        UnitConv(80).ipName = "deltaF";
+        UnitConv(81).ipName = "Btu/lb";
+        UnitConv(82).ipName = "W-min/ft3";
+        UnitConv(83).ipName = "W-min/gal";
+        UnitConv(84).ipName = "~~$~~/ft2";
+        UnitConv(85).ipName = "kBtu";
         UnitConv(86).ipName = "kWh";
-        UnitConv(87).ipName = "therm";
-        UnitConv(88).ipName = "MMBtu";
-        UnitConv(89).ipName = "Wh";
-        UnitConv(90).ipName = "ton-hrs";
-        UnitConv(91).ipName = "kWh/ft2";
-        UnitConv(92).ipName = "kBtu/ft2";
+        UnitConv(87).ipName = "kWh";
+        UnitConv(88).ipName = "therm";
+        UnitConv(89).ipName = "MMBtu";
+        UnitConv(90).ipName = "Wh";
+        UnitConv(91).ipName = "ton-hrs";
+        UnitConv(92).ipName = "kWh/ft2";
         UnitConv(93).ipName = "kBtu/ft2";
-        UnitConv(94).ipName = "kWh/m2";
-        UnitConv(95).ipName = "Invalid/Undefined";
-        UnitConv(96).ipName = "";
-        UnitConv(97).ipName = "Btu/h-F";
-        UnitConv(98).ipName = "day";
-        UnitConv(99).ipName = "min";
-        UnitConv(100).ipName = "hr/wk";
-        UnitConv(101).ipName = "$";
-        UnitConv(102).ipName = "$/unit energy";
-        UnitConv(103).ipName = "kW";
-        UnitConv(104).ipName = "lbWater/lbDryAir";
-        UnitConv(105).ipName = " ";
-        UnitConv(106).ipName = "Ah";
-        UnitConv(107).ipName = "clo";
-        UnitConv(108).ipName = "Btu/lbm-R";
-        UnitConv(109).ipName = "Btu/lbWater";
-        UnitConv(110).ipName = "lbWater/s";
-        UnitConv(111).ipName = "ppm";
-        UnitConv(112).ipName = "rad";
-        UnitConv(113).ipName = "rev/min";
-        UnitConv(114).ipName = "lbf-ft";
-        UnitConv(115).ipName = "Btu/W-h";
-        UnitConv(116).ipName = "person/ft2";
+        UnitConv(94).ipName = "kBtu/ft2";
+        UnitConv(95).ipName = "kWh/m2";
+        UnitConv(96).ipName = "Invalid/Undefined";
+        UnitConv(97).ipName = "";
+        UnitConv(98).ipName = "Btu/h-F";
+        UnitConv(99).ipName = "day";
+        UnitConv(100).ipName = "min";
+        UnitConv(101).ipName = "hr/wk";
+        UnitConv(102).ipName = "$";
+        UnitConv(103).ipName = "$/unit energy";
+        UnitConv(104).ipName = "kW";
+        UnitConv(105).ipName = "lbWater/lbDryAir";
+        UnitConv(106).ipName = " ";
+        UnitConv(107).ipName = "Ah";
+        UnitConv(108).ipName = "clo";
+        UnitConv(109).ipName = "Btu/lbm-R";
+        UnitConv(110).ipName = "Btu/lbWater";
+        UnitConv(111).ipName = "lbWater/s";
+        UnitConv(112).ipName = "ppm";
+        UnitConv(113).ipName = "rad";
+        UnitConv(114).ipName = "rev/min";
+        UnitConv(115).ipName = "lbf-ft";
+        UnitConv(116).ipName = "Btu/W-h";
+        UnitConv(117).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -15836,26 +15836,26 @@ namespace OutputReportTabular {
         UnitConv(76).mult = 0.176085687;
         UnitConv(77).mult = 0.176085687;
         UnitConv(78).mult = 1.0;
-        UnitConv(79).mult = 1.8;
-        UnitConv(80).mult = 0.42956;
-        UnitConv(81).mult = 1.0 / 2118.6438;
-        UnitConv(82).mult = 1.0 / 15852;
-        UnitConv(83).mult = 1.0 / 10.764961;
-        UnitConv(84).mult = 0.00000094845 * 1000000000;
-        UnitConv(85).mult = 0.000000277778 * 1000000000;
+        UnitConv(79).mult = 1.0;
+        UnitConv(80).mult = 1.8;
+        UnitConv(81).mult = 0.42956;
+        UnitConv(82).mult = 1.0 / 2118.6438;
+        UnitConv(83).mult = 1.0 / 15852;
+        UnitConv(84).mult = 1.0 / 10.764961;
+        UnitConv(85).mult = 0.00000094845 * 1000000000;
         UnitConv(86).mult = 0.000000277778 * 1000000000;
-        UnitConv(87).mult = 0.0000000094845 * 1000000000;
-        UnitConv(88).mult = 0.00000000094845 * 1000000000;
-        UnitConv(89).mult = 0.000277777777777778 * 1000000000;
-        UnitConv(90).mult = 0.0000000789847 * 1000000000;
-        UnitConv(91).mult = 0.277777777777778 / 10.764961;
-        UnitConv(92).mult = 0.94708628903179 / 10.764961;
+        UnitConv(87).mult = 0.000000277778 * 1000000000;
+        UnitConv(88).mult = 0.0000000094845 * 1000000000;
+        UnitConv(89).mult = 0.00000000094845 * 1000000000;
+        UnitConv(90).mult = 0.000277777777777778 * 1000000000;
+        UnitConv(91).mult = 0.0000000789847 * 1000000000;
+        UnitConv(92).mult = 0.277777777777778 / 10.764961;
         UnitConv(93).mult = 0.94708628903179 / 10.764961;
-        UnitConv(94).mult = 0.27777777777778;
-        UnitConv(95).mult = 1.0;
+        UnitConv(94).mult = 0.94708628903179 / 10.764961;
+        UnitConv(95).mult = 0.27777777777778;
         UnitConv(96).mult = 1.0;
-        UnitConv(97).mult = 1.8987;
-        UnitConv(98).mult = 1.0;
+        UnitConv(97).mult = 1.0;
+        UnitConv(98).mult = 1.8987;
         UnitConv(99).mult = 1.0;
         UnitConv(100).mult = 1.0;
         UnitConv(101).mult = 1.0;
@@ -15865,20 +15865,21 @@ namespace OutputReportTabular {
         UnitConv(105).mult = 1.0;
         UnitConv(106).mult = 1.0;
         UnitConv(107).mult = 1.0;
-        UnitConv(108).mult = 0.000238845896627;
-        UnitConv(109).mult = 0.0000004302105;
-        UnitConv(110).mult = 2.2046;
-        UnitConv(111).mult = 1.0;
+        UnitConv(108).mult = 1.0;
+        UnitConv(109).mult = 0.000238845896627;
+        UnitConv(110).mult = 0.0000004302105;
+        UnitConv(111).mult = 2.2046;
         UnitConv(112).mult = 1.0;
         UnitConv(113).mult = 1.0;
-        UnitConv(114).mult = 0.737562149277;
-        UnitConv(115).mult = 1.0;
-        UnitConv(116).mult = 0.09290304;
+        UnitConv(114).mult = 1.0;
+        UnitConv(115).mult = 0.737562149277;
+        UnitConv(116).mult = 1.0;
+        UnitConv(117).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;
         UnitConv(25).offset = 7.6736;
-        UnitConv(80).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
+        UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
 
         UnitConv(20).hint = "ELEC";
         UnitConv(21).hint = "GAS";
@@ -15888,14 +15889,15 @@ namespace OutputReportTabular {
         UnitConv(52).hint = "WATER";
         UnitConv(67).hint = "ELEC";
         UnitConv(70).hint = "COOL";
-        UnitConv(82).hint = "WATER";
-        UnitConv(85).hint = "CONSUMP";
-        UnitConv(86).hint = "ELEC";
-        UnitConv(87).hint = "GAS";
-        UnitConv(90).hint = "COOL";
-        UnitConv(91).hint = "ELEC";
-        UnitConv(92).hint = "GAS";
-        UnitConv(92).hint = "ADDITIONAL";
+        UnitConv(79).hint = "SI";
+        UnitConv(83).hint = "WATER";
+        UnitConv(86).hint = "CONSUMP";
+        UnitConv(87).hint = "ELEC";
+        UnitConv(88).hint = "GAS";
+        UnitConv(91).hint = "COOL";
+        UnitConv(92).hint = "ELEC";
+        UnitConv(93).hint = "GAS";
+        UnitConv(93).hint = "ADDITIONAL";
 
         UnitConv(19).several = true;
         UnitConv(20).several = true;
@@ -15930,9 +15932,10 @@ namespace OutputReportTabular {
         UnitConv(70).several = true;
         UnitConv(74).several = true;
         UnitConv(75).several = true;
-        UnitConv(81).several = true;
+        UnitConv(78).several = true;
+        UnitConv(79).several = true;
         UnitConv(82).several = true;
-        UnitConv(84).several = true;
+        UnitConv(83).several = true;
         UnitConv(85).several = true;
         UnitConv(86).several = true;
         UnitConv(87).several = true;
@@ -15943,6 +15946,7 @@ namespace OutputReportTabular {
         UnitConv(92).several = true;
         UnitConv(93).several = true;
         UnitConv(94).several = true;
+        UnitConv(95).several = true;
     }
 
     std::string GetUnitSubString(std::string const &inString) // Input String

@@ -71,7 +71,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,9.0;
+  Version,9.1;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7412,7 +7412,8 @@
     PowerPerFlow,            !- Design Power Sizing Method
     348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
     1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
-    0.0;                     !- Design Minimum Flow Rate Fraction
+    0.0,                     !- Design Minimum Flow Rate Fraction
+    Pump Energy;             !- End-Use Subcategory
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
@@ -7448,7 +7449,8 @@
     ,                        !- Skin Loss Radiative Fraction
     PowerPerFlow,            !- Design Power Sizing Method
     301156.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
+    ,                        !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
+    Pump Energy;             !- End-Use Subcategory
 
   PlantEquipmentList,
     CoolSys1 Equipment List, !- Name

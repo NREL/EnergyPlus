@@ -4923,12 +4923,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSide,
                                             Furnace(FurnaceNum).BranchNum,
                                             Furnace(FurnaceNum).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -4950,12 +4950,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSide,
                                             Furnace(FurnaceNum).BranchNum,
                                             Furnace(FurnaceNum).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -4992,12 +4992,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSideSupp,
                                             Furnace(FurnaceNum).BranchNumSupp,
                                             Furnace(FurnaceNum).CompNumSupp,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5018,12 +5018,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSideSupp,
                                             Furnace(FurnaceNum).BranchNumSupp,
                                             Furnace(FurnaceNum).CompNumSupp,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }

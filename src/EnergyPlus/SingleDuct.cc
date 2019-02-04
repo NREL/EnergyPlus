@@ -2030,12 +2030,12 @@ namespace SingleDuct {
                                         Sys(SysNum).HWLoopSide,
                                         Sys(SysNum).HWBranchIndex,
                                         Sys(SysNum).HWCompIndex,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
 
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + Sys(SysNum).SysName + "\", type=" + Sys(SysNum).SysType);
