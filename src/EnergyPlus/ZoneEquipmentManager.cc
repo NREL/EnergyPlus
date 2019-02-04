@@ -56,13 +56,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
 #include <ChilledCeilingPanelSimple.hh>
 #include <CoolTower.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -4724,9 +4724,9 @@ namespace ZoneEquipmentManager {
                 }
 
                 for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
-
-                    if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0)
+                    if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
                         TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    }
                 }
 
                 // Include zone mixing mass flow rate
@@ -5533,8 +5533,9 @@ namespace ZoneEquipmentManager {
         if (AirFlowFlag != UseSimpleAirFlow) return;
         // AirflowNetwork Multizone field /= SIMPLE
         if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
             return;
+        }
 
         ManageEarthTube();
         ManageCoolTower();
@@ -5553,8 +5554,9 @@ namespace ZoneEquipmentManager {
 
         // Process the scheduled Ventilation for air heat balance
         if (TotVentilation > 0) {
-            for (auto &e : ZnAirRpt)
+            for (auto &e : ZnAirRpt) {
                 e.VentilFanElec = 0.0;
+            }
         }
 
         // Initialization of ZoneAirBalance
@@ -5592,7 +5594,9 @@ namespace ZoneEquipmentManager {
             if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
                 I = Ventilation(j).HybridControlMasterNum;
                 NH = Ventilation(I).ZonePtr;
-                if (j == I) Ventilation(j).HybridControlMasterStatus = false;
+                if (j == I) {
+                    Ventilation(j).HybridControlMasterStatus = false;
+                }
             } else {
                 I = j;
                 NH = NZ;

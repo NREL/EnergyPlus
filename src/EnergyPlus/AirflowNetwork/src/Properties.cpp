@@ -68,10 +68,10 @@ namespace AirflowNetwork {
         Real64 const c = -2.40977632412045e-8;
 
         if (T < LowerLimit) {
-            ShowWarningMessage("Air temperature out of limits for conductivity calculation");
+            ShowWarningMessage("Air temperature below lower limit of -20C for conductivity calculation");
             T = LowerLimit;
         } else if (T > UpperLimit) {
-            ShowWarningMessage("Air temperature out of limits for conductivity calculation");
+            ShowWarningMessage("Air temperature above upper limit of 70C for conductivity calculation");
             T = UpperLimit;
         }
 

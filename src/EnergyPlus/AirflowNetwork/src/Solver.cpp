@@ -251,10 +251,6 @@ namespace AirflowNetwork {
         PB = 101325.0;
         //   LIST = 5
         LIST = 0;
-        if (LIST >= 1) {
-            //Unit21 = GetNewUnitNumber();
-            //gio::open(Unit21, DataStringGlobals::outputAdsFileName);
-        }
 
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             ID(n) = n;
@@ -564,9 +560,9 @@ namespace AirflowNetwork {
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             n = AirflowNetworkLinkageData(i).NodeNums[0];
             m = AirflowNetworkLinkageData(i).NodeNums[1];
-            if (LIST >= 1) {
-                gio::write(Unit21, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
-            }
+            //if (LIST >= 1) {
+            //    gio::write(Unit21, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
+            //}
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
                 SUMAF(n) = SUMAF(n) - AFLOW(i);
                 SUMAF(m) += AFLOW(i);
@@ -575,9 +571,9 @@ namespace AirflowNetwork {
                 SUMAF(m) += AFLOW(i) + AFLOW2(i);
             }
         }
-        for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            if (LIST >= 1) gio::write(Unit21, Format_903) << "Room: " << n << PZ(n) << SUMAF(n) << properties[n].temperature;
-        }
+        //for (n = 1; n <= NetworkNumOfNodes; ++n) {
+        //    if (LIST >= 1) gio::write(Unit21, Format_903) << "Room: " << n << PZ(n) << SUMAF(n) << properties[n].temperature;
+        //}
 
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             if (AFLOW2(i) != 0.0) {

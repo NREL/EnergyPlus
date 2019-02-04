@@ -261,27 +261,11 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //     RE      - Reynolds number.
-        //     FL      - friction factor for laminar flow.
-        //     FT      - friction factor for turbulent flow.
-
         Real64 A0;
         Real64 A1;
         Real64 A2;
@@ -289,11 +273,10 @@ namespace AirflowNetwork {
         Real64 D;
         Real64 S2;
         Real64 CDM;
-        Real64 FL;
-        Real64 FT;
+        Real64 FL; // friction factor for laminar flow.
+        Real64 FT; // friction factor for turbulent flow.
         Real64 FTT;
-        Real64 RE;
-        // int CompNum;
+        Real64 RE; // Reynolds number.
         Real64 ed;
         Real64 ld;
         Real64 g;
@@ -427,21 +410,6 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
         Real64 FL;
@@ -455,7 +423,6 @@ namespace AirflowNetwork {
         Real64 VisAve;
         Real64 Tave;
         Real64 RhoCor;
-        // int CompNum;
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
@@ -558,21 +525,6 @@ namespace AirflowNetwork {
         // na
 
         // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -684,12 +636,6 @@ namespace AirflowNetwork {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int k;
         int k1;
@@ -785,28 +731,15 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const TOL(0.00001);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //     PRISE   - pressure rise (negative of pressure drop) (Pa).
         int j;
         int k;
         int L;
         Real64 DPDF;
-        Real64 PRISE;
+        Real64 PRISE; // pressure rise (negative of pressure drop) (Pa).
         Real64 BX;
         Real64 BY;
         Real64 CX;
@@ -926,21 +859,6 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 C;
 
@@ -1001,21 +919,6 @@ namespace AirflowNetwork {
         // na
 
         // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1146,7 +1049,6 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static Real64 const sqrt_2(std::sqrt(2.0));
 
         Real64 Width;
@@ -1568,38 +1470,19 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SQRT2(1.414213562373095);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //     DPMID   - pressure drop at mid-height of doorway.
-        //     DRHO    - difference in air densities between rooms.
-        //     Y       - height of neutral plane rel. to bottom of door (m).
-        //     F0      - flow factor at the bottom of the door.
-        //     FH      - flow factor at the top of the door.
-        //     DF0     - derivative factor at the bottom of the door.
-        //     DFH     - derivative factor at the top of the door.
-        Real64 DPMID;
+        Real64 DPMID; // pressure drop at mid-height of doorway.
         Real64 C;
-        Real64 DF0;
-        Real64 DFH;
-        Real64 DRHO;
+        Real64 DF0;   // derivative factor at the bottom of the door.
+        Real64 DFH;   // derivative factor at the top of the door.
+        Real64 DRHO;  // difference in air densities between rooms.
         Real64 GDRHO;
-        Real64 F0;
-        Real64 FH;
-        Real64 Y;
+        Real64 F0;    // flow factor at the bottom of the door.
+        Real64 FH;    // flow factor at the top of the door.
+        Real64 Y;     // height of neutral plane rel. to bottom of door (m).
         Real64 coeff;
         Real64 Width;
         Real64 Height;
@@ -1728,21 +1611,6 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Co;
         int k;
@@ -1799,20 +1667,8 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const sqrt_2(std::sqrt(2.0));
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -1900,12 +1756,6 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
@@ -1914,12 +1764,6 @@ namespace AirflowNetwork {
         Real64 const LamDynCoef(64.0);
         Real64 const LamFriCoef(0.0001);
         Real64 const TurDynCoef(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -1933,7 +1777,6 @@ namespace AirflowNetwork {
         Real64 FT;
         Real64 FTT;
         Real64 RE;
-        // int CompNum;
         Real64 ed;
         Real64 ld;
         Real64 g;
@@ -2075,9 +1918,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         using DataLoopNode::Node;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
@@ -2086,12 +1926,6 @@ namespace AirflowNetwork {
         Real64 const LamDynCoef(64.0);
         Real64 const LamFriCoef(0.0001);
         Real64 const TurDynCoef(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2105,7 +1939,6 @@ namespace AirflowNetwork {
         Real64 FT;
         Real64 FTT;
         Real64 RE;
-        // int CompNum;
         Real64 ed;
         Real64 ld;
         Real64 g;
@@ -2250,12 +2083,6 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
@@ -2264,12 +2091,6 @@ namespace AirflowNetwork {
         Real64 const LamDynCoef(64.0);
         Real64 const LamFriCoef(0.0001);
         Real64 const TurDynCoef(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2283,7 +2104,6 @@ namespace AirflowNetwork {
         Real64 FT;
         Real64 FTT;
         Real64 RE;
-        // int CompNum;
         Real64 ed;
         Real64 ld;
         Real64 g;
@@ -2412,18 +2232,6 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
         Real64 FL;
@@ -2437,7 +2245,6 @@ namespace AirflowNetwork {
         Real64 VisAve;
         Real64 Tave;
         Real64 RhoCor;
-        // int CompNum;
         // int InletNode;
 
         // Formats
@@ -2553,17 +2360,6 @@ namespace AirflowNetwork {
 
         // USE STATEMENTS:
         using DataGlobals::Pi;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhozAver;
@@ -2685,17 +2481,8 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -2811,17 +2598,8 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -2965,7 +2743,6 @@ namespace AirflowNetwork {
         MultizoneCompDetOpeningData.deallocate();
         MultizoneCompSimpleOpeningData.deallocate();
         MultizoneCompHorOpeningData.deallocate();
-        // MultizoneSurfaceStdConditionsCrackData.deallocate();
         MultizoneSurfaceCrackData.deallocate();
         MultizoneSurfaceELAData.deallocate();
         MultizoneExternalNodeData.deallocate();
