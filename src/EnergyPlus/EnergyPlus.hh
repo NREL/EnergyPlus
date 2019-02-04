@@ -60,12 +60,114 @@
 #define EP_UNUSED(expr)
 
 // ObjexxFCL
-namespace ObjexxFCL {
-namespace fmt {
-} // namespace fmt
-} // namespace ObjexxFCL
-using namespace ObjexxFCL;
-using namespace ObjexxFCL::fmt;
+#include <ObjexxFCL/Array1.fwd.hh>
+#include <ObjexxFCL/Array1A.fwd.hh>
+#include <ObjexxFCL/Array1D.fwd.hh>
+#include <ObjexxFCL/Array1S.fwd.hh>
+#include <ObjexxFCL/Array2.fwd.hh>
+#include <ObjexxFCL/Array2A.fwd.hh>
+#include <ObjexxFCL/Array2D.fwd.hh>
+#include <ObjexxFCL/Array2S.fwd.hh>
+#include <ObjexxFCL/Array3D.fwd.hh>
+#include <ObjexxFCL/Array4D.fwd.hh>
+#include <ObjexxFCL/Array5D.fwd.hh>
+#include <ObjexxFCL/Array6D.fwd.hh>
+
+#include <ObjexxFCL/IOFlags.fwd.hh>
+
+#include <ObjexxFCL/MArray1.fwd.hh>
+
+#include <ObjexxFCL/Optional.fwd.hh>
+
+#include <ObjexxFCL/Reference.fwd.hh>
+
+#include <ObjexxFCL/Vector2.fwd.hh>
+#include <ObjexxFCL/Vector3.fwd.hh>
+#include <ObjexxFCL/Vector4.fwd.hh>
+
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/bit.hh>
+#include <ObjexxFCL/string.functions.hh>
+
+// amespace ObjexxFCL {
+
+//} // namespace ObjexxFCL
+using ObjexxFCL::Array1;
+using ObjexxFCL::Array1_bool;
+using ObjexxFCL::Array1_string;
+using ObjexxFCL::Array1A;
+using ObjexxFCL::Array1A_bool;
+using ObjexxFCL::Array1A_int;
+using ObjexxFCL::Array1D;
+using ObjexxFCL::Array1D_bool;
+using ObjexxFCL::Array1D_int;
+using ObjexxFCL::Array1D_string;
+using ObjexxFCL::Array1S;
+using ObjexxFCL::Array1S_bool;
+using ObjexxFCL::Array1S_int;
+using ObjexxFCL::Array1S_string;
+using ObjexxFCL::Array2;
+using ObjexxFCL::Array2A;
+using ObjexxFCL::Array2A_bool;
+using ObjexxFCL::Array2D;
+using ObjexxFCL::Array2D_bool;
+using ObjexxFCL::Array2D_int;
+using ObjexxFCL::Array2D_string;
+using ObjexxFCL::Array2S;
+using ObjexxFCL::Array2S_bool;
+using ObjexxFCL::Array2S_int;
+using ObjexxFCL::Array2S_string;
+using ObjexxFCL::Array3D;
+using ObjexxFCL::Array3D_int;
+
+using ObjexxFCL::Array4D;
+// using ObjexxFCL::Array4D_bool;
+using ObjexxFCL::Array4D_int;
+
+using ObjexxFCL::Array5D;
+
+using ObjexxFCL::Array6D;
+
+using ObjexxFCL::IOFlags;
+
+using ObjexxFCL::MArray1;
+
+using ObjexxFCL::_;
+using ObjexxFCL::Optional;
+using ObjexxFCL::Optional_bool;
+using ObjexxFCL::Optional_bool_const;
+using ObjexxFCL::Optional_int;
+using ObjexxFCL::Optional_int_const;
+using ObjexxFCL::Optional_string;
+using ObjexxFCL::Optional_string_const;
+
+using ObjexxFCL::Reference;
+using ObjexxFCL::Reference_bool;
+using ObjexxFCL::Reference_int;
+
+using ObjexxFCL::Vector2;
+using ObjexxFCL::Vector3;
+using ObjexxFCL::Vector4;
+
+using ObjexxFCL::max;
+using ObjexxFCL::min;
+using ObjexxFCL::mod;
+using ObjexxFCL::pow_2;
+using ObjexxFCL::pow_3;
+using ObjexxFCL::pow_4;
+using ObjexxFCL::pow_5;
+using ObjexxFCL::sign;
+
+// using ObjexxFCL::bit::bit;
+using ObjexxFCL::equali;
+using ObjexxFCL::index;
+using ObjexxFCL::len;
+using ObjexxFCL::reshape2;
+using ObjexxFCL::strip;
+using ObjexxFCL::stripped;
+using ObjexxFCL::bit::bit_shift;
+using ObjexxFCL::bit::bit_transfer;
 
 // Types
 typedef std::int32_t Int32;
