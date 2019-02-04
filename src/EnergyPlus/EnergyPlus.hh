@@ -72,16 +72,11 @@
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/Array6D.fwd.hh>
-
 #include <ObjexxFCL/IOFlags.fwd.hh>
-
 #include <ObjexxFCL/MArray1.fwd.hh>
-
 #include <ObjexxFCL/Omit.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
-
 #include <ObjexxFCL/Reference.fwd.hh>
-
 #include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 #include <ObjexxFCL/Vector4.fwd.hh>
@@ -89,6 +84,7 @@
 namespace ObjexxFCL {
 extern Omit const _;
 } // namespace ObjexxFCL
+using ObjexxFCL::_;
 
 using ObjexxFCL::Array1;
 using ObjexxFCL::Array1_bool;
@@ -122,20 +118,12 @@ using ObjexxFCL::Array2S_string;
 using ObjexxFCL::Array3D;
 using ObjexxFCL::Array3D_bool;
 using ObjexxFCL::Array3D_int;
-
 using ObjexxFCL::Array4D;
-// using ObjexxFCL::Array4D_bool;
 using ObjexxFCL::Array4D_int;
-
 using ObjexxFCL::Array5D;
-
 using ObjexxFCL::Array6D;
-
 using ObjexxFCL::IOFlags;
-
 using ObjexxFCL::MArray1;
-
-using ObjexxFCL::_;
 using ObjexxFCL::Optional;
 using ObjexxFCL::Optional_bool;
 using ObjexxFCL::Optional_bool_const;
@@ -143,16 +131,14 @@ using ObjexxFCL::Optional_int;
 using ObjexxFCL::Optional_int_const;
 using ObjexxFCL::Optional_string;
 using ObjexxFCL::Optional_string_const;
-
 using ObjexxFCL::Reference;
 using ObjexxFCL::Reference_bool;
 using ObjexxFCL::Reference_int;
-
 using ObjexxFCL::Vector2;
 using ObjexxFCL::Vector3;
 using ObjexxFCL::Vector4;
 
-// Functions
+// ObjexxFCL Functions
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/bit.hh>
