@@ -2679,7 +2679,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
         delimited_string({
 
             // General Stuff
-            "Version, 9.0;",
+            "Version, 9.1;",
 
             "Timestep, 4;",
 
@@ -3086,7 +3086,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
         delimited_string({
 
             // General Stuff
-            "Version, 9.0;",
+            "Version, 9.1;",
 
             "Timestep, 4;",
 

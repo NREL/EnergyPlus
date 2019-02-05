@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "  Zone,",
         "    SPACE2-1,                !- Name",

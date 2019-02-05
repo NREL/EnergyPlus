@@ -1327,12 +1327,12 @@ namespace WaterUse {
                                         WaterConnections(WaterConnNum).PlantLoopSide,
                                         WaterConnections(WaterConnNum).PlantLoopBranchNum,
                                         WaterConnections(WaterConnNum).PlantLoopCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);                                                        // DSU | DSU | DSU | DSU | DSU | DSU | DSU
+                                        _);                                                        // DSU | DSU | DSU | DSU | DSU | DSU | DSU
                 if (errFlag) {                                                                           // DSU
                     ShowFatalError("InitConnections: Program terminated due to previous condition(s)."); // DSU
                 }                                                                                        // DSU

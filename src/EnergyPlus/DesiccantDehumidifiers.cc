@@ -1768,12 +1768,12 @@ namespace DesiccantDehumidifiers {
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
                                             DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
                     if (ErrorFlag) {
                         ShowFatalError("InitDesiccantDehumidifier: Program terminated for previous conditions.");
                     }
@@ -1798,12 +1798,12 @@ namespace DesiccantDehumidifiers {
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
                                             DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
 
                     if (ErrorFlag) {
                         ShowFatalError("InitDesiccantDehumidifier: Program terminated for previous conditions.");

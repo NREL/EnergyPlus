@@ -381,12 +381,12 @@ namespace PlantComponentTemperatureSources {
                                     WaterSource(SourceNum).Location.loopSideNum,
                                     WaterSource(SourceNum).Location.branchNum,
                                     WaterSource(SourceNum).Location.compNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     WaterSource(SourceNum).InletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
             }
