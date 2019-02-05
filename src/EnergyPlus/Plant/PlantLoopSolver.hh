@@ -85,20 +85,7 @@ namespace PlantLoopSolver {
     struct PlantLoopSolverClass
     {
 
-        struct m_FlowControlValidator
-        {
-            // Members
-            bool Valid;          // Assume true
-            Location ErrorPoint; // Branch where the error was thrown
-            std::string Reason;  // Brief description of error
-
-            // Default Constructor
-            m_FlowControlValidator() : Valid(true)
-            {
-            }
-        };
-
-        m_FlowControlValidator ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
+        void ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
 
         Real64 SetupLoopFlowRequest(int const LoopNum, int const ThisSide, int const OtherSide);
 
@@ -113,13 +100,14 @@ namespace PlantLoopSolver {
                                          int const LastBranchNum,
                                          Real64 const FlowRequest,
                                          bool const FirstHVACIteration,
-                                         bool &LoopShutDownFlag,
-                                         bool const StartingNewLoopSidePass = false);
+                                         bool &LoopShutDownFlag);
 
         void SimulateAllLoopSidePumps(int const LoopNum,
                                       int const ThisSide,
                                       Optional<Location const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
+
+        void SimulateSinglePump(Location const SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         Real64 CalcOtherSideDemand(int const LoopNum, int const ThisSide, Real64 ThisLoopSideFlow);
 

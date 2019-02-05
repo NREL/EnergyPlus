@@ -1940,12 +1940,12 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad()
                                                     g->cogenLocation.loopSideNum,
                                                     g->cogenLocation.branchNum,
                                                     g->cogenLocation.compNum,
+                                                    plantNotFound,
                                                     _,
                                                     _,
                                                     _,
                                                     _,
-                                                    _,
-                                                    plantNotFound);
+                                                    _);
             if (!plantNotFound) g->plantInfoFound = true;
         }
         myCoGenSetupFlag_ = false;

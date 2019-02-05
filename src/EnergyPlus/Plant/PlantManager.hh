@@ -86,8 +86,8 @@ namespace PlantManager {
         std::string ConnectList;        // Connector list name for the half loop
         int TotalBranches;              // Total number of branches on the loop
         Array1D<BranchData> Branch;     // Branch data
-        Array1D<SplitterData> Splitter; // Data for splitter on branch (if any)
-        Array1D<MixerData> Mixer;       // Data for mixer on branch (if any)
+        SplitterData Splitter; // Data for splitter on branch (if any)
+        MixerData Mixer;       // Data for mixer on branch (if any)
         bool SplitterExists;            // Logical Flag indication splitter exists in the half loop
         bool MixerExists;               // Logical Flag indication mixer exists in the half loop
         bool BypassExists;

@@ -854,12 +854,12 @@ namespace SwimmingPool {
                                         Pool(PoolNum).HWLoopSide,
                                         Pool(PoolNum).HWBranchNum,
                                         Pool(PoolNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         Pool(PoolNum).WaterInletNode,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
                 }
