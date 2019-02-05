@@ -116,6 +116,7 @@ namespace OutputReportPredefined {
     int pdchPumpFlow;
     int pdchPumpPower;
     int pdchPumpPwrPerFlow;
+    int pdchPumpEndUse;
     int pdchMotEff;
     // Cooling coil subtable
     int pdstCoolCoil;
@@ -932,6 +933,7 @@ namespace OutputReportPredefined {
         pdchPumpFlow = 0;
         pdchPumpPower = 0;
         pdchPumpPwrPerFlow = 0;
+        pdchPumpEndUse = 0;
         pdchMotEff = 0;
         pdstCoolCoil = 0;
         pdchCoolCoilType = 0;
@@ -1782,6 +1784,8 @@ namespace OutputReportPredefined {
         pdchMechType = newPreDefColumn(pdstMech, "Type");
         pdchMechNomCap = newPreDefColumn(pdstMech, "Nominal Capacity [W]");
         pdchMechNomEff = newPreDefColumn(pdstMech, "Nominal Efficiency [W/W]");
+        // Note: We don't want any of these to convert.
+        // The Btu/W-h isn't going to convert anyways, and the W/W will convert to W/W since it has "SI" in the string as a hint
         pdchMechIPLVSI = newPreDefColumn(pdstMech, "IPLV in SI Units [W/W]");
         pdchMechIPLVIP = newPreDefColumn(pdstMech, "IPLV in IP Units [Btu/W-h]");
 
@@ -1886,6 +1890,7 @@ namespace OutputReportPredefined {
         pdchPumpPower = newPreDefColumn(pdstPump, "Electric Power [W]");
         pdchPumpPwrPerFlow = newPreDefColumn(pdstPump, "Power Per Water Flow Rate [W-s/m3]");
         pdchMotEff = newPreDefColumn(pdstPump, "Motor Efficiency [W/W]");
+        pdchPumpEndUse = newPreDefColumn(pdstPump, "End Use Subcategory");
 
         pdstSWH = newPreDefSubTable(pdrEquip, "Service Water Heating");
         pdchSWHType = newPreDefColumn(pdstSWH, "Type");

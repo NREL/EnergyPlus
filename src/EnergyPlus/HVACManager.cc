@@ -891,7 +891,7 @@ namespace HVACManager {
                 SimAirLoopsFlag = true;
             }
             if (HVACManageIteration < MinAirLoopIterationsAfterFirst) {
-                // sequenced zone loads only work if there are at least two iterations after FirstHVACIteraion
+                // sequenced zone loads for airloops may require extra iterations depending upon zone equipment order and load distribution type
                 SimAirLoopsFlag = true;
                 SimZoneEquipmentFlag = true;
             }
