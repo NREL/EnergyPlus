@@ -4,7 +4,7 @@ import json
 import re
 import os
 
-IDD_PATH = os.path.abspath('../../idd/Energy+.idd.in')
+IDD_PATH = os.path.abspath('idd/Energy+.idd.in')
 
 
 def check_for_stray_fields(idd_path):
