@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.4;",
-
         "Zone,",
         "  Space;                   !- Name",
 
@@ -161,8 +159,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
-
         "  Zone,",
         "    SPACE1-1,                !- Name",
         "    0,                       !- Direction of Relative North {deg}",
@@ -451,8 +447,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.4;",
-
         "Zone,",
         "  Space;                   !- Name",
 

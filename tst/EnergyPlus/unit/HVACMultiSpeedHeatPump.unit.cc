@@ -103,8 +103,6 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,8.4;",
-
         "!-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========",
 
         "  ZoneControl:Thermostat,",

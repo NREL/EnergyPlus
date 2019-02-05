@@ -103,7 +103,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     Real64 RegCoilCapacity(0.0);
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
 
         "  Building,",
         "    Building,                !- Name",
@@ -2866,8 +2865,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,8.4;",
-
         "  Timestep,6;",
 
         "  Building,",
@@ -4047,8 +4044,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     Real64 RegCoilCapacity(0.0);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,8.4;",
 
         "  Timestep,6;",
 

@@ -78,7 +78,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 {
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Coil:Cooling:Water,",
         "	Chilled Water Coil,	!- Name",
         "	AvailSched,			!- Availability Schedule Name",
@@ -273,8 +272,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Coil:Cooling:Water,",
         "    Main Cooling Coil 1,     !- Name",
         "    CoolingCoilAvailSched,   !- Availability Schedule Name",
@@ -455,8 +452,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA Sys 1 Controllers,    !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",
@@ -558,8 +553,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA System Controllers,   !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",

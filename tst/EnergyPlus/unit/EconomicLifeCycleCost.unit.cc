@@ -69,7 +69,6 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "  LifeCycleCost:Parameters,                                           ",
         "    TypicalLCC,              !- Name                                  ",
         "    EndOfYear,               !- Discounting Convention                ",

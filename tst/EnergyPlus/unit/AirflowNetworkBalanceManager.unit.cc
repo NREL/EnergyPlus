@@ -154,7 +154,6 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSch)
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,Aula people sched,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -279,7 +278,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,Aula people sched,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -364,7 +362,6 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     int i;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
         "    0,                       !- North Axis {deg}",
@@ -2390,7 +2387,6 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
     People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,FreeRunningSeason,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -2808,7 +2804,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows)
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,Aula people sched,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -4524,8 +4519,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 TEST_F(EnergyPlusFixture, TestWindPressureTable)
 {
     // Test a Table:OneIV object as a wind pressure curve
-    std::string const idf_objects = delimited_string({"Version,8.6;",
-                                                      "Table:OneIndependentVariable,",
+    std::string const idf_objects = delimited_string({"Table:OneIndependentVariable,",
                                                       "  EFacade_WPCCurve,        !- Name",
                                                       "  Linear,                  !- Curve Type",
                                                       "  LinearInterpolationOfTable,  !- Interpolation Method",
@@ -4615,8 +4609,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
 TEST_F(EnergyPlusFixture, TestWPCValue)
 {
     // Test loading a WPC object into a Table:OneIV
-    std::string const idf_objects = delimited_string({"Version,8.6;",
-                                                      "AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
+    std::string const idf_objects = delimited_string({"AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
                                                       "  Every 30 Degrees,        !- Name",
                                                       "  0,                       !- Wind Direction 1 {deg}",
                                                       "  30,                      !- Wind Direction 2 {deg}",
@@ -4695,7 +4688,7 @@ TEST_F(EnergyPlusFixture, TestWPCValue)
 TEST_F(EnergyPlusFixture, TestExternalNodes)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.6;", "Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
+        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
          "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
          "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
          "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
@@ -5408,7 +5401,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.6;", "Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
+        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
          "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
          "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
          "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
@@ -5756,8 +5749,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.6;",
-         "Curve:Quartic,",
+        {"Curve:Quartic,",
          "  WindPressureFit,         !- Name",
          "  0.592,                   !- Coefficient1 Constant",
          "  0.0148,                  !- Coefficient2 x",
@@ -6392,7 +6384,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.6;", "Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
+        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
          "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
          "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
          "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
@@ -6729,8 +6721,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.6;",
-         "Curve:Quartic,",
+        {"Curve:Quartic,",
          "  WindPressureFit,         !- Name",
          "  0.592,                   !- Coefficient1 Constant",
          "  0.0148,                  !- Coefficient2 x",
@@ -8507,8 +8498,6 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 {
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,8.9;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
