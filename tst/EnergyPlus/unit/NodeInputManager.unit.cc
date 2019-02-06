@@ -70,8 +70,6 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "OutdoorAir:Node, Test node;",
 
         "EnergyManagementSystem:Sensor,",

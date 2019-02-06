@@ -83,7 +83,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  AirTerminal:SingleDuct:SeriesPIU:Reheat,",
         "    SPACE1-1 VAV Reheat,     !- Name",
         "    ReheatCoilAvailSched,    !- Availability Schedule Name",
@@ -205,7 +204,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  AirTerminal:SingleDuct:SeriesPIU:Reheat,",
         "    SPACE1-1 PIU Reheat,     !- Name",
         "    ReheatCoilAvailSched,    !- Availability Schedule Name",
@@ -317,9 +315,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 {
 
     std::string const idf_objects = delimited_string({
-
-        "Version,",
-        "    8.9;                     !- Version Identifier",
 
         "SimulationControl,",
         "    Yes,                     !- Do Zone Sizing Calculation",

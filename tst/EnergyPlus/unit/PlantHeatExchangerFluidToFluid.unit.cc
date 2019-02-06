@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     // to 20.
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
-
         "Building,",
         "Plant Load Profile Example,  !- Name",
         "    0.0,                     !- North Axis {deg}",
@@ -1173,8 +1171,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     // still heats up to 20.
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
-
         "Building,",
         "Plant Load Profile Example,  !- Name",
         "    0.0,                     !- North Axis {deg}",

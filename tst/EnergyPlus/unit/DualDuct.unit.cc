@@ -140,7 +140,6 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		bool ErrorsFound( false );
 //
 //		std::string const idf_objects = delimited_string( {
-//			"Version, 8.9;",
 //			// Dual Duct CV
 //			"  ZoneHVAC:AirDistributionUnit,",
 //			"    ADU DualDuctCV,                   !- Name",

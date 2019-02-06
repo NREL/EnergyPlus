@@ -452,8 +452,6 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  Building,",
         "    NONE,                    !- Name",
         "    0.0000000E+00,           !- North Axis {deg}",

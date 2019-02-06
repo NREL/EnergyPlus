@@ -215,12 +215,11 @@ TEST_F(EnergyPlusFixture, TestAnyPlantSplitterMixerLacksContinuity)
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).NodeNumOut = 2;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(2).NodeNumOut = 3;
     DataPlant::PlantLoop(1).LoopSide(2).SplitterExists = true;
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter(1).NodeNumIn = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter(1).TotalOutletNodes = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter(1).BranchNumOut.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter(1).BranchNumOut(1) = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Splitter(1).BranchNumOut(2) = 2;
+    DataPlant::PlantLoop(1).LoopSide(2).Splitter.NodeNumIn = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Splitter.TotalOutletNodes = 2;
+    DataPlant::PlantLoop(1).LoopSide(2).Splitter.BranchNumOut.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(1) = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(2) = 2;
 
     DataLoopNode::Node.allocate(3);
 
