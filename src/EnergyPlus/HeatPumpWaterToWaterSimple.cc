@@ -645,45 +645,6 @@ namespace HeatPumpWaterToWaterSimple {
                                 "Average",
                                 GSHP(GSHPNum).Name);
 
-            // scan for loop connection data
-            errFlag = false;
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
-                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                    GSHP(GSHPNum).SourceLoopNum,
-                                    GSHP(GSHPNum).SourceLoopSideNum,
-                                    GSHP(GSHPNum).SourceBranchNum,
-                                    GSHP(GSHPNum).SourceCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _);
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
-                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                    GSHP(GSHPNum).LoadLoopNum,
-                                    GSHP(GSHPNum).LoadLoopSideNum,
-                                    GSHP(GSHPNum).LoadBranchNum,
-                                    GSHP(GSHPNum).LoadCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _);
-
-            if (!errFlag) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
-                                                              GSHP(GSHPNum).LoadLoopSideNum,
-                                                              GSHP(GSHPNum).SourceLoopNum,
-                                                              GSHP(GSHPNum).SourceLoopSideNum,
-                                                              GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                                              true);
-            }
-
-            if (errFlag) {
-                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
-            }
         }
     }
 
@@ -753,24 +714,24 @@ namespace HeatPumpWaterToWaterSimple {
                                                     this->SourceLoopSideNum,
                                                     this->SourceBranchNum,
                                                     this->SourceCompNum,
+                                                    errFlag,
                                                     _,
                                                     _,
                                                     _,
                                                     this->SourceSideInletNodeNum,
-                                                    _,
-                                                    errFlag);
+                                                    _);
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->LoadLoopNum,
                                                     this->LoadLoopSideNum,
                                                     this->LoadBranchNum,
                                                     this->LoadCompNum,
+                                                    errFlag,
                                                     _,
                                                     _,
                                                     _,
                                                     this->LoadSideInletNodeNum,
-                                                    _,
-                                                    errFlag);
+                                                    _);
 
             if (!errFlag) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(

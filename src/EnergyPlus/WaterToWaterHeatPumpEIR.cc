@@ -324,12 +324,12 @@ namespace EnergyPlus {
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         this->loadSideNodes.inlet,
-                                                        _,
-                                                        errFlag);
+                                                        _);
 
                 if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // throw error
                     ShowSevereError(routineName + ": Invalid connections for " +
@@ -345,12 +345,12 @@ namespace EnergyPlus {
                                                         this->sourceSideLocation.loopSideNum,
                                                         this->sourceSideLocation.branchNum,
                                                         this->sourceSideLocation.compNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         this->sourceSideNodes.inlet,
-                                                        _,
-                                                        errFlag);
+                                                        _);
 
                 if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // throw error
                     ShowSevereError(routineName + ": Invalid connections for " +
