@@ -176,8 +176,6 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
-
         "  Fan:OnOff,",
         "    ERV Supply Fan,          !- Name",
         "    FanAndCoilAvailSched,    !- Availability Schedule Name",
