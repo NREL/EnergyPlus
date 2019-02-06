@@ -375,7 +375,7 @@ namespace PlantPipingSystemsManager {
                             // Zone interface cells
                             if (thisDomain.Cells(X, Ymax, Z).cellType == CellType::ZoneGroundInterface) {
                                 thisDomain.WeightingFactor(X, Z) =
-                                    abs((ZoneTemp - thisDomain.Cells(X, Ymax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
+                                    std::abs((ZoneTemp - thisDomain.Cells(X, Ymax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
                             }
                         }
                     }

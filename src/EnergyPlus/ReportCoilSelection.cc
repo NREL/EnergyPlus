@@ -1646,7 +1646,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     // calc sensible capacity from inlet outlet
     c->cpMoistAir = Psychrometrics::PsyCpAirFnWTdb(c->coilDesLvgHumRat, 0.5 * (c->coilDesEntTemp + c->coilDesLvgTemp));
     // this is not generally correct but okay for heating coils
-    c->coilSensCapAtPeak = abs(c->cpMoistAir * c->coilDesMassFlow * (c->coilDesLvgTemp - c->coilDesEntTemp));
+    c->coilSensCapAtPeak = std::abs(c->cpMoistAir * c->coilDesMassFlow * (c->coilDesLvgTemp - c->coilDesEntTemp));
     c->coilSensCapAtPeak = min(c->coilSensCapAtPeak, c->coilTotCapAtPeak);
 }
 

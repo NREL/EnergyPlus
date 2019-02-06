@@ -5830,7 +5830,7 @@ namespace SingleDuct {
             MixedAirMassFlowRate = Node(SysATMixer(SysNum).MixedAirOutNode).MassFlowRate;
             SecAirMassFlowRate = max(MixedAirMassFlowRate - PriMassFlowRate, 0.0);
             Node(SysATMixer(SysNum).SecInNode).MassFlowRate = SecAirMassFlowRate;
-            if (abs(PriMassFlowRate + SecAirMassFlowRate - MixedAirMassFlowRate) > SmallMassFlow) {
+            if (std::abs(PriMassFlowRate + SecAirMassFlowRate - MixedAirMassFlowRate) > SmallMassFlow) {
                 ShowSevereError("CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + SysATMixer(SysNum).Name);
                 ShowContinueErrorTimeStamp("Primary mass flow rate=" + General::RoundSigDigits(PriMassFlowRate, 6) +
                                            "Secondary mass flow rate=" + General::RoundSigDigits(SecAirMassFlowRate, 6) +

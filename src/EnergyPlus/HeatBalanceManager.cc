@@ -2114,7 +2114,7 @@ namespace HeatBalanceManager {
                                 ShowContinueError(cAlphaFieldNames(5) +
                                                   " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
                             }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
+                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                                 ErrorsFound = true;
                                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
                                                 "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
@@ -2170,7 +2170,7 @@ namespace HeatBalanceManager {
                                 ShowContinueError(cAlphaFieldNames(5) +
                                                   " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
                             }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
+                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                                 ErrorsFound = true;
                                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
                                                 "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
@@ -2226,7 +2226,7 @@ namespace HeatBalanceManager {
                                 ShowContinueError(cAlphaFieldNames(5) +
                                                   " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
                             }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
+                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                                 ErrorsFound = true;
                                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
                                                 "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");

@@ -508,7 +508,7 @@ namespace RoomAirModelAirflowNetwork {
 
                     // Check fraction to ensure sum = 1.0 for every equipment
                     for (I = 1; I <= ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
-                        if (abs(SupplyFrac(I) - 1.0) > 0.001) {
+                        if (std::abs(SupplyFrac(I) - 1.0) > 0.001) {
                             ShowSevereError("GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0");
                             ShowContinueError("Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
@@ -516,7 +516,7 @@ namespace RoomAirModelAirflowNetwork {
                             ShowContinueError("The sum of fractions entered = " + RoundSigDigits(SupplyFrac(I), 3));
                             ErrorsFound = true;
                         }
-                        if (abs(ReturnFrac(I) - 1.0) > 0.001) {
+                        if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
                             ShowSevereError("GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0");
                             ShowContinueError("Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");

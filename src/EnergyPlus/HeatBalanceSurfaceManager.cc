@@ -6193,8 +6193,8 @@ namespace HeatBalanceSurfaceManager {
                                               QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                  (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                  (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                             if (construct.SourceSinkPresent) {
                                 TempSurfInTmp(SurfNum) =
                                     (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum)) *
@@ -6303,8 +6303,8 @@ namespace HeatBalanceSurfaceManager {
                                                       (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                                 Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                                 // Calculate the current inside surface temperature
-                                if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                          (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                                if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                          (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                                     if (construct.SourceSinkPresent) {
                                         TempSurfInTmp(SurfNum) =
                                             (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum) +

@@ -800,7 +800,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Check continuity of both curves at boundary point
                 if (OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && OccupantVentilationControl(i).ComfortHighTempCurveNum) {
-                    if (abs(CurveValue(OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
+                    if (std::abs(CurveValue(OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
                             CurveValue(OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
@@ -6779,7 +6779,7 @@ namespace AirflowNetworkBalanceManager {
 
                     // Calculate convection coefficient if one or both not present
                     if (DisSysCompDuctData(TypeNum).InsideConvCoeff == 0 && DisSysCompDuctData(TypeNum).OutsideConvCoeff == 0) {
-                        while (abs(UThermal - UThermal_iter) > tolerance) {
+                        while (std::abs(UThermal - UThermal_iter) > tolerance) {
                             UThermal_iter = UThermal;
 
                             Real64 RThermConvIn = CalcDuctInsideConvResist(
@@ -6827,7 +6827,7 @@ namespace AirflowNetworkBalanceManager {
                     Real64 Tin_ave = Tin;
                     Real64 hOut = 0;
 
-                    while (abs(UThermal - UThermal_iter) > tolerance) {
+                    while (std::abs(UThermal - UThermal_iter) > tolerance) {
                         UThermal_iter = UThermal;
 
                         Real64 RThermConvIn = CalcDuctInsideConvResist(
@@ -6904,7 +6904,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                     VFObj.QConv = hOut * DuctSurfArea * (TDuctSurf - Tamb);
-                    UThermal = (VFObj.QRad + VFObj.QConv) / (DuctSurfArea * abs(Tsurr - Tin));
+                    UThermal = (VFObj.QRad + VFObj.QConv) / (DuctSurfArea * std::abs(Tsurr - Tin));
                 }
 
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {

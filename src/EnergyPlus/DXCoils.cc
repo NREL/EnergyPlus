@@ -11428,7 +11428,7 @@ namespace DXCoils {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 } else if ((Error < 0.0) && (ErrorLast > 0.0)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
-                } else if (abs(Error) > abs(ErrorLast)) {
+                } else if (std::abs(Error) > std::abs(ErrorLast)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 }
                 ErrorLast = Error;

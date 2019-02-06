@@ -5149,8 +5149,8 @@ namespace ZoneTempPredictorCorrector {
 
                         InfilVolumeOADensityHM = (MCPIHM / CpAir / AirDensity) * TimeStepZone * SecInHour;
 
-                        if (abs(Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp) > 5.0 &&
-                            abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) < 0.1) { // Filter
+                        if (std::abs(Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp) > 5.0 &&
+                            std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) < 0.1) { // Filter
                             InfilOAACHHM = InfilVolumeOADensityHM / (TimeStepZone * Zone(ZoneNum).Volume);
                             InfilOAACHHM = max(0.0, min(10.0, InfilOAACHHM)); // ACH max 10, min 0
                         } else {
@@ -5186,7 +5186,7 @@ namespace ZoneTempPredictorCorrector {
                         }
 
                         // Calculate multiplier
-                        if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
+                        if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                             MultpHM = AirCapHM /
                                       (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                        PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) *

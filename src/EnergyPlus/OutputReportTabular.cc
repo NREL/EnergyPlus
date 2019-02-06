@@ -8003,7 +8003,7 @@ namespace OutputReportTabular {
                 for (int jUse = 1; jUse <= 14; ++jUse) {
                     curTotal += useVal(iResource, jUse);
                 }
-                if (abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
+                if (std::abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
                     ShowWarningError(ResourceWarningMessage(columnHead(iResource)));
                 }
             }

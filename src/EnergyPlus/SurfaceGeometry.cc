@@ -10259,7 +10259,7 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (foundWallHeight) {
-                    if (abs(maxZ - wallHeightZ) > 0.0254) { //  2.54 cm = 1 inch
+                    if (std::abs(maxZ - wallHeightZ) > 0.0254) { //  2.54 cm = 1 inch
                         areWlHgtSame = false;
                         break;
                     }
@@ -10284,15 +10284,15 @@ namespace SurfaceGeometry {
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
             if (Surface(curSurfNum).Class == SurfaceClass_Floor) {
-                if (abs(Surface(curSurfNum).Tilt - 180.) > 1.) { // with 1 degree angle
+                if (std::abs(Surface(curSurfNum).Tilt - 180.) > 1.) { // with 1 degree angle
                     isFlrHoriz = false;
                 }
             } else if (Surface(curSurfNum).Class == SurfaceClass_Roof) { // includes ceilings
-                if (abs(Surface(curSurfNum).Tilt) > 1.) {                // with 1 degree angle of
+                if (std::abs(Surface(curSurfNum).Tilt) > 1.) {                // with 1 degree angle of
                     isClgHoriz = false;
                 }
             } else if (Surface(curSurfNum).Class == SurfaceClass_Wall) {
-                if (abs(Surface(curSurfNum).Tilt - 90) > 1.) { // with 1 degree angle
+                if (std::abs(Surface(curSurfNum).Tilt - 90) > 1.) { // with 1 degree angle
                     areWlVert = false;
                 }
             }
@@ -10351,7 +10351,7 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (abs(Surface(curSurfNum).Azimuth - azimuth) < 1.) {
+            if (std::abs(Surface(curSurfNum).Azimuth - azimuth) < 1.) {
                 facingAzimuth.emplace_back(iFace);
             }
         }
@@ -10372,8 +10372,8 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if ((zonePoly.SurfaceFace(iFace).NSides == selectedNumCorners) && (abs(Surface(curSurfNum).Area - selectedArea) < 0.01) &&
-                (abs(Surface(curSurfNum).Azimuth - oppositeAzimuth) < 1.)) {
+            if ((zonePoly.SurfaceFace(iFace).NSides == selectedNumCorners) && (std::abs(Surface(curSurfNum).Area - selectedArea) < 0.01) &&
+                (std::abs(Surface(curSurfNum).Azimuth - oppositeAzimuth) < 1.)) {
                 found = iFace;
                 break;
             }
@@ -10397,7 +10397,7 @@ namespace SurfaceGeometry {
                 if (iVertex == 1) {
                     firstDistance = curDistBetwCorners;
                 } else {
-                    if (abs(curDistBetwCorners - firstDistance) > tol) {
+                    if (std::abs(curDistBetwCorners - firstDistance) > tol) {
                         allAreEquidistant = false;
                         break;
                     }
@@ -10416,7 +10416,7 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
 
         Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((abs(v1.x - v2.x) < tol) && (abs(v1.y - v2.y) < tol) && (abs(v1.z - v2.z) < tol));
+        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol) && (std::abs(v1.z - v2.z) < tol));
     }
 
     // test if two points on a plane are in the same position based on a small tolerance
@@ -10425,7 +10425,7 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
 
         Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((abs(v1.x - v2.x) < tol) && (abs(v1.y - v2.y) < tol));
+        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
     }
 
     // test if two points on a plane are in the same position based on a small tolerance (based on Vector2dCount comparison)
@@ -10434,7 +10434,7 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
 
         Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((abs(v1.x - v2.x) < tol) && (abs(v1.y - v2.y) < tol));
+        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
     }
 
     // returns the index of vertex in a list that is in the same position in space as the given vertex
@@ -10464,7 +10464,7 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
 
         Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return (abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
     }
 
     void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
@@ -12785,7 +12785,7 @@ namespace SurfaceGeometry {
             Vect32 = VecNormalize(Surface(ThisSurf).Vertex(3) - Surface(ThisSurf).Vertex(2));
             Vect21 = VecNormalize(Surface(ThisSurf).Vertex(2) - Surface(ThisSurf).Vertex(1));
             DotProd = dot(Vect32, Vect21);
-            if (abs(DotProd) <= cos89deg) {
+            if (std::abs(DotProd) <= cos89deg) {
                 return true;
             } else {
                 return false;

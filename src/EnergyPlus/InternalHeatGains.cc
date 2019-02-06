@@ -6324,7 +6324,7 @@ namespace InternalHeatGains {
                 TAirOut = TAirIn;
             }
 
-            if (abs(TAirOut - TSupply) < SmallTempDiff) {
+            if (std::abs(TAirOut - TSupply) < SmallTempDiff) {
                 TAirOut = TSupply;
             }
 

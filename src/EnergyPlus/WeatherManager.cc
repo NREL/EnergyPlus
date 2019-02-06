@@ -3682,7 +3682,7 @@ namespace WeatherManager {
         // adapted from http://stackoverflow.com/questions/2708476/rotation-interpolation
         Real64 curAng = curHrWindDir;
         Real64 prevAng = prevHrWindDir;
-        Real64 diff = abs(curAng - prevAng);
+        Real64 diff = std::abs(curAng - prevAng);
         if (diff > 180.) {
             if (curAng > prevAng) {
                 prevAng += 360.;

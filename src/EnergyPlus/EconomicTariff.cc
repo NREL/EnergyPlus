@@ -2955,7 +2955,7 @@ namespace EconomicTariff {
                             pushStack(c, noVar);
                         } else if (SELECT_CASE_var == opABSOLUTE) {
                             popStack(a, aPt);
-                            pushStack(abs(a), noVar);
+                            pushStack(ObjexxFCL::abs(a), noVar);
                         } else if (SELECT_CASE_var == opINTEGER) {
                             popStack(a, aPt);
                             pushStack(Array1D_double(Array1D_int(a)), noVar);

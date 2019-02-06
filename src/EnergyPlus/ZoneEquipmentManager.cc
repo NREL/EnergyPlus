@@ -4784,7 +4784,7 @@ namespace ZoneEquipmentManager {
                             ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate +
                                                            ZoneReturnAirMassFlowRate - TotInletAirMassFlowRate;
                             if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-                                if (abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
+                                if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
                                     ZoneInfiltrationFlag(ZoneNum) = true;
                                     MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
                                     MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
@@ -4906,7 +4906,7 @@ namespace ZoneEquipmentManager {
 
             // update the
             if (Iteration > 0) {
-                if (abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance) {
+                if (std::abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance) {
                     ZoneMassBalanceHVACReSim = false;
                     break;
                 } else {

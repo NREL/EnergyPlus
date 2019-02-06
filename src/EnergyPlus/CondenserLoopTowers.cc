@@ -2995,7 +2995,7 @@ namespace CondenserLoopTowers {
                 DesTowerWaterDeltaT = SimpleTower(TowerNum).DesRange;
                 if (PltSizCondNum > 0) {
                     // check the tower range against the plant sizing data
-                    if (abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
+                    if (std::abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
                         ShowWarningError("Error when autosizing the load for cooling tower = " + SimpleTower(TowerNum).Name +
                                          ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                         ShowContinueError("Tower Design Range Temperature specified in tower = " + SimpleTower(TowerNum).Name);
@@ -3008,7 +3008,7 @@ namespace CondenserLoopTowers {
                     }
                     // check if the tower approach is different from plant sizing data
                     DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - SimpleTower(TowerNum).DesInletAirWBTemp;
-                    if (abs(DesTowerApproachFromPlant - SimpleTower(TowerNum).DesApproach) > TolTemp) {
+                    if (std::abs(DesTowerApproachFromPlant - SimpleTower(TowerNum).DesApproach) > TolTemp) {
                         ShowWarningError("Error when autosizing the UA for cooling tower = " + SimpleTower(TowerNum).Name +
                                          ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                         ShowContinueError("The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
@@ -4038,7 +4038,7 @@ namespace CondenserLoopTowers {
             DesTowerWaterDeltaT = SimpleTower(TowerNum).DesRange;
             if (PltSizCondNum > 0) {
                 // check the tower range against the plant sizing data
-                if (abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
+                if (std::abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
                     ShowWarningError("Error when autosizing the load for cooling tower = " + SimpleTower(TowerNum).Name +
                                      ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                     ShowContinueError("Tower Design Range Temperature specified in tower = " + SimpleTower(TowerNum).Name);
@@ -4050,7 +4050,7 @@ namespace CondenserLoopTowers {
                 }
                 // check if the tower approach is different from plant sizing data
                 DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - SimpleTower(TowerNum).DesInletAirWBTemp;
-                if (abs(DesTowerApproachFromPlant - SimpleTower(TowerNum).DesApproach) > TolTemp) {
+                if (std::abs(DesTowerApproachFromPlant - SimpleTower(TowerNum).DesApproach) > TolTemp) {
                     ShowWarningError("Error when autosizing the UA for cooling tower = " + SimpleTower(TowerNum).Name +
                                      ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                     ShowContinueError("The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
