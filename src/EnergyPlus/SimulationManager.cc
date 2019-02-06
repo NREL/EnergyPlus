@@ -2141,7 +2141,6 @@ namespace SimulationManager {
         int Count;
         int Count1;
         int LoopSideNum;
-        int Num;
         static bool WarningOut(true);
         int NumOfControlledZones;
 
@@ -2270,124 +2269,121 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumSplitters; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                                                           PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1) <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
+                    gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
+                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn)
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1))
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713)
-                                << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameIn + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                       LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        }
+                        gio::write(OutputFileBNDetails, Format_713)
+                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
+                                   LoopString;
                     }
                 }
+
                 //  Plant Supply Side Mixer
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumMixers; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes;
-                        gio::write(OutputFileBNDetails, Format_713)
-                            << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                   PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1) <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).MixerExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    gio::write(OutputFileBNDetails, Format_713)
+                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1))
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut)
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameIn(Count1) +
-                                                                               ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameOut +
-                                                                               ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                        }
+                        gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
+                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
+                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
                     }
                 }
             }
@@ -2434,124 +2430,121 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumSplitters; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                                                           PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1) <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
+                    gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
+                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn)
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1))
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713)
-                                << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameIn + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                       LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        }
+                        gio::write(OutputFileBNDetails, Format_713)
+                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
+                                   LoopString;
                     }
                 }
+
                 //  Plant Supply Side Mixer
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumMixers; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes;
-                        gio::write(OutputFileBNDetails, Format_713)
-                            << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                   PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1) <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    gio::write(OutputFileBNDetails, Format_713)
+                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1))
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut)
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameIn(Count1) +
-                                                                               ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameOut +
-                                                                               ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                        }
+                        gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
+                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
+                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
                     }
                 }
             }

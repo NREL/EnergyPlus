@@ -115,7 +115,6 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.8;",
 
         "  Zone,",
         "    Zone 1,                  !- Name",

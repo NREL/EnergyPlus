@@ -86,8 +86,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     int ControlZoneNum(0);   // index to control zone
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        "  ",
         "Zone,",
         "  EAST ZONE,              !- Name",
         "  0,                      !- Direction of Relative North{ deg }",

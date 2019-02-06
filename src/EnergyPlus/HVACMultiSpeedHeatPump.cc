@@ -1848,12 +1848,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                         MSHeatPump(MSHeatPumpNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1870,12 +1870,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1906,12 +1906,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1938,12 +1938,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1974,12 +1974,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }

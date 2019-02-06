@@ -70,7 +70,7 @@ namespace EnergyPlus {
 
         bool getInputsWWHP(true);
         std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
-        std::string static const __EQUIP__ = "EIRWaterToWaterHeatPump";
+        std::string static const __EQUIP__ = "EIRWaterToWaterHeatPump"; // NOLINT(cert-err58-cpp)
 
         void EIRWaterToWaterHeatPump::clear_state() {
             getInputsWWHP = true;
@@ -84,16 +84,16 @@ namespace EnergyPlus {
             auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
             if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
                 if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-                    // there will be a valid setpoint on outlet
+                    // there will be a valid set-point on outlet
                     return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
-                } else { // use plant loop overall setpoint
+                } else { // use plant loop overall set-point
                     return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
                 }
             } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
                 if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-                    // there will be a valid setpoint on outlet
+                    // there will be a valid set-point on outlet
                     return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;
-                } else { // use plant loop overall setpoint
+                } else { // use plant loop overall set-point
                     return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
                 }
             } else {

@@ -68,7 +68,6 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
 
     std::string const idf_objects = delimited_string({
 
-        "Version, 8.9;                             !- Version Identifier",
         "Zone,",
         "  Zone 1;                                 !- Name",
         "BuildingSurface:Detailed,",

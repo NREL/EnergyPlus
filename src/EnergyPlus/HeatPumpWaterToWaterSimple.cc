@@ -644,6 +644,46 @@ namespace HeatPumpWaterToWaterSimple {
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
+
+            // scan for loop connection data
+            errFlag = false;
+            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
+                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                    GSHP(GSHPNum).SourceLoopNum,
+                                    GSHP(GSHPNum).SourceLoopSideNum,
+                                    GSHP(GSHPNum).SourceBranchNum,
+                                    GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    GSHP(GSHPNum).SourceSideInletNodeNum,
+                                    _);
+            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
+                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                    GSHP(GSHPNum).LoadLoopNum,
+                                    GSHP(GSHPNum).LoadLoopSideNum,
+                                    GSHP(GSHPNum).LoadBranchNum,
+                                    GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    GSHP(GSHPNum).LoadSideInletNodeNum,
+                                    _);
+
+            if (!errFlag) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
+                                                              GSHP(GSHPNum).LoadLoopSideNum,
+                                                              GSHP(GSHPNum).SourceLoopNum,
+                                                              GSHP(GSHPNum).SourceLoopSideNum,
+                                                              GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                                              true);
+            }
+
+            if (errFlag) {
+                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
+            }
         }
     }
 

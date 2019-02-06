@@ -45,6 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+#pragma ide diagnostic ignored "cert-err58-cpp"
+#pragma ide diagnostic ignored "modernize-use-equals-delete"
+
 #include <stdexcept>
 
 // Google Test Headers
@@ -975,3 +980,6 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
     }
 
 }
+
+#pragma clang diagnostic pop
+#pragma clang diagnostic pop
