@@ -5271,7 +5271,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac) {
+        if (BeginSimFlag && DoWeathSim && DataSystemVariables::ReportExtShadingSunlitFrac) {
             OpenShadingFile();
         }
 
@@ -5973,7 +5973,6 @@ namespace HeatBalanceManager {
         if (write_stat != 0) {
             ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
         }
-        gio::write(OutputFileShadingFrac, fmtA) << "This file contains external shading fractions for all shading surfaces of all zones.";
         {
             IOFlags flags;
             flags.ADVANCE("No");
