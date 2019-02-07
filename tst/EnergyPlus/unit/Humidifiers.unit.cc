@@ -202,7 +202,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Humidifier:Steam:Gas,",
         "  Main Gas Humidifier,     !- Name",
         "  ,                        !- Availability Schedule Name",
@@ -277,7 +276,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     OutBaroPress = 101325.0;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  Curve:Quadratic,",
         "    ThermalEfficiencyFPLR,   !- Name",
         "    0.9375,                  !- Coefficient1 Constant",

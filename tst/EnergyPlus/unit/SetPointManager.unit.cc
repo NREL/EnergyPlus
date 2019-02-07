@@ -558,7 +558,6 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
 TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "SetpointManager:SingleZone:Reheat,",
         "    SupAirTemp MngrKitchen,    !- Name",
         "    Temperature,              !- Control Variable",
@@ -826,8 +825,6 @@ TEST_F(EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName)
 TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 {
     std::string const idf_objects = delimited_string({
-
-        "Version,8.6;",
 
         "  Zone,",
         "    SPACE1-1,                !- Name",
@@ -1186,7 +1183,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1244,7 +1241,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1300,7 +1297,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
 TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "SetpointManager:SingleZone:Reheat,",
         "    SupAirTemp MngrKitchen,    !- Name",
         "    Temperature,              !- Control Variable",
@@ -1358,7 +1354,6 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "SetpointManager:SingleZone:Heating,",
         "  Heating Supply Air Temp Manager 1,  !- Name",
         "  Temperature,             !- Control Variable",

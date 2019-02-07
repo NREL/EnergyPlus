@@ -160,7 +160,7 @@ namespace PlantCondLoopOperation {
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
-                                     Optional_bool LoadDistributionWasPerformed)
+                                     bool &LoadDistributionWasPerformed)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -353,7 +353,7 @@ namespace PlantCondLoopOperation {
                 if (this_op_scheme.EquipList(ListPtr).NumComps > 0) {
                     TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
                     DistributePlantLoad(LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
-                    if (present(LoadDistributionWasPerformed)) LoadDistributionWasPerformed = true;
+                    LoadDistributionWasPerformed = true;
                 }
             }
 
@@ -1877,12 +1877,12 @@ namespace PlantCondLoopOperation {
                                                                     LoopSideNum,
                                                                     BranchNum,
                                                                     CompNum,
+                                                                    errFlag1,
                                                                     _,
                                                                     _,
                                                                     NumSearchResults,
                                                                     _,
-                                                                    LoopNum,
-                                                                    errFlag1);
+                                                                    LoopNum);
 
                             if (errFlag1) {
                                 ShowSevereError("InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");

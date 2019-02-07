@@ -318,8 +318,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     // DATE WRITTEN: Aug 2015
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "Zone,",
         "  Core_top,             !- Name",
         "  0.0000,                  !- Direction of Relative North {deg}",
@@ -681,8 +679,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     using WeatherManager::Envrn;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
-        " ",
         "Zone,",
         "  Core_top,                !- Name",
         "  0.0000,                  !- Direction of Relative North {deg}",
@@ -1171,7 +1167,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",

@@ -65,7 +65,6 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "Chiller:Absorption:Indirect,",
         "  Big Chiller,             !- Name",
         "  10000,                   !- Nominal Capacity {W}",
