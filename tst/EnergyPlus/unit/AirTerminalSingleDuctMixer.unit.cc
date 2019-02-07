@@ -111,7 +111,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version, 8.5;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
@@ -368,7 +367,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
@@ -695,7 +693,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -1025,7 +1022,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalHeatPump,  !- ZoneHVAC Terminal Unit Object Type",
@@ -1434,7 +1430,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -1846,7 +1841,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -2520,7 +2514,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,   !- Name",
@@ -3194,7 +3187,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -4943,7 +4935,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -6688,7 +6679,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     int UnitVentNum(1);
 
     std::string const idf_objects = delimited_string({
-        "  Version, 8.6;",
 
         "  AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -6922,7 +6912,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     int UnitVentNum(1);
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
 
         "  AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal, !- Name",
@@ -7154,7 +7143,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version, 8.8;",
 
         "DesignSpecification:OutdoorAir,",
         "  DSOA 1,  !- Name",

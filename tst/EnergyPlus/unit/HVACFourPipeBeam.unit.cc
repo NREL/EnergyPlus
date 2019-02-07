@@ -77,7 +77,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
         "    Perimeter_top_ZN_4 4pipe Beam, !- Name",
         "    , !- Primary Air Availability Schedule Name",

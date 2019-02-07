@@ -783,12 +783,12 @@ namespace MicroCHPElectricGenerator {
                                     MicroCHP(GeneratorNum).CWLoopSideNum,
                                     MicroCHP(GeneratorNum).CWBranchNum,
                                     MicroCHP(GeneratorNum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (errFlag) {
                 ShowFatalError("InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");

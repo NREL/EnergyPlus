@@ -792,12 +792,12 @@ namespace UnitHeater {
                                         UnitHeat(UnitHeatNum).HWLoopSide,
                                         UnitHeat(UnitHeatNum).HWBranchNum,
                                         UnitHeat(UnitHeatNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitHeat(UnitHeatNum).Name + "\", type=ZoneHVAC:UnitHeater");
                     ShowFatalError("InitUnitHeater: Program terminated due to previous condition(s).");

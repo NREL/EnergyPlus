@@ -322,7 +322,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1351,7 +1351,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with Local Air Nodes,  !- Name",
@@ -1926,7 +1926,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.7;",
         " Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
         " Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
         " Output:Diagnostics, DisplayAdvancedReportVariables;",
@@ -1968,7 +1967,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with AirflowNetwork simulation,  !- Name",

@@ -891,12 +891,12 @@ namespace WaterToAirHeatPump {
                                     WatertoAirHP(HPNum).LoopSide,
                                     WatertoAirHP(HPNum).BranchNum,
                                     WatertoAirHP(HPNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (PlantLoop(WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
                 if (WatertoAirHP(HPNum).SourceSideUACoeff < rTinyValue) {

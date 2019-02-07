@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Building,
     VRF TU with DOAS RH Control,  !- Name

@@ -189,6 +189,8 @@ namespace ZoneEquipmentManager {
         bool InitZoneEquipmentOneTimeFlag(true);
         bool InitZoneEquipmentEnvrnFlag(true);
         bool FirstPassZoneEquipFlag(true); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+        bool AllocateFlag(true);
+        Array1D_bool fixedReturn;
     }                                      // namespace
 
     Array1D<Real64> AvgData; // scratch array for storing averaged data
@@ -215,6 +217,8 @@ namespace ZoneEquipmentManager {
         PrioritySimOrder.deallocate();
         FirstPassZoneEquipFlag = true;
         reportDOASZoneSizingHeader = true;
+        AllocateFlag = true;
+        fixedReturn.deallocate();
     }
 
     void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir)
@@ -4916,14 +4920,21 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
+        if (AllocateFlag) {
+            AllocateFlag = false;
+            int maxReturnNodes = 0;
+            for (auto & z : ZoneEquipConfig) {
+                maxReturnNodes = max(maxReturnNodes, z.NumReturnNodes);
+            }
+            fixedReturn.allocate(maxReturnNodes);
+        }
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
-        Real64 totVarReturnFlow =
-            0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
+        Real64 totVarReturnFlow = 0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
         Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(thisZoneEquip.ReturnFlowSchedPtrNum);
-        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
-        fixedReturn.allocate(numRetNodes);
+//        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
+//        fixedReturn.allocate(numRetNodes);
         fixedReturn = false;
         FinalTotalReturnMassFlow = 0.0;
 

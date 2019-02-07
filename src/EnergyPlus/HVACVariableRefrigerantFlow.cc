@@ -2358,12 +2358,12 @@ namespace HVACVariableRefrigerantFlow {
                                                         VRF(VRFNum).SourceLoopSideNum,
                                                         VRF(VRFNum).SourceBranchNum,
                                                         VRF(VRFNum).SourceCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         VRF(VRFNum).CondenserNodeNum,
-                                                        _,
-                                                        errFlag);
+                                                        _);
 
                 if (errFlag) {
                     ShowSevereError("GetVRFInput: Error scanning for plant loop data");

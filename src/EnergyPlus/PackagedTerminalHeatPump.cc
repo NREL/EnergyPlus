@@ -3809,12 +3809,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3842,12 +3842,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3882,12 +3882,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -3910,12 +3910,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }

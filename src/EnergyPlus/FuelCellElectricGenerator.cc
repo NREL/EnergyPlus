@@ -4116,12 +4116,12 @@ namespace FuelCellElectricGenerator {
                                     FuelCell(FCnum).CWLoopSideNum,
                                     FuelCell(FCnum).CWBranchNum,
                                     FuelCell(FCnum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
 
             // if there is a stack cooler option it might be connected to plant as well
 
