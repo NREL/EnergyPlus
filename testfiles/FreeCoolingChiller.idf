@@ -2048,7 +2048,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     WestZoneTermReheat,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     EastZoneEquipment,       !- Name
@@ -2056,7 +2058,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     EastZoneTermReheat,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     NorthZoneEquipment,      !- Name
@@ -2064,7 +2068,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     NorthZoneTermReheat,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     WestZoneTermReheat,      !- Name
