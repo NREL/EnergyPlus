@@ -173,6 +173,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
@@ -404,8 +405,9 @@ void EnergyPlusFixture::clear_all_states()
     PackagedTerminalHeatPump::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
-    PlantCondLoopOperation::clear_state();
+    PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
+    PlantCondLoopOperation::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();

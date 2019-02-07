@@ -189,6 +189,8 @@ namespace ZoneEquipmentManager {
         bool InitZoneEquipmentOneTimeFlag(true);
         bool InitZoneEquipmentEnvrnFlag(true);
         bool FirstPassZoneEquipFlag(true); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+        bool AllocateFlag(true);
+        Array1D_bool fixedReturn;
     }                                      // namespace
 
     Array1D<Real64> AvgData; // scratch array for storing averaged data
@@ -215,6 +217,8 @@ namespace ZoneEquipmentManager {
         PrioritySimOrder.deallocate();
         FirstPassZoneEquipFlag = true;
         reportDOASZoneSizingHeader = true;
+        AllocateFlag = true;
+        fixedReturn.deallocate();
     }
 
     void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir)
@@ -4942,8 +4946,6 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
-        static Array1D_bool fixedReturn;
-        static bool AllocateFlag = true;
         if (AllocateFlag) {
             AllocateFlag = false;
             int maxReturnNodes = 0;

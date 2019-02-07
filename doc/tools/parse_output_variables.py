@@ -10,6 +10,8 @@ import io
 import sys
 from os import path
 import re
+import fnmatch
+import os
 
 # generates a csv summary of the output variables in E+
 # assumption: doesn't check for commented lines
@@ -140,8 +142,10 @@ def main():
     # this is the    master list of calls
     output_variables = []
 
-    # find all the source files
-    files = sorted(glob.glob(path.join(source_dir, "*.cc")))
+    files = []
+    for root, _, filenames in os.walk(source_dir):
+        for filename in fnmatch.filter(filenames, '*.cc'):
+            files.append(os.path.join(root, filename))
 
     for this_file in files:
 

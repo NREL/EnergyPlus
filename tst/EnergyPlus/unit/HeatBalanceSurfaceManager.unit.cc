@@ -1926,7 +1926,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.7;",
         " Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
         " Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
         " Output:Diagnostics, DisplayAdvancedReportVariables;",

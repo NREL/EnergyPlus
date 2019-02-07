@@ -125,8 +125,6 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     Real64 HWDensity(0.0);            // hot water density, kg/m3
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  Timestep,4;",
 
         "  Building,",
@@ -1185,8 +1183,6 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     Real64 HWCoilHeatingRate(0.0);     // hot water heating coil heating rate
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  ScheduleTypeLimits,",
         "    Any Number;              !- Name",
 

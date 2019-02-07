@@ -291,8 +291,6 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Timestep,6;",
 
         "  SimulationControl,",

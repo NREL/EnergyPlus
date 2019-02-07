@@ -157,8 +157,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     bool FirstHVACIteration(true); // TRUE if 1st HVAC simulation of system timestep
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
