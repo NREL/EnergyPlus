@@ -76,8 +76,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -138,8 +136,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -188,8 +184,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -238,8 +232,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     // Adaptive comfort model fatal for irrelevant blank fields  #5948
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
 
         "  Schedule:Compact,",
@@ -312,8 +304,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ElectricEquipment:ITE:AirCooled,",
@@ -450,7 +440,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Zone,Zone1;",
     });
 
@@ -525,8 +514,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
-
         "Zone,Zone1;",
 
         "ElectricEquipment:ITE:AirCooled,",
