@@ -443,7 +443,7 @@ namespace Pumps {
                 // Check that the minimum isn't greater than the maximum
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
                         + "\", Invalid '" + cNumericFieldNames(10) +"'");
-                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is below the "
+                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the "
                         + cNumericFieldNames(1) + "=["
                         + General::TrimSigDigits(PumpEquip(PumpNum).NomVolFlowRate, 5) + "].");
                 ShowContinueError("Reseting value of '" + cNumericFieldNames(10) + "' to the value of '" + cNumericFieldNames(1) +"'.");
