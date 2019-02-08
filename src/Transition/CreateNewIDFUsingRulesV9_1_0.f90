@@ -453,7 +453,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! Copy all Args here
                 OutArgs = InArgs
 
-                ! TODO: Move this block to V10_0_0.f90 when available
                 ! If the now-required RunPeriod Name is blank, then create it
                 IF (SameString(TRIM(InArgs(1)), '')) THEN
                   ! If at least one, then need diff
