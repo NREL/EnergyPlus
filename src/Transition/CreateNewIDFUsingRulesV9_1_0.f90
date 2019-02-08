@@ -129,6 +129,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER PNumArgs   ! Number of Arguments in a definition
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
+
+  ! For Defaulting now-required RunPeriod Name
+  INTEGER :: TotRunPeriods = 0
+  INTEGER :: runPeriodNum = 0
+  INTEGER :: iterateRunPeriod = 0
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
+  CHARACTER(len=20) :: PotentialRunPeriodName
+
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -270,6 +279,34 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDIF
           ENDDO
 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                    P R E P R O C E S S I N G                                                     !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+     ! Begin Pre-process RunPeriod to avoid having duplicated names. If the user has one named 'RUNPERIOD 1',
+        ! we do not want to default the first blank to 'RUNPERIOD 1', but rather 'RUNPERIOD 2'
+          CALL DisplayString('Processing IDF -- RunPeriod preprocessing . . .')
+
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(CurrentRunPeriodNames)) DEALLOCATE(CurrentRunPeriodNames)
+          TotRunPeriods = GetNumObjectsFound('RUNPERIOD')
+          ALLOCATE(CurrentRunPeriodNames(TotRunPeriods))
+
+          ! First pass to get all current run period names, ensure we get unique ones in the end
+          DO runPeriodNum=1,TotRunPeriods
+            CALL GetObjectItem('RUNPERIOD',runPeriodNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            CurrentRunPeriodNames(runPeriodNum) = TRIM(Alphas(1));
+          ENDDO
+          CALL DisplayString('Processing IDF -- RunPeriod preprocessing complete.')
+     ! End Pre-process RunPeriod
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                       P R O C E S S I N G                                                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
           CALL DisplayString('Processing IDF -- Processing idf objects . . .')
           DO Num=1,NumIDFRecords
 
@@ -410,6 +447,26 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('RUNPERIOD')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+
+                ! Copy all Args here
+                OutArgs = InArgs
+
+                ! TODO: Move this block to V10_0_0.f90 when available
+                ! If the now-required RunPeriod Name is blank, then create it
+                IF (SameString(TRIM(InArgs(1)), '')) THEN
+                  ! If at least one, then need diff
+                  nodiff = .false.
+                  iterateRunPeriod = iterateRunPeriod + 1
+                  PotentialRunPeriodName='RUNPERIOD '//TrimSigDigits(iterateRunPeriod)
+                  ! While we can find another RunPeriod named like this, increment the number
+                  DO WHILE (FindItemInList(PotentialRunPeriodName,CurrentRunPeriodNames,TotRunPeriods) /= 0)
+                    iterateRunPeriod = iterateRunPeriod + 1
+                    PotentialRunPeriodName='RUNPERIOD '//TrimSigDigits(iterateRunPeriod)
+                  ENDDO
+                  OutArgs(1) = PotentialRunPeriodName
+                ENDIF
 
               ! If your original object starts with S, insert the rules here
 
