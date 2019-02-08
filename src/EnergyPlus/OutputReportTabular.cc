@@ -10510,7 +10510,7 @@ namespace OutputReportTabular {
             }
 
             //---- Hybrid Model: Internal Thermal Mass Sub-Table
-            if (FlagHybridModel_TM) {
+            if (HybridModel::FlagHybridModel_TM) {
                 rowHead.allocate(NumOfZones);
                 NumOfCol = 2;
                 columnHead.allocate(NumOfCol);

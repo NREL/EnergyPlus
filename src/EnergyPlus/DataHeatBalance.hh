@@ -1220,13 +1220,14 @@ namespace DataHeatBalance {
               NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
               ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
               // Hybrid Modeling
-              ZoneMeasuredTemperature(0.0), ZoneVolCapMultpSens(1.0), ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0),
-              ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0), ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0),
-              ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0), InfilOAAirChangeRateHM(0.0), ZoneMeasuredHumidityRatio(0.0),
+              ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0),
               ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0), ZoneMeasuredSupplyAirFlowRate(0.0),
               ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0), ZonePeopleActivityLevel(0.0),
-              ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZonePeopleCO2GenerationRate(0.0), NumOccHM(0.0), delta_T(0.0),
-              delta_HumRat(0.0), delta_CO2(0.0)
+              ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZonePeopleCO2GenerationRate(0.0),
+              ZoneVolCapMultpSens(1.0), ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0),
+              ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0), ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0),
+              ZoneVolCapMultpSensHMAverage(1.0),
+              MCPIHM(0.0), InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), delta_CO2(0.0)
 
         {
         }
