@@ -157,30 +157,38 @@ install( FILES "SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "P
 # Get the latest official version
 list(GET VERSIONS ${end} OLD_VERSION)
 
-# Turn that into a list, so we can get the stuff we need
-string(REPLACE "_" ";" OLD_VERSION_LIST ${OLD_VERSION})
-list(GET OLD_VERSION_LIST 0 OLD_VERSION_MAJOR)
-list(GET OLD_VERSION_LIST 1 OLD_VERSION_MINOR)
-list(GET OLD_VERSION_LIST 2 OLD_VERSION_PATCH)
+set(CUR_VERSION "${CMAKE_VERSION_MAJOR}_${CMAKE_VERSION_MINOR}_${CMAKE_VERSION_PATCH}")
+# Only if the OLD_VERSION is stricly less than the current
+if( OLD_VERSION STRLESS CUR_VERSION)
 
-# For the current iteration, we rely on CMAKE_VERSION_XXX that's defined at the root CMakeLists.txt, so no-op
-set(LAST_NAME "Transition-V${OLD_VERSION_MAJOR}-${OLD_VERSION_MINOR}-${OLD_VERSION_PATCH}-to-V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}" )
+  # Turn that into a list, so we can get the stuff we need
+  string(REPLACE "_" ";" OLD_VERSION_LIST ${OLD_VERSION})
+  list(GET OLD_VERSION_LIST 0 OLD_VERSION_MAJOR)
+  list(GET OLD_VERSION_LIST 1 OLD_VERSION_MINOR)
+  list(GET OLD_VERSION_LIST 2 OLD_VERSION_PATCH)
 
-set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
+  # For the current iteration, we rely on CMAKE_VERSION_XXX that's defined at the root CMakeLists.txt, so no-op
+  set(LAST_NAME "Transition-V${OLD_VERSION_MAJOR}-${OLD_VERSION_MINOR}-${OLD_VERSION_PATCH}-to-V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}" )
 
-set(ITERATION_BIN_NAME "CreateNewIDFUsingRulesV${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.f90")
+  set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
 
-configure_file( CreateNewIDFUsingRules.in.f90 "${CMAKE_Fortran_MODULE_DIRECTORY}/${ITERATION_BIN_NAME}" )
+  set(ITERATION_BIN_NAME "CreateNewIDFUsingRulesV${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.f90")
 
-# then create the binaries using just the Transition source and the version of the main sub
-set(SRC
+  configure_file( CreateNewIDFUsingRules.in.f90 "${CMAKE_Fortran_MODULE_DIRECTORY}/${ITERATION_BIN_NAME}" )
+
+  # then create the binaries using just the Transition source and the version of the main sub
+  set(SRC
   Transition.f90
   ${CMAKE_Fortran_MODULE_DIRECTORY}/${ITERATION_BIN_NAME}
-)
+  )
 
 
-add_executable( "${LAST_NAME}" ${SRC} )
-target_link_libraries( "${LAST_NAME}" TransitionLib )
+  add_executable( "${LAST_NAME}" ${SRC} )
+  target_link_libraries( "${LAST_NAME}" TransitionLib )
 
-# TODO: Not sure how we could create that file automatically, so need to do it manually
-install( FILES "SupportFiles/Report Variables ${OLD_VERSION_MAJOR}-${OLD_VERSION_MINOR}-${OLD_VERSION_PATCH} to ${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+  # TODO: Not sure how we could create that file automatically, so need to do it manually
+  install( FILES "SupportFiles/Report Variables ${OLD_VERSION_MAJOR}-${OLD_VERSION_MINOR}-${OLD_VERSION_PATCH} to ${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+
+else()
+  message("Not building the Transition to current iteration because OLD_VERSION (${OLD_VERSION}) is not less than CURRENT (${CUR_VERSION})")
+endif()
