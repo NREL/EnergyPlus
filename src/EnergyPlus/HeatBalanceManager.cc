@@ -5021,7 +5021,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataDaylighting::ZoneDaylight;
-        using HybridModel::FlagHybridModel;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
