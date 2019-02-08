@@ -142,6 +142,7 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> MCPTThermChim;        // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
     extern Array1D<Real64> MCPThermChim;         // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
     extern Array1D<Real64> ZoneLatentGain;       // Latent Energy from each Zone (People, equipment)
+    extern Array1D<Real64> ZoneLatentGainExceptPeople;       // Added for hybrid model -- Latent Energy from each Zone (equipment)
     extern Array1D<Real64> OAMFL;                // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
     extern Array1D<Real64> VAMFL;                // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
     extern Array1D<Real64> NonAirSystemResponse; // Convective heat addition rate from non forced air
@@ -218,6 +219,9 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> PreviousMeasuredZT1; // Measured zone air temperature at previous timestep1
     extern Array1D<Real64> PreviousMeasuredZT2; // Measured zone air temperature at previous timestep2
     extern Array1D<Real64> PreviousMeasuredZT3; // Measured zone air temperature at previous timestep3
+    extern Array1D<Real64> PreviousMeasuredHumRat1; // Hybrid model zone humidity ratio at previous timestep
+    extern Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
+    extern Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
     // Exact and Euler solutions
     extern Array1D<Real64> ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     extern Array1D<Real64> ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method

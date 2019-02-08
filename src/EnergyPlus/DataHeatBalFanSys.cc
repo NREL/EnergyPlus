@@ -150,6 +150,7 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> MCPTThermChim;        // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
     Array1D<Real64> MCPThermChim;         // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
     Array1D<Real64> ZoneLatentGain;       // Latent Energy from each Zone (People, equipment)
+    Array1D<Real64> ZoneLatentGainExceptPeople;       // Added for hybrid model -- Latent Energy from each Zone (equipment)
     Array1D<Real64> OAMFL;                // OUTDOOR AIR MASS FLOW (M**3/SEC) for infiltration
     Array1D<Real64> VAMFL;                // OUTDOOR AIR MASS FLOW (M**3/SEC) for ventilation
     Array1D<Real64> NonAirSystemResponse; // Convective heat addition rate from non forced air
@@ -225,6 +226,9 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> PreviousMeasuredZT1; // Hybrid model internal mass multiplier at previous timestep
     Array1D<Real64> PreviousMeasuredZT2; // Hybrid model internal mass multiplier at previous timestep
     Array1D<Real64> PreviousMeasuredZT3; // Hybrid model internal mass multiplier at previous timestep
+    Array1D<Real64> PreviousMeasuredHumRat1; // Hybrid model zone humidity ratio at previous timestep
+    Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
+    Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
     // Exact and Euler solutions
     Array1D<Real64> ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     Array1D<Real64> ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -297,6 +301,7 @@ namespace DataHeatBalFanSys {
         MCPTThermChim.deallocate();
         MCPThermChim.deallocate();
         ZoneLatentGain.deallocate();
+        ZoneLatentGainExceptPeople.deallocate();
         OAMFL.deallocate();
         VAMFL.deallocate();
         NonAirSystemResponse.deallocate();
