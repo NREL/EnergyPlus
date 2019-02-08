@@ -788,12 +788,12 @@ namespace ChillerAbsorption {
                                     BLASTAbsorber(ChillNum).CWLoopSideNum,
                                     BLASTAbsorber(ChillNum).CWBranchNum,
                                     BLASTAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     BLASTAbsorber(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     BLASTAbsorber(ChillNum).EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (BLASTAbsorber(ChillNum).CondInletNodeNum > 0) {
                 ScanPlantLoopsForObject(BLASTAbsorber(ChillNum).Name,
                                         TypeOf_Chiller_Absorption,
@@ -801,12 +801,12 @@ namespace ChillerAbsorption {
                                         BLASTAbsorber(ChillNum).CDLoopSideNum,
                                         BLASTAbsorber(ChillNum).CDBranchNum,
                                         BLASTAbsorber(ChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         BLASTAbsorber(ChillNum).CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(BLASTAbsorber(ChillNum).CWLoopNum,
                                               BLASTAbsorber(ChillNum).CWLoopSideNum,
                                               BLASTAbsorber(ChillNum).CDLoopNum,
@@ -821,12 +821,12 @@ namespace ChillerAbsorption {
                                         BLASTAbsorber(ChillNum).GenLoopSideNum,
                                         BLASTAbsorber(ChillNum).GenBranchNum,
                                         BLASTAbsorber(ChillNum).GenCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         BLASTAbsorber(ChillNum).GeneratorInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(BLASTAbsorber(ChillNum).CWLoopNum,
                                               BLASTAbsorber(ChillNum).CWLoopSideNum,
                                               BLASTAbsorber(ChillNum).GenLoopNum,

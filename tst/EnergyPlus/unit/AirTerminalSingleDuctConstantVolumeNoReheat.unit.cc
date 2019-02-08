@@ -91,7 +91,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -173,7 +172,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -260,7 +258,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -395,7 +392,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
 
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",

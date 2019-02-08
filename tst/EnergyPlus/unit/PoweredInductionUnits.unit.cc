@@ -82,7 +82,6 @@ using DataHeatBalance::Zone;
 TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  Zone,",
         "    SPACE2-1;                !- Name",
         "ZoneHVAC:EquipmentConnections,",
@@ -302,7 +301,6 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 TEST_F(EnergyPlusFixture, SeriesPIUTest1)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  Zone,",
         "    SPACE2-1;                !- Name",
         "ZoneHVAC:EquipmentConnections,",

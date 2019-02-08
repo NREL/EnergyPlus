@@ -70,8 +70,7 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 {
     std::string const idf_objects =
-        delimited_string({"Version, 8.6;",
-                          "Material,",
+        delimited_string({"Material,",
                           "Concrete,                !- Name",
                           "Rough,                   !- Roughness",
                           "0.152,                   !- Thickness {m}",
@@ -160,8 +159,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
 {
     std::string const idf_objects =
-        delimited_string({"Version, 8.6;",
-                          "Material,",
+        delimited_string({"Material,",
                           "Concrete,                !- Name",
                           "Rough,                   !- Roughness",
                           "0.152,                   !- Thickness {m}",
@@ -198,8 +196,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
 TEST_F(EnergyPlusFixture, EMPDRcoating)
 {
     std::string const idf_objects =
-        delimited_string({"Version, 8.6;",
-                          "Material,",
+        delimited_string({"Material,",
                           "Concrete,                !- Name",
                           "Rough,                   !- Roughness",
                           "0.152,                   !- Thickness {m}",
@@ -287,9 +284,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 {
     std::string const idf_objects =
-        delimited_string({"Version, 8.9;",
-
-                          "Material,",
+        delimited_string({"Material,",
                           "WOOD,                    !- Name",
                           "MediumSmooth,            !- Roughness",
                           "1.9099999E-02,           !- Thickness {m}",

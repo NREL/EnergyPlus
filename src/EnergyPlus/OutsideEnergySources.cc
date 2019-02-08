@@ -525,12 +525,12 @@ namespace OutsideEnergySources {
                                     EnergySource(EnergySourceNum).LoopSideNum,
                                     EnergySource(EnergySourceNum).BranchNum,
                                     EnergySource(EnergySourceNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitSimVars: Program terminated due to previous condition(s).");
             }

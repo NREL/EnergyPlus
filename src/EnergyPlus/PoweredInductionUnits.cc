@@ -808,12 +808,12 @@ namespace PoweredInductionUnits {
                                         PIU(PIUNum).HWLoopSide,
                                         PIU(PIUNum).HWBranchNum,
                                         PIU(PIUNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitPIU: Program terminated due to previous condition(s).");
                 }

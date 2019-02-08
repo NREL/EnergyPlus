@@ -1335,12 +1335,12 @@ namespace Pumps {
                                     PumpEquip(PumpNum).LoopSideNum,
                                     PumpEquip(PumpNum).BranchNum,
                                     PumpEquip(PumpNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             plloopnum = PumpEquip(PumpNum).LoopNum;
             lsnum = PumpEquip(PumpNum).LoopSideNum;
             brnum = PumpEquip(PumpNum).BranchNum;

@@ -559,12 +559,12 @@ namespace HVACSingleDuctInduc {
                                         IndUnit(IUNum).HWLoopSide,
                                         IndUnit(IUNum).HWBranchNum,
                                         IndUnit(IUNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
             }
             if (errFlag) {
                 ShowContinueError("Reference Unit=\"" + IndUnit(IUNum).Name + "\", type=" + IndUnit(IUNum).UnitType);
@@ -578,12 +578,12 @@ namespace HVACSingleDuctInduc {
                                         IndUnit(IUNum).CWLoopSide,
                                         IndUnit(IUNum).CWBranchNum,
                                         IndUnit(IUNum).CWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
             }
             if (errFlag) {
                 ShowContinueError("Reference Unit=\"" + IndUnit(IUNum).Name + "\", type=" + IndUnit(IUNum).UnitType);
