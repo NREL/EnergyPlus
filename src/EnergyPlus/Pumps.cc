@@ -438,7 +438,8 @@ namespace Pumps {
             PumpEquip(PumpNum).MinVolFlowRate = rNumericArgs(10);
             if (PumpEquip(PumpNum).MinVolFlowRate == AutoSize) {
                 PumpEquip(PumpNum).minVolFlowRateWasAutosized = true;
-            } else if (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate) {
+            } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
+                       (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
                 // Check that the minimum isn't greater than the maximum
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
                         + "\", Invalid '" + cNumericFieldNames(10) +"'");
