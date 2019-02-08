@@ -885,12 +885,12 @@ namespace ChillerIndirectAbsorption {
                                     IndirectAbsorber(ChillNum).CWLoopSideNum,
                                     IndirectAbsorber(ChillNum).CWBranchNum,
                                     IndirectAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     IndirectAbsorber(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     IndirectAbsorber(ChillNum).EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             ScanPlantLoopsForObject(IndirectAbsorber(ChillNum).Name,
                                     TypeOf_Chiller_Indirect_Absorption,
@@ -898,12 +898,12 @@ namespace ChillerIndirectAbsorption {
                                     IndirectAbsorber(ChillNum).CDLoopSideNum,
                                     IndirectAbsorber(ChillNum).CDBranchNum,
                                     IndirectAbsorber(ChillNum).CDCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     IndirectAbsorber(ChillNum).CondInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             InterConnectTwoPlantLoopSides(IndirectAbsorber(ChillNum).CWLoopNum,
                                           IndirectAbsorber(ChillNum).CWLoopSideNum,
                                           IndirectAbsorber(ChillNum).CDLoopNum,
@@ -918,12 +918,12 @@ namespace ChillerIndirectAbsorption {
                                         IndirectAbsorber(ChillNum).GenLoopSideNum,
                                         IndirectAbsorber(ChillNum).GenBranchNum,
                                         IndirectAbsorber(ChillNum).GenCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         IndirectAbsorber(ChillNum).GeneratorInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(IndirectAbsorber(ChillNum).CWLoopNum,
                                               IndirectAbsorber(ChillNum).CWLoopSideNum,
                                               IndirectAbsorber(ChillNum).GenLoopNum,

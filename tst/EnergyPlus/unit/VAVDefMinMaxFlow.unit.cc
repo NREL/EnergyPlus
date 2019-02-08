@@ -129,7 +129,6 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	Zone,",
         "	SPACE3-1, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -310,7 +309,6 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	Zone,",
         "	SPACE3-1, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -491,7 +489,6 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	Zone,",
         "	SPACE3-1, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -673,7 +670,6 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	Zone,",
         "	SPACE3-1, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -823,7 +819,6 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	Zone,",
         "	SPACE3-1, !- Name",
         "	0, !- Direction of Relative North { deg }",

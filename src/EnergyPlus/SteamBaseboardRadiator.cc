@@ -798,12 +798,12 @@ namespace SteamBaseboardRadiator {
                                         SteamBaseboard(BaseboardNum).LoopSideNum,
                                         SteamBaseboard(BaseboardNum).BranchNum,
                                         SteamBaseboard(BaseboardNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 SetLoopIndexFlag(BaseboardNum) = false;
                 if (errFlag) {
                     ShowFatalError("InitSteamBaseboard: Program terminated for previous conditions.");

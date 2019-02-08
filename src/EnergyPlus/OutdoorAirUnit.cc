@@ -1190,12 +1190,12 @@ namespace OutdoorAirUnit {
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitOutdoorAirUnit: Program terminated for previous conditions.");
                     }

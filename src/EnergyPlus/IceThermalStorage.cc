@@ -1414,13 +1414,15 @@ namespace IceThermalStorage {
         }
 
         if (MyPlantScanFlag(IceNum)) {
+            bool errFlag = false;
             ScanPlantLoopsForObject(DetIceStor(IceNum).Name,
                                     TypeOf_TS_IceDetailed,
                                     DetIceStor(IceNum).PlantLoopNum,
                                     DetIceStor(IceNum).PlantLoopSideNum,
                                     DetIceStor(IceNum).PlantBranchNum,
-                                    DetIceStor(IceNum).PlantCompNum);
-
+                                    DetIceStor(IceNum).PlantCompNum,
+                                    errFlag);
+            // if errFlag then do something...
             MyPlantScanFlag(IceNum) = false;
         }
 
@@ -1546,12 +1548,12 @@ namespace IceThermalStorage {
                                     IceStorage(IceNum).LoopSideNum,
                                     IceStorage(IceNum).BranchNum,
                                     IceStorage(IceNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }

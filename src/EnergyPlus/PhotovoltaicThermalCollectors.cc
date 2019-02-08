@@ -586,12 +586,12 @@ namespace PhotovoltaicThermalCollectors {
                                         PVT(PVTnum).WLoopSideNum,
                                         PVT(PVTnum).WLoopBranchNum,
                                         PVT(PVTnum).WLoopCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");
                 }

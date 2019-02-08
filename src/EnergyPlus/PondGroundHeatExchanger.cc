@@ -466,7 +466,7 @@ namespace PondGroundHeatExchanger {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
             ScanPlantLoopsForObject(
-                this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag);
+                this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
             }

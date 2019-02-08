@@ -959,7 +959,7 @@ namespace HVACManager {
         // DSU  Test plant loop for errors
         for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
             for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
-                CheckPlantMixerSplitterConsistency(LoopNum, LoopSide, 1, 1, FirstHVACIteration);
+                CheckPlantMixerSplitterConsistency(LoopNum, LoopSide, FirstHVACIteration);
                 CheckForRunawayPlantTemps(LoopNum, LoopSide);
             }
         }

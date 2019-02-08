@@ -92,8 +92,6 @@ TEST_F(EnergyPlusFixture, RunPeriod_Defaults)
 TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 {
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "8.8;",
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
@@ -248,8 +246,6 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 {
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "8.8;",
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
@@ -285,8 +281,6 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
     {
 
         std::string const idf_objects = delimited_string({
-            "Version, 9.0;",
-
             "RunPeriod,",
             "  Jan,                     !- Name",
             "  1,                       !- Begin Month",
@@ -322,8 +316,6 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
     {
 
         std::string const idf_objects = delimited_string({
-            "Version, 9.0;",
-
             "RunPeriod,",
             "  ,                        !- Name",
             "  1,                       !- Begin Month",
@@ -360,8 +352,6 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
     {
 
         std::string const idf_objects = delimited_string({
-            "Version, 9.0;",
-
             "RunPeriod,",
             "  NotLeap,                 !- Name",
             "  2,                       !- Begin Month",
@@ -406,8 +396,6 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
     {
 
         std::string const idf_objects = delimited_string({
-            "Version, 9.0;",
-
             "SizingPeriod:WeatherFileDays,",
             "  Weather File Sizing Period,  !- Name",
             "  4,                       !- Begin Month",

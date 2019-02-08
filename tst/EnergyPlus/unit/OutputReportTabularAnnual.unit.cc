@@ -66,7 +66,6 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Output:Table:Annual,",
         "Space Gains Annual Report, !- Name",
         "Filter1, !- Filter",
@@ -112,7 +111,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Output:Table:Annual,",
         "Space Gains Annual Report, !- Name",
         ", !- Filter",
@@ -160,7 +158,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Output:Table:Annual,",
         "Space Gains Annual Report, !- Name",
         ", !- Filter",
@@ -210,7 +207,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Output:Table:Annual,",
         "Test Report, !- Name",
         ", !- Filter",
@@ -274,7 +270,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 {
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Output:Table:Annual,",
         "Test Report, !- Name",
         ", !- Filter",
