@@ -569,7 +569,7 @@ namespace EnergyPlus {
                     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                         auto const &fields = instance.value();
                         auto const &thisObjectName = instance.key();
-                        //InputProcessor::markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                        inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                         EIRWaterToWaterHeatPump thisWWHP;
                         thisWWHP.plantTypeOfNum = classToInput.thisTypeNum;
