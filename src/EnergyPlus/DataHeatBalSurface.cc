@@ -95,9 +95,9 @@ namespace DataHeatBalSurface {
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
-    Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient
-    Array1D<Real64> HSkyExtSurf;                  // Outside Convection Coefficient
-    Array1D<Real64> HGrdExtSurf;                  // Outside Convection Coefficient
+    Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient to Air
+    Array1D<Real64> HSkyExtSurf;                  // Outside Convection Coefficient to Sky
+    Array1D<Real64> HGrdExtSurf;                  // Outside Convection Coefficient to Ground
     Array1D<Real64> TempSource;                   // Temperature at the source location for each heat transfer surface
     Array1D<Real64> TempUserLoc;                  // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;                // Temperature of the Inside Surface for each heat transfer surface

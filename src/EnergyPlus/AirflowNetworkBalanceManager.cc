@@ -5444,6 +5444,26 @@ namespace AirflowNetworkBalanceManager {
                                 Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
+            if (DataGlobals::DisplayAdvancedReportVariables) {
+                SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    AirflowNetworkZnRpt(i).ExfilTotalLoss,
+                                    "Zone",
+                                    "Average",
+                                    Zone(i).Name);
+                SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    AirflowNetworkZnRpt(i).ExfilSensiLoss,
+                                    "Zone",
+                                    "Average",
+                                    Zone(i).Name);
+                SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    AirflowNetworkZnRpt(i).ExfilLatentLoss,
+                                    "Zone",
+                                    "Average",
+                                    Zone(i).Name);
+            }
         }
 
         if (OnOffFanFlag) {
@@ -8491,7 +8511,7 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         }
-                        // TODO: H2O Heat of Vap?
+
                         if (ZoneAirHumRat(ZN2) > ZoneAirHumRat(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
@@ -8521,7 +8541,7 @@ namespace AirflowNetworkBalanceManager {
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(i), MAT(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
-            // TODO: InfilHeatLoss is watt?
+
             if (MAT(i) > Tamb) {
                 AirflowNetworkZnRpt(i).InfilHeatLoss = AirflowNetworkExchangeData(i).SumMCp * (MAT(i) - Tamb) * ReportingConstant;
                 AirflowNetworkZnRpt(i).InfilHeatGain = 0.0;
@@ -8542,7 +8562,6 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
 
-            // TODO: add report var?
             Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
             AirflowNetworkZnRpt(i).InletMass = 0;
             AirflowNetworkZnRpt(i).OutletMass = 0;

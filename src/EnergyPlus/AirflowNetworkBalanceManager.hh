@@ -150,8 +150,8 @@ namespace AirflowNetworkBalanceManager {
         Real64 ExfilLatentLoss;    // Latent heat Loss rate {W} due to exfiltration
         Real64 ExfilTotalLoss;     // Total heat Loss rate {W} due to exfiltration
         Real64 ExfilMass;          // Mass of Air {kg} due to exfiltration
-        Real64 InletMass;          // Mass of Air {kg} due to exfiltration
-        Real64 OutletMass;         // Mass of Air {kg} due to exfiltration
+        Real64 InletMass;          // Total zone inlet mass of air {kg}
+        Real64 OutletMass;         // Total zone outlet mass of air {kg}
 
         // Default Constructor
         AirflowNetworkReportVars()
