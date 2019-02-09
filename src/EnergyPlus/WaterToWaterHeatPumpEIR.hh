@@ -144,9 +144,7 @@ namespace EnergyPlus {
 
             static void pairUpCompanionCoils();
 
-            static void processInputForEIRWWHPHeating();
-
-            static void processInputForEIRWWHPCooling();
+            static void processInputForEIRWWHP();
 
             static void clear_state();
         };
