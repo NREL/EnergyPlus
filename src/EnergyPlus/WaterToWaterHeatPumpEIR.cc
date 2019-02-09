@@ -546,6 +546,7 @@ namespace EnergyPlus {
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
                     auto const &thisObjectName = instance.key();
+                    //InputProcessor::markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                     EIRWaterToWaterHeatPump thisWWHP;
                     thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -587,7 +588,7 @@ namespace EnergyPlus {
                     } else {
                         thisWWHP.referenceCapacity = tmpRefCapacity;
                     }
-                    auto tmpRefCOP = fields.at("reference_cop");
+                    auto tmpRefCOP = fields.at("reference_coefficient_of_performance");
                     if (tmpRefCOP == "Autosize") {
                         thisWWHP.referenceCOP = DataSizing::AutoSize;
                     } else {
@@ -680,6 +681,7 @@ namespace EnergyPlus {
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
                     auto const &thisObjectName = instance.key();
+                    //InputProcessor::markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                     EIRWaterToWaterHeatPump thisWWHP;
                     thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
@@ -721,7 +723,7 @@ namespace EnergyPlus {
                     } else {
                         thisWWHP.referenceCapacity = tmpRefCapacity;
                     }
-                    auto tmpRefCOP = fields.at("reference_cop");
+                    auto tmpRefCOP = fields.at("reference_coefficient_of_performance");
                     if (tmpRefCOP == "Autosize") {
                         thisWWHP.referenceCOP = DataSizing::AutoSize;
                     } else {
