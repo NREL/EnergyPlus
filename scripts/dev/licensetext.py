@@ -1,6 +1,8 @@
 import datetime
+import fnmatch
 import json
 import glob
+import os
 #
 # The previous year that is in the license. It should be a string
 #
@@ -198,7 +200,9 @@ class CodeChecker(Visitor):
         results = []
         for ext in extensions:
             results.extend(glob.glob(path+'*.'+ext))
-            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+            for root, _, filenames in os.walk(path):
+                for filename in fnmatch.filter(filenames, '*.'+ext):
+                    results.append(os.path.join(root, filename))
         return results
 
 class Checker(CodeChecker):
