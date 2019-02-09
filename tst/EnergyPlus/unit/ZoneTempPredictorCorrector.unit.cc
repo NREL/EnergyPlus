@@ -166,6 +166,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneW1.allocate(1);
 
     AirModel.allocate(1);
+    ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat
     ZoneW1(1) = 0.008;
@@ -912,20 +913,27 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     Array1D<Real64> runningAverageCEN(365, 25.0);
     CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
     ASSERT_TRUE(AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is initialized
-    ASSERT_EQ(25.55, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(
-                         DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
-    ASSERT_EQ(28.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(
-                         DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
-    ASSERT_EQ(29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(
-                         DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
-    ASSERT_EQ(27.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(
-                         DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
-    ASSERT_EQ(29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(
-                         DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
-    ASSERT_EQ(30.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(
-                         DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
-    ASSERT_EQ(31.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
-                         DayOfYear));                     // Tstat should show CEN 15251 Upper III LINE model set point
+    ASSERT_EQ(
+        25.55,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
+    ASSERT_EQ(
+        28.05,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
+    ASSERT_EQ(
+        29.05,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
+    ASSERT_EQ(27.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(
+                  DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
+    ASSERT_EQ(29.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(
+                  DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
+    ASSERT_EQ(30.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(
+                  DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
+    ASSERT_EQ(31.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
+                  DayOfYear));                            // Tstat should show CEN 15251 Upper III LINE model set point
     ASSERT_EQ(25.55, AdapComfortSetPointSummerDesDay(1)); // Tstat should show ASH 55 CENTRAL LINE model set point
     ASSERT_EQ(27.05, AdapComfortSetPointSummerDesDay(4)); // Tstat should show CEN 15251 CENTRAL LINE model set point
 
@@ -1594,4 +1602,3 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     SetPointSingleHeatCool.deallocate();
     SetPointDualHeatCool.deallocate();
 }
-

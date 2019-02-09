@@ -1647,7 +1647,9 @@ namespace ZoneContaminantPredictorCorrector {
         if (Contaminant.CO2Simulation) {
             for (Loop = 1; Loop <= NumOfZones; ++Loop) {
                 SumAllInternalCO2Gains(Loop, ZoneCO2Gain(Loop));
-                SumAllInternalCO2GainsExceptPeople(Loop, ZoneCO2GainExceptPeople(Loop));
+                if (HybridModel::FlagHybridModel_PC) {
+                    SumAllInternalCO2GainsExceptPeople(Loop, ZoneCO2GainExceptPeople(Loop));
+                }
                 SumInternalCO2GainsByTypes(Loop, Array1D_int(1, IntGainTypeOf_People), ZoneCO2GainFromPeople(Loop));
             }
         }
@@ -2633,7 +2635,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 // Hybrid modeling with CO2 concentration starts here.
                 GetHybridModelZone();
-                if (HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopelCountCalc_C && (!WarmupFlag) && (!DoingSizing)) {
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopelCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
 
                     Zone(ZoneNum).ZoneMeasuredCO2Concentration =
                         GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
@@ -2698,9 +2700,8 @@ namespace ZoneContaminantPredictorCorrector {
                             Real64 BB(0.0); // Sum of air mass flow rate times correcponding CO2 concentration except for the part from people
                             Real64 CC(0.0); // Same as C, zone CO2 moisture capacity
                             Real64 DD(0.0); // 3rd order backward difference terms
-                            Real64 CO2GainPeople(0.0);    // Inversely solved convectice heat gain from people (m^3/s)
-                            Real64 NumPeople(0.0);        // Inversely solved number of people in the zone
-                            Real64 FractionSensible(0.0); // Default sensible portion of the total heat from people
+                            Real64 CO2GainPeople(0.0); // Inversely solved convectice heat gain from people (m^3/s)
+                            Real64 NumPeople(0.0);     // Inversely solved number of people in the zone
                             Real64 CO2GenRate(0.0);
                             Real64 ActivityLevel(0.0);
                             Real64 SumSysM_HM(0.0);

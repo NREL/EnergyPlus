@@ -65,7 +65,8 @@ namespace HybridModel {
     // MODULE PARAMETER DEFINITIONS
 
     // MODULE VARIABLE TYPE DECLARATIONS:
-    extern bool FlagHybridModel_TM;   // True if hybrid model is activated
+    extern bool FlagHybridModel_TM;   // User input IM option - True if hybrid model (thermal mass) is activated
+    extern bool FlagHybridModel_PC;   // User input IM option - True if hybrid model (people count) is activated
     extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 
     // SUBROUTINE SPECIFICATIONS:
@@ -109,9 +110,9 @@ namespace HybridModel {
         // Default Constructor
         HybridModelProperties()
             : ZoneMeasuredTemperatureSchedulePtr(0), ZoneMeasuredHumidityRatioSchedulePtr(0), ZoneMeasuredCO2ConcentrationSchedulePtr(0),
-              ZoneSupplyAirTemperatureSchedulePtr(0), ZoneSupplyAirMassFlowRateSchedulePtr(0), ZoneSupplyAirHumidityRatioSchedulePtr(0),
-              ZoneSupplyAirCO2ConcentrationSchedulePtr(0), ZonePeopleActivityLevelSchedulePtr(0), ZonePeopleSensibleFractionSchedulePtr(0),
-              ZonePeopleRadiationFractionSchedulePtr(0), ZonePeopleCO2GenRateSchedulePtr(0), InternalThermalMassCalc_T(false),
+              ZonePeopleActivityLevelSchedulePtr(0), ZonePeopleSensibleFractionSchedulePtr(0), ZonePeopleRadiationFractionSchedulePtr(0),
+              ZonePeopleCO2GenRateSchedulePtr(0), ZoneSupplyAirTemperatureSchedulePtr(0), ZoneSupplyAirMassFlowRateSchedulePtr(0),
+              ZoneSupplyAirHumidityRatioSchedulePtr(0), ZoneSupplyAirCO2ConcentrationSchedulePtr(0), InternalThermalMassCalc_T(false),
               InfiltrationCalc_T(false), InfiltrationCalc_H(false), InfiltrationCalc_C(false), PeopelCountCalc_T(false), PeopelCountCalc_H(false),
               PeopelCountCalc_C(false), IncludeSystemSupplyParameters(false), ZoneMeasuredTemperatureStartMonth(0),
               ZoneMeasuredTemperatureStartDate(0), ZoneMeasuredTemperatureEndMonth(0), ZoneMeasuredTemperatureEndDate(0), HybridStartDayOfYear(0),

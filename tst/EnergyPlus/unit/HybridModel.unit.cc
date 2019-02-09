@@ -219,15 +219,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     Real64 ZoneTempChange;
 
     // Hybrid modeling trigger
-    FlagHybridModel = true;
+    FlagHybridModel_TM = true;
     WarmupFlag = false;
     DoingSizing = false;
     DayOfYear = 1;
 
     // Case 1: Hybrid model internal thermal mass
 
-    HybridModelZone(1).InfiltrationCalc = false;
-    HybridModelZone(1).InternalThermalMassCalc = true;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InternalThermalMassCalc_T = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
     MAT(1) = 0.0;
@@ -245,8 +245,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
 
     // Case 2: Hybrid model infiltration
 
-    HybridModelZone(1).InfiltrationCalc = true;
-    HybridModelZone(1).InternalThermalMassCalc = false;
+    HybridModelZone(1).InfiltrationCalc_T = true;
+    HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
     MAT(1) = 0.0;

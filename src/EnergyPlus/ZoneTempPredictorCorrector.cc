@@ -3713,7 +3713,9 @@ namespace ZoneTempPredictorCorrector {
             CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
-            SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+            if (HybridModel::FlagHybridModel_PC) {
+                SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+            }
 
             TempDepCoef = SumHA + SumMCp;
             TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged(ZoneNum);
@@ -4992,7 +4994,9 @@ namespace ZoneTempPredictorCorrector {
             CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
-            SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+            if (HybridModel::FlagHybridModel_PC) {
+                SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+            }
 
             //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
             ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
@@ -5144,7 +5148,6 @@ namespace ZoneTempPredictorCorrector {
 
                     Real64 HMMultiplierAverage(1.0);
                     Real64 MultpHM(1.0);
-                    Real64 InfilOAACHHM(0.0);
 
                     ZT(ZoneNum) =
                         Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone Air Temperature Averaged over the System Time Increment
@@ -5837,7 +5840,9 @@ namespace ZoneTempPredictorCorrector {
         CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
-        SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+        if (HybridModel::FlagHybridModel_PC) {
+            SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
+        }
 
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
         LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
@@ -5925,7 +5930,6 @@ namespace ZoneTempPredictorCorrector {
             Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
 
             if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
-                Real64 InfilOAACHHM(0.0);
 
                 ZoneAirHumRat(ZoneNum) = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
 
