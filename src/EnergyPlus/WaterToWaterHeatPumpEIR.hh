@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,9 @@ namespace EnergyPlus {
 
             // reference data
             Real64 referenceCapacity = 0.0;
+            bool referenceCapacityWasAutoSized = false;
             Real64 referenceCOP = 0.0;
+            bool referenceCOPWasAutoSized = false;
             Real64 referenceLeavingLoadSideTemp = 0.0;
             Real64 referenceEnteringSourceSideTemp = 0.0;
 

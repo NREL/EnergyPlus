@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -586,9 +586,9 @@ namespace EnergyPlus {
                         std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(
                                 fields.at("source_side_outlet_node_name")
                         );
-                        if (fields.find("companion_cooling_coil_name") != fields.end()) {  // optional field
+                        if (fields.find("companion_coil_name") != fields.end()) {  // optional field
                             thisWWHP.companionCoilName = UtilityRoutines::MakeUPPERCase(
-                                    fields.at("companion_cooling_coil_name")
+                                    fields.at("companion_coil_name")
                             );
                         }
                         auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
@@ -608,14 +608,18 @@ namespace EnergyPlus {
                         auto tmpRefCapacity = fields.at("reference_capacity");
                         if (tmpRefCapacity == "Autosize") {
                             thisWWHP.referenceCapacity = DataSizing::AutoSize;
+                            thisWWHP.referenceCapacityWasAutoSized = true;
                         } else {
                             thisWWHP.referenceCapacity = tmpRefCapacity;
                         }
-                        auto tmpRefCOP = fields.at("reference_coefficient_of_performance");
-                        if (tmpRefCOP == "Autosize") {
-                            thisWWHP.referenceCOP = DataSizing::AutoSize;
-                        } else {
-                            thisWWHP.referenceCOP = tmpRefCOP;
+                        if (fields.find("reference_coefficient_of_performance") != fields.end()) {  // optional field
+                            auto tmpRefCOP = fields.at("reference_coefficient_of_performance");
+                            if (tmpRefCOP == "Autosize") {
+                                thisWWHP.referenceCOP = DataSizing::AutoSize;
+                                thisWWHP.referenceCOPWasAutoSized = true;
+                            } else {
+                                thisWWHP.referenceCOP = tmpRefCOP;
+                            }
                         }
                         thisWWHP.referenceLeavingLoadSideTemp = fields.at(
                                 "reference_leaving_load_side_water_temperature");

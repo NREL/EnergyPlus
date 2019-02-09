@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,8 +122,8 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     EXPECT_EQ(2u, eir_wwhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[1];
+    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
+    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
@@ -339,7 +339,7 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
                             "  Autosize,",
                             "  Autosize,",
                             "  Autosize,",
-                            "  Autosize,",
+                            "  ,",
                             "  25.56,",
                             "  40.0,",
                             "  1,",
