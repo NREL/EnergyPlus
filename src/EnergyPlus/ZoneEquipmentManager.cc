@@ -56,13 +56,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
 #include <ChilledCeilingPanelSimple.hh>
 #include <CoolTower.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -3337,9 +3337,6 @@ namespace ZoneEquipmentManager {
         using BaseboardElectric::SimElectricBaseboard;
         using BaseboardRadiator::SimBaseboard;
         using CoolingPanelSimple::SimCoolingPanel;
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::AirflowNetworkFanActivated;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::NonAirSystemResponse;
@@ -3421,7 +3418,8 @@ namespace ZoneEquipmentManager {
 
                     if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
-                        if (!(AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone)) {
+                        if (!(AirflowNetwork::AirflowNetworkFanActivated &&
+                              AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                             SimAirLoopSplitter(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
                                                FirstCall,
@@ -3902,7 +3900,8 @@ namespace ZoneEquipmentManager {
 
                     if (SELECT_CASE_var == ZoneSplitter_Type) { // 'AirLoopHVAC:ZoneSplitter'
 
-                        if (!(AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone)) {
+                        if (!(AirflowNetwork::AirflowNetworkFanActivated &&
+                              AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                             SimAirLoopSplitter(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
                                                FirstCall,
@@ -4610,7 +4609,6 @@ namespace ZoneEquipmentManager {
         using DataAirLoop::AirLoopFlow;
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
-        using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
         using DataAirSystems::PrimaryAirSystem;
         using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::AddInfiltrationFlow;
@@ -4730,8 +4728,9 @@ namespace ZoneEquipmentManager {
                 }
 
                 for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
-
-                    if (AirflowNetworkNumOfExhFan == 0) TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+                        TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    }
                 }
 
                 // Include zone mixing mass flow rate
@@ -5401,10 +5400,6 @@ namespace ZoneEquipmentManager {
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using CoolTower::ManageCoolTower;
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::AirflowNetworkZoneFlag;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::MixingMassFlowCO2;
         using DataContaminantBalance::MixingMassFlowGC;
@@ -5548,7 +5543,10 @@ namespace ZoneEquipmentManager {
 
         if (AirFlowFlag != UseSimpleAirFlow) return;
         // AirflowNetwork Multizone field /= SIMPLE
-        if (!(SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS)) return;
+        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
+              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
+            return;
+        }
 
         ManageEarthTube();
         ManageCoolTower();
@@ -5567,8 +5565,9 @@ namespace ZoneEquipmentManager {
 
         // Process the scheduled Ventilation for air heat balance
         if (TotVentilation > 0) {
-            for (auto &e : ZnAirRpt)
+            for (auto &e : ZnAirRpt) {
                 e.VentilFanElec = 0.0;
+            }
         }
 
         // Initialization of ZoneAirBalance
@@ -5606,7 +5605,9 @@ namespace ZoneEquipmentManager {
             if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
                 I = Ventilation(j).HybridControlMasterNum;
                 NH = Ventilation(I).ZonePtr;
-                if (j == I) Ventilation(j).HybridControlMasterStatus = false;
+                if (j == I) {
+                    Ventilation(j).HybridControlMasterStatus = false;
+                }
             } else {
                 I = j;
                 NH = NZ;
@@ -5717,12 +5718,13 @@ namespace ZoneEquipmentManager {
                     Ventilation(j).FanPower = VAMFL_temp * Ventilation(j).FanPressure / (Ventilation(j).FanEfficiency * AirDensity);
                     if (Ventilation(j).FanType == BalancedVentilation) Ventilation(j).FanPower *= 2.0;
                     // calc electric
-                    if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+                    if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                         // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
                         if (!KickOffSimulation) {
-                            if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) || !AirflowNetworkZoneFlag(NZ))
+                            if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
+                                !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
                                 ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
-                        } else if (!AirflowNetworkZoneFlag(NZ)) {
+                        } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {
                             ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
                         }
                     } else {

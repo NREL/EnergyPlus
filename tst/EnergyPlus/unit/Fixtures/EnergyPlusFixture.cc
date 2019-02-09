@@ -74,7 +74,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -310,7 +310,7 @@ void EnergyPlusFixture::clear_all_states()
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CurveManager::clear_state();
-    DataAirflowNetwork::clear_state();
+    AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
