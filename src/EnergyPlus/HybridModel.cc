@@ -139,10 +139,6 @@ namespace HybridModel {
         int SupplyAirHumidityRatioSchPtr(0);
         int SupplyAirCO2ConcentrationSchPtr(0);
 
-        bool Flag_InternalThermalMassCalc(false); // Calculate zone thermal mass flag
-        bool Flag_AirInfiltrationCalc(false);     // Calculate zone air infiltration rate flag
-        bool Flag_PeopleCountCalc(false);         // Calculate zone people count flag
-
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
         NumOfHybridModelZones = inputProcessor->getNumObjectsFound(CurrentModuleObject);
