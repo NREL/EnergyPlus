@@ -58,11 +58,14 @@
 #include <DataPlant.hh>
 #include <DataSizing.hh>
 #include <FluidProperties.hh>
+#include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
 #include <PlantComponent.hh>
 #include <PlantUtilities.hh>
+#include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterToWaterHeatPumpEIR.hh>
 #include "CurveManager.hh"
@@ -440,40 +443,277 @@ namespace EnergyPlus {
             //   autosized fields, but also hard-sized fields so that we can report out significant deviations between
             //   the two values.
             // If plant sizing is not available, it tries to use a companion heat pump coil to do sizing
-            //
-            auto & tmpCapacity = this->referenceCapacity;
-            auto & tmpVolFlow = this->loadSideDesignVolFlowRate;
+
+            bool errorsFound = false;
+
+            // these variables will be used throughout this function as a temporary value of that physical state
+            Real64 tmpCapacity = this->referenceCapacity;
+            Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+            Real64 tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
+
+            std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+            Real64 loadSideInitTemp = DataGlobals::CWInitConvTemp;
+            Real64 sourceSideInitTemp = DataGlobals::HWInitConvTemp;
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+                loadSideInitTemp = DataGlobals::HWInitConvTemp;
+                sourceSideInitTemp = DataGlobals::CWInitConvTemp;
+            }
+
+            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                 loadSideInitTemp,
+                                                                 DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                 "EIRWaterToWaterHeatPump::size()");
+            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                     loadSideInitTemp,
+                                                                     DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                     "EIRWaterToWaterHeatPump::size()");
+            Real64 const rhoSrc = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                    sourceSideInitTemp,
+                                                                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                    "EIRWaterToWaterHeatPump::size()");
+            Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                        sourceSideInitTemp,
+                                                                        DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                        "EIRWaterToWaterHeatPump::size()");
+
             int pltLoadSizNum = DataPlant::PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
             if (pltLoadSizNum > 0) {
+                // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
+                // these represent what the unit would size those to, whether it is doing auto-sizing or not
                 if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
-                    tmpVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
+                    tmpLoadVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
                     if (this->companionHeatPumpCoil) {
-                        tmpVolFlow = max(tmpVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
-                        this->loadSideDesignVolFlowRate = tmpVolFlow;
+                        tmpLoadVolFlow = max(tmpLoadVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
+                        this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                     }
-                    Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
-                                                                   "EIRWaterToWaterHeatPump::size()");
-                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                                                       DataGlobals::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
-                                                                       "EIRWaterToWaterHeatPump::size()");
-                    tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpVolFlow;
+                    tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                } else if (this->companionHeatPumpCoil && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
+                    tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
+                    tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                } else {
+                    if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
+                    if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
+                }
+                // now we actually need to store and report out the values
+                if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                    // handle the auto-sizable reference capacity
+                    if (this->referenceCapacityWasAutoSized) {
+                        // if auto-sized, we just need to store the sized value and then report out the capacity when plant is ready
+                        this->referenceCapacity = tmpCapacity;
+                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                        }
+                        if (DataPlant::PlantFirstSizesOkayToReport) {
+                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                        }
+                    } else {
+                        // this blocks means the capacity value was hard-sized
+                        if (this->referenceCapacity > 0.0 && tmpCapacity > 0.0) {
+                            // then the capacity was hard-sized to a good value and the tmpCapacity was calculated to a good value too
+                            Real64 hardSizedCapacity = this->referenceCapacity;
+                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                                if (DataGlobals::DoPlantSizing) {
+                                    ReportSizingManager::ReportSizingOutput(typeName,
+                                                                            this->name,
+                                                                            "Design Size Nominal Capacity [W]",
+                                                                            tmpCapacity,
+                                                                            "User-Specified Nominal Capacity [W]",
+                                                                            hardSizedCapacity);
+                                } else {
+                                    ReportSizingManager::ReportSizingOutput(typeName,
+                                                                            this->name,
+                                                                            "User-Specified Nominal Capacity [W]",
+                                                                            hardSizedCapacity);
+                                }
+                                // we can warn here if there is a bit mismatch between hard- and auto-sized
+                                if (DataGlobals::DisplayExtraWarnings) {
+                                    if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
+                                        ShowMessage("EIRWaterToWaterHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                        ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
+                                        ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCapacity, 2) +
+                                                          " [W]");
+                                        ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                        ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    }
+                                }
+                            }
+                            // moving forward with more calculations, we need to update the 'tmp' capacity to the hard-sized value
+                            tmpCapacity = hardSizedCapacity;
+                        }
+                    }
+                    // now handle the auto-sizable load side flow rate
+                    if (this->loadSideDesignVolFlowRateWasAutoSized) {
+                        this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
+                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        }
+                        if (DataPlant::PlantFirstSizesOkayToReport) {
+                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        }
+                    } else {
+                        if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
+                            Real64 hardSizedLoadSideFlow = this->loadSideDesignVolFlowRate;
+                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                                if (DataGlobals::DoPlantSizing) {
+                                    ReportSizingManager::ReportSizingOutput(typeName,
+                                                                            this->name,
+                                                                            "Design Size Load Side Volume Flow Rate [m3/s]",
+                                                                            tmpLoadVolFlow,
+                                                                            "User-Specified Load Side Volume Flow Rate [m3/s]",
+                                                                            hardSizedLoadSideFlow);
+                                } else {
+                                    ReportSizingManager::ReportSizingOutput(typeName,
+                                                                            this->name,
+                                                                            "User-Specified Load Side Volume Flow Rate [m3/s]",
+                                                                            hardSizedLoadSideFlow);
+                                }
+                                if (DataGlobals::DisplayExtraWarnings) {
+                                    if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
+                                        DataSizing::AutoVsHardSizingThreshold) {
+                                        ShowMessage("EIRWaterToWaterHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                        ShowContinueError("User-Specified Load Side Volume Flow Rate of " +
+                                                          General::RoundSigDigits(hardSizedLoadSideFlow, 2) + " [m3/s]");
+                                        ShowContinueError("differs from Design Size Load Side Volume Flow Rate of " +
+                                                          General::RoundSigDigits(tmpLoadVolFlow, 2) + " [m3/s]");
+                                        ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                        ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    }
+                                }
+                            }
+                            tmpLoadVolFlow = hardSizedLoadSideFlow;
+                        }
+                    }
+                }
+            } else {
+                // no plant sizing available...try to use the companion coil
+                if (this->companionHeatPumpCoil) {
+                    if (this->companionHeatPumpCoil->loadSideDesignVolFlowRateWasAutoSized && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
+                        tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
+                        if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                            this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
+                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                                ReportSizingManager::ReportSizingOutput(typeName,
+                                                                        this->name,
+                                                                        "Design Size Load Side Volume Flow Rate [m3/s]",
+                                                                        tmpLoadVolFlow);
+                            }
+                            if (DataPlant::PlantFirstSizesOkayToReport) {
+                                ReportSizingManager::ReportSizingOutput(typeName,
+                                                                        this->name,
+                                                                        "Initial Design Size Load Side Volume Flow Rate [m3/s]",
+                                                                        tmpLoadVolFlow);
+                            }
+                        }
+                    }
+                    if (this->companionHeatPumpCoil->referenceCapacityWasAutoSized && this->companionHeatPumpCoil->referenceCapacity > 0.0) {
+                        tmpCapacity = this->companionHeatPumpCoil->referenceCapacity;
+                        if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                            this->referenceCapacity = tmpCapacity;
+                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                                ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                            }
+                            if (DataPlant::PlantFirstSizesOkayToReport) {
+                                ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                            }
+                        }
+                    }
+                } else {
+                    // no companion coil, and no plant sizing, so can't do anything
+                    if ((this->loadSideDesignVolFlowRateWasAutoSized || this->referenceCapacityWasAutoSized) && DataPlant::PlantFirstSizesOkayToFinalize) {
+                        ShowSevereError("EIRWaterToWaterHeatPump::size(): Autosizing requires a loop Sizing:Plant object.");
+                        ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->name);
+                        errorsFound = true;
+                    }
+                }
+                if (!this->loadSideDesignVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+                    ReportSizingManager::ReportSizingOutput(typeName, this->name, "User-Specified Load Side Flow Rate [m3/s]", this->loadSideDesignVolFlowRate);
+                }
+                if (!this->referenceCapacityWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+                    ReportSizingManager::ReportSizingOutput(typeName, this->name, "User-Specified Nominal Capacity [W]", this->referenceCapacity);
                 }
             }
-            if(this->loadSideDesignVolFlowRate == DataSizing::AutoSize) {
-                this->loadSideDesignVolFlowRate = 1.0;
+
+            // now we need to move on to the source side.  To start we need to override the calculated load side flow
+            // rate if it was actually hard-sized
+            if (!this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+
+            // calculate an auto-sized value for source design flow regardless of whether it was auto-sized or not
+            int plantSourceSizingIndex = DataPlant::PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
+            if (plantSourceSizingIndex > 0) {
+                // to get the source flow, we first must calculate the required heat impact on the source side
+                // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
+                // Then the energy balance:     Qsrc = Qload + Power
+                // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
+                Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+                // To get the design source flow rate, just apply the sensible heat rate equation:
+                //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
+                //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
+                tmpSourceVolFlow = designSourceSideHeatTransfer / (DataSizing::PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
+            } else {
+                // just assume it's the same as the load side if we don't have any sizing information
+                tmpSourceVolFlow = tmpLoadVolFlow;
             }
-            if(this->sourceSideDesignVolFlowRate == DataSizing::AutoSize) {
-                this->sourceSideDesignVolFlowRate = 1.0;
+            if (this->sourceSideDesignVolFlowRateWasAutoSized) {
+                this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+                if (DataPlant::PlantFinalSizesOkayToReport) {
+                    ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+                }
+                if (DataPlant::PlantFirstSizesOkayToReport) {
+                    ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+                }
+            } else {
+                // source design flow was hard-sized
+                if (this->sourceSideDesignVolFlowRate > 0.0 && tmpSourceVolFlow > 0.0) {
+                    Real64 const hardSizedSourceSideFlow = this->sourceSideDesignVolFlowRate;
+                    if (DataPlant::PlantFinalSizesOkayToReport) {
+                        if (DataGlobals::DoPlantSizing) {
+                            ReportSizingManager::ReportSizingOutput(typeName,
+                                                                    this->name,
+                                                                    "Design Size Source Side Volume Flow Rate [m3/s]",
+                                                                    tmpSourceVolFlow,
+                                                                    "User-Specified Source Side Volume Flow Rate [m3/s]",
+                                                                    hardSizedSourceSideFlow);
+                        } else {
+                            ReportSizingManager::ReportSizingOutput(typeName,
+                                                                    this->name,
+                                                                    "User-Specified Source Side Volume Flow Rate [m3/s]",
+                                                                    hardSizedSourceSideFlow);
+                        }
+                        if (DataGlobals::DisplayExtraWarnings) {
+                            if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
+                                DataSizing::AutoVsHardSizingThreshold) {
+                                ShowMessage("EIRWaterToWaterHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                ShowContinueError("User-Specified Source Side Volume Flow Rate of " +
+                                                  General::RoundSigDigits(hardSizedSourceSideFlow, 2) + " [m3/s]");
+                                ShowContinueError("differs from Design Size Source Side Volume Flow Rate of " +
+                                                  General::RoundSigDigits(tmpSourceVolFlow, 2) + " [m3/s]");
+                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            }
+                        }
+                    }
+                    tmpSourceVolFlow = hardSizedSourceSideFlow;
+                }
             }
-            if(this->referenceCapacity == DataSizing::AutoSize) {
-                this->referenceCapacity = 1000;
+
+            // skipping autosized power section
+
+            // register the design volume flows with the plant, only doing half of source because the companion
+            // is generally on the same loop
+            PlantUtilities::RegisterPlantCompDesignFlow(this->loadSideNodes.inlet, tmpLoadVolFlow);
+            PlantUtilities::RegisterPlantCompDesignFlow(this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
+
+            if (DataPlant::PlantFinalSizesOkayToReport) {
+                // create predefined report
+                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->name, typeName);
+                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->name, this->referenceCOP);
+                //OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->name, this->RatedPowerCool);
             }
-            if(this->referenceCOP == DataSizing::AutoSize) {
-                this->referenceCOP = 3.14;
+
+            if (errorsFound) {
+                ShowFatalError("Preceding sizing errors cause program termination");
             }
+
         }
 
         PlantComponent *EIRWaterToWaterHeatPump::factory(int plantTypeOfNum, std::string objectName) {
@@ -630,6 +870,7 @@ namespace EnergyPlus {
                         } else {
                             thisWWHP.referenceCapacity = tmpRefCapacity;
                         }
+
                         try {
                             thisWWHP.referenceCOP = fields.at("reference_coefficient_of_performance");
                         } catch (...) {
@@ -640,12 +881,40 @@ namespace EnergyPlus {
                                 // but excluding it from coverage
                                 ShowSevereError("EIR WWHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
                                 errorsFound = true;  // LCOV_EXCL_LINE
+                            } else {
+                                thisWWHP.referenceCOP = defaultVal;
                             }
                         }
-                        thisWWHP.referenceLeavingLoadSideTemp = fields.at(
-                                "reference_leaving_load_side_water_temperature");
-                        thisWWHP.referenceEnteringSourceSideTemp = fields.at(
-                                "reference_entering_source_side_fluid_temperature");
+
+                        try {
+                            thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
+                        } catch (...) {
+                            Real64 defaultVal = 0.0;
+                            if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_leaving_load_side_water_temperature", defaultVal)) {
+                                // this error condition would mean that someone broke the input dictionary, not their
+                                // input file.  I can't really unit test it so I'll leave it here as a severe error
+                                // but excluding it from coverage
+                                ShowSevereError("EIR WWHP: Reference leaving load side temp not entered and could not get default value"); // LCOV_EXCL_LINE
+                                errorsFound = true;  // LCOV_EXCL_LINE
+                            } else {
+                                thisWWHP.referenceLeavingLoadSideTemp = defaultVal;
+                            }
+                        }
+
+                        try {
+                            thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
+                        } catch (...) {
+                            Real64 defaultVal = 0.0;
+                            if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_entering_source_side_fluid_temperature", defaultVal)) {
+                                // this error condition would mean that someone broke the input dictionary, not their
+                                // input file.  I can't really unit test it so I'll leave it here as a severe error
+                                // but excluding it from coverage
+                                ShowSevereError("EIR WWHP: Reference entering source side temp not entered and could not get default value"); // LCOV_EXCL_LINE
+                                errorsFound = true;  // LCOV_EXCL_LINE
+                            } else {
+                                thisWWHP.referenceEnteringSourceSideTemp = defaultVal;
+                            }
+                        }
 
                         try {
                             thisWWHP.sizingFactor = fields.at("sizing_factor");
@@ -657,6 +926,8 @@ namespace EnergyPlus {
                                 // but excluding it from coverage
                                 ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value"); // LCOV_EXCL_LINE
                                 errorsFound = true;  // LCOV_EXCL_LINE
+                            } else {
+                                thisWWHP.sizingFactor = defaultVal;
                             }
                         }
 
