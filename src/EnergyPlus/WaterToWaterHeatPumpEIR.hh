@@ -48,6 +48,7 @@
 #ifndef ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
 #define ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -80,7 +81,6 @@ namespace EnergyPlus {
             Real64 referenceCapacity = 0.0;
             bool referenceCapacityWasAutoSized = false;
             Real64 referenceCOP = 0.0;
-            bool referenceCOPWasAutoSized = false;
             Real64 referenceLeavingLoadSideTemp = 0.0;
             Real64 referenceEnteringSourceSideTemp = 0.0;
 
@@ -122,6 +122,11 @@ namespace EnergyPlus {
             bool oneTimeInit = true;
             bool envrnInit = true;
 
+            // a couple worker functions to easily allow merging of cooling and heating operations
+            std::function<Real64 (Real64, Real64)> calcLoadOutletTemp;
+            std::function<Real64 (Real64, Real64)> calcQsource;
+            std::function<Real64 (Real64, Real64)> calcSourceOutletTemp;
+
             virtual ~EIRWaterToWaterHeatPump() = default;
 
             EIRWaterToWaterHeatPump() = default;
@@ -136,11 +141,13 @@ namespace EnergyPlus {
                                      Real64 &EP_UNUSED(MinLoad),
                                      Real64 &EP_UNUSED(OptLoad)) override;
 
+            void doPhysics(Real64 currentLoad);
+
             void size();
 
-            Real64 getLoadSideOutletSetpointTemp();
+            Real64 getLoadSideOutletSetPointTemp();
 
-            void initialize(bool const runFlag);
+            void setOperatingFlowRates();
 
             static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
@@ -149,6 +156,10 @@ namespace EnergyPlus {
             static void processInputForEIRWWHP();
 
             static void clear_state();
+
+            static Real64 add(Real64 const a, Real64 const b) {return a + b;}
+
+            static Real64 subtract(Real64 const a, Real64 const b) {return a - b;}
         };
 
         extern std::vector<EIRWaterToWaterHeatPump> eir_wwhp;

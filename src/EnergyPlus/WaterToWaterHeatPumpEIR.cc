@@ -1,3 +1,5 @@
+#include <utility>
+
 // EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -77,7 +79,47 @@ namespace EnergyPlus {
             eir_wwhp.clear();
         }
 
-        Real64 EIRWaterToWaterHeatPump::getLoadSideOutletSetpointTemp() {
+        void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+                                               bool const FirstHVACIteration,
+                                               Real64 &CurLoad,
+                                               bool const RunFlag) {
+
+            std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
+
+            // Call initialize to set flow rates, run flag, and entering temperatures
+            this->running = RunFlag;
+            this->setOperatingFlowRates();
+
+            if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
+                PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
+                                                                    this->sourceSideLocation.loopSideNum,
+                                                                    this->plantTypeOfNum,
+                                                                    this->sourceSideNodes.inlet,
+                                                                    this->sourceSideNodes.outlet,
+                                                                    this->sourceSideHeatTransfer,
+                                                                    this->sourceSideInletTemp,
+                                                                    this->sourceSideOutletTemp,
+                                                                    this->sourceSideMassFlowRate,
+                                                                    FirstHVACIteration);
+                return;
+            }
+
+            if (this->running) {
+                this->doPhysics(CurLoad);
+            } else {
+                this->loadSideHeatTransfer = 0.0;
+                this->loadSideOutletTemp = this->loadSideInletTemp;
+                this->powerUsage = 0.0;
+                this->sourceSideHeatTransfer = 0.0;
+                this->sourceSideOutletTemp = this->sourceSideInletTemp;
+            }
+
+            // update nodes
+            DataLoopNode::Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+            DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+        }
+
+        Real64 EIRWaterToWaterHeatPump::getLoadSideOutletSetPointTemp() {
             auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
             auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
             auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
@@ -97,17 +139,15 @@ namespace EnergyPlus {
                     return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
                 }
             } else {
-                ShowFatalError("Unsupported loop demand calculation scheme in EIR heat pump");
-                return -999; // not actually returned with Fatal Error call above
+                // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
+                // lines, they simply should not be able to get here.  But a fatal is here anyway just in case,
+                // and the lines are excluded from coverage.
+                ShowFatalError("Unsupported loop demand calculation scheme in EIR heat pump");  // LCOV_EXCL_LINE
+                return -999; // not actually returned with Fatal Error call above  // LCOV_EXCL_LINE
             }
         }
 
-        void EIRWaterToWaterHeatPump::initialize(bool const runFlag) {
-            // This function is used to set the struct up for simulation, including the following responsibilities:
-            // 1: Set load and source side flow rates
-            // 2: Set unit running flag
-            // 3: Set entering load and source temperatures
-            this->running = runFlag;
+        void EIRWaterToWaterHeatPump::setOperatingFlowRates() {
             if (!this->running) {
                 this->loadSideMassFlowRate = 0.0;
                 this->sourceSideMassFlowRate = 0.0;
@@ -183,117 +223,60 @@ namespace EnergyPlus {
                                                             DataPlant::CriteriaType_MassFlowRate,
                                                             this->sourceSideMassFlowRate);
             }
-            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
         }
 
-        void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-                                               bool const FirstHVACIteration,
-                                               Real64 &CurLoad,
-                                               bool const RunFlag) {
+        void EIRWaterToWaterHeatPump::doPhysics(Real64 currentLoad) {
+            // read inlet temperatures
+            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
-            std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
+            // get setpoint on the load side outlet
+            Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp();
 
-            // Call initialize to set flow rates, run flag, and entering temperatures
-            this->initialize(RunFlag);
-
-            if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
-                PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
-                                                                    this->sourceSideLocation.loopSideNum,
-                                                                    this->plantTypeOfNum,
-                                                                    this->sourceSideNodes.inlet,
-                                                                    this->sourceSideNodes.outlet,
-                                                                    this->sourceSideHeatTransfer,
-                                                                    this->sourceSideInletTemp,
-                                                                    this->sourceSideOutletTemp,
-                                                                    this->sourceSideMassFlowRate,
-                                                                    FirstHVACIteration);
-                return;
+            // evaluate capacity modifier curve and determine load side heat transfer
+            Real64 capacityModifierFuncTemp = CurveManager::CurveValue(
+                    this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp
+            );
+            Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
+            Real64 partLoadRatio = 0.0;
+            if (availableCapacity > 0) {
+                partLoadRatio = max(0.0, min(std::abs(currentLoad) / availableCapacity, 1.0));
             }
+            auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+                    thisLoadPlantLoop.FluidName,
+                    DataLoopNode::Node(this->loadSideNodes.inlet).Temp,
+                    thisLoadPlantLoop.FluidIndex,
+                    "WWHPEIR::simulate()"
+            );
+            this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
 
-            if (this->running) {
+            // calculate load side outlet conditions
+            Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
+            this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
 
-                Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetpointTemp();
-                Real64 const sourceInletNodeTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
-                Real64 capacityModifierFuncTemp = CurveManager::CurveValue(
-                        this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, sourceInletNodeTemp
-                );
-                Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-                Real64 partLoadRatio = 0.0;
-                if (availableCapacity > 0) {
-                    partLoadRatio = max(0.0, min(std::abs(CurLoad) / availableCapacity, 1.0));
-                }
+            // calculate power usage from EIR curves
+            Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex,
+                                                                  this->loadSideOutletTemp,
+                                                                  this->sourceSideInletTemp);
+            Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
+                                                                 partLoadRatio);
+            this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
-                auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                        thisLoadPlantLoop.FluidName,
-                        DataLoopNode::Node(this->loadSideNodes.inlet).Temp,
-                        thisLoadPlantLoop.FluidIndex,
-                        "WWHPEIR::simulate()"
-                );
+            // energy balance on heat pump
+            this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
 
-                this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
-
-                if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-
-                    // calculate load side
-                    Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
-                    this->loadSideOutletTemp = this->loadSideInletTemp + this->loadSideHeatTransfer / loadMCp;
-
-                    // calculate power usage from EIR curves
-                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex,
-                                                                          this->loadSideOutletTemp,
-                                                                          this->sourceSideInletTemp);
-                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
-                                                                         partLoadRatio);
-                    this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
-
-                    // energy balance on coil
-                    this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
-
-                    // calculate source side
-                    Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
-                    this->sourceSideOutletTemp = this->sourceSideInletTemp - this->sourceSideHeatTransfer / sourceMCp;
-
-                } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) {
-
-                    // calculate load side
-                    Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
-                    this->loadSideOutletTemp = this->loadSideInletTemp - this->loadSideHeatTransfer / loadMCp;
-
-                    // calculate power usage from EIR curves
-                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex,
-                                                                          this->loadSideOutletTemp,
-                                                                          this->sourceSideInletTemp);
-                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
-                                                                         partLoadRatio);
-                    this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
-
-                    // energy balance on coil
-                    this->sourceSideHeatTransfer = this->loadSideHeatTransfer + this->powerUsage;
-
-                    // calculate source side
-                    Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
-                    this->sourceSideOutletTemp = this->sourceSideInletTemp + this->sourceSideHeatTransfer / sourceMCp;
-
-                }
-            } else {
-                this->loadSideHeatTransfer = 0.0;
-                this->loadSideOutletTemp = this->loadSideInletTemp;
-                this->powerUsage = 0.0;
-                this->sourceSideHeatTransfer = 0.0;
-                this->sourceSideOutletTemp = this->sourceSideInletTemp;
-            }
-
-            // update nodes
-            DataLoopNode::Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
-            DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+            // calculate source side
+            Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
+            this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
         }
 
         void EIRWaterToWaterHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
             // This function does all one-time and begin-environment initialization
             std::string const routineName = EIRWaterToWaterHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
             if (this->oneTimeInit) {
+                bool errFlag = false;
+
                 // setup output variables
                 SetupOutputVariable(
                         "EIR WWHP Load Side Heat Transfer", OutputProcessor::Unit::W, this->loadSideHeatTransfer,
@@ -317,21 +300,27 @@ namespace EnergyPlus {
                                     "Average", this->name);
 
                 // find this component on the plant
-                bool errFlag = false;
+                bool thisErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(this->name,
                                                         this->plantTypeOfNum,
                                                         this->loadSideLocation.loopNum,
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
-                                                        errFlag,
+                                                        thisErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         this->loadSideNodes.inlet,
                                                         _);
 
-                if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // throw error
+                if (thisErrFlag) {
+                    ShowSevereError(routineName + ": Plant topology problem for " +
+                                    DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                    this->name + "\"");
+                    ShowContinueError("Could not locate component's load side connections on a plant loop");
+                    errFlag = true;
+                } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
                     ShowSevereError(routineName + ": Invalid connections for " +
                                     DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                     this->name + "\"");
@@ -339,20 +328,27 @@ namespace EnergyPlus {
                     errFlag = true;
                 }
 
+                thisErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(this->name,
                                                         this->plantTypeOfNum,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,
                                                         this->sourceSideLocation.branchNum,
                                                         this->sourceSideLocation.compNum,
-                                                        errFlag,
+                                                        thisErrFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         this->sourceSideNodes.inlet,
                                                         _);
 
-                if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // throw error
+                if (thisErrFlag) {
+                    ShowSevereError(routineName + ": Plant topology problem for " +
+                                    DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                    this->name + "\"");
+                    ShowContinueError("Could not locate component's source side connections on a plant loop");
+                    errFlag = true;
+                } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
                     ShowSevereError(routineName + ": Invalid connections for " +
                                     DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                     this->name + "\"");
@@ -494,7 +490,7 @@ namespace EnergyPlus {
             }
 
             ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
-            return nullptr;
+            return nullptr;  // LCOV_EXCL_LINE
         }
 
         void EIRWaterToWaterHeatPump::pairUpCompanionCoils() {
@@ -536,10 +532,22 @@ namespace EnergyPlus {
                 std::string thisType;
                 int thisTypeNum;
                 std::string nodesType;
-                ClassType(std::string _thisType, int _thisTypeNum, std::string _nodesType) :
+                std::function<Real64 (Real64, Real64)> calcLoadOutletTemp;
+                std::function<Real64 (Real64, Real64)> calcQsource;
+                std::function<Real64 (Real64, Real64)> calcSourceOutletTemp;
+                ClassType(
+                        std::string _thisType,
+                        int _thisTypeNum,
+                        std::string _nodesType,
+                        std::function<Real64 (Real64, Real64)> _tLoadOutFunc,
+                        std::function<Real64 (Real64, Real64)> _qSrcFunc,
+                        std::function<Real64 (Real64, Real64)> _tSrcOutFunc) :
                     thisType(std::move(_thisType)),
                     thisTypeNum(_thisTypeNum),
-                    nodesType(std::move(_nodesType))
+                    nodesType(std::move(_nodesType)),
+                    calcLoadOutletTemp(std::move(_tLoadOutFunc)),
+                    calcQsource(std::move(_qSrcFunc)),
+                    calcSourceOutletTemp(std::move(_tSrcOutFunc))
                 {}
             };
             std::vector<ClassType> classesToInput =
@@ -547,12 +555,18 @@ namespace EnergyPlus {
                     ClassType{
                         "HeatPump:WaterToWater:EIR:Cooling",
                         DataPlant::TypeOf_HeatPumpEIRCooling,
-                        "Chilled Water Nodes"
+                        "Chilled Water Nodes",
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::subtract,
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::add,
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::add
                     },
                     ClassType{
                         "HeatPump:WaterToWater:EIR:Heating",
                         DataPlant::TypeOf_HeatPumpEIRHeating,
-                        "Hot Water Nodes"
+                        "Hot Water Nodes",
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::add,
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::subtract,
+                        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::subtract
                     }
                 };
 
@@ -563,7 +577,11 @@ namespace EnergyPlus {
                 if (numWWHP > 0) {
                     auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
                     if (instances == inputProcessor->epJSON.end()) {
-                        errorsFound = true;
+                        // Cannot imagine how you would have numWWHP > 0 and yet the instances is empty
+                        // this would indicate a major problem in the input processor, not a problem here
+                        // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
+                        ShowSevereError("EIR WWHP: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                        errorsFound = true;  // LCOV_EXCL_LINE
                     }
                     auto &instancesValue = instances.value();
                     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -612,13 +630,16 @@ namespace EnergyPlus {
                         } else {
                             thisWWHP.referenceCapacity = tmpRefCapacity;
                         }
-                        if (fields.find("reference_coefficient_of_performance") != fields.end()) {  // optional field
-                            auto tmpRefCOP = fields.at("reference_coefficient_of_performance");
-                            if (tmpRefCOP == "Autosize") {
-                                thisWWHP.referenceCOP = DataSizing::AutoSize;
-                                thisWWHP.referenceCOPWasAutoSized = true;
-                            } else {
-                                thisWWHP.referenceCOP = tmpRefCOP;
+                        try {
+                            thisWWHP.referenceCOP = fields.at("reference_coefficient_of_performance");
+                        } catch (...) {
+                            Real64 defaultVal = 0.0;
+                            if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
+                                // this error condition would mean that someone broke the input dictionary, not their
+                                // input file.  I can't really unit test it so I'll leave it here as a severe error
+                                // but excluding it from coverage
+                                ShowSevereError("EIR WWHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
+                                errorsFound = true;  // LCOV_EXCL_LINE
                             }
                         }
                         thisWWHP.referenceLeavingLoadSideTemp = fields.at(
@@ -631,8 +652,11 @@ namespace EnergyPlus {
                         } catch (...) {
                             Real64 defaultVal = 0.0;
                             if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
-                                ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value");
-                                errorsFound = true;
+                                // this error condition would mean that someone broke the input dictionary, not their
+                                // input file.  I can't really unit test it so I'll leave it here as a severe error
+                                // but excluding it from coverage
+                                ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value"); // LCOV_EXCL_LINE
+                                errorsFound = true;  // LCOV_EXCL_LINE
                             }
                         }
 
@@ -687,6 +711,11 @@ namespace EnergyPlus {
                                 cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName,
                                 "Condenser Water Nodes");
 
+                        // store the worker functions that generalized the heating/cooling sides
+                        thisWWHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;
+                        thisWWHP.calcQsource = classToInput.calcQsource;
+                        thisWWHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
+
                         if (!errorsFound) {
                             eir_wwhp.push_back(thisWWHP);
                         }
@@ -694,7 +723,10 @@ namespace EnergyPlus {
                 }
             }
             if (errorsFound) {
-                ShowFatalError("Previous EIR WWHP errors cause program termination");
+                // currently there are no straightforward unit tests possible to get here
+                // all curves are required and inputs are validated by the input processor
+                // obviously this will stay here but I don't feel like counting it against coverage
+                ShowFatalError("Previous EIR WWHP errors cause program termination");  // LCOV_EXCL_LINE
             }
         }
 
