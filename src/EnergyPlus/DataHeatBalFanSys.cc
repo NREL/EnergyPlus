@@ -133,27 +133,27 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> WZoneTimeMinus3Temp; // Zone air humidity ratio at timestep T-3
     Array1D<Real64> ZoneAirHumRatOld;    // Last Time Steps Zone AIR Humidity Ratio
 
-    Array1D<Real64> MCPI;                 // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTI;                // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPV;                 // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTV;                // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPM;                 // Mixing MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTM;                // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPE;                 // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> EAMFL;                // OUTDOOR AIR MASS FLOW for EarthTube
-    Array1D<Real64> EAMFLxHumRat;         // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
-    Array1D<Real64> MCPTE;                // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPC;                 // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> CTMFL;                // OUTDOOR AIR MASS FLOW for cooltower
-    Array1D<Real64> MCPTC;                // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ThermChimAMFL;        // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
-    Array1D<Real64> MCPTThermChim;        // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPThermChim;         // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ZoneLatentGain;       // Latent Energy from each Zone (People, equipment)
-    Array1D<Real64> ZoneLatentGainExceptPeople;       // Added for hybrid model -- Latent Energy from each Zone (equipment)
-    Array1D<Real64> OAMFL;                // OUTDOOR AIR MASS FLOW (M**3/SEC) for infiltration
-    Array1D<Real64> VAMFL;                // OUTDOOR AIR MASS FLOW (M**3/SEC) for ventilation
-    Array1D<Real64> NonAirSystemResponse; // Convective heat addition rate from non forced air
+    Array1D<Real64> MCPI;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> MCPTI;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> MCPV;                       // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> MCPTV;                      // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> MCPM;                       // Mixing MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> MCPTM;                      // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> MCPE;                       // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> EAMFL;                      // OUTDOOR AIR MASS FLOW for EarthTube
+    Array1D<Real64> EAMFLxHumRat;               // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
+    Array1D<Real64> MCPTE;                      // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> MCPC;                       // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> CTMFL;                      // OUTDOOR AIR MASS FLOW for cooltower
+    Array1D<Real64> MCPTC;                      // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> ThermChimAMFL;              // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
+    Array1D<Real64> MCPTThermChim;              // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
+    Array1D<Real64> MCPThermChim;               // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
+    Array1D<Real64> ZoneLatentGain;             // Latent Energy from each Zone (People, equipment)
+    Array1D<Real64> ZoneLatentGainExceptPeople; // Added for hybrid model -- Latent Energy from each Zone (equipment)
+    Array1D<Real64> OAMFL;                      // OUTDOOR AIR MASS FLOW (M**3/SEC) for infiltration
+    Array1D<Real64> VAMFL;                      // OUTDOOR AIR MASS FLOW (M**3/SEC) for ventilation
+    Array1D<Real64> NonAirSystemResponse;       // Convective heat addition rate from non forced air
     // equipment such as baseboards plus heat from lights to
     Array1D<Real64> SysDepZoneLoads; // Convective heat addition or subtraction rate from sources that
     // depend on what is happening with the HVAC system. Such as:
@@ -223,9 +223,9 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> ZTM2;   // zone air temperature at timestep T-2
     Array1D<Real64> ZTM3;   // zone air temperature at previous T-3
     // Hybrid Modeling
-    Array1D<Real64> PreviousMeasuredZT1; // Hybrid model internal mass multiplier at previous timestep
-    Array1D<Real64> PreviousMeasuredZT2; // Hybrid model internal mass multiplier at previous timestep
-    Array1D<Real64> PreviousMeasuredZT3; // Hybrid model internal mass multiplier at previous timestep
+    Array1D<Real64> PreviousMeasuredZT1;     // Hybrid model internal mass multiplier at previous timestep
+    Array1D<Real64> PreviousMeasuredZT2;     // Hybrid model internal mass multiplier at previous timestep
+    Array1D<Real64> PreviousMeasuredZT3;     // Hybrid model internal mass multiplier at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat1; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
@@ -346,6 +346,12 @@ namespace DataHeatBalFanSys {
         ZTM1.deallocate();
         ZTM2.deallocate();
         ZTM3.deallocate();
+        PreviousMeasuredZT1.deallocate();
+        PreviousMeasuredZT2.deallocate();
+        PreviousMeasuredZT3.deallocate();
+        PreviousMeasuredHumRat1.deallocate();
+        PreviousMeasuredHumRat2.deallocate();
+        PreviousMeasuredHumRat3.deallocate();
         ZoneTMX.deallocate();
         ZoneTM2.deallocate();
         ZoneT1.deallocate();

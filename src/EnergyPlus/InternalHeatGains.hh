@@ -96,10 +96,10 @@ namespace InternalHeatGains {
 
     void UpdateInternalGainValues(Optional_bool_const SuppressRadiationUpdate = _, Optional_bool_const SumLatentGains = _);
 
-    void SumAllInternalConvectionGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+    void SumAllInternalConvectionGains(int const ZoneNum,        // zone index pointer for which zone to sum gains for
                                        Real64 &SumConvGainRate); // For HybridModel
 
-    void SumAllInternalConvectionGainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
+    void SumAllInternalConvectionGainsExceptPeople(int const ZoneNum,                    // zone index pointer for which zone to sum gains for
                                                    Real64 &SumConvGainRateExceptPeople); // For HybridModel
 
     void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
@@ -167,7 +167,7 @@ namespace InternalHeatGains {
 
     // Added for hybrid model -- Overload function for calculating CO2 gains except people
     void SumAllInternalCO2GainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
-											Real64 &SumCO2GainRateExceptPeople);
+                                            Real64 &SumCO2GainRateExceptPeople);
 
     void SumInternalCO2GainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
                                     Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types

@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -97,6 +98,7 @@ using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::HybridModel;
 using namespace SimulationManager;
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
@@ -122,6 +124,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     Node.allocate(5);
 
     Zone.allocate(1);
+    HybridModelZone.allocate(1);
     Zone(1).Name = ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
@@ -191,6 +194,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
+
+    // HybridModel
+    HybridModelZone(1).PeopelCountCalc_H = false;
 
     CorrectZoneHumRat(1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
@@ -291,6 +297,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     Zone.deallocate();
+    HybridModelZone.deallocate();
     ZoneLatentGain.deallocate();
     ZoneEqSizing.deallocate();
     SumLatentHTRadSys.deallocate();

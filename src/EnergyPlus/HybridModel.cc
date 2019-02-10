@@ -204,21 +204,17 @@ namespace HybridModel {
                     HybridModelZone(ZonePtr).PeopelCountCalc_H = false;
                     HybridModelZone(ZonePtr).PeopelCountCalc_C = false;
 
-                    Flag_InternalThermalMassCalc = false;
-                    Flag_AirInfiltrationCalc = false;
-                    Flag_PeopleCountCalc = false;
-
                     // Scenario 1: Only one unknown parameter to solve
                     // Scenario 1-1: To solve thermal mass
                     if (FlagHybridModel_TM) {
                         if (FlagHybridModel_AI) {
-                            ShowWarningError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
-                            ShowContinueError("Field \"" + cAlphaFieldNames(4) + "\" is changed to NO for the hybrid modeling simulations.");
+                            ShowSevereError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
+                            ErrorsFound = true;
                         }
 
                         if (FlagHybridModel_PC) {
-                            ShowWarningError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
-                            ShowContinueError("Field \"" + cAlphaFieldNames(5) + "\" is changed to NO for the hybrid modeling simulations.");
+                            ShowSevereError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                            ErrorsFound = true;
                         }
 
                         if (TemperatureSchPtr == 0) {
@@ -232,8 +228,8 @@ namespace HybridModel {
                     // Scenario 1-2: To solve infiltration rate
                     if (FlagHybridModel_AI) {
                         if (FlagHybridModel_PC) {
-                            ShowWarningError("Field \"" + cAlphaFieldNames(4) + "\" and \"" + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
-                            ShowContinueError("Field \"" + cAlphaFieldNames(5) + "\" is changed to NO for the hybrid modeling simulations.");
+                            ShowSevereError("Field \"" + cAlphaFieldNames(4) + "\" and \"" + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                            ErrorsFound = true;
                         }
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
@@ -246,20 +242,20 @@ namespace HybridModel {
                                 // Temperature schedule is provided, igonore humidity ratio and CO2 concentration schedules.
                                 HybridModelZone(ZonePtr).InfiltrationCalc_T = true;
                                 if (HumidityRatioSchPtr > 0) {
-                                    ShowWarningError(
-                                        "The meausured air humidity ratio schedule will not be used since measured air temperature is provided.");
+                                    ShowWarningError("Field \"" + cAlphaFieldNames(6) + "\" is provided.");
+                                    ShowContinueError("Field \"" + cAlphaFieldNames(7) + "\" will not be used.");
                                 }
                                 if (CO2ConcentrationSchPtr > 0) {
-                                    ShowWarningError(
-                                        "The meausured air CO2 concentration schedule will not be used since measured air temperature is provided.");
+                                    ShowWarningError("Field \"" + cAlphaFieldNames(6) + "\" is provided.");
+                                    ShowContinueError("Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
                                 }
                             }
                             if (HumidityRatioSchPtr > 0 && TemperatureSchPtr == 0) {
                                 // Humidity ratio schedule is provided, ignore CO2 concentration schedule.
                                 HybridModelZone(ZonePtr).InfiltrationCalc_H = true;
                                 if (CO2ConcentrationSchPtr > 0) {
-                                    ShowWarningError(
-                                        "The meausured air CO2 concentration schedule will not be used since measured air temperature is provided.");
+                                    ShowWarningError("Field \"" + cAlphaFieldNames(7) + "\" is provided.");
+                                    ShowContinueError("Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
                                 }
                             }
                             if (CO2ConcentrationSchPtr > 0 && TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0) {
@@ -305,21 +301,6 @@ namespace HybridModel {
                         }
                     }
 
-                    // Summarise hybridmodel flags
-                    if (HybridModelZone(ZonePtr).InternalThermalMassCalc_T) {
-                        Flag_InternalThermalMassCalc = true;
-                    }
-                    if ((HybridModelZone(ZonePtr).InfiltrationCalc_T || HybridModelZone(ZonePtr).InfiltrationCalc_H ||
-                         HybridModelZone(ZonePtr).InfiltrationCalc_C) &&
-                        !Flag_InternalThermalMassCalc) {
-                        Flag_AirInfiltrationCalc = true;
-                    }
-                    if ((HybridModelZone(ZonePtr).PeopelCountCalc_T || HybridModelZone(ZonePtr).PeopelCountCalc_H ||
-                         HybridModelZone(ZonePtr).PeopelCountCalc_C) &&
-                        !Flag_InternalThermalMassCalc && !Flag_AirInfiltrationCalc) {
-                        Flag_PeopleCountCalc = true;
-                    }
-
                     // Decide if system supply terms are valid to be included in the inverse solution
                     if (SupplyAirTemperatureSchPtr > 0 && SupplyAirMassFlowRateSchPtr > 0) {
                         if (HybridModelZone(ZonePtr).InfiltrationCalc_T || HybridModelZone(ZonePtr).PeopelCountCalc_T) {
@@ -349,7 +330,10 @@ namespace HybridModel {
                     }
 
                     // Flags showing Hybrid Modeling settings
-                    FlagHybridModel = Flag_InternalThermalMassCalc || Flag_AirInfiltrationCalc || Flag_PeopleCountCalc;
+                    FlagHybridModel = HybridModelZone(ZonePtr).InternalThermalMassCalc_T || HybridModelZone(ZonePtr).InfiltrationCalc_T ||
+                                      HybridModelZone(ZonePtr).InfiltrationCalc_H || HybridModelZone(ZonePtr).InfiltrationCalc_C ||
+                                      HybridModelZone(ZonePtr).PeopelCountCalc_T || HybridModelZone(ZonePtr).PeopelCountCalc_H ||
+                                      HybridModelZone(ZonePtr).PeopelCountCalc_C;
 
                     if (HybridModelZone(ZonePtr).InternalThermalMassCalc_T || HybridModelZone(ZonePtr).InfiltrationCalc_T ||
                         HybridModelZone(ZonePtr).PeopelCountCalc_T) {
@@ -412,7 +396,8 @@ namespace HybridModel {
                     }
 
                     // Output variable
-                    if (Flag_AirInfiltrationCalc) {
+                    if (HybridModelZone(ZonePtr).InfiltrationCalc_T || HybridModelZone(ZonePtr).InfiltrationCalc_H ||
+                        HybridModelZone(ZonePtr).InfiltrationCalc_C) {
                         SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
                                             OutputProcessor::Unit::ach,
                                             Zone(ZonePtr).InfilOAAirChangeRateHM,
@@ -426,7 +411,8 @@ namespace HybridModel {
                                             "Average",
                                             Zone(ZonePtr).Name);
                     }
-                    if (Flag_PeopleCountCalc) {
+                    if (HybridModelZone(ZonePtr).PeopelCountCalc_T || HybridModelZone(ZonePtr).PeopelCountCalc_H ||
+                        HybridModelZone(ZonePtr).PeopelCountCalc_C) {
                         SetupOutputVariable("Zone Hybrid Model People Count",
                                             OutputProcessor::Unit::None,
                                             Zone(ZonePtr).NumOccHM,

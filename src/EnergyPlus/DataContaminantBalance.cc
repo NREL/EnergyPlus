@@ -81,9 +81,9 @@ namespace DataContaminantBalance {
     Array1D<Real64> ZoneCO2SetPoint;
     Array1D<Real64> CO2PredictedRate;
 
-    Array1D<Real64> ZoneCO2Gain;           // CO2 gain from each Zone (People, equipment)
-    Array1D<Real64> ZoneCO2GainFromPeople; // CO2 gain from each Zone (From People only)
-    Array1D<Real64> ZoneCO2GainExceptPeople;   // Added for hybrid model, CO2 gain from each Zone (except People)
+    Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
+    Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
+    Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model, CO2 gain from each Zone (except People)
 
     // Zone Air Contaminant conditions variables
     Array1D<Real64> ZoneAirCO2Avg;       // AIR CO2 averaged over the zone time step

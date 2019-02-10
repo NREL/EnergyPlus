@@ -5836,17 +5836,12 @@ namespace ZoneTempPredictorCorrector {
             ZoneMassFlowRate += Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
         }
 
-        // Calculate zone heat balance sums
-        CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
-
-        // Sum all convective internal gains except for people: SumIntGainExceptPeople
-        if (HybridModel::FlagHybridModel_PC) {
-            SumAllInternalConvectionGainsExceptPeople(ZoneNum, SumIntGainExceptPeople);
-        }
-
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
         LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
-        LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
+
+        if (HybridModelZone(ZoneNum).PeopelCountCalc_H) {
+            LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
+        }
 
         SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
