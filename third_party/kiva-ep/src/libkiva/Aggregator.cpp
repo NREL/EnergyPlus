@@ -62,7 +62,7 @@ void Aggregator::calc_weighted_results() {
     double hri = grnd->getSurfaceAverageValue({surface_type, Kiva::GroundOutput::OT_RAD});
     double Ts = grnd->getSurfaceAverageValue({surface_type, Kiva::GroundOutput::OT_TEMP});
     double Ta = grnd->getSurfaceAverageValue({surface_type, Kiva::GroundOutput::OT_AVG_TEMP});
-    double qi = grnd->getSurfaceAverageValue({surface_type, Kiva::GroundOutput::OT_FLUX});
+    double qi = -grnd->getSurfaceAverageValue({surface_type, Kiva::GroundOutput::OT_FLUX});
 
     if (!std::isfinite(Ts)) {
       showMessage(MSG_ERR, "Kiva is not giving realistic results!");
