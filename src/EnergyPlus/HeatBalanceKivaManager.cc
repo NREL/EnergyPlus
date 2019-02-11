@@ -73,7 +73,7 @@
 #include <HeatBalanceKivaManager.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
-#include <ThermalComfort.hh>  // MRT Weighting
+#include <ThermalComfort.hh> // MRT Weighting
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WeatherManager.hh>
@@ -94,15 +94,10 @@ namespace HeatBalanceKivaManager {
         }
     }
 
-    KivaInstanceMap::KivaInstanceMap(Kiva::Foundation &foundation,
-                                     std::vector<Kiva::Surface::SurfaceType> oM,
-                                     int floorSurface,
-                                     std::vector<int> wallSurfaces,
-                                     int zoneNum,
-                                     Real64 weightedPerimeter,
-                                     int constructionNum)
-        : outputMap(oM), ground(foundation, outputMap), floorSurface(floorSurface), wallSurfaces(wallSurfaces), zoneNum(zoneNum),
-          zoneControlType(KIVAZONE_UNCONTROLLED), zoneControlNum(0), weightedPerimeter(weightedPerimeter), constructionNum(constructionNum)
+    KivaInstanceMap::KivaInstanceMap(
+        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum)
+        : instance(foundation), floorSurface(floorSurface), wallSurfaces(wallSurfaces), zoneNum(zoneNum), zoneControlType(KIVAZONE_UNCONTROLLED),
+          zoneControlNum(0), floorWeight(floorWeight), constructionNum(constructionNum)
     {
 
         for (int i = 1; i <= DataZoneControls::NumTempControlledZones; ++i) {
@@ -165,27 +160,27 @@ namespace HeatBalanceKivaManager {
         }
 
         // Initialize with steady state before accelerated timestepping
-        ground.foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
+        instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
         setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
-        ground.calculate(bcs);
+        instance.ground->calculate(bcs);
         accDate += acceleratedTimestep;
         while (accDate > 365 + WeatherManager::LeapYearAdd) {
             accDate = accDate - (365 + WeatherManager::LeapYearAdd);
         }
 
         // Accelerated timestepping
-        ground.foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
+        instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
             setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
-            ground.calculate(bcs, acceleratedTimestep * 24 * 60 * 60);
+            instance.ground->calculate(bcs, acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
             while (accDate > 365 + WeatherManager::LeapYearAdd) {
                 accDate = accDate - (365 + WeatherManager::LeapYearAdd);
             }
         }
 
-        ground.calculateSurfaceAverages();
-        ground.foundation.numericalScheme = Kiva::Foundation::NS_ADI;
+        instance.ground->calculateSurfaceAverages();
+        instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_ADI;
     }
 
     void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
@@ -212,7 +207,7 @@ namespace HeatBalanceKivaManager {
 
         bcs.localWindSpeed = (kivaWeather.windSpeed[index] * weightNow + kivaWeather.windSpeed[indexPrev] * (1.0 - weightNow)) *
                              DataEnvironment::WeatherFileWindModCoeff *
-                             std::pow(ground.foundation.grade.roughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
+                             std::pow(instance.ground->foundation.grade.roughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
         bcs.skyEmissivity = kivaWeather.skyEmissivity[index] * weightNow + kivaWeather.skyEmissivity[indexPrev] * (1.0 - weightNow);
         bcs.solarAzimuth = 3.14;
         bcs.solarAltitude = 0.0;
@@ -222,7 +217,7 @@ namespace HeatBalanceKivaManager {
         bcs.wallAbsRadiation = 0.0;
         bcs.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 
-      // Estimate indoor temperature
+        // Estimate indoor temperature
         const Real64 standardTemp = 22;            // degC
         Real64 assumedFloatingTemp = standardTemp; //*0.90 + kivaWeather.dryBulb[index]*0.10; // degC (somewhat arbitrary assumption--not knowing
                                                    // anything else about the building at this point)
@@ -324,14 +319,13 @@ namespace HeatBalanceKivaManager {
         }
         bcs.slabRadiantTemp = bcs.indoorTemp;
         bcs.wallRadiantTemp = bcs.indoorTemp;
-
     }
 
     void KivaInstanceMap::setBoundaryConditions()
     {
         bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
-        bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.grade.roughness);
+        bcs.localWindSpeed = DataEnvironment::WindSpeedAt(instance.ground->foundation.grade.roughness);
         bcs.windDirection = DataEnvironment::WindDir * DataGlobals::DegToRadians;
         bcs.solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
         bcs.solarAltitude = DataGlobals::PiOvr2 - std::acos(DataEnvironment::SOLCOS(3));
@@ -339,13 +333,11 @@ namespace HeatBalanceKivaManager {
         bcs.diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
         bcs.skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs.outdoorTemp);
 
-
-        bcs.slabAbsRadiation =
-            DataHeatBalSurface::QRadSWInAbs(floorSurface) + // solar
-            DataHeatBalance::QRadThermInAbs(floorSurface) + // internal gains
-            DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
-            DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
-            DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
+        bcs.slabAbsRadiation = DataHeatBalSurface::QRadSWInAbs(floorSurface) + // solar
+                               DataHeatBalance::QRadThermInAbs(floorSurface) + // internal gains
+                               DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
+                               DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
+                               DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
         bcs.slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(zoneNum, floorSurface) + DataGlobals::KelvinConv;
 
@@ -354,12 +346,11 @@ namespace HeatBalanceKivaManager {
         Real64 Atotal = 0.0;
         Real64 TAtotal = 0.0;
         for (auto &wl : wallSurfaces) {
-            Real64 Q =
-                DataHeatBalSurface::QRadSWInAbs(wl) + // solar
-                DataHeatBalance::QRadThermInAbs(wl) + // internal gains
-                DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
-                DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
-                DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
+            Real64 Q = DataHeatBalSurface::QRadSWInAbs(wl) + // solar
+                       DataHeatBalance::QRadThermInAbs(wl) + // internal gains
+                       DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
+                       DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
+                       DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
 
             Real64 &A = DataSurfaces::Surface(wl).Area;
 
@@ -746,20 +737,18 @@ namespace HeatBalanceKivaManager {
                         auto numVs = v.size();
                         // Enforce quadrilateralism
                         if (numVs > 4) {
-                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", wall surfaces with more than four vertices referencing");
-                            ShowContinueError("...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
+                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
+                                             "\", wall surfaces with more than four vertices referencing");
+                            ShowContinueError(
+                                "...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
                             ShowContinueError("Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(numVs) + " vertices.");
-                            ShowContinueError("Consider separating the wall into separate surfaces, each spanning from the floor slab to the top of the foundation wall.");
+                            ShowContinueError("Consider separating the wall into separate surfaces, each spanning from the floor slab to the top of "
+                                              "the foundation wall.");
                         }
 
                         // get coplanar points with floor to determine perimeter
                         std::vector<int> coplanarPoints = Vectors::PointsInPlane(
-                                Surfaces(surfNum).Vertex,
-                                Surfaces(surfNum).Sides,
-                                Surfaces(wl).Vertex,
-                                Surfaces(wl).Sides,
-                                ErrorsFound
-                        );
+                            Surfaces(surfNum).Vertex, Surfaces(surfNum).Sides, Surfaces(wl).Vertex, Surfaces(wl).Sides, ErrorsFound);
 
                         Real64 perimeter = 0.0;
 
@@ -767,7 +756,7 @@ namespace HeatBalanceKivaManager {
                         // between them to the overall perimeter for this wall
                         for (std::size_t i = 0; i < coplanarPoints.size(); ++i) {
                             int p(coplanarPoints[i]);
-                            int pC = p == (int)v.size() ? 1 : p + 1; // next consecutive point
+                            int pC = p == (int)v.size() ? 1 : p + 1;                                             // next consecutive point
                             int p2 = i == coplanarPoints.size() - 1 ? coplanarPoints[0] : coplanarPoints[i + 1]; // next coplanar point
 
                             if (p2 == pC) { // if next coplanar point is the next consecutive point
@@ -779,7 +768,8 @@ namespace HeatBalanceKivaManager {
                             ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
                             ShowContinueError("   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
                             ShowContinueError("   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
-                            ShowContinueError("   Simulation will continue using the distance between the two lowest points in the wall for the interface distance.");
+                            ShowContinueError("   Simulation will continue using the distance between the two lowest points in the wall for the "
+                                              "interface distance.");
 
                             // sort vertices by Z-value
                             std::vector<int> zs;
@@ -807,7 +797,7 @@ namespace HeatBalanceKivaManager {
                 }
 
                 // setup map to point floor surface to all related kiva instances
-                std::vector<std::pair<int, Kiva::Surface::SurfaceType>> floorSurfaceMaps;
+                Kiva::Aggregator floorAggregator(Kiva::Surface::ST_SLAB_CORE);
 
                 // Loop through combinations and assign instances until there is no remaining exposed pereimeter
                 bool assignKivaInstances = true;
@@ -830,12 +820,12 @@ namespace HeatBalanceKivaManager {
                         perimeter = remainingExposedPerimeter;
                     }
 
-                    Real64 weightedPerimeter;
+                    Real64 floorWeight;
 
                     if (totalExposedPerimeter > 0.001) {
-                        weightedPerimeter = perimeter / totalExposedPerimeter;
+                        floorWeight = perimeter / totalExposedPerimeter;
                     } else {
-                        weightedPerimeter = 1.0;
+                        floorWeight = 1.0;
                     }
 
                     // Copy foundation input for this instance
@@ -870,10 +860,10 @@ namespace HeatBalanceKivaManager {
 
                             fnd.wall.layers.push_back(tempLayer);
                         }
-                      fnd.wall.interior.emissivity = Constructs(constructionNum).InsideAbsorpThermal;
-                      fnd.wall.interior.absorptivity = Constructs(constructionNum).InsideAbsorpSolar;
-                      fnd.wall.exterior.emissivity = Constructs(constructionNum).OutsideAbsorpThermal;
-                      fnd.wall.exterior.absorptivity = Constructs(constructionNum).OutsideAbsorpSolar;
+                        fnd.wall.interior.emissivity = Constructs(constructionNum).InsideAbsorpThermal;
+                        fnd.wall.interior.absorptivity = Constructs(constructionNum).InsideAbsorpSolar;
+                        fnd.wall.exterior.emissivity = Constructs(constructionNum).OutsideAbsorpThermal;
+                        fnd.wall.exterior.absorptivity = Constructs(constructionNum).OutsideAbsorpSolar;
                     }
 
                     // Set slab construction
@@ -959,32 +949,16 @@ namespace HeatBalanceKivaManager {
 
                     fnd.polygon = floorPolygon;
 
-                    // add new foundation instance to list of all instances
-                    foundationInstances[inst] = fnd;
-
-                    // create output map for ground instance. Calculate average temperature, flux, and convection for each surface
-                    std::vector<Kiva::Surface::SurfaceType> outputMap;
-
-                    outputMap.push_back(Kiva::Surface::ST_SLAB_CORE);
-
-                    if (fnd.hasPerimeterSurface) {
-                        outputMap.push_back(Kiva::Surface::ST_SLAB_PERIM);
-                    }
-
-                    if (fnd.foundationDepth > 0.0) {
-                        outputMap.push_back(Kiva::Surface::ST_WALL_INT);
-                    }
-
                     // point surface to associated ground intance(s)
-                    kivaInstances.emplace_back(
-                        foundationInstances[inst], outputMap, surfNum, wallIDs, surface.Zone, weightedPerimeter, constructionNum);
+                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, floorWeight, constructionNum);
 
                     // Floors can point to any number of foundaiton surfaces
-                    floorSurfaceMaps.emplace_back(inst, Kiva::Surface::ST_SLAB_CORE);
+                    floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);
 
                     // Walls can only have one associated ground instance
                     for (auto &wl : wallIDs) {
-                        surfaceMap[wl] = {{inst, Kiva::Surface::ST_WALL_INT}};
+                        surfaceMap[wl] = Kiva::Aggregator(Kiva::Surface::ST_WALL_INT);
+                        surfaceMap[wl].add_instance(kivaInstances[inst].instance.ground.get(), 1.0);
                     }
 
                     // Increment instnace counter
@@ -999,7 +973,7 @@ namespace HeatBalanceKivaManager {
 
                     if (remainingExposedPerimeter < 0.001) {
                         assignKivaInstances = false;
-                        if (remainingExposedPerimeter < - 0.1) {
+                        if (remainingExposedPerimeter < -0.1) {
                             ErrorsFound = true;
                             ShowSevereError("For Floor Surface=\"" + Surfaces(surfNum).Name + "\", the Wall surfaces referencing");
                             ShowContinueError("  the same Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\" have");
@@ -1010,7 +984,7 @@ namespace HeatBalanceKivaManager {
                     }
                 }
 
-                surfaceMap[surfNum] = floorSurfaceMaps;
+                surfaceMap[surfNum] = floorAggregator;
             }
 
             surfNum++;
@@ -1043,21 +1017,7 @@ namespace HeatBalanceKivaManager {
                                                            "Surface(s)";
         std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
         for (auto &kv : kivaInstances) {
-            auto &grnd = kv.ground;
-
-            if (!kv.ground.foundation.useDetailedExposedPerimeter || !Kiva::isConvex(kv.ground.foundation.polygon)) {
-                if (kv.ground.foundation.reductionStrategy == Kiva::Foundation::RS_BOUNDARY) {
-                    kv.ground.foundation.reductionStrategy = Kiva::Foundation::RS_AP;
-                }
-            }
-
-            if (kv.ground.foundation.reductionStrategy == Kiva::Foundation::RS_BOUNDARY) {
-                // Adjust for concave features using Boundary Layer Adjustment method
-                grnd.calculateBoundaryLayer();
-                grnd.setNewBoundaryGeometry();
-            }
-
-            grnd.buildDomain();
+            auto grnd = kv.instance.ground.get();
 
             std::string constructionName;
             if (kv.constructionNum == 0) {
@@ -1071,9 +1031,9 @@ namespace HeatBalanceKivaManager {
                 wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
             }
             gio::write(DataGlobals::OutputFileInits, fmt)
-                << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX * grnd.nZ
-                << General::RoundSigDigits(grnd.foundation.netPerimeter, 2) << General::RoundSigDigits(kv.weightedPerimeter, 2)
-                << General::RoundSigDigits(grnd.foundation.foundationDepth, 2) << constructionName << DataSurfaces::Surface(kv.floorSurface).Name
+                << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd->nX << grnd->nZ << grnd->nX * grnd->nZ
+                << General::RoundSigDigits(grnd->foundation.netPerimeter, 2) << General::RoundSigDigits(kv.floorWeight, 2)
+                << General::RoundSigDigits(grnd->foundation.foundationDepth, 2) << constructionName << DataSurfaces::Surface(kv.floorSurface).Name
                 << wallSurfaceString;
         }
 
@@ -1098,10 +1058,10 @@ namespace HeatBalanceKivaManager {
     {
         // calculate heat transfer through ground
         for (auto &kv : kivaInstances) {
-            auto &grnd = kv.ground;
+            auto grnd = kv.instance.ground;
             kv.setBoundaryConditions();
-            grnd.calculate(kv.bcs, timestep);
-            grnd.calculateSurfaceAverages();
+            grnd->calculate(kv.bcs, timestep);
+            grnd->calculateSurfaceAverages();
             if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1) {
                 kv.plotDomain();
             }
@@ -1152,7 +1112,6 @@ namespace HeatBalanceKivaManager {
         gp.createFrame(std::to_string(DataEnvironment::Month) + "/" + std::to_string(DataEnvironment::DayOfMonth) + " " +
                        std::to_string(DataGlobals::HourOfDay) + ":00");
 
-
 #ifndef NDEBUG
 
         std::ofstream output;
@@ -1192,51 +1151,13 @@ namespace HeatBalanceKivaManager {
 
 #endif
 #endif
-
     }
 
     void KivaManager::calcKivaSurfaceResults()
     {
-        for (int surfNum = 1; surfNum <=  (int)DataSurfaces::Surface.size(); ++surfNum) {
+        for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                Real64 hc = 0.0;
-                Real64 qc = 0.0;
-                Real64 qt = 0.0;
-                Real64 Tavg = 0.0;
-                Real64 Tz = DataHeatBalFanSys::MAT(DataSurfaces::Surface(surfNum).Zone) + DataGlobals::KelvinConv;
-                Real64 checkWeight = 0.0;
-                assert(surfaceMap[surfNum].size() > 0);
-                for (auto &i : surfaceMap[surfNum]) {
-                    auto &kI = kivaInstances[i.first];
-                    auto &st = i.second;
-                    Real64 p;
-                    if (surfaceMap[surfNum].size() > 1) {
-                        p = kI.weightedPerimeter;
-                    }
-                    else {
-                        p = 1.0;
-                    }
-                    auto hci = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_CONV});
-                    auto Ts = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_TEMP});
-                    auto Ta = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_AVG_TEMP});
-                    auto qi = -kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_FLUX});
-
-                    qc += p * hci * (Tz - Ts);
-                    hc += p * hci;
-                    Tavg += p * Ta;
-                    qt += p * qi;
-                    checkWeight += p;
-                }
-
-                assert(Kiva::isEqual(checkWeight, 1.0));
-
-                SurfaceResults results;
-                results.h = hc;
-                results.q = qt;
-                results.T = Tz - qc / hc - DataGlobals::KelvinConv;
-                results.Tavg = Tavg - DataGlobals::KelvinConv;
-
-                surfaceResults[surfNum] = results;
+                surfaceMap[surfNum].calc_weighted_results();
             }
         }
     }

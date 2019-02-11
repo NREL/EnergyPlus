@@ -49,7 +49,9 @@
 #define HeatBalanceKivaManager_hh_INCLUDED
 
 // Kiva Headers
+#include <libkiva/Aggregator.hpp>
 #include <libkiva/Ground.hpp>
+#include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
 #include <DataHeatBalance.hh>
@@ -91,15 +93,9 @@ namespace HeatBalanceKivaManager {
     class KivaInstanceMap
     {
     public:
-        KivaInstanceMap(Kiva::Foundation &foundation,
-                        std::vector<Kiva::Surface::SurfaceType> oM,
-                        int floorSurface,
-                        std::vector<int> wallSurfaces,
-                        int zoneNum,
-                        Real64 weightedPerimeter,
-                        int constructionNum);
-        std::vector<Kiva::Surface::SurfaceType> outputMap;
-        Kiva::Ground ground;
+        KivaInstanceMap(
+            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum);
+        Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
         int zoneNum;
@@ -110,7 +106,7 @@ namespace HeatBalanceKivaManager {
         void setBoundaryConditions();
         void plotDomain();
         Kiva::BoundaryConditions bcs;
-        Real64 weightedPerimeter;
+        Real64 floorWeight;
         int constructionNum;
 
 #ifdef GROUND_PLOT
@@ -139,13 +135,8 @@ namespace HeatBalanceKivaManager {
         FoundationKiva defaultFoundation;
         std::vector<FoundationKiva> foundationInputs;
         std::vector<KivaInstanceMap> kivaInstances;
+        std::map<int, Kiva::Aggregator> surfaceMap;
         Real64 timestep;
-
-        struct SurfaceResults {
-          Real64 h, T, Tavg, q;
-        };
-
-        std::map<int, SurfaceResults> surfaceResults; // Surface average temperatures to use in radiant exchange calculations
 
         struct Settings
         {
@@ -191,10 +182,6 @@ namespace HeatBalanceKivaManager {
         Settings settings;
         bool defaultSet;
         int defaultIndex;
-
-    private:
-        std::map<int, std::vector<std::pair<int, Kiva::Surface::SurfaceType>>> surfaceMap;
-        std::map<int, Kiva::Foundation> foundationInstances;
     };
 
 } // namespace HeatBalanceKivaManager
