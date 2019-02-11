@@ -1,5 +1,3 @@
-#include <utility>
-
 // EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -49,6 +47,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #include <BranchNodeConnections.hh>
 #include <DataGlobals.hh>
@@ -484,7 +483,7 @@ namespace EnergyPlus {
                     tmpLoadVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
                     if (this->companionHeatPumpCoil) {
                         tmpLoadVolFlow = max(tmpLoadVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
-                        this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
+                        if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                     }
                     tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
                 } else if (this->companionHeatPumpCoil && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {

@@ -653,7 +653,6 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantLoop(2).LoopSide.allocate(2);
     DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
     DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
@@ -663,7 +662,6 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
     DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
 
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
@@ -695,19 +693,24 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     loop2demandComponent2.NodeNumIn = thisCoolingWWHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myCoolingSourceLocation = PlantLocation(2, 1, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisCoolingWWHP->onInitLoopEquip(myLoadLocation);
+    thisCoolingWWHP->onInitLoopEquip(myCoolingLoadLocation);
+    thisHeatingWWHP->onInitLoopEquip(myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingWWHP->size();
+
+    // assign the plant sizing data
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(2).PlantSizNum = 2;
 
     // The load side should be what is imposed by the plant sizing data for the design flow rate.
     // The source side should be calculated based on the COP, which was set at 1.0 for convenience.
@@ -719,9 +722,10 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     Real64 const expectedSourceCp = 4185.0;
     Real64 const expectedSourceRho = 983.2;
     Real64 const expectedLoadFlow = plantSizingLoadVolFlow;
-    Real64 const expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
+    Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     Real64 const baseExpectedSourceFlow = plantSizingLoadVolFlow * 2.0;
-    Real64 const expectedSourceFlow = baseExpectedSourceFlow * (expectedLoadRho * expectedLoadCp) / (expectedSourceRho * expectedSourceCp);
+    Real64 expectedSourceFlow = baseExpectedSourceFlow * (expectedLoadRho * expectedLoadCp) / (expectedSourceRho * expectedSourceCp);
+    thisCoolingWWHP->size();
     EXPECT_NEAR(expectedLoadFlow, thisCoolingWWHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisCoolingWWHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedCapacity, thisCoolingWWHP->referenceCapacity, 0.0001);
@@ -729,17 +733,40 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     // with a sizing run complete, we can also go ahead and get the design capacities...
     // they should be nonzero for the load side of things
     Real64 tmpMin = -1.0, tmpMax = -1.0, tmpOpt = -1.0;
-    thisCoolingWWHP->getDesignCapacities(myLoadLocation, tmpMax, tmpMin, tmpOpt);
+    thisCoolingWWHP->getDesignCapacities(myCoolingLoadLocation, tmpMax, tmpMin, tmpOpt);
     EXPECT_NEAR(0.0, tmpMin, 0.001);
     EXPECT_NEAR(expectedCapacity, tmpMax, 0.001);
     EXPECT_NEAR(expectedCapacity, tmpOpt, 0.001);
     // but always zero for the source side of things
     tmpMin = -1.0, tmpMax = -1.0, tmpOpt = -1.0;
-    thisCoolingWWHP->getDesignCapacities(mySourceLocation, tmpMax, tmpMin, tmpOpt);
+    thisCoolingWWHP->getDesignCapacities(myCoolingSourceLocation, tmpMax, tmpMin, tmpOpt);
     EXPECT_NEAR(0.0, tmpMin, 0.001);
     EXPECT_NEAR(0.0, tmpMax, 0.001);
     EXPECT_NEAR(0.0, tmpOpt, 0.001);
 
+    // we can reset things and do a few more corner cases here
+
+    // lets just try it again but with the plant sizing data set to zero flow, it should try to use the companion
+    // but the companion isn't sized yet, so it should get zero conditions
+    thisCoolingWWHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
+    thisCoolingWWHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+    thisCoolingWWHP->referenceCapacity = DataSizing::AutoSize;
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    thisCoolingWWHP->size();
+    EXPECT_NEAR(0.0, thisCoolingWWHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.0, thisCoolingWWHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.0, thisCoolingWWHP->referenceCapacity, 0.0001);
+
+    // but now let's try to size the heating coil, which will try to use the cooling coil's sized data
+    thisCoolingWWHP->loadSideDesignVolFlowRate = expectedLoadFlow;
+    thisCoolingWWHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
+    thisCoolingWWHP->referenceCapacity = expectedCapacity;
+    expectedSourceFlow = baseExpectedSourceFlow * (expectedSourceRho * expectedSourceCp) / (expectedLoadRho * expectedLoadCp);
+    expectedCapacity = expectedSourceRho * expectedLoadFlow * expectedSourceCp * plantSizingLoadDeltaT;
+    thisHeatingWWHP->size();
+    EXPECT_NEAR(expectedLoadFlow, thisHeatingWWHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(expectedSourceFlow, thisHeatingWWHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(expectedCapacity, thisHeatingWWHP->referenceCapacity, 0.0001);
 }
 
 TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
@@ -829,7 +856,7 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     DataPlant::PlantLoop(2).PlantSizNum = 2;
 
     DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.010;
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.020;
     DataSizing::PlantSizData(1).DeltaT = 1.0;
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
     DataSizing::PlantSizData(2).DeltaT = 1.0;
@@ -859,6 +886,7 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
 
     // set a couple global flags
     DataGlobals::BeginEnvrnFlag = true;
+    DataGlobals::DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingWWHP->onInitLoopEquip(myLoadLocation);
@@ -866,14 +894,347 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisHeatingWWHP->size();
 
     // The values really should just come out all as the hard-sized values, this just makes sure that function didn't
     // botch something up.
+    thisHeatingWWHP->size();
     EXPECT_NEAR(0.01, thisHeatingWWHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.02, thisHeatingWWHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1200, thisHeatingWWHP->referenceCapacity, 0.0001);
 
+    // Call it again, but this time with PlantSizing on, it should come out the same again
+    DataGlobals::DoPlantSizing = true;
+    thisHeatingWWHP->size();
+    EXPECT_NEAR(0.01, thisHeatingWWHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.02, thisHeatingWWHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(1200, thisHeatingWWHP->referenceCapacity, 0.0001);
+
+}
+
+TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  hp heating side,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  ,",
+                            "  ,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 5,",
+                            "  node 6,",
+                            "  node 7,",
+                            "  node 8,",
+                            "  hp cooling side,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  ,",
+                            "  ,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
+
+    // validate that we have the right ones
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
+
+    // We'll set up two plant loops: a load and a source loop
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+
+    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop2demandComponent2 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
+
+    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    loop1supplyComponent1.Name = thisHeatingWWHP->name;
+    loop2demandComponent1.Name = thisHeatingWWHP->name;
+    loop1supplyComponent2.Name = thisCoolingWWHP->name;
+    loop2demandComponent2.Name = thisCoolingWWHP->name;
+
+    loop1supplyComponent1.NodeNumIn = thisHeatingWWHP->loadSideNodes.inlet;
+    loop2demandComponent1.NodeNumIn = thisHeatingWWHP->sourceSideNodes.inlet;
+    loop1supplyComponent2.NodeNumIn = thisCoolingWWHP->loadSideNodes.inlet;
+    loop2demandComponent2.NodeNumIn = thisCoolingWWHP->sourceSideNodes.inlet;
+
+    // the init call expects a "from" calling point
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+
+    // set a couple global flags
+    DataGlobals::BeginEnvrnFlag = true;
+
+    // initialize so the components can find themselves on the plant
+    thisCoolingWWHP->onInitLoopEquip(myCoolingLoadLocation);
+    thisHeatingWWHP->onInitLoopEquip(myHeatingLoadLocation);
+
+    DataPlant::PlantFinalSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+    // let's just fake that the companion coil already got autosized properly
+    thisHeatingWWHP->loadSideDesignVolFlowRate = 0.1;
+    thisHeatingWWHP->sourceSideDesignVolFlowRate = 0.2;
+    thisHeatingWWHP->referenceCapacity = 1000.0;
+
+    // With no plant sizing, it will try to use the autosized companion instead
+    // the load flow should be the companion load flow
+    // with no source plant sizing, the source flow will actually work out to be the same as the load flow (not the source flow)
+    // the capacity will be the companion capacity
+    thisCoolingWWHP->size();
+    EXPECT_NEAR(0.1, thisCoolingWWHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.1, thisCoolingWWHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(1000.0, thisCoolingWWHP->referenceCapacity, 0.0001);
+}
+
+TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 5,",
+                            "  node 6,",
+                            "  node 7,",
+                            "  node 8,",
+                            "  ,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  1,",
+                            "  1,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+
+    // validate that we have the right ones
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
+
+    // We'll set up two plant loops: a load and a source loop
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+
+    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+
+    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+
+    loop1supplyComponent1.Name = thisHeatingWWHP->name;
+    loop2demandComponent1.Name = thisHeatingWWHP->name;
+
+    loop1supplyComponent1.NodeNumIn = thisHeatingWWHP->loadSideNodes.inlet;
+    loop2demandComponent1.NodeNumIn = thisHeatingWWHP->sourceSideNodes.inlet;
+
+    // the init call expects a "from" calling point
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // set a couple global flags
+    DataGlobals::BeginEnvrnFlag = true;
+
+    // initialize so the components can find themselves on the plant
+    thisHeatingWWHP->onInitLoopEquip(myHeatingLoadLocation);
+
+    DataPlant::PlantFinalSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+    // with no plant sizing available and no companion coil to size from, it should throw a fatal
+    EXPECT_THROW(thisHeatingWWHP->size(), std::runtime_error);
+
+}
+
+TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 5,",
+                            "  node 6,",
+                            "  node 7,",
+                            "  node 8,",
+                            "  ,",
+                            "  0.1,",
+                            "  0.1,",
+                            "  1000,",
+                            "  1.0,",
+                            "  1,",
+                            "  1,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+
+    // validate that we have the right ones
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
+
+    // We'll set up two plant loops: a load and a source loop
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+
+    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+
+    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+
+    loop1supplyComponent1.Name = thisHeatingWWHP->name;
+    loop2demandComponent1.Name = thisHeatingWWHP->name;
+
+    loop1supplyComponent1.NodeNumIn = thisHeatingWWHP->loadSideNodes.inlet;
+    loop2demandComponent1.NodeNumIn = thisHeatingWWHP->sourceSideNodes.inlet;
+
+    // the init call expects a "from" calling point
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // set a couple global flags
+    DataGlobals::BeginEnvrnFlag = true;
+
+    // initialize so the components can find themselves on the plant
+    thisHeatingWWHP->onInitLoopEquip(myHeatingLoadLocation);
+
+    DataPlant::PlantFinalSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+    // this should report out to the sizing output, but just the user defined stuff
+    thisHeatingWWHP->size();
+    EXPECT_NEAR(0.1, thisHeatingWWHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.1, thisHeatingWWHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(1000, thisHeatingWWHP->referenceCapacity, 0.0001);
 }
 
 TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
