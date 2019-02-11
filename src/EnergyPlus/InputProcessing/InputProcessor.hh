@@ -108,6 +108,8 @@ public:
 
     void initializeMaps();
 
+    void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
+
     void processInput();
 
     int getNumSectionsFound(std::string const &SectionWord);

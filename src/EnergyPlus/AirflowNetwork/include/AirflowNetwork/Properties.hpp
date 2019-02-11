@@ -45,113 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::AirflowNetworkSolver unit tests
+#ifndef PROPERTIES_HPP
+#define PROPERTIES_HPP
 
-// Google test headers
-#include <gtest/gtest.h>
+#ifndef AIRDENSITY
+#include "Psychrometrics.hh"
+#define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
+#define AIRCP(W, T) Psychrometrics::PsyCpAirFnWTdb(W, T)
+#else
+// Need a fallback
+#endif
 
-// EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetwork/Solver.hpp>
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/UtilityRoutines.hh>
+#ifndef AIRDYNAMICVISCOSITY
+#define AIRDYNAMICVISCOSITY(T) airDynamicVisc(T)
+#else
+// Need a fallback
+#endif
 
-#include "Fixtures/EnergyPlusFixture.hh"
+#ifndef TOKELVIN
+#include "DataGlobals.hh"
+#define TOKELVIN(T) (T+DataGlobals::KelvinConv)
+#else
+// Need a fallback
+#endif
 
-using namespace EnergyPlus;
-using namespace AirflowNetworkBalanceManager;
-using namespace AirflowNetwork;
+namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
-{
+namespace AirflowNetwork {
 
-    int i = 1;
-    int j = 1;
-    int n;
-    int m;
-    int NF;
-    std::array<Real64, 2> F{{0.0, 0.0}};
-    std::array<Real64, 2> DF{{0.0, 0.0}};
+    Real64 airThermConductivity(Real64 T // Temperature in Celsius
+    );
 
-    n = 1;
-    m = 2;
+    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
+    );
 
-    AirflowNetworkCompData.allocate(j);
-    AirflowNetworkCompData(j).TypeNum = 1;
-    MultizoneSurfaceData.allocate(i);
-    MultizoneSurfaceData(i).Width = 10.0;
-    MultizoneSurfaceData(i).Height = 5.0;
-    MultizoneSurfaceData(i).OpenFactor = 1.0;
+    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
+                            Real64 W, // Humidity ratio
+                            Real64 P  // Barometric pressure
+    );
 
-    properties.resize(2);
-    properties[0].density = 1.2;
-    properties[1].density = 1.18;
+    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
+                                 Real64 W, // Humidity ratio
+                                 Real64 P  // Barometric pressure
+    );
 
-    MultizoneCompHorOpeningData.allocate(1);
-    MultizoneCompHorOpeningData(1).FlowCoef = 0.1;
-    MultizoneCompHorOpeningData(1).FlowExpo = 0.5;
-    MultizoneCompHorOpeningData(1).Slope = 90.0;
-    MultizoneCompHorOpeningData(1).DischCoeff = 0.2;
+    Real64 airPrandtl(Real64 T, // Temperature in Celsius
+                      Real64 W, // Humidity ratio
+                      Real64 P  // Barometric pressure
+    );
 
-    AirflowNetworkLinkageData.allocate(i);
-    AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
-    AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
+} // namespace AirflowNetwork
 
-    NF = MultizoneCompHorOpeningData(1).calculate(1, 0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(3.47863, F[0], 0.00001);
-    EXPECT_NEAR(34.7863, DF[0], 0.0001);
-    EXPECT_NEAR(2.96657, F[1], 0.00001);
-    EXPECT_EQ(0.0, DF[1]);
+} // namespace EnergyPlus
 
-    NF = MultizoneCompHorOpeningData(1).calculate(1, -0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(-3.42065, F[0], 0.00001);
-    EXPECT_NEAR(34.20649, DF[0], 0.0001);
-    EXPECT_NEAR(2.96657, F[1], 0.00001);
-    EXPECT_EQ(0.0, DF[1]);
-
-    AirflowNetworkLinkageData.deallocate();
-
-    MultizoneCompHorOpeningData.deallocate();
-    MultizoneSurfaceData.deallocate();
-    AirflowNetworkCompData.deallocate();
-}
-
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_Coil)
-{
-
-    int NF;
-    std::array<Real64,2> F;
-    std::array<Real64,2> DF;
-
-    AirflowNetworkCompData.allocate(1);
-    AirflowNetworkCompData[0].TypeNum = 1;
-
-    DisSysCompCoilData.allocate(1);
-    DisSysCompCoilData[0].hydraulicDiameter = 1.0;
-    DisSysCompCoilData[0].L = 1.0;
-
-    properties.resize(2);
-    properties[0].density = 1.2;
-    properties[1].density = 1.2;
-
-    properties[0].viscosity = 1.0e-5;
-    properties[1].viscosity = 1.0e-5;
-
-    F[1] = DF[1] = 0.0;
-
-
-    NF = DisSysCompCoilData[0].calculate(1, 0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
-    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
-    EXPECT_EQ(0.0, F[1]);
-    EXPECT_EQ(0.0, DF[1]);
-
-    NF = DisSysCompCoilData[0].calculate(1, -0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR( 294.5243112740431, F[0], 0.00001);
-    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
-    EXPECT_EQ(0.0, F[1]);
-    EXPECT_EQ(0.0, DF[1]);
-
-    DisSysCompCoilData.deallocate();
-    AirflowNetworkCompData.deallocate();
-}
+#endif

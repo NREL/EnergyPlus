@@ -45,113 +45,108 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::AirflowNetworkSolver unit tests
+#include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Elements.hpp"
+#include "AirflowNetwork/Properties.hpp"
 
-// Google test headers
-#include <gtest/gtest.h>
+namespace EnergyPlus {
 
-// EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetwork/Solver.hpp>
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/UtilityRoutines.hh>
+namespace AirflowNetwork {
 
-#include "Fixtures/EnergyPlusFixture.hh"
+    Real64 airThermConductivity(Real64 T // Temperature in Celsius
+    )
+    {
+        // Dry air thermal conductivity {W/m-K}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-using namespace EnergyPlus;
-using namespace AirflowNetworkBalanceManager;
-using namespace AirflowNetwork;
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
-{
+        Real64 const a = 0.02364;
+        Real64 const b = 0.0000754772569209165;
+        Real64 const c = -2.40977632412045e-8;
 
-    int i = 1;
-    int j = 1;
-    int n;
-    int m;
-    int NF;
-    std::array<Real64, 2> F{{0.0, 0.0}};
-    std::array<Real64, 2> DF{{0.0, 0.0}};
+        if (T < LowerLimit) {
+            ShowWarningMessage("Air temperature below lower limit of -20C for conductivity calculation");
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            ShowWarningMessage("Air temperature above upper limit of 70C for conductivity calculation");
+            T = UpperLimit;
+        }
 
-    n = 1;
-    m = 2;
+        return a + b * T + c * pow_2(T);
+    }
 
-    AirflowNetworkCompData.allocate(j);
-    AirflowNetworkCompData(j).TypeNum = 1;
-    MultizoneSurfaceData.allocate(i);
-    MultizoneSurfaceData(i).Width = 10.0;
-    MultizoneSurfaceData(i).Height = 5.0;
-    MultizoneSurfaceData(i).OpenFactor = 1.0;
+    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
+    )
+    {
+        return 1.71432e-5 + 4.828e-8 * T;
+    }
 
-    properties.resize(2);
-    properties[0].density = 1.2;
-    properties[1].density = 1.18;
+    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
+                            Real64 W, // Humidity ratio
+                            Real64 P  // Barometric pressure
+    )
+    {
+        // Dry air kinematic viscosity {m2/s}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-    MultizoneCompHorOpeningData.allocate(1);
-    MultizoneCompHorOpeningData(1).FlowCoef = 0.1;
-    MultizoneCompHorOpeningData(1).FlowExpo = 0.5;
-    MultizoneCompHorOpeningData(1).Slope = 90.0;
-    MultizoneCompHorOpeningData(1).DischCoeff = 0.2;
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-    AirflowNetworkLinkageData.allocate(i);
-    AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
-    AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
+        }
 
-    NF = MultizoneCompHorOpeningData(1).calculate(1, 0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(3.47863, F[0], 0.00001);
-    EXPECT_NEAR(34.7863, DF[0], 0.0001);
-    EXPECT_NEAR(2.96657, F[1], 0.00001);
-    EXPECT_EQ(0.0, DF[1]);
+        return airDynamicVisc(T) / AIRDENSITY(P, T, W);
+    }
 
-    NF = MultizoneCompHorOpeningData(1).calculate(1, -0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(-3.42065, F[0], 0.00001);
-    EXPECT_NEAR(34.20649, DF[0], 0.0001);
-    EXPECT_NEAR(2.96657, F[1], 0.00001);
-    EXPECT_EQ(0.0, DF[1]);
+    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
+                                 Real64 W, // Humidity ratio
+                                 Real64 P  // Barometric pressure
+    )
+    {
+        // Dry air thermal diffusivity {-}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-    AirflowNetworkLinkageData.deallocate();
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-    MultizoneCompHorOpeningData.deallocate();
-    MultizoneSurfaceData.deallocate();
-    AirflowNetworkCompData.deallocate();
-}
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
+        }
 
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_Coil)
-{
+        return airThermConductivity(T) / (AIRCP(W, T) * AIRDENSITY(P, T, W));
+    }
 
-    int NF;
-    std::array<Real64,2> F;
-    std::array<Real64,2> DF;
+    Real64 airPrandtl(Real64 T, // Temperature in Celsius
+                      Real64 W, // Humidity ratio
+                      Real64 P  // Barometric pressure
+    )
+    {
+        // Dry air Prandtl number {-}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-    AirflowNetworkCompData.allocate(1);
-    AirflowNetworkCompData[0].TypeNum = 1;
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-    DisSysCompCoilData.allocate(1);
-    DisSysCompCoilData[0].hydraulicDiameter = 1.0;
-    DisSysCompCoilData[0].L = 1.0;
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
+        }
 
-    properties.resize(2);
-    properties[0].density = 1.2;
-    properties[1].density = 1.2;
+        return airKinematicVisc(T, W, P) / airThermalDiffusivity(T, W, P);
+    }
 
-    properties[0].viscosity = 1.0e-5;
-    properties[1].viscosity = 1.0e-5;
+} // namespace AirflowNetwork
 
-    F[1] = DF[1] = 0.0;
-
-
-    NF = DisSysCompCoilData[0].calculate(1, 0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
-    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
-    EXPECT_EQ(0.0, F[1]);
-    EXPECT_EQ(0.0, DF[1]);
-
-    NF = DisSysCompCoilData[0].calculate(1, -0.05, 1, properties[0], properties[1], F, DF);
-    EXPECT_NEAR( 294.5243112740431, F[0], 0.00001);
-    EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
-    EXPECT_EQ(0.0, F[1]);
-    EXPECT_EQ(0.0, DF[1]);
-
-    DisSysCompCoilData.deallocate();
-    AirflowNetworkCompData.deallocate();
-}
+} // namespace EnergyPlus
