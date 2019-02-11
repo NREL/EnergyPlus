@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,7 +93,6 @@ namespace AirflowNetworkBalanceManager {
     extern int AirflowNetworkNumOfDetOpenings;
     extern int AirflowNetworkNumOfSimOpenings;
     extern int AirflowNetworkNumOfHorOpenings;
-    extern int AirflowNetworkNumOfStdCndns;
     extern int AirflowNetworkNumOfSurCracks;
     extern int AirflowNetworkNumOfSurELA;
     extern int AirflowNetworkNumOfExtNode;
@@ -177,27 +176,6 @@ namespace AirflowNetworkBalanceManager {
     void CalcAirflowNetworkAirBalance();
 
     void CalcWindPressureCoeffs();
-
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    );
-
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    );
-
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    );
 
     Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
                                     Real64 const mdot, // Mass flow rate

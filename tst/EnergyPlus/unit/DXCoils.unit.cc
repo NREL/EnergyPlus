@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -970,7 +970,6 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
     // tests autosizing evaporatively cooled condenser pump #4802
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1098,7 +1097,6 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
 
     // IDF snippets
     std::string const idf_objects = delimited_string({
-        "Version,8.3;                                          ",
         "OutdoorAir:Node,                                      ",
         "   Outside Air Inlet Node 1; !- Name                  ",
         "OutdoorAir:NodeList,                                  ",
@@ -1136,7 +1134,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     using Psychrometrics::PsyTwbFnTdbWPb;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1509,7 +1506,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     // Test the crankcase heat for Coil:Cooling:DX:MultiSpeed #5659
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1699,7 +1695,6 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
     // tests autosizing evaporatively cooled condenser pump #4802
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	Always On,            !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1780,7 +1775,6 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
     // tests performance curves reports warning if rating point results is not near 1.0
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	Always On,            !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1848,7 +1842,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1951,7 +1945,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",

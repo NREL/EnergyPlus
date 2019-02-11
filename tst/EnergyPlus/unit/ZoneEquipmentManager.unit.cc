@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.4;",
-
         "Zone,",
         "  Space;                   !- Name",
 
@@ -161,8 +159,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
-
         "  Zone,",
         "    SPACE1-1,                !- Name",
         "    0,                       !- Direction of Relative North {deg}",
@@ -451,8 +447,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.4;",
-
         "Zone,",
         "  Space;                   !- Name",
 
@@ -587,7 +581,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -678,7 +672,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -844,7 +838,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -1010,7 +1004,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -1194,7 +1188,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.0;",
+        " Version,9.1;",
 
         "Zone,",
         "  Space;                   !- Name",

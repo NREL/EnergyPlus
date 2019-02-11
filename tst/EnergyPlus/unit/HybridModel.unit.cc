@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -91,7 +91,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
@@ -126,7 +125,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    AirflowNetworkExchangeData.allocate(1);
+    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -206,7 +205,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     CurZoneEqNum = 1;
     NumZoneReturnPlenums = 0;
     NumZoneSupplyPlenums = 0;
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
     Zone(1).IsControlled = true;
     Zone(1).ZoneEqNum = 1;
     Zone(1).Multiplier = 1;
@@ -286,7 +285,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    AirflowNetworkExchangeData.deallocate();
+    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -113,7 +113,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "Outside Air Inlet Node,",
         "System Node Mass Flow Rate,",
@@ -181,7 +180,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Plus)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "(.+)Inlet(.+),",
         "System Node Mass Flow Rate,",
@@ -223,7 +221,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Plus)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Star)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "(.*)Inlet(.*),",
         "System Node Mass Flow Rate,",
@@ -281,7 +278,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Star)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "SalesFloor I(nlet|NLET) Node,",
         "System Node Mass Flow Rate,",
@@ -318,7 +314,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Brackets)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;", " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
+        "Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
         "timestep;",    " Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,",
         "timestep;",    " Output:Variable,", "[A-Z]{4},",      "Unitary System Compressor Part Load Ratio,",
         "timestep;",    " Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,",
@@ -350,7 +346,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Brackets)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_SpecChars)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "\\w,",
         "System Node Mass Flow Rate,",
@@ -370,7 +365,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_SpecChars)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Carrot)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "^Inlet(.*)Node,",
         "System Node Mass Flow Rate,",
@@ -393,7 +387,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Carrot)
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Dollar)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         " Output:Variable,",
         "(.*)Node$,",
         "System Node Mass Flow Rate,",

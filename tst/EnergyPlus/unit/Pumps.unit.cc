@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,8 +61,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPowerTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:VariableSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -85,20 +83,20 @@ TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPowerTest)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        "1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 162.5, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPower22W_per_gpm)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:VariableSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -133,8 +131,6 @@ TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPower22W_per_gpm)
 TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPowerDefault)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:VariableSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -169,8 +165,6 @@ TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpSizingPowerDefault)
 TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPowerTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:ConstantSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -188,20 +182,20 @@ TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPowerTest)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        "1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 162.5, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPower19W_per_gpm)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:ConstantSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -231,8 +225,6 @@ TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPower19W_per_gpm)
 TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPowerDefault)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "HeaderedPumps:ConstantSpeed,",
         "Chilled Water Headered Pumps,  !- Name",
         "CW Supply Inlet Node,    !- Inlet Node Name",
@@ -262,8 +254,6 @@ TEST_F(EnergyPlusFixture, HeaderedConstantSpeedPumpSizingPowerDefault)
 TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingMinVolFlowRate)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed,",
         "CoolSys1 Pump,           !- Name",
         "CoolSys1 Supply Inlet Node,  !- Inlet Node Name",
@@ -293,7 +283,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingMinVolFlowRate)
         "PowerPerFlowPerPressure, !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
         "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
-        "0.3;                        !- Design Minimum Flow Rate Sizing Factor",
+        "0.3,                     !- Design Minimum Flow Rate Sizing Factor",
+        "Pump Energy;             !- End-Use Subcategory",
 
     });
 
@@ -302,13 +293,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingMinVolFlowRate)
     EXPECT_NEAR(Pumps::PumpEquip(1).MinVolFlowRate, DataSizing::AutoSize, 0.000001);
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).MinVolFlowRate, 0.0003, 0.00001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPowerPerPressureTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed,",
         "CoolSys1 Pump,           !- Name",
         "CoolSys1 Supply Inlet Node,  !- Inlet Node Name",
@@ -351,8 +341,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPowerPerPressureTest)
 TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPowerDefault)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed,",
         "CoolSys1 Pump,           !- Name",
         "CoolSys1 Supply Inlet Node,  !- Inlet Node Name",
@@ -394,8 +382,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPowerDefault)
 TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPower22W_per_GPM)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed,",
         "CoolSys1 Pump,           !- Name",
         "CoolSys1 Supply Inlet Node,  !- Inlet Node Name",
@@ -436,8 +422,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedPumpSizingPower22W_per_GPM)
 TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPower19W_per_gpm)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:ConstantSpeed,",
         "TowerWaterSys Pump,      !- Name",
         "TowerWaterSys Supply Inlet Node,  !- Inlet Node Name",
@@ -456,20 +440,20 @@ TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPower19W_per_gpm)
         ",                        !- Skin Loss Radiative Fraction",
         "PowerPerFlow,            !- Design Power Sizing Method",
         "301156.1,                !- Design Electric Power per Unit Flow Rate",
-        ";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        ",                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 301.1561, 0.0001);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPowerPerPressureTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:ConstantSpeed,",
         "TowerWaterSys Pump,      !- Name",
         "TowerWaterSys Supply Inlet Node,  !- Inlet Node Name",
@@ -501,8 +485,6 @@ TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPowerPerPressureTest)
 TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPowerDefaults)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:ConstantSpeed,",
         "TowerWaterSys Pump,      !- Name",
         "TowerWaterSys Supply Inlet Node,  !- Inlet Node Name",
@@ -534,8 +516,6 @@ TEST_F(EnergyPlusFixture, ConstantSpeedPumpSizingPowerDefaults)
 TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerDefaults)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed:Condensate,",
         "Steam Boiler Plant Steam Circ Pump,  !- Name",
         "Steam Boiler Plant Steam Supply Inlet Node,  !- Inlet Node Name",
@@ -554,7 +534,8 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerDefaults)
         ",                        !- Skin Loss Radiative Fraction",
         ",                        !- Design Power Sizing Method",
         ",                        !- Design Electric Power per Unit Flow Rate",
-        ";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        ",                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
 
     });
 
@@ -562,13 +543,12 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerDefaults)
     Pumps::GetPumpInput();
     Pumps::SizePump(1);
     EXPECT_NEAR(Pumps::PumpEquip(1).NomPowerUse, 153.3, 0.1);
+    EXPECT_EQ(Pumps::PumpEquip(1).EndUseSubcategoryName, "Pump Energy");
 }
 
 TEST_F(EnergyPlusFixture, CondensatePumpSizingPower19W_per_gpm)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed:Condensate,",
         "Steam Boiler Plant Steam Circ Pump,  !- Name",
         "Steam Boiler Plant Steam Supply Inlet Node,  !- Inlet Node Name",
@@ -600,8 +580,6 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPower19W_per_gpm)
 TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Pump:VariableSpeed:Condensate,",
         "Steam Boiler Plant Steam Circ Pump,  !- Name",
         "Steam Boiler Plant Steam Supply Inlet Node,  !- Inlet Node Name",

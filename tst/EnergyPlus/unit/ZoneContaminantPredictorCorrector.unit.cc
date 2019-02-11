@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -93,7 +93,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace SimulationManager;
 using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
@@ -212,7 +211,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -360,7 +359,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     MDotOA.allocate(1);
     MDotOA(1) = 0.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -544,7 +543,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -751,7 +750,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 

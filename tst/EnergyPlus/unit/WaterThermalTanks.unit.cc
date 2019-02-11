@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -354,8 +354,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 {
     // Unit test for #5127
 
-    std::vector<std::string> idf_lines({"Version, 8.4;",
-                                        "Schedule:Constant,DummySch,,1.0;",
+    std::vector<std::string> idf_lines({"Schedule:Constant,DummySch,,1.0;",
                                         "Curve:Biquadratic,",
                                         "    HPWH-Htg-Cap-fT,         !- Name",
                                         "    0.563,                   !- Coefficient1 Constant",
@@ -544,7 +543,6 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     using WaterThermalTanks::WaterThermalTank;
 
     std::string idf_objects = delimited_string({
-        "Version, 8.4;",
         "Schedule:Constant,",
         "    WaterHeaterSP1Schedule,  !- Name",
         "    ,             !- Schedule Type Limits Name",

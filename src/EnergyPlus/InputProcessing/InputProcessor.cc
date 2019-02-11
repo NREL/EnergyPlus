@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,6 +210,14 @@ void InputProcessor::initializeMaps()
         auto const schema_iter = schema_properties.find(objectType);
         objectCache.schemaIterator = schema_iter;
         objectCacheMap.emplace(schema_iter.key(), objectCache);
+    }
+}
+
+void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::string &objectName)
+{
+    auto const find_unused = unusedInputs.find({objectType, objectName});
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
     }
 }
 
@@ -471,7 +479,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = true;
     } else {
         output.first = field_value;
-        output.second = field_value.empty();
+        output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
         output.first = UtilityRoutines::MakeUPPERCase(output.first);
@@ -1478,7 +1486,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1498,7 +1506,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1525,7 +1533,7 @@ void InputProcessor::preScanReportingVariables()
                         addVariablesForMonthlyReport(report_name);
                     }
                 } catch (...) {
-                    continue;  // blank or erroneous fields should be warned about during actual get input routines
+                    continue; // blank or erroneous fields should be warned about during actual get input routines
                 }
             }
         }
@@ -1905,7 +1913,8 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
+        std::unordered_map<std::string,
+                           DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
                            UtilityRoutines::case_insensitive_comparator> data;
         data.reserve(32);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,7 @@
 #include <BranchInputManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -372,9 +372,6 @@ namespace SimAirServingZones {
         using BranchInputManager::GetNumSplitterMixerInConntrList;
         using BranchInputManager::NumBranchesInBranchList;
         using BranchInputManager::NumCompsInBranch;
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
         using DataConvergParams::AirLoopConvergence;
         using General::RoundSigDigits;
@@ -529,7 +526,8 @@ namespace SimAirServingZones {
         AirLoopFlow.allocate(NumPrimaryAirSys);
         AirLoopConvergence.allocate(NumPrimaryAirSys);
         UnitarySysEqSizing.allocate(NumPrimaryAirSys);
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             AirLoopAFNInfo.allocate(NumPrimaryAirSys);
         }
 

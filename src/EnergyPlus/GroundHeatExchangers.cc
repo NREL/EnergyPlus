@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3337,7 +3337,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag);
+            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3446,7 +3446,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag);
+            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }

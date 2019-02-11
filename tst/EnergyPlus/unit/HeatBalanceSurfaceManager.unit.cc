@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -322,7 +322,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1351,7 +1351,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with Local Air Nodes,  !- Name",
@@ -1926,7 +1926,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.7;",
         " Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
         " Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
         " Output:Diagnostics, DisplayAdvancedReportVariables;",
@@ -1968,7 +1967,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with AirflowNetwork simulation,  !- Name",

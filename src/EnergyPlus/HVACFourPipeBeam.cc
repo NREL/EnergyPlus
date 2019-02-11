@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -540,12 +540,12 @@ namespace FourPipeBeam {
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
                                         this->cWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->cWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }
@@ -557,12 +557,12 @@ namespace FourPipeBeam {
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,
                                         this->hWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->hWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }
