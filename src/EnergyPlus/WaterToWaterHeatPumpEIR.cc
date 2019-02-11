@@ -87,6 +87,9 @@ namespace EnergyPlus {
                                                bool const RunFlag) {
 
             std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && RunFlag && DataGlobals::HourOfDay > 7 && CurLoad != 0.0) {
+                int i = 1;
+            }
 
             // Call initialize to set flow rates, run flag, and entering temperatures
             this->running = RunFlag;
@@ -228,6 +231,7 @@ namespace EnergyPlus {
         }
 
         void EIRWaterToWaterHeatPump::doPhysics(Real64 currentLoad) {
+
             // read inlet temperatures
             this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
             this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
@@ -244,6 +248,8 @@ namespace EnergyPlus {
             if (availableCapacity > 0) {
                 partLoadRatio = max(0.0, min(std::abs(currentLoad) / availableCapacity, 1.0));
             }
+
+            // evaluate the actual current operating load side heat transfer rate
             auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                     thisLoadPlantLoop.FluidName,
@@ -263,12 +269,12 @@ namespace EnergyPlus {
                                                                   this->sourceSideInletTemp);
             Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
                                                                  partLoadRatio);
-            this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
+            this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
             // energy balance on heat pump
             this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
 
-            // calculate source side
+            // calculate source side outlet conditions
             Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
             this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
         }
@@ -527,7 +533,7 @@ namespace EnergyPlus {
                                 // we can warn here if there is a bit mismatch between hard- and auto-sized
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
-                                        ShowMessage("EIRWaterToWaterHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                        ShowWarningMessage("EIRWaterToWaterHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                         ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
                                         ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCapacity, 2) +
                                                           " [W]");
