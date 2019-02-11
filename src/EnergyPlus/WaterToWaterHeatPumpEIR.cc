@@ -87,9 +87,6 @@ namespace EnergyPlus {
                                                bool const RunFlag) {
 
             std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
-            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && RunFlag && DataGlobals::HourOfDay > 7 && CurLoad != 0.0) {
-                int i = 1;
-            }
 
             // Call initialize to set flow rates, run flag, and entering temperatures
             this->running = RunFlag;
