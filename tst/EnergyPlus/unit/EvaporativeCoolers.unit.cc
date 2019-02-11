@@ -240,7 +240,6 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
     PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
         "	IndRDD Evap Cooler,  !- Name",
         "	ALWAYS_ON,			 !- Availability Schedule Name",
@@ -332,7 +331,6 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
     PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	EvaporativeCooler:Direct:ResearchSpecial,",
         "	DirectEvapCooler,    !- Name",
         "	ALWAYS_ON,			 !- Availability Schedule Name",
@@ -630,7 +628,6 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
     PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
         "	IndRDD Evap Cooler,  !- Name",
         "	ALWAYS_ON,			 !- Availability Schedule Name",
@@ -719,7 +716,6 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
     PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;",
         "	EvaporativeCooler:Direct:ResearchSpecial,",
         "	DirectEvapCooler,    !- Name",
         "	ALWAYS_ON,			 !- Availability Schedule Name",

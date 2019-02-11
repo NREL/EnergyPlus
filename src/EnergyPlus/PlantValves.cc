@@ -373,43 +373,39 @@ namespace PlantValves {
                                                 if (PlantLoop(i).LoopSide(j).Branch(k).ControlType == ControlType_Active) IsBranchActive = true;
 
                                                 // is Valve inlet node an outlet node of a splitter
-                                                if (allocated(PlantLoop(i).LoopSide(j).Splitter)) {
-                                                    for (int m = 1, m_end = PlantLoop(i).LoopSide(j).NumSplitters; m <= m_end; ++m) {
-                                                        if (allocated(PlantLoop(i).LoopSide(j).Splitter(m).NodeNumOut)) {
-                                                            if (any_eq(PlantLoop(i).LoopSide(j).Splitter(m).NodeNumOut,
-                                                                       TemperValve(CompNum).PltInletNodeNum)) {
-                                                                InNodeOnSplitter = true;
-                                                            }
-                                                        } // allocated
-
-                                                        // are there only 2 branches between splitter and mixer?
-                                                        if (PlantLoop(i).LoopSide(j).Splitter(m).TotalOutletNodes == 2) {
-                                                            TwoBranchesBetwn = true;
+                                                if (PlantLoop(i).LoopSide(j).SplitterExists) {
+                                                    if (allocated(PlantLoop(i).LoopSide(j).Splitter.NodeNumOut)) {
+                                                        if (any_eq(PlantLoop(i).LoopSide(j).Splitter.NodeNumOut,
+                                                                   TemperValve(CompNum).PltInletNodeNum)) {
+                                                            InNodeOnSplitter = true;
                                                         }
-                                                    } // loop over splitters
-                                                }     // allocated %splitter
+                                                    } // allocated
+
+                                                    // are there only 2 branches between splitter and mixer?
+                                                    if (PlantLoop(i).LoopSide(j).Splitter.TotalOutletNodes == 2) {
+                                                        TwoBranchesBetwn = true;
+                                                    }
+                                                }  // has splitter
 
                                                 // is stream 2 node an inlet to the mixer ?
-                                                if (allocated(PlantLoop(i).LoopSide(j).Mixer)) {
-                                                    for (int n = 1, n_end = PlantLoop(i).LoopSide(j).NumMixers; n <= n_end; ++n) {
-                                                        if (!allocated(PlantLoop(i).LoopSide(j).Mixer(n).NodeNumIn)) continue;
-                                                        if (any_eq(PlantLoop(i).LoopSide(j).Mixer(n).NodeNumIn,
-                                                                   TemperValve(CompNum).PltStream2NodeNum)) {
+                                                if (PlantLoop(i).LoopSide(j).MixerExists) {
+                                                    if (!allocated(PlantLoop(i).LoopSide(j).Mixer.NodeNumIn)) continue;
+                                                    if (any_eq(PlantLoop(i).LoopSide(j).Mixer.NodeNumIn,
+                                                               TemperValve(CompNum).PltStream2NodeNum)) {
 
-                                                            // Check other branches component's node, current branch is k
-                                                            for (int kk = 1, kk_end = PlantLoop(i).LoopSide(j).TotalBranches; kk <= kk_end; ++kk) {
-                                                                if (k == kk) continue; // already looped into this one
-                                                                if (!allocated(PlantLoop(i).LoopSide(j).Branch(kk).Comp)) continue;
-                                                                auto const &comp(PlantLoop(i).LoopSide(j).Branch(kk).Comp);
-                                                                if (std::any_of(comp.begin(), comp.end(), [CompNum](DataPlant::CompData const &e) {
-                                                                        return e.NodeNumOut == TemperValve(CompNum).PltStream2NodeNum;
-                                                                    })) { // it is on other branch
-                                                                    Stream2NodeOkay = true;
-                                                                }
-                                                            } // kk branch nested loop
-                                                        }     // stream 2 node is inlet to mixer
-                                                    }         // mixer loop
-                                                }             // mixer allocated
+                                                        // Check other branches component's node, current branch is k
+                                                        for (int kk = 1, kk_end = PlantLoop(i).LoopSide(j).TotalBranches; kk <= kk_end; ++kk) {
+                                                            if (k == kk) continue; // already looped into this one
+                                                            if (!allocated(PlantLoop(i).LoopSide(j).Branch(kk).Comp)) continue;
+                                                            auto const &comp(PlantLoop(i).LoopSide(j).Branch(kk).Comp);
+                                                            if (std::any_of(comp.begin(), comp.end(), [CompNum](DataPlant::CompData const &e) {
+                                                                    return e.NodeNumOut == TemperValve(CompNum).PltStream2NodeNum;
+                                                                })) { // it is on other branch
+                                                                Stream2NodeOkay = true;
+                                                            }
+                                                        } // kk branch nested loop
+                                                    }     // stream 2 node is inlet to mixer
+                                                }  // has mixer
 
                                                 // is pump node really the outlet of a branch with a pump?
                                                 for (int kk = 1, kk_end = PlantLoop(i).LoopSide(j).TotalBranches; kk <= kk_end; ++kk) {

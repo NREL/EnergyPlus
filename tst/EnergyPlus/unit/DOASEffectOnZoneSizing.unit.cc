@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
@@ -77,7 +77,6 @@ using namespace DataZoneEnergyDemands;
 using namespace Psychrometrics;
 using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
-using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 
 using namespace ObjexxFCL;
 
@@ -167,7 +166,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     NumOfZones = 2;
     MassConservation.allocate(NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays();
-    AirflowNetworkNumOfExhFan = 0;
+    AirflowNetwork::AirflowNetworkNumOfExhFan = 0;
     TempControlType(1) = 4;
     TempControlType(2) = 4;
     TempZoneThermostatSetPoint(1) = 0.0;

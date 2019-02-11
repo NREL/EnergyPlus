@@ -11479,7 +11479,6 @@ namespace WaterThermalTanks {
         int LoopSideNum;  // Used for looking up plant info
         // unused  INTEGER             :: BranchNum               ! Used for looking up plant info
         //  INTEGER             :: CompNum                 ! Used for looking up plant info
-        int SplitNum;        // used for checking series parallel in plant
         int UseInletNode;    // Water heater use inlet node number
         int SourceInletNode; // Water heater source inlet node number
         bool ErrorsFound;
@@ -11502,13 +11501,11 @@ namespace WaterThermalTanks {
                 ErrorsFound = true;
             }
             // Is this wh Use side plumbed in series (default) or are there other branches in parallel?
-            if (allocated(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter)) {
-                for (SplitNum = 1; SplitNum <= PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).NumSplitters; ++SplitNum) {
-                    if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumOut,
-                               UseInletNode)) { // this wh is on the splitter
-                        if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes > 1) {
-                            WaterThermalTank(WaterThermalTankNum).UseSideSeries = false;
-                        }
+            if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).SplitterExists) {
+                if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut,
+                           UseInletNode)) { // this wh is on the splitter
+                    if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes > 1) {
+                        WaterThermalTank(WaterThermalTankNum).UseSideSeries = false;
                     }
                 }
             }
@@ -11527,13 +11524,11 @@ namespace WaterThermalTanks {
                 ErrorsFound = true;
             }
             // Is this wh Source side plumbed in series (default) or are there other branches in parallel?
-            if (allocated(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter)) {
-                for (SplitNum = 1; SplitNum <= PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).NumSplitters; ++SplitNum) {
-                    if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumOut,
-                               SourceInletNode)) { // this wh is on the splitter
-                        if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes > 1) {
-                            WaterThermalTank(WaterThermalTankNum).SourceSideSeries = false;
-                        }
+            if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).SplitterExists) {
+                if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut,
+                           SourceInletNode)) { // this wh is on the splitter
+                    if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes > 1) {
+                        WaterThermalTank(WaterThermalTankNum).SourceSideSeries = false;
                     }
                 }
             }

@@ -213,6 +213,14 @@ void InputProcessor::initializeMaps()
     }
 }
 
+void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::string &objectName)
+{
+    auto const find_unused = unusedInputs.find({objectType, objectName});
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
+    }
+}
+
 void InputProcessor::processInput()
 {
     std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in);
@@ -1478,7 +1486,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1498,7 +1506,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1525,7 +1533,7 @@ void InputProcessor::preScanReportingVariables()
                         addVariablesForMonthlyReport(report_name);
                     }
                 } catch (...) {
-                    continue;  // blank or erroneous fields should be warned about during actual get input routines
+                    continue; // blank or erroneous fields should be warned about during actual get input routines
                 }
             }
         }
@@ -1905,7 +1913,8 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables,
+        std::unordered_map<std::string,
+                           DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
                            UtilityRoutines::case_insensitive_comparator> data;
         data.reserve(32);

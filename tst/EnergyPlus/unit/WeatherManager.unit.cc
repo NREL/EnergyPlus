@@ -72,8 +72,6 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, SkyTempTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "8.3;",
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",

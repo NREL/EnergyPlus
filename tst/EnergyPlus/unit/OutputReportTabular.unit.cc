@@ -705,7 +705,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     // DATE WRITTEN: Sep 2015
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
 
         " Output:Diagnostics, DisplayExtraWarnings;",
         "  Timestep, 4;",
@@ -1528,7 +1527,6 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     std::string const idf_objects = delimited_string({
 
-        " Version,8.3;",
         " Output:Diagnostics, DisplayExtraWarnings;",
         " Timestep, 4;",
         " BUILDING, AirloopHVAC_ZoneSumTest, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
@@ -2505,7 +2503,6 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //// DATE WRITTEN: Sep 2015
 
 // std::string const idf_objects = delimited_string( {
-//" Version,8.3;",
 //" Output:Diagnostics, DisplayExtraWarnings;",
 //" Timestep, 4;",
 //" BUILDING, AirloopHVAC_VentilationRateProcedure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
@@ -3479,7 +3476,6 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
@@ -3693,7 +3689,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.3;", "Output:Table:TimeBins,", "System1, !- Key Value", "Some Temperature Variable, !- Variable Name", "0.00, !- Interval Start",
+        {"Output:Table:TimeBins,", "System1, !- Key Value", "Some Temperature Variable, !- Variable Name", "0.00, !- Interval Start",
          "0.20, !- Interval Size", "5,                       !- Interval Count", "Always1; !- Schedule Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3716,7 +3712,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //// based on 4ZoneWithShading_Simple_2.idf
 // std::string const idf_objects = delimited_string( {
 
-//"  Version,8.5;                                                                                     ",
 //"                                                                                                   ",
 //" Output:Diagnostics, DisplayExtraWarnings;",
 //"  Timestep,4;                                                                                      ",
@@ -4849,7 +4844,6 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //{
 //// based on DaylightingDeviceTubular.idf
 // std::string const idf_objects = delimited_string( {
-//"  Version,8.5;                                                                            ",
 //"                                                                                          ",
 //"  Building,                                                                               ",
 //"    Tubular Daylighting Device Example,  !- Name                                          ",
@@ -6315,7 +6309,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",

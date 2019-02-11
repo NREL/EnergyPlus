@@ -354,8 +354,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 {
     // Unit test for #5127
 
-    std::vector<std::string> idf_lines({"Version, 8.4;",
-                                        "Schedule:Constant,DummySch,,1.0;",
+    std::vector<std::string> idf_lines({"Schedule:Constant,DummySch,,1.0;",
                                         "Curve:Biquadratic,",
                                         "    HPWH-Htg-Cap-fT,         !- Name",
                                         "    0.563,                   !- Coefficient1 Constant",
@@ -544,7 +543,6 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     using WaterThermalTanks::WaterThermalTank;
 
     std::string idf_objects = delimited_string({
-        "Version, 8.4;",
         "Schedule:Constant,",
         "    WaterHeaterSP1Schedule,  !- Name",
         "    ,             !- Schedule Type Limits Name",
