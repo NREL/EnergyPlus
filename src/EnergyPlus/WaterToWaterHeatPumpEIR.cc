@@ -886,36 +886,6 @@ namespace EnergyPlus {
                         }
 
                         try {
-                            thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
-                        } catch (...) {
-                            Real64 defaultVal = 0.0;
-                            if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_leaving_load_side_water_temperature", defaultVal)) {
-                                // this error condition would mean that someone broke the input dictionary, not their
-                                // input file.  I can't really unit test it so I'll leave it here as a severe error
-                                // but excluding it from coverage
-                                ShowSevereError("EIR WWHP: Reference leaving load side temp not entered and could not get default value"); // LCOV_EXCL_LINE
-                                errorsFound = true;  // LCOV_EXCL_LINE
-                            } else {
-                                thisWWHP.referenceLeavingLoadSideTemp = defaultVal;
-                            }
-                        }
-
-                        try {
-                            thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
-                        } catch (...) {
-                            Real64 defaultVal = 0.0;
-                            if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_entering_source_side_fluid_temperature", defaultVal)) {
-                                // this error condition would mean that someone broke the input dictionary, not their
-                                // input file.  I can't really unit test it so I'll leave it here as a severe error
-                                // but excluding it from coverage
-                                ShowSevereError("EIR WWHP: Reference entering source side temp not entered and could not get default value"); // LCOV_EXCL_LINE
-                                errorsFound = true;  // LCOV_EXCL_LINE
-                            } else {
-                                thisWWHP.referenceEnteringSourceSideTemp = defaultVal;
-                            }
-                        }
-
-                        try {
                             thisWWHP.sizingFactor = fields.at("sizing_factor");
                         } catch (...) {
                             Real64 defaultVal = 0.0;

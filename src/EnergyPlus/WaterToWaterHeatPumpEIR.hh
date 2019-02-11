@@ -81,8 +81,6 @@ namespace EnergyPlus {
             Real64 referenceCapacity = 0.0;
             bool referenceCapacityWasAutoSized = false;
             Real64 referenceCOP = 0.0;
-            Real64 referenceLeavingLoadSideTemp = 0.0;
-            Real64 referenceEnteringSourceSideTemp = 0.0;
 
             // curve references
             int capFuncTempCurveIndex = 0;
