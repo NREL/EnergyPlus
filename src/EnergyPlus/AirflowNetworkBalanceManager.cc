@@ -2847,6 +2847,23 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork simulation detailed openings
         // Moved into getAirflowElementInput
 
+        // Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
+        if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
+            if (AirflowNetworkNumOfExtSurfaces != AirflowNetworkNumOfExtNode) {
+                ShowSevereError(RoutineName +
+                                "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external "
+                                "surfaces defined in " +
+                                CurrentModuleObject + " objects ");
+                ShowContinueError("has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects.");
+                ShowContinueError("The entered number of external nodes is " + RoundSigDigits(AirflowNetworkNumOfExtNode) +
+                                  ". The entered number of external surfaces is " + RoundSigDigits(AirflowNetworkNumOfExtSurfaces) + '.');
+                ErrorsFound = true;
+            }
+        }
+
+        // Read AirflowNetwork simulation detailed openings
+        // Moved into getAirflowElementInput
+
         // Validate opening component and assign opening dimension
         if (AirflowNetworkNumOfDetOpenings > 0) {
             for (i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i) {
@@ -3603,6 +3620,22 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         } else {
+            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+                ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
+                ErrorsFound = true;
+            }
+        }
+
+        // Read AirflowNetwork Distribution system component: duct leakage
+        // Moved into getAirflowElementInput
+
+        // Read AirflowNetwork Distribution system component: duct effective leakage ratio
+        // Moved into getAirflowElementInput
+
+        // Read AirflowNetwork Distribution system component: duct
+        // Moved into getAirflowElementInput
+        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
+        if (DisSysNumOfDucts == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
@@ -7323,13 +7356,8 @@ namespace AirflowNetworkBalanceManager {
                 if (AirflowNetworkLinkSimu(i).FLOW == 0.0) {
                     Ei = 1.0;
                 } else {
-<<<<<<< HEAD
-                    Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
-                                  (DirSign * AirflowNetworkLinkSimu(i).FLOW));
-=======
                     Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
                                   DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi / (DirSign * AirflowNetworkLinkSimu(i).FLOW));
->>>>>>> 208212976a28f796b2181f8bef621f050518f96d
                 }
                 if (AirflowNetworkLinkageData(i).ZoneNum < 0) {
                     Wamb = OutHumRat;
@@ -7342,13 +7370,8 @@ namespace AirflowNetworkBalanceManager {
                     if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) {
                         Ei = 1.0;
                     } else {
-<<<<<<< HEAD
-                        Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
-                                      (AirflowNetworkLinkSimu(i).FLOW2));
-=======
                         Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
                                       DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi / (AirflowNetworkLinkSimu(i).FLOW2));
->>>>>>> 208212976a28f796b2181f8bef621f050518f96d
                     }
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
@@ -8164,10 +8187,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
-<<<<<<< HEAD
         using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-=======
->>>>>>> 208212976a28f796b2181f8bef621f050518f96d
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
