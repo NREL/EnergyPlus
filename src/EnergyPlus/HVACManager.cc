@@ -2417,8 +2417,8 @@ namespace HVACManager {
             CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
-            if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) && AirflowNetworkZoneFlag(ZoneLoop)) {
+            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) && AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
                     ADSCorrectionFactor = 0.0;
                 }
             }

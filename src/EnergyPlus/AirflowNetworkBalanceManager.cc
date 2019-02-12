@@ -2847,23 +2847,6 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork simulation detailed openings
         // Moved into getAirflowElementInput
 
-        // Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
-        if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
-            if (AirflowNetworkNumOfExtSurfaces != AirflowNetworkNumOfExtNode) {
-                ShowSevereError(RoutineName +
-                                "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external "
-                                "surfaces defined in " +
-                                CurrentModuleObject + " objects ");
-                ShowContinueError("has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects.");
-                ShowContinueError("The entered number of external nodes is " + RoundSigDigits(AirflowNetworkNumOfExtNode) +
-                                  ". The entered number of external surfaces is " + RoundSigDigits(AirflowNetworkNumOfExtSurfaces) + '.');
-                ErrorsFound = true;
-            }
-        }
-
-        // Read AirflowNetwork simulation detailed openings
-        // Moved into getAirflowElementInput
-
         // Validate opening component and assign opening dimension
         if (AirflowNetworkNumOfDetOpenings > 0) {
             for (i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i) {
@@ -3620,22 +3603,6 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         } else {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
-                ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
-                ErrorsFound = true;
-            }
-        }
-
-        // Read AirflowNetwork Distribution system component: duct leakage
-        // Moved into getAirflowElementInput
-
-        // Read AirflowNetwork Distribution system component: duct effective leakage ratio
-        // Moved into getAirflowElementInput
-
-        // Read AirflowNetwork Distribution system component: duct
-        // Moved into getAirflowElementInput
-        CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
-        if (DisSysNumOfDucts == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
