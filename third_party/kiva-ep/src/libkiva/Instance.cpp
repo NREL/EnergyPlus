@@ -39,4 +39,12 @@ void Instance::create() {
   ground->buildDomain();
 }
 
+void Instance::calculate(double ts) {
+	ground->calculate(*bcs, ts);
+}
+
+void Instance::calculate_surface_averages() {
+	ground->calculateSurfaceAverages();
+}
+
 } // namespace Kiva

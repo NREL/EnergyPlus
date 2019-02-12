@@ -105,7 +105,6 @@ namespace HeatBalanceKivaManager {
         void setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
-        Kiva::BoundaryConditions bcs;
         Real64 floorWeight;
         int constructionNum;
 
