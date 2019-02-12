@@ -213,6 +213,14 @@ void InputProcessor::initializeMaps()
     }
 }
 
+void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::string &objectName)
+{
+    auto const find_unused = unusedInputs.find({objectType, objectName});
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
+    }
+}
+
 void InputProcessor::processInput()
 {
     std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in);

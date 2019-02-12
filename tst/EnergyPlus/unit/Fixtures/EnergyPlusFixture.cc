@@ -74,7 +74,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -173,6 +173,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
@@ -309,7 +310,7 @@ void EnergyPlusFixture::clear_all_states()
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CurveManager::clear_state();
-    DataAirflowNetwork::clear_state();
+    AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -404,8 +405,9 @@ void EnergyPlusFixture::clear_all_states()
     PackagedTerminalHeatPump::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
-    PlantCondLoopOperation::clear_state();
+    PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
+    PlantCondLoopOperation::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();

@@ -58,7 +58,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -4729,8 +4729,6 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
@@ -5258,7 +5256,7 @@ namespace Furnaces {
             MassFlowRate = Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
             if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp)
                 MinHumRat = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat;
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
                                 Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -5787,7 +5785,7 @@ namespace Furnaces {
         }
 
         // AirflowNetwork global variable
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
         }
     }
@@ -9468,9 +9466,6 @@ namespace Furnaces {
         // Update global variables used by AirflowNetwork module.
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9487,7 +9482,8 @@ namespace Furnaces {
         }
 
         // Set mass flow rates during on and off cylce using an OnOff fan
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = Furnace(FurnaceNum).OpMode;

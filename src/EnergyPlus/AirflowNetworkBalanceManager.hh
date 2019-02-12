@@ -93,7 +93,6 @@ namespace AirflowNetworkBalanceManager {
     extern int AirflowNetworkNumOfDetOpenings;
     extern int AirflowNetworkNumOfSimOpenings;
     extern int AirflowNetworkNumOfHorOpenings;
-    extern int AirflowNetworkNumOfStdCndns;
     extern int AirflowNetworkNumOfSurCracks;
     extern int AirflowNetworkNumOfSurELA;
     extern int AirflowNetworkNumOfExtNode;
@@ -183,27 +182,6 @@ namespace AirflowNetworkBalanceManager {
     void CalcAirflowNetworkAirBalance();
 
     void CalcWindPressureCoeffs();
-
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    );
-
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    );
-
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    );
 
     Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
                                     Real64 const mdot, // Mass flow rate

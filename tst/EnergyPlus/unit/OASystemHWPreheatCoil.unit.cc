@@ -82,8 +82,6 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     int OASysNum(1);
 
     std::string const idf_objects = delimited_string({
-        "  Version, 8.6;",
-
         "  Timestep, 4;",
 
         "  SimulationControl,",
@@ -1069,8 +1067,6 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     Real64 CpAir(0.0);
 
     std::string const idf_objects = delimited_string({
-        "  Version, 8.6;",
-
         "  Timestep, 4;",
 
         "  SimulationControl,",

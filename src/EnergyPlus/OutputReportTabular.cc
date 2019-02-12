@@ -71,7 +71,7 @@
 #include <CondenserLoopTowers.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataCostEstimate.hh>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
@@ -6490,9 +6490,6 @@ namespace OutputReportTabular {
         //   na
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::RunPeriodStartDayOfWeek;
@@ -6656,10 +6653,11 @@ namespace OutputReportTabular {
                         PreDefTableEntry(pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
                     }
                     // AFN infiltration -- check that afn sim is being done.
-                    if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) {
+                    if (AirflowNetwork::SimulateAirflowNetwork < AirflowNetwork::AirflowNetworkControlMultizone) {
                         ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                         ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
-                        if (!(SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS)) {
+                        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
                             ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                             ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
                         }
@@ -12482,9 +12480,6 @@ namespace OutputReportTabular {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::AirflowNetworkReportData;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::NumOfTimeStepInHour;
@@ -12514,17 +12509,17 @@ namespace OutputReportTabular {
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * SecInHour)); // zone infiltration
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
-                         AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
                 }
                 infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).InfilLatentGain - ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * SecInHour)); // zone infiltration
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
-                         AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
                 }
 
                 zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
@@ -12534,17 +12529,17 @@ namespace OutputReportTabular {
 
                 interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * SecInHour)); // zone mixing
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
-                         AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
                 }
                 interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).MixLatentGain - ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * SecInHour)); // zone mixing
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
-                        (AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
-                         AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
                 }
             }
         }

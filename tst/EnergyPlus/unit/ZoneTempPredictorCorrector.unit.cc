@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -93,7 +93,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
@@ -158,7 +157,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     SumHmARa.allocate(1);
     MixingMassFlowXHumRat.allocate(1);
     MixingMassFlowZone.allocate(1);
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
     MDotOA.allocate(1);
 
     ZoneAirSolutionAlgo = UseEulerMethod;
@@ -318,8 +317,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     // DATE WRITTEN: Aug 2015
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "Zone,",
         "  Core_top,             !- Name",
         "  0.0000,                  !- Direction of Relative North {deg}",
@@ -681,8 +678,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     using WeatherManager::Envrn;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
-        " ",
         "Zone,",
         "  Core_top,                !- Name",
         "  0.0000,                  !- Direction of Relative North {deg}",
@@ -1171,7 +1166,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
