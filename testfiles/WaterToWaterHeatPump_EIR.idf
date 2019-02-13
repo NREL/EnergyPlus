@@ -415,15 +415,15 @@
     Cooling Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
     Condenser Loop Demand Intermediate Node,  !- Source Side Inlet Node Name
     Condenser Loop Demand Outlet Node,  !- Source Side Outlet Node Name
-    Heating Coil,            !- Companion Coil Name
+    Heating Coil,            !- Companion Heating Heat Pump Name
     0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
     0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
     400000,                  !- Reference Capacity
     3.5,                     !- Reference COP
     ,                        !- Sizing Factor
-    CapCurveFuncTemp2,       !- Heating Capacity Function of Temperature Curve Name
-    EIRCurveFuncTemp2,       !- Electric Input to Heating Output Ratio Function of Temperature Curve Name
-    EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Function of Part Load Ratio Curve Name
+    CapCurveFuncTemp2,       !- Heating Capacity Modifier Function of Temperature Curve Name
+    EIRCurveFuncTemp2,       !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
 
  Curve:Biquadratic,
     CapCurveFuncTemp2,       !- Name
@@ -698,19 +698,20 @@
 
   Output:VariableDictionary, IDF;
 
-  ! Output:Diagnostics, ReportDuringWarmup;
-
-  ! Output:Variable, *, System Node Temperature, Hourly;
   Output:Variable, *, Plant Load Profile Mass Flow Rate, Hourly;
   Output:Variable, *, Plant Load Profile Heat Transfer Rate, Hourly;
-  Output:Variable, *, EIR WWHP Load Side Heat Transfer, Hourly;
-  Output:Variable, *, EIR WWHP Source Side Heat Transfer, Hourly;
-  Output:Variable, *, EIR WWHP Load Side Inlet Temperature, Hourly;
-  Output:Variable, *, EIR WWHP Load Side Outlet Temperature, Hourly;
-  Output:Variable, *, EIR WWHP Source Side Inlet Temperature, Hourly;
-  Output:Variable, *, EIR WWHP Source Side Outlet Temperature, Hourly;
-  Output:Variable, *, EIR WWHP Power Usage, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Load Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Load Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Source Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Source Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Load Side Inlet Temperature, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Load Side Outlet Temperature, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Source Side Inlet Temperature, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Source Side Outlet Temperature, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Electric Power, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Electric Energy, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Load Side Mass Flow Rate, Hourly;
+  Output:Variable, *, Water to Water Heat Pump Source Side Mass Flow Rate, Hourly;
   Output:Variable, *, Ground Heat Exchanger Heat Transfer Rate, Hourly;
   Output:Variable, *, Ground Heat Exchanger Inlet Temperature, Hourly;
   Output:Variable, *, Ground Heat Exchanger Outlet Temperature, Hourly;
-  ! Output:Variable, Cooling Coil Load Loop.*, System Node Mass Flow Rate, Hourly;

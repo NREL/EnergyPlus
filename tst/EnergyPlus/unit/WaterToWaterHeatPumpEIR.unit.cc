@@ -421,6 +421,32 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
     );
 }
 
+TEST_F(EIRWWHPFixture, CatchErrorsOnBadCurves) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  ,",
+                            "  1,",
+                            "  dummyCurveA,",
+                            "  dummyCurveB,",
+                            "  dummyCurveC;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+    // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
+}
+
 TEST_F(EIRWWHPFixture, Initialization) {
     std::string const idf_objects =
             delimited_string(
@@ -1758,6 +1784,165 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
         EXPECT_NEAR(availableCapacity, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
     }
 
+}
+
+TEST_F(EIRWWHPFixture, HeatingSimulate) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.0001,",
+                            "  0.0001,",
+                            "  1000,",
+                            "  3.14,",
+                            "  ,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  0.95,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &wwhpPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    wwhpPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    // then the source side
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &wwhpPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    wwhpPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+
+    // do a bit of extra wiring up to the plant
+    wwhpPlantLoadSideComp.Name = thisHeatingWWHP->name;
+    wwhpPlantLoadSideComp.NodeNumIn = thisHeatingWWHP->loadSideNodes.inlet;
+    wwhpPlantLoadSourceComp.Name = thisHeatingWWHP->name;
+    wwhpPlantLoadSourceComp.NodeNumIn = thisHeatingWWHP->sourceSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisHeatingWWHP->onInitLoopEquip(myLoadLocation);
+
+    // call it from the load side, but this time there is a positive (cooling) load - shouldn't try to run
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = 900;
+        bool runFlag = true;  // plant actually shouldn't do this but the component can be smart enough to handle it
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const loadInletTemp = 46;
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.inlet).Temp = loadInletTemp;
+        DataLoopNode::Node(thisHeatingWWHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(loadInletTemp, thisHeatingWWHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(0.0, thisHeatingWWHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // call it from the load side, but this time there is load (still firsthvac, unit can meet load)
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = -800;
+        bool runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4180;
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisHeatingWWHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingWWHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(-curLoad, thisHeatingWWHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = -1200;
+        Real64 availableCapacity = 950.0;
+        bool runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4180;
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisHeatingWWHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to miss setpoint and be at max capacity
+        EXPECT_NEAR(44.402, thisHeatingWWHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(availableCapacity, thisHeatingWWHP->loadSideHeatTransfer, 0.001);
+    }
+
+}
+
+TEST_F(EIRWWHPFixture, TestConcurrentOperationChecking) {
+    eir_wwhp.resize(4);
+    EIRWaterToWaterHeatPump *coil1 = &eir_wwhp[0];
+    EIRWaterToWaterHeatPump *coil2 = &eir_wwhp[1];
+    EIRWaterToWaterHeatPump *coil3 = &eir_wwhp[2];
+    EIRWaterToWaterHeatPump *coil4 = &eir_wwhp[3];
+
+    // pair up the last two
+    coil3->companionHeatPumpCoil = coil4;
+    coil4->companionHeatPumpCoil = coil3;
+
+    // set all of them to running
+    coil1->running = true;
+    coil2->running = true;
+    coil3->running = true;
+    coil4->running = true;
+
+    // check to warn about concurrent operation
+    EIRWaterToWaterHeatPump::checkConcurrentOperation();
+
+    // that will just add a recurring warning to the end, so to check whether
+    //  a warning was actually made, I'll just check the warning index values
+    ASSERT_EQ(0, coil1->recurringConcurrentOperationWarningIndex);
+    ASSERT_EQ(0, coil2->recurringConcurrentOperationWarningIndex);
+    ASSERT_EQ(1, coil3->recurringConcurrentOperationWarningIndex);
+    ASSERT_EQ(1, coil4->recurringConcurrentOperationWarningIndex);
 }
 
 #pragma clang diagnostic pop

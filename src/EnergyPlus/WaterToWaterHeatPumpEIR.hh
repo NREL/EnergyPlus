@@ -105,6 +105,9 @@ namespace EnergyPlus {
             Real64 sourceSideInletTemp = 0.0;
             Real64 sourceSideOutletTemp = 0.0;
             Real64 powerUsage = 0.0;
+            Real64 loadSideEnergy = 0.0;
+            Real64 sourceSideEnergy = 0.0;
+            Real64 powerEnergy = 0.0;
             bool running = false;
 
             // topology variables
@@ -115,6 +118,7 @@ namespace EnergyPlus {
 
             // counters and indexes
             int condMassFlowRateTriggerIndex = 0;
+            int recurringConcurrentOperationWarningIndex = 0;
 
             // logic flags
             bool oneTimeInit = true;
@@ -147,6 +151,8 @@ namespace EnergyPlus {
 
             void setOperatingFlowRates();
 
+            void resetReportingVariables();
+
             static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
             static void pairUpCompanionCoils();
@@ -154,6 +160,8 @@ namespace EnergyPlus {
             static void processInputForEIRWWHP();
 
             static void clear_state();
+
+            static void checkConcurrentOperation();
 
             static Real64 add(Real64 const a, Real64 const b) {return a + b;}
 
