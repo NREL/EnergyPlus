@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -72,12 +73,14 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace DataGlobals;
 using namespace EnergyPlus::DataZoneControls;
@@ -87,6 +90,7 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
+using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
@@ -134,6 +138,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     PreviousMeasuredZT1.allocate(1);
     PreviousMeasuredZT2.allocate(1);
     PreviousMeasuredZT3.allocate(1);
+    PreviousMeasuredHumRat1.allocate(1);
+    PreviousMeasuredHumRat2.allocate(1);
+    PreviousMeasuredHumRat3.allocate(1);
+    CO2ZoneTimeMinus1Temp.allocate(1);
+    CO2ZoneTimeMinus2Temp.allocate(1);
+    CO2ZoneTimeMinus3Temp.allocate(1);
+    CO2ZoneTimeMinus1.allocate(1);
+    CO2ZoneTimeMinus2.allocate(1);
+    CO2ZoneTimeMinus3.allocate(1);
+    Schedule.allocate(1);
 
     // CalcZoneComponentLoadSums variable initialization
     MCPI.allocate(1);
@@ -180,25 +194,67 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     // CorrectZoneHumRat variable initialization
     ZoneLatentGain.allocate(1);
     ZoneLatentGain(1) = 0.0;
+    ZoneLatentGainExceptPeople.allocate(1);
+    ZoneLatentGainExceptPeople(1) = 0.0;
     SumLatentHTRadSys.allocate(1);
     SumLatentHTRadSys(1) = 0.0;
     SumHmARaW.allocate(1);
+    SumHmARaW(1) = 0.0;
     SumConvHTRadSys.allocate(1);
     SumConvHTRadSys(1) = 0.0;
     SumConvPool.allocate(1);
     SumConvPool(1) = 0.0;
     SumHmARa.allocate(1);
+    SumHmARa(1) = 0.0;
     MixingMassFlowXHumRat.allocate(1);
+    MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone.allocate(1);
+    MixingMassFlowZone(1) = 0.0;
     ZoneW1.allocate(1);
     ZoneAirHumRatTemp.allocate(1);
     SumLatentPool.allocate(1);
     SumLatentPool(1) = 0.0;
     OAMFL.allocate(1);
+    OAMFL(1) = 0.0;
     VAMFL.allocate(1);
+    VAMFL(1) = 0.0;
     EAMFL.allocate(1);
+    EAMFL(1) = 0.0;
     EAMFLxHumRat.allocate(1);
+    EAMFLxHumRat(1) = 0.0;
     CTMFL.allocate(1);
+    CTMFL(1) = 0.0;
+    ZT.allocate(1);
+    ZT(1) = 0.0;
+
+    // CorrectZoneContaminants variable initialization
+    AZ.allocate(1);
+    BZ.allocate(1);
+    CZ.allocate(1);
+    AZGC.allocate(1);
+    BZGC.allocate(1);
+    CZGC.allocate(1);
+    AZ(1) = 0.0;
+    BZ(1) = 0.0;
+    CZ(1) = 0.0;
+    AZGC(1) = 0.0;
+    BZGC(1) = 0.0;
+    CZGC(1) = 0.0;
+    ZoneAirCO2.allocate(1);
+    ZoneAirCO2(1) = 0.0;
+    ZoneAirCO2Temp.allocate(1);
+    ZoneAirCO2Temp(1) = 0.0;
+    ZoneAirDensityCO.allocate(1);
+    ZoneAirDensityCO(1) = 0.0;
+    ZoneCO2Gain.allocate(1);
+    ZoneCO2Gain(1) = 0.0;
+    ZoneCO2GainExceptPeople.allocate(1);
+    ZoneCO2GainExceptPeople(1) = 0.0;
+    ZoneGCGain.allocate(1);
+    ZoneGCGain(1) = 0.0;
+    MixingMassFlowCO2.allocate(1);
+    MixingMassFlowCO2(1) = 0.0;
+    Real64 CO2MassFlowRate(0.0);
 
     // Parameter setup
     NumOfZones = 1;
@@ -225,8 +281,13 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
 
     // Case 1: Hybrid model internal thermal mass
 
-    HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InternalThermalMassCalc_T = true;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_H = false;
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
     MAT(1) = 0.0;
@@ -242,10 +303,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(15.13, Zone(1).ZoneVolCapMultpSensHM, 0.01);
 
-    // Case 2: Hybrid model infiltration
+    // Case 2: Hybrid model infiltration with measured temperature
 
-    HybridModelZone(1).InfiltrationCalc_T = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_T = true;
+    HybridModelZone(1).InfiltrationCalc_H = false;
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
     MAT(1) = 0.0;
@@ -262,9 +328,128 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.2444, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
+    // Case 3: Hybrid model infiltration with measured humidity ratio
+
+    HybridModelZone(1).InternalThermalMassCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_H = true;
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
+    HybridModelZone(1).HybridStartDayOfYear = 1;
+    HybridModelZone(1).HybridEndDayOfYear = 2;
+    Zone(1).Volume = 4000;
+    Zone(1).OutDryBulbTemp = -10.62;
+    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    ZoneAirHumRat(1) = 0.001120003;
+    ZT(1) = -6.08;
+    OutHumRat = 0.0011366887816818931;
+    PreviousMeasuredHumRat1(1) = 0.0011186324286;
+    PreviousMeasuredHumRat2(1) = 0.0011172070768;
+    PreviousMeasuredHumRat3(1) = 0.0011155109625;
+    HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
+    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.001120003;
+    MCPV(1) = 539.49;
+    MCPTV(1) = 270.10;
+    OutBaroPress = 99500;
+
+    CorrectZoneHumRat(1);
+    EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
+
+    // Case 4: Hybrid model infiltration with measured CO2 concentration
+
+    Contaminant.CO2Simulation = true;
+    HybridModelZone(1).InternalThermalMassCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_H = false;
+    HybridModelZone(1).InfiltrationCalc_C = true;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
+    HybridModelZone(1).HybridStartDayOfYear = 1;
+    HybridModelZone(1).HybridEndDayOfYear = 2;
+    Zone(1).Volume = 4000;
+    Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    OutdoorCO2 = 387.6064554;
+    OutHumRat = 0.001147;
+    OutBaroPress = 99500;
+    CO2ZoneTimeMinus1(1) = 388.595225;
+    CO2ZoneTimeMinus2(1) = 389.084601;
+    CO2ZoneTimeMinus3(1) = 388.997009;
+    HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
+    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
+
+    CorrectZoneContaminants(false, true, 10 / 60);
+    EXPECT_NEAR(0.4965, Zone(1).InfilOAAirChangeRateHM, 0.01);
+
+    // Case 5: Hybrid model people count with measured temperature
+
+
+
+    // Case 6: Hybrid model people count with measured humidity ratio
+
+    HybridModelZone(1).InternalThermalMassCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_H = false;
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = true;
+    HybridModelZone(1).PeopleCountCalc_C = false;
+    HybridModelZone(1).HybridStartDayOfYear = 1;
+    HybridModelZone(1).HybridEndDayOfYear = 2;
+    Zone(1).Volume = 4000;
+    Zone(1).OutDryBulbTemp = -10.62;
+    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    ZoneAirHumRat(1) = 0.0024964;
+    ZT(1) = -2.92;
+    OutHumRat = 0.0025365002784602363;
+	OutBaroPress = 98916.7;
+    OAMFL(1) = 0.700812;
+    ZoneLatentGain(1) = 211.2;
+    ZoneLatentGainExceptPeople(1) = 0.0;
+    PreviousMeasuredHumRat1(1) = 0.002496356;
+    PreviousMeasuredHumRat2(1) = 0.002489048;
+    PreviousMeasuredHumRat3(1) = 0.002480404;
+    HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
+    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
+    
+    CorrectZoneHumRat(1);
+    EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
+
+    // Case 7: Hybrid model people count with measured CO2 concentration
+    Contaminant.CO2Simulation = true;
+    HybridModelZone(1).InternalThermalMassCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_T = false;
+    HybridModelZone(1).InfiltrationCalc_H = false;
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_T = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_C = true;
+    HybridModelZone(1).HybridStartDayOfYear = 1;
+    HybridModelZone(1).HybridEndDayOfYear = 2;
+    Zone(1).Volume = 4000;
+    Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    Zone(1).OutDryBulbTemp = -1.0394166434012677;
+    ZT(1) = -2.92;
+    ZoneAirHumRat(1) = 0.00112;
+    OutdoorCO2 = 387.6064554;
+    OutBaroPress = 98916.7;
+    OAMFL(1) = 0.700812;
+    Real64 CO2GainExceptPeople(0.0);
+    ZoneCO2Gain(1) = 0.00001989;
+    CO2ZoneTimeMinus1(1) = 387.9962885;
+    CO2ZoneTimeMinus2(1) = 387.676037;
+    CO2ZoneTimeMinus3(1) = 387.2385685;
+    HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
+    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
+
+    CorrectZoneContaminants(false, true, 10 / 60);
+    EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
+
     // Deallocate everything
+	HybridModel::clear_state();
     Zone.deallocate();
-    HybridModelZone.deallocate();
     AirModel.deallocate();
     ZTM1.deallocate();
     ZTM2.deallocate();
@@ -281,6 +466,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     WZoneTimeMinus1.deallocate();
     WZoneTimeMinus2.deallocate();
     WZoneTimeMinus3.deallocate();
+    PreviousMeasuredHumRat1.deallocate();
+    PreviousMeasuredHumRat2.deallocate();
+    PreviousMeasuredHumRat3.deallocate();
+    CO2ZoneTimeMinus1Temp.deallocate();
+    CO2ZoneTimeMinus2Temp.deallocate();
+    CO2ZoneTimeMinus3Temp.deallocate();
+    CO2ZoneTimeMinus1.deallocate();
+    CO2ZoneTimeMinus2.deallocate();
+    CO2ZoneTimeMinus3.deallocate();
     AIRRAT.deallocate();
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
@@ -338,4 +532,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     EAMFL.deallocate();
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
+    ZoneAirCO2.deallocate();
+    ZoneAirCO2Temp.deallocate();
+    ZoneAirDensityCO.deallocate();
+    ZoneCO2Gain.deallocate();
+    ZoneCO2GainExceptPeople.deallocate();
+    ZoneGCGain.deallocate();
+    MixingMassFlowCO2.deallocate();
+    Schedule.deallocate();
 }

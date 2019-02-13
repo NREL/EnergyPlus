@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MDotOA(1) = 0.0;
 
     // HybridModel
-    HybridModelZone(1).PeopelCountCalc_H = false;
+    HybridModelZone(1).PeopleCountCalc_H = false;
 
     CorrectZoneHumRat(1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);

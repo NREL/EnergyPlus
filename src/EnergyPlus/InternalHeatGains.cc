@@ -7346,8 +7346,6 @@ namespace InternalHeatGains {
         Real64 tmpSumLatentGainRate;
         int DeviceNum;
 
-		std::string tt_str;
-
         tmpSumLatentGainRate = 0.0;
 
         if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
@@ -7356,7 +7354,6 @@ namespace InternalHeatGains {
         }
 
         for (DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-			tt_str = ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectType;
             tmpSumLatentGainRate += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
         }
 
@@ -7367,24 +7364,15 @@ namespace InternalHeatGains {
     void SumAllInternalLatentGainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                                Real64 &SumLatentGainRateExceptPeople)
     {
-
-        Real64 tmpSumLatentGainRateExceptPeople;
-        int DeviceNum;
-        std::string str_people = "PEOPLE";
-        tmpSumLatentGainRateExceptPeople = 0.0;
-
         if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             SumLatentGainRateExceptPeople = 0.0;
             return;
         }
-
-        for (DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectType != str_people) {
-                tmpSumLatentGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
+        for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
+            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+				SumLatentGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
             }
         }
-
-        SumLatentGainRateExceptPeople = tmpSumLatentGainRateExceptPeople;
     }
 
     void SumInternalLatentGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
@@ -7563,23 +7551,16 @@ namespace InternalHeatGains {
     void SumAllInternalCO2GainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                             Real64 &SumCO2GainRateExceptPeople)
     {
-
-        Real64 tmpSumCO2GainRateExceptPeople(0.0);
-        int DeviceNum;
-
-        std::string str_people = "PEOPLE";
-
         if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             SumCO2GainRateExceptPeople = 0.0;
             return;
         }
 
-        for (DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectType != str_people) {
-                tmpSumCO2GainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).CarbonDioxideGainRate;
+        for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
+            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+				SumCO2GainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).CarbonDioxideGainRate;
             }
         }
-        SumCO2GainRateExceptPeople = tmpSumCO2GainRateExceptPeople;
     }
 
     void SumInternalCO2GainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for

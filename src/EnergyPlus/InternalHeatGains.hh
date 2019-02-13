@@ -100,7 +100,7 @@ namespace InternalHeatGains {
                                        Real64 &SumConvGainRate); // For HybridModel
 
     void SumAllInternalConvectionGainsExceptPeople(int const ZoneNum,                    // zone index pointer for which zone to sum gains for
-                                                   Real64 &SumConvGainRateExceptPeople); // For HybridModel
+                                                   Real64 &SumConvGainRateExceptPeople);
 
     void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
                                            Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types

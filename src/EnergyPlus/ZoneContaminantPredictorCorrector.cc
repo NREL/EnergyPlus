@@ -1317,6 +1317,9 @@ namespace ZoneContaminantPredictorCorrector {
 
         } // ContControlledZoneNum
 
+        // Get the Hybrid Model setting inputs
+        GetHybridModelZone();
+
         if (ErrorsFound) {
             ShowFatalError("Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination.");
         }
@@ -2380,6 +2383,11 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 ACH_inf(0.0); // Reversely solved infiltration air change rate
         Real64 SumSysM_HM(0.0);
         Real64 SumSysMxCO2_HM(0.0);
+        Real64 CO2GainPeople(0.0); // Inversely solved convectice heat gain from people (m^3/s)
+        Real64 NumPeople(0.0);     // Inversely solved number of people in the zone
+        Real64 CO2GenRate(0.0);
+        Real64 ActivityLevel(0.0);
+        Real64 UpperBound(0.0); // Upper bound of number of people
 
         // FLOW:
         // Update zone CO2
@@ -2632,8 +2640,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
                 // Hybrid modeling with CO2 concentration starts here.
-                GetHybridModelZone();
-                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopelCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
 
                     Zone(ZoneNum).ZoneMeasuredCO2Concentration =
                         GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
@@ -2675,7 +2682,6 @@ namespace ZoneContaminantPredictorCorrector {
 
                             zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                             delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
-
                             CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
                             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
 
@@ -2693,19 +2699,7 @@ namespace ZoneContaminantPredictorCorrector {
                         }
 
                         // Hybrid Model calculate people count
-                        if (HybridModelZone(ZoneNum).PeopelCountCalc_C && UseZoneTimeStepHistory) {
-                            Real64 AA(0.0); // Same as A -- Sum of air mass flow terms
-                            Real64 BB(0.0); // Sum of air mass flow rate times correcponding CO2 concentration except for the part from people
-                            Real64 CC(0.0); // Same as C, zone CO2 moisture capacity
-                            Real64 DD(0.0); // 3rd order backward difference terms
-                            Real64 CO2GainPeople(0.0); // Inversely solved convectice heat gain from people (m^3/s)
-                            Real64 NumPeople(0.0);     // Inversely solved number of people in the zone
-                            Real64 CO2GenRate(0.0);
-                            Real64 ActivityLevel(0.0);
-                            Real64 SumSysM_HM(0.0);
-                            Real64 SumSysMxCO2_HM(0.0);
-                            Real64 UpperBound(0.0); // Upper bound of number of people
-
+                        if (HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
                             Zone(ZoneNum).ZonePeopleActivityLevel =
                                 GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                             ActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);

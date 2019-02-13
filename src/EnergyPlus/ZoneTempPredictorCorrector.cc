@@ -5133,7 +5133,7 @@ namespace ZoneTempPredictorCorrector {
 
             // Hybrid modeling start: Added by Sang Hoon Lee May 2015, updated by Han Li 2018
             if ((HybridModelZone(ZoneNum).InfiltrationCalc_T || HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
-                 HybridModelZone(ZoneNum).PeopelCountCalc_T) &&
+                 HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
                 (!WarmupFlag) && (!DoingSizing)) {
 
                 Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
@@ -5271,7 +5271,7 @@ namespace ZoneTempPredictorCorrector {
                     } // Hybrid model internal thermal mass calcualtion end
 
                     // Hybrid model people count calculation
-                    if (HybridModelZone(ZoneNum).PeopelCountCalc_T && UseZoneTimeStepHistory) {
+                    if (HybridModelZone(ZoneNum).PeopleCountCalc_T && UseZoneTimeStepHistory) {
 
                         Real64 AA(0.0);               // Same as A -- Sum of temperature independent terms
                         Real64 BB(0.0);               // Sum of zone internal convective heat gains except for the part from people
@@ -5773,6 +5773,24 @@ namespace ZoneTempPredictorCorrector {
         static Real64 SumSysMCp(0.0);  // Zone sum of air system MassFlowRate*Cp
         static Real64 SumSysMCpT(0.0); // Zone sum of air system MassFlowRate*Cp*T
 
+        // hybrid mdoel
+        Real64 AA(0.0);
+        Real64 BB(0.0);
+        Real64 CC(0.0);
+        Real64 DD(0.0);
+        Real64 SumSysM_HM(0.0);
+        Real64 SumSysMHumRat_HM(0.0);
+        Real64 LatentGainPeople(0.0);
+        Real64 NumPeople(0.0);
+        Real64 FractionSensible(0.0);
+        Real64 ActivityLevel(0.0);
+        Real64 UpperBound(0.0);
+        Real64 zone_M_HR(0.0);
+        Real64 delta_HR(0.0);
+        Real64 AirDensity(0.0);
+        Real64 CpAir(0.0);
+        Real64 M_inf(0.0);
+        Real64 ACH_inf(0.0);
         static Real64 SumIntGainExceptPeople(0.0); // Zone sum of convective internal gains
 
         // FLOW:
@@ -5834,7 +5852,7 @@ namespace ZoneTempPredictorCorrector {
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
         LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
 
-        if (HybridModelZone(ZoneNum).PeopelCountCalc_H) {
+        if (HybridModelZone(ZoneNum).PeopleCountCalc_H) {
             LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
         }
 
@@ -5918,7 +5936,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // HybridModel with measured humidity ratio begins
-        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopelCountCalc_H) && (!WarmupFlag) && (!DoingSizing)) {
+        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!WarmupFlag) && (!DoingSizing)) {
 
             // Get measured zone humidity ratio
             Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
@@ -5929,19 +5947,6 @@ namespace ZoneTempPredictorCorrector {
 
                 // Hybrid Model calculate air infiltration rate
                 if (HybridModelZone(ZoneNum).InfiltrationCalc_H && UseZoneTimeStepHistory) {
-
-                    Real64 AA(0.0); // AA = A - M_inf
-                    Real64 BB(0.0); // BB = B - M_inf * W_out
-                    Real64 CC(0.0); // CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-                    Real64 DD(0.0); // DD is the previous timestamp terms for 3rd order backward different approach
-                    Real64 zone_M_HR(0.0);
-                    Real64 delta_HR(0.0);
-                    Real64 AirDensity(0.0);
-                    Real64 CpAir(0.0);
-                    Real64 M_inf(0.0);   // Reversely solved infiltration mass flow rate
-                    Real64 ACH_inf(0.0); // Reversely solved infiltration air change rate flow rate
-                    Real64 SumSysM_HM(0.0);
-                    Real64 SumSysMHumRat_HM(0.0);
 
                     // Conditionally calculate the time dependent and time independent terms
                     if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
@@ -5990,19 +5995,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Hybrid Model calculate people count
-                if (HybridModelZone(ZoneNum).PeopelCountCalc_H && UseZoneTimeStepHistory) {
-
-                    Real64 AA(0.0); // Same as A -- Sum of mass flow rate
-                    Real64 BB(0.0); // Sum of zone internal latent gains except for the part from people
-                    Real64 CC(0.0); // Same as C, zone air moisture capacity
-                    Real64 DD(0.0); // 3rd order backward difference terms
-                    Real64 SumSysM_HM(0.0);
-                    Real64 SumSysMHumRat_HM(0.0);
-                    Real64 LatentGainPeople(0.0); // Inversely solved convectice heat gain from people
-                    Real64 NumPeople(0.0);        // Inversely solved number of people in the zone
-                    Real64 FractionSensible(0.0); // Default sensible portion of the total heat from people
-                    Real64 ActivityLevel(0.0);
-                    Real64 UpperBound(0.0); // Upper bound of number of people
+                if (HybridModelZone(ZoneNum).PeopleCountCalc_H && UseZoneTimeStepHistory) {
 
                     Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                     Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
