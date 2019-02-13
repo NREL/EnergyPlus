@@ -2564,13 +2564,10 @@ Once load and source flow rates have been established for the component using th
 
 \begin{enumerate}
 	\item Retrieve load side outlet temperature setpoint
-	\item Evaluate the capacity modifier function using the source inlet temperature and the load side setpoint temperature as the projected outlet temperature ($f_{cap} = f(T_{in,load}, T_{out,src,set}) $)
-	\item Calculate available load side capacity using the specific heat evaluated at the inlet temperature
-	\item Calculate the part load ratio using the current plant-dispatched load (constrained between zero and one)
-	\item Calculate the actual operating load side heat transfer and the load side outlet temperature
-	\item Evaluate power usage by evaluating the EIR curves using the source inlet temperature, actual load side outlet temperature, and the current part load ratio
-	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature
+	\item Evaluate the capacity modifier function using the source inlet temperature and the load side setpoint temperature as the projected outlet temperature ($f_{cap} = f(T_{out,load,set}, T_{in,src}) $)
+	\item Calculate available load side capacity using the reference value and the modifier ($\dot{q}_{load,avail} = \dot{q}_{reference} \cdot f_{cap}$)
+	\item Calculate the part load ratio using the current plant-dispatched load (constrained between zero and one) ($PLR = \frac{\dot{q}_{plant}}{\dot{q}_{avail}}$)
+	\item Calculate the actual operating load side heat transfer and the load side outlet temperature ($\dot{q}_{load} = \dot{q}_{avail}PLR$, $T_{out,load} = T_{in,load} \pm \frac{\dot{q}_{load}}{\dot{m}_{load}C_{p,load}}) $) -- note the plus/minus refers to how the value will be added in heating mode and subtracted in cooling mode.  This is required because the sign convention is not consistent and a positive value for calculated heat rate will be obtained for both units under normal conditions.
+	\item Evaluate power usage by evaluating the EIR curves using the source inlet temperature, actual load side outlet temperature, and the current part load ratio ($f_{eir,t} = f(T_{out,load,set}, T_{in,src})$, $f_{eir,plr} = f(PLR)$, $P = P_{reference} f_{eir,t} f_{eir,plr}$)
+	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature ($q_{src} = q_{load} \pm P$, $T_{out,src} = T_{in,src} \pm \frac{\dot{q}_{src}}{\dot{m}_{src}C_{p,src}} $) -- again the plus/minus refers to the different behavior between cooling and heating mode.
 \end{enumerate}
-
-These steps are briefly documented
-
