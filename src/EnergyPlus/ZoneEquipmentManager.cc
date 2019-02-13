@@ -4403,37 +4403,6 @@ namespace ZoneEquipmentManager {
         auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
         auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum));
 
-        auto evaluate_loads_deadband_setback = [&]{
-            auto const SELECT_CASE_var(TempControlType(ZoneNum));
-            if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
-                CurDeadBandOrSetback(ZoneNum) = false;
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
-                    CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
-                    CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            }
-        };
-
         // If zone is uncontrolled use original method for remaining output
         if (!DataHeatBalance::Zone(ZoneNum).IsControlled) {
             // SequentialLoading, use original method for remaining output
@@ -4446,7 +4415,36 @@ namespace ZoneEquipmentManager {
             moisture.RemainingOutputReqToDehumidSP -= LatOutputProvided;
 
             // re-evaluate if loads are now such that in dead band or set back
-            evaluate_loads_deadband_setback();
+            {
+                auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+                    CurDeadBandOrSetback(ZoneNum) = false;
+                } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                    if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                    if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                    if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                    if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                }
+            }
 
             if (present(EquipPriorityNum)) {
                 // now store remaining load at the by sequence level
@@ -4485,7 +4483,36 @@ namespace ZoneEquipmentManager {
             moisture.RemainingOutputReqToDehumidSP -= LatOutputProvided;
 
             // re-evaluate if loads are now such that in dead band or set back
-            evaluate_loads_deadband_setback();
+            {
+                auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+                    CurDeadBandOrSetback(ZoneNum) = false;
+                } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                    if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                    if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                    if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                    if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                        CurDeadBandOrSetback(ZoneNum) = true;
+                    } else {
+                        CurDeadBandOrSetback(ZoneNum) = false;
+                    }
+                }
+            }
 
             if (present(EquipPriorityNum)) {
                 // now store remaining load at the by sequence level
