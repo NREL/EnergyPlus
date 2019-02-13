@@ -239,7 +239,6 @@ unsigned int getVariables(const unsigned int valueReferences[],
                           const char *log)
 {
   UNUSED(log);
-  std::cout << "begin getVariables" << std::endl;
   //for ( const auto & var : valueReferences ) {
   //  std::cout << var << std::endl;
   //}
@@ -251,7 +250,6 @@ unsigned int getVariables(const unsigned int valueReferences[],
 
     getter(variablePointer);
   }
-  std::cout << "end getVariables" << std::endl;
 
   return 0;
 }
