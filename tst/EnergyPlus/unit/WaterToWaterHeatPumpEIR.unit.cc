@@ -1748,33 +1748,33 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit can meet load)
     {
         firstHVAC = true;
-        curLoad = 800;
+        curLoad = -800;
         runFlag = true;
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).Temp = 30;
         thisCoolingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingWWHP->loadSideOutletTemp, 0.001);
-        EXPECT_NEAR(curLoad, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
+        EXPECT_NEAR(-curLoad, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
     }
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
     {
         firstHVAC = true;
-        curLoad = 1200;
+        curLoad = -1200;
         Real64 availableCapacity = 950.0;
         runFlag = true;
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).Temp = 30;
@@ -1860,10 +1860,10 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingWWHP->onInitLoopEquip(myLoadLocation);
 
-    // call it from the load side, but this time there is a positive (cooling) load - shouldn't try to run
+    // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
     {
         bool firstHVAC = true;
-        Real64 curLoad = 900;
+        Real64 curLoad = -900;
         bool runFlag = true;  // plant actually shouldn't do this but the component can be smart enough to handle it
         Real64 const specifiedLoadSetpoint = 45;
         Real64 const loadInletTemp = 46;
@@ -1879,33 +1879,33 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
     // call it from the load side, but this time there is load (still firsthvac, unit can meet load)
     {
         bool firstHVAC = true;
-        Real64 curLoad = -800;
+        Real64 curLoad = 800;
         bool runFlag = true;
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingWWHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingWWHP->loadSideOutletTemp, 0.001);
-        EXPECT_NEAR(-curLoad, thisHeatingWWHP->loadSideHeatTransfer, 0.001);
+        EXPECT_NEAR(curLoad, thisHeatingWWHP->loadSideHeatTransfer, 0.001);
     }
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
     {
         bool firstHVAC = true;
-        Real64 curLoad = -1200;
+        Real64 curLoad = 1200;
         Real64 availableCapacity = 950.0;
         bool runFlag = true;
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingWWHP->sourceSideNodes.inlet).Temp = 30;

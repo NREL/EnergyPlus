@@ -244,8 +244,8 @@ namespace EnergyPlus {
 
             // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
             // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
-            if ((this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && currentLoad <= 0.0) ||
-                (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating && currentLoad >= 0.0)) {
+            if ((this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && currentLoad >= 0.0) ||
+                (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating && currentLoad <= 0.0)) {
                 this->resetReportingVariables();
                 return;
             }
