@@ -5043,9 +5043,9 @@ This output variable represents the average fluid flow rate through the load sid
 
 This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together.
-
 \subsection{HeatPump:WaterToWater:EIR:Cooling (and Heating)}\label{wwhpeir}
+
+Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together.  Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition to make it respond to outlet setpoint in order to vary the flow request.
 
 \subsubsection{Inputs}\label{wwhpeir_inputs}
 
