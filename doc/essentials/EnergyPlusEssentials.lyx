@@ -778,16 +778,8 @@ literal "false"
 
 \end_inset
 
- and as 
-\begin_inset CommandInset href
-LatexCommand href
-name "browsable HTML"
-target "https://bigladdersoftware.com/epx/docs/"
-literal "false"
-
-\end_inset
-
-.
+ and from third parties that have generated HTML documentation from the
+ source.
  Using search in the documentation is critical to finding the information
  needed.
  Some of the documentation PDFs are very large, so searching is a good way
