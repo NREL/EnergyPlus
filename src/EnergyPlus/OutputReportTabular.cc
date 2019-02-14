@@ -63,6 +63,7 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetworkBalanceManager.hh>
 #include <Boilers.hh>
 #include <ChillerElectricEIR.hh>
@@ -71,7 +72,6 @@
 #include <CondenserLoopTowers.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataCostEstimate.hh>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
@@ -4834,6 +4834,7 @@ namespace OutputReportTabular {
         using DataHeatBalSurface::SumSurfaceHeatEmission;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
+        using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
         using DXCoils::DXCoil;
         using DXCoils::NumDXCoils;
@@ -4880,39 +4881,39 @@ namespace OutputReportTabular {
 
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
-
+        Real64 TimeStepSysSec = TimeStepSys * SecInHour;
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
 
-        if (!DoWeathSim) return;
-
         if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
-        if (IndexTypeKey != stepTypeZone) return; // only add values over the zone timestep basis
-
-        BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission;
+        // Only gather zone report at zone time steps
+        if (IndexTypeKey == stepTypeZone) {
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission;
+            return;
+        }
 
         BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss;
 
         BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss;
 
         // HVAC relief air
-        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepZoneSec * convertJtoGJ;
+        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {			
+            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec * convertJtoGJ;
         }
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss;
 
         // Consendor water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepZoneSec + SimpleTowerReport(iCooler).FanEnergy +
+            SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
                                           SimpleTowerReport(iCooler).BasinHeaterConsumption;
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepZoneSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
         }
         for (iCooler = 1; iCooler <= NumSimpleFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepZoneSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
+            SysTotalHVACRejectHeatLoss += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
@@ -4967,7 +4968,7 @@ namespace OutputReportTabular {
                                                   DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
                 if (DXCoil(iCoil).FuelType != DXCoils::FuelTypeElectricity) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepZoneSec;
+                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
             } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                        DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
@@ -5023,10 +5024,10 @@ namespace OutputReportTabular {
             if (VRF(iCoil).CondenserType == AirCooled) {
                 SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
                                               VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
-                                              (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepZoneSec;
+                                              (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
             } else if (VRF(iCoil).CondenserType == EvapCooled) {
                 SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
-                                              VRF(iCoil).EvapWaterConsumpRate * TimeStepZoneSec * RhoWater * H2OHtOfVap_HVAC;
+                                              VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
             } else if (VRF(iCoil).CondenserType == WaterCooled) {
                 SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
             }
@@ -11156,43 +11157,10 @@ namespace OutputReportTabular {
     void WriteHeatEmissionTable()
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Xuan Luo
-        //       DATE WRITTEN   November 2018
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Writes summary table for heat emissions
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        //        using DataHeatBalSurface::QHeatEmiReport;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Array1D_string columnHead(6);
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
-
-        // Should deallocate after writing table. - LKL
 
         if (displayHeatEmissionsSummary) {
 

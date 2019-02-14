@@ -59,8 +59,8 @@
 #include <AirflowNetworkBalanceManager.hh>
 #include <HVACManager.hh>
 //#include <CoolTower.hh>
-#include <DataAirLoop.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <DataAirLoop.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -2418,7 +2418,8 @@ namespace HVACManager {
             H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) && AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
+                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
                     ADSCorrectionFactor = 0.0;
                 }
             }

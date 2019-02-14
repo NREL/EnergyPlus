@@ -59,14 +59,14 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetworkBalanceManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
@@ -1414,7 +1414,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string coil_name = fields.at("coil_name");
@@ -1440,7 +1440,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string hx_name = fields.at("heatexchanger_name");
@@ -1467,7 +1467,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string tu_name = fields.at("terminal_unit_name");
@@ -5606,19 +5606,19 @@ namespace AirflowNetworkBalanceManager {
                 SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     AirflowNetworkZnRpt(i).ExfilTotalLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(i).Name);
                 SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     AirflowNetworkZnRpt(i).ExfilSensiLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(i).Name);
                 SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     AirflowNetworkZnRpt(i).ExfilLatentLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(i).Name);
             }

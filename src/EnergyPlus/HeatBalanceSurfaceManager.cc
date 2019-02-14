@@ -59,11 +59,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <ChilledCeilingPanelSimple.hh>
 #include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
 #include <DElightManagerF.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataDElight.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>

@@ -79,9 +79,9 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ResultsSchema.hh>
+#include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <SortAndStringUtilities.hh>
-#include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
@@ -6087,7 +6087,6 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     using DataGlobals::eso_stream;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
-    using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // Locals

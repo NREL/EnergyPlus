@@ -503,13 +503,13 @@ namespace HeatBalanceAirManager {
                 SetupOutputVariable("Zone Phase Change Material Melting Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyM,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Phase Change Material Freezing Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyH,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(
@@ -520,42 +520,46 @@ namespace HeatBalanceAirManager {
                 SetupOutputVariable("Zone Exfiltration Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExfilTotalLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Exfiltration Sensible Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExfilSensiLoss,
-                                    "Zone",
-                                    "Average",
+                                    "System",
+                                    "System",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Exfiltration Latent Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExfilLatentLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
-                SetupOutputVariable(
-                    "Zone Exhaust Air Heat Transfer Rate", OutputProcessor::Unit::W, ZnAirRpt(Loop).ExhTotalLoss, "Zone", "Average", Zone(Loop).Name);
+                SetupOutputVariable("Zone Exhaust Air Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    ZnAirRpt(Loop).ExhTotalLoss,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
                 SetupOutputVariable("Zone Exhaust Air Sensible Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExhSensiLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Exhaust Air Latent Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     ZnAirRpt(Loop).ExhLatentLoss,
-                                    "Zone",
+                                    "System",
                                     "Average",
                                     Zone(Loop).Name);
             }
         }
 
         SetupOutputVariable(
-            "Site Total Zone Exfiltration Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExfiltrationHeatLoss, "Zone", "Sum", "Environment");
+            "Site Total Zone Exfiltration Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExfiltrationHeatLoss, "System", "Sum", "Environment");
         SetupOutputVariable(
-            "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExhaustHeatLoss, "Zone", "Sum", "Environment");
+            "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);

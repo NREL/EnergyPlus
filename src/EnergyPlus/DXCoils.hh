@@ -208,14 +208,14 @@ namespace DXCoils {
         int AirOutNode;                   // Air outlet node number
         Array1D_int CCapFTemp;            // index of total cooling capacity modifier curve
         // (function of entering wetbulb, outside drybulb)
-        int CCapFTempErrorIndex;               // Used for warning messages when output of CCapFTemp is negative
-        Array1D_int CCapFFlow;                 // index of total cooling capacity modifier curve
+        int CCapFTempErrorIndex; // Used for warning messages when output of CCapFTemp is negative
+        Array1D_int CCapFFlow;   // index of total cooling capacity modifier curve
         // (function of actual supply air flow vs rated air flow)
         int CCapFFlowErrorIndex; // Used for warning messages when output of CCapFFlow is negative
         Array1D_int EIRFTemp;    // index of energy input ratio modifier curve
         // (function of entering wetbulb, outside drybulb)
-        int EIRFTempErrorIndex;             // Used for warning messages when output of EIRFTemp is negative
-        Array1D_int EIRFFlow;               // index of energy input ratio modifier curve
+        int EIRFTempErrorIndex; // Used for warning messages when output of EIRFTemp is negative
+        Array1D_int EIRFFlow;   // index of energy input ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int EIRFFlowErrorIndex;               // Used for warning messages when output of EIRFFlow is negative
         Array1D_int PLFFPLR;                  // index of part-load factor vs part-load ratio curve
@@ -435,7 +435,7 @@ namespace DXCoils {
         Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
         Array1D<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
         // water circulation pump
-        Array1D<Real64> MSTwet_Rated;            // Nominal time for condensate to begin leaving the coil's
+        Array1D<Real64> MSTwet_Rated; // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
         Array1D<Real64> MSGamma_Rated; // Initial moisture evaporation rate divided by steady-state
         // AC latent capacity (dimensionless)
@@ -444,7 +444,7 @@ namespace DXCoils {
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
         Real64 FuelUsed;         // Energy used, in addition to electricity [W]
         Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
-        Real64 MSFuelWasteHeat;   // Total waste heat [J]
+        Real64 MSFuelWasteHeat;  // Total waste heat [J]
         bool MSHPHeatRecActive;  // True when entered Heat Rec Vol Flow Rate > 0
         int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
         // End of multispeed DX coil input
@@ -454,8 +454,8 @@ namespace DXCoils {
         bool ISHundredPercentDOASDXCoil; // FALSE if coil is regular dx coil
         Array1D_int SHRFTemp;            // index of sensible heat ratio modifier curve
         // (function of entering wetbulb and drybulb)
-        int SHRFTempErrorIndex;        // Used for warning messages when output of SHRFTemp is negative
-        Array1D_int SHRFFlow;          // index of sensible heat ratio modifier curve
+        int SHRFTempErrorIndex; // Used for warning messages when output of SHRFTemp is negative
+        Array1D_int SHRFFlow;   // index of sensible heat ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int SHRFFlowErrorIndex; // Used for warning messages when output of SHRFFlow is negative
         int SHRFTemp2;          // index of sensible heat ratio modifier curve
@@ -511,7 +511,7 @@ namespace DXCoils {
         int EIRFTErrIndex;         // index/pointer to recurring error structure for EIRFT curve value <= 0.0
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // current coil capacity modification factor
-        int AirLoopNum; // Airloop number
+        int AirLoopNum;            // Airloop number
 
         // Default Constructor
         DXCoilData()
@@ -520,34 +520,33 @@ namespace DXCoils {
               RatedSHREMSOverrideValue(MaxModes, 0.0), RatedCOP(MaxModes, 0.0), RatedAirVolFlowRate(MaxModes, 0.0),
               RatedAirVolFlowRateEMSOverrideON(MaxModes, false), RatedAirVolFlowRateEMSOverrideValue(MaxModes, 0.0),
               FanPowerPerEvapAirFlowRate(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0), BypassedFlowFrac(MaxModes, 0.0),
-              RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
-              CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0),
-              EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0),
-              ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0),
-              CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0),
-              FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0),
-              FullLoadInletAirTempLast(0.0), PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0),
-              RatedSHR2(0.0), RatedCOP2(0.0), RatedAirVolFlowRate2(0.0), RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0),
-              RatedEIR2(0.0), InternalStaticPressureDrop(0.0), RateWithInternalStaticAndFanObject(false), SupplyFanIndex(-1), SupplyFan_TypeNum(0),
-              RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0), InletAirMassFlowRateMax(0.0), InletAirTemp(0.0), InletAirHumRat(0.0),
-              InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0), PartLoadRatio(0.0), TotalCoolingEnergy(0.0),
-              SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0), SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0),
-              ElecCoolingConsumption(0.0), ElecCoolingPower(0.0), CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0),
-              TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0), ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(0),
-              DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATCompressor(0.0),
-              MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0),
-              TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0), HeatingPerformanceOATType(DryBulbIndicator),
-              HPCoilIsInCoilSystemHeatingDX(false), OATempCompressorOnOffBlank(false), Twet_Rated(MaxModes, 0.0), Gamma_Rated(MaxModes, 0.0),
-              MaxONOFFCyclesperHour(MaxModes, 0.0), LatentCapacityTimeConstant(MaxModes, 0.0), CondenserType(MaxModes, AirCooled),
-              ReportEvapCondVars(false), EvapCondEffect(MaxModes, 0.0), CondInletTemp(0.0), EvapCondAirFlow(MaxModes, 0.0),
-              EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0),
-              EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0), EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0),
-              BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0), CoilPerformanceType(MaxModes),
-              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), DehumidificationMode(0),
-              WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0),
-              HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0),
-              HCapFAirFlow(0), HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0), HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0),
-              RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0),
+              RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0), CCapFFlow(MaxModes, 0),
+              CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0),
+              PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
+              MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
+              CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0),
+              FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0), PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0),
+              BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0), RatedAirVolFlowRate2(0.0), RatedAirMassFlowRate2(0.0),
+              RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0), RateWithInternalStaticAndFanObject(false),
+              SupplyFanIndex(-1), SupplyFan_TypeNum(0), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0), InletAirMassFlowRateMax(0.0),
+              InletAirTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0),
+              PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0),
+              SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
+              CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0), TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0),
+              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0),
+              RegionNum(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATCompressor(0.0), MaxOATDefrost(0.0), DefrostTime(0.0),
+              DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
+              DefrostConsumption(0.0), HeatingPerformanceOATType(DryBulbIndicator), HPCoilIsInCoilSystemHeatingDX(false),
+              OATempCompressorOnOffBlank(false), Twet_Rated(MaxModes, 0.0), Gamma_Rated(MaxModes, 0.0), MaxONOFFCyclesperHour(MaxModes, 0.0),
+              LatentCapacityTimeConstant(MaxModes, 0.0), CondenserType(MaxModes, AirCooled), ReportEvapCondVars(false), EvapCondEffect(MaxModes, 0.0),
+              CondInletTemp(0.0), EvapCondAirFlow(MaxModes, 0.0), EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0),
+              EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0),
+              EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0),
+              CoilPerformanceType(MaxModes), CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0),
+              DehumidificationMode(0), WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0),
+              HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0), HCapFAirFlow(0),
+              HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0), HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0), RatedInletDBTemp(0.0),
+              RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0),
               RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0), ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true),
               CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false), LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0),
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
@@ -555,11 +554,11 @@ namespace DXCoils {
               CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
               CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0),
               MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
-              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0),
-              SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
-              SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
-              SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
-              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
+              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0),
+              UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0), SecCoilSHRFF(0), SecCoilAirFlow(0.0),
+              SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0), SecCoilSensibleHeatGainRate(0.0),
+              SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0), SecCoilLatentHeatRemovalRate(0.0),
+              IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
               // MSSecCoilSHRFT( 0 ),
               // MSSecCoilSHRFF( 0 ),
               // MSSecCoilAirFlow( 0.0 ),
@@ -965,9 +964,8 @@ namespace DXCoils {
 
     void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
 
-    void SetDXCoilAirLoopNumber(std::string const & CoilName,
-                                int const AirLoopNum
-    ); // must match coil names for the coil type
+    void SetDXCoilAirLoopNumber(std::string const &CoilName,
+                                int const AirLoopNum); // must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.
@@ -978,4 +976,3 @@ namespace DXCoils {
 } // namespace EnergyPlus
 
 #endif
-

@@ -3745,7 +3745,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     displayHeatEmissionsSummary = true;
     DoWeathSim = true;
-    DataGlobals::TimeStepZoneSec = 600.0;
+    DataHVACGlobals::TimeStepSys = 10.0;
     DataEnvironment::OutHumRat = 0.005;
     DataEnvironment::OutDryBulbTemp = 25.0;
 
@@ -3758,10 +3758,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     CondenserLoopTowers::SimpleTowerReport(1).Qactual = 1.0;
     CondenserLoopTowers::SimpleTowerReport(1).FanEnergy = 50.0;
 
-    Real64 reliefEnergy = 2.0 * DataGlobals::TimeStepZoneSec * DataGlobals::convertJtoGJ;
-    Real64 condenserReject = (1.0 * DataGlobals::TimeStepZoneSec + 50.0) * DataGlobals::convertJtoGJ;
+    Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
+    Real64 reliefEnergy = 2.0 * TimeStepSysSec * DataGlobals::convertJtoGJ;
+    Real64 condenserReject = (1.0 * TimeStepSysSec + 50.0) * DataGlobals::convertJtoGJ;
 
-    GatherHeatEmissionReport(ZoneTSReporting);
+    GatherHeatEmissionReport(HVACTSReporting);
 
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy, BuildingPreDefRep.emiHVACRelief);
@@ -3785,9 +3786,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil(2).FuelConsumed = 0.0;
     DXCoils::DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
-    Real64 coilReject = (1.0 * DataGlobals::TimeStepZoneSec + 200.0 + 10.0) * DataGlobals::convertJtoGJ;
+    Real64 coilReject = (1.0 * TimeStepSysSec + 200.0 + 10.0) * DataGlobals::convertJtoGJ;
 
-    GatherHeatEmissionReport(ZoneTSReporting);
+    GatherHeatEmissionReport(HVACTSReporting);
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
@@ -3800,9 +3801,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 {
-    std::string const idf_objects = delimited_string(
-        {"Output:Table:TimeBins,", "System1, !- Key Value", "Some Temperature Variable, !- Variable Name", "0.00, !- Interval Start",
-         "0.20, !- Interval Size", "5,                       !- Interval Count", "Always1; !- Schedule Name"});
+    std::string const idf_objects = delimited_string({"Output:Table:TimeBins,",
+                                                      "System1, !- Key Value",
+                                                      "Some Temperature Variable, !- Variable Name",
+                                                      "0.00, !- Interval Start",
+                                                      "0.20, !- Interval Size",
+                                                      "5,                       !- Interval Count",
+                                                      "Always1; !- Schedule Name"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     DataGlobals::DoWeathSim = true;
@@ -6283,7 +6288,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Zone(2).isPartOfTotalArea = true;
     Zone(2).Multiplier = 1.;
     Zone(2).ListMultiplier = 1.;
-     // 10x10x2
+    // 10x10x2
     Zone(2).FloorArea = 100.;
     Zone(2).Volume = 200.;
     Zone(2).ExtGrossWallArea = 80.;
@@ -6295,7 +6300,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Zone(3).isPartOfTotalArea = false;
     Zone(3).Multiplier = 1.;
     Zone(3).ListMultiplier = 1.;
-      // 10x10x2
+    // 10x10x2
     Zone(3).FloorArea = 10.;
     Zone(3).Volume = 20.;
     Zone(3).ExtGrossWallArea = 8.;
@@ -6305,8 +6310,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     WriteVeriSumTable();
 
     /***********************************************************************************************************************************************
-    *                                                              Check Yes/No flag                                                              *
-    ***********************************************************************************************************************************************/
+     *                                                              Check Yes/No flag                                                              *
+     ***********************************************************************************************************************************************/
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -6324,18 +6329,16 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     std::string rowName;
     std::string columnName;
 
-    for (auto v: results_strings) {
+    for (auto v : results_strings) {
 
         rowName = std::get<0>(v);
         columnName = std::get<1>(v);
 
-        std::string query(
-            "SELECT Value From TabularDataWithStrings"
-            "  WHERE ReportName = 'InputVerificationandResultsSummary'"
-            "  AND TableName = 'Zone Summary'"
-            "  AND RowName = '" + rowName + "'"
-            + "  AND ColumnName = '" + columnName + "'"
-        );
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = 'InputVerificationandResultsSummary'"
+                          "  AND TableName = 'Zone Summary'"
+                          "  AND RowName = '" +
+                          rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
         // Not needed, we're just querying, not inside a transaction
@@ -6345,68 +6348,65 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 
-
     /***********************************************************************************************************************************************
-    *                                                       Check each zone and total rows                                                        *
-    ***********************************************************************************************************************************************/
+     *                                                       Check each zone and total rows                                                        *
+     ***********************************************************************************************************************************************/
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
-            {Zone(1).Name, "Area", Zone(1).FloorArea},
-            {Zone(2).Name, "Area", Zone(2).FloorArea},
-            {Zone(3).Name, "Area", Zone(3).FloorArea},
-            {"Total", "Area", Zone(1).FloorArea + Zone(2).FloorArea},
-            {"Conditioned Total", "Area", Zone(1).FloorArea},
-            {"Unconditioned Total", "Area", Zone(2).FloorArea},
-            {"Not Part of Total", "Area", Zone(3).FloorArea},
+        {Zone(1).Name, "Area", Zone(1).FloorArea},
+        {Zone(2).Name, "Area", Zone(2).FloorArea},
+        {Zone(3).Name, "Area", Zone(3).FloorArea},
+        {"Total", "Area", Zone(1).FloorArea + Zone(2).FloorArea},
+        {"Conditioned Total", "Area", Zone(1).FloorArea},
+        {"Unconditioned Total", "Area", Zone(2).FloorArea},
+        {"Not Part of Total", "Area", Zone(3).FloorArea},
 
-            {Zone(1).Name, "Volume", Zone(1).Volume},
-            {Zone(2).Name, "Volume", Zone(2).Volume},
-            {Zone(3).Name, "Volume", Zone(3).Volume},
-            {"Total", "Volume", Zone(1).Volume + Zone(2).Volume},
-            {"Conditioned Total", "Volume", Zone(1).Volume},
-            {"Unconditioned Total", "Volume", Zone(2).Volume},
-            {"Not Part of Total", "Volume", Zone(3).Volume},
+        {Zone(1).Name, "Volume", Zone(1).Volume},
+        {Zone(2).Name, "Volume", Zone(2).Volume},
+        {Zone(3).Name, "Volume", Zone(3).Volume},
+        {"Total", "Volume", Zone(1).Volume + Zone(2).Volume},
+        {"Conditioned Total", "Volume", Zone(1).Volume},
+        {"Unconditioned Total", "Volume", Zone(2).Volume},
+        {"Not Part of Total", "Volume", Zone(3).Volume},
 
-            {Zone(1).Name, "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
-            {Zone(2).Name, "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
-            {Zone(3).Name, "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
-            {"Total", "Lighting", (Lights(1).DesignLevel + Lights(2).DesignLevel) /  ( Zone(1).FloorArea + Zone(2).FloorArea )},
-            {"Conditioned Total", "Lighting", Lights(1).DesignLevel /  Zone(1).FloorArea},
-            {"Unconditioned Total", "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
-            {"Not Part of Total", "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
+        {Zone(1).Name, "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
+        {Zone(2).Name, "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
+        {Zone(3).Name, "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
+        {"Total", "Lighting", (Lights(1).DesignLevel + Lights(2).DesignLevel) / (Zone(1).FloorArea + Zone(2).FloorArea)},
+        {"Conditioned Total", "Lighting", Lights(1).DesignLevel / Zone(1).FloorArea},
+        {"Unconditioned Total", "Lighting", Lights(2).DesignLevel / Zone(2).FloorArea},
+        {"Not Part of Total", "Lighting", Lights(3).DesignLevel / Zone(3).FloorArea},
 
-            // People/m^2
-            {Zone(1).Name, "People", Zone(1).FloorArea / People(1).NumberOfPeople},
-            {Zone(2).Name, "People", Zone(2).FloorArea / People(2).NumberOfPeople},
-            {Zone(3).Name, "People", Zone(3).FloorArea / People(3).NumberOfPeople},
-            {"Total", "People", ( Zone(1).FloorArea + Zone(2).FloorArea ) / (People(1).NumberOfPeople + People(2).NumberOfPeople)},
-            {"Conditioned Total", "People", Zone(1).FloorArea / People(1).NumberOfPeople},
-            {"Unconditioned Total", "People", Zone(2).FloorArea / People(2).NumberOfPeople},
-            {"Not Part of Total", "People", Zone(3).FloorArea / People(3).NumberOfPeople},
+        // People/m^2
+        {Zone(1).Name, "People", Zone(1).FloorArea / People(1).NumberOfPeople},
+        {Zone(2).Name, "People", Zone(2).FloorArea / People(2).NumberOfPeople},
+        {Zone(3).Name, "People", Zone(3).FloorArea / People(3).NumberOfPeople},
+        {"Total", "People", (Zone(1).FloorArea + Zone(2).FloorArea) / (People(1).NumberOfPeople + People(2).NumberOfPeople)},
+        {"Conditioned Total", "People", Zone(1).FloorArea / People(1).NumberOfPeople},
+        {"Unconditioned Total", "People", Zone(2).FloorArea / People(2).NumberOfPeople},
+        {"Not Part of Total", "People", Zone(3).FloorArea / People(3).NumberOfPeople},
 
-            {Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
-            {Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
-            {Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
-            {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel) /  ( Zone(1).FloorArea + Zone(2).FloorArea )},
-            {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel /  Zone(1).FloorArea},
-            {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
-            {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
+        {Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
+        {Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
+        {Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
+        {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel) / (Zone(1).FloorArea + Zone(2).FloorArea)},
+        {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel / Zone(1).FloorArea},
+        {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel / Zone(2).FloorArea},
+        {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / Zone(3).FloorArea},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
-    for (auto v: results) {
+    for (auto v : results) {
 
         rowName = std::get<0>(v);
         columnName = std::get<1>(v);
 
-        std::string query(
-            "SELECT Value From TabularDataWithStrings"
-            "  WHERE ReportName = 'InputVerificationandResultsSummary'"
-            "  AND TableName = 'Zone Summary'"
-            "  AND RowName = '" + rowName + "'"
-            + "  AND ColumnName = '" + columnName + "'"
-        );
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = 'InputVerificationandResultsSummary'"
+                          "  AND TableName = 'Zone Summary'"
+                          "  AND RowName = '" +
+                          rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         Real64 return_val = execAndReturnFirstDouble(query);
         // EnergyPlus::sqlite->sqliteCommit();
@@ -6414,7 +6414,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         // Add informative message if failed
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
-
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
