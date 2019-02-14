@@ -108,6 +108,7 @@
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
+#include <WaterToWaterHeatPumpEIR.hh>
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -542,6 +543,7 @@ namespace HVACManager {
                     UpdateZoneSizing(DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
+                EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
@@ -690,7 +692,6 @@ namespace HVACManager {
         using PlantManager::GetPlantInput;
         using PlantManager::GetPlantLoopData;
         using PlantManager::InitOneTimePlantSizingInfo;
-        using PlantManager::ManagePlantLoops;
         using PlantManager::ReInitPlantLoopsAtFirstHVACIteration;
         using PlantManager::SetupBranchControlTypes;
         using PlantManager::SetupInitialPlantCallingOrder;
