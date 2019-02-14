@@ -4,7 +4,7 @@
 \begin_header
 \save_transient_properties true
 \origin unavailable
-\textclass article
+\textclass book
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -98,10 +98,10 @@ EnergyPlus Essentials
 \end_layout
 
 \begin_layout Date
-February 4, 2019
+February 14, 2019
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Introduction
 \end_layout
 
@@ -111,7 +111,7 @@ The following background on building energy modeling (BEM) will provide
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 What is BEM?
 \end_layout
 
@@ -327,7 +327,7 @@ on in buildings because the energy flows in buildings can be very complicated.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Questions that BEM can answer
 \end_layout
 
@@ -363,7 +363,7 @@ These questions and more can occur at different times during the life-cycle
  of the design process, and into the operation of the building
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The Design Process and BEM 
 \end_layout
 
@@ -451,7 +451,7 @@ In addition, it has information about how to integrate climate and site
  energy modeling.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 EnergyPlus QuickStart Guide
 \end_layout
 
@@ -468,7 +468,7 @@ Don't be intimidated by the apparent complexity of EnergyPlus; you can get
  a good strategy for learning EnergyPlus.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 EnergyPlus Capabilities
 \end_layout
 
@@ -589,6 +589,22 @@ n.
 \end_layout
 
 \begin_layout Itemize
+EnergyPlus can be used for for building load calculations and sizing equipment
+ and uses the heat balance method recommended in the 
+\begin_inset CommandInset href
+LatexCommand href
+name "ASHRAE Handbook Fundamentals"
+target "https://www.ashrae.org/technical-resources/ashrae-handbook"
+literal "false"
+
+\end_inset
+
+.
+ Proper sizing of equipment without oversizing, generally saves energy as
+ the equipment is operated nearer to optimal loads.
+\end_layout
+
+\begin_layout Itemize
 EnergyPlus runs on Windows, MacOS, and Linux computers.
  
 \end_layout
@@ -606,7 +622,7 @@ s is the integration of all aspects of the simulation—loads, systems, and
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Open Source
 \end_layout
 
@@ -660,11 +676,20 @@ literal "false"
 
  (compile the source code into an executable application) are available
  in source code repository wiki if you see something that needs to be enhanced
- or fixed.
+ or fixed, please also see the 
+\begin_inset CommandInset href
+LatexCommand href
+name "contribution policy"
+target "https://energyplus.net/contributing"
+literal "false"
+
+\end_inset
+
+.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Brief History
 \end_layout
 
@@ -719,7 +744,7 @@ literal "false"
  utilize it.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Documentation and Other Resources
 \end_layout
 
@@ -823,11 +848,11 @@ The example files are a great resource to learn more about how to use EnergyPlus
  The example files are in the directory ExampleFiles.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 The EnergyPlus Ecosystem 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Current Interfaces 
 \end_layout
 
@@ -848,7 +873,7 @@ noprefix "false"
 .
  In addition, EnergyPlus is often the simulation engine for graphical user
  interfaces.
- To see a comprehensive list, see the 
+ To see a list, see the 
 \begin_inset CommandInset href
 LatexCommand href
 name "BEST (Building Energy Software Tools) Directory"
@@ -867,76 +892,10 @@ literal "false"
 \end_inset
 
 .
- At the time of writing, many people use EnergyPlus inside an existing graphical
- user interface such as 
-\begin_inset CommandInset href
-LatexCommand href
-name "OpenStudio"
-target "https://www.openstudio.net/"
-literal "false"
-
-\end_inset
-
-, 
-\begin_inset CommandInset href
-LatexCommand href
-name "DesignBuilder"
-target "https://www.designbuilder.com/"
-literal "false"
-
-\end_inset
-
-, 
-\begin_inset CommandInset href
-LatexCommand href
-name "Simergy"
-target "https://d-alchemy.com/products/simergy"
-literal "false"
-
-\end_inset
-
-, 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ladybug"
-target "https://www.ladybug.tools/"
-literal "false"
-
-\end_inset
-
-, 
-\begin_inset CommandInset href
-LatexCommand href
-name "Insight"
-target "https://www.autodesk.com/products/insight/overview"
-literal "false"
-
-\end_inset
-
-, 
-\begin_inset CommandInset href
-LatexCommand href
-name "AECOsim"
-target "https://www.bentley.com/en/products/brands/aecosim"
-literal "false"
-
-\end_inset
-
-, and 
-\begin_inset CommandInset href
-LatexCommand href
-name "Euclid"
-target "https://bigladdersoftware.com/projects/euclid/"
-literal "false"
-
-\end_inset
-
-.
- Other interfaces are also available.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Approaches to Implement Measures 
 \end_layout
 
@@ -1027,118 +986,6 @@ ns, and simple efficiency changes but is probably not the appropriate tool
 \end_layout
 
 \begin_layout Standard
-Another approach to writing measures and using measures written by others
- is to use 
-\begin_inset CommandInset href
-LatexCommand href
-name "OpenStudio"
-target "https://www.openstudio.net/"
-literal "false"
-
-\end_inset
-
- and its 
-\begin_inset CommandInset href
-LatexCommand href
-name "documentation"
-target "http://nrel.github.io/OpenStudio-user-documentation/"
-literal "false"
-
-\end_inset
-
-.
- OpenStudio is closely aligned with EnergyPlus but has a different data
- model and file format.
- It is an application programming interface for EnergyPlus, and some graphical
- user interfaces are using it to work with EnergyPlus.
- It has two categories of measures: native OpenStudio measures and EnergyPlus
- measures.
- Both types of measures are usually written in the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ruby"
-target "https://www.ruby-lang.org/en/"
-literal "false"
-
-\end_inset
-
- programming language.
- Many measures are already available for OpenStudio and can be found in
- the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Building Component Library."
-target "https://bcl.nrel.gov/"
-literal "false"
-
-\end_inset
-
-It is an open source project.
- 
-\end_layout
-
-\begin_layout Standard
-Using the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Python"
-target "https://www.python.org/"
-literal "false"
-
-\end_inset
-
- scripting language, 
-\begin_inset CommandInset href
-LatexCommand href
-name "Eppy"
-target "https://github.com/santoshphilip/eppy"
-literal "false"
-
-\end_inset
-
- allows access to any of the input objects in EnergyPlus as if they were
- native Python objects.
- It is very flexible and an especially good choice if you are already familiar
- with Python.
- It is also an open source project.
- Other ways to manipulate EnergyPlus with Python include 
-\begin_inset CommandInset href
-LatexCommand href
-name "pyidf"
-target "https://github.com/rbuffat/pyidf"
-literal "false"
-
-\end_inset
-
- and 
-\begin_inset CommandInset href
-LatexCommand href
-name "py-idd-idf"
-target "https://github.com/Myoldmopar/py-idd-idf"
-literal "false"
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Standard
-Another option based on the Ruby programming language is 
-\begin_inset CommandInset href
-LatexCommand href
-name "Modelkit"
-target "https://bigladdersoftware.com/projects/modelkit/"
-literal "false"
-
-\end_inset
-
- which similar to EP-Macro, consists of embedding scripting within normal
- EnergyPlus input files, but since it is using Ruby, it has a great deal
- more flexibility.
-\end_layout
-
-\begin_layout Standard
 A 
 \begin_inset CommandInset href
 LatexCommand href
@@ -1148,11 +995,11 @@ literal "false"
 
 \end_inset
 
- that describes these approaches to scripting was written during the 2018
- ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
+ that describes various other approaches to scripting was written during
+ the 2018 ASHRAE/IBPSA-USA Building Performance Conference and SimBuild.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Parametric Analysis Tools 
 \end_layout
 
@@ -1164,73 +1011,29 @@ When just implementing a simple measure or even a series of measures is
  to see the impacts of optimization.
  While many of the approaches used to implement measures described previously
  may also be used for parametric analysis, a few specific tools have been
- developed: 
-\end_layout
-
-\begin_layout Itemize
+ developed.
+ To see a list, see the 
 \begin_inset CommandInset href
 LatexCommand href
-name "OpenStudio Parametric Analysis"
-target "http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/"
+name "BEST (Building Energy Software Tools) Directory"
+target "https://www.buildingenergysoftwaretools.com/"
 literal "false"
 
 \end_inset
 
- tool works with OpenStudio measures and allows the simulation of a large
- number of options using cloud computing services and is part of the 
+ that is operated by 
 \begin_inset CommandInset href
 LatexCommand href
-name "OpenStudio"
-target "https://www.openstudio.net/"
+name "IBPSA-USA"
+target "https://www.ibpsa.us/"
 literal "false"
 
 \end_inset
 
- suite.
- 
+.
 \end_layout
 
-\begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-name "JEPlus"
-target "http://www.jeplus.org/wiki/doku.php"
-literal "false"
-
-\end_inset
-
- is a simulation manager for parametrics that includes optimization and
- leverages both the EP-Macro style of implementing measures as well as Eppy
- for implementing measures in the Python programming language.
- 
-\end_layout
-
-\begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-name "GenOpt"
-target "https://simulationresearch.lbl.gov/GO/summary.html"
-literal "false"
-
-\end_inset
-
- is a Java-based generic optimization program that can use EnergyPlus.
- 
-\end_layout
-
-\begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-name "BEopt"
-target "https://beopt.nrel.gov/"
-literal "false"
-
-\end_inset
-
- is a building optimization tool focused on residential applications.
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Section
 Weather Files 
 \begin_inset CommandInset label
 LatexCommand label
@@ -1281,7 +1084,94 @@ literal "false"
  to many other sites that provide weather files.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
+Co-Simulation and Linked Software
+\end_layout
+
+\begin_layout Standard
+The modelling of multi-domain, multi-physics, and multi-time scale systems
+ such as buildings is a challenge for building energy modelling and simulation
+ tools.
+ In certain circumstances, it may be better for modelling such systems to
+ split the systems into multiple sub-systems, model the individual sub-systems
+ in the language or tool which is best suited for the system’s domain, and
+ use a master algorithm to link the sub-systems for a so called “co-simulation.”
+ In a nutshell, co-simulation consists of the theory and techniques that
+ enable the simulation of a coupled system through the composition of simulators.
+ Each simulator is an input-output mock-up of a constituent system, developed
+ and provided by the team that is responsible for the 
+\begin_inset CommandInset href
+LatexCommand href
+name "sub-system"
+target "https://arxiv.org/abs/1702.00686"
+literal "false"
+
+\end_inset
+
+.
+ The coupling of the sub-systems is performed by a master algorithm which
+ is responsible for linking the sub-systems at run-time for data-exchange.
+ EnergyPlus implements two mechanisms to support co-simulation.
+\end_layout
+
+\begin_layout Itemize
+EnergyPlus provides an interface which allows it to import, link, and exchange
+ data with simulation models which implement the Functional Mock-up Interface
+ (FMI) for 
+\begin_inset CommandInset href
+LatexCommand href
+name "co-simulation"
+target "https://www.tandfonline.com/doi/abs/10.1080/19401493.2013.808265"
+literal "false"
+
+\end_inset
+
+.
+ Such models are called Functional Mock-up Units (FMUs).
+ This feature allows for instance the integration and testing of 
+\begin_inset CommandInset href
+LatexCommand href
+name "Simulink"
+target "https://www.mathworks.com/"
+literal "false"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset href
+LatexCommand href
+name "Modelica"
+target "https://www.modelica.org/"
+literal "false"
+
+\end_inset
+
+-based control algorithms which may not exist in EnergyPlus.
+\end_layout
+
+\begin_layout Itemize
+EnergyPlus itself can be exported as an FMU which implements the 
+\begin_inset CommandInset href
+LatexCommand href
+name "FMI for co-simulation"
+target "https://simulationresearch.lbl.gov/wetter/download/2014_NouiduiWetter.pdf"
+literal "false"
+
+\end_inset
+
+.
+ Such FMU can then be imported into any simulation engine which implements
+ the FMI import interface for co-simulation.
+ This feature is relevant for applications such as the development of building
+ controls.
+ For example, the building envelope of EnergyPlus may be exported as an
+ FMU which in turn will be imported in a tool which is best suited for control
+ development.
+ In this use case, the FMU will be used as a boundary condition for control's
+ development.
+\end_layout
+
+\begin_layout Section
 Example Files 
 \end_layout
 
@@ -1310,7 +1200,7 @@ ExampleFiles-ObjectsLink.html file which lists every type of input object
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Getting Help 
 \begin_inset CommandInset label
 LatexCommand label
@@ -1428,7 +1318,7 @@ In addition, if you are using a graphical user interface, the vendor probably
  also provides training.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Using EnergyPlus 
 \begin_inset CommandInset label
 LatexCommand label
@@ -1439,7 +1329,7 @@ name "sec:Using-EnergyPlus"
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Installing EnergyPlus
 \end_layout
 
@@ -1448,7 +1338,7 @@ Please see the EnergyPlus QuickStart Guide for instructions on how to install
  EnergyPlus for your system.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Running EnergyPlus
 \end_layout
 
@@ -1477,7 +1367,7 @@ In each case, a building model will be simulated in combination with a weather
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Graphical User Interface
 \end_layout
 
@@ -1489,7 +1379,7 @@ When running an EnergyPlus simulation within a graphical user interface,
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Command Line
 \end_layout
 
@@ -1502,6 +1392,7 @@ t Guide.
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus --help 
 \end_layout
 
@@ -1511,100 +1402,124 @@ when in the Energyplus folder.
 \end_layout
 
 \begin_layout Verbatim
+
 EnergyPlus, Version 9.0.1-bb7ca4f0da
 \end_layout
 
 \begin_layout Verbatim
+
 Usage: energyplus [options] [input-file]
 \end_layout
 
 \begin_layout Verbatim
+
 Options:
 \end_layout
 
 \begin_layout Verbatim
+
   -a, --annual                 Force annual simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent
  on
 \end_layout
 
 \begin_layout Verbatim
+
                                input file type
 \end_layout
 
 \begin_layout Verbatim
+
   -d, --output-directory ARG   Output directory path (default: current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -D, --design-day             Force design-day-only simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -h, --help                   Display help information
 \end_layout
 
 \begin_layout Verbatim
+
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
 \end_layout
 
 \begin_layout Verbatim
+
                                in executable directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -m, --epmacro                Run EPMacro prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
 \end_layout
 
 \begin_layout Verbatim
+
   -r, --readvars               Run ReadVarsESO after simulation
 \end_layout
 
 \begin_layout Verbatim
+
   -s, --output-suffix ARG      Suffix style for output file names (default:
  L)
 \end_layout
 
 \begin_layout Verbatim
+
                                   L: Legacy (e.g., eplustbl.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   C: Capital (e.g., eplusTable.csv)
 \end_layout
 
 \begin_layout Verbatim
+
                                   D: Dash (e.g., eplus-table.csv)
 \end_layout
 
 \begin_layout Verbatim
+
   -v, --version                Display version information
 \end_layout
 
 \begin_layout Verbatim
+
   -w, --weather ARG            Weather file path (default: in.epw in current
 \end_layout
 
 \begin_layout Verbatim
+
                                directory)
 \end_layout
 
 \begin_layout Verbatim
+
   -x, --expandobjects          Run ExpandObjects prior to simulation
 \end_layout
 
 \begin_layout Verbatim
+
 Example: energyplus -w weather.epw -r input.idf
 \end_layout
 
@@ -1628,6 +1543,7 @@ Using a custom IDD file:
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus -i custom.idd -w weather.epw input.idf
 \end_layout
 
@@ -1636,6 +1552,7 @@ Pre-processing using EPMacro and ExpandObjects:
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus -w weather.epw -m -x input.imf
 \end_layout
 
@@ -1644,6 +1561,7 @@ Forcing design-day only simulations:
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus -D input.idf
 \end_layout
 
@@ -1653,6 +1571,7 @@ Giving all output files the prefix being the same as the input file (building.id
 \end_layout
 
 \begin_layout Verbatim
+
 energyplus -w weather -p building -d output building.idf
 \end_layout
 
@@ -1668,7 +1587,7 @@ The command line interface is a new feature as of EnergyPlus 8.3.
  line.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 EP-Launch
 \end_layout
 
@@ -1690,6 +1609,7 @@ The main screen of EP-Launch 2 is shown below:
 \begin_layout Standard
 \begin_inset Graphics
 	filename eplaunch2.png
+	scale 75
 
 \end_inset
 
@@ -1763,7 +1683,7 @@ While both EP-Launch 2 and EP-Launch 3 do many of the same functions, the
  workflows that run whatever programs they need to run.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 IDF and JSON syntax
 \end_layout
 
@@ -1776,7 +1696,7 @@ EnergyPlus has two different input file formats that can be used to describe
  
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 IDF
 \end_layout
 
@@ -1812,38 +1732,47 @@ The legacy file format is a text-based format that describes each input
 \end_layout
 
 \begin_layout Verbatim
+
   Building,
 \end_layout
 
 \begin_layout Verbatim
+
     Simple One Zone,   !- Name
 \end_layout
 
 \begin_layout Verbatim
+
     0,                 !- North Axis {deg}
 \end_layout
 
 \begin_layout Verbatim
+
     Suburbs,           !- Terrain
 \end_layout
 
 \begin_layout Verbatim
+
     0.04,              !- Loads Convergence Tolerance Value
 \end_layout
 
 \begin_layout Verbatim
+
     0.004,             !- Temperature Convergence Tolerance Value {deltaC}
 \end_layout
 
 \begin_layout Verbatim
+
     MinimalShadowing,  !- Solar Distribution
 \end_layout
 
 \begin_layout Verbatim
+
     30,                !- Maximum Number of Warmup Days
 \end_layout
 
 \begin_layout Verbatim
+
     6;                 !- Minimum Number of Warmup Days
 \end_layout
 
@@ -1864,7 +1793,7 @@ A variation on the IDF file format is the IMF file format which includes
 s document.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 epJSON
 \end_layout
 
@@ -1902,66 +1831,82 @@ literal "false"
 \end_layout
 
 \begin_layout Verbatim
+
 {
 \end_layout
 
 \begin_layout Verbatim
+
     "Building": {
 \end_layout
 
 \begin_layout Verbatim
+
         "Simple One Zone: {
 \end_layout
 
 \begin_layout Verbatim
+
             "idf_max_extensible_fields": 0,
 \end_layout
 
 \begin_layout Verbatim
+
             "idf_max_fields": 8,
 \end_layout
 
 \begin_layout Verbatim
+
             "idf_order": 3,
 \end_layout
 
 \begin_layout Verbatim
+
             "loads_convergence_tolerance_value": 0.04,
 \end_layout
 
 \begin_layout Verbatim
+
             "maximum_number_of_warmup_days": 30,
 \end_layout
 
 \begin_layout Verbatim
+
             "minimum_number_of_warmup_days": 6,
 \end_layout
 
 \begin_layout Verbatim
+
             "north_axis": 0,
 \end_layout
 
 \begin_layout Verbatim
+
             "solar_distribution": "MinimalShadowing",
 \end_layout
 
 \begin_layout Verbatim
+
             "temperature_convergence_tolerance_value": 0.004,
 \end_layout
 
 \begin_layout Verbatim
+
             "terrain": "Suburbs"
 \end_layout
 
 \begin_layout Verbatim
+
         }
 \end_layout
 
 \begin_layout Verbatim
+
     }
 \end_layout
 
 \begin_layout Verbatim
+
 }
 \end_layout
 
@@ -1975,7 +1920,7 @@ While the IDF and epJSON file formats are quite different, they contain
  and from epJSON to IDF using the -c or --convert option.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Creating and Editing Input Files
 \end_layout
 
@@ -2061,21 +2006,7 @@ Creating Input Files
 
 \end_layout
 
-\begin_layout Standard
-A cross-platform program called 
-\begin_inset CommandInset href
-LatexCommand href
-name "IDF+"
-target "https://bitbucket.org/mattdoiron/idfplus/src/default/"
-literal "false"
-
-\end_inset
-
- is currently being developed independently and will have many of the same
- features as the IDF Editor when complete.
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Section
 Run-Check-Edit Repeat 
 \begin_inset CommandInset label
 LatexCommand label
@@ -2179,7 +2110,7 @@ To speed the process of running the simulations, you may want only to run
  the first time.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Key Concepts
 \end_layout
 
@@ -2187,7 +2118,7 @@ Key Concepts
 The following sections highlight some key concepts in EnergyPlus
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Everything Included
 \end_layout
 
@@ -2208,7 +2139,7 @@ One principal that EnergyPlus uses is that (almost) everything is specified
  in the input file you have developed.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Wall Thickness
 \end_layout
 
@@ -2242,7 +2173,7 @@ ions.
  correct amount of thermal mass (possibly losing some corner mass).
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Zones Are Not the Same as Rooms
 \end_layout
 
@@ -2264,7 +2195,7 @@ istics, even if many different thermostats are used, they may still be grouped
  into a single zone in EnergyPlus.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 One Construction Per Surface
 \end_layout
 
@@ -2275,7 +2206,7 @@ Only one type of construction can be associated with each surface so if
  be represented as separate surfaces.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Available Outputs Created by First Simulation
 \end_layout
 
@@ -2288,7 +2219,7 @@ Since EnergyPlus creates a custom list of possible output variables during
  Select the outputs you want and specify them in the input file.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Always Plan Ahead
 \end_layout
 
@@ -2343,7 +2274,7 @@ Obtain utility tariff information when expressing the results as costs.
 Obtain component cost information when performing life-cycle costs.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 What Are All These Folders?
 \end_layout
 
@@ -2400,7 +2331,7 @@ noprefix "false"
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 What Are All These Output Files?
 \end_layout
 
@@ -2581,7 +2512,7 @@ Don't be intimidated by the long list of files; you can do a lot in EnergyPlus
  a good strategy for using EnergyPlus.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Versions and Updating
 \end_layout
 
@@ -2663,7 +2594,7 @@ Using Older Version Input Files - Transition
  in the AuxiliaryPrograms document.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Errors and How to Fix Them
 \end_layout
 
@@ -2701,7 +2632,7 @@ noprefix "false"
  section.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Data Sets
 \end_layout
 
@@ -2714,7 +2645,7 @@ EnergyPlus uses snippets of IDF files to create the library of data that
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Other Useful Utility Programs
 \end_layout
 
@@ -2746,7 +2677,7 @@ convertESOMTR - This simple post-processing program can be used seamlessly
  This program is described more fully in the Auxiliary Programs document.
 \end_layout
 
-\begin_layout Section
+\begin_layout Chapter
 Input Object Groups
 \end_layout
 
@@ -2758,7 +2689,7 @@ The following sections provide an overview of the input objects based on
  efficiency measure.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Simulation Parameters
 \end_layout
 
@@ -2839,7 +2770,7 @@ Group-Simulation Parameters.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Location and Climate
 \end_layout
 
@@ -2918,7 +2849,7 @@ Group-Location and Climate.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Schedules
 \end_layout
 
@@ -2990,7 +2921,7 @@ Group-Schedules.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Surface Construction Elements
 \end_layout
 
@@ -3092,7 +3023,7 @@ Group-Surface Construction Elements.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Thermal Zones and Surfaces
 \end_layout
 
@@ -3190,7 +3121,7 @@ Window Modeling Options
  should be examined.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Shading Related
 \end_layout
 
@@ -3235,7 +3166,7 @@ Shading:Zone:Detailed - describes an attachment to the building that casts
  The wall that the fin or overhang is attached to is also specified.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Input Object Variations
 \end_layout
 
@@ -3353,7 +3284,7 @@ Shading:Fin
 Shading:Fin:Projection
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Other Related Input Objects
 \end_layout
 
@@ -3400,6 +3331,10 @@ WindowProperty:FrameAndDivider - defines the frame material around a window
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 Figure X - A window with frame and divider
 \end_layout
 
@@ -3443,7 +3378,7 @@ Other less common input objects include ZoneList and ZoneGroup that can
  allows a building model to be stretched with just a few inputs.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Internal Gains 
 \end_layout
 
@@ -3556,7 +3491,7 @@ Group-Internal Gains.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Daylighting 
 \end_layout
 
@@ -3647,7 +3582,7 @@ Group-Daylighting.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Advanced Construction, Surface, Zone Concepts
 \end_layout
 
@@ -3744,7 +3679,7 @@ Group-Advanced Surface Concepts.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Exterior Equipment
 \end_layout
 
@@ -3785,7 +3720,7 @@ Group-Exterior Energy Use Equipment.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Zone Airflow
 \end_layout
 
@@ -3881,7 +3816,7 @@ Group-Airflow.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 HVAC Templates
 \end_layout
 
@@ -4157,7 +4092,7 @@ In addition, this group of input objects includes three plant input objects
  “ExpandObjects.”
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Detailed HVAC
 \end_layout
 
@@ -4431,7 +4366,7 @@ The input object groups described in this section are further explained
  in the InputOutputReference.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Output Reporting
 \end_layout
 
@@ -4654,7 +4589,7 @@ Standard Output Reports
  Output:DaylightFactors input object in the Daylighting group.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Economics
 \end_layout
 
@@ -4840,7 +4775,7 @@ eplustbl.<ext>
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Other Groups of Input Objects
 \end_layout
 
