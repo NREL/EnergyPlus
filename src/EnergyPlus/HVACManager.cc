@@ -60,7 +60,7 @@
 #include <HVACManager.hh>
 //#include <CoolTower.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -107,6 +107,7 @@
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
+#include <WaterToWaterHeatPumpEIR.hh>
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -179,8 +180,6 @@ namespace HVACManager {
     using namespace DataLoopNode;
     using namespace DataAirLoop;
     using namespace DataConvergParams;
-    using DataAirflowNetwork::AirflowNetworkControlSimple;
-    using DataAirflowNetwork::SimulateAirflowNetwork;
     using namespace DataReportingFlags;
 
     // Data
@@ -251,7 +250,6 @@ namespace HVACManager {
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataAirflowNetwork::RollBackFlag;
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::OutdoorCO2;
         using DataContaminantBalance::OutdoorGC;
@@ -401,8 +399,8 @@ namespace HVACManager {
         ManageHybridVentilation();
 
         CalcAirFlowSimple();
-        if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
-            RollBackFlag = false;
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            AirflowNetwork::RollBackFlag = false;
             ManageAirflowNetworkBalance(false);
         }
 
@@ -459,8 +457,8 @@ namespace HVACManager {
 
                 ManageHybridVentilation();
                 CalcAirFlowSimple(SysTimestepLoop);
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
-                    RollBackFlag = false;
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    AirflowNetwork::RollBackFlag = false;
                     ManageAirflowNetworkBalance(false);
                 }
 
@@ -544,6 +542,7 @@ namespace HVACManager {
                     UpdateZoneSizing(DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
+                EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
@@ -692,7 +691,6 @@ namespace HVACManager {
         using PlantManager::GetPlantInput;
         using PlantManager::GetPlantLoopData;
         using PlantManager::InitOneTimePlantSizingInfo;
-        using PlantManager::ManagePlantLoops;
         using PlantManager::ReInitPlantLoopsAtFirstHVACIteration;
         using PlantManager::SetupBranchControlTypes;
         using PlantManager::SetupInitialPlantCallingOrder;
@@ -1804,7 +1802,7 @@ namespace HVACManager {
         if (FirstHVACIteration) {
             RepIterAir = 0;
             // Call AirflowNetwork simulation to calculate air flows and pressures
-            if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ManageAirflowNetworkBalance(FirstHVACIteration);
             }
             ManageAirLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1828,7 +1826,7 @@ namespace HVACManager {
                 ++IterAir; // Increment the iteration counter
                 // Call AirflowNetwork simulation to calculate air flows and pressures
                 ResimulateAirZone = false;
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     ManageAirflowNetworkBalance(FirstHVACIteration, IterAir, ResimulateAirZone);
                 }
                 if (SimAirLoops) {
@@ -1854,7 +1852,7 @@ namespace HVACManager {
                 FlowMaxAvailAlreadyReset = false;
 
                 //      IterAir = IterAir + 1   ! Increment the iteration counter
-                if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                         SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                         SimZoneEquipment = true;
@@ -2359,10 +2357,6 @@ namespace HVACManager {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::AirflowNetworkZoneFlag;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataZoneEquipment::ZoneEquipAvail;
 
         using DataZoneEquipment::CrossMixingReportFlag;
@@ -2402,12 +2396,14 @@ namespace HVACManager {
         Real64 VentZoneAirTemp;            // Average Zone inlet temperature
 
         // Ensure no airflownetwork and simple calculations
-        if (SimulateAirflowNetwork == 0) return;
+        if (AirflowNetwork::SimulateAirflowNetwork == 0) return;
 
-        if (SimulateAirflowNetwork > AirflowNetworkControlSimple) ReportAirflowNetwork();
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork();
 
         // Report results for SIMPLE option only
-        if (!(SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS)) return;
+        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
+              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+            return;
 
         if (ReportAirHeatBalanceFirstTimeFlag) {
             MixSenLoad.allocate(NumOfZones);
@@ -2420,9 +2416,10 @@ namespace HVACManager {
             // Break the infiltration load into heat gain and loss components
             ADSCorrectionFactor = 1.0;
 
-            if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) && AirflowNetworkZoneFlag(ZoneLoop))
+                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop))
                     ADSCorrectionFactor = 0.0;
             }
 

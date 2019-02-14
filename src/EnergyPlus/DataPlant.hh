@@ -247,6 +247,8 @@ namespace DataPlant {
     extern int const TypeOf_SwimmingPool_Indoor;
     extern int const TypeOf_GrndHtExchgSlinky;
     extern int const TypeOf_FourPipeBeamAirTerminal;
+    extern int const TypeOf_HeatPumpEIRCooling;
+    extern int const TypeOf_HeatPumpEIRHeating;
 
     // Parameters for General Equipment Types
     extern int const NumGeneralEquipTypes;
