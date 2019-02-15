@@ -4422,7 +4422,7 @@ These outputs are the energy input to the boiler. Valid fuel types are:~ Electri
 
 \subsection{Water to Water Heat Pumps}\label{water-to-water-heat-pumps}
 
-The EnergyPlus has two water-to-water heat pump models, parameter estimation and equation fit, to choose from:
+The EnergyPlus has three water-to-water heat pump models, parameter estimation, equation fit and an EIR-formulated version, to choose from.
 
 \textbf{HeatPump:WaterToWater:EquationFit:Cooling}
 
@@ -4436,11 +4436,13 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\\FluidPropertiesRefData.idf.
 
-Descriptions and strength of each respective model is available in the following references:
+Descriptions and strengths of these two models are available in the following references:
 
 Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Phd. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
 
 Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simulation Program. M.S. Thesis. Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
+
+Beginning with version 9.1, an EIR-formulated water-to-water heat pump model was added.  This formulation allows the user to enter curves for specifying the capacity and energy usage in a more generic way, allowing the curves to be applicable to a wide variety of components.  With the original equation fit model, the curve form was locked in to a specific set of linear coefficients.  With the new form, the curve can be a quadratic function of temperatures, or an even more generic lookup table.
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
@@ -4962,9 +4964,264 @@ HeatPump:WaterToWater:ParameterEstimation:Heating,
       0.0;                     !- LowPressure Cut off {Pa}
 \end{lstlisting}
 
-Since the heat pump is defined with two separate objects (one for heating, one for cooling), the connections to the condenser has to be done carefully. The example below shows the configuration for parameter estimation objects. The same specifications and configuration also applies to the equation fit model.
+\subsubsection{Outputs}\label{outputs-13-003}
 
-\paragraph{Steps to specify the Ground Source Heat Pump}\label{steps-to-specify-the-ground-source-heat-pump}
+This section describes the outputs available for the water to water heat pump, parameter estimation model; both cooling and heating.
+
+\begin{itemize}
+\item
+  HVAC,Average,Water to Water Heat Pump Electric Power {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Electric Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Outlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Inlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Outlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Inlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
+\end{itemize}
+
+\paragraph{Water to Water Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
+
+This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Electric Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j-1}
+
+This output variable represents the cumulative energy used by the compressor. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
+
+\paragraph{Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-rate-w-1}
+
+This output variable represents the heat transfer across the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-energy-j-1}
+
+This output variable represents the cumulative heat transfer across the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
+
+\paragraph{Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-rate-w-1}
+
+This output variable represents the heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-energy-j-1}
+
+This output variable represents the cumulative heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
+
+\paragraph{Water to Water Heat Pump Load Side Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-outlet-temperature-c-1}
+
+This output variable represents the average fluid temperature leaving the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Load Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-inlet-temperature-c-1}
+
+This output variable represents the average fluid temperature entering the load side coil.~ The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Source Side Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-outlet-temperature-c-1}
+
+This output variable represents the average fluid temperature leaving the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Source Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-inlet-temperature-c-1}
+
+This output variable represents the average fluid temperature entering the source side coil.~ The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-load-side-mass-flow-rate-kgs-1}
+
+This output variable represents the average fluid flow rate through the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-source-side-mass-flow-rate-kgs-1}
+
+This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\subsection{HeatPump:WaterToWater:EIR:Cooling (and Heating)}\label{wwhpeir}
+
+Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together.  Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition to make it respond to outlet setpoint in order to vary the flow request.
+
+\subsubsection{Inputs}\label{wwhpeir_inputs}
+
+\paragraph{Field: Name}\label{wwhpeir_inputs_name}
+
+This alpha field contains the identifying name for the ground source heat pump.
+
+\paragraph{Field: Load Side Inlet Node Name}\label{wwhpeir_inputs_load_inlet_node}
+
+This alpha field contains the heat pump's load side inlet node name.
+
+\paragraph{Field: Load Side Outlet Node Name}\label{wwhpeir_inputs_load_outlet_node}
+
+This alpha field contains the heat pump's load side outlet node name.
+
+\paragraph{Field: Source Side Inlet Node Name}\label{wwhpeir_inputs_source_inlet_node}
+
+This alpha field contains the heat pump's source side inlet node name.
+
+\paragraph{Field: Source Side Outlet Node Name}\label{wwhpeir_inputs_source_outlet_node}
+
+This alpha field contains the heat pump's source side outlet node name.
+
+\paragraph{Field: Companion Heat Pump Name}\label{wwhp_eir_inputs_companion_name}
+
+This optional alpha field contains the name of a companion heat pump object.  If the current object is heating type then this is expected to include the paired cooling object, and vice-versa.  The companion is used for sizing if plant sizing data is unavailable, and during the simulation to ensure that any unexpected simultaneous operation of the two objects provides a warning to the user.
+
+\paragraph{Field: Load Side Reference Flow Rate}\label{wwhp_eir_inputs_load_side_flow}
+
+This autosizable field defines the reference load side flow rate for the coil.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
+
+\paragraph{Field: Source Side Reference Flow Rate}\label{wwhp_eir_inputs_source_side_flow}
+
+This autosizable field defines the reference demand side flow rate for the coil.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
+
+\paragraph{Field: Reference Capacity}\label{wwhp_eir_inputs_reference_capacity}
+
+This autosizable field defines the reference load side heat capacity for the coil.  Cooling capacity for a cooling coil and heating capacity for a heating coil.  The units for this field are [W].
+
+\paragraph{Field: Reference Coefficient of Performance}\label{wwhp_eir_inputs_reference_cop}
+
+This field contains the reference COP for this unit, which is used when calculating the power required for the coil under simulation conditions.  The COP is defined as the load side energy transfer divided by the power input, with dimensionless units of [W/W].
+
+\paragraph{Field: Sizing Factor}\label{wwhp_eir_inputs_sizing_factor}
+
+This field allows the user to scale the sizing of this unit compared to the plant-determined autosized flow and heat capacity.
+
+\paragraph{Field: Capacity Modifier Function of Temperature Curve Name}\label{wwhp_eir_inputs_capft}
+
+This field is the name of a bivariate curve that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the source side inlet temperature.
+
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{wwhp_eir_inputs_eirft}
+
+This field is the name of a bivariate curve that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the source side inlet temperature.
+
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name}\label{wwhp_eir_inputs_eirfplr}
+
+This field is the name of a univariate curve that defines an EIR modifier as a function of the current part load ratio.
+
+An idf example:
+
+\begin{lstlisting}
+  HeatPump:WaterToWater:EIR:Heating,
+    Heating Coil,            !- Name
+    Heating Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    Condenser Loop Demand Inlet Node,  !- Source Side Inlet Node Name
+    Condenser Loop Demand Intermediate Node,  !- Source Side Outlet Node Name
+    Cooling Coil,            !- Companion Heat Pump Name
+    0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
+    0.002,                   !- Source Side Design Volume Flow Rate {m3/s}
+    80000,                   !- Reference Capacity
+    3.5,                     !- Reference COP
+    ,                        !- Sizing Factor
+    CapCurveFuncTemp,        !- Heating Capacity Modifier Function of Temperature Curve Name
+    EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+  HeatPump:WaterToWater:EIR:Cooling,
+    Cooling Coil,            !- Name
+    Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
+    Cooling Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    Condenser Loop Demand Intermediate Node,  !- Source Side Inlet Node Name
+    Condenser Loop Demand Outlet Node,  !- Source Side Outlet Node Name
+    Heating Coil,            !- Companion Heat Pump Name
+    0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
+    0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
+    75000,                   !- Reference Capacity
+    4.0,                     !- Reference COP
+    ,                        !- Sizing Factor
+    CapCurveFuncTemp2,       !- Heating Capacity Modifier Function of Temperature Curve Name
+    EIRCurveFuncTemp2,       !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{wwhp_eir_outputs}
+
+This section describes the outputs available for the water to water heat pump, equation fit model; both cooling and heating.
+
+\begin{itemize}
+\item
+  HVAC,Average,Water to Water Heat Pump Electric Power {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Electric Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Sum,Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Inlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Outlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Inlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Outlet Temperature {[}°C{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
+\end{itemize}
+
+\paragraph{Water to Water Heat Pump Electric Power {[}W{]}}\label{eir_wwhp_outputs_power_usage}
+
+This output variable represents the average power usage of this coil during the specified reporting window.
+
+\paragraph{Water to Water Heat Pump Electric Energy {[}J{]}}\label{eir_wwhp_outputs_energy_usage}
+
+This output variable represents the summed energy usage of the heat pump over a specified reporting window.
+
+\paragraph{Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}}\label{eir_wwhp_outputs_q_load}
+
+This output variable represents the average load side heat transfer during the specified output reporting window.
+
+\paragraph{Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}}\label{eir_wwhp_outputs_q_load_sum}
+
+This output variable represents the summed load side heat transfer during the specified output reporting window.
+
+\paragraph{Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}}\label{eir_wwhp_outputs_q_source}
+
+This output variable represents the average source side heat transfer occurring for this coil during the specified output reporting window.
+
+\paragraph{Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}}\label{eir_wwhp_outputs_q_src_sum}
+
+This output variable represents the summed source side heat transfer during the specified output reporting window.
+
+\paragraph{Water to Water Heat Pump Load Side Inlet Temperature {[}°C{]}}\label{eir_wwhp_outputs_t_load_in}
+
+This output variable represents the inlet temperature on the load side connection of this coil.
+
+\paragraph{Water to Water Heat Pump Load Side Outlet Temperature {[}°C{]}}\label{eir_wwhp_outputs_t_load_out}
+
+This output variable represents the outlet temperature on the load side connection of this coil.
+
+\paragraph{Water to Water Heat Pump Source Side Inlet Temperature {[}°C{]}}\label{eir_wwhp_outputs_t_source_in}
+
+This output variable represents the inlet temperature on the source side connection of this coil.
+
+\paragraph{Water to Water Heat Pump Source Side Outlet Temperature {[}°C{]}}\label{eir_wwhp_outputs_t_source_out}
+
+This output variable represents the outlet temperature on the source side connection of this coil.
+
+\paragraph{Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}}\label{eir_wwhp_outputs_load_flow}
+
+This output variable represents the average load side mass flow rate during the specified reporting window.
+
+\paragraph{Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}}\label{eir_wwhp_outputs_src_flow}
+
+This output variable represents the average source side mass flow rate during the specified reporting window.
+
+\subsection{Steps to specify the Ground Source Heat Pump}\label{steps-to-specify-the-ground-source-heat-pump}
+
+Since the heat pump is defined with two separate objects (one for heating, one for cooling), the connections to the condenser has to be done carefully. The example below shows the configuration for parameter estimation objects. The same specifications and configuration also applies to the equation fit model.
 
 For the heating mode:
 
@@ -5043,133 +5300,6 @@ BRANCH, GshpCLG1 Condenser Branch,
     GshpCLG SourceSide Inlet Node1,
     GshpCLG SourceSide Outlet Node1;
 \end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-13-003}
-
-This section describes the outputs available for the water to water heat pump, parameter estimation model; both cooling and heating.
-
-\begin{itemize}
-\item
-  HVAC,Average,Water to Water Heat Pump Electric Power {[}W{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Electric Power {[}W{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Electric Energy {[}J{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Electric Energy {[}J{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}
-\item
-  HVAC,Sum,Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Outlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Outlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Inlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Inlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Outlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Outlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Inlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Inlet Temperature {[}°C{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average,Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
-\end{itemize}
-
-\paragraph{Water to Water Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
-
-\paragraph{Water to Water Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-2}
-
-This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Electric Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j-1}
-
-\paragraph{Water to Water Heat Pump Electric Energy {[}J{]}}\label{water-to-water-heat-pump-electric-energy-j-2}
-
-This output variable represents the cumulative energy used by the compressor. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
-
-\paragraph{Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-rate-w-1}
-
-\paragraph{Water to Water Heat Pump Load Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-rate-w-2}
-
-This output variable represents the heat transfer across the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-energy-j-1}
-
-\paragraph{Water to Water Heat Pump Load Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-load-side-heat-transfer-energy-j-2}
-
-This output variable represents the cumulative heat transfer across the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
-
-\paragraph{Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-rate-w-1}
-
-\paragraph{Water to Water Heat Pump Source Side Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-rate-w-2}
-
-This output variable represents the heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-energy-j-1}
-
-\paragraph{Water to Water Heat Pump Source Side Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-source-side-heat-transfer-energy-j-2}
-
-This output variable represents the cumulative heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
-
-\paragraph{Water to Water Heat Pump Load Side Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-outlet-temperature-c-1}
-
-\paragraph{Water to Water Heat Pump Load Side Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-outlet-temperature-c-2}
-
-This output variable represents the average fluid temperature leaving the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Load Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-inlet-temperature-c-1}
-
-\paragraph{Water to Water Heat Pump Load Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-load-side-inlet-temperature-c-2}
-
-This output variable represents the average fluid temperature entering the load side coil.~ The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Source Side Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-outlet-temperature-c-1}
-
-\paragraph{Water to Water Heat Pump Source Side Outlet Temperature °C{]}}\label{water-to-water-heat-pump-source-side-outlet-temperature-c-2}
-
-This output variable represents the average fluid temperature leaving the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Source Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-inlet-temperature-c-1}
-
-\paragraph{Water to Water Heat Pump Source Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-inlet-temperature-c-2}
-
-This output variable represents the average fluid temperature entering the source side coil.~ The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-load-side-mass-flow-rate-kgs-1}
-
-\paragraph{Water to Water Heat Pump Load Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-load-side-mass-flow-rate-kgs-2}
-
-This output variable represents the average fluid flow rate through the load side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
-
-\paragraph{Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-source-side-mass-flow-rate-kgs-1}
-
-\paragraph{Water to Water Heat Pump Source Side Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-source-side-mass-flow-rate-kgs-2}
-
-This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \subsection{DistrictCooling}\label{districtcooling}
 

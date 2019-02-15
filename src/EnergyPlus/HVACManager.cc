@@ -107,6 +107,7 @@
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
+#include <WaterToWaterHeatPumpEIR.hh>
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -541,6 +542,7 @@ namespace HVACManager {
                     UpdateZoneSizing(DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
+                EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
@@ -689,7 +691,6 @@ namespace HVACManager {
         using PlantManager::GetPlantInput;
         using PlantManager::GetPlantLoopData;
         using PlantManager::InitOneTimePlantSizingInfo;
-        using PlantManager::ManagePlantLoops;
         using PlantManager::ReInitPlantLoopsAtFirstHVACIteration;
         using PlantManager::SetupBranchControlTypes;
         using PlantManager::SetupInitialPlantCallingOrder;
@@ -888,7 +889,7 @@ namespace HVACManager {
                 SimAirLoopsFlag = true;
             }
             if (HVACManageIteration < MinAirLoopIterationsAfterFirst) {
-                // sequenced zone loads only work if there are at least two iterations after FirstHVACIteraion
+                // sequenced zone loads for airloops may require extra iterations depending upon zone equipment order and load distribution type
                 SimAirLoopsFlag = true;
                 SimZoneEquipmentFlag = true;
             }
