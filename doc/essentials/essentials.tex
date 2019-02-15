@@ -462,6 +462,12 @@ files contain a specific year of weather data and generally used for
 calibration or verification studies where the simulation results are
 compared to actual utility bills or other measured data.
 
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/WeatherFileLocations.png}
+\caption{EnergyPlus.net Weather File Locations}
+\end{figure}
+
 \section{Co-Simulation and Linked Software}
 
 The modelling of multi-domain, multi-physics, and multi-time scale
@@ -1235,6 +1241,9 @@ whenever water heaters are described. A good example can be seen in
 5ZoneVAV-ChilledWaterStorage-Mixed.idf. If not specified, some default
 assumptions are used for the water temperature supplied to the building.
 \end{itemize}
+
+
+
 Other input objects in this group can help perform sizing using the
 weather file, override the sky temperature, impact the variation of
 outdoor conditions with building height (especially important for
@@ -1272,6 +1281,14 @@ object allows a column of data from an external file to be referenced
 as the values of the schedule. A variation of this input object allows
 input specifically for shading.
 \end{itemize}
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/officeSchedules.png}
+\caption{Various Office Schedules}
+\end{figure}
+
+
 Other input objects in this input group allow specification of schedule
 values to be in different formats. These input objects and more are
 further explained in the InputOutputReference under the heading ``Group-Schedules.''
@@ -1319,6 +1336,13 @@ and WindowMaterial:Gas input objects but if all you have is the U-Factor
 and Solar Heat Gain Coefficient (SHGC) they can be specified in this
 input object.
 \end{itemize}
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/EnvelopeHierarchy.png}
+\caption{Envelope Component Hierarchy}
+\end{figure}
+
 A large variety of input objects in this group are not as commonly
 used but are key to modeling specific types of walls and windows so
 if what you are trying to model does not fall into the neat categories
@@ -1598,6 +1622,13 @@ for the daylighting control system.
 The InputOutputReference includes not only a description of these
 input objects but also extra guidance on how they should be applied.
 The PurchAirWithDaylighting.idf contains examples of these input objects.
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DaylightingContinuous.png}
+\caption{Daylighting with Continuous Dimming}
+\end{figure}
+
 
 Three different devices can be used with daylighting: 
 \begin{itemize}
@@ -1959,6 +1990,13 @@ tower, fluid cooler, or ground source heat exchanger, etc. As with
 the demand side, this loop can also include a splitter, a mixer, and
 a bypass.
 \end{itemize}
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/HvacHeatLoop.png}
+\caption{Detailed HVAC Heat Loop Line Diagram}
+\end{figure}
+
 The following is a list of groups of input objects related to specifying
 detailed HVAC systems in EnergyPlus related to zone equipment and
 secondary systems:
