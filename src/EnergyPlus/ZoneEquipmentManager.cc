@@ -4473,13 +4473,19 @@ namespace ZoneEquipmentManager {
         // If zone is uncontrolled use original method for remaining output
         if (!DataHeatBalance::Zone(ZoneNum).IsControlled) {
             // SequentialLoading, use original method for remaining output
-            energy.RemainingOutputRequired -= SysOutputProvided;
-            energy.RemainingOutputReqToHeatSP -= SysOutputProvided;
-            energy.RemainingOutputReqToCoolSP -= SysOutputProvided;
+            energy.UnadjRemainingOutputRequired -= SysOutputProvided;
+            energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired;
+            energy.UnadjRemainingOutputReqToHeatSP -= SysOutputProvided;
+            energy.RemainingOutputReqToHeatSP = energy.UnadjRemainingOutputReqToHeatSP;
+            energy.UnadjRemainingOutputReqToCoolSP -= SysOutputProvided;
+            energy.RemainingOutputReqToCoolSP = energy.UnadjRemainingOutputReqToCoolSP;
             // Latent output updates
-            moisture.RemainingOutputRequired -= LatOutputProvided;
-            moisture.RemainingOutputReqToHumidSP -= LatOutputProvided;
-            moisture.RemainingOutputReqToDehumidSP -= LatOutputProvided;
+            moisture.UnadjRemainingOutputRequired -= LatOutputProvided;
+            moisture.RemainingOutputRequired = moisture.UnadjRemainingOutputRequired;
+            moisture.UnadjRemainingOutputReqToHumidSP -= LatOutputProvided;
+            moisture.RemainingOutputReqToHumidSP = moisture.UnadjRemainingOutputReqToHumidSP;
+            moisture.UnadjRemainingOutputReqToDehumidSP -= LatOutputProvided;
+            moisture.RemainingOutputReqToDehumidSP = moisture.UnadjRemainingOutputReqToDehumidSP;
 
             // re-evaluate if loads are now such that in dead band or set back
             {
@@ -4541,15 +4547,15 @@ namespace ZoneEquipmentManager {
         switch (thisZEqList.LoadDistScheme) {
         case DataZoneEquipment::LoadDist::SequentialLoading:
             {
-                if (present(EquipPriorityNum)) {
+                // Subtract the system output from the unadjusted loads required
+                energy.UnadjRemainingOutputRequired -= SysOutputProvided;
+                energy.UnadjRemainingOutputReqToHeatSP -= SysOutputProvided;
+                energy.UnadjRemainingOutputReqToCoolSP -= SysOutputProvided;
+                moisture.UnadjRemainingOutputRequired -= LatOutputProvided;
+                moisture.UnadjRemainingOutputReqToHumidSP -= LatOutputProvided;
+                moisture.UnadjRemainingOutputReqToDehumidSP -= LatOutputProvided;
 
-                    // Subtract the system output from the unadjusted loads required
-                    energy.UnadjRemainingOutputRequired -= SysOutputProvided;
-                    energy.UnadjRemainingOutputReqToHeatSP -= SysOutputProvided;
-                    energy.UnadjRemainingOutputReqToCoolSP -= SysOutputProvided;
-                    moisture.UnadjRemainingOutputRequired -= LatOutputProvided;
-                    moisture.UnadjRemainingOutputReqToHumidSP -= LatOutputProvided;
-                    moisture.UnadjRemainingOutputReqToDehumidSP -= LatOutputProvided;
+                if (present(EquipPriorityNum)) {
 
                     const int nextHeatingSystem = PrioritySimOrder(EquipPriorityNum).HeatingPriority + 1;
                     const Real64 heatingLoadFrac = (nextHeatingSystem <= energy.NumZoneEquipment) ? thisZEqList.SequentialHeatingFraction(nextHeatingSystem) : 1.0;
@@ -4581,13 +4587,13 @@ namespace ZoneEquipmentManager {
                     }
                 } else {
                     // SequentialLoading, use original method for remaining output
-                    energy.RemainingOutputRequired -= SysOutputProvided;
-                    energy.RemainingOutputReqToHeatSP -= SysOutputProvided;
-                    energy.RemainingOutputReqToCoolSP -= SysOutputProvided;
+                    energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired;
+                    energy.RemainingOutputReqToHeatSP = energy.UnadjRemainingOutputReqToHeatSP;
+                    energy.RemainingOutputReqToCoolSP = energy.UnadjRemainingOutputReqToCoolSP;
                     // Latent output updates
-                    moisture.RemainingOutputRequired -= LatOutputProvided;
-                    moisture.RemainingOutputReqToHumidSP -= LatOutputProvided;
-                    moisture.RemainingOutputReqToDehumidSP -= LatOutputProvided;
+                    moisture.RemainingOutputRequired = moisture.UnadjRemainingOutputRequired;
+                    moisture.RemainingOutputReqToHumidSP = moisture.UnadjRemainingOutputReqToHumidSP;
+                    moisture.RemainingOutputReqToDehumidSP = moisture.UnadjRemainingOutputReqToDehumidSP;
                 }
 
                 // re-evaluate if loads are now such that in dead band or set back
