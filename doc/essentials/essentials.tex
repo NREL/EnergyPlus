@@ -631,7 +631,13 @@ different versions of EP-Launch currently part of the EnergyPlus system.
 
 The main screen of EP-Launch 2 is shown below:
 
-\includegraphics[width=6in]{media/eplaunch2}
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/eplaunch2.png}
+\caption{EP-Launch 2}
+\end{figure}
+
 
 It is a Windows program only. EP-Launch 2 is included in the EnergyPlus
 installation package when installing on Windows, so no additional
@@ -641,7 +647,12 @@ x's are the version number.
 
 In 2018, EP-Launch 3 was developed, and its main screen is shown below:
 
-\includegraphics[width=6in]{media/eplaunch3}
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/eplaunch3.png}
+\caption{EP-Launch 3}
+\end{figure}
+
 
 EP-Launch 3 is not part of the EnergyPlus installation package and
 needs to be installed separately. It is also open source and is available
@@ -764,7 +775,11 @@ range are used. The main screen of the IDF editor is shown below.
 Full details of the IDF Editor can be found in the Auxiliary Programs
 document under the ``Creating Input Files'' section.
 
-\includegraphics[width=6in]{media/idfeditor}
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/idfeditor.png}
+\caption{IDF Editor}
+\end{figure}
 
 \section{Run-Check-Edit Repeat \label{subsec:Run-Check-Edit-Repeat}}
 
@@ -934,7 +949,11 @@ and scheduling of the boilers, chillers and other plant equipment.
 The installation of EnergyPlus includes many different files in different
 folders:
 
-\includegraphics{media/energyplusfolder}
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/energyplusfolder.png}
+\caption{EnergyPlus Installation Folders}
+\end{figure}
 
 Many of these folders include valuable resources for using and learning
 EnergyPlus. 
@@ -1053,7 +1072,13 @@ It can also update a group of files. It is documented in the Chapter
 titled ``Using Older Version Input Files - Transition'' in the AuxiliaryPrograms
 document.
 \end{itemize}
-\includegraphics[width=5in]{media/IDFVersionUpdater}
+
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/IDFVersionUpdater.png}
+\caption{IDFVersionUpdater}
+\end{figure}
+
 \begin{itemize}
 \item EP-Launch 2 - The Windows-only program that comes with the EnergyPlus
 installation can update a single file from the just previous version
@@ -1341,9 +1366,12 @@ EnergyPlus uses a right-hand coordinate system as shown in Figure
 X with three dimensions. The X-axis points east, the Y-axis points
 north, and the Z-axis points up.
 
-\includegraphics[width=6in]{media/coordinatesystem}
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/coordinatesystem.png}
+\caption{EnergyPlus Coordinate System}
+\end{figure}
 
-Figure X. EnergyPlus Coordinate System.
 \begin{itemize}
 \item Zone - defines the name of the thermal zone as well as the ceiling
 height, floor area, and volume. For most zones that are fully enclosed
@@ -1468,9 +1496,13 @@ of a window. Note that the area of the Fenestration:Detailed object
 is the glazed area without the frame. The frame extends beyond the
 glazed area. See the PurchAirWithDaylighting.idf example file.
 \end{itemize}
-\includegraphics[width=5in]{media/window_frame_and_divider}
 
-Figure X - A window with frame and divider
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/window_frame_and_divider.png}
+\caption{A window with frame and divider}
+\end{figure}
+
 \begin{itemize}
 \item WindowProperty:AirflowControl - defines windows that have forced air
 flow between the panes of glass, also called heat-extract windows
@@ -1614,10 +1646,12 @@ that undergoes heat transfer with the environment. Edges of underground
 surfaces that are fully under the building and not along the perimeter
 are not expected to have any heat transfer with the environment.
 \end{itemize}
-\includegraphics{media/kiva-2d-elements}
 
-Figure X: Structural and insulation components of Foundation:Kiva
-input objects.
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/kiva-2d-elements.png}
+\caption{Structural and insulation components of Foundation:Kiva input objects}
+\end{figure}
 
 Input objects of interest in this group not related to Kiva include
 \begin{itemize}
@@ -1875,9 +1909,11 @@ the first steps taken in defining an HVAC system in EnergyPlus be
 the definition of a node diagram or map. This is helpful for visualization
 of the entire system. 
 
-\includegraphics[width=6in]{media/NodeDiagram}
-
-Figure X: Example Node Diagram
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/NodeDiagram.png}
+\caption{Example Node Diagram}
+\end{figure}
 
 So that these loops are manageable and more clearly defined both in
 the input and in the simulation, four different loop sections can
@@ -2182,9 +2218,12 @@ same hierarchy.
 month's demand but also compensate for the highest demand in recent
 months, and this input object allows the specification of such a structure.
 \end{itemize}
-\includegraphics[width=5in]{media/tariff-charges}
 
-Figure X Hierarchy of Economic Charges
+\begin{figure}[hbtp] 
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/tariff-charges.png}
+\caption{Hierarchy of Economic Charges}
+\end{figure}
 
 The following two input objects are uncommon to use:
 \begin{itemize}
