@@ -317,6 +317,7 @@ ADD_SIMULATION_TEST(IDF_FILE HospitalBaseline.idf EPW_FILE USA_IL_Chicago-OHare.
 ADD_SIMULATION_TEST(IDF_FILE HospitalBaselineReheatReportEMS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HospitalLowEnergy.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialLoad.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialLoadFractions.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialUniformPLR.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-UniformLoad.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-UniformPLR.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
