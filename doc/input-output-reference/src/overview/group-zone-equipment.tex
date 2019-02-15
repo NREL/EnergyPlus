@@ -287,6 +287,14 @@ Specifies the zone equipment simulation order when the zone thermostat requests 
 
 Specifies the zone equipment simulation order when the zone thermostat requests heating or no load.
 
+\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Cooling Fraction}\label{field-zone-equipment-x-sequential-cooling-fraction}
+
+Specifies the fraction of the remaining cooling load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad. 
+
+\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Heating or No-Load Fraction}\label{field-zone-equipment-x-sequential-heating-fraction}
+
+Specified the fraction of the remaining heating load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad.
+
 Examples of this statement in an IDF are:
 
 \begin{lstlisting}
