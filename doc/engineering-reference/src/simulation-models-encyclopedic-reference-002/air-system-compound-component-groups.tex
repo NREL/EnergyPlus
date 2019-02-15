@@ -2345,7 +2345,15 @@ Additional model details and a discussion of the parameters and parameter estima
 
 \section{Water To Water Heat Pumps}\label{water-to-water-heat-pumps}
 
-There are two water-water heat pump models available in EnergyPlus which are \textbf{parameter estimation based model} and \textbf{equation-fit model}. Detailed descriptions of the model are available in the references Tang and Jin
+There are three water-water heat pump models available in EnergyPlus:
+
+\begin{itemize}
+  \item Parameter estimation based
+  \item Equation fit
+  \item EIR-formulated
+\end{itemize}
+
+Detailed descriptions of the former two models are available in the references Tang and Jin.  The EIR formulation was added with EnergyPlus 9.1, based on the popular EIR formulation used in the chiller model.  This section describes the important details of the three models.
 
 \subsection{Equation Fit Water To Water Heat Pump Model}\label{equation-fit-water-to-water-heat-pump-model}
 
@@ -2473,7 +2481,7 @@ C is the clearance factor
 
 \(\gamma\) is the isentropic exponent.
 
-\subsubsection{Parameter estimation procedure:}\label{parameter-estimation-procedure}
+\subsubsection{Parameter estimation procedure}\label{parameter-estimation-procedure}
 
 A set of parameters for the cooling mode is defined on the basis of the equations used in the model. An information flowchart indicating the parameters, inputs to the model and the resulting outputs acquired are shown in Figure~\ref{fig:information-flowchart-for-water-to-water-heat}. The estimation of parameters is conducted using the catalog data.
 
@@ -2532,7 +2540,7 @@ Extrapolation beyond the catalog data grants the parameter estimation model an u
 \caption{Flow diagram of EnergyPlus Water to Water Heat Pump implementation \protect \label{fig:flow-diagram-of-energyplus-water-to-water}}
 \end{figure}
 
-\subsubsection{Control Strategy:}\label{control-strategy}
+\subsubsection{Control Strategy}\label{control-strategy}
 
 Both water-to-water heat pump models; parameter estimation based model and curve-fit model use the ``cycle time control logic'' developed by Murugappan (2002).
 
@@ -2545,3 +2553,23 @@ Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Ph
 Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simulation Program. M.S. Thesis. Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
 
 Murugappan, Arun. 2002.~ Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment, M.S. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
+
+\subsection{EIR Formulated Water To Water Heat Pump Model}\label{eir-water-to-water-heat-pump-model}
+
+This section describes the EIR formulated model for water-to-water heat pumps. (Object names: HeatPump:WaterToWater:EIR:Cooling \& HeatPump:WaterToWater:EIR:Heating). In general, these heat pump objects are treated the same as the other heat pump models by the plant loop.  Even though a heat pump is generally a single load coil and a single source coil with a reversing valve, in EnergyPlus, the paradigm is to split the operation into two separate coils, a heating and a cooling.  It is certainly possible to connect the load side of both of these to a single plant loop if the controls are established properly.  The source side of the coils are often placed on a single loop with some form of condensing supply, either a ground loop heat exchanger or a cooling tower (or a combination of the two).
+
+Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition to make it respond to outlet setpoint in order to vary the flow request.
+
+The bookkeeping part of the heat pump code with regards to flow requests and nodal conditions is identical to other components, so this section will only briefly discuss the mathematical formulation of the model.
+
+Once load and source flow rates have been established for the component using the SetComponentFlowRate interface to the plant, and inlet temperatures for each side have been read, a function calculates the response of the unit to these conditions.  The process to evaluate the outlet state is as follows:
+
+\begin{enumerate}
+	\item Retrieve load side outlet temperature setpoint
+	\item Evaluate the capacity modifier function using the source inlet temperature and the load side setpoint temperature as the projected outlet temperature ($f_{cap} = f(T_{out,load,set}, T_{in,src}) $)
+	\item Calculate available load side capacity using the reference value and the modifier ($\dot{q}_{load,avail} = \dot{q}_{reference} \cdot f_{cap}$)
+	\item Calculate the part load ratio using the current plant-dispatched load (constrained between zero and one) ($PLR = \frac{\dot{q}_{plant}}{\dot{q}_{avail}}$)
+	\item Calculate the actual operating load side heat transfer and the load side outlet temperature ($\dot{q}_{load} = \dot{q}_{avail}PLR$, $T_{out,load} = T_{in,load} \pm \frac{\dot{q}_{load}}{\dot{m}_{load}C_{p,load}}) $) -- note the plus/minus refers to how the value will be added in heating mode and subtracted in cooling mode.  This is required because the sign convention is not consistent and a positive value for calculated heat rate will be obtained for both units under normal conditions.
+	\item Evaluate power usage by evaluating the EIR curves using the source inlet temperature, actual load side outlet temperature, and the current part load ratio ($f_{eir,t} = f(T_{out,load,set}, T_{in,src})$, $f_{eir,plr} = f(PLR)$, $P = P_{reference} f_{eir,t} f_{eir,plr}$)
+	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature ($q_{src} = q_{load} \pm P$, $T_{out,src} = T_{in,src} \pm \frac{\dot{q}_{src}}{\dot{m}_{src}C_{p,src}} $) -- again the plus/minus refers to the different behavior between cooling and heating mode.
+\end{enumerate}
