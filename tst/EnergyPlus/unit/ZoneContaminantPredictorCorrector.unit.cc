@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -87,6 +88,7 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
@@ -199,6 +201,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
     OutBaroPress = 101325.0;
+
+    HybridModelZone.allocate(1);
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
 
     NumZoneReturnPlenums = 0;
     NumZoneSupplyPlenums = 0;
@@ -351,6 +357,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
     OutBaroPress = 101325.0;
+
+    HybridModelZone.allocate(1);
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
 
     NumZoneReturnPlenums = 0;
     NumZoneSupplyPlenums = 0;

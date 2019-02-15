@@ -298,16 +298,16 @@ namespace HybridModel {
                     }
 
                     // Decide if system supply terms are valid to be included in the inverse solution
-                    if (SupplyAirTemperatureSchPtr > 0 && SupplyAirMassFlowRateSchPtr > 0) {
+                    if (SupplyAirTemperatureSchPtr > 0 && SupplyAirMassFlowRateSchPtr > 0 && SupplyAirHumidityRatioSchPtr) {
                         if (HybridModelZone(ZonePtr).InfiltrationCalc_T || HybridModelZone(ZonePtr).PeopleCountCalc_T) {
                             HybridModelZone(ZonePtr).IncludeSystemSupplyParameters = true;
                         } else {
-                            ShowWarningError("Field \"" + cAlphaFieldNames(13) + "\" and \"" + cAlphaFieldNames(14) +
+                            ShowWarningError("Field \"" + cAlphaFieldNames(13) + "\", " + cAlphaFieldNames(14) + ", and \"" + cAlphaFieldNames(15) +
                                              "\" will not be used in the inverse balance euqation.");
                         }
                     }
 
-                    if (SupplyAirHumidityRatioSchPtr > 0 && SupplyAirMassFlowRateSchPtr > 0) {
+                    if (SupplyAirHumidityRatioSchPtr && SupplyAirMassFlowRateSchPtr > 0) {
                         if (HybridModelZone(ZonePtr).InfiltrationCalc_H || HybridModelZone(ZonePtr).PeopleCountCalc_H) {
                             HybridModelZone(ZonePtr).IncludeSystemSupplyParameters = true;
                         } else {
@@ -354,10 +354,32 @@ namespace HybridModel {
                     // Get optional people related schedules
                     if (HybridModelZone(ZonePtr).PeopleCountCalc_T || HybridModelZone(ZonePtr).PeopleCountCalc_H ||
                         HybridModelZone(ZonePtr).PeopleCountCalc_C) {
-                        HybridModelZone(ZonePtr).ZonePeopleActivityLevelSchedulePtr = GetScheduleIndex(cAlphaArgs(9));
-                        HybridModelZone(ZonePtr).ZonePeopleSensibleFractionSchedulePtr = GetScheduleIndex(cAlphaArgs(10));
-                        HybridModelZone(ZonePtr).ZonePeopleRadiationFractionSchedulePtr = GetScheduleIndex(cAlphaArgs(11));
-                        HybridModelZone(ZonePtr).ZonePeopleCO2GenRateSchedulePtr = GetScheduleIndex(cAlphaArgs(12));
+                        if (PeopleActivityLevelSchPtr > 0) {
+                            HybridModelZone(ZonePtr).ZonePeopleActivityLevelSchedulePtr = GetScheduleIndex(cAlphaArgs(9));
+                        } else {
+                            ShowWarningError("Field \"" + cAlphaFieldNames(9) +
+                                             "\": default people activity level is not provided, default value of 130W/person will be used.");
+                        }
+                        if (PeopleSensibleFractionSchPtr > 0) {
+                            HybridModelZone(ZonePtr).ZonePeopleSensibleFractionSchedulePtr = GetScheduleIndex(cAlphaArgs(10));
+                        } else {
+                            ShowWarningError("Field \"" + cAlphaFieldNames(10) +
+                                             "\": default people sensible heat rate is not provided, default value of 0.6 will be used.");
+                        }
+                        if (PeopleRadiantFractionSchPtr > 0) {
+                            HybridModelZone(ZonePtr).ZonePeopleRadiationFractionSchedulePtr = GetScheduleIndex(cAlphaArgs(11));
+                        } else {
+                            ShowWarningError(
+                                "Field \"" + cAlphaFieldNames(11) +
+                                "\": default people radiant heat portion (of sensible heat) is not provided, default value of 0.7 will be used.");
+                        }
+                        if (PeopleCO2GenRateSchPtr > 0) {
+                            HybridModelZone(ZonePtr).ZonePeopleCO2GenRateSchedulePtr = GetScheduleIndex(cAlphaArgs(12));
+                        } else {
+                            ShowWarningError(
+                                "Field \"" + cAlphaFieldNames(12) +
+                                "\": default people CO2 generation rate is not provided, default value of 0.0000000382 kg/W will be used.");
+                        }
                     }
 
                     if (FlagHybridModel) {

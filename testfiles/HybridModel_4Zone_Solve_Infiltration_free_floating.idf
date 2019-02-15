@@ -7,12 +7,12 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-! HybridZoneModel.idf
+! HybridModel_4Zone_Solve_Infiltration_free_floating.idf
 ! Basic file description:  Small, 4 zone model to illustrate simple rectangular building using 4ZoneWithShading_Simple_1.idf
 !
-! Highlights:              Hybrid model use measured zone air temperature data to inversely calculate zone air infiltration air change per hour (ach) and zone internal !                          thermal mass
+! Highlights:              Hybrid model use measured zone air temperature, humidity ratio, and C02 concentration data to inversely calculate zone air infiltration air change per hour (ach)
 !
-! External file:           HybridModel_Measurements_with_HVAC.csv for zone air temperature data input
+! External file:           HybridModel_Measurements_no_HVAC.csv for zone air temperature data input
 !
 ! Simulation Location/Run: CHICAGO_OHARE_INTL_IL_USA, 2 design days
 !
@@ -461,41 +461,65 @@ Schedule:Compact,
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,            !- Field 3
-    120;                     !- Field 4
+    120;                       !- Field 4
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:FILE ===========
 
-Schedule:File,ZONE Out_DummyCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,4,1,8760,Comma,,10;
-Schedule:File,obFMU_PeopleSch,People Fraction,HybridModel_Measurements_with_HVAC.csv,5,1,8760,Comma,No,10;
-Schedule:File,ZONE 1_MeasuredTemperature,Any Number,HybridModel_Measurements_with_HVAC.csv,6,1,8760,Comma,,10;
-Schedule:File,ZONE 2_MeasuredTemperature,Any Number,HybridModel_Measurements_with_HVAC.csv,7,1,8760,Comma,,10;
-Schedule:File,ZONE 3_MeasuredTemperature,Any Number,HybridModel_Measurements_with_HVAC.csv,8,1,8760,Comma,,10;
-Schedule:File,ZONE 4_MeasuredTemperature,Any Number,HybridModel_Measurements_with_HVAC.csv,9,1,8760,Comma,,10;
-! Schedule:File,ZONE 1_MeasuredHumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,10,1,8760,Comma,,10;
-! Schedule:File,ZONE 2_MeasuredHumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,11,1,8760,Comma,,10;
-! Schedule:File,ZONE 3_MeasuredHumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,12,1,8760,Comma,,10;
-! Schedule:File,ZONE 4_MeasuredHumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,13,1,8760,Comma,,10;
-! Schedule:File,ZONE 1_MeasuredCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,14,1,8760,Comma,,10;
-! Schedule:File,ZONE 2_MeasuredCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,15,1,8760,Comma,,10;
-! Schedule:File,ZONE 3_MeasuredCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,16,1,8760,Comma,,10;
-! Schedule:File,ZONE 4_MeasuredCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,17,1,8760,Comma,,10;
-Schedule:File,ZONE 1_Inlet_MassFlow,Any Number,HybridModel_Measurements_with_HVAC.csv,18,1,8760,Comma,,10;
-Schedule:File,ZONE 2_Inlet_MassFlow,Any Number,HybridModel_Measurements_with_HVAC.csv,19,1,8760,Comma,,10;
-Schedule:File,ZONE 3_Inlet_MassFlow,Any Number,HybridModel_Measurements_with_HVAC.csv,20,1,8760,Comma,,10;
-Schedule:File,ZONE 4_Inlet_MassFlow,Any Number,HybridModel_Measurements_with_HVAC.csv,21,1,8760,Comma,,10;
-Schedule:File,ZONE 1_Inlet_Temperature,Any Number,HybridModel_Measurements_with_HVAC.csv,22,1,8760,Comma,,10;
-Schedule:File,ZONE 2_Inlet_Temperature,Any Number,HybridModel_Measurements_with_HVAC.csv,23,1,8760,Comma,,10;
-Schedule:File,ZONE 3_Inlet_Temperature,Any Number,HybridModel_Measurements_with_HVAC.csv,24,1,8760,Comma,,10;
-Schedule:File,ZONE 4_Inlet_Temperature,Any Number,HybridModel_Measurements_with_HVAC.csv,25,1,8760,Comma,,10;
-! Schedule:File,ZONE 1_Inlet_HumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,26,1,8760,Comma,,10;
-! Schedule:File,ZONE 2_Inlet_HumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,27,1,8760,Comma,,10;
-! Schedule:File,ZONE 3_Inlet_HumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,28,1,8760,Comma,,10;
-! Schedule:File,ZONE 4_Inlet_HumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,29,1,8760,Comma,,10;
-! Schedule:File,ZONE 1_Inlet_CO2,Any Number,HybridModel_Measurements_with_HVAC.csv,30,1,8760,Comma,,10;
-! Schedule:File,ZONE 2_Inlet_CO2,Any Number,HybridModel_Measurements_with_HVAC.csv,31,1,8760,Comma,,10;
-! Schedule:File,ZONE 3_Inlet_CO2,Any Number,HybridModel_Measurements_with_HVAC.csv,32,1,8760,Comma,,10;
-! Schedule:File,ZONE 4_Inlet_CO2,Any Number,HybridModel_Measurements_with_HVAC.csv,33,1,8760,Comma,,10;
+Schedule:File,
+    ZONE Out_DummyCO2Concentration,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    HybridModel_Measurements_no_HVAC.csv,  !- File Name
+    4,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    ,                        !- Interpolate to Timestep
+    10;                      !- Minutes per Item
+
+Schedule:File,
+    obFMU_PeopleSch,         !- Name
+    People Fraction,         !- Schedule Type Limits Name
+    HybridModel_Measurements_no_HVAC.csv,  !- File Name
+    5,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    No,                      !- Interpolate to Timestep
+    10;                      !- Minutes per Item
+
+Schedule:File,
+    ZONE 1_MeasuredTemperature,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    HybridModel_Measurements_no_HVAC.csv,  !- File Name
+    6,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    ,                        !- Interpolate to Timestep
+    10;                      !- Minutes per Item
+
+Schedule:File,
+    ZONE 2_MeasuredHumidityRatio,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    HybridModel_Measurements_no_HVAC.csv,  !- File Name
+    11,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    ,                        !- Interpolate to Timestep
+    10;                      !- Minutes per Item
+
+Schedule:File,
+    ZONE 3_MeasuredCO2Concentration,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    HybridModel_Measurements_no_HVAC.csv,  !- File Name
+    16,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    ,                        !- Interpolate to Timestep
+    10;                      !- Minutes per Item
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 
@@ -1456,28 +1480,28 @@ ZoneControl:Thermostat,
     ZONE 1,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    SmallOffice - Thermostat;        !- Control 1 Name
+    ZONE 1 SETPOINTS;        !- Control 1 Name
 
 ZoneControl:Thermostat,
     ZONE 2 CONTROLS,         !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    SmallOffice - Thermostat;        !- Control 1 Name
+    ZONE 2 SETPOINTS;        !- Control 1 Name
 
 ZoneControl:Thermostat,
     ZONE 3 CONTROLS,         !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    SmallOffice - Thermostat;        !- Control 1 Name
+    ZONE 3 SETPOINTS;        !- Control 1 Name
 
 ZoneControl:Thermostat,
     ZONE 4 CONTROLS,         !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    SmallOffice - Thermostat;        !- Control 1 Name
+    ZONE 4 SETPOINTS;        !- Control 1 Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
@@ -1501,132 +1525,6 @@ ThermostatSetpoint:DualSetpoint,
     ZONE 4 SETPOINTS,        !- Name
     ZONE Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name
     ZONE Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name
-
-
-ThermostatSetpoint:DualSetpoint,
-  SmallOffice - Thermostat,  !- Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM,     !- Heating Setpoint Temperature Schedule Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM;     !- Cooling Setpoint Temperature Schedule Name
-
-ScheduleTypeLimits,
-  Temperature 36,                         !- Name
-  ,                                       !- Lower Limit Value {BasedOnField A3}
-  ,                                       !- Upper Limit Value {BasedOnField A3}
-  Continuous,                             !- Numeric Type
-  temperature;                            !- Unit Type
-
-Schedule:Day:Interval,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  15.56;                                  !- Value Until Time 1
-
-Schedule:Day:Interval,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  06:00,                                  !- Time 1 {hh:mm}
-  15.56,                                  !- Value Until Time 1
-  19:00,                                  !- Time 2 {hh:mm}
-  21.11,                                  !- Value Until Time 2
-  24:00,                                  !- Time 3 {hh:mm}
-  15.56;                                  !- Value Until Time 3
-
-Schedule:Week:Daily,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Week Rule - Jan1-Dec31, !- Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default, !- Sunday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Monday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Tuesday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Wednesday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Thursday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Friday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default, !- Saturday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default, !- Holiday Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Summer Design Day, !- SummerDesignDay Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Winter Design Day, !- WinterDesignDay Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default, !- CustomDay1 Schedule:Day Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Default; !- CustomDay2 Schedule:Day Name
-
-Schedule:Year,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM,     !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Week Rule - Jan1-Dec31, !- Schedule:Week Name 1
-  1,                                      !- Start Month 1
-  1,                                      !- Start Day 1
-  12,                                     !- End Month 1
-  31;                                     !- End Day 1
-
-Schedule:Day:Interval,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Summer Design Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  15.56;                                  !- Value Until Time 1
-
-Schedule:Day:Interval,
-  OfficeSmall HTGSETP_SCH_NO_OPTIMUM Winter Design Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  21.11;                                  !- Value Until Time 1
-
-Schedule:Day:Interval,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  29.44;                                  !- Value Until Time 1
-
-Schedule:Day:Interval,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  06:00,                                  !- Time 1 {hh:mm}
-  29.44,                                  !- Value Until Time 1
-  18:00,                                  !- Time 2 {hh:mm}
-  23.89,                                  !- Value Until Time 2
-  24:00,                                  !- Time 3 {hh:mm}
-  29.44;                                  !- Value Until Time 3
-
-Schedule:Week:Daily,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Week Rule - Jan1-Dec31, !- Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default, !- Sunday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Monday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Tuesday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Wednesday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Thursday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Wkdy Day, !- Friday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default, !- Saturday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default, !- Holiday Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Summer Design Day, !- SummerDesignDay Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Winter Design Day, !- WinterDesignDay Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default, !- CustomDay1 Schedule:Day Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Default; !- CustomDay2 Schedule:Day Name
-
-Schedule:Year,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM,     !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Week Rule - Jan1-Dec31, !- Schedule:Week Name 1
-  1,                                      !- Start Month 1
-  1,                                      !- Start Day 1
-  12,                                     !- End Month 1
-  31;                                     !- End Day 1
-
-Schedule:Day:Interval,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Summer Design Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  23.89;                                  !- Value Until Time 1
-
-Schedule:Day:Interval,
-  OfficeSmall CLGSETP_SCH_NO_OPTIMUM Winter Design Day, !- Name
-  Temperature 36,                         !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  29.44;                                  !- Value Until Time 1
-
 
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:IDEALLOADSAIRSYSTEM ===========
@@ -1843,17 +1741,17 @@ HybridModel:Zone,
     ZONE 1 HybridModel,      !- Name
     ZONE 1,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
-    No,                     !- Calculate Zone Air Infiltration Rate
-    Yes,                      !- Calculate Zone People Count
+    Yes,                     !- Calculate Zone Air Infiltration Rate
+    No,                      !- Calculate Zone People Count
     ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
     ,                        !- Zone Measured Air Humidity Ratio Schedule Name
     ,                        !- Zone Measured Air CO2 Concentration Schedule Name
-    OfficeSmall ACTIVITY_SCH,                        !- Zone Input People Activity Schedule Name
-    People Sensible Heat Fraction Sch,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
-    People Radiation Heat Fraction Sch,                        !- Zone Input People Radiant Heat Fraction Schedule Name
-    People CO2 Generation Rate Sch,                        !- Zone Input People CO2 Generation Rate Schedule Name
-    ZONE 1_Inlet_Temperature,                        !- Zone Input Supply Air Temperature Schedule Name
-    ZONE 1_Inlet_MassFlow,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
     ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
     ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
@@ -1865,17 +1763,17 @@ HybridModel:Zone,
     ZONE 2 HybridModel,      !- Name
     ZONE 2,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
-    No,                     !- Calculate Zone Air Infiltration Rate
-    Yes,                      !- Calculate Zone People Count
-    ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    Yes,                     !- Calculate Zone Air Infiltration Rate
+    No,                      !- Calculate Zone People Count
+    ,  !- Zone Measured Air Temperature Schedule Name
+    ZONE 2_MeasuredHumidityRatio,                        !- Zone Measured Air Humidity Ratio Schedule Name
     ,                        !- Zone Measured Air CO2 Concentration Schedule Name
-    OfficeSmall ACTIVITY_SCH,                        !- Zone Input People Activity Schedule Name
-    People Sensible Heat Fraction Sch,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
-    People Radiation Heat Fraction Sch,                        !- Zone Input People Radiant Heat Fraction Schedule Name
-    People CO2 Generation Rate Sch,                        !- Zone Input People CO2 Generation Rate Schedule Name
-    ZONE 2_Inlet_Temperature,                        !- Zone Input Supply Air Temperature Schedule Name
-    ZONE 2_Inlet_MassFlow,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
     ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
     ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
@@ -1887,17 +1785,17 @@ HybridModel:Zone,
     ZONE 3 HybridModel,      !- Name
     ZONE 3,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
-    No,                     !- Calculate Zone Air Infiltration Rate
-    Yes,                      !- Calculate Zone People Count
-    ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    Yes,                     !- Calculate Zone Air Infiltration Rate
+    No,                      !- Calculate Zone People Count
+    ,                        !- Zone Measured Air Temperature Schedule Name
     ,                        !- Zone Measured Air Humidity Ratio Schedule Name
-    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
-    OfficeSmall ACTIVITY_SCH,                        !- Zone Input People Activity Schedule Name
-    People Sensible Heat Fraction Sch,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
-    People Radiation Heat Fraction Sch,                        !- Zone Input People Radiant Heat Fraction Schedule Name
-    People CO2 Generation Rate Sch,                        !- Zone Input People CO2 Generation Rate Schedule Name
-    ZONE 3_Inlet_Temperature,                        !- Zone Input Supply Air Temperature Schedule Name
-    ZONE 3_Inlet_MassFlow,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ZONE 3_MeasuredCO2Concentration,  !- Zone Measured Air CO2 Concentration Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
     ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
     ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
@@ -1905,51 +1803,6 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
-    ZONE 4 HybridModel,      !- Name
-    ZONE 4,                  !- Zone Name
-    No,                      !- Calculate Zone Internal Thermal Mass
-    No,                     !- Calculate Zone Air Infiltration Rate
-    Yes,                      !- Calculate Zone People Count
-    ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
-    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
-    OfficeSmall ACTIVITY_SCH,                        !- Zone Input People Activity Schedule Name
-    People Sensible Heat Fraction Sch,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
-    People Radiation Heat Fraction Sch,                        !- Zone Input People Radiant Heat Fraction Schedule Name
-    People CO2 Generation Rate Sch,                        !- Zone Input People CO2 Generation Rate Schedule Name
-    ZONE 4_Inlet_Temperature,                        !- Zone Input Supply Air Temperature Schedule Name
-    ZONE 4_Inlet_MassFlow,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
-    ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
-    ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
-    1,                       !- Begin Month
-    1,                       !- Begin Day of Month
-    12,                      !- End Month
-    31;                      !- End Day of Month
-
-Schedule:Compact,
-    People Sensible Heat Fraction Sch,             !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0.6;                     !- Field 4
-
-Schedule:Compact,
-    People Radiation Heat Fraction Sch,             !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0.3;                     !- Field 4
-
-Schedule:Compact,
-    People CO2 Generation Rate Sch,             !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0.0000000382;            !- Field 4
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
@@ -1970,7 +1823,6 @@ OutputControl:Table:Style,
 
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
-
 Output:Variable,*,Zone Mean Air Temperature,Timestep;
 Output:Variable,*,Zone Air CO2 Concentration,Timestep;
 Output:Variable,*,Zone Mean Air Humidity Ratio,Timestep;
@@ -1979,7 +1831,3 @@ Output:Variable,*,Zone Infiltration Air Change Rate,Timestep;
 Output:Variable,ZONE 1,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 Output:Variable,ZONE 3,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
-Output:Variable,ZONE 4,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
-
-Output:Variable,*,Zone People Occupant Count,Timestep;
-Output:Variable,*,Zone Hybrid Model People Count,Timestep;

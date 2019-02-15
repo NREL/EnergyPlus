@@ -5951,8 +5951,6 @@ namespace ZoneTempPredictorCorrector {
                     // Conditionally calculate the time dependent and time independent terms
                     if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
 
-                        Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
-                            GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
                         Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
                             GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                         Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
@@ -5996,7 +5994,6 @@ namespace ZoneTempPredictorCorrector {
 
                 // Hybrid Model calculate people count
                 if (HybridModelZone(ZoneNum).PeopleCountCalc_H && UseZoneTimeStepHistory) {
-
                     Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
                     Zone(ZoneNum).ZonePeopleSensibleHeatFraction =
                         GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleSensibleFractionSchedulePtr);
@@ -6016,8 +6013,6 @@ namespace ZoneTempPredictorCorrector {
                     // Conditionally calculate the humidity-dependent and humidity-independent terms.
                     if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
 
-                        Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
-                            GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirTemperatureSchedulePtr);
                         Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
                             GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                         Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio =
