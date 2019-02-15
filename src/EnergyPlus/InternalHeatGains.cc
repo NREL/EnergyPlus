@@ -6001,9 +6001,9 @@ namespace InternalHeatGains {
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
-			if (HybridModel::FlagHybridModel_PC) {
-				SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
-			}
+            if (HybridModel::FlagHybridModel_PC) {
+                SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+            }
         }
 
         SumConvHTRadSys = 0.0;
@@ -6947,9 +6947,9 @@ namespace InternalHeatGains {
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
                 // Added for the hybrid model
-				if (HybridModel::FlagHybridModel_PC) {
-					SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
-				}
+                if (HybridModel::FlagHybridModel_PC) {
+                    SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+                }
             }
         }
 
@@ -7004,7 +7004,7 @@ namespace InternalHeatGains {
             SumConvGainRate = 0.0;
             return;
         }
-		
+
         for (DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
             tmpSumConvGainRate += ZoneIntGain(ZoneNum).Device(DeviceNum).ConvectGainRate;
         }
@@ -7370,7 +7370,7 @@ namespace InternalHeatGains {
         }
         for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
             if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
-				SumLatentGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
+                SumLatentGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
             }
         }
     }
@@ -7558,7 +7558,7 @@ namespace InternalHeatGains {
 
         for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
             if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
-				SumCO2GainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).CarbonDioxideGainRate;
+                SumCO2GainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).CarbonDioxideGainRate;
             }
         }
     }

@@ -65,7 +65,9 @@ namespace HybridModel {
     // MODULE PARAMETER DEFINITIONS
 
     // MODULE VARIABLE TYPE DECLARATIONS:
+    extern bool FlagHybridModel;    // True if hybrid model is activated
     extern bool FlagHybridModel_TM;   // User input IM option - True if hybrid model (thermal mass) is activated
+    extern bool FlagHybridModel_AI; // User input IM option - True if hybrid model (air infiltration) is activated
     extern bool FlagHybridModel_PC;   // User input IM option - True if hybrid model (people count) is activated
     extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 

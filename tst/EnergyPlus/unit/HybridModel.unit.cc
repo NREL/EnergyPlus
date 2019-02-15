@@ -351,6 +351,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
+
     MAT(1) = -2.89;
     PreviousMeasuredZT1(1) = -2.887415174;
     PreviousMeasuredZT2(1) = -2.897557416;
@@ -538,7 +539,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
-	HybridModel::clear_state();
+    HybridModel::clear_state();
     Zone.deallocate();
     AirModel.deallocate();
     ZTM1.deallocate();
