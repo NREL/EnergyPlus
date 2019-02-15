@@ -4039,113 +4039,77 @@ namespace ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Initialize remaining output variables using predictor calculations
 
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::DeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
+        auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+        auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum));
 
-        ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
-        ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
-        ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
+        energy.RemainingOutputRequired = energy.TotalOutputRequired;
+        energy.RemainingOutputReqToHeatSP = energy.OutputRequiredToHeatingSP;
+        energy.RemainingOutputReqToCoolSP = energy.OutputRequiredToCoolingSP;
 
-        ZoneSysMoistureDemand(ZoneNum).RemainingOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired;
-        ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP;
-        ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP;
-        // Check if controlled first, becuase if it's not, there is no zone equipment list
-        if (!DataHeatBalance::Zone(ZoneNum).IsControlled || DataGlobals::ZoneSizingCalc) {
-            // init each sequenced demand to the full output
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired; // array assignment
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
-                    ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP; // array assignment
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
-                    ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
-            // init each sequenced demand to the full output
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
-        } else if (FirstHVACIteration && ((ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading) ||
-                                          (ZoneEquipList(ZoneNum).LoadDistScheme == DataZoneEquipment::LoadDist::UniformLoading))) {
-            // init each sequenced demand to the full output
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired; // array assignment
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
-                    ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP; // array assignment
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
-                    ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
-            // init each sequenced demand to the full output
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
-        } else if (FirstHVACIteration && (ZoneEquipList(ZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading) &&
-                   (ZoneEquipList(ZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading)) {
-            // init each sequenced demand to the zone design load in order to get available capacities from equipment
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired)) {
-                if (ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
-                } else {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
+        moisture.RemainingOutputRequired = moisture.TotalOutputRequired;
+        moisture.RemainingOutputReqToHumidSP = moisture.OutputRequiredToHumidifyingSP;
+        moisture.RemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
+
+        // If one sequenced load is allocated, then all have been allocated in InitZoneEquipment
+        if (allocated(energy.SequencedOutputRequired)) {
+            // Check if controlled first, because if it's not, there is no zone equipment list
+            if (!DataHeatBalance::Zone(ZoneNum).IsControlled || DataGlobals::ZoneSizingCalc) {
+                // init each sequenced demand to the full output
+                energy.SequencedOutputRequired = energy.TotalOutputRequired;                        // array assignment
+                energy.SequencedOutputRequiredToHeatingSP = energy.OutputRequiredToHeatingSP;       // array assignment
+                energy.SequencedOutputRequiredToCoolingSP = energy.OutputRequiredToCoolingSP;       // array assignment
+                                                                                                    // init each sequenced demand to the full output
+                moisture.SequencedOutputRequired = moisture.TotalOutputRequired;                    // array assignment
+                moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP; // array assignment
+                moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
+            } else if (FirstHVACIteration) {
+                auto loadDistType = ZoneEquipList(DataHeatBalance::Zone(ZoneNum).ZoneEqNum).LoadDistScheme;
+                if ((loadDistType == DataZoneEquipment::LoadDist::SequentialLoading) ||
+                    (loadDistType == DataZoneEquipment::LoadDist::UniformLoading)) {
+                    // init each sequenced demand to the full output
+                    energy.SequencedOutputRequired = energy.TotalOutputRequired;                  // array assignment
+                    energy.SequencedOutputRequiredToHeatingSP = energy.OutputRequiredToHeatingSP; // array assignment
+                    energy.SequencedOutputRequiredToCoolingSP = energy.OutputRequiredToCoolingSP; // array assignment
+                                                                                                  // init each sequenced demand to the full output
+                    moisture.SequencedOutputRequired = moisture.TotalOutputRequired;              // array assignment
+                    moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP;     // array assignment
+                    moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
+                } else if ((loadDistType == DataZoneEquipment::LoadDist::UniformPLRLoading) ||
+                           (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading)) {
+                    // init each sequenced demand to the zone design load in order to get available capacities from equipment
+                    if (energy.TotalOutputRequired >= 0.0) {
+                        energy.SequencedOutputRequired = DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
+                    } else {
+                        energy.SequencedOutputRequired = -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
+                    }
+                    if (energy.TotalOutputRequired >= 0.0) {
+                        energy.SequencedOutputRequiredToHeatingSP = DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
+                    } else {
+                        energy.SequencedOutputRequiredToHeatingSP = -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
+                    }
+                    if (energy.TotalOutputRequired >= 0.0) {
+                        energy.SequencedOutputRequiredToCoolingSP = DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
+                    } else {
+                        energy.SequencedOutputRequiredToCoolingSP = -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
+                    }
+                    // init each sequenced moisture demand to the full output
+                    moisture.SequencedOutputRequired = moisture.TotalOutputRequired;                        // array assignment
+                    moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP;     // array assignment
+                    moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
                 }
+            } else {
+                // init first sequenced sensible demand to the full output
+                energy.SequencedOutputRequired(1) = energy.TotalOutputRequired;
+                energy.SequencedOutputRequiredToHeatingSP(1) = energy.OutputRequiredToHeatingSP;
+                energy.SequencedOutputRequiredToCoolingSP(1) = energy.OutputRequiredToCoolingSP;
+                // init first sequenced moisture demand to the full output
+                moisture.SequencedOutputRequired(1) = moisture.TotalOutputRequired;
+                moisture.SequencedOutputRequiredToHumidSP(1) = moisture.OutputRequiredToHumidifyingSP;
+                moisture.SequencedOutputRequiredToDehumidSP(1) = moisture.OutputRequiredToDehumidifyingSP;
             }
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP)) {
-                if (ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
-                        DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
-                } else {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
-                        -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
-                }
-            }
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP)) {
-                if (ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
-                        DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
-                } else {
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
-                        -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad; // array assignment
-                }
-            }
-            // init each sequenced moisture demand to the full output
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
-                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
-        } else {
-            // init first sequenced sensible demand to the full output
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired(1) = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP(1) = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
-            if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
-                ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP(1) = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
-            // init first sequenced moisture demand to the full output
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired(1) = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired;
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP(1) = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP;
-            if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-                ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP(1) = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP;
         }
 
-        CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
+        DataZoneEnergyDemands::CurDeadBandOrSetback(ZoneNum) = DataZoneEnergyDemands::DeadBandOrSetback(ZoneNum);
 
         DistributeSystemOutputRequired(ZoneNum, FirstHVACIteration);
     }
@@ -4154,14 +4118,13 @@ namespace ZoneEquipmentManager {
     {
         // Distribute zone equipment loads according to load distribution scheme
 
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::DeadBandOrSetback;
-
-        // Do nothing on first HVAC iteration or if this zone is uncontrolled
-        if (FirstHVACIteration) return;
+        // Do nothing if this zone is uncontrolled or doing zone sizing
         if (!DataHeatBalance::Zone(ActualZoneNum).IsControlled) return;
+        if (DataGlobals::ZoneSizingCalc) return;
 
         int ctrlZoneNum = DataHeatBalance::Zone(ActualZoneNum).ZoneEqNum;
+        // Do nothing on FirstHVACIteration if not UniformLoading
+        if (FirstHVACIteration && (ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading)) return;
         auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ActualZoneNum));
         auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ActualZoneNum));
         auto &thisZEqList(DataZoneEquipment::ZoneEquipList(ctrlZoneNum));
@@ -4395,6 +4358,16 @@ namespace ZoneEquipmentManager {
         default:
             ShowFatalError("DistributeSystemOutputRequired: Illegal load distribution scheme type.");
             break;
+        }
+        // For every load distribution scheme except SequentialLoad
+        //  set the remaining loads to the first equipment type's load to support equipment types that don't use the sequenced loads
+        if (thisZEqList.LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading) {
+            energy.RemainingOutputRequired = energy.SequencedOutputRequired(1);
+            moisture.RemainingOutputRequired = moisture.SequencedOutputRequired(1);
+            energy.RemainingOutputReqToHeatSP = energy.SequencedOutputRequiredToHeatingSP(1);
+            moisture.RemainingOutputReqToHumidSP = moisture.SequencedOutputRequiredToHumidSP(1);
+            energy.RemainingOutputReqToCoolSP = energy.SequencedOutputRequiredToCoolingSP(1);
+            moisture.RemainingOutputReqToDehumidSP = moisture.SequencedOutputRequiredToDehumidSP(1);
         }
     }
 
