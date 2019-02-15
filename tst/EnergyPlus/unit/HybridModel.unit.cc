@@ -385,8 +385,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
 
     // Case 5: Hybrid model people count with measured temperature
 
-
-
     // Case 6: Hybrid model people count with measured humidity ratio
 
     HybridModelZone(1).InternalThermalMassCalc_T = false;
@@ -404,7 +402,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     ZoneAirHumRat(1) = 0.0024964;
     ZT(1) = -2.92;
     OutHumRat = 0.0025365002784602363;
-	OutBaroPress = 98916.7;
+    OutBaroPress = 98916.7;
     OAMFL(1) = 0.700812;
     ZoneLatentGain(1) = 211.2;
     ZoneLatentGainExceptPeople(1) = 0.0;
@@ -413,7 +411,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     PreviousMeasuredHumRat3(1) = 0.002480404;
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
-    
+
     CorrectZoneHumRat(1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
@@ -448,7 +446,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest)
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
-	HybridModel::clear_state();
+    HybridModel::clear_state();
     Zone.deallocate();
     AirModel.deallocate();
     ZTM1.deallocate();
