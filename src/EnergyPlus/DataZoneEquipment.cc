@@ -579,6 +579,8 @@ namespace DataZoneEquipment {
                 thisZoneEquipList.HeatingPriority = 0;
                 thisZoneEquipList.CoolingCapacity = 0;
                 thisZoneEquipList.HeatingCapacity = 0;
+                thisZoneEquipList.SequentialCoolingFraction = 1.0;
+                thisZoneEquipList.SequentialHeatingFraction = 1.0;
 
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     thisZoneEquipList.EquipType(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 1);
