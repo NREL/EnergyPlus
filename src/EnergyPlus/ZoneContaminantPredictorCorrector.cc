@@ -82,7 +82,6 @@
 #include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
-
 namespace ZoneContaminantPredictorCorrector {
 
     // MODULE INFORMATION:
@@ -1789,7 +1788,7 @@ namespace ZoneContaminantPredictorCorrector {
         bool ControlledGCZoneFlag; // This determines whether this is a generic contaminant controlled zone or not
         Real64 ZoneAirGCSetPoint;  // Zone generic contaminant setpoint
         Real64 GCGain;             // Zone generic contaminant internal load
-        //  REAL(r64) :: Temp                      ! Zone generic contaminant internal load
+                                   //  REAL(r64) :: Temp                      ! Zone generic contaminant internal load
 
         // FLOW:
 
@@ -2299,6 +2298,161 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
     }
 
+    void InverseModelCO2(int const ZoneNum,           // Zone number
+                         Real64 &CO2Gain,             // Zone total CO2 gain
+                         Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
+                         Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
+                         Real64 &CO2MassFlowRate,     // Zone air CO2 mass flow rate
+                         Real64 &RhoAir               // Air density
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Han Li
+        //       DATE WRITTEN   February 2019
+        //       MODIFIED		na
+        //       RE-ENGINEERED	na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine inversely solve infiltration airflow rate or people count with zone air CO2 concentration measurements.
+
+        // Using/Aliasing
+        using DataEnvironment::DayOfYear;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const RoutineName("InverseModelCO2");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 AA(0.0);
+        Real64 BB(0.0);
+        Real64 CC(0.0);
+        Real64 DD(0.0);
+        Real64 zone_M_CO2(0.0);
+        Real64 delta_CO2(0.0);
+        Real64 AirDensity(0.0);
+        Real64 CpAir(0.0);
+        Real64 M_inf(0.0);   // Reversely solved infiltration mass flow rate
+        Real64 ACH_inf(0.0); // Reversely solved infiltration air change rate
+        Real64 SumSysM_HM(0.0);
+        Real64 SumSysMxCO2_HM(0.0);
+        Real64 CO2GainPeople(0.0); // Inversely solved convectice heat gain from people (m^3/s)
+        Real64 NumPeople(0.0);     // Inversely solved number of people in the zone
+        Real64 CO2GenRate(0.0);
+        Real64 ActivityLevel(0.0);
+        Real64 UpperBound(0.0); // Upper bound of number of people
+
+        Real64 SysTimeStepInSeconds(0.0);
+        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+
+        Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
+
+        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+            ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
+
+            if (HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
+                static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+
+                // Conditionally calculate the CO2-dependent and CO2-independent terms.
+                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                    Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                    Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+
+                    SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
+                    SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
+
+                    AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
+                    BB = SumSysMxCO2_HM + CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + MixingMassFlowCO2(ZoneNum) +
+                         MDotOA(ZoneNum) * OutdoorCO2;
+
+                } else {
+                    AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
+                    BB = CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + MixingMassFlowCO2(ZoneNum) +
+                         MDotOA(ZoneNum) * OutdoorCO2;
+                }
+
+                CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+                DD = (3.0 * CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * CO2ZoneTimeMinus2Temp(ZoneNum) +
+                      (1.0 / 3.0) * CO2ZoneTimeMinus3Temp(ZoneNum));
+
+                zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
+                delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
+                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
+                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+
+                if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {
+                    M_inf = 0.0;
+                } else {
+                    M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredCO2Concentration) / delta_CO2;
+                }
+
+                // Add threshold for air change rate
+                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / SecInHour * Zone(ZoneNum).Volume)));
+                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / SecInHour;
+                Zone(ZoneNum).MCPIHM = M_inf;
+                Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
+            }
+
+            // Hybrid Model calculate people count
+            if (HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
+                Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                ActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                CO2GenRate = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
+
+                if (ActivityLevel <= 0.0) {
+                    ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
+                }
+                if (CO2GenRate <= 0.0) {
+                    CO2GenRate = 0.0000000382; // 0.0000000382 is the default CO2
+                                               // generation rate [m3/(s*W)]
+                }
+
+                // Conditionally calculate the CO2-dependent and CO2-independent terms.
+                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
+                    Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                    Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+
+                    SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
+                    SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
+
+                    AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
+                         MDotOA(ZoneNum);
+                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + (SumSysMxCO2_HM) +
+                         MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+
+                } else {
+                    AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
+                         MDotOA(ZoneNum);
+                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
+                         (CO2MassFlowRate) + MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+                }
+
+                CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+                DD = (3.0 * CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * CO2ZoneTimeMinus2Temp(ZoneNum) +
+                      (1.0 / 3.0) * CO2ZoneTimeMinus3Temp(ZoneNum));
+
+                CO2GainPeople = (((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredCO2Concentration - BB - CC * DD) / (1000000 * RhoAir);
+
+                // Make sure the results are reasonable
+                UpperBound = CO2Gain / (1000000 * RhoAir * CO2GenRate * ActivityLevel);
+                NumPeople = min(UpperBound, CO2GainPeople / (CO2GenRate * ActivityLevel));
+
+                NumPeople = floor(NumPeople * 100.00 + 0.5) / 100.00;
+                if (NumPeople < 0.05) {
+                    NumPeople = 0;
+                }
+                Zone(ZoneNum).NumOccHM = NumPeople;
+            }
+        }
+
+        // Update zone humidity ratio in the previous steps
+        CO2ZoneTimeMinus3Temp(ZoneNum) = CO2ZoneTimeMinus2Temp(ZoneNum);
+        CO2ZoneTimeMinus2Temp(ZoneNum) = CO2ZoneTimeMinus1Temp(ZoneNum);
+        CO2ZoneTimeMinus1Temp(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
+    }
+
     void CorrectZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -2370,24 +2524,6 @@ namespace ZoneContaminantPredictorCorrector {
         int ADUInNode;
         int ADUOutNode;
         int ZoneNum;
-        // Added for the new hybrid model feature
-        Real64 AA(0.0); // Sum of air mass flow terms except infiltration. (AA = A - M_inf)
-        Real64 BB(0.0); // Sum of air mass flow rate times correcponding CO2 concentration except infiltration. (BB = B - M_inf * C_out)
-        Real64 CC(0.0);
-        Real64 DD(0.0);
-        Real64 zone_M_CO2(0.0);
-        Real64 delta_CO2(0.0);
-        Real64 AirDensity(0.0);
-        Real64 CpAir(0.0);
-        Real64 M_inf(0.0);   // Reversely solved infiltration mass flow rate
-        Real64 ACH_inf(0.0); // Reversely solved infiltration air change rate
-        Real64 SumSysM_HM(0.0);
-        Real64 SumSysMxCO2_HM(0.0);
-        Real64 CO2GainPeople(0.0); // Inversely solved convectice heat gain from people (m^3/s)
-        Real64 NumPeople(0.0);     // Inversely solved number of people in the zone
-        Real64 CO2GenRate(0.0);
-        Real64 ActivityLevel(0.0);
-        Real64 UpperBound(0.0); // Upper bound of number of people
 
         // FLOW:
         // Update zone CO2
@@ -2529,7 +2665,7 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                     ZoneMassFlowRate += Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
                 } // NodeNum
-                // add in the leak flow
+                  // add in the leak flow
                 for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                     ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                     if (AirDistUnit(ADUNum).UpStreamLeak) {
@@ -2639,126 +2775,8 @@ namespace ZoneContaminantPredictorCorrector {
 
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
-                if (HybridModel::FlagHybridModel) {
-                    if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
-                        Zone(ZoneNum).ZoneMeasuredCO2Concentration =
-                            GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
-
-                        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
-
-                            ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
-
-                            if (HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
-
-                                static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
-
-                                // Conditionally calculate the CO2-dependent and CO2-independent terms.
-                                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
-
-                                    Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
-                                    Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
-
-                                    SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
-                                    SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
-
-                                    AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                                    BB = SumSysMxCO2_HM + CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
-                                        MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
-
-                                }
-                                else {
-                                    AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                                    BB = CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + MixingMassFlowCO2(ZoneNum) +
-                                        MDotOA(ZoneNum) * OutdoorCO2;
-                                }
-
-                                CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
-                                DD = (3.0 * CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * CO2ZoneTimeMinus2Temp(ZoneNum) +
-                                    (1.0 / 3.0) * CO2ZoneTimeMinus3Temp(ZoneNum));
-
-                                zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
-                                delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
-                                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
-                                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
-
-                                if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {
-                                    M_inf = 0.0;
-                                }
-                                else {
-                                    M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredCO2Concentration) / delta_CO2;
-                                }
-
-                                // Add threshold for air change rate
-                                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / SecInHour * Zone(ZoneNum).Volume)));
-                                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / SecInHour;
-                                Zone(ZoneNum).MCPIHM = M_inf;
-                                Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
-                            }
-
-                            // Hybrid Model calculate people count
-                            if (HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
-                                Zone(ZoneNum).ZonePeopleActivityLevel =
-                                    GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                                ActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                                CO2GenRate = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
-
-                                if (ActivityLevel <= 0.0) {
-                                    ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
-                                }
-                                if (CO2GenRate <= 0.0) {
-                                    CO2GenRate = 0.0000000382; // 0.0000000382 is the default CO2 generation rate [m3/(s*W)]
-                                }
-
-                                // Conditionally calculate the CO2-dependent and CO2-independent terms.
-                                if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
-
-                                    Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
-                                    Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
-
-                                    SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
-                                    SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
-
-                                    AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
-                                        MDotOA(ZoneNum);
-                                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
-                                        (SumSysMxCO2_HM)+MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
-
-                                }
-                                else {
-                                    AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) +
-                                        MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
-                                        (CO2MassFlowRate)+MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
-                                }
-
-                                CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
-                                DD = (3.0 * CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * CO2ZoneTimeMinus2Temp(ZoneNum) +
-                                    (1.0 / 3.0) * CO2ZoneTimeMinus3Temp(ZoneNum));
-
-                                CO2GainPeople =
-                                    (((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredCO2Concentration - BB - CC * DD) / (1000000 * RhoAir);
-
-                                // Make sure the results are reasonable
-                                UpperBound = CO2Gain / (1000000 * RhoAir * CO2GenRate * ActivityLevel);
-                                NumPeople = min(UpperBound, CO2GainPeople / (CO2GenRate * ActivityLevel));
-
-                                NumPeople = floor(NumPeople * 100.00 + 0.5) / 100.00;
-                                if (NumPeople < 0.05) {
-                                    NumPeople = 0;
-                                }
-                                Zone(ZoneNum).NumOccHM = NumPeople;
-                            }
-                        }
-
-                        // Update zone humidity ratio in the previous steps
-                        CO2ZoneTimeMinus3Temp(ZoneNum) = CO2ZoneTimeMinus2Temp(ZoneNum);
-                        CO2ZoneTimeMinus2Temp(ZoneNum) = CO2ZoneTimeMinus1Temp(ZoneNum);
-                        CO2ZoneTimeMinus1Temp(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
-                    }
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
+                    InverseModelCO2(ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
                 ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;

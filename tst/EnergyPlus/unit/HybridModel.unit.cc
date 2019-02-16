@@ -483,7 +483,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Zone(1).OutDryBulbTemp = -6.71;
     ZoneAirHumRat(1) = 0.0024964;
     OutBaroPress = 98916.7;
-    MCPV(1) = 6616;    // Assign TempDepCoef
+    MCPV(1) = 6616;      // Assign TempDepCoef
     MCPTV(1) = 138483.2; // Assign TempIndCoef
     HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr = 2;
@@ -499,7 +499,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
 
     CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
-    //EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
+    EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 9: Hybrid model people count with measured humidity ratio (with HVAC)
     HybridModelZone(1).InternalThermalMassCalc_T = false;
@@ -732,7 +732,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZoneGCGain(1) = 0.0;
     MixingMassFlowCO2.allocate(1);
     MixingMassFlowCO2(1) = 0.0;
-    Real64 CO2MassFlowRate(0.0);
 
     // Parameter setup
     NumOfZones = 1;
@@ -749,7 +748,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Zone(1).Volume = 4000;
     TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
-    Real64 ZoneTempChange;
 
     // Hybrid modeling trigger
     FlagHybridModel_TM = false;
@@ -803,7 +801,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     OutdoorCO2 = 387.6064554;
     OutBaroPress = 98916.7;
     OAMFL(1) = 0.700812;
-    Real64 CO2GainExceptPeople(0.0);
     ZoneCO2Gain(1) = 0.00001989;
     CO2ZoneTimeMinus1(1) = 387.9962885;
     CO2ZoneTimeMinus2(1) = 387.676037;
