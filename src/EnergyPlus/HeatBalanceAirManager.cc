@@ -503,57 +503,56 @@ namespace HeatBalanceAirManager {
                 SetupOutputVariable("Zone Phase Change Material Melting Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyM,
-                                    "System",
+                                    "Zone",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Phase Change Material Freezing Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyH,
-                                    "System",
+                                    "Zone",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(
                     "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, ZnAirRpt(Loop).imBalance, "System", "Average", Zone(Loop).Name);
             }
 
-            if (DisplayAdvancedReportVariables) {
-                SetupOutputVariable("Zone Exfiltration Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExfilTotalLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(Loop).Name);
-                SetupOutputVariable("Zone Exfiltration Sensible Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExfilSensiLoss,
-                                    "System",
-                                    "System",
-                                    Zone(Loop).Name);
-                SetupOutputVariable("Zone Exfiltration Latent Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExfilLatentLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(Loop).Name);
-                SetupOutputVariable("Zone Exhaust Air Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExhTotalLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(Loop).Name);
-                SetupOutputVariable("Zone Exhaust Air Sensible Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExhSensiLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(Loop).Name);
-                SetupOutputVariable("Zone Exhaust Air Latent Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    ZnAirRpt(Loop).ExhLatentLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(Loop).Name);
-            }
+
+            SetupOutputVariable("Zone Exfiltration Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exfiltration Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exfiltration Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
         }
 
         SetupOutputVariable(

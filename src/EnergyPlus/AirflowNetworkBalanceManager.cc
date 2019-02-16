@@ -5602,26 +5602,25 @@ namespace AirflowNetworkBalanceManager {
                                 Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
-            if (DataGlobals::DisplayAdvancedReportVariables) {
-                SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    AirflowNetworkZnRpt(i).ExfilTotalLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(i).Name);
-                SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    AirflowNetworkZnRpt(i).ExfilSensiLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(i).Name);
-                SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    AirflowNetworkZnRpt(i).ExfilLatentLoss,
-                                    "System",
-                                    "Average",
-                                    Zone(i).Name);
-            }
+
+            SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
         }
 
         if (OnOffFanFlag) {

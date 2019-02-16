@@ -127,17 +127,17 @@ In addition to the canned Surface reports (view the Reports section later in thi
 \item
   Zone,Average,Zone Total Internal Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Zone Exfiltration Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exfiltration Heat Transfer Rate {[}W{]}
 \item
-  Zone,Average,Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}
 \item
-  Zone,Average,Zone Exfiltration Latent Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exfiltration Latent Heat Transfer Rate {[}W{]}
 \item
-  Zone,Average,Zone Exhaust Air Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exhaust Air Heat Transfer Rate {[}W{]}
 \item
-  Zone,Average,Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}
 \item
-  Zone,Average,Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}
+  HVAC,Average,Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}
 \item
   HVAC,Average,Zone Air Temperature {[}C{]}
 \item
@@ -307,7 +307,7 @@ These output variables represent the sum of all heat gains throughout the zone i
 
 \subsubsection{Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-latent-heat-transfer-rate-w}
 
-These output variables represent the heat emitted to ambient from exfiltration in watts. The exfiltration rate is calculated by solving a mass flow balance on the zone including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. The positive values indicate the zone injects heat to the environment, while the negative values indicate the building extracts heat from the environment. (This output variable is only generated if the user has set a computer system environment variable DisplayAdvancedReportVariables equal to "yes".)
+These output variables represent the heat emitted to ambient from exfiltration in Watts. The exfiltration rate is calculated by solving a mass flow balance on the zone including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. Positive values indicate the zone injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
 
 \subsubsection{Zone Exhaust Air Heat Transfer Rate {[}W{]}}\label{zone-exhaust-heat-transfer-rate-w}
 
@@ -315,15 +315,15 @@ These output variables represent the heat emitted to ambient from exfiltration i
 
 \subsubsection{Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}}\label{zone-exhaust-latent-heat-transfer-rate-w}
 
-These output variables represent the heat emitted to ambient from exhaust air in watts. The zone exhaust air flow rate is aggregated from the zone exhaust nodes. The positive values indicate the building injects heat to the environment, while the negative values indicate the building extracts heat from the environment. (This output variable is only generated if the user has set a computer system environment variable DisplayAdvancedReportVariables equal to "yes".)
+These output variables represent the heat emitted to ambient from exhaust air in Watts. The zone exhaust air flow rate is aggregated from the zone exhaust nodes. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
 
 \subsubsection{Site Total Zone Exfiltration Heat Loss {[}W{]}}\label{site-total-exfiltration-heat-transfer-rate-w}
 
-These output variables represent the total amount of heat emitted to ambient from all zones by exfiltration in watts. The positive values indicate the building injects heat to the environment, while the negative values indicate the building extracts heat from the environment.
+These output variables represent the total amount of heat emitted to ambient from all zones by exfiltration in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exfiltration.
 
 \subsubsection{Site Total Zone Exhaust Air Heat Loss {[}W{]}}\label{site-total-exhaust-heat-transfer-rate-w}
 
-These output variables represent the total amount of heat emitted to ambient from all zones by exhaust air in watts. The positive values indicate the building injects heat to the environment, while the negative values indicate the building extracts heat from the environment.
+These output variables represent the total amount of heat emitted to ambient from all zones by exhaust air in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exhaust air.
 
 \subsection{ZoneList}\label{zonelist}
 
@@ -2797,7 +2797,7 @@ This is the coefficient that describes thermal radiation heat transfer between t
 
 \subsubsection{Surface Outside Face Thermal Radiation to Air Heat Transfer Rate {[}W{]}}\label{surface-outside-face-thermal-radiation-to-air-heat-transfer-rate-w}
 
-This is thermal radiation heat transfer rate between the outside face and the air mass surrounding the surface, calculated by the coeffient.
+This is thermal radiation heat transfer rate between the outside face and the air mass surrounding the surface.
 
 \subsubsection{Surface Outside Face Heat Emission to Air Rate {[}W{]}}\label{surface-outside-face-heat-emission-to-air-heat-transfer-rate-w}
 

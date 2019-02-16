@@ -2142,6 +2142,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2194,6 +2195,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -3769,6 +3771,7 @@ namespace OutputReportTabular {
         static std::string const Surface_Shadowing_Summary("Surface Shadowing Summary");
         static std::string const Adaptive_Comfort_Summary("Adaptive Comfort Summary");
         static std::string const Initialization_Summary("Initialization Summary");
+        static std::string const Annual_Heat_Emissions_Summary("Annual Heat Emissions Summary");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3835,6 +3838,9 @@ namespace OutputReportTabular {
                 }
                 if (displayEioSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Initialization_Summary, Entire_Facility) << "\">Initialization Summary</a>\n";
+                }
+                if (displayHeatEmissionsSummary) {
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility) << "\">Annual Heat Emissions Summary</a>\n";
                 }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
@@ -4898,7 +4904,7 @@ namespace OutputReportTabular {
         BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss;
 
         // HVAC relief air
-        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {			
+        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
             SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec * convertJtoGJ;
         }
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss;

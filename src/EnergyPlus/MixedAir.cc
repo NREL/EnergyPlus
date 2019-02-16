@@ -910,7 +910,6 @@ namespace MixedAir {
         InitOAController(OAControllerNum, FirstHVACIteration, AirLoopNum);
 
         OAController(OAControllerNum).CalcOAController(AirLoopNum, FirstHVACIteration);
-
         OAController(OAControllerNum).UpdateOAController();
     }
 
@@ -3195,18 +3194,21 @@ namespace MixedAir {
                                         "System",
                                         "Average",
                                         airloopName);
+
                     SetupOutputVariable("Air System Relief Air Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelTotalLossRate,
                                         "System",
                                         "Average",
                                         airloopName);
+
                     SetupOutputVariable("Air System Relief Air Sensible Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelSensiLossRate,
                                         "System",
                                         "Average",
                                         airloopName);
+
                     SetupOutputVariable("Air System Relief Air Latent Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelLatentLossRate,

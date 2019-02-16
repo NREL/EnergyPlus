@@ -1,6 +1,8 @@
-! RefBldgFullServiceRestaurantNew2004_Chicago.idf
+! ReportHeatEmission_RefFSRestaurant.idf
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
+!
+! This example file shows the use of the heat emissions report and is based on RefBldgFullServiceRestaurantNew2004_Chicago.idf
 !
 ! DOE Commercial Reference Building
 ! Full Service Restaurant, new construction 90.1-2004
@@ -68,7 +70,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,9.0;
+  Version,9.1;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
