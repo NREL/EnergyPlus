@@ -319,12 +319,11 @@
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
+  Output:VariableDictionary,regular;
+
   Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
-
-  Output:Table:SummaryReports,
-    AllSummaryAndMonthly;    !- Report 1 Name
 
   OutputControl:Table:Style,
     Comma;                   !- Column Separator

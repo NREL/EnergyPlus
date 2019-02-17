@@ -4779,7 +4779,7 @@ namespace ZoneTempPredictorCorrector {
         // time step.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear;
+
         using DataLoopNode::Node;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::IsZoneDV;
@@ -4838,7 +4838,6 @@ namespace ZoneTempPredictorCorrector {
         static Real64 TempDepCoef(0.0);            // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);            // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
         static Real64 AirCap(0.0);                 // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
-        static Real64 AirCapHM(0.0);               // Air power capacity for hybrid modeling
         static Real64 SNLoad(0.0);                 // Sensible load calculated for zone in watts and then loaded in report variables
         static int ZoneNum(0);
         static int ZoneNodeNum(0); // System node number for air flow through zone either by system or as a plenum
@@ -5497,7 +5496,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataEnvironment::DayOfYear;
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
@@ -5506,8 +5504,6 @@ namespace ZoneTempPredictorCorrector {
         using ZonePlenum::ZoneRetPlenCond;
         using ZonePlenum::ZoneSupPlenCond;
 
-        using DataGlobals::DayOfSim;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStepZone;
 
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
