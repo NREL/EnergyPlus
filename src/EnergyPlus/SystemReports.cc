@@ -2285,13 +2285,13 @@ namespace SystemReports {
             }
         }
         SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
-                            OutputProcessor::Unit::GJ,
+                            OutputProcessor::Unit::J,
                             DataHeatBalance::SysTotalHVACReliefHeatLoss,
                             "HVAC",
                             "Sum",
                             "SimHVAC");
         SetupOutputVariable("HVAC System Total Heat Rejection Energy",
-                            OutputProcessor::Unit::GJ,
+                            OutputProcessor::Unit::J,
                             DataHeatBalance::SysTotalHVACRejectHeatLoss,
                             "HVAC",
                             "Sum",

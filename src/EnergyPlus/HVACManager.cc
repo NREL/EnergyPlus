@@ -2848,8 +2848,8 @@ namespace HVACManager {
                 ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * SecInHour) * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap;
             ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
 
-            ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * SecInHour * DataGlobals::convertJtoGJ;
-            ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * SecInHour * DataGlobals::convertJtoGJ;
+            ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * SecInHour;
+            ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * SecInHour;
         }
     }
 

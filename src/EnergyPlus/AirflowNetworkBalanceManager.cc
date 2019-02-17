@@ -8652,7 +8652,7 @@ namespace AirflowNetworkBalanceManager {
                 AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
             AirflowNetworkZnRpt(i).ExfilTotalLoss = AirflowNetworkZnRpt(i).ExfilSensiLoss + AirflowNetworkZnRpt(i).ExfilLatentLoss;
 
-            ZoneTotalExfiltrationHeatLoss += AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant * DataGlobals::convertJtoGJ;
+            ZoneTotalExfiltrationHeatLoss += AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate

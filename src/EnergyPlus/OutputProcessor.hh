@@ -197,7 +197,6 @@ namespace OutputProcessor {
         min,
         W,
         J,
-        GJ,
         m3,
         kg,
         ach,

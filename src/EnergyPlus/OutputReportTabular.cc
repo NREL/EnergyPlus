@@ -4895,19 +4895,19 @@ namespace OutputReportTabular {
 
         // Only gather zone report at zone time steps
         if (IndexTypeKey == stepTypeZone) {
-            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission;
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
             return;
         }
 
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss;
+        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
 
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss;
+        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
 
         // HVAC relief air
         for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec * convertJtoGJ;
+            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss;
+        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
 
         // Consendor water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
@@ -5061,8 +5061,7 @@ namespace OutputReportTabular {
             SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
         }
 
-        SysTotalHVACRejectHeatLoss *= convertJtoGJ;
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss;
+        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
 
         BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
                                        BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;

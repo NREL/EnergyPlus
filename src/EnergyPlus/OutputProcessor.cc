@@ -5308,9 +5308,6 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::J:
             return "J";
             break;
-        case OutputProcessor::Unit::GJ:
-            return "GJ";
-            break;
         case OutputProcessor::Unit::W:
             return "W";
             break;
@@ -5462,8 +5459,6 @@ namespace OutputProcessor {
         std::string unitUpper = UtilityRoutines::MakeUPPERCase(unitIn);
         if (unitUpper == "J") {
             return OutputProcessor::Unit::J;
-        } else if (unitUpper == "GJ") {
-            return OutputProcessor::Unit::GJ;
         } else if (unitUpper == "DELTAC") {
             return OutputProcessor::Unit::deltaC;
         } else if (unitUpper == "") {

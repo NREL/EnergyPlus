@@ -2031,7 +2031,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         SetupOutputVariable(
-            "Site Total Surface Heat Emission to Air", OutputProcessor::Unit::GJ, SumSurfaceHeatEmission, "Zone", "Sum", "Environment");
+            "Site Total Surface Heat Emission to Air", OutputProcessor::Unit::J, SumSurfaceHeatEmission, "Zone", "Sum", "Environment");
     }
 
     void InitThermalAndFluxHistories()
@@ -5124,7 +5124,7 @@ namespace HeatBalanceSurfaceManager {
 
             } // opaque heat transfer surfaces.
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec * DataGlobals::convertJtoGJ;
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec;
             }
         } // loop over surfaces
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -5804,7 +5804,10 @@ namespace HeatBalanceSurfaceManager {
                 QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
             }
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
-
+            // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
+            QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+            QHeatEmiReport(SurfNum) =
+                Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
@@ -7296,10 +7299,6 @@ namespace HeatBalanceSurfaceManager {
 
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
 
-        // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
-        QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
-        QHeatEmiReport(SurfNum) =
-            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {
 

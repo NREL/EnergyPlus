@@ -3759,15 +3759,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     CondenserLoopTowers::SimpleTowerReport(1).FanEnergy = 50.0;
 
     Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
-    Real64 reliefEnergy = 2.0 * TimeStepSysSec * DataGlobals::convertJtoGJ;
-    Real64 condenserReject = (1.0 * TimeStepSysSec + 50.0) * DataGlobals::convertJtoGJ;
+    Real64 reliefEnergy = 2.0 * TimeStepSysSec;
+    Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
     GatherHeatEmissionReport(HVACTSReporting);
 
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
-    EXPECT_EQ(reliefEnergy, BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
-    EXPECT_EQ(condenserReject, BuildingPreDefRep.emiHVACReject);
+    EXPECT_EQ(condenserReject * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
 
     DXCoils::NumDXCoils = 2;
     DXCoils::DXCoil.allocate(2);
@@ -3786,13 +3786,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil(2).FuelConsumed = 0.0;
     DXCoils::DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
-    Real64 coilReject = (1.0 * TimeStepSysSec + 200.0 + 10.0) * DataGlobals::convertJtoGJ;
+    Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
 
     GatherHeatEmissionReport(HVACTSReporting);
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
-    EXPECT_EQ(2 * reliefEnergy, BuildingPreDefRep.emiHVACRelief);
+    EXPECT_EQ(2 * reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
-    EXPECT_EQ(2 * condenserReject + coilReject, BuildingPreDefRep.emiHVACReject);
+    EXPECT_EQ(2 * condenserReject * DataGlobals::convertJtoGJ + coilReject * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
 
     MixedAir::clear_state();
     DXCoils::clear_state();

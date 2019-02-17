@@ -556,9 +556,9 @@ namespace HeatBalanceAirManager {
         }
 
         SetupOutputVariable(
-            "Site Total Zone Exfiltration Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExfiltrationHeatLoss, "System", "Sum", "Environment");
+            "Site Total Zone Exfiltration Heat Loss", OutputProcessor::Unit::J, ZoneTotalExfiltrationHeatLoss, "System", "Sum", "Environment");
         SetupOutputVariable(
-            "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::GJ, ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
+            "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::J, ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
