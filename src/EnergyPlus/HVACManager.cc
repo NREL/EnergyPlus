@@ -59,8 +59,8 @@
 #include <AirflowNetworkBalanceManager.hh>
 #include <HVACManager.hh>
 //#include <CoolTower.hh>
-#include <DataAirLoop.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <DataAirLoop.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -81,6 +81,7 @@
 #include <DisplayRoutines.hh>
 //#include <EarthTube.hh>
 #include <EMSManager.hh>
+#include <Fans.hh>
 #include <General.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
@@ -268,8 +269,8 @@ namespace HVACManager {
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
         using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHeatBalFanSys::ZoneThermostatSetPointHiAver;
+        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHeatBalFanSys::ZoneThermostatSetPointLoAver;
         using DataHeatBalFanSys::ZTAVComf;
         using DataSystemVariables::ReportDuringWarmup; // added for FMI
@@ -2346,6 +2347,8 @@ namespace HVACManager {
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirBalance;
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
+        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
         using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
         using DataHeatBalFanSys::MCPV;
         using DataHeatBalFanSys::MDotCPOA;
@@ -2362,6 +2365,12 @@ namespace HVACManager {
         using DataZoneEquipment::CrossMixingReportFlag;
         using DataZoneEquipment::MixingReportFlag;
         using DataZoneEquipment::VentMCP;
+
+        using DataZoneEquipment::ZoneEquipConfig;
+
+        using DataHVACGlobals::FanType_ZoneExhaust;
+        using Fans::Fan;
+        using Fans::NumFans;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2382,6 +2391,7 @@ namespace HVACManager {
         int ZoneA;                         // Mated zone number for pair pf zones sharing refrigeration door opening
         int ZoneB;                         // Mated zone number for pair pf zones sharing refrigeration door opening
         int VentNum;                       // Counter for ventilation statements
+        int FanNum;                        // Counter for exhaust fans
         Real64 AirDensity;                 // Density of air (kg/m^3)
         Real64 CpAir;                      // Heat capacity of air (J/kg-C)
         Real64 ADSCorrectionFactor;        // Correction factor of air flow model values when ADS is simulated
@@ -2395,10 +2405,46 @@ namespace HVACManager {
         Real64 VentZoneMassflow;           // Total mass flow rate per zone
         Real64 VentZoneAirTemp;            // Average Zone inlet temperature
 
+        ZoneTotalExfiltrationHeatLoss = 0.0;
+        ZoneTotalExhaustHeatLoss = 0.0;
+
         // Ensure no airflownetwork and simple calculations
         if (AirflowNetwork::SimulateAirflowNetwork == 0) return;
 
         if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork();
+
+        // Reports zone exhaust loss by exhaust fans
+        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+            CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            ADSCorrectionFactor = 1.0;
+            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+                    AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
+                    ADSCorrectionFactor = 0.0;
+                }
+            }
+
+            ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
+            ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
+
+            for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
+                //  Add reportable vars
+                if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
+                    for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {
+                        if (Fan(FanNum).InletNodeNum == ZoneEquipConfig(ZoneLoop).ExhaustNode(ExhNum)) {
+                            ZnAirRpt(ZoneLoop).ExhTotalLoss +=
+                                Fan(FanNum).OutletAirMassFlowRate * (Fan(FanNum).OutletAirEnthalpy - OutEnthalpy) * ADSCorrectionFactor;
+                            ZnAirRpt(ZoneLoop).ExhSensiLoss += Fan(FanNum).OutletAirMassFlowRate * CpAir *
+                                                               (Fan(FanNum).OutletAirTemp - Zone(ZoneLoop).OutDryBulbTemp) * ADSCorrectionFactor;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ZnAirRpt(ZoneLoop).ExhLatentLoss = ZnAirRpt(ZoneLoop).ExhTotalLoss - ZnAirRpt(ZoneLoop).ExhSensiLoss;
+        }
 
         // Report results for SIMPLE option only
         if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
@@ -2774,6 +2820,36 @@ namespace HVACManager {
                     ZnAirRpt(ZoneLoop).OABalanceFanElec = ZnAirRpt(ZoneLoop).VentilFanElec;
                 }
             }
+            // Reports exfiltration loss
+            H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            ZnAirRpt(ZoneLoop).SysInletMass = 0;
+            ZnAirRpt(ZoneLoop).SysOutletMass = 0;
+            if (!ZoneEquipConfig(ZoneLoop).IsControlled) {
+                for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumInletNodes; ++j) {
+                    ZnAirRpt(ZoneLoop).SysInletMass +=
+                        Node(ZoneEquipConfig(ZoneLoop).InletNode(j)).MassFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ++j) {
+                    ZnAirRpt(ZoneLoop).SysOutletMass +=
+                        Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(j)).MassFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(ZoneLoop).NumReturnNodes; ++j) {
+                    ZnAirRpt(ZoneLoop).SysOutletMass +=
+                        Node(ZoneEquipConfig(ZoneLoop).ReturnNode(j)).MassFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+                }
+            }
+
+            ZnAirRpt(ZoneLoop).ExfilMass = ZnAirRpt(ZoneLoop).InfilMass + ZnAirRpt(ZoneLoop).VentilMass + ZnAirRpt(ZoneLoop).MixMass +
+                                           ZnAirRpt(ZoneLoop).OABalanceMass + ZnAirRpt(ZoneLoop).SysInletMass -
+                                           ZnAirRpt(ZoneLoop).SysOutletMass; // kg
+            ZnAirRpt(ZoneLoop).ExfilSensiLoss =
+                ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * SecInHour) * (MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * CpAir; // W
+            ZnAirRpt(ZoneLoop).ExfilLatentLoss =
+                ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * SecInHour) * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap;
+            ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
+
+            ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * SecInHour;
+            ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * SecInHour;
         }
     }
 
