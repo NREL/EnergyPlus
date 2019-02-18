@@ -324,28 +324,28 @@ ScheduleTypeLimits,
 
 Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Default,  !- Name
-    Fractional,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
     24:00,                   !- Time 1 {hh:mm}
     0;                       !- Value Until Time 1
 
 Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Summer Design Day,  !- Name
-    Fractional,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
     24:00,                   !- Time 1 {hh:mm}
     1;                       !- Value Until Time 1
 
 Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Winter Design Day,  !- Name
-    Fractional,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
     24:00,                   !- Time 1 {hh:mm}
     0;                       !- Value Until Time 1
 
 Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Wkdy Day,  !- Name
-    Fractional,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
     06:00,                   !- Time 1 {hh:mm}
     0,                       !- Value Until Time 1
@@ -391,7 +391,7 @@ Schedule:Week:Daily,
 
 Schedule:Year,
     OfficeSmall BLDG_OCC_SCH,!- Name
-    Fractional,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     OfficeSmall BLDG_OCC_SCH Week Rule - Jan1-Dec31,  !- Schedule:Week Name 1
     1,                       !- Start Month 1
     1,                       !- Start Day 1
@@ -467,7 +467,7 @@ Schedule:Compact,
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:FILE ===========
 
 Schedule:File,ZONE Out_DummyCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,4,1,8760,Comma,,10;
-Schedule:File,obFMU_PeopleSch,People Fraction,HybridModel_Measurements_with_HVAC.csv,5,1,8760,Comma,No,10;
+Schedule:File,obFMU_PeopleSch,Fraction,HybridModel_Measurements_with_HVAC.csv,5,1,8760,Comma,No,10;
 Schedule:File,ZONE 1_MeasuredTemperature,Any Number,HybridModel_Measurements_with_HVAC.csv,6,1,8760,Comma,,10;
 Schedule:File,ZONE 2_MeasuredHumidityRatio,Any Number,HybridModel_Measurements_with_HVAC.csv,12,1,8760,Comma,,10;
 Schedule:File,ZONE 3_MeasuredCO2Concentration,Any Number,HybridModel_Measurements_with_HVAC.csv,16,1,8760,Comma,,10;
@@ -716,10 +716,10 @@ GlobalGeometryRules,
 
 Zone,
     ZONE 1,                  !- Name
-    0,                       !- Direction of Relative North {deg}
-    6.000000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    0,                       !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -727,10 +727,10 @@ Zone,
 
 Zone,
     ZONE 2,                  !- Name
-    0,                       !- Direction of Relative North {deg}
-    26.00000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    0,                       !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -738,10 +738,10 @@ Zone,
 
 Zone,
     ZONE 3,                  !- Name
-    0,                       !- Direction of Relative North {deg}
-    6.000000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    10.00000,                !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -749,10 +749,10 @@ Zone,
 
 Zone,
     ZONE 4,                  !- Name
-    0,                       !- Direction of Relative North {deg}
-    26.00000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    10.00000,                !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}

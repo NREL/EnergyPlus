@@ -664,10 +664,10 @@
 
   Zone,
     ZONE 1,                  !- Name
-    0.0000000E+00,           !- Direction of Relative North {deg}
-    6.000000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    0.0000000E+00,           !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -675,10 +675,10 @@
 
   Zone,
     ZONE 2,                  !- Name
-    0.0000000E+00,           !- Direction of Relative North {deg}
-    26.00000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    0.0000000E+00,           !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -686,10 +686,10 @@
 
   Zone,
     ZONE 3,                  !- Name
-    0.0000000E+00,           !- Direction of Relative North {deg}
-    6.000000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    10.00000,                !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -697,10 +697,10 @@
 
   Zone,
     ZONE 4,                  !- Name
-    0.0000000E+00,           !- Direction of Relative North {deg}
-    26.00000,                !- X Origin {m}
-    6.000000,                !- Y Origin {m}
-    10.00000,                !- Z Origin {m}
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
