@@ -666,6 +666,8 @@ This alpha field defines the source of superheated refrigerant gas from which th
 \item
   Coil:Cooling:DX:VariableSpeed
 \item
+  Coil:Cooling:DX
+\item
   Refrigeration:CompressorRack
 \item
   Refrigeration:Condenser:AirCooled
@@ -2386,7 +2388,7 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
 
 \subsection{Coil:Cooling:DX:MultiSpeed}\label{coilcoolingdxmultispeed}
 
-This component models a DX cooling unit with multiple discrete levels of cooling capacity. Depending on input choices, the user can model a single compressor with multiple operating speeds, or a unit with a single cooling coil fed by multiple compressors (e.g., row split or intertwined coil circuiting). Currently, this cooling coil can only be referenced by a AirLoopHVAC:UnitaryHeatPump:AirToAir:Multispeed object. Refer to Coil:Cooling:DX:TwoStageWithHumidityControlMode if the user wishes to model a cooling coil with discrete levels of cooling and the possibility of air bypass during low speed operation (e.g.~face-split coil circuiting), or if cooling coil operation based on dehumidification requirements is desired.
+This component models a DX cooling unit with multiple discrete levels of cooling capacity. Depending on input choices, the user can model a single compressor with multiple operating speeds, or a unit with a single cooling coil fed by multiple compressors (e.g., row split or intertwined coil circuiting). Currently, this cooling coil can only be referenced by a AirLoopHVAC:UnitaryHeatPump:AirToAir:Multispeed object. Refer to Coil:Cooling:DX:TwoStageWithHumidityControlMode or Coil:Cooling:DX if the user wishes to model a cooling coil with discrete levels of cooling and the possibility of air bypass during low speed operation (e.g.~face-split coil circuiting), or if cooling coil operation based on dehumidification requirements is desired.
 
 The multispeed DX cooling coil can have from two to four operating speeds. When the coil operates at Speed 1 (the lowest speed), its performance is very similar to the single speed DX coil where the impacts of part-load ratio and latent capacity degradation can be included. When the coil operates at higher speeds (above Speed 1), the linear approximation methodology is applied. The coil outputs at two consecutive speeds are linearly interpolated to meet the required cooling capacity during an HVAC system timestep. When the coil performs above the lowest speed, the user can chose if they want to include part-load ratio and latent capacity degradation impacts at the higher speeds.
 
@@ -4693,6 +4695,8 @@ This alpha (choice) field defines the source of superheated refrigerant gas from
 \item
   Coil:Cooling:DX:VariableSpeed
 \item
+  Coil:Cooling:DX
+\item
   Refrigeration:CompressorRack
 \item
   Refrigeration:Condenser:AirCooled
@@ -4861,6 +4865,8 @@ This alpha field specifies the type of DX cooling coil. The valid choices for th
   Coil:Cooling:DX:VariableSpeed
 \item
   Coil:Cooling:DX:SingleSpeed:ThermalStorage
+\item
+  Coil:Cooling:DX
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-000}
@@ -4875,9 +4881,9 @@ This alpha field contains the type of dehumidification control. The following op
 
 \textbf{None} - meet sensible load only, no active dehumidification control
 
-\textbf{MultiMode} - activate enhanced dehumidification mode as needed and operate to meet the sensible load. If a sensible load exists, the system will operate to meet that sensible load and may not meet the latent load. If no sensible load exists, and Run on Latent Load = Yes, the system will operate to meet the entire latent load. This option is used to model DX equipment with a switchable option such as subcool reheat. It is valid only with Cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or CoilSystem:Cooling:DX:HeatExchangerAssisted. If the Run on Latent Load option below is set to Yes, this option may require the use of a heating coil and heating coil outlet air temperature set point manager downstream of this cooling coil to maintain the temperature set point.
+\textbf{MultiMode} - activate enhanced dehumidification mode as needed and operate to meet the sensible load. If a sensible load exists, the system will operate to meet that sensible load and may not meet the latent load. If no sensible load exists, and Run on Latent Load = Yes, the system will operate to meet the entire latent load. This option is used to model DX equipment with a switchable option such as subcool reheat. It is valid only with Cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode, CoilSystem:Cooling:DX:HeatExchangerAssisted, or Coil:Cooling:DX (last coil option must reference an enhanced dehumidification Coil:Cooling:DX:CurveFit:OperatingMode object). If the Run on Latent Load option below is set to Yes, this option may require the use of a heating coil and heating coil outlet air temperature set point manager downstream of this cooling coil to maintain the temperature set point.
 
-\textbf{CoolReheat} - cool beyond the dry-bulb setpoint as required to meet the humidity setpoint. It is valid only with Cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode. This option requires the use of a heating coil and heating coil outlet air temperature set point manager downstream of this cooling coil to maintain the temperature set point.
+\textbf{CoolReheat} - cool beyond the dry-bulb setpoint as required to meet the humidity setpoint. It is valid only with Cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode, or Coil:Cooling:DX that references an enhanced dehumidification Coil:Cooling:DX:CurveFit:OperatingMode object. This option requires the use of a heating coil and heating coil outlet air temperature set point manager downstream of this cooling coil to maintain the temperature set point.
 
 The default is \textbf{None}. For all dehumidification controls, the max humidity setpoint on the control node is used. This must be set using a \textbf{ZoneControl:Humidistat} \textbf{ZoneControl:Humidistat} and one of:
 
@@ -5081,7 +5087,7 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \item
   Air-to-air heat exchanger object (HeatExchanger:AirToAir:FlatPlate, HeatExchanger:AirToAir:SensibleAndLatent, or HeatExchanger:Desiccant:BalancedFlow)
 \item
-  DX cooling coil object (Coil:Cooling:DX:SingleSpeed or Coil:Cooling:DX:VariableSpeed)
+  DX cooling coil object (Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed, or Coil:Cooling:DX)
 \end{itemize}
 
 In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger s energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. CoilSystem:Cooling:DX). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass and AirLoopHVAC:UnitaryHeatPump:AirToAir); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. ZoneHVAC:PackagedTerminalHeatPump) where the heat exchanger s heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. ZoneHVAC:WindowAirConditioner) where the heat exchanger s heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger s heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger s exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
@@ -5121,7 +5127,7 @@ This alpha field denotes the name of the air-to-air heat exchanger being modeled
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-1}
 
-This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are Coil:Cooling:DX:SingleSpeed or Coil:Cooling:DX:VariableSpeed.
+This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed, or Coil:Cooling:DX.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1}
 
