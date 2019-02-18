@@ -1919,6 +1919,13 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
 
+    } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
+        // Place holder
+        addRecordToOutputVariableStructure("*", "Site Total Surface Heat Emission to Air");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exfiltration Heat Loss");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exhaust Air Heat Loss");
+        addRecordToOutputVariableStructure("*", "Air System Relief Air Total Heat Loss Energy");
+        addRecordToOutputVariableStructure("*", "HVAC System Total Heat Rejection Energy");
     } else {
     }
 }
@@ -1952,7 +1959,8 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
         std::unordered_map<std::string,
                            DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
-                           UtilityRoutines::case_insensitive_comparator> data;
+                           UtilityRoutines::case_insensitive_comparator>
+            data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));

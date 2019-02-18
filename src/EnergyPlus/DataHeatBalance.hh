@@ -356,10 +356,13 @@ namespace DataHeatBalance {
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
     // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
-    extern int ZoneAirSolutionAlgo;           // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    extern Real64 BuildingRotationAppendixG;  // Building Rotation for Appendix G
-    extern bool ZoneAirMassBalanceSimulation; // if true, then enforces zone mass flow conservation
-
+    extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
+    extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
+    extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration
+    extern Real64 ZoneTotalExhaustHeatLoss;      // Building total heat emission through zone air exhaust
+    extern Real64 SysTotalHVACReliefHeatLoss;    // Building total heat emission through HVAC system relief air
+    extern Real64 SysTotalHVACRejectHeatLoss;    // Building total heat emission through HVAC system heat rejection
     // END SiteData
 
     extern int NumOfZoneLists;             // Total number of zone lists
@@ -2204,6 +2207,15 @@ namespace DataHeatBalance {
         Real64 MixLatentGain;          // Latent Loss {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixTotalLoss;           // Total Gain {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixTotalGain;           // Total Loss {J} due to mixing and cross mixing and refrigeration door mixing
+        Real64 SysInletMass;           // Total mass of Air {kg} from all system inlets
+        Real64 SysOutletMass;          // Total mass of Air {kg} from all system outlets
+        Real64 ExfilMass;              // Mass of Air {kg} due to exfiltration
+        Real64 ExfilTotalLoss;         // Total Loss rate {W} due to exfiltration (sensible+latent)
+        Real64 ExfilSensiLoss;         // Sensible Loss rate {W} due to exfiltration
+        Real64 ExfilLatentLoss;        // Latent Loss rate {W} due to exfiltration
+        Real64 ExhTotalLoss;           // Total Loss rate {W} due to zone exhaust air (sensible+latent)
+        Real64 ExhSensiLoss;           // Sensible Loss rate {W} due to zone exhaust air
+        Real64 ExhLatentLoss;          // Latent Loss rate {W} due to zone exhaust air
         // air heat balance component load summary results
         Real64 SumIntGains;     // Zone sum of convective internal gains
         Real64 SumHADTsurfs;    // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -2243,11 +2255,12 @@ namespace DataHeatBalance {
               VentilVolumeCurDensity(0.0), VentilVolumeStdDensity(0.0), VentilVdotCurDensity(0.0), VentilVdotStdDensity(0.0), VentilMass(0.0),
               VentilMdot(0.0), VentilAirChangeRate(0.0), VentilFanElec(0.0), VentilAirTemp(0.0), MixVolume(0.0), MixVdotCurDensity(0.0),
               MixVdotStdDensity(0.0), MixMass(0.0), MixMdot(0.0), MixHeatLoss(0.0), MixHeatGain(0.0), MixLatentLoss(0.0), MixLatentGain(0.0),
-              MixTotalLoss(0.0), MixTotalGain(0.0), SumIntGains(0.0), SumHADTsurfs(0.0), SumMCpDTzones(0.0), SumMCpDtInfil(0.0), SumMCpDTsystem(0.0),
-              SumNonAirSystem(0.0), CzdTdt(0.0), imBalance(0.0), OABalanceHeatLoss(0.0), OABalanceHeatGain(0.0), OABalanceLatentLoss(0.0),
-              OABalanceLatentGain(0.0), OABalanceTotalLoss(0.0), OABalanceTotalGain(0.0), OABalanceVolumeCurDensity(0.0),
-              OABalanceVolumeStdDensity(0.0), OABalanceVdotCurDensity(0.0), OABalanceVdotStdDensity(0.0), OABalanceMass(0.0), OABalanceMdot(0.0),
-              OABalanceAirChangeRate(0.0), OABalanceFanElec(0.0), SumEnthalpyM(0.0), SumEnthalpyH(0.0)
+              MixTotalLoss(0.0), MixTotalGain(0.0), SysInletMass(0.0), SysOutletMass(0.0), ExfilMass(0.0), ExfilTotalLoss(0.0), ExfilSensiLoss(0.0),
+              ExfilLatentLoss(0.0), ExhTotalLoss(0.0), ExhSensiLoss(0.0), ExhLatentLoss(0.0), SumIntGains(0.0), SumHADTsurfs(0.0), SumMCpDTzones(0.0),
+              SumMCpDtInfil(0.0), SumMCpDTsystem(0.0), SumNonAirSystem(0.0), CzdTdt(0.0), imBalance(0.0), OABalanceHeatLoss(0.0),
+              OABalanceHeatGain(0.0), OABalanceLatentLoss(0.0), OABalanceLatentGain(0.0), OABalanceTotalLoss(0.0), OABalanceTotalGain(0.0),
+              OABalanceVolumeCurDensity(0.0), OABalanceVolumeStdDensity(0.0), OABalanceVdotCurDensity(0.0), OABalanceVdotStdDensity(0.0),
+              OABalanceMass(0.0), OABalanceMdot(0.0), OABalanceAirChangeRate(0.0), OABalanceFanElec(0.0), SumEnthalpyM(0.0), SumEnthalpyH(0.0)
         {
         }
     };
@@ -2332,6 +2345,14 @@ namespace DataHeatBalance {
         Real64 SHGSHtInfilRem;  // infiltration removal
         Real64 SHGSHtOtherRem;  // opaque surface and other removal
 
+        // heat emission
+        Real64 emiEnvelopConv;      // heat emission from envelope convection
+        Real64 emiZoneExfiltration; // heat emission from zone exfiltration
+        Real64 emiZoneExhaust;      // heat emission from zone exhaust air
+        Real64 emiHVACRelief;       // heat emission from HVAC relief air
+        Real64 emiHVACReject;       // heat emission from HVAC reject air
+        Real64 emiTotHeat;          // total building heat emission
+
         // Default Constructor
         ZonePreDefRepType()
             : isOccupied(false), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolMin(9.9e9),
@@ -2345,7 +2366,8 @@ namespace DataHeatBalance {
               SHGSClOtherRem(0.0), htPtTimeStamp(0), htPeak(0.0), SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0),
               SHGSHtSurfHt(0.0), SHGSHtSurfCl(0.0), SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0),
               SHGSHtIzaAdd(0.0), SHGSHtInfilAdd(0.0), SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0),
-              SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0)
+              SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0), emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0),
+              emiHVACReject(0.0), emiTotHeat(0.0)
         {
         }
     };
