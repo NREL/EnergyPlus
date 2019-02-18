@@ -12,52 +12,6 @@ urlcolor=Blue,
 breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
 
-%
-%%% LyX 2.3.1-1 created this file.  For more info, see http://www.lyx.org/.
-%%% Do not edit unless you really know what you are doing.
-%\documentclass[english]{article}
-%\usepackage[T1]{fontenc}
-%\usepackage[letterpaper]{geometry}
-%\geometry{verbose,tmargin=0.5in,bmargin=0.5in,lmargin=0.5in,rmargin=0.5in,headheight=0.5in,headsep=0.5in,footskip=0.5in}
-%\usepackage{babel}
-%\usepackage{refstyle}
-%\usepackage{textcomp}
-%\usepackage{graphicx}
-%\usepackage[unicode=true,pdfusetitle,
-% bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
-% breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
-% {hyperref}
-%
-%\makeatletter
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
-%
-%\AtBeginDocument{\providecommand\secref[1]{\ref{sec:#1}}}
-%\RS@ifundefined{subsecref}
-%  {\newref{subsec}{name = \RSsectxt}}
-%  {}
-%\RS@ifundefined{thmref}
-%  {\def\RSthmtxt{theorem~}\newref{thm}{name = \RSthmtxt}}
-%  {}
-%\RS@ifundefined{lemref}
-%  {\def\RSlemtxt{lemma~}\newref{lem}{name = \RSlemtxt}}
-%  {}
-%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
-%\newenvironment{lyxcode}
-%	{\par\begin{list}{}{
-%		\setlength{\rightmargin}{\leftmargin}
-%		\setlength{\listparindent}{0pt}% needed for AMS classes
-%		\raggedright
-%		\setlength{\itemsep}{0pt}
-%		\setlength{\parsep}{0pt}
-%		\normalfont\ttfamily}%
-%	 \item[]}
-%	{\end{list}}
-%
-%\makeatother
-
 \begin{document}
 
 \input{src/title}
@@ -484,8 +438,12 @@ system, developed and provided by the team that is responsible for
 the \href{https://arxiv.org/abs/1702.00686}{sub-system}. The coupling
 of the sub-systems is performed by a master algorithm which is responsible
 for linking the sub-systems at run-time for data-exchange. EnergyPlus
-implements two mechanisms to support co-simulation.
+implements three mechanisms to support co-simulation.
 \begin{itemize}
+\item EnergyPlus implements the Building Controls Virtual Test Bed ( \href{https://www.tandfonline.com/doi/abs/10.1080/19401493.2010.518631}{BCVTB}) API. 
+This API leverages the BCVTB to enable the co-simulation of EnergyPlus with various simulation programs such as \href{http://www.trnsys.com/}{TRNSYS}, 
+\href{http://www.esru.strath.ac.uk/Programs/ESP-r.htm}{ESP-r}, \href{http://radsite.lbl.gov/radiance/HOME.html}{Radiance}, or 
+\href{https://www.3ds.com/products-services/catia/products/dymola/}{DYMOLA}.
 \item EnergyPlus provides an interface which allows it to import, link,
 and exchange data with simulation models which implement the Functional
 Mock-up Interface (FMI) for \href{https://www.tandfonline.com/doi/abs/10.1080/19401493.2013.808265}{co-simulation}.
