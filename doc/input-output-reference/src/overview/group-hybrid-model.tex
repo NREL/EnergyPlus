@@ -1,8 +1,10 @@
 \section{Group -- Hybrid Model}\label{group-hybrid-model}
 
-\subsubsection{HybridModel:Zone}\label{inputs-hm}
+\subsection{HybridModel:Zone}\label{inputs-hm}
 
 This object provides a hybrid model feature to enhance energy simulations for existing buildings by inversely solving hard-to-measure model input parameters. More specifically, zone internal thermal mass, air infiltration rate (ACH), and people count are usually hard to be measured directly yet important in building energy simulations. The hybrid model takes measured zone air temperature, humidity ratio, or CO$_2$ concentration as inputs and inversely solve those unknown parameters based on the zone air heat, moisture, or CO$_2$ balance algorithms. The inversely solved internal thermal mass, air infiltration rate, and people count can then be used to substitute the original simplified assumptions to enhance the energy simulation.
+
+\subsubsection{Inputs}\label{inputs-hybridzone}
 
 \paragraph{Field: Name}\label{field-name-hm}
 
