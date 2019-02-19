@@ -76,7 +76,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Timestep,6;
 
@@ -190,7 +190,18 @@
     ZONE 1,                  !- Zone Name
     NO,                      !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
+    NO,                      !- Calculate Zone People Count
     ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+    ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -201,7 +212,18 @@
     ZONE 2,                  !- Zone Name
     NO,                      !- Calculate Zone Internal Thermal Mass
     YES,                     !- Calculate Zone Air Infiltration Rate
+    NO,                      !- Calculate Zone People Count
     ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+    ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -212,7 +234,18 @@
     ZONE 3,                  !- Zone Name
     YES,                     !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
+    NO,                      !- Calculate Zone People Count
     ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+    ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -223,7 +256,18 @@
     ZONE 4,                  !- Zone Name
     YES,                     !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
+    NO,                      !- Calculate Zone People Count
     ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    ,                        !- Zone Measured Air CO2 Concentration Schedule Name
+    ,                        !- Zone Input People Activity Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+    ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+    ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+    ,                        !- Zone Input Supply Air Temperature Schedule Name
+    ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+    ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+    ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -275,12 +319,11 @@
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
+  Output:VariableDictionary,regular;
+
   Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
-
-  Output:Table:SummaryReports,
-    AllSummaryAndMonthly;    !- Report 1 Name
 
   OutputControl:Table:Style,
     Comma;                   !- Column Separator
@@ -663,13 +706,12 @@
     AutoCalculate,           !- Ceiling Height {m}
     AutoCalculate;           !- Volume {m3}
 
- ! BLAST Translator units, UpperLeftCorner, Counter Clock-Wise, World Coordinate System
- ! Note original Building and Zone Origins are retained
-
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    Relative,                !- Coordinate System
+    Relative,                !- Daylighting Reference Point Coordinate System
+    Relative;                !- Rectangular Surface Coordinate System
 
   Shading:Site,
     Bushes-South,            !- Name

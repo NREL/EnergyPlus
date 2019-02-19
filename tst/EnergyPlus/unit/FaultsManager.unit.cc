@@ -204,7 +204,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     //     to the corresponding coil controller
 
     std::string const idf_objects = delimited_string({
-        "Version,                                                      ", "   8.6;                !- Version Identifier                  ",
         "                                                              ", "FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
         "   Fault_SAT_CoolCoil1,!- Name                                ", "   ,                   !- Availability Schedule Name          ",
         "   ,                   !- Severity Schedule Name              ", "   Coil:Cooling:Water, !- Coil Object Type                    ",
@@ -321,7 +320,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // checks GetOAControllerInputs also fills economizer fault info to OA controller
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.9;",
 
         "  Controller:OutdoorAir,",
         "    VAV_1_OA_Controller,     !- Name",

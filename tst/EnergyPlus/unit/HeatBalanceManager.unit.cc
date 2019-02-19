@@ -133,7 +133,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowMaterial:Gap,",
         "    Gap_1_Layer,             !- Name",
         "    0.0127,                  !- Thickness {m}",
@@ -171,7 +170,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowGap:DeflectionState,",
         "    DeflectionState_813_Measured_Gap_1,  !- Name",
         "    0.0120;                  !- Deflected Thickness {m}",
@@ -322,7 +320,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     //	 GLASS;        !- Layer 3
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Construction,",
         " WINDOWWBLIND, !- Name",
         " GLASS,        !- Outside Layer",
@@ -373,7 +370,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     // Test get input for ZoneAirMassFlowConservation object
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -407,8 +403,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Version,8.3;",
-                                                      "Building,",
+    std::string const idf_objects = delimited_string({"Building,",
                                                       "My Building, !- Name",
                                                       "30., !- North Axis{ deg }",
                                                       "City, !- Terrain",
@@ -574,8 +569,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Version,8.3;",
-                                                      "Building,",
+    std::string const idf_objects = delimited_string({"Building,",
                                                       "My Building, !- Name",
                                                       "30., !- North Axis{ deg }",
                                                       "City, !- Terrain",
@@ -608,7 +602,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     // Test get output variables for ZoneAirMassFlowConservation object #5637
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -677,8 +670,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Material:RoofVegetation,",
         "    ThickSoil,               !- Name",
         "    0.5,                     !- Height of Plants {m}",
@@ -800,7 +791,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1282,7 +1273,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1316,7 +1307,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1348,7 +1339,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",

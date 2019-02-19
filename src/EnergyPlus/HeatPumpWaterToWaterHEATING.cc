@@ -482,24 +482,24 @@ namespace HeatPumpWaterToWaterHEATING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     GSHP(GSHPNum).WWHPPlantTypeOfNum,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (!errFlag) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,

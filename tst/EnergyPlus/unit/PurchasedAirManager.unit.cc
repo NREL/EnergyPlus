@@ -212,7 +212,6 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
 TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "ZoneHVAC:IdealLoadsAirSystem,",
         "ZONE 1 Ideal Loads, !- Name",
         ", !- Availability Schedule Name",
