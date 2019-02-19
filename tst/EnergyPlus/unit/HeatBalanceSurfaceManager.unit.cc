@@ -136,6 +136,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(SurfNum);
     DataHeatBalSurface::QRadOutReport.allocate(SurfNum);
+    DataHeatBalSurface::QAirExtReport.allocate(SurfNum);
+    DataHeatBalSurface::QHeatEmiReport.allocate(SurfNum);
     DataGlobals::TimeStepZoneSec = 900.0;
 
     CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
@@ -149,6 +151,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_EQ(10.0 * 1.0 * (DataHeatBalSurface::TH(1, 1, SurfNum) - DataSurfaces::Surface(SurfNum).OutDryBulbTemp),
+              DataHeatBalSurface::QAirExtReport(SurfNum));
+    EXPECT_EQ(10.0 * 2.0 * (DataHeatBalSurface::TH(1, 1, SurfNum) - DataSurfaces::Surface(SurfNum).OutDryBulbTemp),
+              DataHeatBalSurface::QHeatEmiReport(SurfNum));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf)
@@ -187,8 +193,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+                          "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+                          "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
                           "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
     EXPECT_TRUE(compare_err_stream(error_string01, true));
     EXPECT_TRUE(testZone.TempOutOfBoundsReported);
@@ -221,8 +229,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     std::string const error_string03 =
         delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+                          "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+                          "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
                           "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
     EXPECT_TRUE(compare_err_stream(error_string03, true));
     EXPECT_TRUE(testZone.TempOutOfBoundsReported);

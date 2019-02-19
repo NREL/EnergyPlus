@@ -63,9 +63,15 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataAirLoop.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetworkBalanceManager.hh>
+#include <Boilers.hh>
+#include <ChillerElectricEIR.hh>
+#include <ChillerReformulatedEIR.hh>
+#include <CommandLineInterface.hh>
+#include <CondenserLoopTowers.hh>
+#include <DXCoils.hh>
+#include <DataAirLoop.hh>
 #include <DataCostEstimate.hh>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
@@ -73,6 +79,7 @@
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -87,25 +94,36 @@
 #include <DisplayRoutines.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <ElectricPowerServiceManager.hh>
+#include <EvaporativeCoolers.hh>
+#include <EvaporativeFluidCoolers.hh>
 #include <ExteriorEnergyUse.hh>
+#include <FluidCoolers.hh>
 #include <General.hh>
+#include <HVACVariableRefrigerantFlow.hh>
+#include <HeatingCoils.hh>
 #include <HybridModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
+#include <MixedAir.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReportTabularAnnual.hh>
+#include <PackagedThermalStorageCoil.hh>
+#include <PlantChillers.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
+#include <RefrigeratedCase.hh>
 #include <ReportCoilSelection.hh>
 #include <ResultsSchema.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 #include <VentilatedSlab.hh>
+#include <WaterThermalTanks.hh>
 #include <WeatherManager.hh>
 #include <ZonePlenum.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -230,7 +248,7 @@ namespace OutputReportTabular {
     int BinResultsTableCount(0);
     int BinResultsIntervalCount(0);
 
-    int const numNamedMonthly(62);
+    int const numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
     int MonthlyInputCount(0);
@@ -283,6 +301,7 @@ namespace OutputReportTabular {
     bool displayLifeCycleCostReport(false);
     bool displayTariffReport(false);
     bool displayEconomicResultSummary(false);
+    bool displayHeatEmissionsSummary(false);
     bool displayEioSummary(false);
 
     // BEPS Report Related Variables
@@ -575,6 +594,7 @@ namespace OutputReportTabular {
         displayLifeCycleCostReport = false;
         displayTariffReport = false;
         displayEconomicResultSummary = false;
+        displayHeatEmissionsSummary = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -780,6 +800,7 @@ namespace OutputReportTabular {
                 GatherSourceEnergyEndUseResultsForTimestep(IndexTypeKey);
                 GatherPeakDemandForTimestep(IndexTypeKey);
                 GatherHeatGainReport(IndexTypeKey);
+                GatherHeatEmissionReport(IndexTypeKey);
             }
         }
     }
@@ -2071,6 +2092,10 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     WriteTabularFiles = true;
                     nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "HeatEmissionsSummary")) {
+                    displayHeatEmissionsSummary = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2097,6 +2122,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2116,6 +2142,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2145,6 +2172,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2167,6 +2195,7 @@ namespace OutputReportTabular {
                     displayEconomicResultSummary = true;
                     displayEioSummary = true;
                     displayLEEDSummary = true;
+                    displayHeatEmissionsSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2551,6 +2580,7 @@ namespace OutputReportTabular {
         namedMonthly(60).title = "AirLoopSystemComponentLoadsMonthly";
         namedMonthly(61).title = "AirLoopSystemComponentEnergyUseMonthly";
         namedMonthly(62).title = "MechanicalVentilationLoadsMonthly";
+        namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
             ShowFatalError("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits(numNamedMonthly) +
@@ -3229,6 +3259,15 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Decrease Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", aggTypeSumOrAvg);
         }
+        if (namedMonthly(63).show) {
+            curReport = AddMonthlyReport("HeatEmissionsReportMonthly", 2);
+            // Place holder
+            AddMonthlyFieldSetInput(curReport, "Site Total Surface Heat Emission to Air", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Site Total Zone Exfiltration Heat Loss", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Site Total Zone Exhaust Air Heat Loss", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Relief Air Total Heat Loss Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "HVAC System Total Heat Rejection Energy", "", aggTypeSumOrAvg);
+        }
     }
 
     void GetInputFuelAndPollutionFactors()
@@ -3732,6 +3771,7 @@ namespace OutputReportTabular {
         static std::string const Surface_Shadowing_Summary("Surface Shadowing Summary");
         static std::string const Adaptive_Comfort_Summary("Adaptive Comfort Summary");
         static std::string const Initialization_Summary("Initialization Summary");
+        static std::string const Annual_Heat_Emissions_Summary("Annual Heat Emissions Summary");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3798,6 +3838,9 @@ namespace OutputReportTabular {
                 }
                 if (displayEioSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Initialization_Summary, Entire_Facility) << "\">Initialization Summary</a>\n";
+                }
+                if (displayHeatEmissionsSummary) {
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility) << "\">Annual Heat Emissions Summary</a>\n";
                 }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
@@ -4767,6 +4810,263 @@ namespace OutputReportTabular {
         }
     }
 
+    void GatherHeatEmissionReport(int const IndexTypeKey)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // Gathers the data each zone timestep for the heat gain report.
+        // The routine generates an annual table with the following columns which correspond to
+        // the output variables and data structures shown.
+
+        // Using/Aliasing
+        using Boilers::BoilerReport;
+        using Boilers::NumBoilers;
+        using ChillerElectricEIR::ElectricEIRChiller;
+        using ChillerElectricEIR::ElectricEIRChillerReport;
+        using ChillerElectricEIR::NumElectricEIRChillers;
+        using ChillerReformulatedEIR::ElecReformEIRChiller;
+        using ChillerReformulatedEIR::ElecReformEIRChillerReport;
+        using ChillerReformulatedEIR::NumElecReformEIRChillers;
+        using CondenserLoopTowers::NumSimpleTowers;
+        using CondenserLoopTowers::SimpleTowerReport;
+        using DataEnvironment::WeatherFileLocationTitle;
+        using DataGlobals::convertJtoGJ;
+        using DataHeatBalance::BuildingPreDefRep;
+        using DataHeatBalance::NumRefrigCondensers;
+        using DataHeatBalance::NumRefrigeratedRacks;
+        using DataHeatBalance::SysTotalHVACRejectHeatLoss;
+        using DataHeatBalance::SysTotalHVACReliefHeatLoss;
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
+        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
+        using DataHeatBalSurface::SumSurfaceHeatEmission;
+        using DataHVACGlobals::AirCooled;
+        using DataHVACGlobals::EvapCooled;
+        using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::WaterCooled;
+        using DXCoils::DXCoil;
+        using DXCoils::NumDXCoils;
+        using EvaporativeCoolers::EvapCond;
+        using EvaporativeCoolers::NumEvapCool;
+        using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using FluidCoolers::NumSimpleFluidCoolers;
+        using FluidCoolers::SimpleFluidCoolerReport;
+        using HeatingCoils::HeatingCoil;
+        using HeatingCoils::NumHeatingCoils;
+        using HVACVariableRefrigerantFlow::NumVRFCond;
+        using HVACVariableRefrigerantFlow::VRF;
+        using MixedAir::NumOAControllers;
+        using MixedAir::OAController;
+        using PackagedThermalStorageCoil::NumTESCoils;
+        using PackagedThermalStorageCoil::TESCoil;
+        using PlantChillers::ConstCOPChiller;
+        using PlantChillers::ConstCOPChillerReport;
+        using PlantChillers::ElectricChiller;
+        using PlantChillers::ElectricChillerReport;
+        using PlantChillers::EngineDrivenChiller;
+        using PlantChillers::EngineDrivenChillerReport;
+        using PlantChillers::GTChiller;
+        using PlantChillers::GTChillerReport;
+        using PlantChillers::NumConstCOPChillers;
+        using PlantChillers::NumElectricChillers;
+        using PlantChillers::NumEngineDrivenChillers;
+        using PlantChillers::NumGTChillers;
+        using RefrigeratedCase::RefrigRack;
+        using VariableSpeedCoils::NumVarSpeedCoils;
+        using VariableSpeedCoils::VarSpeedCoil;
+        using WaterThermalTanks::AmbientTempOutsideAir;
+        using WaterThermalTanks::NumWaterThermalTank;
+        using WaterThermalTanks::WaterThermalTank;
+
+        static int iOACtrl(0);
+        static int iCoil(0);
+        static int iCooler(0);
+        static int iChiller(0);
+        static int iBoiler(0);
+        static int iTank(0);
+        static int iRef(0);
+
+        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
+        static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+        Real64 TimeStepSysSec = TimeStepSys * SecInHour;
+        SysTotalHVACReliefHeatLoss = 0;
+        SysTotalHVACRejectHeatLoss = 0;
+
+        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
+
+        // Only gather zone report at zone time steps
+        if (IndexTypeKey == stepTypeZone) {
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
+            return;
+        }
+
+        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
+
+        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
+
+        // HVAC relief air
+        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
+            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
+        }
+        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
+
+        // Consendor water loop
+        for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
+            SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
+                                          SimpleTowerReport(iCooler).BasinHeaterConsumption;
+        }
+        for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
+            SysTotalHVACRejectHeatLoss +=
+                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+        }
+        for (iCooler = 1; iCooler <= NumSimpleFluidCoolers; ++iCooler) {
+            SysTotalHVACRejectHeatLoss += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
+        }
+
+        // Air- and Evap-cooled chiller
+        for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
+            if (ElectricChiller(iChiller).Base.CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
+            if (EngineDrivenChiller(iChiller).Base.CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += EngineDrivenChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
+            if (GTChiller(iChiller).Base.CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += GTChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
+            if (ConstCOPChiller(iChiller).Base.CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ConstCOPChillerReport(iChiller).Base.CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
+            if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricEIRChillerReport(iChiller).CondEnergy;
+            }
+        }
+        for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
+            if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElecReformEIRChillerReport(iChiller).CondEnergy;
+            }
+        }
+
+        // Water / steam boiler
+        for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
+            SysTotalHVACRejectHeatLoss +=
+                BoilerReport(iBoiler).FuelConsumed + BoilerReport(iBoiler).ParasiticElecConsumption - BoilerReport(iBoiler).BoilerEnergy;
+        }
+
+        // DX Coils air to air
+        for (iCoil = 1; iCoil <= NumDXCoils; ++iCoil) {
+            if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
+                                                  DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
+                } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
+                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+                }
+                if (DXCoil(iCoil).FuelType != DXCoils::FuelTypeElectricity) {
+                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
+                }
+            } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
+                       DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
+                                              DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
+            }
+        }
+        // VAV coils - air to air
+        for (iCoil = 1; iCoil <= NumVarSpeedCoils; ++iCoil) {
+            if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
+                } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+                }
+            } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                              VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
+            }
+        }
+
+        // Heating coils - fuel
+        for (iCoil = 1; iCoil <= NumHeatingCoils; ++iCoil) {
+            if (HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
+                HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
+                SysTotalHVACRejectHeatLoss +=
+                    HeatingCoil(iCoil).FuelUseLoad + HeatingCoil(iCoil).ParasiticFuelLoad - HeatingCoil(iCoil).HeatingCoilLoad;
+            }
+        }
+
+        // Packaged TES
+        for (iCoil = 1; iCoil <= NumTESCoils; ++iCoil) {
+            if (TESCoil(iCoil).CondenserType == AirCooled) {
+                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
+                                              TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
+            } else if (TESCoil(iCoil).CondenserType == EvapCooled) {
+                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
+                                              TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
+            }
+        }
+
+        // Water heater and thermal storage
+        for (iTank = 1; iTank <= NumWaterThermalTank; ++iTank) {
+            if (WaterThermalTank(iTank).AmbientTempIndicator == AmbientTempOutsideAir) {
+                SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
+            }
+        }
+
+        // Variable Refrigerant Flow
+        for (iCoil = 1; iCoil <= NumVRFCond; ++iCoil) {
+            if (VRF(iCoil).CondenserType == AirCooled) {
+                SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
+                                              VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
+                                              (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
+            } else if (VRF(iCoil).CondenserType == EvapCooled) {
+                SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
+                                              VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
+            } else if (VRF(iCoil).CondenserType == WaterCooled) {
+                SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
+            }
+        }
+
+        // Refrigerated Rack
+        for (iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
+            if (RefrigRack(iRef).CondenserType == AirCooled) {
+                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
+            } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
+                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
+                                              RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
+            } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
+                SysTotalHVACRejectHeatLoss += RefrigRack(iCoil).CondEnergy;
+            }
+        }
+
+        // Refrigerated Case - Condenser
+        for (iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
+            SysTotalHVACRejectHeatLoss += RefrigRack(iCoil).CondEnergy;
+        }
+
+        // Evaporative coolers
+        for (iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
+            SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
+        }
+
+        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
+
+        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
+                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
+    }
+
     void GatherHeatGainReport(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
@@ -5436,6 +5736,7 @@ namespace OutputReportTabular {
             WriteAdaptiveComfortTable();
             WriteEioTables();
             WriteLoadComponentSummaryTables();
+            WriteHeatEmissionTable();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
@@ -7867,9 +8168,12 @@ namespace OutputReportTabular {
                 }
 
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
-                        "Site to Source Energy Conversion Factors");
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Site to Source Energy Conversion Factors");
                 }
             }
 
@@ -8403,9 +8707,12 @@ namespace OutputReportTabular {
                                                            "Utility Use Per Conditioned Floor Area");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
-                        "Utility Use Per Conditioned Floor Area");
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Utility Use Per Conditioned Floor Area");
                 }
             }
             //---- Normalized by Total Area Sub-Table
@@ -8430,9 +8737,12 @@ namespace OutputReportTabular {
                                                            "Utility Use Per Total Floor Area");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
                                                                                             "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility", "Utility Use Per Total Floor Area");
+                                                                                            "Entire Facility",
+                                                                                            "Utility Use Per Total Floor Area");
                 }
             }
 
@@ -8725,9 +9035,12 @@ namespace OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
                                                                                             "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility", "Setpoint Not Met Criteria");
+                                                                                            "Entire Facility",
+                                                                                            "Setpoint Not Met Criteria");
                 }
             }
 
@@ -8765,9 +9078,12 @@ namespace OutputReportTabular {
                                                            "Comfort and Setpoint Not Met Summary");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility",
-                        "Comfort and Setpoint Not Met Summary");
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Comfort and Setpoint Not Met Summary");
                 }
             }
 
@@ -9000,8 +9316,11 @@ namespace OutputReportTabular {
                                                        "Source Energy End Use Components Summary");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
-                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                        rowHead,
+                                                                                        columnHead,
+                                                                                        "Source Energy End Use Components Summary",
+                                                                                        "Entire Facility",
                                                                                         "Source Energy End Use Components Summary");
             }
 
@@ -9054,8 +9373,11 @@ namespace OutputReportTabular {
                                                        "Source Energy End Use Component Per Conditioned Floor Area");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
-                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                        rowHead,
+                                                                                        columnHead,
+                                                                                        "Source Energy End Use Components Summary",
+                                                                                        "Entire Facility",
                                                                                         "Source Energy End Use Component Per Conditioned Floor Area");
             }
 
@@ -9082,8 +9404,11 @@ namespace OutputReportTabular {
                                                        "Source Energy End Use Components Per Total Floor Area");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
-                                                                                        "Source Energy End Use Components Summary", "Entire Facility",
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                        rowHead,
+                                                                                        columnHead,
+                                                                                        "Source Energy End Use Components Summary",
+                                                                                        "Entire Facility",
                                                                                         "Source Energy End Use Components Per Total Floor Area");
             }
         }
@@ -10484,7 +10809,7 @@ namespace OutputReportTabular {
             }
 
             //---- Hybrid Model: Internal Thermal Mass Sub-Table
-            if (FlagHybridModel) {
+            if (FlagHybridModel_TM) {
                 rowHead.allocate(NumOfZones);
                 NumOfCol = 2;
                 columnHead.allocate(NumOfCol);
@@ -10500,7 +10825,7 @@ namespace OutputReportTabular {
 
                 for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                     rowHead(iZone) = Zone(iZone).Name;
-                    if (HybridModelZone(iZone).InternalThermalMassCalc) {
+                    if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
                         tableBody(1, iZone) = "Yes";
                     } else {
                         tableBody(1, iZone) = "No";
@@ -10828,8 +11153,51 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Adaptive Comfort Report",
-                                                                                        "Entire Facility", "People Summary");
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+            }
+        }
+    }
+
+    void WriteHeatEmissionTable()
+    {
+
+        Array1D_string columnHead(6);
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+
+        if (displayHeatEmissionsSummary) {
+
+            WriteReportHeaders("Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            WriteSubtitle("Heat Emission by Components");
+
+            columnWidth.allocate(6);
+            columnWidth = 10;
+
+            rowHead.allocate(1);
+            tableBody.allocate(6, 1);
+
+            rowHead(1) = "Heat Emissions [GJ]";
+            columnHead(1) = "Envelope Convection";
+            columnHead(2) = "Zone Exfiltration";
+            columnHead(3) = "Zone Exhaust Air";
+            columnHead(4) = "HVAC Relief Air";
+            columnHead(5) = "HVAC Reject Heat";
+            columnHead(6) = "Total";
+
+            tableBody = "";
+            tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv, 2);
+            tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
+            tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
+            tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
+            tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
+            tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
+
+            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
             }
         }
     }
@@ -11269,7 +11637,12 @@ namespace OutputReportTabular {
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Component Sizing Summary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField,
+                        tableBody,
+                        rowHead,
+                        columnHead,
+                        "Component Sizing Summary",
+                        "Entire Facility",
+                        CompSizeTableEntry(foundEntry).typeField,
                         "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
                 }
             }
@@ -11411,7 +11784,11 @@ namespace OutputReportTabular {
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility",
+                            tableBody,
+                            rowHead,
+                            columnHead,
+                            "Surface Shadowing Summary",
+                            "Entire Facility",
                             "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
                 } else if (iKindRec == recKindSubsurface) {
@@ -11426,7 +11803,11 @@ namespace OutputReportTabular {
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility",
+                            tableBody,
+                            rowHead,
+                            columnHead,
+                            "Surface Shadowing Summary",
+                            "Entire Facility",
                             "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
                 }
@@ -13680,8 +14061,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
-                                                                                            zoneAirLoopFacilityName, peakLoadCompName);
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
 
                 //---- Peak Conditions
@@ -13762,8 +14143,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
-                                                                                            zoneAirLoopFacilityName, peakCondName);
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
 
                 //---- Engineering Checks
@@ -13815,8 +14196,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
-                                                                                            zoneAirLoopFacilityName, engineeringCheckName);
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
 
                 // write the list of zone for the AirLoop level report
@@ -13850,8 +14231,8 @@ namespace OutputReportTabular {
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
-                                                                                                zoneAirLoopFacilityName, zonesIncludedName);
+                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                 }
             }

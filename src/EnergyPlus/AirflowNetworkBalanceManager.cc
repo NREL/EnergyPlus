@@ -59,14 +59,14 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetworkBalanceManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
@@ -1414,7 +1414,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string coil_name = fields.at("coil_name");
@@ -1440,7 +1440,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string hx_name = fields.at("heatexchanger_name");
@@ -1467,7 +1467,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string tu_name = fields.at("terminal_unit_name");
@@ -5602,6 +5602,25 @@ namespace AirflowNetworkBalanceManager {
                                 Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
+
+            SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
         }
 
         if (OnOffFanFlag) {
@@ -8134,6 +8153,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -8177,6 +8197,8 @@ namespace AirflowNetworkBalanceManager {
             onetime = true;
         }
         ReportingConstant = TimeStepSys * SecInHour;
+
+        ZoneTotalExfiltrationHeatLoss = 0.0;
 
         for (auto &e : AirflowNetworkReportData) {
             e.MultiZoneInfiSenGainW = 0.0;
@@ -8558,6 +8580,7 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         }
+
                         if (ZoneAirHumRat(ZN2) > ZoneAirHumRat(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
@@ -8587,6 +8610,7 @@ namespace AirflowNetworkBalanceManager {
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(i), MAT(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
+
             if (MAT(i) > Tamb) {
                 AirflowNetworkZnRpt(i).InfilHeatLoss = AirflowNetworkExchangeData(i).SumMCp * (MAT(i) - Tamb) * ReportingConstant;
                 AirflowNetworkZnRpt(i).InfilHeatGain = 0.0;
@@ -8606,6 +8630,29 @@ namespace AirflowNetworkBalanceManager {
                     ZonePreDefRep(i).AFNInfilVolMin = AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
+
+            Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
+            AirflowNetworkZnRpt(i).InletMass = 0;
+            AirflowNetworkZnRpt(i).OutletMass = 0;
+            if (ZoneEquipConfig(i).IsControlled) {
+                for (int j = 1; j <= ZoneEquipConfig(i).NumInletNodes; ++j) {
+                    AirflowNetworkZnRpt(i).InletMass += Node(ZoneEquipConfig(i).InletNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumExhaustNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ExhaustNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumReturnNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ReturnNode(j)).MassFlowRate * ReportingConstant;
+                }
+            }
+            AirflowNetworkZnRpt(i).ExfilMass = AirflowNetworkZnRpt(i).InfilMass + AirflowNetworkZnRpt(i).VentilMass + AirflowNetworkZnRpt(i).MixMass +
+                                               AirflowNetworkZnRpt(i).InletMass - AirflowNetworkZnRpt(i).OutletMass;
+            AirflowNetworkZnRpt(i).ExfilSensiLoss = AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (MAT(i) - Tamb) * CpAir;
+            AirflowNetworkZnRpt(i).ExfilLatentLoss =
+                AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
+            AirflowNetworkZnRpt(i).ExfilTotalLoss = AirflowNetworkZnRpt(i).ExfilSensiLoss + AirflowNetworkZnRpt(i).ExfilLatentLoss;
+
+            ZoneTotalExfiltrationHeatLoss += AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate
