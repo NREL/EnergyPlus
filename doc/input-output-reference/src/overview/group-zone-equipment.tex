@@ -221,7 +221,7 @@ The Load Distribution Scheme selects the algorithm used to allocate the current 
 \item
   SequentialUniformPLR determines how many of the available components are required to meet the current load, then distributes the load at a uniform part load ratio (PLR).
 \end{itemize}
-\paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
+\paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence, Sequential Cooling Fraction, Sequential Heating Fraction)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
 
 This set is used together in order to sequence the equipment for heating and cooling. The \#1 sequence equipment will try to meet the entire demand with its capacity and then pass the results on to the \#2 and so on for both heating and cooling. This field set is extensible by duplicating the last four fields.
 
@@ -291,7 +291,7 @@ Specifies the zone equipment simulation order when the zone thermostat requests 
 
 Specifies the fraction of the remaining cooling load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad. 
 
-\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Heating or No-Load Fraction}\label{field-zone-equipment-x-sequential-heating-fraction}
+\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Heating Fraction}\label{field-zone-equipment-x-sequential-heating-fraction}
 
 Specifies the fraction of the remaining heating load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad.
 
