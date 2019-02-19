@@ -159,6 +159,7 @@ namespace DataGlobals {
     int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
     int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
     int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 

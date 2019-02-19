@@ -352,6 +352,7 @@ namespace HeatBalanceManager {
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
