@@ -4442,7 +4442,13 @@ Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Ph
 
 Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simulation Program. M.S. Thesis. Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
 
+\textbf{HeatPump:WaterToWater:EIR:Cooling}
+
+\textbf{HeatPump:WaterToWater:EIR:Heating}
+
 Beginning with version 9.1, an EIR-formulated water-to-water heat pump model was added.  This formulation allows the user to enter curves for specifying the capacity and energy usage in a more generic way, allowing the curves to be applicable to a wide variety of components.  With the original equation fit model, the curve form was locked in to a specific set of linear coefficients.  With the new form, the curve can be a quadratic function of temperatures, or an even more generic lookup table.
+
+\textbf{Configuration}
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
@@ -5075,19 +5081,19 @@ This optional alpha field contains the name of a companion heat pump object.  If
 
 \paragraph{Field: Load Side Reference Flow Rate}\label{wwhp_eir_inputs_load_side_flow}
 
-This autosizable field defines the reference load side flow rate for the coil.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
+This autosizable field defines the reference load side flow rate for the heat pump.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
 
 \paragraph{Field: Source Side Reference Flow Rate}\label{wwhp_eir_inputs_source_side_flow}
 
-This autosizable field defines the reference demand side flow rate for the coil.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
+This autosizable field defines the reference source side side flow rate for the heat pump.  This field is used as the nominal flow request for this heat pump unit during the simulation.  The units for this field are [m3/s].
 
 \paragraph{Field: Reference Capacity}\label{wwhp_eir_inputs_reference_capacity}
 
-This autosizable field defines the reference load side heat capacity for the coil.  Cooling capacity for a cooling coil and heating capacity for a heating coil.  The units for this field are [W].
+This autosizable field defines the reference load side heat capacity for the heat pump.  Cooling capacity for a cooling companion heat pump and heating capacity for a heating companion heat pump.  The units for this field are [W].
 
 \paragraph{Field: Reference Coefficient of Performance}\label{wwhp_eir_inputs_reference_cop}
 
-This field contains the reference COP for this unit, which is used when calculating the power required for the coil under simulation conditions.  The COP is defined as the load side energy transfer divided by the power input, with dimensionless units of [W/W].
+This field contains the reference COP for this unit, which is used when calculating the power required for the heat pump under simulation conditions.  The COP is defined as the load side energy transfer divided by the power input, with dimensionless units of [W/W].
 
 \paragraph{Field: Sizing Factor}\label{wwhp_eir_inputs_sizing_factor}
 
@@ -5095,15 +5101,15 @@ This field allows the user to scale the sizing of this unit compared to the plan
 
 \paragraph{Field: Capacity Modifier Function of Temperature Curve Name}\label{wwhp_eir_inputs_capft}
 
-This field is the name of a bivariate curve that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the source side inlet temperature.
+This field is the name of a bivariate curve or table that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the source side inlet temperature.  The temperatures are in degrees Celsius when used in the function and the output of the function is multiplied by the reference capacity to get a current available capacity.
 
 \paragraph{Field: Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{wwhp_eir_inputs_eirft}
 
-This field is the name of a bivariate curve that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the source side inlet temperature.
+This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the source side inlet temperature.  The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR .
 
 \paragraph{Field: Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name}\label{wwhp_eir_inputs_eirfplr}
 
-This field is the name of a univariate curve that defines an EIR modifier as a function of the current part load ratio.
+This field is the name of a univariate curve or table that defines an EIR modifier as a function of the current part load ratio.  The output of this function and the output of the EIR Modifier Function of Temperature are multiplied by the reference EIR to get a current EIR .
 
 An idf example:
 
