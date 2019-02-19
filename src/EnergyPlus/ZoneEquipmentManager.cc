@@ -4694,7 +4694,9 @@ namespace ZoneEquipmentManager {
 
                 for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
 
-                    if (AirflowNetworkNumOfExhFan == 0) ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
+                        ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+                    }
                 }
 
                 // Include zone mixing mass flow rate
