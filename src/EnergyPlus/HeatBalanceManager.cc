@@ -5021,7 +5021,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataDaylighting::ZoneDaylight;
-        using HybridModel::FlagHybridModel;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5137,15 +5136,6 @@ namespace HeatBalanceManager {
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
         SetupOutputVariable(
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
-
-        if (FlagHybridModel) {
-            SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
-                                OutputProcessor::Unit::ach,
-                                Zone(ZoneLoop).InfilOAAirChangeRateHM,
-                                "Zone",
-                                "Average",
-                                Zone(ZoneLoop).Name);
-        }
     }
 
     // End of Get Input subroutines for the HB Module
@@ -5407,6 +5397,7 @@ namespace HeatBalanceManager {
         ZoneInfiltrationFlag.dimension(NumOfZones, false);
         ZoneReOrder = 0;
         ZoneLatentGain.dimension(NumOfZones, 0.0);
+        ZoneLatentGainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
         OAMFL.dimension(NumOfZones, 0.0);
         VAMFL.dimension(NumOfZones, 0.0);
         ZTAV.dimension(NumOfZones, 23.0);

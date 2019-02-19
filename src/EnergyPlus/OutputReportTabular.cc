@@ -10809,7 +10809,7 @@ namespace OutputReportTabular {
             }
 
             //---- Hybrid Model: Internal Thermal Mass Sub-Table
-            if (FlagHybridModel) {
+            if (FlagHybridModel_TM) {
                 rowHead.allocate(NumOfZones);
                 NumOfCol = 2;
                 columnHead.allocate(NumOfCol);
@@ -10825,7 +10825,7 @@ namespace OutputReportTabular {
 
                 for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                     rowHead(iZone) = Zone(iZone).Name;
-                    if (HybridModelZone(iZone).InternalThermalMassCalc) {
+                    if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
                         tableBody(1, iZone) = "Yes";
                     } else {
                         tableBody(1, iZone) = "No";
