@@ -551,6 +551,7 @@ namespace EMSManager {
         using DataGlobals::emsCallFromBeforeHVACManagers;
         using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
+        using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
         using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
         using DataGlobals::emsCallFromComponentGetInput;
         using DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
@@ -951,6 +952,8 @@ namespace EMSManager {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
                     } else if (SELECT_CASE_var == "BEGINTIMESTEPBEFOREPREDICTOR") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginTimestepBeforePredictor;
                     } else if (SELECT_CASE_var == "AFTERPREDICTORBEFOREHVACMANAGERS") {

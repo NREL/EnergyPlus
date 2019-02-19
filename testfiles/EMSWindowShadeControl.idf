@@ -1298,7 +1298,7 @@
 
   EnergyManagementSystem:ProgramCallingManager,
     Window Shading Device EMS Controller,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
+    BeginZoneTimestepBeforeInitHeatBalance,  !- EnergyPlus Model Calling Point
     Set_Shade_Control_State; !- Program Name 1
 
   EnergyManagementSystem:Actuator,
