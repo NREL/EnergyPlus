@@ -6014,7 +6014,7 @@
 
   EnergyManagementSystem:ProgramCallingManager,
     My thermochromic window emulator,  !- Name
-    BeginZoneTimestepBeforeInitHeatBalance,  !- EnergyPlus Model Calling Point
+    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     ZN_1_wall_south_Window_1_Control;  !- Program Name 1
 
   EnergyManagementSystem:Program,
