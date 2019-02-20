@@ -1316,9 +1316,6 @@ namespace ZoneContaminantPredictorCorrector {
 
         } // ContControlledZoneNum
 
-        // Get the Hybrid Model setting inputs
-        GetHybridModelZone();
-
         if (ErrorsFound) {
             ShowFatalError("Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination.");
         }
