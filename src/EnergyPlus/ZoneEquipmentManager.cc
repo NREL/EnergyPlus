@@ -4560,7 +4560,7 @@ namespace ZoneEquipmentManager {
                         moisture.SequencedOutputRequiredToHumidSP(nextSystem) = moisture.RemainingOutputReqToHumidSP;
                         energy.RemainingOutputReqToCoolSP = coolingLoadFrac * energy.UnadjRemainingOutputReqToCoolSP;
                         energy.SequencedOutputRequiredToCoolingSP(nextSystem) = energy.RemainingOutputReqToCoolSP;
-                        energy.RemainingOutputReqToCoolSP = coolingLoadFrac * energy.UnadjRemainingOutputReqToCoolSP;
+                        moisture.RemainingOutputReqToDehumidSP = coolingLoadFrac * moisture.UnadjRemainingOutputReqToDehumidSP;
                         moisture.SequencedOutputRequiredToDehumidSP(nextSystem) = moisture.RemainingOutputReqToDehumidSP;
                     }
                 } else {
