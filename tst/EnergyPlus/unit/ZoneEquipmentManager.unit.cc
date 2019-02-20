@@ -1916,12 +1916,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool firstHVACIteration = true;
     InitSystemOutputRequired(ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired * 0.6);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(4), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP * 0.6);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(4), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
@@ -1966,12 +1966,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Expect next sequenced load fractions to be applied here on the first and second equipments
     Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
-    Real64 expectedCoolLoad = energy.UnadjRemainingOutputReqToCoolSP * 0.5;
+    Real64 expectedCoolLoad = energy.UnadjRemainingOutputReqToCoolSP;
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(2), expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(2), expectedHeatLoad);
-    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP * 0.4);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(2), expectedCoolLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputRequired, expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToHeatSP, expectedHeatLoad);
