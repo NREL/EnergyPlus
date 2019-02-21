@@ -398,6 +398,8 @@ namespace DataZoneEquipment {
         std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
+        Array1D<Real64> SequentialCoolingFraction;
+        Array1D<Real64> SequentialHeatingFraction;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]
         Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
         Array1D<EquipmentData> EquipData; // Index of energy output report data

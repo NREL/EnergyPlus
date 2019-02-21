@@ -12,4 +12,9 @@ Old field F5 (A5) shifts down to F6 (A6) 'Zone Measured Air Temperature Schedule
 Insert 10 new fields, new F7-F16, all blank.
 Shift all later fields down by 11. The old input fields F6-F9 (N1-N4) become the new F17-F20.
 
+# Object Change: `ZoneHVAC:EquipmentList`
+
+Fields F1-F2 remain the same.
+Each extensible block has 2 numeric fields added to the end of it, making the extensible block 6 items long instead of 4. 
+The additional fields can be left empty. 
 

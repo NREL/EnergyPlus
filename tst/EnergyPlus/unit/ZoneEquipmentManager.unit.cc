@@ -98,7 +98,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
         " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
         " Exhaust Fan,              !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
-        " 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
 
         "Fan:ZoneExhaust,",
         "Exhaust Fan,               !- Name",
@@ -465,7 +467,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
         " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
         " Exhaust Fan,              !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
-        " 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
 
         "Fan:ZoneExhaust,",
         "Exhaust Fan,               !- Name",
@@ -603,7 +607,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
         " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
         " Exhaust Fan,              !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
-        " 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
 
         "Fan:ZoneExhaust,",
         "Exhaust Fan,               !- Name",
@@ -856,14 +862,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
         " 2,                        !- Zone Equipment 2 Cooling Sequence",
         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
         " 3,                        !- Zone Equipment 3 Cooling Sequence",
-        " 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         " Air Terminal 1 ADU,       !- Name",
@@ -1030,14 +1042,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
         " 2,                        !- Zone Equipment 2 Cooling Sequence",
         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
         " 0,                        !- Zone Equipment 3 Cooling Sequence",
-        " 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         " Air Terminal 1 ADU,       !- Name",
@@ -1212,14 +1230,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
         " 2,                        !- Zone Equipment 2 Cooling Sequence",
         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
         " 0,                        !- Zone Equipment 3 Cooling Sequence",
-        " 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         " Air Terminal 1 ADU,       !- Name",
@@ -1426,14 +1450,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
         " 2,                        !- Zone Equipment 2 Cooling Sequence",
         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
         " 0,                        !- Zone Equipment 3 Cooling Sequence",
-        " 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         " Air Terminal 1 ADU,       !- Name",
@@ -1737,18 +1767,26 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
         " 1,                        !- Zone Equipment 1 Cooling Sequence",
         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:IdealLoadsAirSystem,",
         " Ideal System A,           !- Name",
         " 2,                        !- Zone Equipment 2 Cooling Sequence",
         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
         " 3,                        !- Zone Equipment 3 Cooling Sequence",
         " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+        " ,                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
         " ZoneHVAC:IdealLoadsAirSystem,",
         " Ideal System B,           !- Name",
         " 4,                        !- Zone Equipment 4 Cooling Sequence",
-        " 4;                        !- Zone Equipment 4 Heating or No-Load Sequence",
+        " 4,                        !- Zone Equipment 4 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 4 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 4 Sequential Heating or No-Load Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         " Air Terminal 1 ADU,       !- Name",
@@ -1908,3 +1946,198 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
 }
 
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEquip_WithFractions)
+{
+
+    std::string const idf_objects = delimited_string({
+         " Version,9.0;",
+
+         "Zone,",
+         "  Space;                   !- Name",
+
+         "ZoneHVAC:EquipmentConnections,",
+         " Space,                    !- Zone Name",
+         " Space Equipment,          !- Zone Conditioning Equipment List Name",
+         " Space Inlet Nodes,        !- Zone Air Inlet Node or NodeList Name",
+         " Space Exhaust Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+         " Space Node,               !- Zone Air Node Name",
+         " Space Ret Node;           !- Zone Return Air Node Name",
+
+         "ZoneHVAC:EquipmentList,",
+         " Space Equipment,          !- Name",
+         " SequentialLoad,           !- Load Distribution Scheme",
+         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+         " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
+         " 1,                        !- Zone Equipment 1 Cooling Sequence",
+         " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+         " 0.3,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+         " 0.4,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+         " ZoneHVAC:IdealLoadsAirSystem,",
+         " Ideal System A,           !- Name",
+         " 2,                        !- Zone Equipment 2 Cooling Sequence",
+         " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+         " 0.5,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+         " 0.6,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
+         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+         " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
+         " 3,                        !- Zone Equipment 3 Cooling Sequence",
+         " 3,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+         " ,                         !- Zone Equipment 3 Sequential Cooling Fraction",
+         " ,                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction",
+         " ZoneHVAC:IdealLoadsAirSystem,",
+         " Ideal System B,           !- Name",
+         " 4,                        !- Zone Equipment 4 Cooling Sequence",
+         " 4,                        !- Zone Equipment 4 Heating or No-Load Sequence",
+         " ,                         !- Zone Equipment 4 Sequential Cooling Fraction",
+         " ;                         !- Zone Equipment 4 Sequential Heating or No-Load Fraction",
+
+         "ZoneHVAC:AirDistributionUnit,",
+         " Air Terminal 1 ADU,       !- Name",
+         " Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+         " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+         " Air Terminal 1;           !- Air Terminal Name",
+
+         "ZoneHVAC:IdealLoadsAirSystem,",
+         " Ideal System A,           !- Name",
+         " ,                         !- Availability Schedule Name",
+         " Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
+         " Zone Equip Exhaust 2;     !- Zone Exhaust Air Node Name",
+
+         "ZoneHVAC:AirDistributionUnit,",
+         " Air Terminal 3 ADU,       !- Name",
+         " Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+         " AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+         " Air Terminal 3;           !- Air Terminal Name",
+
+         "ZoneHVAC:IdealLoadsAirSystem,",
+         " Ideal System B,           !- Name",
+         " ,                         !- Availability Schedule Name",
+         " Zone Equip Inlet 4,       !- Zone Supply Air Node Name",
+         " Zone Equip Exhaust 4;     !- Zone Exhaust Air Node Name",
+
+         "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+         " Air Terminal 1,          !- Name",
+         " ,    !- Availability Schedule Name",
+         " Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+         " Zone Equip Inlet 1,      !- Air Outlet Node Name",
+         " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+         "AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+         " Air Terminal 3,          !- Name",
+         " ,                        !- Availability Schedule Name",
+         " Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+         " Zone Equip Inlet 3,      !- Air Outlet Node Name",
+         " 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+         "NodeList,",
+         "  Space Inlet Nodes,       !- Name",
+         "  Zone Equip Inlet 1,      !- Node 1 Name",
+         "  Zone Equip Inlet 2,      !- Node 2 Name",
+         "  Zone Equip Inlet 3,      !- Node 3 Name",
+         "  Zone Equip Inlet 4;      !- Node 4 Name",
+
+         "NodeList,",
+         "  Space Exhaust Nodes,       !- Name",
+         "  Zone Equip Exhaust 2,      !- Node 1 Name",
+         "  Zone Equip Exhaust 4;      !- Node 2 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    bool ErrorsFound = false;
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
+    ZoneEquipInputsFilled = true;
+    int ZoneNum = 1;
+    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
+    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
+    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
+    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    DataHeatBalFanSys::TempControlType.allocate(1);
+    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    int NumEquip = 4;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
+    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
+    ZoneEquipmentManager::DefaultSimOrder.allocate(NumEquip);
+
+    // Sequential Test 1 - Heating, FirstHVACIteration = true
+    energy.TotalOutputRequired = 1000.0;
+    energy.OutputRequiredToHeatingSP = 1000.0;
+    energy.OutputRequiredToCoolingSP = 2000.0;
+    bool firstHVACIteration = true;
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired * 0.6);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
+    EXPECT_EQ(energy.SequencedOutputRequired(4), energy.TotalOutputRequired);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP * 0.6);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(4), energy.OutputRequiredToHeatingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(4), energy.OutputRequiredToCoolingSP);
+
+    // Check sequenced load processing for unitary systems
+    // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int coolingPriority = 0;
+    int heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 1);
+    EXPECT_EQ(heatingPriority, 1);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 1);
+    zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    coolingPriority = 0;
+    heatingPriority = 0;
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    EXPECT_EQ(coolingPriority, 3);
+    EXPECT_EQ(heatingPriority, 3);
+    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    EXPECT_EQ(DataHVACGlobals::MinAirLoopIterationsAfterFirst, 3);
+
+    // Sequential Test 2 - Heating, FirstHVACIteration = false
+    firstHVACIteration = false;
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    SetZoneEquipSimOrder(ZoneNum, ZoneNum);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    // Equipment 1 provides 100W of heating
+    Real64 SysOutputProvided = 100.0;
+    Real64 LatOutputProvided = 0.0;
+    int EquipNum = 1;
+    UpdateSystemOutputRequired(ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+
+    // Expect next sequenced load fractions to be applied here on the first and second equipments
+    Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
+    Real64 expectedCoolLoad = energy.UnadjRemainingOutputReqToCoolSP;
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(2), expectedHeatLoad);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(2), expectedHeatLoad);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(2), expectedCoolLoad);
+    EXPECT_DOUBLE_EQ(energy.RemainingOutputRequired, expectedHeatLoad);
+    EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToHeatSP, expectedHeatLoad);
+    EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToCoolSP, expectedCoolLoad);
+
+}
