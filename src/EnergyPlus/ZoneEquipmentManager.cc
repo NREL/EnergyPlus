@@ -189,8 +189,6 @@ namespace ZoneEquipmentManager {
         bool InitZoneEquipmentOneTimeFlag(true);
         bool InitZoneEquipmentEnvrnFlag(true);
         bool FirstPassZoneEquipFlag(true); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
-        bool AllocateFlag(true);
-        Array1D_bool fixedReturn;
     }                                      // namespace
 
     Array1D<Real64> AvgData; // scratch array for storing averaged data
@@ -217,8 +215,6 @@ namespace ZoneEquipmentManager {
         PrioritySimOrder.deallocate();
         FirstPassZoneEquipFlag = true;
         reportDOASZoneSizingHeader = true;
-        AllocateFlag = true;
-        fixedReturn.deallocate();
     }
 
     void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir)
@@ -4975,22 +4971,12 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
-        if (AllocateFlag) {
-            AllocateFlag = false;
-            int maxReturnNodes = 0;
-            for (auto & z : ZoneEquipConfig) {
-                maxReturnNodes = max(maxReturnNodes, z.NumReturnNodes);
-            }
-            fixedReturn.allocate(maxReturnNodes);
-        }
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
         Real64 totVarReturnFlow = 0.0; // Total variable return flow, for return nodes connected to an airloop with an OA system or not with specified flow (kg/s)
         Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(thisZoneEquip.ReturnFlowSchedPtrNum);
-//        Array1D_bool fixedReturn; // If true, this return flow may not be adjusted
-//        fixedReturn.allocate(numRetNodes);
-        fixedReturn = false;
+        thisZoneEquip.FixedReturnFlow = false;
         FinalTotalReturnMassFlow = 0.0;
         thisZoneEquip.TotAvailAirLoopOA = 0.0;
 
@@ -5043,7 +5029,7 @@ namespace ZoneEquipmentManager {
                     } else {
                         // Set return flow to matching inlet node flow
                         returnNodeMassFlow = inletMassFlow;
-                        fixedReturn(returnNum) = true;
+                        thisZoneEquip.FixedReturnFlow(returnNum) = true;
                     }
                 } else {
                     returnNodeMassFlow = 0.0;
@@ -5068,10 +5054,10 @@ namespace ZoneEquipmentManager {
                                 basisNodesMassFlow += DataLoopNode::Node(thisZoneEquip.ReturnFlowBasisNode(nodeNum)).MassFlowRate;
                             }
                             returnNodeMassFlow = max(0.0, (basisNodesMassFlow * returnSchedFrac));
-                            fixedReturn(returnNum) = true;
+                            thisZoneEquip.FixedReturnFlow(returnNum) = true;
                         } else {
                             // If only 1 return node, use the standard return mass flow
-                            if ((numRetNodes == 1) && !fixedReturn(returnNum))  {
+                            if ((numRetNodes == 1) && !thisZoneEquip.FixedReturnFlow(returnNum))  {
                                 returnNodeMassFlow = max(0.0, (ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac));
                             }
                         }
@@ -5080,7 +5066,7 @@ namespace ZoneEquipmentManager {
                 totReturnFlow += returnNodeMassFlow;
                 retNodeData.MassFlowRate = returnNodeMassFlow;
                 retNodeData.MassFlowRateMinAvail = 0.0;
-                if (!fixedReturn(returnNum)) totVarReturnFlow += returnNodeMassFlow;
+                if (!thisZoneEquip.FixedReturnFlow(returnNum)) totVarReturnFlow += returnNodeMassFlow;
             }
         }
 
@@ -5092,7 +5078,7 @@ namespace ZoneEquipmentManager {
                 int retNode = thisZoneEquip.ReturnNode(returnNum);
                 Real64 curReturnFlow = DataLoopNode::Node(retNode).MassFlowRate;
                 if (retNode > 0) {
-                    if (!fixedReturn(returnNum)) {
+                    if (!thisZoneEquip.FixedReturnFlow(returnNum)) {
                         newReturnFlow = curReturnFlow * returnAdjFactor;
                         FinalTotalReturnMassFlow += newReturnFlow;
                         DataLoopNode::Node(retNode).MassFlowRate = newReturnFlow;

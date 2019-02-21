@@ -303,6 +303,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+        Array1D_bool FixedReturnFlow;     // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
         Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 
