@@ -486,6 +486,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
     ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
@@ -512,6 +513,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 8;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
     ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
@@ -1223,6 +1225,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataHeatBalance::TempEffBulkAir.allocate(6);
 

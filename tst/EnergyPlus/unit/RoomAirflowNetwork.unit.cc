@@ -252,6 +252,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
     ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
     ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Zone(ZoneNum).Volume = 100;
     Zone(ZoneNum).IsControlled = true;
