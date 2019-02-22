@@ -288,13 +288,13 @@ namespace PlantPipingSystemsManager {
             thisDomain.Cur.CurSimTimeSeconds = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * SecInHour;
 
             // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
-            if ((BeginSimFlag && thisDomain.BeginSimInit) || (BeginEnvrnFlag && thisDomain.BeginSimEnvrn)) {
+            if ((BeginSimFlag && thisDomain.BeginSimInit) || (BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
                 DoOneTimeInitializations(DomainNum, _);
 
                 if (thisDomain.HasZoneCoupledSlab) {
                     int Xmax = ubound(thisDomain.Cells, 1);
-                    // int Ymax = ubound( thisDomain.Cells, 2 );
+                    // int yMax = ubound( thisDomain.Cells, 2 );
                     int Zmax = ubound(thisDomain.Cells, 3);
 
                     thisDomain.WeightingFactor.allocate({0, Xmax}, {0, Zmax});
@@ -302,10 +302,10 @@ namespace PlantPipingSystemsManager {
                 }
 
                 thisDomain.BeginSimInit = false;
-                thisDomain.BeginSimEnvrn = false;
+                thisDomain.BeginSimEnvironment = false;
             }
             if (!BeginSimFlag) thisDomain.BeginSimInit = true;
-            if (!BeginEnvrnFlag) thisDomain.BeginSimEnvrn = true;
+            if (!BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
 
             // Reset the heat fluxes if domain update has been completed
             if (thisDomain.ResetHeatFluxFlag) {
@@ -368,14 +368,14 @@ namespace PlantPipingSystemsManager {
                     ZoneTemp = ZoneTemp / (SurfCtr - 1);
                     Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(CellType::ZoneGroundInterface);
 
-                    int Ymax = ubound(thisDomain.Cells, 2);
+                    int yMax = ubound(thisDomain.Cells, 2);
 
                     for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
                         for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
                             // Zone interface cells
-                            if (thisDomain.Cells(X, Ymax, Z).cellType == CellType::ZoneGroundInterface) {
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
                                 thisDomain.WeightingFactor(X, Z) =
-                                    abs((ZoneTemp - thisDomain.Cells(X, Ymax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
+                                    abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
                             }
                         }
                     }
@@ -384,7 +384,7 @@ namespace PlantPipingSystemsManager {
                     for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
                         for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
                             // Zone interface cells
-                            if (thisDomain.Cells(X, Ymax, Z).cellType == CellType::ZoneGroundInterface) {
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
                                 thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightingFactor(X, Z) * thisDomain.HeatFlux;
                             }
                         }
@@ -398,8 +398,8 @@ namespace PlantPipingSystemsManager {
                     for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
                         for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
                             // Zone interface cells
-                            if (thisDomain.Cells(X, Ymax, Z).cellType == CellType::ZoneGroundInterface) {
-                                auto &cell(thisDomain.Cells(X, Ymax, Z));
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                auto &cell(thisDomain.Cells(X, yMax, Z));
                                 thisDomain.TotalEnergyWeightedHeatFlux +=
                                     thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
                             }
@@ -413,8 +413,8 @@ namespace PlantPipingSystemsManager {
                     for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
                         for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
                             // Zone interface cells
-                            if (thisDomain.Cells(X, Ymax, Z).cellType == CellType::ZoneGroundInterface) {
-                                auto &cell(thisDomain.Cells(X, Ymax, Z));
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                auto &cell(thisDomain.Cells(X, yMax, Z));
                                 thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightedHeatFlux(X, Z) / thisDomain.HeatFluxWeightingFactor;
                                 thisDomain.TotalEnergyWeightedHeatFlux +=
                                     thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
@@ -472,12 +472,10 @@ namespace PlantPipingSystemsManager {
         int NumZoneCoupledDomains;
         int NumBasements;
         int PipeCtr;
-        int CircuitCtr;
         int CircuitIndex;
         int ThisSegmentIndex;
         int NumPipeCircuits;
         int NumPipeSegmentsInInput;
-        int NumCircuitsInThisDomain;
         int NumHorizontalTrenches;
         int NumSegmentsInHorizontalTrenches;
         int DomainNum;
@@ -528,7 +526,7 @@ namespace PlantPipingSystemsManager {
         SetupPipingSystemOutputVariables(TotalNumSegments, TotalNumCircuits);
 
         // Validate CIRCUIT-SEGMENT cross references
-        for (CircuitCtr = PipingSystemCircuits.l1(); CircuitCtr <= PipingSystemCircuits.u1(); ++CircuitCtr) {
+        for (int CircuitCtr = PipingSystemCircuits.l1(); CircuitCtr <= PipingSystemCircuits.u1(); ++CircuitCtr) {
 
             // validate circuit-segment name-to-index references
             for (ThisCircuitPipeSegmentCounter = PipingSystemCircuits(CircuitCtr).PipeSegmentNames.l1();
@@ -538,12 +536,11 @@ namespace PlantPipingSystemsManager {
                 ThisSegmentName = PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter);
                 ThisSegmentIndex = UtilityRoutines::FindItemInList(ThisSegmentName, PipingSystemSegments);
                 if (ThisSegmentIndex > 0) {
-                    PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(ThisCircuitPipeSegmentCounter) = ThisSegmentIndex;
-                    PipingSystemSegments(ThisSegmentIndex).ParentCircuitIndex = CircuitCtr;
+                    PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(ThisCircuitPipeSegmentCounter) = ThisSegmentIndex;
                 } else {
-                    ShowSevereError(RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' +
-                                    PipingSystemCircuits(CircuitCtr).Name);
-                    ShowContinueError(RoutineName + ": Looking for: " + ObjName_Segment + '=' + ThisSegmentName);
+                    ShowSevereError(RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' + PipingSystemCircuits(CircuitCtr).Name);  // NOLINT(performance-inefficient-string-concatenation)
+
+                    ShowContinueError(RoutineName + ": Looking for: " + ObjName_Segment + '=' + ThisSegmentName); // NOLINT(performance-inefficient-string-concatenation)
                     ErrorsFound = true;
                 }
 
@@ -555,55 +552,55 @@ namespace PlantPipingSystemsManager {
         for (DomainNum = 1; DomainNum <= TotalNumDomains; ++DomainNum) {
 
             // Convenience
-            NumCircuitsInThisDomain = size(PipingSystemDomains(DomainNum).CircuitNames);
+            int const NumCircuitsInThisDomain = static_cast<int>(size(PipingSystemDomains(DomainNum).CircuitNames));
 
             // validate pipe domain-circuit name-to-index references
-            for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
+            for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CircuitIndex = UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).CircuitNames(CircuitCtr), PipingSystemCircuits);
-                PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr) = CircuitIndex;
+                PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr) = CircuitIndex;
                 PipingSystemCircuits(CircuitIndex).ParentDomainIndex = DomainNum;
             }
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
-            for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr);
-                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+            for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
+                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
+                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
+                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
                      ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
+                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
                     PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y =
-                        PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y;
+                        PipingSystemDomains(DomainNum).Extents.yMax - PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y;
                 } // segment loop
             }     // circuit loop
 
             // correct segment locations for: BASEMENT X SHIFT
             if (PipingSystemDomains(DomainNum).HasBasement && PipingSystemDomains(DomainNum).BasementZone.ShiftPipesByWidth) {
-                for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr);
-                    for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                         PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
+                    CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
+                    for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
+                         PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
                          ++PipeCtr) {
-                        ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
+                        ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
                         PipingSystemSegments(ThisSegmentIndex).PipeLocation.X += PipingSystemDomains(DomainNum).BasementZone.Width;
                     } // segment loop
                 }     // circuit loop
             }
 
             // now we will have good values of pipe segment locations, we can validate them
-            for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
+            for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
 
                 // retrieve the index
-                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr);
+                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
 
                 // check to make sure it isn't outside the domain
-                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
+                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
                      ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
-                    if ((PipingSystemSegments(ThisSegmentIndex).PipeLocation.X > PipingSystemDomains(DomainNum).Extents.Xmax) ||
+                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
+                    if ((PipingSystemSegments(ThisSegmentIndex).PipeLocation.X > PipingSystemDomains(DomainNum).Extents.xMax) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.X < 0.0) ||
-                        (PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y > PipingSystemDomains(DomainNum).Extents.Ymax) ||
+                        (PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y > PipingSystemDomains(DomainNum).Extents.yMax) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y < 0.0)) {
                         ShowSevereError(
                             "PipingSystems::" + RoutineName +
@@ -637,9 +634,6 @@ namespace PlantPipingSystemsManager {
         // Using/Aliasing
         using namespace DataIPShortCuts;
 
-        // Return value
-        int Total;
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int HorizontalCtr;
         int NumPipesInThisHorizontal;
@@ -647,7 +641,7 @@ namespace PlantPipingSystemsManager {
         int NumNumbers;
         int IOStatus;
 
-        Total = 0;
+        int Total = 0;
 
         for (HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr) {
 
@@ -664,7 +658,7 @@ namespace PlantPipingSystemsManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            NumPipesInThisHorizontal = rNumericArgs(3);
+            NumPipesInThisHorizontal = static_cast<int> (rNumericArgs(3));
 
             Total += NumPipesInThisHorizontal;
         }
@@ -720,12 +714,12 @@ namespace PlantPipingSystemsManager {
             PipingSystemDomains(DomainNum).Name = cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             // Mesh extents, validated by IP
-            PipingSystemDomains(DomainNum).Extents.Xmax = rNumericArgs(1);
-            PipingSystemDomains(DomainNum).Extents.Ymax = rNumericArgs(2);
-            PipingSystemDomains(DomainNum).Extents.Zmax = rNumericArgs(3);
+            PipingSystemDomains(DomainNum).Extents.xMax = rNumericArgs(1);
+            PipingSystemDomains(DomainNum).Extents.yMax = rNumericArgs(2);
+            PipingSystemDomains(DomainNum).Extents.zMax = rNumericArgs(3);
 
             // X direction mesh inputs, validated by IP
-            PipingSystemDomains(DomainNum).Mesh.X.RegionMeshCount = rNumericArgs(4);
+            PipingSystemDomains(DomainNum).Mesh.X.RegionMeshCount = static_cast<int>(rNumericArgs(4));
             {
                 auto const meshDistribution(uppercased(cAlphaArgs(2)));
                 if (meshDistribution == "UNIFORM") {
@@ -754,7 +748,7 @@ namespace PlantPipingSystemsManager {
             }
 
             // Y direction mesh inputs, validated by IP
-            PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount = rNumericArgs(6);
+            PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount = static_cast<int>(rNumericArgs(6));
             {
                 auto const meshDistribution(stripped(cAlphaArgs(3)));
                 if (meshDistribution == "UNIFORM") {
@@ -783,7 +777,7 @@ namespace PlantPipingSystemsManager {
             }
 
             // Z direction mesh inputs, validated by IP
-            PipingSystemDomains(DomainNum).Mesh.Z.RegionMeshCount = rNumericArgs(8);
+            PipingSystemDomains(DomainNum).Mesh.Z.RegionMeshCount = static_cast<int>(rNumericArgs(8));
             {
                 auto const meshDistribution(stripped(cAlphaArgs(4)));
                 if (meshDistribution == "UNIFORM") {
@@ -951,7 +945,7 @@ namespace PlantPipingSystemsManager {
 
             // get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
             PipingSystemDomains(DomainNum).SimControls.Convergence_CurrentToPrevIteration = rNumericArgs(17);
-            PipingSystemDomains(DomainNum).SimControls.MaxIterationsPerTS = rNumericArgs(18);
+            PipingSystemDomains(DomainNum).SimControls.MaxIterationsPerTS = static_cast<int>(rNumericArgs(18));
 
             // additional evapotranspiration parameter, min/max validated by IP
             PipingSystemDomains(DomainNum).Moisture.GroundCoverCoefficient = rNumericArgs(19);
@@ -959,7 +953,7 @@ namespace PlantPipingSystemsManager {
             // Allocate the circuit placeholder arrays
             NumCircuitsInThisDomain = int(rNumericArgs(20));
             PipingSystemDomains(DomainNum).CircuitNames.allocate(NumCircuitsInThisDomain);
-            PipingSystemDomains(DomainNum).CircuitIndeces.allocate(NumCircuitsInThisDomain);
+            PipingSystemDomains(DomainNum).CircuitIndices.allocate(NumCircuitsInThisDomain);
 
             // Check for blank or missing or mismatched number...
             NumAlphasBeforePipeCircOne = 10;
@@ -1205,7 +1199,7 @@ namespace PlantPipingSystemsManager {
 
             // Set simulation interval flag
             if (UtilityRoutines::SameString(cAlphaArgs(12), "TIMESTEP")) {
-                PipingSystemDomains(DomainCtr).SimTimestepFlag = true;
+                PipingSystemDomains(DomainCtr).SimTimeStepFlag = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(12), "HOURLY")) {
                 PipingSystemDomains(DomainCtr).SimHourlyFlag = true;
             } else {
@@ -1282,9 +1276,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // Set ground domain dimensions
-            PipingSystemDomains(DomainCtr).Extents.Xmax = Domain(ZoneCoupledDomainCtr).PerimeterOffset + PipingSystemDomains(DomainCtr).SlabWidth / 2;
-            PipingSystemDomains(DomainCtr).Extents.Ymax = Domain(ZoneCoupledDomainCtr).Depth;
-            PipingSystemDomains(DomainCtr).Extents.Zmax =
+            PipingSystemDomains(DomainCtr).Extents.xMax = Domain(ZoneCoupledDomainCtr).PerimeterOffset + PipingSystemDomains(DomainCtr).SlabWidth / 2;
+            PipingSystemDomains(DomainCtr).Extents.yMax = Domain(ZoneCoupledDomainCtr).Depth;
+            PipingSystemDomains(DomainCtr).Extents.zMax =
                 Domain(ZoneCoupledDomainCtr).PerimeterOffset + PipingSystemDomains(DomainCtr).SlabLength / 2;
 
             // Get mesh parameters
@@ -1300,7 +1294,7 @@ namespace PlantPipingSystemsManager {
             PipingSystemDomains(DomainCtr).Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
             PipingSystemDomains(DomainCtr).Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-            int MeshCount = rNumericArgs(13);
+            int MeshCount = static_cast<int>(rNumericArgs(13));
             if (MeshCount == 0.0) MeshCount = 6;
             PipingSystemDomains(DomainCtr).Mesh.X.RegionMeshCount = MeshCount;
             PipingSystemDomains(DomainCtr).Mesh.Y.RegionMeshCount = MeshCount;
@@ -1530,7 +1524,7 @@ namespace PlantPipingSystemsManager {
             if (lNumericFieldBlanks(13)) {
                 meshCount = 4;
             } else {
-                meshCount = rNumericArgs(13);
+                meshCount = static_cast<int>(rNumericArgs(13));
             }
             PipingSystemDomains(DomainNum).Mesh.X.RegionMeshCount = meshCount;
             PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount = meshCount;
@@ -1638,7 +1632,7 @@ namespace PlantPipingSystemsManager {
 
             // Set simulation interval flag
             if (UtilityRoutines::SameString(cAlphaArgs(11), "TIMESTEP")) {
-                PipingSystemDomains(DomainNum).SimTimestepFlag = true;
+                PipingSystemDomains(DomainNum).SimTimeStepFlag = true;
             } else if (UtilityRoutines::SameString(cAlphaArgs(11), "HOURLY")) {
                 PipingSystemDomains(DomainNum).SimHourlyFlag = true;
             } else {
@@ -1666,9 +1660,9 @@ namespace PlantPipingSystemsManager {
 
             // Set ground domain dimensions
             // get width and length from aspect ratio later
-            PipingSystemDomains(DomainNum).Extents.Xmax = Domain(BasementCtr).PerimeterOffset + PipingSystemDomains(DomainNum).BasementZone.Width / 2;
-            PipingSystemDomains(DomainNum).Extents.Ymax = Domain(BasementCtr).Depth;
-            PipingSystemDomains(DomainNum).Extents.Zmax =
+            PipingSystemDomains(DomainNum).Extents.xMax = Domain(BasementCtr).PerimeterOffset + PipingSystemDomains(DomainNum).BasementZone.Width / 2;
+            PipingSystemDomains(DomainNum).Extents.yMax = Domain(BasementCtr).Depth;
+            PipingSystemDomains(DomainNum).Extents.zMax =
                 Domain(BasementCtr).PerimeterOffset + PipingSystemDomains(DomainNum).BasementZone.Length / 2;
 
             // Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical
@@ -1791,16 +1785,16 @@ namespace PlantPipingSystemsManager {
 
             // Convergence tolerance values, validated by IP
             PipingSystemCircuits(PipeCircuitCounter).Convergence_CurrentToPrevIteration = rNumericArgs(7);
-            PipingSystemCircuits(PipeCircuitCounter).MaxIterationsPerTS = rNumericArgs(8);
+            PipingSystemCircuits(PipeCircuitCounter).MaxIterationsPerTS = static_cast<int>(rNumericArgs(8));
 
             // Radial mesh inputs, validated by IP
             // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-            PipingSystemCircuits(PipeCircuitCounter).NumRadialCells = rNumericArgs(9);
+            PipingSystemCircuits(PipeCircuitCounter).NumRadialCells = static_cast<int>(rNumericArgs(9));
             PipingSystemCircuits(PipeCircuitCounter).RadialMeshThickness = rNumericArgs(10);
 
             // Read number of pipe segments for this circuit, allocate arrays
-            NumPipeSegments = rNumericArgs(11);
-            PipingSystemCircuits(PipeCircuitCounter).PipeSegmentIndeces.allocate(NumPipeSegments);
+            NumPipeSegments = static_cast<int>(rNumericArgs(11));
+            PipingSystemCircuits(PipeCircuitCounter).PipeSegmentIndices.allocate(NumPipeSegments);
             PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames.allocate(NumPipeSegments);
 
             // Check for blank or missing or mismatched number...
@@ -2000,7 +1994,7 @@ namespace PlantPipingSystemsManager {
             HGHX(HorizontalGHXCtr).OutletNodeName = cAlphaArgs(3);
             HGHX(HorizontalGHXCtr).DesignFlowRate = rNumericArgs(1);
             HGHX(HorizontalGHXCtr).AxialLength = rNumericArgs(2);
-            HGHX(HorizontalGHXCtr).NumPipes = rNumericArgs(3);
+            HGHX(HorizontalGHXCtr).NumPipes = static_cast<int>(rNumericArgs(3));
             HGHX(HorizontalGHXCtr).InterPipeSpacing = rNumericArgs(4);
             HGHX(HorizontalGHXCtr).PipeID = rNumericArgs(5);
             HGHX(HorizontalGHXCtr).PipeOD = rNumericArgs(6);
@@ -2016,12 +2010,12 @@ namespace PlantPipingSystemsManager {
             HGHX(HorizontalGHXCtr).EvapotranspirationCoeff = rNumericArgs(16);
 
             //******* We'll first set up the domain ********
-            // the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing
+            // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
             PipingSystemDomains(DomainCtr).IsActuallyPartOfAHorizontalTrench = true;
             gio::write(PipingSystemDomains(DomainCtr).Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
-            PipingSystemDomains(DomainCtr).Extents.Xmax = (double(HGHX(HorizontalGHXCtr).NumPipes) + 1.0) * HGHX(HorizontalGHXCtr).InterPipeSpacing;
-            PipingSystemDomains(DomainCtr).Extents.Ymax = 2.0 * HGHX(HorizontalGHXCtr).BurialDepth;
-            PipingSystemDomains(DomainCtr).Extents.Zmax = HGHX(HorizontalGHXCtr).AxialLength;
+            PipingSystemDomains(DomainCtr).Extents.xMax = (double(HGHX(HorizontalGHXCtr).NumPipes) + 1.0) * HGHX(HorizontalGHXCtr).InterPipeSpacing;
+            PipingSystemDomains(DomainCtr).Extents.yMax = 2.0 * HGHX(HorizontalGHXCtr).BurialDepth;
+            PipingSystemDomains(DomainCtr).Extents.zMax = HGHX(HorizontalGHXCtr).AxialLength;
 
             // set up the mesh with some default parameters
             PipingSystemDomains(DomainCtr).Mesh.X.RegionMeshCount = 4;
@@ -2052,7 +2046,7 @@ namespace PlantPipingSystemsManager {
 
             // Allocate the circuit placeholder arrays
             PipingSystemDomains(DomainCtr).CircuitNames.allocate(1);
-            PipingSystemDomains(DomainCtr).CircuitIndeces.allocate(1);
+            PipingSystemDomains(DomainCtr).CircuitIndices.allocate(1);
             PipingSystemDomains(DomainCtr).CircuitNames(1) = HGHX(HorizontalGHXCtr).ObjName;
 
             //******* We'll next set up the circuit ********
@@ -2122,7 +2116,7 @@ namespace PlantPipingSystemsManager {
 
             // Read number of pipe segments for this circuit, allocate arrays
             NumPipeSegments = HGHX(HorizontalGHXCtr).NumPipes;
-            PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces.allocate(NumPipeSegments);
+            PipingSystemCircuits(CircuitCtr).PipeSegmentIndices.allocate(NumPipeSegments);
             PipingSystemCircuits(CircuitCtr).PipeSegmentNames.allocate(NumPipeSegments);
 
             // Hard-code the segments
@@ -2358,9 +2352,9 @@ namespace PlantPipingSystemsManager {
             thisDomain.developMesh();
 
             // would be OK to do some post-mesh error handling here I think
-            for (int CircCtr = 1; CircCtr <= isize(thisDomain.CircuitIndeces); ++CircCtr) {
-                for (int SegCtr = 1; SegCtr <= isize(PipingSystemCircuits(thisDomain.CircuitIndeces(CircCtr)).PipeSegmentIndeces); ++SegCtr) {
-                    int SegmentIndex = PipingSystemCircuits(thisDomain.CircuitIndeces(CircCtr)).PipeSegmentIndeces(SegCtr);
+            for (int CircCtr = 1; CircCtr <= isize(thisDomain.CircuitIndices); ++CircCtr) {
+                for (int SegCtr = 1; SegCtr <= isize(PipingSystemCircuits(thisDomain.CircuitIndices(CircCtr)).PipeSegmentIndices); ++SegCtr) {
+                    int SegmentIndex = PipingSystemCircuits(thisDomain.CircuitIndices(CircCtr)).PipeSegmentIndices(SegCtr);
                     if (!PipingSystemSegments(SegmentIndex).PipeCellCoordinatesSet) {
                         ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                         ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
@@ -2381,7 +2375,7 @@ namespace PlantPipingSystemsManager {
                                            (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
-        if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) || (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvrn)) {
+        if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) || (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
             // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
             // being based on the inlet temperature, which wasn't updated until later
@@ -2391,10 +2385,10 @@ namespace PlantPipingSystemsManager {
             DoOneTimeInitializations(DomainNum, CircuitNum);
 
             thisDomain.BeginSimInit = false;
-            thisDomain.BeginSimEnvrn = false;
+            thisDomain.BeginSimEnvironment = false;
         }
         if (!DataGlobals::BeginSimFlag) thisDomain.BeginSimInit = true;
-        if (!DataGlobals::BeginEnvrnFlag) thisDomain.BeginSimEnvrn = true;
+        if (!DataGlobals::BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
 
         // Shift history arrays only if necessary
         if (std::abs(thisDomain.Cur.CurSimTimeSeconds - thisDomain.Cur.PrevSimTimeSeconds) > 1.0e-6) {
@@ -2909,7 +2903,7 @@ namespace PlantPipingSystemsManager {
             XPartitionsExist = false;
         }
 
-        XPartitionRegions = this->createPartitionRegionList(this->Partitions.X, XPartitionsExist, this->Extents.Xmax, this->Partitions.X.u1());
+        XPartitionRegions = this->createPartitionRegionList(this->Partitions.X, XPartitionsExist, this->Extents.xMax, this->Partitions.X.u1());
 
         if (allocated(this->Partitions.Y)) {
             YPartitionRegions.allocate({0, this->Partitions.Y.u1()});
@@ -2920,7 +2914,7 @@ namespace PlantPipingSystemsManager {
             YPartitionsExist = false;
         }
 
-        YPartitionRegions = this->createPartitionRegionList(this->Partitions.Y, YPartitionsExist, this->Extents.Ymax, this->Partitions.Y.u1());
+        YPartitionRegions = this->createPartitionRegionList(this->Partitions.Y, YPartitionsExist, this->Extents.yMax, this->Partitions.Y.u1());
 
         if (allocated(this->Partitions.Z)) {
             ZPartitionRegions.allocate({0, this->Partitions.Z.u1()});
@@ -2931,14 +2925,14 @@ namespace PlantPipingSystemsManager {
             ZPartitionsExist = false;
         }
 
-        ZPartitionRegions = this->createPartitionRegionList(this->Partitions.Z, ZPartitionsExist, this->Extents.Zmax, this->Partitions.Z.u1());
+        ZPartitionRegions = this->createPartitionRegionList(this->Partitions.Z, ZPartitionsExist, this->Extents.zMax, this->Partitions.Z.u1());
 
         //'***** LAYOUT MESH REGIONS *****'
         // Zone-coupled slab  models
         if (this->HasZoneCoupledBasement) {
             this->createRegionList(XRegions,
                                    XPartitionRegions,
-                                   this->Extents.Xmax,
+                                   this->Extents.xMax,
                                    RegionType::XDirection,
                                    XPartitionsExist,
                                    _,
@@ -2949,7 +2943,7 @@ namespace PlantPipingSystemsManager {
 
             this->createRegionList(YRegions,
                                    YPartitionRegions,
-                                   this->Extents.Ymax,
+                                   this->Extents.yMax,
                                    RegionType::YDirection,
                                    YPartitionsExist,
                                    _,
@@ -2963,7 +2957,7 @@ namespace PlantPipingSystemsManager {
 
             this->createRegionList(ZRegions,
                                    ZPartitionRegions,
-                                   this->Extents.Zmax,
+                                   this->Extents.zMax,
                                    RegionType::ZDirection,
                                    ZPartitionsExist,
                                    _,
@@ -2980,7 +2974,7 @@ namespace PlantPipingSystemsManager {
         } else if (this->HasZoneCoupledSlab) {
             this->createRegionList(XRegions,
                                    XPartitionRegions,
-                                   this->Extents.Xmax,
+                                   this->Extents.xMax,
                                    RegionType::XDirection,
                                    XPartitionsExist,
                                    _,
@@ -2991,7 +2985,7 @@ namespace PlantPipingSystemsManager {
 
             this->createRegionList(YRegions,
                                    YPartitionRegions,
-                                   this->Extents.Ymax,
+                                   this->Extents.yMax,
                                    RegionType::YDirection,
                                    YPartitionsExist,
                                    _,
@@ -3005,7 +2999,7 @@ namespace PlantPipingSystemsManager {
 
             this->createRegionList(ZRegions,
                                    ZPartitionRegions,
-                                   this->Extents.Zmax,
+                                   this->Extents.zMax,
                                    RegionType::ZDirection,
                                    ZPartitionsExist,
                                    _,
@@ -3021,26 +3015,26 @@ namespace PlantPipingSystemsManager {
                                    this->InsulationZIndex);
         } else {
             this->createRegionList(
-                XRegions, XPartitionRegions, this->Extents.Xmax, RegionType::XDirection, XPartitionsExist, this->BasementZone.BasementWallXIndex);
+                XRegions, XPartitionRegions, this->Extents.xMax, RegionType::XDirection, XPartitionsExist, this->BasementZone.BasementWallXIndex);
 
             this->createRegionList(
-                YRegions, YPartitionRegions, this->Extents.Ymax, RegionType::YDirection, YPartitionsExist, _, this->BasementZone.BasementFloorYIndex);
+                YRegions, YPartitionRegions, this->Extents.yMax, RegionType::YDirection, YPartitionsExist, _, this->BasementZone.BasementFloorYIndex);
 
-            this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.Zmax, RegionType::ZDirection, ZPartitionsExist);
+            this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.zMax, RegionType::ZDirection, ZPartitionsExist);
         }
 
         //'** MAKE REGIONS > BOUNDARIES **'
         BoundaryListCount = CreateBoundaryListCount(XRegions, RegionType::XDirection);
         XBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        XBoundaryPoints = CreateBoundaryList(XRegions, this->Extents.Xmax, RegionType::XDirection, 0, BoundaryListCount - 1);
+        XBoundaryPoints = CreateBoundaryList(XRegions, this->Extents.xMax, RegionType::XDirection, 0, BoundaryListCount - 1);
 
         BoundaryListCount = CreateBoundaryListCount(YRegions, RegionType::YDirection);
         YBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        YBoundaryPoints = CreateBoundaryList(YRegions, this->Extents.Ymax, RegionType::YDirection, 0, BoundaryListCount - 1);
+        YBoundaryPoints = CreateBoundaryList(YRegions, this->Extents.yMax, RegionType::YDirection, 0, BoundaryListCount - 1);
 
         BoundaryListCount = CreateBoundaryListCount(ZRegions, RegionType::ZDirection);
         ZBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        ZBoundaryPoints = CreateBoundaryList(ZRegions, this->Extents.Zmax, RegionType::ZDirection, 0, BoundaryListCount - 1);
+        ZBoundaryPoints = CreateBoundaryList(ZRegions, this->Extents.zMax, RegionType::ZDirection, 0, BoundaryListCount - 1);
 
         //'****** DEVELOP CELL ARRAY *****'
         this->createCellArray(XBoundaryPoints, YBoundaryPoints, ZBoundaryPoints);
@@ -3091,8 +3085,8 @@ namespace PlantPipingSystemsManager {
 
         //'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
         //'in input they are measured by depth, but internally they are referred to by distance from y = 0, or the bottom boundary
-        for (CircuitCtr = this->CircuitIndeces.l1(); CircuitCtr <= this->CircuitIndeces.u1(); ++CircuitCtr) {
-            CircuitIndex = this->CircuitIndeces(CircuitCtr);
+        for (CircuitCtr = this->CircuitIndices.l1(); CircuitCtr <= this->CircuitIndices.u1(); ++CircuitCtr) {
+            CircuitIndex = this->CircuitIndices(CircuitCtr);
 
             // set up a convenience variable here
             //'account for the pipe and insulation if necessary
@@ -3105,11 +3099,11 @@ namespace PlantPipingSystemsManager {
             //'then add the radial mesh thickness on both sides of the pipe/insulation construct
             PipeCellWidth += 2 * PipingSystemCircuits(CircuitIndex).RadialMeshThickness;
 
-            for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                 PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+            for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
+                 PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
                  ++PipeCtr) {
 
-                ThisSegment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces(PipeCtr));
+                ThisSegment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices(PipeCtr));
                 if (!allocated(this->Partitions.X)) {
                     this->Partitions.X.allocate({0, 0});
                     this->Partitions.X(0) = MeshPartition(ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth);
@@ -3131,7 +3125,7 @@ namespace PlantPipingSystemsManager {
             if (this->HasBasement) { // FHX model
                 //'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
                 if (this->BasementZone.Width > 0) {
-                    SurfCellWidth = this->Extents.Xmax * BasementCellFraction;
+                    SurfCellWidth = this->Extents.xMax * BasementCellFraction;
                     if (!allocated(this->Partitions.X)) {
                         this->Partitions.X.allocate({0, 0});
                         this->Partitions.X(0) = MeshPartition(this->BasementZone.Width, PartitionType::BasementWall, SurfCellWidth);
@@ -3141,8 +3135,8 @@ namespace PlantPipingSystemsManager {
                 }
 
                 if (this->BasementZone.Depth > 0) {
-                    SurfCellWidth = this->Extents.Ymax * BasementCellFraction;
-                    BasementDistFromBottom = this->Extents.Ymax - this->BasementZone.Depth;
+                    SurfCellWidth = this->Extents.yMax * BasementCellFraction;
+                    BasementDistFromBottom = this->Extents.yMax - this->BasementZone.Depth;
                     if (!allocated(this->Partitions.Y)) {
                         this->Partitions.Y.allocate({0, 0});
                         this->Partitions.Y(0) = MeshPartition(BasementDistFromBottom, PartitionType::BasementFloor, SurfCellWidth);
@@ -3163,6 +3157,8 @@ namespace PlantPipingSystemsManager {
                 if (this->HorizInsPresentFlag && !this->FullHorizInsPresent) {
                     // Insulation Edge in X direction
                     SideXInsulationLocation = this->PerimeterOffset + this->HorizInsWidth + InterfaceCellWidth / 2.0;
+                } else {
+                    SideXInsulationLocation = -1;
                 }
                 if (!allocated(this->Partitions.X)) {
                     if (this->HorizInsPresentFlag) {
@@ -3217,11 +3213,13 @@ namespace PlantPipingSystemsManager {
             if (this->BasementZone.Depth > 0) {
                 CellWidth = this->HorizInsThickness;
                 // Distance of basement floor interface from domain bottom
-                FloorLocation = this->Extents.Ymax - this->BasementZone.Depth - InterfaceCellWidth / 2.0;
+                FloorLocation = this->Extents.yMax - this->BasementZone.Depth - InterfaceCellWidth / 2.0;
                 // Distance of basement floor insulation layer from domain bottom
-                UnderFloorLocation = this->Extents.Ymax - this->BasementZone.Depth - InterfaceCellWidth - CellWidth / 2.0;
+                UnderFloorLocation = this->Extents.yMax - this->BasementZone.Depth - InterfaceCellWidth - CellWidth / 2.0;
                 if (this->VertInsPresentFlag) {
-                    YInsulationLocation = this->Extents.Ymax - this->VertInsDepth - InterfaceCellWidth / 2.0;
+                    YInsulationLocation = this->Extents.yMax - this->VertInsDepth - InterfaceCellWidth / 2.0;
+                } else {
+                    YInsulationLocation = -1;
                 }
                 if (!allocated(this->Partitions.Y)) {
                     // Partition at bottom edge of vertical insulation, if vertical insulation is present. Must be careful not to have floor and
@@ -3264,6 +3262,8 @@ namespace PlantPipingSystemsManager {
                 if (this->HorizInsPresentFlag && !this->FullHorizInsPresent) {
                     // Insulation Edge Z direction
                     SideZInsulationLocation = this->PerimeterOffset + this->HorizInsWidth + InterfaceCellWidth / 2.0;
+                } else {
+                    SideZInsulationLocation = -1;
                 }
                 if (!allocated(this->Partitions.Z)) {
                     if (this->HorizInsPresentFlag) {
@@ -3329,6 +3329,8 @@ namespace PlantPipingSystemsManager {
             // Insulation Edge X direction
             if (this->HorizInsPresentFlag && !this->FullHorizInsPresent) {
                 SideXInsulationLocation = SideXLocation + this->HorizInsWidth;
+            } else {
+                SideXInsulationLocation = -1;
             }
             if (!allocated(this->Partitions.X)) {
                 // Partition at insulation edges in the X direction, if horizontal insulation present
@@ -3374,12 +3376,14 @@ namespace PlantPipingSystemsManager {
 
             // Partition at bottom edge of vertical insulation, if vertical insulation present
             if (this->VertInsPresentFlag) {
-                YInsulationLocation = this->Extents.Ymax - this->VertInsDepth + CellWidth / 2.0;
+                YInsulationLocation = this->Extents.yMax - this->VertInsDepth + CellWidth / 2.0;
+            } else {
+                YInsulationLocation = -1;
             }
 
             if (this->SlabInGradeFlag) { // Slab in-grade case
 
-                SlabDistFromBottom = this->Extents.Ymax - this->SlabThickness - CellWidth / 2.0;
+                SlabDistFromBottom = this->Extents.yMax - this->SlabThickness - CellWidth / 2.0;
 
                 if (!allocated(this->Partitions.Y)) {
                     if (this->VertInsPresentFlag) {
@@ -3432,6 +3436,8 @@ namespace PlantPipingSystemsManager {
             // Insulation Edge Z direction
             if (this->HorizInsPresentFlag && !this->FullHorizInsPresent) {
                 SideZInsulationLocation = SideZLocation + this->HorizInsWidth;
+            } else {
+                SideZInsulationLocation = -1;
             }
             if (!allocated(this->Partitions.Z)) {
                 // Partition at insulation edges in the Z direction, if horizontal insulation present
@@ -3583,45 +3589,8 @@ namespace PlantPipingSystemsManager {
         return ThesePartitionRegions;
     }
 
-    int CreateRegionListCount(Array1D<GridRegion> const &ThesePartitionRegions, Real64 const DirExtentMax, bool const PartitionsExist)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // Return value
-        int RetVal;
-
-        RetVal = 0;
-        if (PartitionsExist) {
-            for (int Index = ThesePartitionRegions.l1(); Index <= ThesePartitionRegions.u1(); ++Index) {
-                // Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a region to
-                // the left of ThesePartitionRegions( 1 ).-SA
-                if (!DataGlobals::AnyBasementsInModel || (DataGlobals::AnyBasementsInModel && (Index == 0 || Index == 2))) {
-                    //'add a mesh region to the "left" of the partition
-                    ++RetVal;
-                }
-                //'then add the pipe node itself
-                ++RetVal;
-                // some cleanup based on where we are
-                if ((Index == 0 && size(ThesePartitionRegions) == 1) ||
-                    (Index == ThesePartitionRegions.u1() && ThesePartitionRegions(Index).Max < DirExtentMax)) {
-                    //'if there is only one partition, add a mesh region to the "right" before we leave
-                    //'or if we are on the last partition, and we have room on the "right" side then add a mesh region
-                    ++RetVal;
-                }
-            }
-        } else { // Input partitions were not allocate
-            //'if we don't have a region, we still need to make a single mesh region
-            ++RetVal;
-        }
-
-        return RetVal;
-    }
-
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ArgumentSelectionDefectsInspection"
     void FullDomainStructureInfo::createRegionList(Array1D<GridRegion> &Regions,
                                                    Array1D<GridRegion> const &ThesePartitionRegions,
                                                    Real64 const DirExtentMax,
@@ -3646,7 +3615,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int cellCountUpToNow = 0.0;
+        int cellCountUpToNow = 0;
         int regionIndex = 0;
         Array1D<Real64> tempCellWidths({0, -1});
 
@@ -3747,6 +3716,7 @@ namespace PlantPipingSystemsManager {
             Regions.push_back(tempRegion);
         }
     }
+#pragma clang diagnostic pop
 
     int CreateBoundaryListCount(Array1D<GridRegion> const &RegionList, RegionType const DirDirection)
     {
@@ -4077,17 +4047,17 @@ namespace PlantPipingSystemsManager {
                     Real64 RadialMeshThickness(0.0);
                     bool HasInsulation(false);
                     RadialSizing PipeSizing;
-                    for (int CircuitCtr = this->CircuitIndeces.l1(), NumCircuits = this->CircuitIndeces.u1(); CircuitCtr <= NumCircuits;
+                    for (int CircuitCtr = this->CircuitIndices.l1(), NumCircuits = this->CircuitIndices.u1(); CircuitCtr <= NumCircuits;
                          ++CircuitCtr) {
 
-                        FoundOnCircuitIndex = this->CircuitIndeces(CircuitCtr);
-                        for (int PipeCounter = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces.l1(),
-                                 NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces.u1();
+                        FoundOnCircuitIndex = this->CircuitIndices(CircuitCtr);
+                        for (int PipeCounter = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.l1(),
+                                 NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.u1();
                              PipeCounter <= NumSegments;
                              ++PipeCounter) {
 
                             PipeSegmentInfo const &ThisSegment =
-                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces(PipeCounter));
+                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices(PipeCounter));
                             if (XYRectangle.contains(ThisSegment.PipeLocation)) {
                                 //'inform the cell that it is a pipe node
                                 cellType = CellType::Pipe;
@@ -4096,7 +4066,7 @@ namespace PlantPipingSystemsManager {
                                 //'inform the cell of which pipe circuit contains it
                                 CircuitIndex = FoundOnCircuitIndex;
                                 //'inform the pipe of what cell it is inside
-                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces(PipeCounter))
+                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices(PipeCounter))
                                     .initPipeCells(CellXIndex, CellYIndex);
                                 //'set the number of cells to be generated in this near-pipe region
                                 NumRadialCells = PipingSystemCircuits(FoundOnCircuitIndex).NumRadialCells;
@@ -4131,11 +4101,11 @@ namespace PlantPipingSystemsManager {
 
                     //'instantiate the cell class
                     cell.X_min = CellExtents.Xmin;
-                    cell.X_max = CellExtents.Xmax;
+                    cell.X_max = CellExtents.xMax;
                     cell.Y_min = CellExtents.Ymin;
-                    cell.Y_max = CellExtents.Ymax;
+                    cell.Y_max = CellExtents.yMax;
                     cell.Z_min = CellExtents.Zmin;
-                    cell.Z_max = CellExtents.Zmax;
+                    cell.Z_max = CellExtents.zMax;
                     cell.X_index = CellIndeces.X;
                     cell.Y_index = CellIndeces.Y;
                     cell.Z_index = CellIndeces.Z;
@@ -4143,7 +4113,6 @@ namespace PlantPipingSystemsManager {
                     cell.cellType = cellType;
 
                     if (PipeIndex != -1) {
-                        cell.PipeIndex = PipeIndex;
                         CartesianPipeCellInformation::ctor(cell.PipeCellData,
                                                            cell.X_max - cell.X_min,
                                                            PipeSizing,
@@ -4218,11 +4187,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveX,
-                                                     CellRightCentroidX - ThisCellCentroidX,
                                                      CellRightLeftWallX - ThisCellCentroidX,
                                                      CellRightCentroidX - CellRightLeftWallX,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeX, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::NegativeX, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (X == this->x_max_index) {
                         // on the X=XMAX face, the adiabatic cases are:
                         //   1) if we are doing a zone coupled slab/basement simulation where we quartered the domain
@@ -4236,11 +4204,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeX,
-                                                     ThisCellCentroidX - CellLeftCentroidX,
                                                      ThisCellCentroidX - CellLeftRightWallX,
                                                      CellLeftRightWallX - CellLeftCentroidX,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveX, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::PositiveX, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
                         LeftCellCentroidX = cells(X - 1, Y, Z).Centroid.X;
                         LeftCellRightWallX = cells(X - 1, Y, Z).X_max;
@@ -4250,7 +4217,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeX,
-                                                     ThisCellCentroidX - LeftCellCentroidX,
                                                      ThisCellCentroidX - LeftCellRightWallX,
                                                      LeftCellRightWallX - LeftCellCentroidX,
                                                      ThisAdiabaticMultiplier);
@@ -4258,7 +4224,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveX,
-                                                     RightCellCentroidX - ThisCellCentroidX,
                                                      RightCellLeftWallX - ThisCellCentroidX,
                                                      RightCellCentroidX - RightCellLeftWallX,
                                                      ThisAdiabaticMultiplier);
@@ -4278,11 +4243,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveY,
-                                                     UpperCellCentroidY - ThisCellCentroidY,
                                                      UpperCellLowerWallY - ThisCellCentroidY,
                                                      UpperCellCentroidY - UpperCellLowerWallY,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeY, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::NegativeY, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (Y == this->y_max_index) {
                         LowerCellCentroidY = cells(X, Y - 1, Z).Centroid.Y;
                         LowerCellUpperWallY = cells(X, Y - 1, Z).Y_max;
@@ -4292,11 +4256,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeY,
-                                                     ThisCellCentroidY - LowerCellCentroidY,
                                                      ThisCellCentroidY - LowerCellUpperWallY,
                                                      LowerCellUpperWallY - LowerCellCentroidY,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveY, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::PositiveY, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
                         UpperCellCentroidY = cells(X, Y + 1, Z).Centroid.Y;
                         LowerCellCentroidY = cells(X, Y - 1, Z).Centroid.Y;
@@ -4306,7 +4269,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeY,
-                                                     ThisCellCentroidY - LowerCellCentroidY,
                                                      ThisCellCentroidY - LowerCellUpperWallY,
                                                      LowerCellUpperWallY - LowerCellCentroidY,
                                                      ThisAdiabaticMultiplier);
@@ -4314,7 +4276,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveY,
-                                                     UpperCellCentroidY - ThisCellCentroidY,
                                                      UpperCellLowerWallY - ThisCellCentroidY,
                                                      UpperCellCentroidY - UpperCellLowerWallY,
                                                      ThisAdiabaticMultiplier);
@@ -4339,11 +4300,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveZ,
-                                                     UpperZCellCentroidZ - ThisCellCentroidZ,
                                                      UpperZCellLowerWallZ - ThisCellCentroidZ,
                                                      UpperZCellCentroidZ - UpperZCellLowerWallZ,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeZ, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::NegativeZ, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (Z == this->z_max_index) {
                         LowerZCellCentroidZ = cells(X, Y, Z - 1).Centroid.Z;
                         LowerZCellUpperWallZ = cells(X, Y, Z - 1).Z_max;
@@ -4357,11 +4317,10 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeZ,
-                                                     ThisCellCentroidZ - LowerZCellCentroidZ,
                                                      ThisCellCentroidZ - LowerZCellUpperWallZ,
                                                      LowerZCellUpperWallZ - LowerZCellCentroidZ,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveZ, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
+                        this->addNeighborInformation(X, Y, Z, Direction::PositiveZ, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
                         LowerZCellCentroidZ = cells(X, Y, Z - 1).Centroid.Z;
                         UpperZCellCentroidZ = cells(X, Y, Z + 1).Centroid.Z;
@@ -4371,7 +4330,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::NegativeZ,
-                                                     ThisCellCentroidZ - LowerZCellCentroidZ,
                                                      ThisCellCentroidZ - LowerZCellUpperWallZ,
                                                      LowerZCellUpperWallZ - LowerZCellCentroidZ,
                                                      ThisAdiabaticMultiplier);
@@ -4379,7 +4337,6 @@ namespace PlantPipingSystemsManager {
                                                      Y,
                                                      Z,
                                                      Direction::PositiveZ,
-                                                     UpperZCellCentroidZ - ThisCellCentroidZ,
                                                      UpperZCellLowerWallZ - ThisCellCentroidZ,
                                                      UpperZCellCentroidZ - UpperZCellLowerWallZ,
                                                      ThisAdiabaticMultiplier);
@@ -4393,7 +4350,6 @@ namespace PlantPipingSystemsManager {
                                                          int const Y,
                                                          int const Z,
                                                          Direction const direction,
-                                                         Real64 const ThisCentroidToNeighborCentroid,
                                                          Real64 const ThisCentroidToNeighborWall,
                                                          Real64 const ThisWallToNeighborCentroid,
                                                          Real64 const ThisAdiabaticMultiplier)
@@ -4405,7 +4361,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
         NeighborInformation newItem;
         newItem.direction = direction;
-        newItem.ThisCentroidToNeighborCentroid = ThisCentroidToNeighborCentroid;
         newItem.ThisCentroidToNeighborWall = ThisCentroidToNeighborWall;
         newItem.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
         newItem.adiabaticMultiplier = ThisAdiabaticMultiplier;
@@ -4436,16 +4391,16 @@ namespace PlantPipingSystemsManager {
         int CircuitOutletCellZ;
 
         auto const &cells(this->Cells);
-        for (int CircuitNum = this->CircuitIndeces.l1(); CircuitNum <= this->CircuitIndeces.u1(); ++CircuitNum) {
+        for (int CircuitNum = this->CircuitIndices.l1(); CircuitNum <= this->CircuitIndices.u1(); ++CircuitNum) {
 
-            int CircuitIndex = this->CircuitIndeces(CircuitNum);
+            int CircuitIndex = this->CircuitIndices(CircuitNum);
             bool CircuitInletCellSet = false;
 
-            for (int SegmentCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                 SegmentCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+            for (int SegmentCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
+                 SegmentCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
                  ++SegmentCtr) {
 
-                auto &Segment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces(SegmentCtr));
+                auto &Segment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices(SegmentCtr));
                 switch (Segment.FlowDirection) {
                 case SegmentFlow::IncreasingZ:
                     SegmentInletCellX = Segment.PipeCellCoordinates.X;
@@ -4514,10 +4469,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // Array1D< Real64 > RetVal;
-        int maxIndex;
-
         // Object Data
         DistributionStructure ThisMesh;
         ThisMesh.RegionMeshCount = 0;
@@ -4550,20 +4501,17 @@ namespace PlantPipingSystemsManager {
 
         if (ThisMesh.RegionMeshCount > 0) {
             g.CellWidths.allocate({0, ThisMesh.RegionMeshCount - 1});
-            maxIndex = ThisMesh.RegionMeshCount - 1;
         } else {
             g.CellWidths.allocate({0, 0});
-            maxIndex = 0;
         }
 
         Real64 GridWidth = g.Max - g.Min;
 
         if (ThisMesh.thisMeshDistribution == MeshDistribution::Uniform) {
-            if (this->HasZoneCoupledSlab && g.thisRegionType == RegionType::YDirection && g.Max == this->Extents.Ymax) { // Slab region
+            if (this->HasZoneCoupledSlab && g.thisRegionType == RegionType::YDirection && g.Max == this->Extents.yMax) { // Slab region
                 int NumCells = this->NumSlabCells;
                 if (allocated(g.CellWidths)) g.CellWidths.deallocate();
                 g.CellWidths.allocate({0, NumCells - 1});
-                maxIndex = NumCells - 1;
                 Real64 CellWidth = GridWidth / NumCells;
 
                 for (int I = 0; I <= NumCells - 1; ++I) {
@@ -4631,11 +4579,10 @@ namespace PlantPipingSystemsManager {
                 }
             } else if (g.thisRegionType == RegionType::YDirection) {
                 // Assign uniform cell thickness to the slab cells.
-                if (g.Max == this->Extents.Ymax) {
+                if (g.Max == this->Extents.yMax) {
                     NumCells = this->NumSlabCells;
                     if (allocated(g.CellWidths)) g.CellWidths.deallocate();
                     g.CellWidths.allocate({0, NumCells - 1});
-                    maxIndex = NumCells - 1;
 
                     Real64 CellWidth = GridWidth / NumCells;
 
@@ -4842,7 +4789,6 @@ namespace PlantPipingSystemsManager {
         Real64 Hour_Angle;
         Real64 X_sunset;
         Real64 Sunset_Angle;
-        Real64 Altitude_Angle;
         Real64 Solar_Angle_1;
         Real64 Solar_Angle_2;
         Real64 QRAD_A;
@@ -4956,9 +4902,6 @@ namespace PlantPipingSystemsManager {
             }
         }
 
-        // Initialize, this variable is used for both evapotranspiration and non-ET cases, [W]
-        IncidentHeatGain = 0.0;
-
         // Latitude, converted to radians...positive for northern hemisphere, [radians]
         Latitude_Radians = Pi / 180.0 * Latitude_Degrees;
 
@@ -4987,10 +4930,6 @@ namespace PlantPipingSystemsManager {
 
         // Find sunset angle
         Sunset_Angle = Pi / 2.0 - std::atan(-std::tan(Latitude_Radians) * std::tan(Declination) / std::sqrt(X_sunset));
-
-        // Find the current sun angle
-        Altitude_Angle =
-            std::asin(std::sin(Latitude_Radians) * std::sin(Declination) + std::cos(Latitude_Radians) * std::cos(Declination) * std::cos(Hour_Angle));
 
         // Find solar angles
         Solar_Angle_1 = Hour_Angle - Pi / 24.0;
@@ -5113,7 +5052,7 @@ namespace PlantPipingSystemsManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 Beta = 0.0;
         Real64 NeighborTemp = 0.0;
-        Real64 HeatFlux = 0.0;
+        Real64 HeatFlux;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
         Real64 Resistance = 0.0;
@@ -5222,7 +5161,7 @@ namespace PlantPipingSystemsManager {
 
             // if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
             // if ( CurDirection == Direction::PositiveX || CurDirection == Direction::PositiveZ ) {
-            // AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at Xmax, Ymin, Zmax
+            // AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at xMax, Ymin, zMax
             //}
             //}
 
@@ -5243,8 +5182,8 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 HeatFlux = 0.0;
-        Real64 ConductionArea = 0.0;
+        Real64 HeatFlux;
+        Real64 ConductionArea;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
         Real64 Resistance = 0.0;
@@ -5337,9 +5276,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        int NumSurfaces = size(this->BasementZone.WallSurfacePointers);
-        for (int SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int SurfacePointer = this->BasementZone.WallSurfacePointers(SurfaceCounter);
+        unsigned long const NumSurfaces = size(this->BasementZone.WallSurfacePointers);
+        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
+            int iSurfCounter = static_cast<int>(SurfaceCounter);
+            int SurfacePointer = this->BasementZone.WallSurfacePointers(iSurfCounter);
             RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
@@ -5355,9 +5295,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        int NumSurfaces = size(this->BasementZone.FloorSurfacePointers);
-        for (int SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int SurfacePointer = this->BasementZone.FloorSurfacePointers(SurfaceCounter);
+        unsigned long const NumSurfaces = size(this->BasementZone.FloorSurfacePointers);
+        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
+            int iSurfCounter = static_cast<int>(SurfaceCounter);
+            int SurfacePointer = this->BasementZone.FloorSurfacePointers(iSurfCounter);
             RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
@@ -5402,9 +5343,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        int NumSurfaces = size(this->ZoneCoupledSurfaces);
-        for (int SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int SurfacePointer = this->ZoneCoupledSurfaces(SurfaceCounter).IndexInSurfaceArray;
+        unsigned long const NumSurfaces = size(this->ZoneCoupledSurfaces);
+        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
+            int iSurfCounter = static_cast<int>(SurfaceCounter);
+            int SurfacePointer = this->ZoneCoupledSurfaces(iSurfCounter).IndexInSurfaceArray;
             RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
@@ -5511,7 +5453,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 CurTime = PipingSystemDomains(DomainNum).Cur.CurSimTimeSeconds;
-        Real64 z = PipingSystemDomains(DomainNum).Extents.Ymax - cell.Centroid.Y;
+        Real64 z = PipingSystemDomains(DomainNum).Extents.yMax - cell.Centroid.Y;
         return PipingSystemDomains(DomainNum).Farfield.groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
     }
 
@@ -5582,15 +5524,15 @@ namespace PlantPipingSystemsManager {
 
         // initialize
         int SegmentCellCtr = 0;
-        int StartingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.l1();
-        int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.u1();
+        int StartingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.l1();
+        int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.u1();
 
         //'loop across all segments (pipes) of the circuit
         auto &dom(PipingSystemDomains(DomainNum));
         auto &cells(dom.Cells);
         for (int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr) {
 
-            int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndeces(SegmentCtr);
+            int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegmentCtr);
             int StartingZ = 0;
             int EndingZ = 0;
             int Increment = 0;
@@ -5735,7 +5677,7 @@ namespace PlantPipingSystemsManager {
         static Array1D<Direction> const Directions(4, {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Resistance = 0.0;
+        Real64 Resistance;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
         Real64 Beta = cell.Beta;
@@ -5978,7 +5920,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Resistance = 0.0;
+        Real64 Resistance;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
 
@@ -6023,7 +5965,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 OuterNeighborRadialCellOuterRadius;
         Real64 OuterNeighborRadialCellRadialCentroid;
         Real64 OuterNeighborRadialCellConductivity;
         Real64 OuterNeighborRadialCellInnerRadius;
@@ -6031,17 +5972,15 @@ namespace PlantPipingSystemsManager {
 
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
-        Real64 Resistance = 0.0;
+        Real64 Resistance;
 
         //'convenience variables
         if (PipingSystemCircuits(CircuitNum).HasInsulation) {
-            OuterNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
             OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             OuterNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
             OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
             OuterNeighborRadialCellTemperature = cell.PipeCellData.Insulation.Temperature;
         } else {
-            OuterNeighborRadialCellOuterRadius = cell.PipeCellData.Soil(0).OuterRadius;
             OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Soil(0).RadialCentroid;
             OuterNeighborRadialCellConductivity = cell.PipeCellData.Soil(0).Properties.Conductivity;
             OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Soil(0).InnerRadius;
@@ -6207,7 +6146,6 @@ namespace PlantPipingSystemsManager {
                         EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
                         int NX = 0, NY = 0, NZ = 0;
                         EvaluateNeighborCoordinates(cell, CurDirection, NX, NY, NZ);
-                        SetAdditionalNeighborData(DomainNum, X, Y, Z, CurDirection, Resistance, cells(NX, NY, NZ));
                     }
                 }
             }
@@ -6220,18 +6158,18 @@ namespace PlantPipingSystemsManager {
 
                 int SegCtr2 = -1;
 
-                int TotalSegments = size(cells, 3) * size(PipingSystemCircuits(CircuitNum).PipeSegmentIndeces);
+                int TotalSegments = size(cells, 3) * size(PipingSystemCircuits(CircuitNum).PipeSegmentIndices);
                 PipingSystemCircuits(CircuitNum).ListOfCircuitPoints.allocate({0, TotalSegments - 1});
 
-                for (int SegIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.l1();
-                     SegIndex <= PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.u1();
+                for (int SegIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.l1();
+                     SegIndex <= PipingSystemCircuits(CircuitNum).PipeSegmentIndices.u1();
                      ++SegIndex) {
 
                     //'set simulation flow direction
                     int StartingZ = 0;
                     int EndingZ = 0;
                     int Increment = 0;
-                    switch (PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndeces(SegIndex)).FlowDirection) {
+                    switch (PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).FlowDirection) {
                     case SegmentFlow::IncreasingZ:
                         StartingZ = 0;
                         EndingZ = thisDomain.z_max_index;
@@ -6244,8 +6182,8 @@ namespace PlantPipingSystemsManager {
                         break;
                     }
 
-                    int PipeX = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndeces(SegIndex)).PipeCellCoordinates.X;
-                    int PipeY = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndeces(SegIndex)).PipeCellCoordinates.Y;
+                    int PipeX = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).PipeCellCoordinates.X;
+                    int PipeY = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).PipeCellCoordinates.Y;
 
                     //'loop across all z-direction indices
                     int const Zindex_stop(floop_end(StartingZ, EndingZ, Increment));
@@ -6546,30 +6484,6 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void SetAdditionalNeighborData(int const DomainNum,
-                                   int const X,
-                                   int const Y,
-                                   int const Z,
-                                   Direction const direction,
-                                   Real64 const Resistance,
-                                   CartesianCell const &NeighborCell)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        auto &cell(PipingSystemDomains(DomainNum).Cells(X, Y, Z));
-        for (auto &neighborInfo : cell.NeighborInfo) {
-            if (neighborInfo.first == direction) {
-                neighborInfo.second.ConductionResistance = Resistance;
-                neighborInfo.second.NeighborCellIndeces = Point3DInteger(NeighborCell.X_index, NeighborCell.Y_index, NeighborCell.Z_index);
-            }
-        }
-    }
-
     void EvaluateNeighborCoordinates(CartesianCell const &ThisCell, Direction const CurDirection, int &NX, int &NY, int &NZ)
     {
 
@@ -6637,8 +6551,8 @@ namespace PlantPipingSystemsManager {
         EvaluateNeighborCoordinates(ThisCell, CurDirection, NX, NY, NZ);
 
         //'split effects between the two cells so we can carefully calculate resistance values
-        Real64 ThisCellLength = 0.0;
-        Real64 NeighborCellLength = 0.0;
+        Real64 ThisCellLength;
+        Real64 NeighborCellLength;
         Real64 ThisCellConductivity = 10000.0;
         if (ThisCell.Properties.Conductivity > 0.0) ThisCellConductivity = ThisCell.Properties.Conductivity;
         Real64 NeighborConductivity = 10000.0;
