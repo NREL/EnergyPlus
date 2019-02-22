@@ -126,10 +126,12 @@ namespace PlantPipingSystemsManager {
     Array1D<PipeSegmentInfo> PipingSystemSegments;
     std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
     bool GetInputFlag(true); // First time, input is "gotten"
+    bool WriteEIOFlag(true); // False after EIO is written
 
     void clear_state()
     {
         GetInputFlag = true;
+        WriteEIOFlag = true;
         PipingSystemDomains.deallocate();
         PipingSystemCircuits.deallocate();
         PipingSystemSegments.deallocate();
@@ -251,9 +253,6 @@ namespace PlantPipingSystemsManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitAndSimGroundDomain");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool WriteEIOFlag(true); // Set to false once eio information is written
 
         static gio::Fmt DomainCellsToEIOHeader(
             "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
@@ -467,7 +466,7 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("GetPipingSystemsAndGroundDomainsInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumGeneralizedDomains;
         int NumZoneCoupledDomains;
         int NumBasements;
@@ -3056,7 +3055,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
+        Real64 const BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
         // actual dimension shouldn't matter for calculation purposes
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
