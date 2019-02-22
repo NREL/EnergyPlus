@@ -208,7 +208,7 @@ ADD_SUBDIRECTORY(src/FMI)
 include(cmake/179DReporting.cmake)
 
 if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
+  #ADD_SUBDIRECTORY(third_party/gtest)
   #ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 

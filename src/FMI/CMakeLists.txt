@@ -31,9 +31,9 @@ if( BUILD_TESTING )
   
   file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test-config.h" INPUT "${CMAKE_CURRENT_BINARY_DIR}/test-config.h.in2")
   
-  add_executable( libfmi_test Test/EPFMI_DLL_TEST.c )
-  add_dependencies( libfmi_test epfmi )
-  target_link_libraries( libfmi_test ${CMAKE_DL_LIBS} )
+  add_executable( libfmi_dll_test Test/EPFMI_DLL_Test.c )
+  add_dependencies( libfmi_dll_test epfmi )
+  target_link_libraries( libfmi_dll_test ${CMAKE_DL_LIBS} )
 endif()
 
 install( TARGETS epfmi
@@ -45,4 +45,11 @@ install( TARGETS epfmi
 install( FILES EPFMI.hpp DESTINATION ./include )
 
 export(TARGETS epfmi APPEND FILE energyplus-exports.cmake)
+
+set(test_src
+  Test/EPFMI_Test.cpp
+  Test/main.cc
+)
+
+CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
 
