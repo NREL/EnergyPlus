@@ -1,5 +1,3 @@
-#include <utility>
-
 // EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -53,6 +51,7 @@
 // C++ Headers
 #include <map>
 #include <memory>
+#include <utility>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
