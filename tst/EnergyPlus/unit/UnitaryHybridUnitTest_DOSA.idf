@@ -15,8 +15,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16°C
-!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.5°C
+! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16ï¿½C
+!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6ï¿½C MWB=15.5ï¿½C
 !
 ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
@@ -81,10 +81,10 @@
 !  Data Source=ASHRAE 2009 Annual Design Conditions
 ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 ! Denver Centennial CO USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.5m/s, 5%=8.4m/s
-! Denver Centennial CO USA Extreme Annual Temperatures, Max Drybulb=-22.9°C Min Drybulb=36.1°C
+! Denver Centennial CO USA Extreme Annual Temperatures, Max Drybulb=-22.9ï¿½C Min Drybulb=36.1ï¿½C
 ! Denver Centennial CO USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
 ! Coldest Month=December
-! Denver Centennial CO USA Annual Heating 99.6%, MaxDB=-18.8°C
+! Denver Centennial CO USA Annual Heating 99.6%, MaxDB=-18.8ï¿½C
 
   SizingPeriod:DesignDay,
     Denver Centennial Ann Htg 99.6% Condns DB,  !- Name
@@ -116,7 +116,7 @@
 
 ! Denver Centennial Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
 ! Hottest Month=July
-! Denver Centennial CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
+! Denver Centennial CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32ï¿½C MWB=15.5ï¿½C
 
   SizingPeriod:DesignDay,
     Denver Centennial Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -575,17 +575,20 @@
 
   ZoneHVAC:EquipmentList,
     Main Zone Equipment List,!- Name
-	SequentialLoad,
+    SequentialLoad,
     ZoneHVAC:HybridUnitaryHVAC,  !- Zone Equipment 1 Object Type
     MUNTERSEPX5000,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Main Zone Baseboard,     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
-	
-	
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction
+
 ZoneHVAC:HybridUnitaryHVAC,
     MUNTERSEPX5000,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
