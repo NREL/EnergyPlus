@@ -58,6 +58,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 
+#include <Plant/PlantLocation.hh>
+
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
 using DataSurfaces::Surface;
@@ -1769,12 +1771,9 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     GetOSCMData(errorsFound);
     GetMaterialData(errorsFound);
 
-    int compIndex = 0;
-    bool firstHVAC = true; // not used
-
-    // first call, set initLoopEquip to true; it will only call GetInput
+    // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+    PlantComponent *thisCircuit = PlantPipingSystemsManager::PipeCircuitInfo::factory(DataPlant::TypeOf_PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
 
     EXPECT_EQ(2u, PlantPipingSystemsManager::PipingSystemDomains.size());
 
@@ -1790,7 +1789,9 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;
-    PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+    EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, 2, 1, 1);
+    Real64 curLoad = 0.0;
+    thisCircuit->simulate(myLocation, true, curLoad, true);
 
     // we can also try to call from the Domain side
     DataGlobals::BeginSimFlag = true;

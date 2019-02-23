@@ -162,62 +162,33 @@ namespace PlantPipingSystemsManager {
         DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    void SimPipingSystemCircuit(std::string const &EquipName,             // name of the Pipe Heat Transfer.
-                                int &EqNum,                               // index in local derived types for external calling
-                                bool const EP_UNUSED(FirstHVACIteration), // component number
-                                bool const InitLoopEquip)
+    PlantComponent *PipeCircuitInfo::factory(int EP_UNUSED(objectType), std::string objectName)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimPipingSystems");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CircuitNum;
-
-        // Read input if necessary
+        // Process the input data for circuits if it hasn't been done already
         if (GetInputFlag) {
             GetPipingSystemsAndGroundDomainsInput();
             GetInputFlag = false;
         }
-
-        // Look for circuit index
-        if (EqNum == 0) {
-            CircuitNum = UtilityRoutines::FindItemInList(EquipName, PipingSystemCircuits);
-            if (CircuitNum == 0) {
-                // Catch any bad names before crashing
-                ShowFatalError(RoutineName + ": Piping circuit requested not found=" + EquipName);
-            }
-            EqNum = CircuitNum;
-        } else {
-            CircuitNum = EqNum;
-            int const NumOfPipeCircuits = isize(PipingSystemCircuits);
-            if (CircuitNum > NumOfPipeCircuits || CircuitNum < 1) {
-                ShowFatalError(RoutineName + ":  Invalid component index passed=" + TrimSigDigits(CircuitNum) + ", Number of Units=" +
-                               TrimSigDigits(NumOfPipeCircuits) + ", Entered Unit name=" + EquipName); // Autodesk:Uninit DomainNum was uninitialized
-            }
-            if (PipingSystemCircuits(CircuitNum).CheckEquipName) {
-                if (EquipName != PipingSystemCircuits(CircuitNum).Name) {
-                    ShowFatalError(RoutineName + ": Invalid component name passed=" + TrimSigDigits(CircuitNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + PipingSystemCircuits(CircuitNum).Name);
-                }
-                PipingSystemCircuits(CircuitNum).CheckEquipName = false;
+        // Now look for this particular pipe in the list
+        for (auto &circuit : PipingSystemCircuits) {
+            if (circuit.Name == objectName) {
+                return &circuit;
             }
         }
+        // If we didn't find it, fatal
+        ShowFatalError("PipeCircuitInfoFactory: Error getting inputs for circuit named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
 
-        // If we are just initializing data structures, then return
-        if (InitLoopEquip) return;
-
+    void PipeCircuitInfo::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 bool const EP_UNUSED(FirstHVACIteration),
+                                 Real64 &EP_UNUSED(CurLoad),
+                                 bool const EP_UNUSED(RunFlag))
+    {
         // Retrieve the parent domain index for this pipe circuit
-        int DomainNum = PipingSystemCircuits(CircuitNum).ParentDomainIndex;
+        int DomainNum = this->ParentDomainIndex;
+        int CircuitNum = this->CircuitIndex;
 
         // Do any initialization here
         InitPipingSystems(DomainNum, CircuitNum);
@@ -1739,6 +1710,7 @@ namespace PlantPipingSystemsManager {
 
             // Get the name, validate
             PipingSystemCircuits(PipeCircuitCounter).Name = cAlphaArgs(1);
+            PipingSystemCircuits(PipeCircuitCounter).CircuitIndex = PipeCircuitCounter;
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             // Read pipe thermal properties, validated by IP

@@ -80,6 +80,7 @@
 #include <Plant/PlantManager.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
+#include <PlantPipingSystemsManager.hh>
 #include <PlantUtilities.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
@@ -872,6 +873,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
                             this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                             this_comp.CurOpSchemeType = NoControlOpSchemeType;
+                            this_comp.compPtr = PlantPipingSystemsManager::PipeCircuitInfo::factory(TypeOf_PipingSystemPipeCircuit, CompNames(CompNum));
                         } else if (has_prefixi(this_comp_type, "Pump") || has_prefixi(this_comp_type, "HeaderedPumps")) {
                             if (has_prefixi(this_comp_type, "Pump:VariableSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;

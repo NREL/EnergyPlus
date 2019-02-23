@@ -63,6 +63,10 @@
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
+
+// Forward Declarations
+struct PlantLocation;
 
 namespace EnergyPlus {
 
@@ -630,74 +634,74 @@ namespace PlantPipingSystemsManager {
         void initPipeCells(int x, int y);
     };
 
-    struct PipeCircuitInfo
+    struct PipeCircuitInfo : public PlantComponent
     {
+
         // Members
         // ID
-        std::string Name;
+        std::string Name = "";
         // Inlet and outlet information
-        std::string InletNodeName;
-        std::string OutletNodeName;
-        int InletNodeNum;
-        int OutletNodeNum;
+        std::string InletNodeName = "";
+        std::string OutletNodeName = "";
+        int InletNodeNum = 0;
+        int OutletNodeNum = 0;
         Point3DInteger CircuitInletCell;
         Point3DInteger CircuitOutletCell;
         // Names and pointers to pipe segments found in this pipe circuit
         Array1D_string PipeSegmentNames;
         Array1D_int PipeSegmentIndices;
         // Pointer to the domain which contains this pipe circuit
-        int ParentDomainIndex;
+        int ParentDomainIndex = 0;
+        int CircuitIndex = 0;
         // Misc inputs
         RadialSizing PipeSize;
         RadialSizing InsulationSize;
-        Real64 RadialMeshThickness;
-        bool HasInsulation;
-        Real64 DesignVolumeFlowRate;
-        Real64 DesignMassFlowRate;
-        Real64 Convergence_CurrentToPrevIteration;
-        int MaxIterationsPerTS;
-        int NumRadialCells;
+        Real64 RadialMeshThickness = 0.0;
+        bool HasInsulation = false;
+        Real64 DesignVolumeFlowRate = 0.0;
+        Real64 DesignMassFlowRate = 0.0;
+        Real64 Convergence_CurrentToPrevIteration = 0.0;
+        int MaxIterationsPerTS = 0;
+        int NumRadialCells = 0;
         BaseThermalPropertySet PipeProperties;
         BaseThermalPropertySet InsulationProperties;
         // A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
         Array1D<Point3DInteger> ListOfCircuitPoints;
         // Flags
-        bool CheckEquipName;
-        bool NeedToFindOnPlantLoop;
-        bool IsActuallyPartOfAHorizontalTrench;
+        bool CheckEquipName = true;
+        bool NeedToFindOnPlantLoop = true;
+        bool IsActuallyPartOfAHorizontalTrench = false;
         // Location of this pipe circuit in the PlantLoop topology
-        int LoopNum;
-        int LoopSideNum;
-        int BranchNum;
-        int CompNum;
+        int LoopNum = 0;
+        int LoopSideNum = 0;
+        int BranchNum = 0;
+        int CompNum = 0;
         // Current fluid property values
-        Real64 CurFluidDensity;
-        Real64 CurFluidViscosity;
-        Real64 CurFluidConductivity;
-        Real64 CurFluidPrandtl;
-        Real64 CurFluidSpecificHeat;
+        Real64 CurFluidDensity = 998.0;
+        Real64 CurFluidViscosity = 0.0015;
+        Real64 CurFluidConductivity = 0.58;
+        Real64 CurFluidPrandtl = 7.0;
+        Real64 CurFluidSpecificHeat = 4190.0;
         ExtendedFluidProperties CurFluidPropertySet; // is_used
         // Variables used to pass information from INIT-type routines to CALC-type routines
-        Real64 CurCircuitInletTemp;
-        Real64 CurCircuitFlowRate;
-        Real64 CurCircuitConvectionCoefficient;
+        Real64 CurCircuitInletTemp = 23.0;
+        Real64 CurCircuitFlowRate = 0.1321;
+        Real64 CurCircuitConvectionCoefficient = 0.0;
         // Reporting variables
-        Real64 InletTemperature;
-        Real64 OutletTemperature;
-        Real64 FluidHeatLoss;
+        Real64 InletTemperature = 0.0;
+        Real64 OutletTemperature = 0.0;
+        Real64 FluidHeatLoss = 0.0;
 
         // Default Constructor
-        PipeCircuitInfo()
-            : InletNodeNum(0), OutletNodeNum(0), ParentDomainIndex(0), RadialMeshThickness(0.0), HasInsulation(false), DesignVolumeFlowRate(0.0),
-              DesignMassFlowRate(0.0), Convergence_CurrentToPrevIteration(0.0), MaxIterationsPerTS(0), NumRadialCells(0), CheckEquipName(true),
-              NeedToFindOnPlantLoop(true), IsActuallyPartOfAHorizontalTrench(false), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
-              CurFluidDensity(998.0), CurFluidViscosity(0.0015), CurFluidConductivity(0.58), CurFluidPrandtl(7.0), CurFluidSpecificHeat(4190.0),
-              CurCircuitInletTemp(23.0), CurCircuitFlowRate(0.1321), CurCircuitConvectionCoefficient(0.0), InletTemperature(0.0),
-              OutletTemperature(0.0), FluidHeatLoss(0.0)
-        {
-        }
+        PipeCircuitInfo() = default;
+        virtual ~PipeCircuitInfo() = default;
 
         void initInOutCells(CartesianCell const &in, CartesianCell const &out);
+
+        static PlantComponent *factory(int objectType, std::string objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
     };
 
     struct ZoneCoupledSurfaceData
@@ -913,11 +917,6 @@ namespace PlantPipingSystemsManager {
     extern Array1D<PipeSegmentInfo> PipingSystemSegments;
 
     void clear_state();
-
-    void SimPipingSystemCircuit(std::string const &EquipName,  // name of the Pipe Heat Transfer.
-                                int &EqNum,                    // index in local derived types for external calling
-                                bool FirstHVACIteration, // component number
-                                bool InitLoopEquip);
 
     void SimulateGroundDomains(bool initOnly);
 
