@@ -1347,6 +1347,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
                             this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                             this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
+                            this_comp.compPtr = PlantPipingSystemsManager::PipeCircuitInfo::factory(TypeOf_GrndHtExchgHorizTrench, CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                             this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
                             this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;

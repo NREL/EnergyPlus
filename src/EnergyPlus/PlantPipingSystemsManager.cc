@@ -2023,6 +2023,7 @@ namespace PlantPipingSystemsManager {
             //******* We'll next set up the circuit ********
             PipingSystemCircuits(CircuitCtr).IsActuallyPartOfAHorizontalTrench = true;
             PipingSystemCircuits(CircuitCtr).Name = HGHX(HorizontalGHXCtr).ObjName;
+            PipingSystemCircuits(CircuitCtr).CircuitIndex = CircuitCtr;
 
             // Read pipe thermal properties
             PipingSystemCircuits(CircuitCtr).PipeProperties.Conductivity = HGHX(HorizontalGHXCtr).PipeConductivity;
