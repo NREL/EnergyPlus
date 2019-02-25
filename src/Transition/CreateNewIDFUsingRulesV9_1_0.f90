@@ -434,7 +434,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
-              CASE('ZoneHVAC:EquipmentList')
+              CASE('ZONEHVAC:EQUIPMENTLIST')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
                   OutArgs(1) = InArgs(1)
