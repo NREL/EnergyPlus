@@ -2820,10 +2820,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> XBoundaryPoints;
-        Array1D<Real64> YBoundaryPoints;
-        Array1D<Real64> ZBoundaryPoints;
-        int BoundaryListCount;
         bool XPartitionsExist;
         bool YPartitionsExist;
         bool ZPartitionsExist;
@@ -2966,17 +2962,9 @@ namespace PlantPipingSystemsManager {
         }
 
         //'** MAKE REGIONS > BOUNDARIES **'
-        BoundaryListCount = CreateBoundaryListCount(XRegions, RegionType::XDirection);
-        XBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        XBoundaryPoints = CreateBoundaryList(XRegions, this->Extents.xMax, RegionType::XDirection, 0, BoundaryListCount - 1);
-
-        BoundaryListCount = CreateBoundaryListCount(YRegions, RegionType::YDirection);
-        YBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        YBoundaryPoints = CreateBoundaryList(YRegions, this->Extents.yMax, RegionType::YDirection, 0, BoundaryListCount - 1);
-
-        BoundaryListCount = CreateBoundaryListCount(ZRegions, RegionType::ZDirection);
-        ZBoundaryPoints.allocate({0, BoundaryListCount - 1});
-        ZBoundaryPoints = CreateBoundaryList(ZRegions, this->Extents.zMax, RegionType::ZDirection, 0, BoundaryListCount - 1);
+        std::vector<Real64> XBoundaryPoints = CreateBoundaryList(XRegions, this->Extents.xMax, RegionType::XDirection);
+        std::vector<Real64> YBoundaryPoints = CreateBoundaryList(YRegions, this->Extents.yMax, RegionType::YDirection);
+        std::vector<Real64> ZBoundaryPoints = CreateBoundaryList(ZRegions, this->Extents.zMax, RegionType::ZDirection);
 
         //'****** DEVELOP CELL ARRAY *****'
         this->createCellArray(XBoundaryPoints, YBoundaryPoints, ZBoundaryPoints);
@@ -3660,49 +3648,9 @@ namespace PlantPipingSystemsManager {
     }
 #pragma clang diagnostic pop
 
-    int CreateBoundaryListCount(Array1D<GridRegion> const &RegionList, RegionType const DirDirection)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int RetVal = 0;
-        for (int Index = RegionList.l1(); Index <= RegionList.u1(); ++Index) {
-            switch (RegionList(Index).thisRegionType) {
-            case RegionType::Pipe:
-            case RegionType::BasementFloor:
-            case RegionType::BasementWall:
-            case RegionType::XSide:
-            case RegionType::XSideWall:
-            case RegionType::ZSide:
-            case RegionType::ZSideWall:
-            case RegionType::HorizInsXSide:
-            case RegionType::HorizInsZSide:
-            case RegionType::FloorInside:
-            case RegionType::UnderFloor:
-            case RegionType::VertInsLowerEdge:
-                ++RetVal;
-                break;
-            default:
-                if (RegionList(Index).thisRegionType == DirDirection) {
-                    for (int CellWidthCtr = RegionList(Index).CellWidths.l1(); CellWidthCtr <= RegionList(Index).CellWidths.u1(); ++CellWidthCtr) {
-                        ++RetVal;
-                    }
-                }
-            }
-        }
-        ++RetVal;
-        return RetVal;
-    }
-
-    Array1D<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList,
+    std::vector<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList,
                                        Real64 const DirExtentMax,
-                                       RegionType const DirDirection,
-                                       int const RetValLbound,
-                                       int const RetValUBound)
+                                       RegionType const DirDirection)
     {
 
         // FUNCTION INFORMATION:
@@ -3711,7 +3659,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Array1D<Real64> RetVal({RetValLbound, RetValUBound});
+        std::vector<Real64> RetVal;
         int Counter = -1;
         for (int Index = RegionList.l1(); Index <= RegionList.u1(); ++Index) {
             switch (RegionList(Index).thisRegionType) {
@@ -3728,26 +3676,26 @@ namespace PlantPipingSystemsManager {
             case RegionType::UnderFloor:
             case RegionType::VertInsLowerEdge:
                 ++Counter;
-                RetVal(Counter) = RegionList(Index).Min;
+                RetVal.push_back(RegionList(Index).Min);
                 break;
             default:
                 if (RegionList(Index).thisRegionType == DirDirection) {
                     Real64 StartingPointCounter = RegionList(Index).Min;
                     for (int CellWidthCtr = RegionList(Index).CellWidths.l1(); CellWidthCtr <= RegionList(Index).CellWidths.u1(); ++CellWidthCtr) {
                         ++Counter;
-                        RetVal(Counter) = StartingPointCounter;
+                        RetVal.push_back(StartingPointCounter);
                         StartingPointCounter += RegionList(Index).CellWidths(CellWidthCtr);
                     }
                 }
             }
         }
-        RetVal(RetVal.u1()) = DirExtentMax;
+        RetVal.push_back(DirExtentMax);
         return RetVal;
     }
 
-    void FullDomainStructureInfo::createCellArray(Array1D<Real64> const &XBoundaryPoints,
-                                                  Array1D<Real64> const &YBoundaryPoints,
-                                                  Array1D<Real64> const &ZBoundaryPoints)
+    void FullDomainStructureInfo::createCellArray(std::vector<Real64> const &XBoundaryPoints,
+                                                  std::vector<Real64> const &YBoundaryPoints,
+                                                  std::vector<Real64> const &ZBoundaryPoints)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3778,9 +3726,9 @@ namespace PlantPipingSystemsManager {
         //'subtract 2 in each dimension:
         //'     one for zero based array
         //'     one because the boundary points contain one entry more than the number of cells WITHIN the domain
-        this->x_max_index = isize(XBoundaryPoints) - 2;
-        this->y_max_index = isize(YBoundaryPoints) - 2;
-        this->z_max_index = isize(ZBoundaryPoints) - 2;
+        this->x_max_index = XBoundaryPoints.size() - 2;
+        this->y_max_index = YBoundaryPoints.size() - 2;
+        this->z_max_index = ZBoundaryPoints.size() - 2;
         this->Cells.allocate({0, this->x_max_index}, {0, this->y_max_index}, {0, this->z_max_index});
 
         int MaxBasementXNodeIndex = this->BasementZone.BasementWallXIndex;
@@ -3803,22 +3751,22 @@ namespace PlantPipingSystemsManager {
 
                     //'set up x-direction variables
                     int CellXIndex = X;                            //'zero based index
-                    Real64 CellXMinValue = XBoundaryPoints(X);     //'left wall x-value
-                    Real64 CellXMaxValue = XBoundaryPoints(X + 1); //'right wall x-value
+                    Real64 CellXMinValue = XBoundaryPoints[X];     //'left wall x-value
+                    Real64 CellXMaxValue = XBoundaryPoints[X + 1]; //'right wall x-value
                     Real64 CellXCenter = (CellXMinValue + CellXMaxValue) / 2;
                     Real64 CellWidth = CellXMaxValue - CellXMinValue;
 
                     //'set up y-direction variables
                     int CellYIndex = Y;                            //'zero based index
-                    Real64 CellYMinValue = YBoundaryPoints(Y);     //'bottom wall y-value
-                    Real64 CellYMaxValue = YBoundaryPoints(Y + 1); //'top wall y-value
+                    Real64 CellYMinValue = YBoundaryPoints[Y];     //'bottom wall y-value
+                    Real64 CellYMaxValue = YBoundaryPoints[Y + 1]; //'top wall y-value
                     Real64 CellYCenter = (CellYMinValue + CellYMaxValue) / 2;
                     Real64 CellHeight = CellYMaxValue - CellYMinValue;
 
                     //'set up z-direction variables
                     int CellZIndex = Z;                            //'zero based index
-                    Real64 CellZMinValue = ZBoundaryPoints(Z);     //'lower z value
-                    Real64 CellZMaxValue = ZBoundaryPoints(Z + 1); //'higher z value
+                    Real64 CellZMinValue = ZBoundaryPoints[Z];     //'lower z value
+                    Real64 CellZMaxValue = ZBoundaryPoints[Z + 1]; //'higher z value
                     Real64 CellZCenter = (CellZMinValue + CellZMaxValue) / 2;
 
                     //'set up an extent class for this cell

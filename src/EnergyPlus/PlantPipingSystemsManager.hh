@@ -865,7 +865,7 @@ namespace PlantPipingSystemsManager {
                               Optional_int ZWallIndex = _,
                               Optional_int InsulationZIndex = _);
 
-        void createCellArray(Array1D<Real64> const &XBoundaryPoints, Array1D<Real64> const &YBoundaryPoints, Array1D<Real64> const &ZBoundaryPoints);
+        void createCellArray(std::vector<Real64> const &XBoundaryPoints, std::vector<Real64> const &YBoundaryPoints, std::vector<Real64> const &ZBoundaryPoints);
 
         void setupCellNeighbors();
 
@@ -1028,13 +1028,7 @@ namespace PlantPipingSystemsManager {
 
     void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
-    int CreateBoundaryListCount(Array1D<GridRegion> const &RegionList, RegionType DirDirection);
-
-    Array1D<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList,
-                                       Real64 DirExtentMax,
-                                       RegionType DirDirection,
-                                       int RetValLbound,
-                                       int RetValUBound);
+    std::vector<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
 
     void SimulateOuterMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
 
