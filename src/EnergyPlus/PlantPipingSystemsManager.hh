@@ -651,8 +651,8 @@ namespace PlantPipingSystemsManager {
         Point3DInteger CircuitInletCell;
         Point3DInteger CircuitOutletCell;
         // Names and pointers to pipe segments found in this pipe circuit
-        Array1D_string PipeSegmentNames;
-        Array1D_int PipeSegmentIndices;
+        std::vector<std::string> PipeSegmentNames;
+        std::vector<int> PipeSegmentIndices;
         // Pointer to the domain which contains this pipe circuit
         int ParentDomainIndex = 0;
         int CircuitIndex = 0;
@@ -668,8 +668,6 @@ namespace PlantPipingSystemsManager {
         int NumRadialCells = 0;
         BaseThermalPropertySet PipeProperties;
         BaseThermalPropertySet InsulationProperties;
-        // A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
-        Array1D<Point3DInteger> ListOfCircuitPoints;
         // Flags
         bool CheckEquipName = true;
         bool NeedToFindOnPlantLoop = true;
@@ -840,8 +838,8 @@ namespace PlantPipingSystemsManager {
               InsulationZIndex(0), SimTimeStepFlag(false), SimHourlyFlag(false), SimDailyFlag(false), ZoneCoupledSurfaceTemp(0.0),
               BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0), NumInsulationCells(0), NumSlabCells(0)
         {
-            NeighborFieldCells.reserve(6);
-            NeighborBoundaryCells.reserve(6);
+            NeighborFieldCells.resize(6);
+            NeighborBoundaryCells.resize(6);
         }
 
         void developMesh();

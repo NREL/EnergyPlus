@@ -489,24 +489,19 @@ namespace PlantPipingSystemsManager {
         SetupPipingSystemOutputVariables(TotalNumSegments, TotalNumCircuits);
 
         // Validate CIRCUIT-SEGMENT cross references
-        for (int CircuitCtr = PipingSystemCircuits.l1(); CircuitCtr <= PipingSystemCircuits.u1(); ++CircuitCtr) {
+        for (auto & pipeCircuit : PipingSystemCircuits) {
 
             // validate circuit-segment name-to-index references
-            for (ThisCircuitPipeSegmentCounter = PipingSystemCircuits(CircuitCtr).PipeSegmentNames.l1();
-                 ThisCircuitPipeSegmentCounter <= PipingSystemCircuits(CircuitCtr).PipeSegmentNames.u1();
-                 ++ThisCircuitPipeSegmentCounter) {
-
-                ThisSegmentName = PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter);
+            for (ThisCircuitPipeSegmentCounter = 0; ThisCircuitPipeSegmentCounter < static_cast<int>(pipeCircuit.PipeSegmentNames.size()); ++ThisCircuitPipeSegmentCounter) {
+                ThisSegmentName = pipeCircuit.PipeSegmentNames[ThisCircuitPipeSegmentCounter];
                 ThisSegmentIndex = UtilityRoutines::FindItemInList(ThisSegmentName, PipingSystemSegments);
                 if (ThisSegmentIndex > 0) {
-                    PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(ThisCircuitPipeSegmentCounter) = ThisSegmentIndex;
+                    pipeCircuit.PipeSegmentIndices.push_back(ThisSegmentIndex);
                 } else {
-                    ShowSevereError(RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' + PipingSystemCircuits(CircuitCtr).Name);  // NOLINT(performance-inefficient-string-concatenation)
-
+                    ShowSevereError(RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' + pipeCircuit.Name);  // NOLINT(performance-inefficient-string-concatenation)
                     ShowContinueError(RoutineName + ": Looking for: " + ObjName_Segment + '=' + ThisSegmentName); // NOLINT(performance-inefficient-string-concatenation)
                     ErrorsFound = true;
                 }
-
             } // Segment loop
 
         } // Circuit loop
@@ -528,10 +523,8 @@ namespace PlantPipingSystemsManager {
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
-                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
-                     ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
                     PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y =
                         PipingSystemDomains(DomainNum).Extents.yMax - PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y;
                 } // segment loop
@@ -541,10 +534,8 @@ namespace PlantPipingSystemsManager {
             if (PipingSystemDomains(DomainNum).HasBasement && PipingSystemDomains(DomainNum).BasementZone.ShiftPipesByWidth) {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                     CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
-                    for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
-                         PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
-                         ++PipeCtr) {
-                        ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
+                    for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
+                        ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
                         PipingSystemSegments(ThisSegmentIndex).PipeLocation.X += PipingSystemDomains(DomainNum).BasementZone.Width;
                     } // segment loop
                 }     // circuit loop
@@ -557,10 +548,8 @@ namespace PlantPipingSystemsManager {
                 CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
 
                 // check to make sure it isn't outside the domain
-                for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
-                     ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices(PipeCtr);
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
                     if ((PipingSystemSegments(ThisSegmentIndex).PipeLocation.X > PipingSystemDomains(DomainNum).Extents.xMax) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.X < 0.0) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y > PipingSystemDomains(DomainNum).Extents.yMax) ||
@@ -1739,8 +1728,6 @@ namespace PlantPipingSystemsManager {
 
             // Read number of pipe segments for this circuit, allocate arrays
             NumPipeSegments = static_cast<int>(rNumericArgs(11));
-            PipingSystemCircuits(PipeCircuitCounter).PipeSegmentIndices.allocate(NumPipeSegments);
-            PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames.allocate(NumPipeSegments);
 
             // Check for blank or missing or mismatched number...
             NumAlphasBeforeSegmentOne = 3;
@@ -1755,7 +1742,7 @@ namespace PlantPipingSystemsManager {
                                                           "Expected a pipe segment name, check pipe segment count input field.",
                                                           ErrorsFound);
                 }
-                PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames(ThisCircuitPipeSegmentCounter) = cAlphaArgs(CurIndex);
+                PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames.push_back(cAlphaArgs(CurIndex));
             }
 
         } // All pipe circuits in input
@@ -2062,31 +2049,26 @@ namespace PlantPipingSystemsManager {
 
             // Read number of pipe segments for this circuit, allocate arrays
             NumPipeSegments = HGHX(HorizontalGHXCtr).NumPipes;
-            PipingSystemCircuits(CircuitCtr).PipeSegmentIndices.allocate(NumPipeSegments);
-            PipingSystemCircuits(CircuitCtr).PipeSegmentNames.allocate(NumPipeSegments);
 
             // Hard-code the segments
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
-                gio::write(PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter),
-                           "( 'HorizontalTrenchCircuit',I4,'Segment',I4 )")
-                    << HorizontalGHXCtr << ThisCircuitPipeSegmentCounter;
+                PipingSystemCircuits(CircuitCtr).PipeSegmentNames.push_back("HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter));
             }
 
             //******* Then we'll do the segments *******!
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 ++SegmentCtr;
-                gio::write(PipingSystemSegments(SegmentCtr).Name, "( 'HorizontalTrenchCircuit',I4,'Segment',I4 )")
-                    << HorizontalGHXCtr << ThisCircuitPipeSegmentCounter;
-
-                PipingSystemSegments(SegmentCtr).IsActuallyPartOfAHorizontalTrench = true;
-                PipingSystemSegments(SegmentCtr).PipeLocation =
-                    PointF(ThisCircuitPipeSegmentCounter * HGHX(HorizontalGHXCtr).InterPipeSpacing, HGHX(HorizontalGHXCtr).BurialDepth);
+                PipeSegmentInfo segment;
+                segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter);
+                segment.IsActuallyPartOfAHorizontalTrench = true;
+                segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * HGHX(HorizontalGHXCtr).InterPipeSpacing, HGHX(HorizontalGHXCtr).BurialDepth);
 
                 if (mod(ThisCircuitPipeSegmentCounter, 2) != 0) {
-                    PipingSystemSegments(SegmentCtr).FlowDirection = SegmentFlow::IncreasingZ;
+                    segment.FlowDirection = SegmentFlow::IncreasingZ;
                 } else {
-                    PipingSystemSegments(SegmentCtr).FlowDirection = SegmentFlow::DecreasingZ;
+                    segment.FlowDirection = SegmentFlow::DecreasingZ;
                 }
+                PipingSystemSegments(SegmentCtr) = segment;
             }
         }
     }
@@ -2297,10 +2279,9 @@ namespace PlantPipingSystemsManager {
             this->developMesh();
 
             // would be OK to do some post-mesh error handling here I think
-            for (int CircCtr = 1; CircCtr <= isize(this->CircuitIndices); ++CircCtr) {
-                for (int SegCtr = 1; SegCtr <= isize(PipingSystemCircuits(this->CircuitIndices(CircCtr)).PipeSegmentIndices); ++SegCtr) {
-                    int SegmentIndex = PipingSystemCircuits(this->CircuitIndices(CircCtr)).PipeSegmentIndices(SegCtr);
-                    if (!PipingSystemSegments(SegmentIndex).PipeCellCoordinatesSet) {
+            for (auto & circuitIndex : this->CircuitIndices) {
+                for (auto & segmentIndex : PipingSystemCircuits(circuitIndex).PipeSegmentIndices) {
+                    if (!PipingSystemSegments(segmentIndex).PipeCellCoordinatesSet) {
                         ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                         ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
                         ShowContinueError("...Verify piping system domain inputs, circuits, and segments.");
@@ -3720,13 +3701,8 @@ namespace PlantPipingSystemsManager {
                          ++CircuitCtr) {
 
                         FoundOnCircuitIndex = this->CircuitIndices(CircuitCtr);
-                        for (int PipeCounter = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.l1(),
-                                 NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.u1();
-                             PipeCounter <= NumSegments;
-                             ++PipeCounter) {
-
-                            PipeSegmentInfo const &ThisSegment =
-                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices(PipeCounter));
+                        for (int PipeCounter = 0, NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
+                            PipeSegmentInfo const &ThisSegment = PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices[PipeCounter]);
                             if (XYRectangle.contains(ThisSegment.PipeLocation)) {
                                 //'inform the cell that it is a pipe node
                                 cellType = CellType::Pipe;
@@ -3735,8 +3711,7 @@ namespace PlantPipingSystemsManager {
                                 //'inform the cell of which pipe circuit contains it
                                 CircuitIndex = FoundOnCircuitIndex;
                                 //'inform the pipe of what cell it is inside
-                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices(PipeCounter))
-                                    .initPipeCells(CellXIndex, CellYIndex);
+                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices[PipeCounter]).initPipeCells(CellXIndex, CellYIndex);
                                 //'set the number of cells to be generated in this near-pipe region
                                 NumRadialCells = PipingSystemCircuits(FoundOnCircuitIndex).NumRadialCells;
                                 //'exit the pipe counter loop
@@ -4065,11 +4040,8 @@ namespace PlantPipingSystemsManager {
             int CircuitIndex = this->CircuitIndices(CircuitNum);
             bool CircuitInletCellSet = false;
 
-            for (int SegmentCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.l1();
-                 SegmentCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.u1();
-                 ++SegmentCtr) {
-
-                auto &Segment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices(SegmentCtr));
+            for (auto & segmentIndex : PipingSystemCircuits(CircuitIndex).PipeSegmentIndices) {
+                auto &Segment = PipingSystemSegments(segmentIndex);
                 switch (Segment.FlowDirection) {
                 case SegmentFlow::IncreasingZ:
                     SegmentInletCellX = Segment.PipeCellCoordinates.X;
@@ -5168,14 +5140,14 @@ namespace PlantPipingSystemsManager {
 
         // initialize
         int SegmentCellCtr = 0;
-        int StartingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.l1();
-        int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.u1();
+        int StartingSegment = 0;
+        int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.size() - 1;
 
         //'loop across all segments (pipes) of the circuit
         auto &cells(this->Cells);
         for (int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr) {
 
-            int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegmentCtr);
+            int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices[SegmentCtr];
             int StartingZ = 0;
             int EndingZ = 0;
             int Increment = 0;
@@ -5785,50 +5757,6 @@ namespace PlantPipingSystemsManager {
                         this->EvaluateNeighborCharacteristics(cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
                         int NX = 0, NY = 0, NZ = 0;
                         cell.EvaluateNeighborCoordinates(CurDirection, NX, NY, NZ);
-                    }
-                }
-            }
-        }
-
-        //'create circuit array for convenience
-
-        if (present(CircuitNum)) {
-            if (!allocated(PipingSystemCircuits(CircuitNum).ListOfCircuitPoints)) {
-
-                int SegCtr2 = -1;
-
-                int TotalSegments = size(cells, 3) * size(PipingSystemCircuits(CircuitNum).PipeSegmentIndices);
-                PipingSystemCircuits(CircuitNum).ListOfCircuitPoints.allocate({0, TotalSegments - 1});
-
-                for (int SegIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.l1();
-                     SegIndex <= PipingSystemCircuits(CircuitNum).PipeSegmentIndices.u1();
-                     ++SegIndex) {
-
-                    //'set simulation flow direction
-                    int StartingZ = 0;
-                    int EndingZ = 0;
-                    int Increment = 0;
-                    switch (PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).FlowDirection) {
-                    case SegmentFlow::IncreasingZ:
-                        StartingZ = 0;
-                        EndingZ = this->z_max_index;
-                        Increment = 1;
-                        break;
-                    case SegmentFlow::DecreasingZ:
-                        StartingZ = this->z_max_index;
-                        EndingZ = 0;
-                        Increment = -1;
-                        break;
-                    }
-
-                    int PipeX = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).PipeCellCoordinates.X;
-                    int PipeY = PipingSystemSegments(PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegIndex)).PipeCellCoordinates.Y;
-
-                    //'loop across all z-direction indices
-                    int const Zindex_stop(floop_end(StartingZ, EndingZ, Increment));
-                    for (int Zindex = StartingZ; Zindex != Zindex_stop; Zindex += Increment) {
-                        ++SegCtr2;
-                        PipingSystemCircuits(CircuitNum).ListOfCircuitPoints(SegCtr2) = Point3DInteger(PipeX, PipeY, Zindex);
                     }
                 }
             }
