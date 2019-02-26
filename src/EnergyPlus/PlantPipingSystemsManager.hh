@@ -567,9 +567,9 @@ namespace PlantPipingSystemsManager {
     struct MeshPartitions
     {
         // Members
-        Array1D<MeshPartition> X;
-        Array1D<MeshPartition> Y;
-        Array1D<MeshPartition> Z;
+        std::vector<MeshPartition> X;
+        std::vector<MeshPartition> Y;
+        std::vector<MeshPartition> Z;
 
         // Default Constructor
         MeshPartitions() = default;
@@ -810,9 +810,9 @@ namespace PlantPipingSystemsManager {
         Real64 TotalEnergyUniformHeatFlux = 0.0;
         Real64 TotalEnergyWeightedHeatFlux = 0.0;
         Real64 HeatFluxWeightingFactor = 0.0;
-        Array1D<GridRegion> XRegions;
-        Array1D<GridRegion> YRegions;
-        Array1D<GridRegion> ZRegions;
+        std::vector<GridRegion> XRegions;
+        std::vector<GridRegion> YRegions;
+        std::vector<GridRegion> ZRegions;
 
         // Main 3D cells array
         Array3D<CartesianCell> Cells;
@@ -832,8 +832,7 @@ namespace PlantPipingSystemsManager {
               NumHeatFlux(0), ResetHeatFluxFlag(true), ConvectionCoefficient(0.0), FullHorizInsPresent(false), VertInsPresentFlag(false), VertInsMaterialNum(0),
               VertInsThickness(0.0254), VertInsDepth(0.0), XWallIndex(0), YFloorIndex(0), ZWallIndex(0), InsulationXIndex(0), InsulationYIndex(0),
               InsulationZIndex(0), SimTimeStepFlag(false), SimHourlyFlag(false), SimDailyFlag(false), ZoneCoupledSurfaceTemp(0.0),
-              BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0), NumInsulationCells(0), NumSlabCells(0),
-              XRegions({0, -1}), YRegions({0, -1}), ZRegions({0, -1})
+              BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0), NumInsulationCells(0), NumSlabCells(0)
         {
             NeighborFieldCells.reserve(6);
             NeighborBoundaryCells.reserve(6);
@@ -843,13 +842,12 @@ namespace PlantPipingSystemsManager {
 
         void createPartitionCenterList();
 
-        Array1D<GridRegion> createPartitionRegionList(Array1D<MeshPartition> const &ThesePartitionCenters,
+        std::vector<GridRegion> createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
                                                       bool PartitionsExist,
-                                                      Real64 DirExtentMax,
-                                                      int PartitionsUBound);
+                                                      Real64 DirExtentMax);
 
-        void createRegionList(Array1D<GridRegion> &Regions,
-                              Array1D<GridRegion> const &ThesePartitionRegions,
+        void createRegionList(std::vector<GridRegion> &Regions,
+                              std::vector<GridRegion> const &ThesePartitionRegions,
                               Real64 DirExtentMax,
                               RegionType DirDirection,
                               bool PartitionsExist,
@@ -1022,9 +1020,9 @@ namespace PlantPipingSystemsManager {
         return ((r >= lower) && (r < upper));
     }
 
-    bool MeshPartitionArray_Contains(Array1D<MeshPartition> const &meshes, Real64 value);
+    bool MeshPartitionArray_Contains(std::vector<MeshPartition> const &meshes, Real64 value);
 
-    void MeshPartition_SelectionSort(Array1<MeshPartition> &X);
+    void MeshPartition_SelectionSort(std::vector<MeshPartition> &X);
 
     void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
