@@ -923,6 +923,14 @@ namespace PlantPipingSystemsManager {
 
         Real64 GetFarfieldTemp(CartesianCell const &cell);
 
+        void PreparePipeCircuitSimulation(int CircuitNum);
+
+        void PerformPipeCircuitSimulation(int CircuitNum);
+
+        void PerformPipeCellSimulation(int CircuitNum, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
+
+        void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
+
     };
 
     // Object Data
@@ -1002,8 +1010,6 @@ namespace PlantPipingSystemsManager {
 
     void MeshPartition_SelectionSort(Array1<MeshPartition> &X);
 
-    bool IsConverged_PipeCurrentToPrevIteration(int CircuitNum, CartesianCell const &CellToCheck);
-
     void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
     int CreateBoundaryListCount(Array1D<GridRegion> const &RegionList, RegionType DirDirection);
@@ -1031,15 +1037,6 @@ namespace PlantPipingSystemsManager {
     void EvaluateFarfieldCharacteristics(
         int DomainNum, CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
 
-    void PreparePipeCircuitSimulation(int DomainNum, int CircuitNum);
-
-    void PerformPipeCircuitSimulation(int DomainNum, int CircuitNum);
-
-    void
-    PerformPipeCellSimulation(int DomainNum, int CircuitNum, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
-
-    void SimulateRadialToCartesianInterface(int DomainNum, CartesianCell &ThisCell);
-
     void SimulateOuterMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
 
     void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
@@ -1051,6 +1048,8 @@ namespace PlantPipingSystemsManager {
     void SimulateRadialPipeCell(int CircuitNum, CartesianCell &ThisCell, Real64 ConvectionCoefficient);
 
     void SimulateFluidCell(CartesianCell &ThisCell, Real64 FlowRate, Real64 ConvectionCoefficient, Real64 EnteringFluidTemp);
+
+    bool IsConverged_PipeCurrentToPrevIteration(int CircuitNum, CartesianCell const &CellToCheck);
 
 } // namespace PlantPipingSystemsManager
 

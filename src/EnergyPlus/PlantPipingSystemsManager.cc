@@ -4568,7 +4568,7 @@ namespace PlantPipingSystemsManager {
 
         // Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
         if (thisDomain.HasAPipeCircuit) {
-            PreparePipeCircuitSimulation(DomainNum, CircuitNum);
+            thisDomain.PreparePipeCircuitSimulation(CircuitNum);
         }
 
         // Begin iterating for this time step
@@ -4577,7 +4577,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.ShiftTemperaturesForNewIteration();
 
             if (thisDomain.HasAPipeCircuit) {
-                PerformPipeCircuitSimulation(DomainNum, CircuitNum);
+                thisDomain.PerformPipeCircuitSimulation(CircuitNum);
             }
 
             if (thisDomain.DomainNeedsSimulation) PerformTemperatureFieldUpdate(DomainNum);
@@ -5405,7 +5405,7 @@ namespace PlantPipingSystemsManager {
         return this->Farfield.groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
     }
 
-    void PreparePipeCircuitSimulation(int const DomainNum, int const CircuitNum)
+    void FullDomainStructureInfo::PreparePipeCircuitSimulation(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5437,14 +5437,14 @@ namespace PlantPipingSystemsManager {
         if (Velocity > 0) {
             Real64 Reynolds = Density * PipingSystemCircuits(CircuitNum).PipeSize.InnerDia * Velocity / Viscosity;
             Real64 ExponentTerm = 0.0;
-            if (PipingSystemDomains(DomainNum).Cells(CellX, CellY, CellZ).PipeCellData.Fluid.Temperature >
-                PipingSystemDomains(DomainNum).Cells(CellX, CellY, CellZ).PipeCellData.Pipe.Temperature) {
+            if (this->Cells(CellX, CellY, CellZ).PipeCellData.Fluid.Temperature >
+                this->Cells(CellX, CellY, CellZ).PipeCellData.Pipe.Temperature) {
                 ExponentTerm = 0.3;
             } else {
                 ExponentTerm = 0.4;
             }
             Real64 Nusselt = 0.023 * std::pow(Reynolds, 4.0 / 5.0) * std::pow(Prandtl, ExponentTerm);
-            ConvCoefficient = Nusselt * Conductivity / PipingSystemCircuits(DomainNum).PipeSize.InnerDia;
+            ConvCoefficient = Nusselt * Conductivity / PipingSystemCircuits(CircuitNum).PipeSize.InnerDia;
         } else {
             ConvCoefficient = StagnantFluidConvCoeff;
         }
@@ -5453,7 +5453,7 @@ namespace PlantPipingSystemsManager {
         PipingSystemCircuits(CircuitNum).CurCircuitConvectionCoefficient = ConvCoefficient;
     }
 
-    void PerformPipeCircuitSimulation(int const DomainNum, int const CircuitNum)
+    void FullDomainStructureInfo::PerformPipeCircuitSimulation(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5476,8 +5476,7 @@ namespace PlantPipingSystemsManager {
         int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.u1();
 
         //'loop across all segments (pipes) of the circuit
-        auto &dom(PipingSystemDomains(DomainNum));
-        auto &cells(dom.Cells);
+        auto &cells(this->Cells);
         for (int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr) {
 
             int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices(SegmentCtr);
@@ -5489,11 +5488,11 @@ namespace PlantPipingSystemsManager {
             switch (PipingSystemSegments(SegmentIndex).FlowDirection) {
             case SegmentFlow::IncreasingZ:
                 StartingZ = 0;
-                EndingZ = dom.z_max_index;
+                EndingZ = this->z_max_index;
                 Increment = 1;
                 break;
             case SegmentFlow::DecreasingZ:
-                StartingZ = dom.z_max_index;
+                StartingZ = this->z_max_index;
                 EndingZ = 0;
                 Increment = -1;
                 break;
@@ -5514,13 +5513,12 @@ namespace PlantPipingSystemsManager {
 
                 if (SegmentCellCtr == 1) {
                     //'we have the very first cell, need to pass in circuiting entering temperature
-                    PerformPipeCellSimulation(DomainNum, CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate, EnteringTemp);
+                    this->PerformPipeCellSimulation(CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate, EnteringTemp);
                 } else {
                     //'we don't have the first cell so just normal simulation
                     if (Zindex == EndingZ) {
                         // simulate current cell using upstream as entering conditions
-                        PerformPipeCellSimulation(DomainNum,
-                                                  CircuitNum,
+                        this->PerformPipeCellSimulation(CircuitNum,
                                                   cells(PipeX, PipeY, Zindex),
                                                   FlowRate,
                                                   cells(PipeX, PipeY, Zindex - Increment).PipeCellData.Fluid.Temperature);
@@ -5528,11 +5526,10 @@ namespace PlantPipingSystemsManager {
                         CircuitCrossTemp = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
                     } else if (Zindex == StartingZ) {
                         // we are starting another segment, use the previous cross temperature
-                        PerformPipeCellSimulation(DomainNum, CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate, CircuitCrossTemp);
+                        this->PerformPipeCellSimulation(CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate, CircuitCrossTemp);
                     } else {
                         // we are in an interior node, so just get the upstream cell and use the main simulation
-                        PerformPipeCellSimulation(DomainNum,
-                                                  CircuitNum,
+                        this->PerformPipeCellSimulation(CircuitNum,
                                                   cells(PipeX, PipeY, Zindex),
                                                   FlowRate,
                                                   cells(PipeX, PipeY, Zindex - Increment).PipeCellData.Fluid.Temperature);
@@ -5567,7 +5564,7 @@ namespace PlantPipingSystemsManager {
     }
 
     void
-    PerformPipeCellSimulation(int const DomainNum, int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
+    FullDomainStructureInfo::PerformPipeCellSimulation(int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5582,7 +5579,7 @@ namespace PlantPipingSystemsManager {
             ShiftPipeTemperaturesForNewIteration(ThisCell);
 
             //'simulate the funny interface soil cell between the radial and cartesian systems
-            SimulateRadialToCartesianInterface(DomainNum, ThisCell);
+            this->SimulateRadialToCartesianInterface(ThisCell);
 
             //'simulate the outermost radial slice
             SimulateOuterMostRadialSoilSlice(CircuitNum, ThisCell);
@@ -5608,11 +5605,11 @@ namespace PlantPipingSystemsManager {
             SimulateFluidCell(ThisCell, FlowRate, PipingSystemCircuits(CircuitNum).CurCircuitConvectionCoefficient, EnteringTemp);
 
             //'check convergence
-            if (IsConverged_PipeCurrentToPrevIteration(DomainNum, ThisCell)) break;
+            if (IsConverged_PipeCurrentToPrevIteration(CircuitNum, ThisCell)) break; // potential diff source
         }
     }
 
-    void SimulateRadialToCartesianInterface(int const DomainNum, CartesianCell &cell)
+    void FullDomainStructureInfo::SimulateRadialToCartesianInterface(CartesianCell &cell)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5647,7 +5644,7 @@ namespace PlantPipingSystemsManager {
         for (auto & curDirection : Directions) {
             Real64 AdiabaticMultiplier = 1.0;
             Real64 NeighborTemp = 0.0;
-            PipingSystemDomains(DomainNum).EvaluateNeighborCharacteristics(cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
+            this->EvaluateNeighborCharacteristics(cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
             Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
             Denominator += AdiabaticMultiplier * (Beta / Resistance);
         }
