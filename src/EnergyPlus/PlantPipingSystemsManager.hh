@@ -555,8 +555,8 @@ namespace PlantPipingSystemsManager {
         int WallBoundaryOSCMIndex = 0;
         std::string FloorBoundaryOSCMName = "";
         int FloorBoundaryOSCMIndex = 0;
-        Array1D_int WallSurfacePointers;
-        Array1D_int FloorSurfacePointers;
+        std::vector<int> WallSurfacePointers;
+        std::vector<int> FloorSurfacePointers;
         int BasementWallXIndex = -1;
         int BasementFloorYIndex = -1;
 
@@ -756,7 +756,7 @@ namespace PlantPipingSystemsManager {
         CurSimConditionsInfo Cur;
         bool HasBasement;
         // Zone coupled variables
-        Array1D<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
+        std::vector<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
         int ZoneCoupledOSCMIndex;
         Real64 PerimeterOffset;
         bool SlabInGradeFlag;
@@ -961,9 +961,9 @@ namespace PlantPipingSystemsManager {
 
     int GetSurfaceCountForOSCM(int OSCMIndex);
 
-    Array1D_int GetSurfaceIndecesForOSCM(int OSCMIndex, int SurfCount);
+    std::vector<int> GetSurfaceIndecesForOSCM(int OSCMIndex);
 
-    Array1D<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex, int SurfCount);
+    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex);
 
     bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper)
     {

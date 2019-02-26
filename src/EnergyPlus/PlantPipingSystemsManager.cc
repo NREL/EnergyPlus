@@ -232,9 +232,6 @@ namespace PlantPipingSystemsManager {
             "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
         static gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
 
-        // int ZoneNum( 0 );
-        int SurfCtr(0);
-
         // Read input if necessary
         if (GetInputFlag) {
             GetPipingSystemsAndGroundDomainsInput();
@@ -333,12 +330,12 @@ namespace PlantPipingSystemsManager {
                     Real64 ZoneTemp = 0.0;
 
                     // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
-                    for (SurfCtr = 1; SurfCtr <= isize(thisDomain.ZoneCoupledSurfaces); ++SurfCtr) {
-                        int ZoneNum = thisDomain.ZoneCoupledSurfaces(SurfCtr).Zone;
+                    for (auto & z: thisDomain.ZoneCoupledSurfaces) {
+                        int ZoneNum = z.Zone;
                         ZoneTemp += ZTAV(ZoneNum);
                     }
 
-                    ZoneTemp = ZoneTemp / (SurfCtr - 1);
+                    ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
                     Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(CellType::ZoneGroundInterface);
 
                     int yMax = ubound(thisDomain.Cells, 2);
@@ -664,7 +661,6 @@ namespace PlantPipingSystemsManager {
         int IOStatus;   // Used in GetObjectItem
         int NumCircuitsInThisDomain;
         int CircuitCtr;
-        int NumSurfacesWithThisOSCM;
         int NumAlphasBeforePipeCircOne;
         int CurIndex;
 
@@ -868,8 +864,8 @@ namespace PlantPipingSystemsManager {
                                                           "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
-                    NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
-                    if (NumSurfacesWithThisOSCM <= 0) {
+                    auto const & wallIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
+                    if (wallIndexes.size() <= 0) {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
@@ -879,9 +875,7 @@ namespace PlantPipingSystemsManager {
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
-                        PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers.allocate(NumSurfacesWithThisOSCM);
-                        PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers =
-                            GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex, NumSurfacesWithThisOSCM);
+                        PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers = wallIndexes;
                     }
                 }
 
@@ -898,8 +892,8 @@ namespace PlantPipingSystemsManager {
                                                           "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
-                    NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
-                    if (NumSurfacesWithThisOSCM <= 0) {
+                    auto const & floorIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
+                    if (floorIndexes.size() <= 0) {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
@@ -909,9 +903,7 @@ namespace PlantPipingSystemsManager {
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
-                        PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers.allocate(NumSurfacesWithThisOSCM);
-                        PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers =
-                            GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex, NumSurfacesWithThisOSCM);
+                        PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers = floorIndexes;
                     }
                 }
             }
@@ -966,7 +958,6 @@ namespace PlantPipingSystemsManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int NumSurfacesWithThisOSCM;
-        int SurfCtr;
         Real64 ThisArea;
 
         struct GroundDomainData
@@ -1213,18 +1204,15 @@ namespace PlantPipingSystemsManager {
                         ErrorsFound);
                     ErrorsFound = true;
                 } else {
-                    PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces.allocate(NumSurfacesWithThisOSCM);
-                    // Create GetSurfaceDataForOSCM function
-                    PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces =
-                        GetSurfaceDataForOSCM(PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex, NumSurfacesWithThisOSCM);
+                    PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces = GetSurfaceDataForOSCM(PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex);
                 }
             }
 
             // Total surface area
             ThisArea = 0.0;
 
-            for (SurfCtr = 1; SurfCtr <= isize(PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces); ++SurfCtr) {
-                ThisArea += PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces(SurfCtr).SurfaceArea;
+            for (auto & z : PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces) {
+                ThisArea += z.SurfaceArea;
             }
 
             PipingSystemDomains(DomainCtr).SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
@@ -1326,7 +1314,6 @@ namespace PlantPipingSystemsManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
-        int NumSurfacesWithThisOSCM;
         Real64 ThisArea;
 
         struct GroundDomainData
@@ -1432,8 +1419,8 @@ namespace PlantPipingSystemsManager {
                                                       "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
             } else {
-                NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
-                if (NumSurfacesWithThisOSCM <= 0) {
+                auto const & floorIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
+                if (floorIndexes.size() <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
@@ -1443,13 +1430,9 @@ namespace PlantPipingSystemsManager {
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                 } else {
-                    PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers.allocate(NumSurfacesWithThisOSCM);
-                    PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers =
-                        GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex, NumSurfacesWithThisOSCM);
-                    PipingSystemDomains(DomainNum).ZoneCoupledSurfaces.allocate(NumSurfacesWithThisOSCM);
+                    PipingSystemDomains(DomainNum).BasementZone.FloorSurfacePointers = floorIndexes;
                     // Create GetSurfaceDataForOSCM function
-                    PipingSystemDomains(DomainNum).ZoneCoupledSurfaces =
-                        GetSurfaceDataForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex, NumSurfacesWithThisOSCM);
+                    PipingSystemDomains(DomainNum).ZoneCoupledSurfaces = GetSurfaceDataForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
                 }
             }
 
@@ -1467,8 +1450,8 @@ namespace PlantPipingSystemsManager {
                                                       ErrorsFound);
                 ErrorsFound = true;
             } else {
-                NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
-                if (NumSurfacesWithThisOSCM <= 0) {
+                auto const & wallIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
+                if (wallIndexes.size() <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
@@ -1479,9 +1462,7 @@ namespace PlantPipingSystemsManager {
                         ErrorsFound);
                     ErrorsFound = true;
                 } else {
-                    PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers.allocate(NumSurfacesWithThisOSCM);
-                    PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers =
-                        GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex, NumSurfacesWithThisOSCM);
+                    PipingSystemDomains(DomainNum).BasementZone.WallSurfacePointers = wallIndexes;
                 }
             }
 
@@ -1623,8 +1604,8 @@ namespace PlantPipingSystemsManager {
             // Total surface area
             ThisArea = 0.0;
 
-            for (int SurfCtr = 1, SurfCtr_end = isize(PipingSystemDomains(DomainNum).ZoneCoupledSurfaces); SurfCtr <= SurfCtr_end; ++SurfCtr) {
-                ThisArea += PipingSystemDomains(DomainNum).ZoneCoupledSurfaces(SurfCtr).SurfaceArea;
+            for (auto & z : PipingSystemDomains(DomainNum).ZoneCoupledSurfaces) {
+                ThisArea += z.SurfaceArea;
             }
 
             // Surface dimensions
@@ -2459,7 +2440,7 @@ namespace PlantPipingSystemsManager {
         return RetVal;
     }
 
-    Array1D_int GetSurfaceIndecesForOSCM(int const OSCMIndex, int const SurfCount)
+    std::vector<int> GetSurfaceIndecesForOSCM(int const OSCMIndex)
     {
 
         // FUNCTION INFORMATION:
@@ -2468,18 +2449,16 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Array1D_int RetVal({1, SurfCount});
-        int FoundSurfIndexCtr(0);
+        std::vector<int> retVal;
         for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
             if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
-                ++FoundSurfIndexCtr;
-                RetVal(FoundSurfIndexCtr) = SurfCtr;
+                retVal.push_back(SurfCtr);
             }
         }
-        return RetVal;
+        return retVal;
     }
 
-    Array1D<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int const OSCMIndex, int const SurfCount)
+    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int const OSCMIndex)
     {
 
         // FUNCTION INFORMATION:
@@ -2488,14 +2467,14 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Array1D<ZoneCoupledSurfaceData> RetVal({1, SurfCount});
-        int FoundSurfIndexCtr(0);
+        std::vector<ZoneCoupledSurfaceData> RetVal;
         for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
             if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
-                ++FoundSurfIndexCtr;
-                RetVal(FoundSurfIndexCtr).IndexInSurfaceArray = SurfCtr;
-                RetVal(FoundSurfIndexCtr).SurfaceArea = DataSurfaces::Surface(SurfCtr).Area;
-                RetVal(FoundSurfIndexCtr).Zone = DataSurfaces::Surface(SurfCtr).Zone;
+                ZoneCoupledSurfaceData z;
+                z.IndexInSurfaceArray = SurfCtr;
+                z.SurfaceArea = DataSurfaces::Surface(SurfCtr).Area;
+                z.Zone = DataSurfaces::Surface(SurfCtr).Zone;
+                RetVal.push_back(z);
             }
         }
         return RetVal;
@@ -5251,13 +5230,11 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        unsigned long const NumSurfaces = size(this->BasementZone.WallSurfacePointers);
-        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int iSurfCounter = static_cast<int>(SurfaceCounter);
-            int SurfacePointer = this->BasementZone.WallSurfacePointers(iSurfCounter);
-            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
+        auto const & numSurfaces = static_cast<unsigned int>(this->BasementZone.WallSurfacePointers.size());
+        for (auto & surfaceIndex : this->BasementZone.WallSurfacePointers) {
+            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
         }
-        return -RunningSummation / NumSurfaces; // heat flux is negative here
+        return -RunningSummation / numSurfaces; // heat flux is negative here
     }
 
     Real64 FullDomainStructureInfo::GetBasementFloorHeatFlux()
@@ -5270,13 +5247,11 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        unsigned long const NumSurfaces = size(this->BasementZone.FloorSurfacePointers);
-        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int iSurfCounter = static_cast<int>(SurfaceCounter);
-            int SurfacePointer = this->BasementZone.FloorSurfacePointers(iSurfCounter);
-            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
+        auto const & numSurfaces = static_cast<unsigned int>(this->BasementZone.FloorSurfacePointers.size());
+        for (auto & surfaceIndex : this->BasementZone.FloorSurfacePointers) {
+            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(surfaceIndex);
         }
-        return -RunningSummation / NumSurfaces; // heat flux is negative here
+        return -RunningSummation / numSurfaces; // heat flux is negative here
     }
 
     void FullDomainStructureInfo::UpdateBasementSurfaceTemperatures()
@@ -5318,11 +5293,9 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         Real64 RunningSummation = 0.0;
-        unsigned long const NumSurfaces = size(this->ZoneCoupledSurfaces);
-        for (unsigned long SurfaceCounter = 1; SurfaceCounter <= NumSurfaces; ++SurfaceCounter) {
-            int iSurfCounter = static_cast<int>(SurfaceCounter);
-            int SurfacePointer = this->ZoneCoupledSurfaces(iSurfCounter).IndexInSurfaceArray;
-            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(SurfacePointer);
+        auto const & NumSurfaces = this->ZoneCoupledSurfaces.size();
+        for (auto & z : this->ZoneCoupledSurfaces) {
+            RunningSummation += DataHeatBalSurface::QdotConvOutRepPerArea(z.IndexInSurfaceArray);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
     }
@@ -5649,7 +5622,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D<Direction> const Directions(4, {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY});
+        static std::vector<Direction> const Directions = {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Resistance;
@@ -5671,11 +5644,10 @@ namespace PlantPipingSystemsManager {
         Denominator += (Beta / Resistance);
 
         //'add effects from neighboring Cartesian cells
-        for (int DirectionCounter = Directions.l1(); DirectionCounter <= Directions.u1(); ++DirectionCounter) {
-            Direction CurDirection = Directions(DirectionCounter);
+        for (auto & curDirection : Directions) {
             Real64 AdiabaticMultiplier = 1.0;
             Real64 NeighborTemp = 0.0;
-            EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
+            EvaluateNeighborCharacteristics(DomainNum, cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
             Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
             Denominator += AdiabaticMultiplier * (Beta / Resistance);
         }
