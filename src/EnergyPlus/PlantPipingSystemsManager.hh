@@ -65,9 +65,6 @@
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <PlantComponent.hh>
 
-// Forward Declarations
-struct PlantLocation;
-
 namespace EnergyPlus {
 
 namespace PlantPipingSystemsManager {
@@ -676,12 +673,6 @@ namespace PlantPipingSystemsManager {
         int LoopSideNum = 0;
         int BranchNum = 0;
         int CompNum = 0;
-        // Current fluid property values
-        Real64 CurFluidDensity = 998.0;
-        Real64 CurFluidViscosity = 0.0015;
-        Real64 CurFluidConductivity = 0.58;
-        Real64 CurFluidPrandtl = 7.0;
-        Real64 CurFluidSpecificHeat = 4190.0;
         ExtendedFluidProperties CurFluidPropertySet; // is_used
         // Variables used to pass information from INIT-type routines to CALC-type routines
         Real64 CurCircuitInletTemp = 23.0;

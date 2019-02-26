@@ -110,6 +110,8 @@ namespace PlantPipingSystemsManager {
     // Using/Aliasing
     using DataGlobals::Pi;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp"
     // MODULE PARAMETER DEFINITIONS:
     std::string const ObjName_ug_GeneralDomain("PipingSystem:Underground:Domain");
     std::string const ObjName_Circuit("PipingSystem:Underground:PipeCircuit");
@@ -127,6 +129,7 @@ namespace PlantPipingSystemsManager {
     std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
     bool GetInputFlag(true); // First time, input is "gotten"
     bool WriteEIOFlag(true); // False after EIO is written
+#pragma clang diagnostic pop
 
     void clear_state()
     {
