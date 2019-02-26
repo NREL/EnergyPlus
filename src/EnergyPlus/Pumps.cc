@@ -438,6 +438,17 @@ namespace Pumps {
             PumpEquip(PumpNum).MinVolFlowRate = rNumericArgs(10);
             if (PumpEquip(PumpNum).MinVolFlowRate == AutoSize) {
                 PumpEquip(PumpNum).minVolFlowRateWasAutosized = true;
+            } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
+                       (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
+                // Check that the minimum isn't greater than the maximum
+                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
+                        + "\", Invalid '" + cNumericFieldNames(10) +"'");
+                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the "
+                        + cNumericFieldNames(1) + "=["
+                        + General::TrimSigDigits(PumpEquip(PumpNum).NomVolFlowRate, 5) + "].");
+                ShowContinueError("Reseting value of '" + cNumericFieldNames(10) + "' to the value of '" + cNumericFieldNames(1) +"'.");
+                // Set min to roughly max, but not quite, otherwise it can't turn on, ever
+                PumpEquip(PumpNum).MinVolFlowRate = 0.99 * PumpEquip(PumpNum).NomVolFlowRate;
             }
             // Probably the following two lines will be used if the team agrees on changing the F10 value from min flow rate to
             // minimum flow as a fraction of nominal flow.

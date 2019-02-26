@@ -3281,6 +3281,8 @@ namespace EvaporativeFluidCoolers {
 
     void clear_state()
     {
+        NumSimpleEvapFluidCoolers = 0;
+        CheckEquipName.clear();
         UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
     }

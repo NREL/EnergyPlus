@@ -79,13 +79,12 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ResultsSchema.hh>
+#include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <SortAndStringUtilities.hh>
-#include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -640,7 +639,8 @@ namespace OutputProcessor {
         for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             if (ReqRepVars(Loop).Key.empty()) continue;
             if (!UtilityRoutines::SameString(ReqRepVars(Loop).VarName, VariableName)) continue;
-            if (!(UtilityRoutines::SameString(ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key))) continue;
+            if (!(UtilityRoutines::SameString(ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key)))
+                continue;
 
             //   A match.  Make sure doesn't duplicate
 
@@ -5609,7 +5609,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     StoreType VariableType; // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    bool OnMeter;        // True if this variable is on a meter
+    bool OnMeter;                   // True if this variable is on a meter
     std::string ResourceType;       // Will hold value of ResourceTypeKey
     std::string EndUse;             // Will hold value of EndUseKey
     std::string EndUseSub;          // Will hold value of EndUseSubKey
@@ -6082,7 +6082,6 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     using DataGlobals::eso_stream;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
-    using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // Locals
