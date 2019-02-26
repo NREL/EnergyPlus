@@ -312,7 +312,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_PipingSystemPipeCircuit) {
-                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration);
+                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Pipe Type=" + sim_component.TypeOf);
