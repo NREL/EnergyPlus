@@ -366,13 +366,18 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         MeshPartition() = default;
 
-        // Member Constructor
+        // Member Constructor -- showed unused but it's actually implied in an emplace_back call
         MeshPartition(Real64 const rDimension,
                       PartitionType const partitionType, // From Enum: ParitionType
                       Real64 const TotalWidth)
             : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth)
         {
         }
+
+        bool operator ==(Real64 a) {
+            return this->rDimension == a;
+        }
+
     };
 
     struct GridRegion

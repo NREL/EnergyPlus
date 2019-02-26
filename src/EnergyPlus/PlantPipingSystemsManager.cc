@@ -3434,7 +3434,7 @@ namespace PlantPipingSystemsManager {
     }
 #pragma clang diagnostic pop
 
-    std::vector<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList,
+    std::vector<Real64> CreateBoundaryList(std::vector<GridRegion> const &RegionList,
                                        Real64 const DirExtentMax,
                                        RegionType const DirDirection)
     {
@@ -3447,8 +3447,8 @@ namespace PlantPipingSystemsManager {
 
         std::vector<Real64> RetVal;
         int Counter = -1;
-        for (int Index = RegionList.l1(); Index <= RegionList.u1(); ++Index) {
-            switch (RegionList(Index).thisRegionType) {
+        for (auto const & thisRegion : RegionList) {
+            switch (thisRegion.thisRegionType) {
             case RegionType::Pipe:
             case RegionType::BasementFloor:
             case RegionType::BasementWall:
@@ -3462,15 +3462,15 @@ namespace PlantPipingSystemsManager {
             case RegionType::UnderFloor:
             case RegionType::VertInsLowerEdge:
                 ++Counter;
-                RetVal.push_back(RegionList(Index).Min);
+                RetVal.push_back(thisRegion.Min);
                 break;
             default:
-                if (RegionList(Index).thisRegionType == DirDirection) {
-                    Real64 StartingPointCounter = RegionList(Index).Min;
-                    for (int CellWidthCtr = RegionList(Index).CellWidths.l1(); CellWidthCtr <= RegionList(Index).CellWidths.u1(); ++CellWidthCtr) {
+                if (thisRegion.thisRegionType == DirDirection) {
+                    Real64 StartingPointCounter = thisRegion.Min;
+                    for (int CellWidthCtr = thisRegion.CellWidths.l1(); CellWidthCtr <= thisRegion.CellWidths.u1(); ++CellWidthCtr) {
                         ++Counter;
                         RetVal.push_back(StartingPointCounter);
-                        StartingPointCounter += RegionList(Index).CellWidths(CellWidthCtr);
+                        StartingPointCounter += thisRegion.CellWidths(CellWidthCtr);
                     }
                 }
             }
