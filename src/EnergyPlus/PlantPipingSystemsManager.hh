@@ -1020,13 +1020,9 @@ namespace PlantPipingSystemsManager {
         return ((r >= lower) && (r < upper));
     }
 
-    bool MeshPartitionArray_Contains(std::vector<MeshPartition> const &meshes, Real64 value);
-
-    void MeshPartition_SelectionSort(std::vector<MeshPartition> &X);
-
     void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
-    std::vector<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
+    std::vector<Real64> CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
 
     void SimulateOuterMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
 

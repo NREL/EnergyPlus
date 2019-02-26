@@ -2468,44 +2468,6 @@ namespace PlantPipingSystemsManager {
         return RetVal;
     }
 
-    bool MeshPartitionArray_Contains(std::vector<MeshPartition> const &meshes, Real64 const value)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        for (auto & mesh : meshes) {
-            if (mesh.rDimension == value) return true;
-        }
-        return false;
-    }
-
-    void MeshPartition_SelectionSort(std::vector<MeshPartition> &X)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        for (int I = 0, I_end = X.size() - 2; I <= I_end; ++I) {
-            int loc(1), l(1);
-            Real64 r_min(std::numeric_limits<Real64>::max());
-            for (int j = I, j_end = X.size() - 1; j <= j_end; ++j, ++l) {
-                if (X[j].rDimension < r_min) {
-                    r_min = X[j].rDimension;
-                    loc = l;
-                }
-            }
-            int const ISWAP1(loc + I - 1);
-            if (ISWAP1 != I) std::swap(X[I], X[ISWAP1]);
-        }
-    }
-
     void PipeSegmentInfo::initPipeCells(int const x, int const y)
     {
 
@@ -2994,10 +2956,10 @@ namespace PlantPipingSystemsManager {
 
             for (auto & SegmentIndex : thisCircuit.PipeSegmentIndices) {
                 ThisSegment = PipingSystemSegments(SegmentIndex);
-                if (!MeshPartitionArray_Contains(this->Partitions.X, ThisSegment.PipeLocation.X)) {
+                if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), ThisSegment.PipeLocation.X) == this->Partitions.X.end()) {
                     this->Partitions.X.emplace_back(ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth);
                 }
-                if (!MeshPartitionArray_Contains(this->Partitions.Y, ThisSegment.PipeLocation.Y)) {
+                if (std::find(this->Partitions.Y.begin(), this->Partitions.Y.end(), ThisSegment.PipeLocation.Y) == this->Partitions.Y.end()) {
                     this->Partitions.Y.emplace_back(ThisSegment.PipeLocation.Y, PartitionType::Pipe, PipeCellWidth);
                 }
             }
@@ -3009,14 +2971,14 @@ namespace PlantPipingSystemsManager {
                 //'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
                 if (this->BasementZone.Width > 0) {
                     SurfCellWidth = this->Extents.xMax * BasementCellFraction;
-                    if (!MeshPartitionArray_Contains(this->Partitions.X, this->BasementZone.Width)) {
+                    if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), this->BasementZone.Width) == this->Partitions.X.end()) {
                         this->Partitions.X.emplace_back(this->BasementZone.Width, PartitionType::BasementWall, SurfCellWidth);
                     }
                 }
                 if (this->BasementZone.Depth > 0) {
                     SurfCellWidth = this->Extents.yMax * BasementCellFraction;
                     BasementDistFromBottom = this->Extents.yMax - this->BasementZone.Depth;
-                    if (!MeshPartitionArray_Contains(this->Partitions.Y, BasementDistFromBottom)) {
+                    if (std::find(this->Partitions.Y.begin(), this->Partitions.Y.end(), BasementDistFromBottom) == this->Partitions.Y.end()) {
                         this->Partitions.Y.emplace_back(BasementDistFromBottom, PartitionType::BasementFloor, SurfCellWidth);
                     }
                 }
@@ -3036,7 +2998,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     SideXInsulationLocation = -1;
                 }
-                if (!MeshPartitionArray_Contains(this->Partitions.X, this->BasementZone.Width)) {
+                if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), this->BasementZone.Width) == this->Partitions.X.end()) {
                     // Partition at insulation edges in the X direction, if horizontal insulation present
                     if (this->HorizInsPresentFlag) {
                         if (!this->FullHorizInsPresent) {
@@ -3072,7 +3034,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     YInsulationLocation = -1;
                 }
-                if (!MeshPartitionArray_Contains(this->Partitions.Y, FloorLocation)) {
+                if (std::find(this->Partitions.Y.begin(), this->Partitions.Y.end(), FloorLocation) == this->Partitions.Y.end()) {
                     // Partition at bottom edge of vertical insulation, if vertical insulation is present
                     if (this->VertInsPresentFlag && YInsulationLocation > FloorLocation + CellWidth) {
                         // Partition at basement floor interface
@@ -3100,7 +3062,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     SideZInsulationLocation = -1;
                 }
-                if (!MeshPartitionArray_Contains(this->Partitions.Z, this->BasementZone.Width)) {
+                if (std::find(this->Partitions.Z.begin(), this->Partitions.Z.end(), this->BasementZone.Width) == this->Partitions.Z.end()) {
                     // Partition at insulation edges in the Z direction, if horizontal insulation present
                     if (this->HorizInsPresentFlag) {
                         if (!this->FullHorizInsPresent) {
@@ -3142,8 +3104,7 @@ namespace PlantPipingSystemsManager {
             } else {
                 SideXInsulationLocation = -1;
             }
-            if (!MeshPartitionArray_Contains(this->Partitions.X, this->SlabWidth)) {
-
+            if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), this->SlabWidth) == this->Partitions.X.end()) {
                 // Partition at insulation edges in the X direction, if horizontal insulation present
                 if (this->HorizInsPresentFlag) {
                     if (!this->FullHorizInsPresent) {
@@ -3176,23 +3137,22 @@ namespace PlantPipingSystemsManager {
 
                 SlabDistFromBottom = this->Extents.yMax - this->SlabThickness - CellWidth / 2.0;
 
-                if (!MeshPartitionArray_Contains(this->Partitions.Y, SlabDistFromBottom)) {
+                if (std::find(this->Partitions.Y.begin(), this->Partitions.Y.end(), SlabDistFromBottom) == this->Partitions.Y.end()) {
 
                     // Partition at bottom edge of vertical insulation, if vertical insulation present
                     if (this->VertInsPresentFlag) {
-                        // Underslab partition
+                        // Under-slab partition
                         this->Partitions.Y.emplace_back(SlabDistFromBottom, PartitionType::UnderFloor, CellWidth);
                         // Vertical-Insulation edge partition
                         this->Partitions.Y.emplace_back(YInsulationLocation, PartitionType::VertInsLowerEdge, CellWidth);
                     } else {
-                        // Underslab partition
+                        // Under-slab partition
                         this->Partitions.Y.emplace_back(SlabDistFromBottom, PartitionType::UnderFloor, CellWidth);
                     }
                 }
             } else { // Slab on-grade case
 
-                if (!MeshPartitionArray_Contains(this->Partitions.Y, YInsulationLocation)) {
-
+                if (std::find(this->Partitions.Y.begin(), this->Partitions.Y.end(), YInsulationLocation) == this->Partitions.Y.end()) {
                     // Partition at bottom edge of vertical insulation, if vertical insulation present
                     if (this->VertInsPresentFlag) {
                         // Vertical-Insulation edge partition
@@ -3212,8 +3172,7 @@ namespace PlantPipingSystemsManager {
             } else {
                 SideZInsulationLocation = -1;
             }
-            if (!MeshPartitionArray_Contains(this->Partitions.Z, this->SlabWidth)) {
-
+            if (std::find(this->Partitions.Z.begin(), this->Partitions.Z.end(), this->SlabWidth) == this->Partitions.Z.end()) {
                 // Partition at insulation edges in the Z direction, if horizontal insulation present
                 if (this->HorizInsPresentFlag) {
                     if (!this->FullHorizInsPresent) {
