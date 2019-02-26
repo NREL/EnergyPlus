@@ -4871,6 +4871,7 @@ namespace OutputReportTabular {
         using PlantChillers::NumEngineDrivenChillers;
         using PlantChillers::NumGTChillers;
         using RefrigeratedCase::RefrigRack;
+        using RefrigeratedCase::Condenser;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
         using WaterThermalTanks::AmbientTempOutsideAir;
@@ -5053,7 +5054,7 @@ namespace OutputReportTabular {
 
         // Refrigerated Case - Condenser
         for (iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
-            SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
+            SysTotalHVACRejectHeatLoss += Condenser(iRef).CondEnergy;
         }
 
         // Evaporative coolers
