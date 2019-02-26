@@ -5047,13 +5047,13 @@ namespace OutputReportTabular {
                 SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
                                               RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
             } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iCoil).CondEnergy;
+                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
             }
         }
 
         // Refrigerated Case - Condenser
         for (iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
-            SysTotalHVACRejectHeatLoss += RefrigRack(iCoil).CondEnergy;
+            SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
         }
 
         // Evaporative coolers
