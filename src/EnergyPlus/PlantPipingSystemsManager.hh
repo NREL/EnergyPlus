@@ -484,6 +484,9 @@ namespace PlantPipingSystemsManager {
         }
 
         Real64 normalArea(Direction direction) const;
+
+        void EvaluateNeighborCoordinates(Direction CurDirection, int &NX, int &NY, int &NZ);
+
     };
 
     struct MeshExtents
@@ -903,6 +906,23 @@ namespace PlantPipingSystemsManager {
         bool IsConverged_CurrentToPrevIteration();
 
         bool CheckForOutOfRangeTemps();
+
+        void EvaluateNeighborCharacteristics(CartesianCell &ThisCell,
+                                             Direction CurDirection,
+                                             Real64 &NeighborTemp,
+                                             Real64 &Resistance,
+                                             Real64 &AdiabaticMultiplier);
+
+        void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
+
+        void DoEndOfIterationOperations(bool &Finished);
+
+        void DoOneTimeInitializations(Optional<int const> CircuitNum);
+
+        void DoStartOfTimeStepInitializations(Optional<int const> CircuitNum);
+
+        Real64 GetFarfieldTemp(CartesianCell const &cell);
+
     };
 
     // Object Data
@@ -1011,8 +1031,6 @@ namespace PlantPipingSystemsManager {
     void EvaluateFarfieldCharacteristics(
         int DomainNum, CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
 
-    Real64 GetFarfieldTemp(int DomainNum, CartesianCell const &cell);
-
     void PreparePipeCircuitSimulation(int DomainNum, int CircuitNum);
 
     void PerformPipeCircuitSimulation(int DomainNum, int CircuitNum);
@@ -1033,23 +1051,6 @@ namespace PlantPipingSystemsManager {
     void SimulateRadialPipeCell(int CircuitNum, CartesianCell &ThisCell, Real64 ConvectionCoefficient);
 
     void SimulateFluidCell(CartesianCell &ThisCell, Real64 FlowRate, Real64 ConvectionCoefficient, Real64 EnteringFluidTemp);
-
-    void DoOneTimeInitializations(int DomainNum, Optional<int const> CircuitNum);
-
-    void DoStartOfTimeStepInitializations(int DomainNum, Optional<int const> CircuitNum);
-
-    void DoEndOfIterationOperations(int DomainNum, bool &Finished);
-
-    void EvaluateNeighborCoordinates(CartesianCell const &ThisCell, Direction CurDirection, int &NX, int &NY, int &NZ);
-
-    void EvaluateNeighborCharacteristics(int DomainNum,
-                                         CartesianCell &ThisCell,
-                                         Direction CurDirection,
-                                         Real64 &NeighborTemp,
-                                         Real64 &Resistance,
-                                         Real64 &AdiabaticMultiplier);
-
-    void EvaluateCellNeighborDirections(int DomainNum, CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
 
 } // namespace PlantPipingSystemsManager
 
