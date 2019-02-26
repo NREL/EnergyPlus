@@ -151,9 +151,6 @@ namespace PlantPipingSystemsManager {
         ZoneGroundInterface
     };
 
-    extern std::vector<Direction> NeighborFieldCells;
-    extern std::vector<Direction> NeighborBoundaryCells;
-
     struct BaseThermalPropertySet
     {
         // Members
@@ -817,6 +814,10 @@ namespace PlantPipingSystemsManager {
         // Main 3D cells array
         Array3D<CartesianCell> Cells;
 
+        // Dynamic indexes to available neighbor directions for a particular cell
+        std::vector<Direction> NeighborFieldCells;
+        std::vector<Direction> NeighborBoundaryCells;
+
         // Default Constructor
         FullDomainStructureInfo()
             : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvironment(true), DomainNeedsSimulation(true),
@@ -831,6 +832,8 @@ namespace PlantPipingSystemsManager {
               BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0), NumInsulationCells(0), NumSlabCells(0),
               XRegions({0, -1}), YRegions({0, -1}), ZRegions({0, -1})
         {
+            NeighborFieldCells.reserve(6);
+            NeighborBoundaryCells.reserve(6);
         }
 
         void developMesh();
