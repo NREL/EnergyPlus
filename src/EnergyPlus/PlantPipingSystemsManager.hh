@@ -151,8 +151,8 @@ namespace PlantPipingSystemsManager {
         ZoneGroundInterface
     };
 
-    extern Array1D<Direction> NeighborFieldCells;
-    extern Array1D<Direction> NeighborBoundaryCells;
+    extern std::vector<Direction> NeighborFieldCells;
+    extern std::vector<Direction> NeighborBoundaryCells;
 
     struct BaseThermalPropertySet
     {

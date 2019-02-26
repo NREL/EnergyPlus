@@ -121,8 +121,8 @@ namespace PlantPipingSystemsManager {
     std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D<Direction> NeighborFieldCells;
-    Array1D<Direction> NeighborBoundaryCells;
+    std::vector<Direction> NeighborFieldCells;
+    std::vector<Direction> NeighborBoundaryCells;
     Array1D<FullDomainStructureInfo> PipingSystemDomains;
     Array1D<PipeCircuitInfo> PipingSystemCircuits;
     Array1D<PipeSegmentInfo> PipingSystemSegments;
@@ -138,8 +138,8 @@ namespace PlantPipingSystemsManager {
         PipingSystemDomains.deallocate();
         PipingSystemCircuits.deallocate();
         PipingSystemSegments.deallocate();
-        NeighborFieldCells.deallocate();
-        NeighborBoundaryCells.deallocate();
+        NeighborFieldCells.clear();
+        NeighborBoundaryCells.clear();
         GroundDomainUniqueNames.clear();
     }
 
@@ -455,8 +455,8 @@ namespace PlantPipingSystemsManager {
         int ThisCircuitPipeSegmentCounter;
         std::string ThisSegmentName;
 
-        NeighborFieldCells.allocate(6);
-        NeighborBoundaryCells.allocate(6);
+        NeighborFieldCells.reserve(6);
+        NeighborBoundaryCells.reserve(6);
 
         // Read number of objects and allocate main data structures - first domains
         NumGeneralizedDomains = inputProcessor->getNumObjectsFound(ObjName_ug_GeneralDomain);
@@ -4684,11 +4684,11 @@ namespace PlantPipingSystemsManager {
         EvaluateCellNeighborDirections(DomainNum, cell, NumFieldCells, NumBoundaryCells);
 
         // loop across each direction in the simulation
-        for (int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
+        for (int DirectionCounter = 0; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
 
             Real64 NeighborTemp = 0.0;
             Real64 Resistance = 0.0;
-            Direction CurDirection = NeighborFieldCells(DirectionCounter);
+            Direction CurDirection = NeighborFieldCells[DirectionCounter];
 
             //'evaluate the transient expression terms
             EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -4791,8 +4791,8 @@ namespace PlantPipingSystemsManager {
         EvaluateCellNeighborDirections(DomainNum, cell, NumFieldCells, NumBoundaryCells);
 
         // loop over all regular neighbor cells, check if we have adiabatic on opposite surface
-        for (int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
-            Direction CurDirection = NeighborFieldCells(DirectionCounter);
+        for (int DirectionCounter = 0; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
+            Direction CurDirection = NeighborFieldCells[DirectionCounter];
 
             // Use the multiplier ( either 1 or 2 ) to calculate the neighbor cell effects
             EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -4801,8 +4801,8 @@ namespace PlantPipingSystemsManager {
         }
 
         // do all non-adiabatic boundary types here
-        for (int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
-            Direction CurDirection = NeighborBoundaryCells(DirectionCounter);
+        for (int DirectionCounter = 0; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
+            Direction CurDirection = NeighborBoundaryCells[DirectionCounter];
 
             // For Zone-coupled slab or basement configuration
             if (PipingSystemDomains(DomainNum).HasZoneCoupledSlab || PipingSystemDomains(DomainNum).HasZoneCoupledBasement) {
@@ -5093,8 +5093,8 @@ namespace PlantPipingSystemsManager {
         EvaluateCellNeighborDirections(DomainNum, cell, NumFieldCells, NumBoundaryCells);
 
         // Do all neighbor cells
-        for (int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
-            Direction CurDirection = NeighborFieldCells(DirectionCounter);
+        for (int DirectionCounter = 0; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
+            Direction CurDirection = NeighborFieldCells[DirectionCounter];
 
             Real64 NeighborTemp = 0.0;
             EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -5104,8 +5104,8 @@ namespace PlantPipingSystemsManager {
         }
 
         // Then all farfield boundaries
-        for (int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
-            Direction CurDirection = NeighborBoundaryCells(DirectionCounter);
+        for (int DirectionCounter = 0; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
+            Direction CurDirection = NeighborBoundaryCells[DirectionCounter];
 
             Real64 NeighborTemp = 0.0;
             EvaluateFarfieldCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -5176,10 +5176,10 @@ namespace PlantPipingSystemsManager {
         EvaluateCellNeighborDirections(DomainNum, cell, NumFieldCells, NumBoundaryCells);
 
         // loop across each direction in the simulation
-        for (int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
+        for (int DirectionCounter = 0; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
 
             Real64 NeighborTemp = 0.0;
-            Direction CurDirection = NeighborFieldCells(DirectionCounter);
+            Direction CurDirection = NeighborFieldCells[DirectionCounter];
 
             // Have to be careful here to make sure heat conduction happens only in the appropriate directions
             if (cell.cellType == CellType::BasementWall) {
@@ -6084,8 +6084,8 @@ namespace PlantPipingSystemsManager {
                     auto &cell(cells(X, Y, Z));
                     int NumFieldCells = 0, NumBoundaryCells = 0;
                     EvaluateCellNeighborDirections(DomainNum, cell, NumFieldCells, NumBoundaryCells);
-                    for (int DirectionCtr = 1; DirectionCtr <= NumFieldCells; ++DirectionCtr) {
-                        Direction CurDirection = NeighborFieldCells(DirectionCtr);
+                    for (int DirectionCtr = 0; DirectionCtr <= NumFieldCells; ++DirectionCtr) {
+                        Direction CurDirection = NeighborFieldCells[DirectionCtr];
                         Real64 AdiabaticMultiplier = 1.0, NeighborTemp = 0.0, Resistance = 0.0;
                         EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
                         int NX = 0, NY = 0, NZ = 0;
@@ -6547,62 +6547,56 @@ namespace PlantPipingSystemsManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto const &dom(PipingSystemDomains(DomainNum));
-        int Xmax = dom.x_max_index;
-        int Ymax = dom.y_max_index;
-        int Zmax = dom.z_max_index;
-        int Xindex = cell.X_index;
-        int Yindex = cell.Y_index;
-        int Zindex = cell.Z_index;
 
-        NumFieldCells = 0;
-        NumBoundaryCells = 0;
+        NumFieldCells = -1;
+        NumBoundaryCells = -1;
 
-        if (Xindex < Xmax) {
+        if (cell.X_index < dom.x_max_index) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::PositiveX;
+            NeighborFieldCells[NumFieldCells] = Direction::PositiveX;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::PositiveX;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::PositiveX;
         }
 
-        if (Xindex > 0) {
+        if (cell.X_index > 0) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::NegativeX;
+            NeighborFieldCells[NumFieldCells] = Direction::NegativeX;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::NegativeX;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::NegativeX;
         }
 
-        if (Yindex < Ymax) {
+        if (cell.Y_index < dom.y_max_index) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::PositiveY;
+            NeighborFieldCells[NumFieldCells] = Direction::PositiveY;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::PositiveY;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::PositiveY;
         }
 
-        if (Yindex > 0) {
+        if (cell.Y_index > 0) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::NegativeY;
+            NeighborFieldCells[NumFieldCells] = Direction::NegativeY;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::NegativeY;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::NegativeY;
         }
 
-        if (Zindex < Zmax) {
+        if (cell.Z_index < dom.z_max_index) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::PositiveZ;
+            NeighborFieldCells[NumFieldCells] = Direction::PositiveZ;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::PositiveZ;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::PositiveZ;
         }
 
-        if (Zindex > 0) {
+        if (cell.Z_index > 0) {
             ++NumFieldCells;
-            NeighborFieldCells(NumFieldCells) = Direction::NegativeZ;
+            NeighborFieldCells[NumFieldCells] = Direction::NegativeZ;
         } else {
             ++NumBoundaryCells;
-            NeighborBoundaryCells(NumBoundaryCells) = Direction::NegativeZ;
+            NeighborBoundaryCells[NumBoundaryCells] = Direction::NegativeZ;
         }
     }
 
