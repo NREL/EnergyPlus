@@ -865,7 +865,7 @@ namespace PlantPipingSystemsManager {
                                                           ErrorsFound);
                 } else {
                     auto const & wallIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
-                    if (wallIndexes.size() <= 0) {
+                    if (wallIndexes.empty()) {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
@@ -893,7 +893,7 @@ namespace PlantPipingSystemsManager {
                                                           ErrorsFound);
                 } else {
                     auto const & floorIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
-                    if (floorIndexes.size() <= 0) {
+                    if (floorIndexes.empty()) {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
@@ -1209,11 +1209,8 @@ namespace PlantPipingSystemsManager {
             }
 
             // Total surface area
-            ThisArea = 0.0;
-
-            for (auto & z : PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces) {
-                ThisArea += z.SurfaceArea;
-            }
+            auto lambda = [](Real64 total, ZoneCoupledSurfaceData const & z){return total + z.SurfaceArea;};
+            ThisArea = std::accumulate(PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces.begin(), PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces.end(), 0.0, lambda);
 
             PipingSystemDomains(DomainCtr).SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
 
@@ -1420,7 +1417,7 @@ namespace PlantPipingSystemsManager {
                                                       ErrorsFound);
             } else {
                 auto const & floorIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
-                if (floorIndexes.size() <= 0) {
+                if (floorIndexes.empty()) {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
@@ -1451,7 +1448,7 @@ namespace PlantPipingSystemsManager {
                 ErrorsFound = true;
             } else {
                 auto const & wallIndexes = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
-                if (wallIndexes.size() <= 0) {
+                if (wallIndexes.empty()) {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
