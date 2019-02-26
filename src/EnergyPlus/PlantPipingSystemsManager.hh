@@ -366,7 +366,7 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         MeshPartition() = default;
 
-        // Member Constructor -- showed unused but it's actually implied in an emplace_back call
+        // Member Constructor -- showed unused but it's actually implied in emplace_back calls in createPartitionCenterList
         MeshPartition(Real64 const rDimension,
                       PartitionType const partitionType, // From Enum: ParitionType
                       Real64 const TotalWidth)
@@ -374,6 +374,7 @@ namespace PlantPipingSystemsManager {
         {
         }
 
+        // used to allow std::find to see if a MeshPartition matches a float (rDimension) value
         bool operator ==(Real64 a) {
             return this->rDimension == a;
         }
@@ -386,13 +387,13 @@ namespace PlantPipingSystemsManager {
         Real64 Min = 0.0;
         Real64 Max = 0.0;
         RegionType thisRegionType = RegionType::Pipe;
-        Array1D<Real64> CellWidths;
+        std::vector<Real64> CellWidths;
 
         // Default Constructor
         GridRegion() = default;
 
         // Member Constructor
-        GridRegion(Real64 Min, Real64 Max, RegionType thisRegionType, Array1D<Real64> CellWidths)
+        GridRegion(Real64 Min, Real64 Max, RegionType thisRegionType, std::vector<Real64> CellWidths)
             : Min(Min), Max(Max), thisRegionType(thisRegionType), CellWidths(std::move(CellWidths))
         {
         }

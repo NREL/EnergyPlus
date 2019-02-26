@@ -3333,7 +3333,7 @@ namespace PlantPipingSystemsManager {
 
         int cellCountUpToNow = 0;
         int regionIndex = 0;
-        Array1D<Real64> tempCellWidths({0, -1});
+        std::vector<Real64> tempCellWidths;
 
         if (PartitionsExist) {
 
@@ -3342,7 +3342,7 @@ namespace PlantPipingSystemsManager {
 
                 if (i == 0) { // First partition
                     // Create region to left of partition
-                    auto tempRegion(GridRegion(0.0, thisPartition.Min, DirDirection, tempCellWidths));
+                    GridRegion tempRegion(0.0, thisPartition.Min, DirDirection, tempCellWidths);
                     int potentialCellWidthsCount = this->getCellWidthsCount(DirDirection);
                     if ((thisPartition.Min - 0.0) < 0.00001) {
                         cellCountUpToNow += 1; // just one cell for extremely tight regions
@@ -3418,16 +3418,12 @@ namespace PlantPipingSystemsManager {
             // Create final region
             auto &thisPartition(ThesePartitionRegions[ThesePartitionRegions.size()-1]);
             auto tempRegion(GridRegion(thisPartition.Max, DirExtentMax, DirDirection, tempCellWidths));
-            cellCountUpToNow += this->getCellWidthsCount(DirDirection);
-            ++regionIndex;
             this->getCellWidths(tempRegion, tempRegion.thisRegionType);
             Regions.push_back(tempRegion);
 
         } else {
             // Need to create a region anyway if no partitions exist
             auto tempRegion(GridRegion(0.0, DirExtentMax, DirDirection, tempCellWidths));
-            cellCountUpToNow += this->getCellWidthsCount(DirDirection);
-            ++regionIndex;
             this->getCellWidths(tempRegion, tempRegion.thisRegionType);
             Regions.push_back(tempRegion);
         }
@@ -3446,7 +3442,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         std::vector<Real64> RetVal;
-        int Counter = -1;
         for (auto const & thisRegion : RegionList) {
             switch (thisRegion.thisRegionType) {
             case RegionType::Pipe:
@@ -3461,16 +3456,14 @@ namespace PlantPipingSystemsManager {
             case RegionType::FloorInside:
             case RegionType::UnderFloor:
             case RegionType::VertInsLowerEdge:
-                ++Counter;
                 RetVal.push_back(thisRegion.Min);
                 break;
             default:
                 if (thisRegion.thisRegionType == DirDirection) {
                     Real64 StartingPointCounter = thisRegion.Min;
-                    for (int CellWidthCtr = thisRegion.CellWidths.l1(); CellWidthCtr <= thisRegion.CellWidths.u1(); ++CellWidthCtr) {
-                        ++Counter;
+                    for (auto & cellWidth : thisRegion.CellWidths) {
                         RetVal.push_back(StartingPointCounter);
-                        StartingPointCounter += thisRegion.CellWidths(CellWidthCtr);
+                        StartingPointCounter += cellWidth;
                     }
                 }
             }
@@ -4175,31 +4168,20 @@ namespace PlantPipingSystemsManager {
         }
         assert(g.Max > g.Min);
 
-        if (ThisMesh.RegionMeshCount > 0) {
-            g.CellWidths.allocate({0, ThisMesh.RegionMeshCount - 1});
-        } else {
-            g.CellWidths.allocate({0, 0});
-        }
-
         Real64 GridWidth = g.Max - g.Min;
 
         if (ThisMesh.thisMeshDistribution == MeshDistribution::Uniform) {
             if (this->HasZoneCoupledSlab && g.thisRegionType == RegionType::YDirection && g.Max == this->Extents.yMax) { // Slab region
-                int NumCells = this->NumSlabCells;
-                if (allocated(g.CellWidths)) g.CellWidths.deallocate();
-                g.CellWidths.allocate({0, NumCells - 1});
-                Real64 CellWidth = GridWidth / NumCells;
-
-                for (int I = 0; I <= NumCells - 1; ++I) {
-                    g.CellWidths(I) = CellWidth;
+                Real64 const CellWidth = GridWidth / this->NumSlabCells;
+                for (int I = 0; I <= this->NumSlabCells - 1; ++I) {
+                    g.CellWidths.push_back(CellWidth);
                 }
             } else {
                 // we have it quite simple
                 assert(ThisMesh.RegionMeshCount > 0);
-                Real64 CellWidth = GridWidth / ThisMesh.RegionMeshCount;
-
+                Real64 const CellWidth = GridWidth / ThisMesh.RegionMeshCount;
                 for (int I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I) {
-                    g.CellWidths(I) = CellWidth;
+                    g.CellWidths.push_back(CellWidth);
                 }
             }
         } else if (ThisMesh.thisMeshDistribution == MeshDistribution::SymmetricGeometric) {
@@ -4207,30 +4189,25 @@ namespace PlantPipingSystemsManager {
             //'then apply this "direction"'s conditions to generate a cell width array
             //'first get the total number of cells on this half of the region
             int NumCellsOnEachSide = ThisMesh.RegionMeshCount / 2; // Already validated to be an even #
-
             //'calculate geometric series
             Real64 SummationTerm = 0.0;
             for (int I = 1; I <= NumCellsOnEachSide; ++I) {
                 SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
             }
-
             //'set up a list of cell widths for this region
             Real64 CellWidth = (GridWidth / 2) / SummationTerm;
-            g.CellWidths(0) = CellWidth;
+            g.CellWidths.push_back(CellWidth);
             for (int I = 1; I <= NumCellsOnEachSide - 1; ++I) {
                 CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-                g.CellWidths(I) = CellWidth;
+                g.CellWidths.push_back(CellWidth);
             }
-            int SubIndex = NumCellsOnEachSide;
             for (int I = NumCellsOnEachSide - 1; I >= 0; --I) {
-                g.CellWidths(SubIndex) = g.CellWidths(I);
-                ++SubIndex; // SubIndex should be incremented here - After RetVal (SubIndex) is assigned a value. -SA
+                g.CellWidths.push_back(g.CellWidths[I]);
             }
 
         } else if (ThisMesh.thisMeshDistribution == MeshDistribution::Geometric) {
 
             int NumCells = ThisMesh.RegionMeshCount;
-
             if (g.thisRegionType == RegionType::XDirection || g.thisRegionType == RegionType::ZDirection) {
                 //'calculate geometric series
                 Real64 SummationTerm = 0.0;
@@ -4240,30 +4217,29 @@ namespace PlantPipingSystemsManager {
                 Real64 CellWidth = GridWidth / SummationTerm;
                 if (g.Min == 0) {
                     // Ground region to the left of the slab will have cells expanding to the left
-                    g.CellWidths(NumCells - 1) = CellWidth;
-                    for (int I = NumCells - 2; I >= 0; --I) {
+                    // adding them here moving forward, then reversing it to get this effect
+                    // Possible spot for diffs
+                    g.CellWidths.push_back(CellWidth);
+                    for (int I = 0; I < NumCells; ++I) {
                         CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-                        g.CellWidths(I) = CellWidth;
+                        g.CellWidths.push_back(CellWidth);
                     }
+                    std::reverse(g.CellWidths.begin(), g.CellWidths.end());
                 } else {
                     // Slab region will have cells expanding to the right
-                    g.CellWidths(0) = CellWidth;
+                    g.CellWidths.push_back(CellWidth);
                     for (int I = 1; I <= NumCells - 1; ++I) {
                         CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-                        g.CellWidths(I) = CellWidth;
+                        g.CellWidths.push_back(CellWidth);
                     }
                 }
             } else if (g.thisRegionType == RegionType::YDirection) {
                 // Assign uniform cell thickness to the slab cells.
                 if (g.Max == this->Extents.yMax) {
                     NumCells = this->NumSlabCells;
-                    if (allocated(g.CellWidths)) g.CellWidths.deallocate();
-                    g.CellWidths.allocate({0, NumCells - 1});
-
                     Real64 CellWidth = GridWidth / NumCells;
-
                     for (int I = 0; I <= NumCells - 1; ++I) {
-                        g.CellWidths(I) = CellWidth;
+                        g.CellWidths.push_back(CellWidth);
                     }
                 } else {
                     //'calculate geometric series
@@ -4272,13 +4248,15 @@ namespace PlantPipingSystemsManager {
                         SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
                     }
                     Real64 CellWidth = GridWidth / SummationTerm;
-
                     // Ground region under the slab will have cells expanding as we go down
-                    g.CellWidths(NumCells - 1) = CellWidth;
-                    for (int I = NumCells - 2; I >= 0; --I) {
+                    // adding them here moving forward, then reversing it to get this effect
+                    // Possible spot for diffs
+                    g.CellWidths.push_back(CellWidth);
+                    for (int I = 1; I < NumCells; ++I) {
                         CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-                        g.CellWidths(I) = CellWidth;
+                        g.CellWidths.push_back(CellWidth);
                     }
+                    std::reverse(g.CellWidths.begin(), g.CellWidths.end());
                 }
             }
         }
