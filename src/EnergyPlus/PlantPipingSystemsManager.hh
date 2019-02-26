@@ -931,6 +931,28 @@ namespace PlantPipingSystemsManager {
 
         void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
+        void PerformTemperatureFieldUpdate();
+
+        Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
+
+        Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+
+        Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
+
+        Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
+
+        Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+
+        void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
+
+        void PerformIterationLoop(Optional<int const> CircuitNum);
+
+        void InitPipingSystems(int CircuitNum);
+
+        void UpdatePipingSystems(int CircuitNum);
+
+        void SetupZoneCoupledOutputVariables();
+
     };
 
     // Object Data
@@ -967,12 +989,6 @@ namespace PlantPipingSystemsManager {
                                     bool &ErrorsFound);
 
     void SetupPipingSystemOutputVariables(int TotalNumSegments, int TotalNumCircuits);
-
-    void SetupZoneCoupledOutputVariables(int DomainNum);
-
-    void InitPipingSystems(int DomainNum, int CircuitNum);
-
-    void UpdatePipingSystems(int DomainNum, int CircuitNum);
 
     void IssueSevereInputFieldErrorStringEntry(std::string const &RoutineName,
                                                std::string const &ObjectName,
@@ -1019,23 +1035,6 @@ namespace PlantPipingSystemsManager {
                                        RegionType DirDirection,
                                        int RetValLbound,
                                        int RetValUBound);
-
-    void PerformIterationLoop(int DomainNum, Optional<int const> CircuitNum);
-
-    void PerformTemperatureFieldUpdate(int DomainNum);
-
-    Real64 EvaluateFieldCellTemperature(int DomainNum, CartesianCell &ThisCell);
-
-    Real64 EvaluateGroundSurfaceTemperature(int DomainNum, CartesianCell &cell);
-
-    Real64 EvaluateBasementCellTemperature(int DomainNum, CartesianCell &cell);
-
-    Real64 EvaluateZoneInterfaceTemperature(int DomainNum, CartesianCell &cell);
-
-    Real64 EvaluateFarfieldBoundaryTemperature(int DomainNum, CartesianCell &cell);
-
-    void EvaluateFarfieldCharacteristics(
-        int DomainNum, CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
 
     void SimulateOuterMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
 
