@@ -107,9 +107,6 @@ namespace PlantPipingSystemsManager {
     // The mesh can include any number of pipe circuits placed within the domain
     // The mesh can interact with basement walls also
 
-    // Using/Aliasing
-    using DataGlobals::Pi;
-
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cert-err58-cpp"
     // MODULE PARAMETER DEFINITIONS:
@@ -208,20 +205,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       by Sushobhit Acharya, March 2015
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using DataGlobals::AnyBasementsInModel;
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::BeginSimFlag;
-        using DataGlobals::DayOfSim;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::OutputFileInits;
-        using DataGlobals::SecInHour;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
-        using DataHeatBalFanSys::ZTAV;
-        using DataHVACGlobals::SysTimeElapsed;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitAndSimGroundDomain");
 
         static gio::Fmt DomainCellsToEIOHeader(
@@ -250,11 +233,11 @@ namespace PlantPipingSystemsManager {
             // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
-            thisDomain.Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
-            thisDomain.Cur.CurSimTimeSeconds = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * SecInHour;
+            thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+            thisDomain.Cur.CurSimTimeSeconds = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed) * DataGlobals::SecInHour;
 
             // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
-            if ((BeginSimFlag && thisDomain.BeginSimInit) || (BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
+            if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) || (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
                 thisDomain.DoOneTimeInitializations(_);
 
@@ -270,8 +253,8 @@ namespace PlantPipingSystemsManager {
                 thisDomain.BeginSimInit = false;
                 thisDomain.BeginSimEnvironment = false;
             }
-            if (!BeginSimFlag) thisDomain.BeginSimInit = true;
-            if (!BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
+            if (!DataGlobals::BeginSimFlag) thisDomain.BeginSimInit = true;
+            if (!DataGlobals::BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
 
             // Reset the heat fluxes if domain update has been completed
             if (thisDomain.ResetHeatFluxFlag) {
@@ -328,7 +311,7 @@ namespace PlantPipingSystemsManager {
                     // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
                     for (auto & z: thisDomain.ZoneCoupledSurfaces) {
                         int ZoneNum = z.Zone;
-                        ZoneTemp += ZTAV(ZoneNum);
+                        ZoneTemp += DataHeatBalFanSys::ZTAV(ZoneNum);
                     }
 
                     ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
@@ -405,12 +388,12 @@ namespace PlantPipingSystemsManager {
 
         if (WriteEIOFlag) {
             // Write eio header
-            gio::write(OutputFileInits, DomainCellsToEIOHeader);
+            gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
 
             // Write eio data
             for (int DomainNum = 0; DomainNum < (int)domains.size(); ++DomainNum) {
                 auto &thisDomain(domains[DomainNum]);
-                gio::write(OutputFileInits, DomainCellsToEIO)
+                gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
                     << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells << thisDomain.NumInsulationCells;
             }
             WriteEIOFlag = false;
@@ -426,10 +409,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetPipingSystemsAndGroundDomainsInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -566,8 +545,8 @@ namespace PlantPipingSystemsManager {
                             ":A pipe was found to be outside of the domain extents after performing any corrections for basement or burial depth.");
                         ShowContinueError("Pipe segment name:" + thisSegment.Name);
                         ShowContinueError("Corrected pipe location: ( x,y )=( " +
-                                          TrimSigDigits(thisSegment.PipeLocation.X, 2) + ',' +
-                                          TrimSigDigits(thisSegment.PipeLocation.Y, 2) + " )");
+                                                  General::TrimSigDigits(thisSegment.PipeLocation.X, 2) + ',' +
+                                                  General::TrimSigDigits(thisSegment.PipeLocation.Y, 2) + " )");
                     }
                 } // segment loop
 
@@ -590,38 +569,26 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int HorizontalCtr;
-        int NumPipesInThisHorizontal;
-        int NumAlphas;
-        int NumNumbers;
-        int IOStatus;
-
         int Total = 0;
-
-        for (HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr) {
-
+        for (int HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr) {
+            int NumAlphas;
+            int NumNumbers;
+            int IOStatus;
             // Set up all the inputs for this domain object
             inputProcessor->getObjectItem(ObjName_HorizTrench,
                                           HorizontalCtr,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-
-            NumPipesInThisHorizontal = static_cast<int> (rNumericArgs(3));
-
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
+            int const NumPipesInThisHorizontal = static_cast<int> (DataIPShortCuts::rNumericArgs(3));
             Total += NumPipesInThisHorizontal;
         }
-
         return Total;
     }
 
@@ -634,17 +601,10 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataSurfaces::OSCM;
-        using General::TrimSigDigits;
-        using namespace GroundTemperatureManager;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadGeneralDomainInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DomainNum;  // Item to be "gotten"
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
@@ -653,35 +613,35 @@ namespace PlantPipingSystemsManager {
         int NumAlphasBeforePipeCircOne;
         int CurIndex;
 
-        for (DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
+        for (int DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
 
             // Set up all the inputs for this domain object
             inputProcessor->getObjectItem(ObjName_ug_GeneralDomain,
                                           DomainNum,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             auto & thisDomain = domains[DomainNum-1];
 
             // Get the name, validate
-            thisDomain.Name = cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // Mesh extents, validated by IP
-            thisDomain.Extents.xMax = rNumericArgs(1);
-            thisDomain.Extents.yMax = rNumericArgs(2);
-            thisDomain.Extents.zMax = rNumericArgs(3);
+            thisDomain.Extents.xMax = DataIPShortCuts::rNumericArgs(1);
+            thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(2);
+            thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(3);
 
             // X direction mesh inputs, validated by IP
-            thisDomain.Mesh.X.RegionMeshCount = static_cast<int>(rNumericArgs(4));
+            thisDomain.Mesh.X.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(4));
             {
-                auto const meshDistribution(uppercased(cAlphaArgs(2)));
+                auto const meshDistribution(uppercased(DataIPShortCuts::cAlphaArgs(2)));
                 if (meshDistribution == "UNIFORM") {
                     thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::Uniform;
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -692,25 +652,25 @@ namespace PlantPipingSystemsManager {
                         ShowContinueError("An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
                         ++thisDomain.Mesh.X.RegionMeshCount;
-                        thisDomain.Mesh.X.GeometricSeriesCoefficient = rNumericArgs(5);
+                        thisDomain.Mesh.X.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(5);
                     } else {
                         thisDomain.Mesh.X.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(2),
-                                                          cAlphaArgs(2),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(2),
+                                                          DataIPShortCuts::cAlphaArgs(2),
                                                           "Use a choice from the available mesh type keys.",
                                                           ErrorsFound);
                 }
             }
 
             // Y direction mesh inputs, validated by IP
-            thisDomain.Mesh.Y.RegionMeshCount = static_cast<int>(rNumericArgs(6));
+            thisDomain.Mesh.Y.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(6));
             {
-                auto const meshDistribution(stripped(cAlphaArgs(3)));
+                auto const meshDistribution(stripped(DataIPShortCuts::cAlphaArgs(3)));
                 if (meshDistribution == "UNIFORM") {
                     thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::Uniform;
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -721,25 +681,25 @@ namespace PlantPipingSystemsManager {
                         ShowContinueError("An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
                         ++thisDomain.Mesh.Y.RegionMeshCount;
-                        thisDomain.Mesh.Y.GeometricSeriesCoefficient = rNumericArgs(7);
+                        thisDomain.Mesh.Y.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(7);
                     } else {
                         thisDomain.Mesh.Y.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(3),
-                                                          cAlphaArgs(3),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(3),
+                                                          DataIPShortCuts::cAlphaArgs(3),
                                                           "Use a choice from the available mesh type keys.",
                                                           ErrorsFound);
                 }
             }
 
             // Z direction mesh inputs, validated by IP
-            thisDomain.Mesh.Z.RegionMeshCount = static_cast<int>(rNumericArgs(8));
+            thisDomain.Mesh.Z.RegionMeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(8));
             {
-                auto const meshDistribution(stripped(cAlphaArgs(4)));
+                auto const meshDistribution(stripped(DataIPShortCuts::cAlphaArgs(4)));
                 if (meshDistribution == "UNIFORM") {
                     thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
@@ -750,41 +710,41 @@ namespace PlantPipingSystemsManager {
                         ShowContinueError("An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
                         ++thisDomain.Mesh.Z.RegionMeshCount;
-                        thisDomain.Mesh.Z.GeometricSeriesCoefficient = rNumericArgs(9);
+                        thisDomain.Mesh.Z.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(9);
                     } else {
                         thisDomain.Mesh.Z.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(4),
-                                                          cAlphaArgs(4),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(4),
+                                                          DataIPShortCuts::cAlphaArgs(4),
                                                           "Use a choice from the available mesh type keys.",
                                                           ErrorsFound);
                 }
             }
 
             // Soil properties, validated min/max by IP
-            thisDomain.GroundProperties.Conductivity = rNumericArgs(10);
-            thisDomain.GroundProperties.Density = rNumericArgs(11);
-            thisDomain.GroundProperties.SpecificHeat = rNumericArgs(12);
+            thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(10);
+            thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(11);
+            thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(12);
 
             // Moisture properties, validated min/max by IP, and converted to a fraction for computation here
-            thisDomain.Moisture.Theta_liq = rNumericArgs(13) / 100.0;
-            thisDomain.Moisture.Theta_sat = rNumericArgs(14) / 100.0;
+            thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(13) / 100.0;
+            thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(14) / 100.0;
 
             // check if there is a basement
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "YES")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "YES")) {
                 thisDomain.HasBasement = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
                 thisDomain.HasBasement = false;
             } else {
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_ug_GeneralDomain,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(7),
-                                                      cAlphaArgs(7),
+                                                      DataIPShortCuts::cAlphaArgs(1),
+                                                      DataIPShortCuts::cAlphaFieldNames(7),
+                                                      DataIPShortCuts::cAlphaArgs(7),
                                                       "Must enter either yes or no.",
                                                       ErrorsFound);
             }
@@ -794,64 +754,64 @@ namespace PlantPipingSystemsManager {
 
                 // check if there are blank inputs related to the basement,
                 // IP can't catch this because they are inherently optional if there ISN'T a basement
-                if (lNumericFieldBlanks(15) || lNumericFieldBlanks(16) || lAlphaFieldBlanks(8) || lAlphaFieldBlanks(9) || lAlphaFieldBlanks(10)) {
-                    ShowSevereError("Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + cAlphaArgs(1));
+                if (DataIPShortCuts::lNumericFieldBlanks(15) || DataIPShortCuts::lNumericFieldBlanks(16) || DataIPShortCuts::lAlphaFieldBlanks(8) || DataIPShortCuts::lAlphaFieldBlanks(9) || DataIPShortCuts::lAlphaFieldBlanks(10)) {
+                    ShowSevereError("Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError("Object specified to have a basement, while at least one basement input was left blank.");
                     ErrorsFound = true;
                 }
 
                 // get dimensions for meshing
                 CurIndex = 15;
-                thisDomain.BasementZone.Width = rNumericArgs(CurIndex);
+                thisDomain.BasementZone.Width = DataIPShortCuts::rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Width <= 0.0) {
                     IssueSevereInputFieldErrorRealEntry(RoutineName,
                                                         ObjName_ug_GeneralDomain,
-                                                        cAlphaArgs(1),
-                                                        cNumericFieldNames(CurIndex),
-                                                        rNumericArgs(CurIndex),
+                                                        DataIPShortCuts::cAlphaArgs(1),
+                                                        DataIPShortCuts::cNumericFieldNames(CurIndex),
+                                                        DataIPShortCuts::rNumericArgs(CurIndex),
                                                         "Basement width must be a positive nonzero value.",
                                                         ErrorsFound);
                 }
 
                 CurIndex = 16;
-                thisDomain.BasementZone.Depth = rNumericArgs(CurIndex);
+                thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Depth <= 0.0) {
                     IssueSevereInputFieldErrorRealEntry(RoutineName,
                                                         ObjName_ug_GeneralDomain,
-                                                        cAlphaArgs(1),
-                                                        cNumericFieldNames(CurIndex),
-                                                        rNumericArgs(CurIndex),
+                                                        DataIPShortCuts::cAlphaArgs(1),
+                                                        DataIPShortCuts::cNumericFieldNames(CurIndex),
+                                                        DataIPShortCuts::rNumericArgs(CurIndex),
                                                         "Basement depth must be a positive nonzero value.",
                                                         ErrorsFound);
                 }
 
                 // check for dimension shift
                 CurIndex = 8;
-                if (UtilityRoutines::SameString(cAlphaArgs(CurIndex), "YES")) {
+                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "YES")) {
                     thisDomain.BasementZone.ShiftPipesByWidth = true;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(CurIndex), "NO")) {
+                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "NO")) {
                     thisDomain.BasementZone.ShiftPipesByWidth = false;
                 } else {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(CurIndex),
                                                           "Must enter either yes or no.",
                                                           ErrorsFound);
                 }
 
                 // get boundary condition model names and indices --error check
                 CurIndex = 9;
-                thisDomain.BasementZone.WallBoundaryOSCMName = cAlphaArgs(CurIndex);
+                thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
-                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, OSCM);
+                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(CurIndex),
                                                           "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
@@ -860,9 +820,9 @@ namespace PlantPipingSystemsManager {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
-                            cAlphaArgs(1),
-                            cAlphaFieldNames(CurIndex),
-                            cAlphaArgs(CurIndex),
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                            DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
@@ -871,15 +831,15 @@ namespace PlantPipingSystemsManager {
                 }
 
                 CurIndex = 10;
-                thisDomain.BasementZone.FloorBoundaryOSCMName = cAlphaArgs(CurIndex);
+                thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
-                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, OSCM);
+                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_ug_GeneralDomain,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(CurIndex),
                                                           "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
@@ -888,9 +848,9 @@ namespace PlantPipingSystemsManager {
                         IssueSevereInputFieldErrorStringEntry(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
-                            cAlphaArgs(1),
-                            cAlphaFieldNames(CurIndex),
-                            cAlphaArgs(CurIndex),
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                            DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
@@ -900,23 +860,23 @@ namespace PlantPipingSystemsManager {
             }
 
             // get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
-            thisDomain.SimControls.Convergence_CurrentToPrevIteration = rNumericArgs(17);
-            thisDomain.SimControls.MaxIterationsPerTS = static_cast<int>(rNumericArgs(18));
+            thisDomain.SimControls.Convergence_CurrentToPrevIteration = DataIPShortCuts::rNumericArgs(17);
+            thisDomain.SimControls.MaxIterationsPerTS = static_cast<int>(DataIPShortCuts::rNumericArgs(18));
 
             // additional evapotranspiration parameter, min/max validated by IP
-            thisDomain.Moisture.GroundCoverCoefficient = rNumericArgs(19);
+            thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(19);
 
             // Allocate the circuit placeholder arrays
-            NumCircuitsInThisDomain = int(rNumericArgs(20));
+            NumCircuitsInThisDomain = int(DataIPShortCuts::rNumericArgs(20));
 
             // Check for blank or missing or mismatched number...
             NumAlphasBeforePipeCircOne = 10;
             for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                thisDomain.CircuitNames.push_back(cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne));
+                thisDomain.CircuitNames.push_back(DataIPShortCuts::cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne));
             }
 
             // Initialize ground temperature model and get pointer reference
-            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(5), cAlphaArgs(6));
+            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
             
             // now add this instance to the main vector
             // domains.push_back(thisDomain);
@@ -931,14 +891,6 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   Summer 2011
         //       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accommodate ground coupled calculations
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataHeatBalance::Material;
-        using DataHeatBalance::TotMaterials;
-        using DataSurfaces::OSCM;
-        using General::TrimSigDigits;
-        using namespace GroundTemperatureManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadZoneCoupledDomainInputs");
@@ -998,75 +950,74 @@ namespace PlantPipingSystemsManager {
             // Read all the inputs for this domain object
             inputProcessor->getObjectItem(ObjName_ZoneCoupled_Slab,
                                           ZoneCoupledDomainCtr,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
             
             // Get the name, validate
-            gdd.ObjName = cAlphaArgs(1);
+            gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
-                GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Slab, cAlphaFieldNames(1), ErrorsFound);
+                GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
             // Read in the rest of the inputs into the local type for clarity during transition
-            gdd.OSCMName = cAlphaArgs(4);
-            gdd.Depth = rNumericArgs(1);
-            gdd.AspectRatio = rNumericArgs(2);
-            gdd.PerimeterOffset = rNumericArgs(3);
-            gdd.SoilConductivity = rNumericArgs(4);
-            gdd.SoilDensity = rNumericArgs(5);
-            gdd.SoilSpecificHeat = rNumericArgs(6);
-            gdd.MoistureContent = rNumericArgs(7);
-            gdd.SaturationMoistureContent = rNumericArgs(8);
-            gdd.EvapotranspirationCoeff = rNumericArgs(9);
-            gdd.HorizInsWidth = rNumericArgs(10);
-            gdd.VertInsDepth = rNumericArgs(11);
+            gdd.OSCMName = DataIPShortCuts::cAlphaArgs(4);
+            gdd.Depth = DataIPShortCuts::rNumericArgs(1);
+            gdd.AspectRatio = DataIPShortCuts::rNumericArgs(2);
+            gdd.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
+            gdd.SoilConductivity = DataIPShortCuts::rNumericArgs(4);
+            gdd.SoilDensity = DataIPShortCuts::rNumericArgs(5);
+            gdd.SoilSpecificHeat = DataIPShortCuts::rNumericArgs(6);
+            gdd.MoistureContent = DataIPShortCuts::rNumericArgs(7);
+            gdd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(8);
+            gdd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(9);
+            gdd.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
+            gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
 
             auto & thisDomain = domains[DomainCtr-1];
             
             // Set flag for slab in-grade or slab on-grade
-            if (UtilityRoutines::SameString(cAlphaArgs(5), "INGRADE")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "ONGRADE")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "ONGRADE")) {
                 thisDomain.SlabInGradeFlag = false;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
                 ShowContinueError("Found in: " + gdd.ObjName);
                 ErrorsFound = true;
             }
 
             // Get slab material properties
             if (thisDomain.SlabInGradeFlag) {
-                gdd.SlabMaterial = cAlphaArgs(6);
-                thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), Material, TotMaterials);
+                gdd.SlabMaterial = DataIPShortCuts::cAlphaArgs(6);
+                thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6), DataHeatBalance::Material, DataHeatBalance::TotMaterials);
                 if (thisDomain.SlabMaterialNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(6) + "=" + cAlphaArgs(6));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" + DataIPShortCuts::cAlphaArgs(6));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.SlabThickness = Material(thisDomain.SlabMaterialNum).Thickness;
-                    thisDomain.SlabProperties.Density = Material(thisDomain.SlabMaterialNum).Density;
-                    thisDomain.SlabProperties.SpecificHeat = Material(thisDomain.SlabMaterialNum).SpecHeat;
-                    thisDomain.SlabProperties.Conductivity =
-                        Material(thisDomain.SlabMaterialNum).Conductivity;
+                    thisDomain.SlabThickness = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Thickness;
+                    thisDomain.SlabProperties.Density = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Density;
+                    thisDomain.SlabProperties.SpecificHeat = DataHeatBalance::Material(thisDomain.SlabMaterialNum).SpecHeat;
+                    thisDomain.SlabProperties.Conductivity = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Conductivity;
                 }
             }
 
             // set flag for horizontal insulation
             if (thisDomain.SlabInGradeFlag) {
-                if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
+                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
                     thisDomain.HorizInsPresentFlag = false;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(7), "YES")) {
+                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(7) + "=" + cAlphaArgs(7));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" + DataIPShortCuts::cAlphaArgs(7));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 }
@@ -1074,36 +1025,34 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                gdd.HorizInsMaterial = cAlphaArgs(8);
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(8), Material, TotMaterials);
+                gdd.HorizInsMaterial = DataIPShortCuts::cAlphaArgs(8);
+                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8), DataHeatBalance::Material, DataHeatBalance::TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(8) + "=" + cAlphaArgs(8));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" + DataIPShortCuts::cAlphaArgs(8));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = Material(thisDomain.HorizInsMaterialNum).Thickness;
-                    thisDomain.HorizInsProperties.Density = Material(thisDomain.HorizInsMaterialNum).Density;
-                    thisDomain.HorizInsProperties.SpecificHeat =
-                        Material(thisDomain.HorizInsMaterialNum).SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity =
-                        Material(thisDomain.HorizInsMaterialNum).Conductivity;
+                    thisDomain.HorizInsThickness = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Thickness;
+                    thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Conductivity;
                 }
 
                 // Set flag for horizontal insulation extents
-                if (UtilityRoutines::SameString(cAlphaArgs(9), "PERIMETER")) {
+                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (gdd.HorizInsWidth > 0.0) {
                         thisDomain.HorizInsWidth = gdd.HorizInsWidth;
                     } else {
-                        ShowSevereError("Invalid " + cNumericFieldNames(10));
+                        ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
                         ShowContinueError("Found in: " + gdd.ObjName);
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(cAlphaArgs(9), "FULL")) {
+                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(9) + "=" + cAlphaArgs(9));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" + DataIPShortCuts::cAlphaArgs(9));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 }
@@ -1113,37 +1062,35 @@ namespace PlantPipingSystemsManager {
             }
 
             // set flag for vertical insulation
-            if (UtilityRoutines::SameString(cAlphaArgs(10), "NO")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(10), "YES")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(10) + "=" + cAlphaArgs(10));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
                 ShowContinueError("Found in: " + gdd.ObjName);
                 ErrorsFound = true;
             }
 
             // Get vertical insulation material properties
             if (thisDomain.VertInsPresentFlag) {
-                gdd.VertInsMaterial = cAlphaArgs(11);
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(11), Material, TotMaterials);
+                gdd.VertInsMaterial = DataIPShortCuts::cAlphaArgs(11);
+                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11), DataHeatBalance::Material, DataHeatBalance::TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(11) + "=" + cAlphaArgs(11));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" + DataIPShortCuts::cAlphaArgs(11));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = Material(thisDomain.VertInsMaterialNum).Thickness;
-                    thisDomain.VertInsProperties.Density = Material(thisDomain.VertInsMaterialNum).Density;
-                    thisDomain.VertInsProperties.SpecificHeat =
-                        Material(thisDomain.VertInsMaterialNum).SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity =
-                        Material(thisDomain.VertInsMaterialNum).Conductivity;
+                    thisDomain.VertInsThickness = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Thickness;
+                    thisDomain.VertInsProperties.Density = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Density;
+                    thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Conductivity;
                 }
 
                 // vertical insulation depth
                 if (gdd.VertInsDepth > gdd.Depth ||
                     gdd.VertInsDepth <= 0.0) {
-                    ShowSevereError("Invalid " + cNumericFieldNames(11));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(11));
                     ShowContinueError("Found in: " + gdd.ObjName);
                     ErrorsFound = true;
                 } else {
@@ -1155,12 +1102,12 @@ namespace PlantPipingSystemsManager {
             thisDomain.PerimeterOffset = gdd.PerimeterOffset;
 
             // Set simulation interval flag
-            if (UtilityRoutines::SameString(cAlphaArgs(12), "TIMESTEP")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(12), "HOURLY")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(12) + "=" + cAlphaArgs(12));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + "=" + DataIPShortCuts::cAlphaArgs(12));
                 ShowContinueError("Found in: " + gdd.ObjName);
                 ErrorsFound = true;
             }
@@ -1174,13 +1121,13 @@ namespace PlantPipingSystemsManager {
             thisDomain.Name = gdd.ObjName;
 
             // get boundary condition model names and indices -- error check
-            thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(gdd.OSCMName, OSCM);
+            thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(gdd.OSCMName, DataSurfaces::OSCM);
             if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_ZoneCoupled_Slab,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(4),
-                                                      cAlphaArgs(4),
+                                                      DataIPShortCuts::cAlphaArgs(1),
+                                                      DataIPShortCuts::cAlphaFieldNames(4),
+                                                      DataIPShortCuts::cAlphaArgs(4),
                                                       "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
                 ErrorsFound = true;
@@ -1190,9 +1137,9 @@ namespace PlantPipingSystemsManager {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Slab,
-                        cAlphaArgs(1),
-                        cAlphaFieldNames(4),
-                        cAlphaArgs(4),
+                        DataIPShortCuts::cAlphaArgs(1),
+                        DataIPShortCuts::cAlphaFieldNames(4),
+                        DataIPShortCuts::cAlphaArgs(4),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1239,13 +1186,13 @@ namespace PlantPipingSystemsManager {
             thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
             thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
 
-            Real64 MeshCoefficient = rNumericArgs(12);
+            Real64 MeshCoefficient = DataIPShortCuts::rNumericArgs(12);
             if (MeshCoefficient == 0.0) MeshCoefficient = 1.6;
             thisDomain.Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
             thisDomain.Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
             thisDomain.Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-            int MeshCount = static_cast<int>(rNumericArgs(13));
+            int MeshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(13));
             if (MeshCount == 0.0) MeshCount = 6;
             thisDomain.Mesh.X.RegionMeshCount = MeshCount;
             thisDomain.Mesh.Y.RegionMeshCount = MeshCount;
@@ -1264,7 +1211,7 @@ namespace PlantPipingSystemsManager {
                 thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
             // Farfield model
-            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(2), cAlphaArgs(3));
+            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3));
 
             // Other parameters
             thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1289,13 +1236,6 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   Summer 2011
         //       MODIFIED       Summer 2014  Sushobhit Acharya to accommodate basement calculations
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataHeatBalance::Material;
-        using DataHeatBalance::TotMaterials;
-        using DataSurfaces::OSCM;
-        using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadBasementInputs");
@@ -1344,72 +1284,72 @@ namespace PlantPipingSystemsManager {
             // Read all the inputs for this domain object
             inputProcessor->getObjectItem(ObjName_ZoneCoupled_Basement,
                                           BasementCtr,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
             
             // Get the name, validate
-            gdd.ObjName = cAlphaArgs(1);
+            gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
-                GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Basement, cAlphaFieldNames(1), ErrorsFound);
+                GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
             // Read in the some of the inputs into the local type for clarity during transition
-            gdd.Depth = rNumericArgs(1);
-            gdd.AspectRatio = rNumericArgs(2);
-            gdd.PerimeterOffset = rNumericArgs(3);
-            gdd.HorizInsWidth = rNumericArgs(10);
-            gdd.VertInsDepth = rNumericArgs(12);
+            gdd.Depth = DataIPShortCuts::rNumericArgs(1);
+            gdd.AspectRatio = DataIPShortCuts::rNumericArgs(2);
+            gdd.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
+            gdd.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
+            gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
 
             auto & thisDomain = domains[DomainNum-1];
             
             // Other inputs
-            thisDomain.Name = cAlphaArgs(1);
+            thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
             // Soil properties, validated min/max by IP
-            thisDomain.GroundProperties.Conductivity = rNumericArgs(4);
-            thisDomain.GroundProperties.Density = rNumericArgs(5);
-            thisDomain.GroundProperties.SpecificHeat = rNumericArgs(6);
+            thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(4);
+            thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(5);
+            thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(6);
 
             // Moisture properties, validated min/max by IP, and converted to a fraction for computation here
-            thisDomain.Moisture.Theta_liq = rNumericArgs(7) / 100.0;
-            thisDomain.Moisture.Theta_sat = rNumericArgs(8) / 100.0;
+            thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(7) / 100.0;
+            thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(8) / 100.0;
 
             // check if there are blank inputs related to the basement,
-            if (lNumericFieldBlanks(11) || lAlphaFieldBlanks(5) || lAlphaFieldBlanks(10)) {
-                ShowSevereError("Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + cAlphaArgs(1));
+            if (DataIPShortCuts::lNumericFieldBlanks(11) || DataIPShortCuts::lAlphaFieldBlanks(5) || DataIPShortCuts::lAlphaFieldBlanks(10)) {
+                ShowSevereError("Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("At least one basement input was left blank.");
                 ErrorsFound = true;
             }
 
             // Basement zone depth
             CurIndex = 11;
-            thisDomain.BasementZone.Depth = rNumericArgs(CurIndex);
+            thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
             if (thisDomain.BasementZone.Depth >= gdd.Depth ||
                 thisDomain.BasementZone.Depth <= 0.0) {
-                ShowSevereError("Invalid " + cNumericFieldNames(CurIndex));
+                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(CurIndex));
                 ShowContinueError("Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
             // get boundary condition model names and indices --error check
             CurIndex = 4;
-            thisDomain.BasementZone.FloorBoundaryOSCMName = cAlphaArgs(CurIndex);
+            thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
             thisDomain.BasementZone.FloorBoundaryOSCMIndex =
-                UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, OSCM);
+                UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, DataSurfaces::OSCM);
             if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_ZoneCoupled_Basement,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(1),
+                                                      DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(CurIndex),
                                                       "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
             } else {
@@ -1418,9 +1358,9 @@ namespace PlantPipingSystemsManager {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
-                        cAlphaArgs(1),
-                        cAlphaFieldNames(CurIndex),
-                        cAlphaArgs(CurIndex),
+                        DataIPShortCuts::cAlphaArgs(1),
+                        DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                        DataIPShortCuts::cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                 } else {
@@ -1431,15 +1371,15 @@ namespace PlantPipingSystemsManager {
             }
 
             CurIndex = 8;
-            thisDomain.BasementZone.WallBoundaryOSCMName = cAlphaArgs(CurIndex);
+            thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
             thisDomain.BasementZone.WallBoundaryOSCMIndex =
-                UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, OSCM);
+                UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, DataSurfaces::OSCM);
             if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_ZoneCoupled_Basement,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(1),
+                                                      DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(CurIndex),
                                                       "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
                 ErrorsFound = true;
@@ -1449,9 +1389,9 @@ namespace PlantPipingSystemsManager {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
-                        cAlphaArgs(1),
-                        cAlphaFieldNames(CurIndex),
-                        cAlphaArgs(CurIndex),
+                        DataIPShortCuts::cAlphaArgs(1),
+                        DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                        DataIPShortCuts::cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1465,14 +1405,14 @@ namespace PlantPipingSystemsManager {
             thisDomain.SimControls.MaxIterationsPerTS = 250;
 
             // additional evapotranspiration parameter, min/max validated by IP
-            thisDomain.Moisture.GroundCoverCoefficient = rNumericArgs(9);
+            thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(9);
 
             // assign the mesh count
             int meshCount;
-            if (lNumericFieldBlanks(13)) {
+            if (DataIPShortCuts::lNumericFieldBlanks(13)) {
                 meshCount = 4;
             } else {
-                meshCount = static_cast<int>(rNumericArgs(13));
+                meshCount = static_cast<int>(DataIPShortCuts::rNumericArgs(13));
             }
             thisDomain.Mesh.X.RegionMeshCount = meshCount;
             thisDomain.Mesh.Y.RegionMeshCount = meshCount;
@@ -1488,49 +1428,47 @@ namespace PlantPipingSystemsManager {
             thisDomain.BasementInterfaceProperties.Density = 1.0;
 
             // set flag for horizontal insulation
-            // Check cAlphaArgs value
-            if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
+            // Check DataIPShortCuts::cAlphaArgs value
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "NO")) {
                 thisDomain.HorizInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "YES")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "YES")) {
                 thisDomain.HorizInsPresentFlag = true;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
                 ShowContinueError("Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                gdd.HorizInsMaterial = cAlphaArgs(6);
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), Material, TotMaterials);
+                gdd.HorizInsMaterial = DataIPShortCuts::cAlphaArgs(6);
+                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6), DataHeatBalance::Material, DataHeatBalance::TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(6) + "=" + cAlphaArgs(6));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" + DataIPShortCuts::cAlphaArgs(6));
                     ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = Material(thisDomain.HorizInsMaterialNum).Thickness;
-                    thisDomain.HorizInsProperties.Density = Material(thisDomain.HorizInsMaterialNum).Density;
-                    thisDomain.HorizInsProperties.SpecificHeat =
-                        Material(thisDomain.HorizInsMaterialNum).SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity =
-                        Material(thisDomain.HorizInsMaterialNum).Conductivity;
+                    thisDomain.HorizInsThickness = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Thickness;
+                    thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(thisDomain.HorizInsMaterialNum).Conductivity;
                 }
 
                 // Set flag for horizontal insulation extents
-                if (UtilityRoutines::SameString(cAlphaArgs(7), "PERIMETER")) {
+                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (gdd.HorizInsWidth > 0.0) {
                         thisDomain.HorizInsWidth = gdd.HorizInsWidth;
                     } else {
-                        ShowSevereError("Invalid " + cNumericFieldNames(10));
+                        ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(cAlphaArgs(7), "FULL")) {
+                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(7) + "=" + cAlphaArgs(7));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" + DataIPShortCuts::cAlphaArgs(7));
                     ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
@@ -1540,12 +1478,12 @@ namespace PlantPipingSystemsManager {
             }
 
             // set flag for vertical insulation
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "NO")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "YES")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(9) + "=" + cAlphaArgs(9));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" + DataIPShortCuts::cAlphaArgs(9));
                 ShowContinueError("Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
@@ -1554,7 +1492,7 @@ namespace PlantPipingSystemsManager {
             if (thisDomain.VertInsPresentFlag) {
                 // Check if vertical insulation is in domain
                 if (gdd.VertInsDepth >= gdd.Depth || gdd.VertInsDepth <= 0.0) {
-                    ShowSevereError("Invalid " + cNumericFieldNames(12));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(12));
                     ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
@@ -1562,35 +1500,33 @@ namespace PlantPipingSystemsManager {
                     thisDomain.VertInsDepth = gdd.VertInsDepth;
                 }
 
-                gdd.VertInsMaterial = cAlphaArgs(10);
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(10), Material, TotMaterials);
+                gdd.VertInsMaterial = DataIPShortCuts::cAlphaArgs(10);
+                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10), DataHeatBalance::Material, DataHeatBalance::TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(10) + "=" + cAlphaArgs(10));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
                     ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = Material(thisDomain.VertInsMaterialNum).Thickness;
-                    thisDomain.VertInsProperties.Density = Material(thisDomain.VertInsMaterialNum).Density;
-                    thisDomain.VertInsProperties.SpecificHeat =
-                        Material(thisDomain.VertInsMaterialNum).SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity =
-                        Material(thisDomain.VertInsMaterialNum).Conductivity;
+                    thisDomain.VertInsThickness = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Thickness;
+                    thisDomain.VertInsProperties.Density = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Density;
+                    thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(thisDomain.VertInsMaterialNum).Conductivity;
                 }
             }
 
             // Set simulation interval flag
-            if (UtilityRoutines::SameString(cAlphaArgs(11), "TIMESTEP")) {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(11), "HOURLY")) {
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(11) + "=" + cAlphaArgs(11));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" + DataIPShortCuts::cAlphaArgs(11));
                 ShowContinueError("Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
             // Farfield ground temperature model
-            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(2), cAlphaArgs(3));
+            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3));
 
             // Domain perimeter offset
             thisDomain.PerimeterOffset = gdd.PerimeterOffset;
@@ -1655,12 +1591,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using namespace DataLoopNode;
-        using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadPipeCircuitInputs");
 
@@ -1679,90 +1609,90 @@ namespace PlantPipingSystemsManager {
             // Read all the inputs for this pipe circuit
             inputProcessor->getObjectItem(ObjName_Circuit,
                                           PipeCircuitCounter,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             auto & thisCircuit = circuits[PipeCircuitCounter-1];
             
             // Get the name, validate
-            thisCircuit.Name = cAlphaArgs(1);
+            thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
             thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // Read pipe thermal properties, validated by IP
-            thisCircuit.PipeProperties.Conductivity = rNumericArgs(1);
-            thisCircuit.PipeProperties.Density = rNumericArgs(2);
-            thisCircuit.PipeProperties.SpecificHeat = rNumericArgs(3);
+            thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(1);
+            thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(2);
+            thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(3);
 
             // Read pipe sizing, validated individually by IP, validated comparison here
-            thisCircuit.PipeSize.InnerDia = rNumericArgs(4);
-            thisCircuit.PipeSize.OuterDia = rNumericArgs(5);
+            thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(4);
+            thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(5);
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 CurIndex = 5;
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_Circuit,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(1),
+                                                      DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                      DataIPShortCuts::cAlphaArgs(CurIndex),
                                                       "Outer diameter must be greater than inner diameter.",
                                                       ErrorsFound);
             }
 
             // Read design flow rate, validated positive by IP
-            thisCircuit.DesignVolumeFlowRate = rNumericArgs(6);
+            thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(6);
 
             // Read inlet and outlet node names and validate them
-            thisCircuit.InletNodeName = cAlphaArgs(2);
-            thisCircuit.InletNodeNum = GetOnlySingleNode(
-                cAlphaArgs(2), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
+            thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
                 IssueSevereInputFieldErrorStringEntry(
-                    RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
+                    RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
-            thisCircuit.OutletNodeName = cAlphaArgs(3);
-            thisCircuit.OutletNodeNum = GetOnlySingleNode(
-                cAlphaArgs(3), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+            thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
                 IssueSevereInputFieldErrorStringEntry(
-                    RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
+                    RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
-            TestCompSet(ObjName_Circuit, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Piping System Circuit Nodes");
+            BranchNodeConnections::TestCompSet(ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3), "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
-            thisCircuit.Convergence_CurrentToPrevIteration = rNumericArgs(7);
-            thisCircuit.MaxIterationsPerTS = static_cast<int>(rNumericArgs(8));
+            thisCircuit.Convergence_CurrentToPrevIteration = DataIPShortCuts::rNumericArgs(7);
+            thisCircuit.MaxIterationsPerTS = static_cast<int>(DataIPShortCuts::rNumericArgs(8));
 
             // Radial mesh inputs, validated by IP
             // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-            thisCircuit.NumRadialCells = static_cast<int>(rNumericArgs(9));
-            thisCircuit.RadialMeshThickness = rNumericArgs(10);
+            thisCircuit.NumRadialCells = static_cast<int>(DataIPShortCuts::rNumericArgs(9));
+            thisCircuit.RadialMeshThickness = DataIPShortCuts::rNumericArgs(10);
 
             // Read number of pipe segments for this circuit, allocate arrays
-            NumPipeSegments = static_cast<int>(rNumericArgs(11));
+            NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(11));
 
             // Check for blank or missing or mismatched number...
             NumAlphasBeforeSegmentOne = 3;
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
-                if (lAlphaFieldBlanks(CurIndex)) {
+                if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_Circuit,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(CurIndex),
                                                           "Expected a pipe segment name, check pipe segment count input field.",
                                                           ErrorsFound);
                 }
-                thisCircuit.PipeSegmentNames.push_back(cAlphaArgs(CurIndex));
+                thisCircuit.PipeSegmentNames.push_back(DataIPShortCuts::cAlphaArgs(CurIndex));
             }
 
         } // All pipe circuits in input
@@ -1776,9 +1706,6 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   Summer 2011
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadPipeSegmentInputs");
@@ -1796,30 +1723,30 @@ namespace PlantPipingSystemsManager {
             // Read all inputs for this pipe segment
             inputProcessor->getObjectItem(ObjName_Segment,
                                           SegmentCtr,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             auto & thisSegment = segments[SegmentCtr-1];
             
             // Get the name, validate
-            thisSegment.Name = cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // Read in the pipe location, validated as positive by IP
             // -- note that these values will be altered by the main GetInput routine in two ways:
             //   1) shift for basement wall if selected
             //   2) invert y direction to be measured from domain bottom surface for calculations
-            thisSegment.PipeLocation = PointF(rNumericArgs(1), rNumericArgs(2));
+            thisSegment.PipeLocation = PointF(DataIPShortCuts::rNumericArgs(1), DataIPShortCuts::rNumericArgs(2));
 
             // Read in the flow direction
             {
-                auto const SELECT_CASE_var(stripped(cAlphaArgs(2)));
+                auto const SELECT_CASE_var(stripped(DataIPShortCuts::cAlphaArgs(2)));
                 if (SELECT_CASE_var == "INCREASINGZ") {
                     thisSegment.FlowDirection = SegmentFlow::IncreasingZ;
                 } else if (SELECT_CASE_var == "DECREASINGZ") {
@@ -1828,9 +1755,9 @@ namespace PlantPipingSystemsManager {
                     CurIndex = 2;
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                           ObjName_Segment,
-                                                          cAlphaArgs(1),
-                                                          cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                          DataIPShortCuts::cAlphaArgs(CurIndex),
                                                           "Invalid flow direction, use one of the available keys.",
                                                           ErrorsFound);
                 }
@@ -1850,13 +1777,6 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   September 2012
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using namespace DataLoopNode;
-        using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
-        using namespace GroundTemperatureManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReadHorizontalTrenchInputs");
@@ -1926,41 +1846,41 @@ namespace PlantPipingSystemsManager {
             // Read all inputs for this pipe segment
             inputProcessor->getObjectItem(ObjName_HorizTrench,
                                           HorizontalGHXCtr,
-                                          cAlphaArgs,
+                                          DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
-                                          rNumericArgs,
+                                          DataIPShortCuts::rNumericArgs,
                                           NumNumbers,
                                           IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             HorizontalTrenchData htd;
             
             // Get the name, validate
-            htd.ObjName = cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            htd.ObjName = DataIPShortCuts::cAlphaArgs(1);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // Read in the rest of the inputs into the local type for clarity during transition
-            htd.InletNodeName = cAlphaArgs(2);
-            htd.OutletNodeName = cAlphaArgs(3);
-            htd.DesignFlowRate = rNumericArgs(1);
-            htd.AxialLength = rNumericArgs(2);
-            htd.NumPipes = static_cast<int>(rNumericArgs(3));
-            htd.InterPipeSpacing = rNumericArgs(4);
-            htd.PipeID = rNumericArgs(5);
-            htd.PipeOD = rNumericArgs(6);
-            htd.BurialDepth = rNumericArgs(7);
-            htd.SoilConductivity = rNumericArgs(8);
-            htd.SoilDensity = rNumericArgs(9);
-            htd.SoilSpecificHeat = rNumericArgs(10);
-            htd.PipeConductivity = rNumericArgs(11);
-            htd.PipeDensity = rNumericArgs(12);
-            htd.PipeSpecificHeat = rNumericArgs(13);
-            htd.MoistureContent = rNumericArgs(14);
-            htd.SaturationMoistureContent = rNumericArgs(15);
-            htd.EvapotranspirationCoeff = rNumericArgs(16);
+            htd.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
+            htd.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+            htd.DesignFlowRate = DataIPShortCuts::rNumericArgs(1);
+            htd.AxialLength = DataIPShortCuts::rNumericArgs(2);
+            htd.NumPipes = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
+            htd.InterPipeSpacing = DataIPShortCuts::rNumericArgs(4);
+            htd.PipeID = DataIPShortCuts::rNumericArgs(5);
+            htd.PipeOD = DataIPShortCuts::rNumericArgs(6);
+            htd.BurialDepth = DataIPShortCuts::rNumericArgs(7);
+            htd.SoilConductivity = DataIPShortCuts::rNumericArgs(8);
+            htd.SoilDensity = DataIPShortCuts::rNumericArgs(9);
+            htd.SoilSpecificHeat = DataIPShortCuts::rNumericArgs(10);
+            htd.PipeConductivity = DataIPShortCuts::rNumericArgs(11);
+            htd.PipeDensity = DataIPShortCuts::rNumericArgs(12);
+            htd.PipeSpecificHeat = DataIPShortCuts::rNumericArgs(13);
+            htd.MoistureContent = DataIPShortCuts::rNumericArgs(14);
+            htd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(15);
+            htd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(16);
 
             auto & thisDomain = domains[DomainCtr-1];
 
@@ -1990,7 +1910,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.Moisture.Theta_sat = htd.SaturationMoistureContent / 100.0;
 
             // Farfield model parameters
-            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(4), cAlphaArgs(5));
+            thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
 
             // Other parameters
             thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -2021,8 +1941,8 @@ namespace PlantPipingSystemsManager {
             thisCircuit.PipeSize.OuterDia = htd.PipeOD;
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 // CurIndex = 5
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                //                            cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
+                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                //                            DataIPShortCuts::cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
             }
 
             // Read design flow rate, validated positive by IP
@@ -2030,34 +1950,34 @@ namespace PlantPipingSystemsManager {
 
             // Read inlet and outlet node names and validate them
             thisCircuit.InletNodeName = htd.InletNodeName;
-            thisCircuit.InletNodeNum = GetOnlySingleNode(thisCircuit.InletNodeName,
+            thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
                                                                               ErrorsFound,
                                                                               ObjName_HorizTrench,
                                                                               htd.ObjName,
-                                                                              NodeType_Water,
-                                                                              NodeConnectionType_Inlet,
+                                                         DataLoopNode::NodeType_Water,
+                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                               1,
-                                                                              ObjectIsNotParent);
+                                                         DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
+                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
             thisCircuit.OutletNodeName = htd.OutletNodeName;
-            thisCircuit.OutletNodeNum = GetOnlySingleNode(thisCircuit.OutletNodeName,
+            thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                htd.ObjName,
-                                                                               NodeType_Water,
-                                                                               NodeConnectionType_Outlet,
+                                                          DataLoopNode::NodeType_Water,
+                                                          DataLoopNode::NodeConnectionType_Outlet,
                                                                                1,
-                                                                               ObjectIsNotParent);
+                                                          DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
+                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
-            TestCompSet(ObjName_HorizTrench,
+            BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
                         htd.ObjName,
                         thisCircuit.InletNodeName,
                         thisCircuit.OutletNodeName,
@@ -2719,8 +2639,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataGlobals::Pi;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 InsulationInnerRadius;
         Real64 InsulationOuterRadius;
@@ -2769,7 +2687,7 @@ namespace PlantPipingSystemsManager {
         }
 
         //'also assign the interface cell surrounding the radial system
-        c.InterfaceVolume = (1.0 - (Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
+        c.InterfaceVolume = (1.0 - (DataGlobals::Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
     }
 
     void Domain::developMesh()
@@ -4542,7 +4460,7 @@ namespace PlantPipingSystemsManager {
         }
 
         // Latitude, converted to radians...positive for northern hemisphere, [radians]
-        Latitude_Radians = Pi / 180.0 * Latitude_Degrees;
+        Latitude_Radians = DataGlobals::Pi / 180.0 * Latitude_Degrees;
 
         // The day of year at this point in the simulation
         DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobals::SecsInDay);
@@ -4557,22 +4475,22 @@ namespace PlantPipingSystemsManager {
         CurAirTempK = this->Cur.CurAirTemp + 273.15;
 
         // Calculate some angles
-        dr = 1.0 + 0.033 * std::cos(2.0 * Pi * DayOfYear / 365.0);
-        Declination = 0.409 * std::sin(2.0 * Pi / 365.0 * DayOfYear - 1.39);
-        b_SC = 2.0 * Pi * (DayOfYear - 81.0) / 364.0;
+        dr = 1.0 + 0.033 * std::cos(2.0 * DataGlobals::Pi * DayOfYear / 365.0);
+        Declination = 0.409 * std::sin(2.0 * DataGlobals::Pi / 365.0 * DayOfYear - 1.39);
+        b_SC = 2.0 * DataGlobals::Pi * (DayOfYear - 81.0) / 364.0;
         Sc = 0.1645 * std::sin(2.0 * b_SC) - 0.1255 * std::cos(b_SC) - 0.025 * std::sin(b_SC);
-        Hour_Angle = Pi / 12.0 * (((HourOfDay - 0.5) + 0.06667 * (StMeridian_Degrees - Longitude_Degrees) + Sc) - 12.0);
+        Hour_Angle = DataGlobals::Pi / 12.0 * (((HourOfDay - 0.5) + 0.06667 * (StMeridian_Degrees - Longitude_Degrees) + Sc) - 12.0);
 
         // Calculate sunset something, and constrain to a minimum of 0.000001
         X_sunset = 1.0 - pow_2(std::tan(Latitude_Radians)) * pow_2(std::tan(Declination));
         X_sunset = max(X_sunset, 0.000001);
 
         // Find sunset angle
-        Sunset_Angle = Pi / 2.0 - std::atan(-std::tan(Latitude_Radians) * std::tan(Declination) / std::sqrt(X_sunset));
+        Sunset_Angle = DataGlobals::Pi / 2.0 - std::atan(-std::tan(Latitude_Radians) * std::tan(Declination) / std::sqrt(X_sunset));
 
         // Find solar angles
-        Solar_Angle_1 = Hour_Angle - Pi / 24.0;
-        Solar_Angle_2 = Hour_Angle + Pi / 24.0;
+        Solar_Angle_1 = Hour_Angle - DataGlobals::Pi / 24.0;
+        Solar_Angle_2 = Hour_Angle + DataGlobals::Pi / 24.0;
 
         // Constrain solar angles
         if (Solar_Angle_1 < -Sunset_Angle) Solar_Angle_1 = -Sunset_Angle;
@@ -4585,7 +4503,7 @@ namespace PlantPipingSystemsManager {
         IncidentSolar_MJhrmin = this->Cur.CurIncidentSolar * Convert_Wm2_To_MJhrmin;
 
         // Calculate another Q term...
-        QRAD_A = 12.0 * 60.0 / Pi * MeanSolarConstant * dr *
+        QRAD_A = 12.0 * 60.0 / DataGlobals::Pi * MeanSolarConstant * dr *
                  ((Solar_Angle_2 - Solar_Angle_1) * std::sin(Latitude_Radians) * std::sin(Declination) +
                   std::cos(Latitude_Radians) * std::cos(Declination) * (std::sin(Solar_Angle_2) - std::sin(Solar_Angle_1)));
 
@@ -5115,7 +5033,7 @@ namespace PlantPipingSystemsManager {
         Real64 Prandtl = thisCircuit.CurFluidPropertySet.Prandtl;
 
         // Flow calculations
-        Real64 Area_c = (Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
+        Real64 Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
         Real64 Velocity = thisCircuit.CurCircuitFlowRate / (Density * Area_c);
 
         // Determine convection coefficient based on flow conditions
@@ -5325,7 +5243,7 @@ namespace PlantPipingSystemsManager {
         Real64 OutermostRadialCellOuterRadius = outerRadialCell.OuterRadius;
         Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
         Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
-        Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) / (2.0 * Pi * cell.depth() * cell.Properties.Conductivity);
+        Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) / (2.0 * DataGlobals::Pi * cell.depth() * cell.Properties.Conductivity);
         Numerator += (Beta / Resistance) * OutermostRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
@@ -5401,14 +5319,14 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from interface cell
-        Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Pi * cell.depth() * ThisRadialCellConductivity);
+        Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity);
         Numerator += (Beta / Resistance) * cell.Temperature;
         Denominator += (Beta / Resistance);
 
         //'add effects from inner radial cell
-        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * Pi * cell.depth() * ThisRadialCellConductivity)) +
+        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
                      (std::log(NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid) /
-                      (2 * Pi * cell.depth() * NextOuterRadialCellConductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * NextOuterRadialCellConductivity));
         Numerator += (Beta / Resistance) * NextOuterRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
@@ -5459,15 +5377,15 @@ namespace PlantPipingSystemsManager {
 
             //'add effects from outer cell
             Real64 Resistance =
-                (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) / (2 * Pi * cell.depth() * OuterRadialCellConductivity)) +
-                (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Pi * cell.depth() * ThisRadialCellConductivity));
+                (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * OuterRadialCellConductivity)) +
+                (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
             Numerator += (Beta / Resistance) * OuterRadialCellTemperature;
             Denominator += (Beta / Resistance);
 
             //'add effects from inner cell
             Resistance =
-                (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * Pi * cell.depth() * ThisRadialCellConductivity)) +
-                (std::log(InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid) / (2 * Pi * cell.depth() * InnerRadialCellConductivity));
+                (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
+                (std::log(InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * InnerRadialCellConductivity));
             Numerator += (Beta / Resistance) * InnerRadialCellTemperature;
             Denominator += (Beta / Resistance);
 
@@ -5533,15 +5451,15 @@ namespace PlantPipingSystemsManager {
 
         //'add effects from outer radial cell
         Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                      (2 * Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
-                     (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Pi * cell.depth() * ThisRadialCellConductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                     (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
         Numerator += (Beta / Resistance) * OuterNeighborRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
         //'add effects from pipe cell
-        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * Pi * cell.depth() * ThisRadialCellConductivity)) +
+        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
                      (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
-                      (2 * Pi * cell.depth() * InnerNeighborRadialCellConductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
         Numerator += (Beta / Resistance) * InnerNeighborRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
@@ -5577,16 +5495,16 @@ namespace PlantPipingSystemsManager {
 
         //'add effects from outer radial cell
         Resistance = (std::log(NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius) /
-                      (2 * Pi * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
+                      (2 * DataGlobals::Pi * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
                      (std::log(ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid) /
-                      (2 * Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity));
         Numerator += (Beta / Resistance) * NextInnerRadialCell.Temperature;
         Denominator += (Beta / Resistance);
 
         //'add effects from pipe cell
         Resistance = (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
-                      (2 * Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
-                     (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) / (2 * Pi * cell.depth() * PipeCell.Properties.Conductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
+                     (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * PipeCell.Properties.Conductivity));
         Numerator += (Beta / Resistance) * PipeCell.Temperature;
         Denominator += (Beta / Resistance);
 
@@ -5644,15 +5562,15 @@ namespace PlantPipingSystemsManager {
 
         //'add effects from outer radial cell
         Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                      (2 * Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
-                     (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) / (2 * Pi * cell.depth() * ThisPipeCellConductivity));
+                      (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                     (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity));
         Numerator += (Beta / Resistance) * OuterNeighborRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
         //'add effects from water cell
         Real64 PipeConductionResistance =
-            std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) / (2 * Pi * cell.depth() * ThisPipeCellConductivity);
-        Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * cell.depth());
+            std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity);
+        Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * ThisPipeCellInnerRadius * cell.depth());
         Resistance = PipeConductionResistance + ConvectiveResistance;
         Numerator += (Beta / Resistance) * FluidCellTemperature;
         Denominator += (Beta / Resistance);
@@ -5690,8 +5608,8 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from outer pipe cell
-        Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) / (2 * Pi * cell.depth() * PipeCellConductivity);
-        Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * cell.depth());
+        Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * PipeCellConductivity);
+        Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * PipeCellInnerRadius * cell.depth());
         Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
         Numerator += (Beta / TotalPipeResistance) * PipeCellTemperature;
         Denominator += (Beta / TotalPipeResistance);
