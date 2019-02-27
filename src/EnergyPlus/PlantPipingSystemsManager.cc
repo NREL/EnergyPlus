@@ -510,19 +510,19 @@ namespace PlantPipingSystemsManager {
         for (DomainNum = 1; DomainNum <= TotalNumDomains; ++DomainNum) {
 
             // Convenience
-            int const NumCircuitsInThisDomain = static_cast<int>(size(PipingSystemDomains(DomainNum).CircuitNames));
+            int const NumCircuitsInThisDomain = static_cast<int>(PipingSystemDomains(DomainNum).CircuitNames.size());
 
             // validate pipe domain-circuit name-to-index references
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).CircuitNames(CircuitCtr), PipingSystemCircuits);
-                PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr) = CircuitIndex;
+                CircuitIndex = UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).CircuitNames[CircuitCtr-1], PipingSystemCircuits);
+                PipingSystemDomains(DomainNum).CircuitIndices.push_back(CircuitIndex);
                 PipingSystemCircuits(CircuitIndex).ParentDomainIndex = DomainNum;
             }
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
+                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices[CircuitCtr-1];
                 for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
                     ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
                     PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y =
@@ -533,7 +533,7 @@ namespace PlantPipingSystemsManager {
             // correct segment locations for: BASEMENT X SHIFT
             if (PipingSystemDomains(DomainNum).HasBasement && PipingSystemDomains(DomainNum).BasementZone.ShiftPipesByWidth) {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
+                    CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices[CircuitCtr-1];
                     for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
                         ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
                         PipingSystemSegments(ThisSegmentIndex).PipeLocation.X += PipingSystemDomains(DomainNum).BasementZone.Width;
@@ -545,7 +545,7 @@ namespace PlantPipingSystemsManager {
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
 
                 // retrieve the index
-                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices(CircuitCtr);
+                CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndices[CircuitCtr-1];
 
                 // check to make sure it isn't outside the domain
                 for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
@@ -899,13 +899,11 @@ namespace PlantPipingSystemsManager {
 
             // Allocate the circuit placeholder arrays
             NumCircuitsInThisDomain = int(rNumericArgs(20));
-            PipingSystemDomains(DomainNum).CircuitNames.allocate(NumCircuitsInThisDomain);
-            PipingSystemDomains(DomainNum).CircuitIndices.allocate(NumCircuitsInThisDomain);
 
             // Check for blank or missing or mismatched number...
             NumAlphasBeforePipeCircOne = 10;
             for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                PipingSystemDomains(DomainNum).CircuitNames(CircuitCtr) = cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne);
+                PipingSystemDomains(DomainNum).CircuitNames.push_back(cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne));
             }
 
             // Initialize ground temperature model and get pointer reference
@@ -1977,9 +1975,7 @@ namespace PlantPipingSystemsManager {
             PipingSystemDomains(DomainCtr).Moisture.GroundCoverCoefficient = HGHX(HorizontalGHXCtr).EvapotranspirationCoeff;
 
             // Allocate the circuit placeholder arrays
-            PipingSystemDomains(DomainCtr).CircuitNames.allocate(1);
-            PipingSystemDomains(DomainCtr).CircuitIndices.allocate(1);
-            PipingSystemDomains(DomainCtr).CircuitNames(1) = HGHX(HorizontalGHXCtr).ObjName;
+            PipingSystemDomains(DomainCtr).CircuitNames.push_back(HGHX(HorizontalGHXCtr).ObjName);
 
             //******* We'll next set up the circuit ********
             PipingSystemCircuits(CircuitCtr).IsActuallyPartOfAHorizontalTrench = true;
@@ -3687,15 +3683,11 @@ namespace PlantPipingSystemsManager {
 
                     //'check to see if this is a pipe node...
                     Real64 InsulationThickness(0.0);
-                    int FoundOnCircuitIndex(0);
                     Real64 RadialMeshThickness(0.0);
                     bool HasInsulation(false);
                     RadialSizing PipeSizing;
-                    for (int CircuitCtr = this->CircuitIndices.l1(), NumCircuits = this->CircuitIndices.u1(); CircuitCtr <= NumCircuits;
-                         ++CircuitCtr) {
-
-                        FoundOnCircuitIndex = this->CircuitIndices(CircuitCtr);
-                        for (int PipeCounter = 0, NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
+                    for (auto & FoundOnCircuitIndex : this->CircuitIndices) {
+                        for (int PipeCounter = 0, NumSegments = (int)PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
                             PipeSegmentInfo const &ThisSegment = PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices[PipeCounter]);
                             if (XYRectangle.contains(ThisSegment.PipeLocation)) {
                                 //'inform the cell that it is a pipe node
@@ -4029,9 +4021,8 @@ namespace PlantPipingSystemsManager {
         int CircuitOutletCellZ;
 
         auto const &cells(this->Cells);
-        for (int CircuitNum = this->CircuitIndices.l1(); CircuitNum <= this->CircuitIndices.u1(); ++CircuitNum) {
+        for (auto & CircuitIndex : this->CircuitIndices) {
 
-            int CircuitIndex = this->CircuitIndices(CircuitNum);
             bool CircuitInletCellSet = false;
 
             for (auto & segmentIndex : PipingSystemCircuits(CircuitIndex).PipeSegmentIndices) {

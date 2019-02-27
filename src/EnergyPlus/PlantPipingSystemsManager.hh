@@ -730,8 +730,8 @@ namespace PlantPipingSystemsManager {
         // ID
         std::string Name;
         // Names and pointers to circuits found in this domain
-        Array1D_string CircuitNames;
-        Array1D_int CircuitIndices;
+        std::vector<std::string> CircuitNames;
+        std::vector<int> CircuitIndices;
         int MaxIterationsPerTS;
         // Flag variables
         bool OneTimeInit;
