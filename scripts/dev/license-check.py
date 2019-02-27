@@ -30,7 +30,4 @@ checker = licensetext.Checker(current, toolname=TOOL_NAME)
 
 # Check files
 for base in dirs:
-    subdirs = glob.glob(base + '*/')
     checker.check(base)
-    for sub in subdirs:
-        checker.check(sub)
