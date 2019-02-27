@@ -535,6 +535,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+
     Node(1).MassFlowRate = 0.0; // Zone 1 zone node
     Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
     Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node

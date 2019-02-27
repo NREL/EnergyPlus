@@ -135,6 +135,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 
     ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
@@ -529,6 +534,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     int returnNode2 = ZoneEquipConfig(ZoneNum).ReturnNode(2);
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
     DataAirLoop::AirLoopFlow.allocate(3);
@@ -660,6 +671,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+
     // Set return node basis node flows to zero, return flow should be zero
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
         Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
@@ -757,6 +774,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     int returnNode1 = ZoneEquipConfig(ZoneNum).ReturnNode(1);
     int returnNode2 = ZoneEquipConfig(ZoneNum).ReturnNode(2);
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
+
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
