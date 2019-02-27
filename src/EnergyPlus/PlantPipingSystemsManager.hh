@@ -612,7 +612,7 @@ namespace PlantPipingSystemsManager {
         CurSimConditionsInfo() = default;
     };
 
-    struct PipeSegmentInfo
+    struct Segment
     {
         // Members
         // ID
@@ -631,7 +631,7 @@ namespace PlantPipingSystemsManager {
         bool IsActuallyPartOfAHorizontalTrench = false;
 
         // Default Constructor
-        PipeSegmentInfo() = default;
+        Segment() = default;
 
         void initPipeCells(int x, int y);
 
@@ -640,7 +640,7 @@ namespace PlantPipingSystemsManager {
         }
     };
 
-    struct PipeCircuitInfo : public PlantComponent
+    struct Circuit : public PlantComponent
     {
 
         // Members
@@ -691,8 +691,8 @@ namespace PlantPipingSystemsManager {
         Real64 FluidHeatLoss = 0.0;
 
         // Default Constructor
-        PipeCircuitInfo() = default;
-        virtual ~PipeCircuitInfo() = default;
+        Circuit() = default;
+        virtual ~Circuit() = default;
 
         void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
@@ -730,7 +730,7 @@ namespace PlantPipingSystemsManager {
         }
     };
 
-    struct FullDomainStructureInfo
+    struct Domain
     {
         // Members
         // ID
@@ -832,7 +832,7 @@ namespace PlantPipingSystemsManager {
         std::vector<Direction> NeighborBoundaryCells;
 
         // Default Constructor
-        FullDomainStructureInfo()
+        Domain()
             : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvironment(true), DomainNeedsSimulation(true),
               DomainNeedsToBeMeshed(true), IsActuallyPartOfAHorizontalTrench(false), HasAPipeCircuit(true), HasZoneCoupledSlab(false),
               HasZoneCoupledBasement(false), HasBasement(false), ZoneCoupledOSCMIndex(0), PerimeterOffset(0.0), SlabInGradeFlag(false),
@@ -964,9 +964,9 @@ namespace PlantPipingSystemsManager {
     };
 
     // Object Data
-    extern std::vector<FullDomainStructureInfo> PipingSystemDomains;
-    extern std::vector<PipeCircuitInfo> PipingSystemCircuits;
-    extern std::vector<PipeSegmentInfo> PipingSystemSegments;
+    extern std::vector<Domain> domains;
+    extern std::vector<Circuit> circuits;
+    extern std::vector<Segment> segments;
 
     void clear_state();
 

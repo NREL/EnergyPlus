@@ -1729,19 +1729,19 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantComponent *thisCircuit = PlantPipingSystemsManager::PipeCircuitInfo::factory(DataPlant::TypeOf_PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
+    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(DataPlant::TypeOf_PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
 
-    EXPECT_EQ(2u, PlantPipingSystemsManager::PipingSystemDomains.size());
+    EXPECT_EQ(2u, PlantPipingSystemsManager::domains.size());
 
-    EXPECT_TRUE(PlantPipingSystemsManager::PipingSystemDomains[0].HasAPipeCircuit);
-    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.X.RegionMeshCount);
-    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.Z.RegionMeshCount);
+    EXPECT_TRUE(PlantPipingSystemsManager::domains[0].HasAPipeCircuit);
+    EXPECT_EQ(2, PlantPipingSystemsManager::domains[0].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(2, PlantPipingSystemsManager::domains[0].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(6, PlantPipingSystemsManager::domains[0].Mesh.Z.RegionMeshCount);
 
-    EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains[1].HasAPipeCircuit);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.X.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.Z.RegionMeshCount);
+    EXPECT_FALSE(PlantPipingSystemsManager::domains[1].HasAPipeCircuit);
+    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.Z.RegionMeshCount);
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;

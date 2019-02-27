@@ -121,9 +121,9 @@ namespace PlantPipingSystemsManager {
     std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
 
     // MODULE VARIABLE DECLARATIONS:
-    std::vector<FullDomainStructureInfo> PipingSystemDomains;
-    std::vector<PipeCircuitInfo> PipingSystemCircuits;
-    std::vector<PipeSegmentInfo> PipingSystemSegments;
+    std::vector<Domain> domains;
+    std::vector<Circuit> circuits;
+    std::vector<Segment> segments;
     std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
     bool GetInputFlag(true); // First time, input is "gotten"
     bool WriteEIOFlag(true); // False after EIO is written
@@ -133,9 +133,9 @@ namespace PlantPipingSystemsManager {
     {
         GetInputFlag = true;
         WriteEIOFlag = true;
-        PipingSystemDomains.clear();
-        PipingSystemCircuits.clear();
-        PipingSystemSegments.clear();
+        domains.clear();
+        circuits.clear();
+        segments.clear();
         GroundDomainUniqueNames.clear();
     }
 
@@ -161,7 +161,7 @@ namespace PlantPipingSystemsManager {
         DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *PipeCircuitInfo::factory(int EP_UNUSED(objectType), std::string objectName)
+    PlantComponent *Circuit::factory(int EP_UNUSED(objectType), std::string objectName)
     {
         // Process the input data for circuits if it hasn't been done already
         if (GetInputFlag) {
@@ -169,7 +169,7 @@ namespace PlantPipingSystemsManager {
             GetInputFlag = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &circuit : PipingSystemCircuits) {
+        for (auto &circuit : circuits) {
             if (circuit.Name == objectName) {
                 return &circuit;
             }
@@ -180,13 +180,13 @@ namespace PlantPipingSystemsManager {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void PipeCircuitInfo::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void Circuit::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
     {
         // Retrieve the parent domain index for this pipe circuit
-        auto & thisDomain(PipingSystemDomains[this->ParentDomainIndex]);
+        auto & thisDomain(domains[this->ParentDomainIndex]);
         int CircuitNum = this->CircuitIndex;
 
         // Do any initialization here
@@ -234,9 +234,9 @@ namespace PlantPipingSystemsManager {
             GetInputFlag = false;
         }
 
-        for (int DomainNum = 0; DomainNum < (int)PipingSystemDomains.size(); ++DomainNum) {
+        for (int DomainNum = 0; DomainNum < (int)domains.size(); ++DomainNum) {
 
-            auto &thisDomain(PipingSystemDomains[DomainNum]);
+            auto &thisDomain(domains[DomainNum]);
 
             // if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
             if (thisDomain.HasAPipeCircuit) continue;
@@ -408,8 +408,8 @@ namespace PlantPipingSystemsManager {
             gio::write(OutputFileInits, DomainCellsToEIOHeader);
 
             // Write eio data
-            for (int DomainNum = 0; DomainNum < (int)PipingSystemDomains.size(); ++DomainNum) {
-                auto &thisDomain(PipingSystemDomains[DomainNum]);
+            for (int DomainNum = 0; DomainNum < (int)domains.size(); ++DomainNum) {
+                auto &thisDomain(domains[DomainNum]);
                 gio::write(OutputFileInits, DomainCellsToEIO)
                     << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells << thisDomain.NumInsulationCells;
             }
@@ -457,18 +457,18 @@ namespace PlantPipingSystemsManager {
         NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Slab);
         NumBasements = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Basement);
         TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
-        PipingSystemDomains.resize(TotalNumDomains);
+        domains.resize(TotalNumDomains);
 
         // then circuits
         NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
         TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
-        PipingSystemCircuits.resize(TotalNumCircuits);
+        circuits.resize(TotalNumCircuits);
 
         // then segments
         NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(ObjName_Segment);
         NumSegmentsInHorizontalTrenches = GetNumSegmentsForHorizontalTrenches(NumHorizontalTrenches);
         TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
-        PipingSystemSegments.resize(TotalNumSegments);
+        segments.resize(TotalNumSegments);
 
         // Read in raw inputs, don't try to interpret dependencies yet
         ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
@@ -489,18 +489,18 @@ namespace PlantPipingSystemsManager {
         SetupPipingSystemOutputVariables();
 
         // Validate CIRCUIT-SEGMENT cross references
-        for (auto & pipeCircuit : PipingSystemCircuits) {
+        for (auto & pipeCircuit : circuits) {
 
             // validate circuit-segment name-to-index references
             for (ThisCircuitPipeSegmentCounter = 0; ThisCircuitPipeSegmentCounter < static_cast<int>(pipeCircuit.PipeSegmentNames.size()); ++ThisCircuitPipeSegmentCounter) {
                 std::string thisSegmentName = pipeCircuit.PipeSegmentNames[ThisCircuitPipeSegmentCounter];
-                auto tryToFindSegmentByName = std::find(PipingSystemSegments.begin(), PipingSystemSegments.end(), thisSegmentName);
-                if (tryToFindSegmentByName == PipingSystemSegments.end()) {
+                auto tryToFindSegmentByName = std::find(segments.begin(), segments.end(), thisSegmentName);
+                if (tryToFindSegmentByName == segments.end()) {
                     ShowSevereError(RoutineName + ": Could not match a pipe segment for: " + ObjName_Circuit + '=' + pipeCircuit.Name);  // NOLINT(performance-inefficient-string-concatenation)
                     ShowContinueError(RoutineName + ": Looking for: " + ObjName_Segment + '=' + thisSegmentName); // NOLINT(performance-inefficient-string-concatenation)
                     ErrorsFound = true;
                 } else {
-                    int thisSegmentIndex = (int)std::distance(PipingSystemSegments.begin(), tryToFindSegmentByName);
+                    int thisSegmentIndex = (int)std::distance(segments.begin(), tryToFindSegmentByName);
                     pipeCircuit.PipeSegmentIndices.push_back(thisSegmentIndex);
                 }
             } // Segment loop
@@ -511,38 +511,38 @@ namespace PlantPipingSystemsManager {
         for (DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
             // Convenience
-            int const NumCircuitsInThisDomain = static_cast<int>(PipingSystemDomains[DomainNum].CircuitNames.size());
+            int const NumCircuitsInThisDomain = static_cast<int>(domains[DomainNum].CircuitNames.size());
 
             // validate pipe domain-circuit name-to-index references
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                std::string thisCircuitName = PipingSystemDomains[DomainNum].CircuitNames[CircuitCtr-1];
-                auto tryToFindCircuitByName = std::find(PipingSystemCircuits.begin(), PipingSystemCircuits.end(), thisCircuitName);
-                if (tryToFindCircuitByName == PipingSystemCircuits.end()) {
+                std::string thisCircuitName = domains[DomainNum].CircuitNames[CircuitCtr-1];
+                auto tryToFindCircuitByName = std::find(circuits.begin(), circuits.end(), thisCircuitName);
+                if (tryToFindCircuitByName == circuits.end()) {
                     // error, could not find domain-specified-circuit-name in the list of input circuits
                 } else {
-                    int thisCircuitIndex = (int)std::distance(PipingSystemCircuits.begin(), tryToFindCircuitByName);
-                    PipingSystemDomains[DomainNum].CircuitIndices.push_back(thisCircuitIndex);
-                    PipingSystemCircuits[thisCircuitIndex].ParentDomainIndex = DomainNum;
+                    int thisCircuitIndex = (int)std::distance(circuits.begin(), tryToFindCircuitByName);
+                    domains[DomainNum].CircuitIndices.push_back(thisCircuitIndex);
+                    circuits[thisCircuitIndex].ParentDomainIndex = DomainNum;
                 }
             }
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits[CircuitCtr-1].PipeSegmentIndices[PipeCtr]; // possible diff location
-                    PipingSystemSegments[ThisSegmentIndex].PipeLocation.Y = PipingSystemDomains[DomainNum].Extents.yMax - PipingSystemSegments[ThisSegmentIndex].PipeLocation.Y;
+                CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = circuits[CircuitCtr-1].PipeSegmentIndices[PipeCtr]; // possible diff location
+                    segments[ThisSegmentIndex].PipeLocation.Y = domains[DomainNum].Extents.yMax - segments[ThisSegmentIndex].PipeLocation.Y;
                 } // segment loop
             }     // circuit loop
 
             // correct segment locations for: BASEMENT X SHIFT
-            if (PipingSystemDomains[DomainNum].HasBasement && PipingSystemDomains[DomainNum].BasementZone.ShiftPipesByWidth) {
+            if (domains[DomainNum].HasBasement && domains[DomainNum].BasementZone.ShiftPipesByWidth) {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
-                    for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
-                        ThisSegmentIndex = PipingSystemCircuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
-                        PipingSystemSegments[ThisSegmentIndex].PipeLocation.X += PipingSystemDomains[DomainNum].BasementZone.Width;
+                    CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
+                    for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                        ThisSegmentIndex = circuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
+                        segments[ThisSegmentIndex].PipeLocation.X += domains[DomainNum].BasementZone.Width;
                     } // segment loop
                 }     // circuit loop
             }
@@ -551,15 +551,15 @@ namespace PlantPipingSystemsManager {
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
 
                 // retrieve the index
-                CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
+                CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
 
                 // check to make sure it isn't outside the domain
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
-                    auto & thisSegment = PipingSystemSegments[ThisSegmentIndex];
-                    if ((thisSegment.PipeLocation.X > PipingSystemDomains[DomainNum].Extents.xMax) ||
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = circuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
+                    auto & thisSegment = segments[ThisSegmentIndex];
+                    if ((thisSegment.PipeLocation.X > domains[DomainNum].Extents.xMax) ||
                         (thisSegment.PipeLocation.X < 0.0) ||
-                        (thisSegment.PipeLocation.Y > PipingSystemDomains[DomainNum].Extents.yMax) ||
+                        (thisSegment.PipeLocation.Y > domains[DomainNum].Extents.yMax) ||
                         (thisSegment.PipeLocation.Y < 0.0)) {
                         ShowSevereError(
                             "PipingSystems::" + RoutineName +
@@ -668,7 +668,7 @@ namespace PlantPipingSystemsManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            auto & thisDomain = PipingSystemDomains[DomainNum-1];
+            auto & thisDomain = domains[DomainNum-1];
 
             // Get the name, validate
             thisDomain.Name = cAlphaArgs(1);
@@ -919,7 +919,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(5), cAlphaArgs(6));
             
             // now add this instance to the main vector
-            // PipingSystemDomains.push_back(thisDomain);
+            // domains.push_back(thisDomain);
         }
     }
 
@@ -1029,7 +1029,7 @@ namespace PlantPipingSystemsManager {
             gdd.HorizInsWidth = rNumericArgs(10);
             gdd.VertInsDepth = rNumericArgs(11);
 
-            auto & thisDomain = PipingSystemDomains[DomainCtr-1];
+            auto & thisDomain = domains[DomainCtr-1];
             
             // Set flag for slab in-grade or slab on-grade
             if (UtilityRoutines::SameString(cAlphaArgs(5), "INGRADE")) {
@@ -1277,7 +1277,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.SetupZoneCoupledOutputVariables();
             
             // add it to the main vector
-            // PipingSystemDomains.push_back(thisDomain);
+            // domains.push_back(thisDomain);
         }
     }
 
@@ -1368,7 +1368,7 @@ namespace PlantPipingSystemsManager {
             gdd.HorizInsWidth = rNumericArgs(10);
             gdd.VertInsDepth = rNumericArgs(12);
 
-            auto & thisDomain = PipingSystemDomains[DomainNum-1];
+            auto & thisDomain = domains[DomainNum-1];
             
             // Other inputs
             thisDomain.Name = cAlphaArgs(1);
@@ -1642,7 +1642,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.SetupZoneCoupledOutputVariables();
 
             // add it to the main vector
-            // PipingSystemDomains.push_back(thisDomain);
+            // domains.push_back(thisDomain);
         }
     }
 
@@ -1689,7 +1689,7 @@ namespace PlantPipingSystemsManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            auto & thisCircuit = PipingSystemCircuits[PipeCircuitCounter-1];
+            auto & thisCircuit = circuits[PipeCircuitCounter-1];
             
             // Get the name, validate
             thisCircuit.Name = cAlphaArgs(1);
@@ -1806,7 +1806,7 @@ namespace PlantPipingSystemsManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            auto & thisSegment = PipingSystemSegments[SegmentCtr-1];
+            auto & thisSegment = segments[SegmentCtr-1];
             
             // Get the name, validate
             thisSegment.Name = cAlphaArgs(1);
@@ -1962,7 +1962,7 @@ namespace PlantPipingSystemsManager {
             htd.SaturationMoistureContent = rNumericArgs(15);
             htd.EvapotranspirationCoeff = rNumericArgs(16);
 
-            auto & thisDomain = PipingSystemDomains[DomainCtr-1];
+            auto & thisDomain = domains[DomainCtr-1];
 
             //******* We'll first set up the domain ********
             // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -2003,10 +2003,10 @@ namespace PlantPipingSystemsManager {
             thisDomain.CircuitNames.push_back(htd.ObjName);
 
             // add it to the main vector
-            // PipingSystemDomains.push_back(thisDomain);
+            // domains.push_back(thisDomain);
 
             //******* We'll next set up the circuit ********
-            auto & thisCircuit = PipingSystemCircuits[CircuitCtr-1];
+            auto & thisCircuit = circuits[CircuitCtr-1];
             thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
             thisCircuit.Name = htd.ObjName;
             thisCircuit.CircuitIndex = CircuitCtr - 1;
@@ -2083,7 +2083,7 @@ namespace PlantPipingSystemsManager {
             //******* Then we'll do the segments *******!
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 ++SegmentCtr;
-                PipeSegmentInfo segment;
+                Segment segment;
                 segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter);
                 segment.IsActuallyPartOfAHorizontalTrench = true;
                 segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * htd.InterPipeSpacing, htd.BurialDepth);
@@ -2093,7 +2093,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     segment.FlowDirection = SegmentFlow::DecreasingZ;
                 }
-                PipingSystemSegments[SegmentCtr-1] = segment;  // possible array issue
+                segments[SegmentCtr-1] = segment;  // possible array issue
             }
         }
     }
@@ -2107,7 +2107,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        for (auto & thisSegment : PipingSystemSegments) {
+        for (auto & thisSegment : segments) {
 
             if (!thisSegment.IsActuallyPartOfAHorizontalTrench) {
 
@@ -2133,7 +2133,7 @@ namespace PlantPipingSystemsManager {
             }
         }
 
-        for (auto & thisCircuit : PipingSystemCircuits) {
+        for (auto & thisCircuit : circuits) {
 
             if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
 
@@ -2196,7 +2196,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::SetupZoneCoupledOutputVariables()
+    void Domain::SetupZoneCoupledOutputVariables()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2249,7 +2249,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::InitPipingSystems(int const CircuitNum)
+    void Domain::InitPipingSystems(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2261,7 +2261,7 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitPipingSystems");
 
-        auto &thisCircuit = PipingSystemCircuits[CircuitNum];
+        auto &thisCircuit = circuits[CircuitNum];
 
         // Do any one-time initializations
         if (thisCircuit.NeedToFindOnPlantLoop) {
@@ -2305,8 +2305,8 @@ namespace PlantPipingSystemsManager {
 
             // would be OK to do some post-mesh error handling here I think
             for (auto & circuitIndex : this->CircuitIndices) {
-                for (auto & segmentIndex : PipingSystemCircuits[circuitIndex].PipeSegmentIndices) {
-                    if (!PipingSystemSegments[segmentIndex].PipeCellCoordinatesSet) {
+                for (auto & segmentIndex : circuits[circuitIndex].PipeSegmentIndices) {
+                    if (!segments[segmentIndex].PipeCellCoordinatesSet) {
                         ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                         ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
                         ShowContinueError("...Verify piping system domain inputs, circuits, and segments.");
@@ -2364,7 +2364,7 @@ namespace PlantPipingSystemsManager {
                                              thisCircuit.CompNum);
     }
 
-    void FullDomainStructureInfo::UpdatePipingSystems(int const CircuitNum)
+    void Domain::UpdatePipingSystems(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2373,8 +2373,8 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int OutletNodeNum = PipingSystemCircuits[CircuitNum].OutletNodeNum;
-        auto const &out_cell(PipingSystemCircuits[CircuitNum].CircuitOutletCell);
+        int OutletNodeNum = circuits[CircuitNum].OutletNodeNum;
+        auto const &out_cell(circuits[CircuitNum].CircuitOutletCell);
         DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
     }
 
@@ -2474,7 +2474,7 @@ namespace PlantPipingSystemsManager {
         return RetVal;
     }
 
-    void PipeSegmentInfo::initPipeCells(int const x, int const y)
+    void Segment::initPipeCells(int const x, int const y)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2491,7 +2491,7 @@ namespace PlantPipingSystemsManager {
         this->PipeCellCoordinatesSet = true;
     }
 
-    void PipeCircuitInfo::initInOutCells(CartesianCell const &in, CartesianCell const &out)
+    void Circuit::initInOutCells(CartesianCell const &in, CartesianCell const &out)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2504,7 +2504,7 @@ namespace PlantPipingSystemsManager {
         this->CircuitOutletCell = Point3DInteger(out.X_index, out.Y_index, out.Z_index);
     }
 
-    bool FullDomainStructureInfo::IsConverged_CurrentToPrevIteration()
+    bool Domain::IsConverged_CurrentToPrevIteration()
     {
 
         // FUNCTION INFORMATION:
@@ -2555,17 +2555,17 @@ namespace PlantPipingSystemsManager {
             MaxDivAmount = ThisCellMax;
         }
         //'also do insulation if it exists
-        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+        if (circuits[CircuitNum].HasInsulation) {
             ThisCellMax = std::abs(CellToCheck.PipeCellData.Insulation.Temperature - CellToCheck.PipeCellData.Insulation.Temperature_PrevIteration);
             if (ThisCellMax > MaxDivAmount) {
                 MaxDivAmount = ThisCellMax;
             }
         }
 
-        return (MaxDivAmount < PipingSystemCircuits[CircuitNum].Convergence_CurrentToPrevIteration);
+        return (MaxDivAmount < circuits[CircuitNum].Convergence_CurrentToPrevIteration);
     }
 
-    void FullDomainStructureInfo::ShiftTemperaturesForNewTimeStep()
+    void Domain::ShiftTemperaturesForNewTimeStep()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2598,7 +2598,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::ShiftTemperaturesForNewIteration()
+    void Domain::ShiftTemperaturesForNewIteration()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2654,7 +2654,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    bool FullDomainStructureInfo::CheckForOutOfRangeTemps()
+    bool Domain::CheckForOutOfRangeTemps()
     {
 
         // FUNCTION INFORMATION:
@@ -2772,7 +2772,7 @@ namespace PlantPipingSystemsManager {
         c.InterfaceVolume = (1.0 - (Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
     }
 
-    void FullDomainStructureInfo::developMesh()
+    void Domain::developMesh()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2904,7 +2904,7 @@ namespace PlantPipingSystemsManager {
         this->setupPipeCircuitInOutCells();
     }
 
-    void FullDomainStructureInfo::createPartitionCenterList()
+    void Domain::createPartitionCenterList()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2936,12 +2936,12 @@ namespace PlantPipingSystemsManager {
 
         // Object Data
         std::vector<MeshPartition> PreviousEntries;
-        PipeSegmentInfo ThisSegment;
+        Segment ThisSegment;
 
         //'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
         //'in input they are measured by depth, but internally they are referred to by distance from y = 0, or the bottom boundary
         for (auto & CircuitIndex: this->CircuitIndices) {
-            auto & thisCircuit = PipingSystemCircuits[CircuitIndex];
+            auto & thisCircuit = circuits[CircuitIndex];
 
             // set up a convenience variable here
             //'account for the pipe and insulation if necessary
@@ -2955,7 +2955,7 @@ namespace PlantPipingSystemsManager {
             PipeCellWidth += 2 * thisCircuit.RadialMeshThickness;
 
             for (auto & SegmentIndex : thisCircuit.PipeSegmentIndices) {
-                ThisSegment = PipingSystemSegments[SegmentIndex];
+                ThisSegment = segments[SegmentIndex];
                 if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), ThisSegment.PipeLocation.X) == this->Partitions.X.end()) {
                     this->Partitions.X.emplace_back(ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth);
                 }
@@ -3196,7 +3196,7 @@ namespace PlantPipingSystemsManager {
         std::sort(this->Partitions.Z.begin(), this->Partitions.Z.end(), lambda);
     }
 
-    std::vector<GridRegion> FullDomainStructureInfo::createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
+    std::vector<GridRegion> Domain::createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
                                                                            bool const PartitionsExist,
                                                                            Real64 const DirExtentMax)
     {
@@ -3307,7 +3307,7 @@ namespace PlantPipingSystemsManager {
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ArgumentSelectionDefectsInspection"
-    void FullDomainStructureInfo::createRegionList(std::vector<GridRegion> &Regions,
+    void Domain::createRegionList(std::vector<GridRegion> &Regions,
                                                    std::vector<GridRegion> const &ThesePartitionRegions,
                                                    Real64 const DirExtentMax,
                                                    RegionType const DirDirection,
@@ -3472,7 +3472,7 @@ namespace PlantPipingSystemsManager {
         return RetVal;
     }
 
-    void FullDomainStructureInfo::createCellArray(std::vector<Real64> const &XBoundaryPoints,
+    void Domain::createCellArray(std::vector<Real64> const &XBoundaryPoints,
                                                   std::vector<Real64> const &YBoundaryPoints,
                                                   std::vector<Real64> const &ZBoundaryPoints)
     {
@@ -3716,9 +3716,9 @@ namespace PlantPipingSystemsManager {
                     bool HasInsulation(false);
                     RadialSizing PipeSizing;
                     for (auto & FoundOnCircuitIndex : this->CircuitIndices) {
-                        for (int PipeCounter = 0, NumSegments = (int)PipingSystemCircuits[FoundOnCircuitIndex].PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
-                            auto & thisSegmentIndex = PipingSystemCircuits[FoundOnCircuitIndex].PipeSegmentIndices[PipeCounter];
-                            PipeSegmentInfo const &ThisSegment = PipingSystemSegments[thisSegmentIndex];
+                        for (int PipeCounter = 0, NumSegments = (int)circuits[FoundOnCircuitIndex].PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
+                            auto & thisSegmentIndex = circuits[FoundOnCircuitIndex].PipeSegmentIndices[PipeCounter];
+                            Segment const &ThisSegment = segments[thisSegmentIndex];
                             if (XYRectangle.contains(ThisSegment.PipeLocation)) {
                                 //'inform the cell that it is a pipe node
                                 cellType = CellType::Pipe;
@@ -3727,9 +3727,9 @@ namespace PlantPipingSystemsManager {
                                 //'inform the cell of which pipe circuit contains it
                                 CircuitIndex = FoundOnCircuitIndex;
                                 //'inform the pipe of what cell it is inside
-                                PipingSystemSegments[thisSegmentIndex].initPipeCells(CellXIndex, CellYIndex);
+                                segments[thisSegmentIndex].initPipeCells(CellXIndex, CellYIndex);
                                 //'set the number of cells to be generated in this near-pipe region
-                                NumRadialCells = PipingSystemCircuits[FoundOnCircuitIndex].NumRadialCells;
+                                NumRadialCells = circuits[FoundOnCircuitIndex].NumRadialCells;
                                 //'exit the pipe counter loop
                                 goto CircuitLoop_exit;
                             }
@@ -3751,7 +3751,7 @@ namespace PlantPipingSystemsManager {
 
                     // if we were found on a pipe circuit, get some things for convenience
                     if (CircuitIndex != -1) {
-                        auto const & thisCircuit = PipingSystemCircuits[CircuitIndex];
+                        auto const & thisCircuit = circuits[CircuitIndex];
                         if (thisCircuit.HasInsulation) {
                             InsulationThickness = thisCircuit.InsulationSize.thickness();
                         }
@@ -3793,7 +3793,7 @@ namespace PlantPipingSystemsManager {
         this->NumInsulationCells = NumInsulationCells;
     }
 
-    void FullDomainStructureInfo::setupCellNeighbors()
+    void Domain::setupCellNeighbors()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4007,7 +4007,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::addNeighborInformation(int const X,
+    void Domain::addNeighborInformation(int const X,
                                                          int const Y,
                                                          int const Z,
                                                          Direction const direction,
@@ -4028,7 +4028,7 @@ namespace PlantPipingSystemsManager {
         this->Cells(X, Y, Z).NeighborInfo[direction] = newItem;
     }
 
-    void FullDomainStructureInfo::setupPipeCircuitInOutCells()
+    void Domain::setupPipeCircuitInOutCells()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4056,8 +4056,8 @@ namespace PlantPipingSystemsManager {
 
             bool CircuitInletCellSet = false;
 
-            for (auto & segmentIndex : PipingSystemCircuits[CircuitIndex].PipeSegmentIndices) {
-                auto &Segment = PipingSystemSegments[segmentIndex];
+            for (auto & segmentIndex : circuits[CircuitIndex].PipeSegmentIndices) {
+                auto &Segment = segments[segmentIndex];
                 switch (Segment.FlowDirection) {
                 case SegmentFlow::IncreasingZ:
                     SegmentInletCellX = Segment.PipeCellCoordinates.X;
@@ -4087,13 +4087,13 @@ namespace PlantPipingSystemsManager {
                 CircuitOutletCellZ = SegmentOutletCellZ;
             }
 
-            PipingSystemCircuits[CircuitIndex]
+            circuits[CircuitIndex]
                 .initInOutCells(cells(CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ),
                                 cells(CircuitOutletCellX, CircuitOutletCellY, CircuitOutletCellZ));
         }
     }
 
-    int FullDomainStructureInfo::getCellWidthsCount(RegionType const dir)
+    int Domain::getCellWidthsCount(RegionType const dir)
     {
 
         // FUNCTION INFORMATION:
@@ -4117,7 +4117,7 @@ namespace PlantPipingSystemsManager {
         return 0;
     }
 
-    void FullDomainStructureInfo::getCellWidths(GridRegion &g, RegionType const direction)
+    void Domain::getCellWidths(GridRegion &g, RegionType const direction)
     {
 
         // FUNCTION INFORMATION:
@@ -4144,7 +4144,7 @@ namespace PlantPipingSystemsManager {
         default:
             ThisMesh.RegionMeshCount = 1; // it must be a partition type or something
             ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
-            // ShowSevereError( "Invalid RegionType passed to PlantPipingSystems::FullDomainStructureInfo::getCellWidths; should be x, y, or z
+            // ShowSevereError( "Invalid RegionType passed to PlantPipingSystems::Domain::getCellWidths; should be x, y, or z
             // direction only." );  ShowContinueError( "This is a developer problem, as the code should never reach this point." );  ShowFatalError(
             // "EnergyPlus aborts due to the previous severe error" );
         }
@@ -4250,7 +4250,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::PerformIterationLoop(Optional<int const> CircuitNum)
+    void Domain::PerformIterationLoop(Optional<int const> CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4294,7 +4294,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::PerformTemperatureFieldUpdate()
+    void Domain::PerformTemperatureFieldUpdate()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4348,7 +4348,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    Real64 FullDomainStructureInfo::EvaluateFieldCellTemperature(CartesianCell &cell)
+    Real64 Domain::EvaluateFieldCellTemperature(CartesianCell &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -4389,7 +4389,7 @@ namespace PlantPipingSystemsManager {
         return Numerator / Denominator;
     }
 
-    Real64 FullDomainStructureInfo::EvaluateGroundSurfaceTemperature(CartesianCell &cell)
+    Real64 Domain::EvaluateGroundSurfaceTemperature(CartesianCell &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -4679,7 +4679,7 @@ namespace PlantPipingSystemsManager {
         return Numerator / Denominator;
     }
 
-    Real64 FullDomainStructureInfo::EvaluateBasementCellTemperature(CartesianCell &cell)
+    Real64 Domain::EvaluateBasementCellTemperature(CartesianCell &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -4756,7 +4756,7 @@ namespace PlantPipingSystemsManager {
         return Numerator / Denominator;
     }
 
-    Real64 FullDomainStructureInfo::EvaluateFarfieldBoundaryTemperature(CartesianCell &cell)
+    Real64 Domain::EvaluateFarfieldBoundaryTemperature(CartesianCell &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -4798,7 +4798,7 @@ namespace PlantPipingSystemsManager {
             Real64 NeighborTemp = 0.0;
             this->EvaluateFarfieldCharacteristics(cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
 
-            // if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
+            // if ( domains( DomainNum ).HasZoneCoupledSlab || domains( DomainNum ).HasZoneCoupledBasement ) {
             // if ( CurDirection == Direction::PositiveX || CurDirection == Direction::PositiveZ ) {
             // AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at xMax, Ymin, zMax
             //}
@@ -4811,7 +4811,7 @@ namespace PlantPipingSystemsManager {
         return Numerator / Denominator;
     }
 
-    Real64 FullDomainStructureInfo::EvaluateZoneInterfaceTemperature(CartesianCell &cell)
+    Real64 Domain::EvaluateZoneInterfaceTemperature(CartesianCell &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -4905,7 +4905,7 @@ namespace PlantPipingSystemsManager {
         return Numerator / Denominator;
     }
 
-    Real64 FullDomainStructureInfo::GetBasementWallHeatFlux()
+    Real64 Domain::GetBasementWallHeatFlux()
     {
 
         // FUNCTION INFORMATION:
@@ -4922,7 +4922,7 @@ namespace PlantPipingSystemsManager {
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
 
-    Real64 FullDomainStructureInfo::GetBasementFloorHeatFlux()
+    Real64 Domain::GetBasementFloorHeatFlux()
     {
 
         // FUNCTION INFORMATION:
@@ -4939,7 +4939,7 @@ namespace PlantPipingSystemsManager {
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
 
-    void FullDomainStructureInfo::UpdateBasementSurfaceTemperatures()
+    void Domain::UpdateBasementSurfaceTemperatures()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4968,7 +4968,7 @@ namespace PlantPipingSystemsManager {
         DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
     }
 
-    Real64 FullDomainStructureInfo::GetZoneInterfaceHeatFlux()
+    Real64 Domain::GetZoneInterfaceHeatFlux()
     {
 
         // FUNCTION INFORMATION:
@@ -4985,7 +4985,7 @@ namespace PlantPipingSystemsManager {
         return -RunningSummation / NumSurfaces; // heat flux is negative here
     }
 
-    void FullDomainStructureInfo::UpdateZoneSurfaceTemperatures()
+    void Domain::UpdateZoneSurfaceTemperatures()
     {
 
         // SUBROUTINE INFORMATION:
@@ -5008,7 +5008,7 @@ namespace PlantPipingSystemsManager {
         this->ResetHeatFluxFlag = true;
     }
 
-    Real64 FullDomainStructureInfo::GetAverageTempByType(CellType const cellType)
+    Real64 Domain::GetAverageTempByType(CellType const cellType)
     {
 
         // FUNCTION INFORMATION:
@@ -5036,13 +5036,13 @@ namespace PlantPipingSystemsManager {
         }
 
         if (RunningVolume <= 0.0) {
-            ShowFatalError("FullDomainStructureInfo::GetAverageTempByType calculated zero volume, program aborts");
+            ShowFatalError("Domain::GetAverageTempByType calculated zero volume, program aborts");
         }
 
         return RunningSummation / RunningVolume;
     }
 
-    void FullDomainStructureInfo::EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction const direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier)
+    void Domain::EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction const direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5075,7 +5075,7 @@ namespace PlantPipingSystemsManager {
         adiabaticMultiplier = cell.NeighborInfo[direction].adiabaticMultiplier;
     }
 
-    Real64 FullDomainStructureInfo::GetFarfieldTemp(CartesianCell const &cell)
+    Real64 Domain::GetFarfieldTemp(CartesianCell const &cell)
     {
 
         // FUNCTION INFORMATION:
@@ -5089,7 +5089,7 @@ namespace PlantPipingSystemsManager {
         return this->Farfield.groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
     }
 
-    void FullDomainStructureInfo::PreparePipeCircuitSimulation(int const CircuitNum)
+    void Domain::PreparePipeCircuitSimulation(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5101,7 +5101,7 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         Real64 const StagnantFluidConvCoeff(200.0);
 
-        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+        auto & thisCircuit = circuits[CircuitNum];
         
         // Setup circuit flow conditions -- convection coefficient
         int CellX = thisCircuit.CircuitInletCell.X;
@@ -5139,7 +5139,7 @@ namespace PlantPipingSystemsManager {
         thisCircuit.CurCircuitConvectionCoefficient = ConvCoefficient;
     }
 
-    void FullDomainStructureInfo::PerformPipeCircuitSimulation(int const CircuitNum)
+    void Domain::PerformPipeCircuitSimulation(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5151,7 +5151,7 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CircuitCrossTemp;
 
-        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+        auto & thisCircuit = circuits[CircuitNum];
         
         // retrieve initial conditions from the data structure
         // these have been set either by the init routine or by the heat pump routine
@@ -5168,7 +5168,7 @@ namespace PlantPipingSystemsManager {
         for (int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr) {
 
             int SegmentIndex = thisCircuit.PipeSegmentIndices[SegmentCtr];
-            auto & thisSegment = PipingSystemSegments[SegmentIndex];
+            auto & thisSegment = segments[SegmentIndex];
             int StartingZ = 0;
             int EndingZ = 0;
             int Increment = 0;
@@ -5251,7 +5251,7 @@ namespace PlantPipingSystemsManager {
     }
 
     void
-    FullDomainStructureInfo::PerformPipeCellSimulation(int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
+    Domain::PerformPipeCellSimulation(int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5260,7 +5260,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+        auto & thisCircuit = circuits[CircuitNum];
 
         for (int Iter = 1; Iter <= thisCircuit.MaxIterationsPerTS; ++Iter) {
 
@@ -5298,7 +5298,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::SimulateRadialToCartesianInterface(CartesianCell &cell)
+    void Domain::SimulateRadialToCartesianInterface(CartesianCell &cell)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5371,7 +5371,7 @@ namespace PlantPipingSystemsManager {
         Real64 ThisRadialCellInnerRadius = outerMostSoilCell.InnerRadius;
         Real64 ThisRadialCellTemperature_PrevTimeStep = outerMostSoilCell.Temperature_PrevTimeStep;
         if (numSoilCells == 1) {
-            if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+            if (circuits[CircuitNum].HasInsulation) {
                 NextOuterRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
                 NextOuterRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                 NextOuterRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5497,7 +5497,7 @@ namespace PlantPipingSystemsManager {
         Real64 Denominator = 0.0;
 
         //'convenience variables
-        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+        if (circuits[CircuitNum].HasInsulation) {
             InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
             InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             InnerNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5614,7 +5614,7 @@ namespace PlantPipingSystemsManager {
         Real64 Resistance;
 
         //'convenience variables
-        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+        if (circuits[CircuitNum].HasInsulation) {
             OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             OuterNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
             OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
@@ -5707,7 +5707,7 @@ namespace PlantPipingSystemsManager {
         cell.PipeCellData.Fluid.Temperature = Numerator / Denominator;
     }
 
-    void FullDomainStructureInfo::DoOneTimeInitializations(Optional<int const> CircuitNum)
+    void Domain::DoOneTimeInitializations(Optional<int const> CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5728,9 +5728,9 @@ namespace PlantPipingSystemsManager {
                         for (auto & soilCell : cell.PipeCellData.Soil) {
                             soilCell.Properties = this->GroundProperties;
                         }
-                        cell.PipeCellData.Pipe.Properties = PipingSystemCircuits[CircuitNum].PipeProperties;
-                        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
-                            cell.PipeCellData.Insulation.Properties = PipingSystemCircuits[CircuitNum].InsulationProperties;
+                        cell.PipeCellData.Pipe.Properties = circuits[CircuitNum].PipeProperties;
+                        if (circuits[CircuitNum].HasInsulation) {
+                            cell.PipeCellData.Insulation.Properties = circuits[CircuitNum].InsulationProperties;
                         }
                         break;
                     case CellType::GeneralField:
@@ -5815,7 +5815,7 @@ namespace PlantPipingSystemsManager {
                         cell.PipeCellData.Pipe.Temperature = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevIteration = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevTimeStep = ThisCellTemp;
-                        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+                        if (circuits[CircuitNum].HasInsulation) {
                             cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
                             cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
                             cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
@@ -5829,7 +5829,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::DoStartOfTimeStepInitializations(Optional<int const> CircuitNum)
+    void Domain::DoStartOfTimeStepInitializations(Optional<int const> CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5857,7 +5857,7 @@ namespace PlantPipingSystemsManager {
 
         // If pipe circuit present
         if (present(CircuitNum)) {
-            auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+            auto & thisCircuit = circuits[CircuitNum];
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
             FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
@@ -5943,7 +5943,7 @@ namespace PlantPipingSystemsManager {
                             }
 
                             //'then insulation if it exists
-                            if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+                            if (circuits[CircuitNum].HasInsulation) {
                                 Beta = this->Cur.CurSimTimeStepSize /
                                        (cell.PipeCellData.Insulation.Properties.Density * cell.PipeCellData.Insulation.XY_CrossSectArea() *
                                         cell.depth() * cell.PipeCellData.Insulation.Properties.SpecificHeat);
@@ -5957,7 +5957,7 @@ namespace PlantPipingSystemsManager {
                             cell.PipeCellData.Pipe.Beta = Beta;
 
                             // now the fluid cell also
-                            cell.PipeCellData.Fluid.Properties = PipingSystemCircuits[CircuitNum].CurFluidPropertySet;
+                            cell.PipeCellData.Fluid.Properties = circuits[CircuitNum].CurFluidPropertySet;
                             cell.PipeCellData.Fluid.Beta = this->Cur.CurSimTimeStepSize /
                                                            (cell.PipeCellData.Fluid.Properties.Density * cell.PipeCellData.Fluid.Volume *
                                                             cell.PipeCellData.Fluid.Properties.SpecificHeat);
@@ -5973,7 +5973,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::DoEndOfIterationOperations(bool &Finished)
+    void Domain::DoEndOfIterationOperations(bool &Finished)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6011,7 +6011,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::InitializeSoilMoistureCalcs()
+    void Domain::InitializeSoilMoistureCalcs()
     {
 
         // These vary by domain now, so we must be careful to retrieve them every time
@@ -6039,7 +6039,7 @@ namespace PlantPipingSystemsManager {
         this->Moisture.rhoCP_soil_ice = this->Moisture.rhoCp_soil_liq_1 * (1.0 - Theta_sat) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
     }
 
-    void FullDomainStructureInfo::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp)
+    void Domain::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6119,7 +6119,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void FullDomainStructureInfo::EvaluateNeighborCharacteristics(CartesianCell &ThisCell,
+    void Domain::EvaluateNeighborCharacteristics(CartesianCell &ThisCell,
             Direction const CurDirection,
             Real64 &NeighborTemp,
             Real64 &Resistance,
@@ -6177,7 +6177,7 @@ namespace PlantPipingSystemsManager {
         AdiabaticMultiplier = TempNeighborInfo.adiabaticMultiplier;
     }
 
-    void FullDomainStructureInfo::EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells)
+    void Domain::EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells)
     {
 
         // SUBROUTINE INFORMATION:
