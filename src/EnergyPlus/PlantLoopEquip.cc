@@ -1047,7 +1047,11 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
+<<<<<<< HEAD
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+=======
+                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
+>>>>>>> origin/develop
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
