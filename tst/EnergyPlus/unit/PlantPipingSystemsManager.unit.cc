@@ -124,8 +124,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -194,8 +192,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -266,8 +262,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -336,8 +330,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -408,8 +400,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -478,8 +468,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -550,8 +538,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -620,8 +606,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -692,8 +676,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -762,8 +744,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -834,8 +814,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -904,8 +882,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -976,8 +952,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1046,8 +1020,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -1118,8 +1090,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1188,8 +1158,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -1260,8 +1228,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1330,8 +1296,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -1402,8 +1366,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1473,8 +1435,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
 
-    PipingSystemDomains.allocate(1);
-
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1543,9 +1503,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName)
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
-
+    
     bool errorsFound = false;
 
     // Other necessary inputs
@@ -1614,8 +1572,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-
-    PipingSystemDomains.allocate(1);
 
     bool errorsFound = false;
 
@@ -1777,15 +1733,15 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     EXPECT_EQ(2u, PlantPipingSystemsManager::PipingSystemDomains.size());
 
-    EXPECT_TRUE(PlantPipingSystemsManager::PipingSystemDomains(1).HasAPipeCircuit);
-    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.X.RegionMeshCount);
-    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Z.RegionMeshCount);
+    EXPECT_TRUE(PlantPipingSystemsManager::PipingSystemDomains[0].HasAPipeCircuit);
+    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains[0].Mesh.Z.RegionMeshCount);
 
-    EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains(2).HasAPipeCircuit);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.X.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Z.RegionMeshCount);
+    EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains[1].HasAPipeCircuit);
+    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains[1].Mesh.Z.RegionMeshCount);
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;

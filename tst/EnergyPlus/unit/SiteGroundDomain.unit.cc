@@ -80,11 +80,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    PipingSystemDomains.allocate(2);
+    PipingSystemDomains.resize(2);
 
-    PipingSystemDomains(1).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    PipingSystemDomains[0].Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    PipingSystemDomains(2).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    PipingSystemDomains[1].Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(PipingSystemDomains(1).Farfield.groundTempModel, PipingSystemDomains(2).Farfield.groundTempModel);
+    EXPECT_NE(PipingSystemDomains[0].Farfield.groundTempModel, PipingSystemDomains[1].Farfield.groundTempModel);
 }

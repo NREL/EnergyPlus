@@ -958,7 +958,7 @@ namespace PlantPipingSystemsManager {
     };
 
     // Object Data
-    extern Array1D<FullDomainStructureInfo> PipingSystemDomains;
+    extern std::vector<FullDomainStructureInfo> PipingSystemDomains;
     extern Array1D<PipeCircuitInfo> PipingSystemCircuits;
     extern Array1D<PipeSegmentInfo> PipingSystemSegments;
 
