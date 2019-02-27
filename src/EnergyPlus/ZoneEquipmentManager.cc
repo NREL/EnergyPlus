@@ -4919,28 +4919,41 @@ namespace ZoneEquipmentManager {
                     !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
-                        Real64 unbalancedFlow = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced) + totalZoneReturnMassFlow -
-                            thisZoneEquip.TotInletAirMassFlowRate;
-                        int actualZone = thisZoneEquip.ActualZoneNum;
-                        // Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
-                        unbalancedFlow = max(0.0,
-                            unbalancedFlow - DataHeatBalFanSys::OAMFL(actualZone) - DataHeatBalFanSys::VAMFL(actualZone) -
-                            DataHeatBalFanSys::MixingMassFlowZone(actualZone));
-                        if (unbalancedFlow > SmallMassFlow) {
-                            ShowWarningError("In zone " + thisZoneEquip.ZoneName +
-                                " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
-                            ShowContinueErrorTimeStamp("");
-                            ShowContinueError("  Flows [kg/s]: Inlets: " + General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate, 6) +
-                                "  Unbalanced exhausts: " +
-                                General::RoundSigDigits((thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced), 6) +
-                                "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow, 6));
-                            ShowContinueError("  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone), 6) +
-                                "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone), 6) +
-                                "  Mixing (incoming): " + General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone), 6));
-                            ShowContinueError("  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedFlow, 6) +
-                                "  Total system OA flow (for all airloops serving this zone): " + General::RoundSigDigits(thisZoneEquip.TotAvailAirLoopOA, 6));
-                            ShowContinueError("  This error will only be reported once per zone.");
-                            thisZoneEquip.FlowError = true;
+                        Real64 sysUnbalExhaust = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced);
+                        Real64 sysUnbalancedFlow = sysUnbalExhaust + totalZoneReturnMassFlow - thisZoneEquip.TotInletAirMassFlowRate;
+                        if (sysUnbalancedFlow > SmallMassFlow) {
+                            int actualZone = thisZoneEquip.ActualZoneNum;
+                            // Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
+                            Real64 incomingFlow = DataHeatBalFanSys::OAMFL(actualZone) + DataHeatBalFanSys::VAMFL(actualZone) +
+                                                  DataHeatBalFanSys::MixingMassFlowZone(actualZone);
+                            Real64 unbalancedFlow = max(0.0, sysUnbalancedFlow - incomingFlow);
+                            if (unbalancedFlow > SmallMassFlow) {
+                                // Re-check on volume basis - use current zone density for incoming, standard density for HVAC sys
+                                Real64 zoneTemp = Node(thisZoneEquip.ZoneNode).Temp;
+                                Real64 zoneHumRat = Node(thisZoneEquip.ZoneNode).HumRat;
+                                Real64 rhoZone = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, zoneTemp, zoneHumRat, "CalcZoneMassBalance");
+                                Real64 incomingVolFlow = incomingFlow / rhoZone;
+                                Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / DataEnvironment::StdRhoAir;
+                                Real64 unbalancedVolFlow = max(0.0, sysUnbalancedVolFlow - incomingVolFlow);
+                                if (unbalancedVolFlow > DataHVACGlobals::SmallAirVolFlow) {
+                                    ShowWarningError("In zone " + thisZoneEquip.ZoneName +
+                                                     " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
+                                    ShowContinueErrorTimeStamp("");
+                                    ShowContinueError(
+                                        "  Flows [m3/s]: Inlets: " + General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate/DataEnvironment::StdRhoAir, 6) +
+                                        "  Unbalanced exhausts: " + General::RoundSigDigits(sysUnbalancedVolFlow, 6) +
+                                        "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow/DataEnvironment::StdRhoAir, 6));
+                                    ShowContinueError(
+                                        "  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone)/rhoZone, 6) +
+                                        "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone)/rhoZone, 6) +
+                                        "  Mixing (incoming): " + General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone)/rhoZone, 6));
+                                    ShowContinueError("  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedVolFlow, 6) +
+                                                      "  Total system OA flow (for all airloops serving this zone): " +
+                                                      General::RoundSigDigits(thisZoneEquip.TotAvailAirLoopOA/DataEnvironment::StdRhoAir, 6));
+                                    ShowContinueError("  This error will only be reported once per zone.");
+                                    thisZoneEquip.FlowError = true;
+                                }
+                            }
                         }
                     }
                 }
