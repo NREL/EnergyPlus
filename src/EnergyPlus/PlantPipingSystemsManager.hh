@@ -273,7 +273,7 @@ namespace PlantPipingSystemsManager {
     struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
     {
         // Members
-        Array1D<RadialCellInformation> Soil;
+        std::vector<RadialCellInformation> Soil;
         RadialCellInformation Insulation;
         RadialCellInformation Pipe;
         FluidCellInformation Fluid;
