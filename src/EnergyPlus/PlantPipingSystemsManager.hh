@@ -925,9 +925,9 @@ namespace PlantPipingSystemsManager {
 
         void DoEndOfIterationOperations(bool &Finished);
 
-        void DoOneTimeInitializations(Optional<int const> CircuitNum);
+        void DoOneTimeInitializations(int CircuitNum);
 
-        void DoStartOfTimeStepInitializations(Optional<int const> CircuitNum);
+        void DoStartOfTimeStepInitializations(int CircuitNum);
 
         Real64 GetFarfieldTemp(CartesianCell const &cell);
 
@@ -953,7 +953,7 @@ namespace PlantPipingSystemsManager {
 
         void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
 
-        void PerformIterationLoop(Optional<int const> CircuitNum);
+        void PerformIterationLoop(int CircuitNum);
 
         void InitPipingSystems(int CircuitNum);
 

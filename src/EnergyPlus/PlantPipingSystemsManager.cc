@@ -239,7 +239,7 @@ namespace PlantPipingSystemsManager {
             // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
             if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) || (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
-                thisDomain.DoOneTimeInitializations(_);
+                thisDomain.DoOneTimeInitializations(-1);
 
                 if (thisDomain.HasZoneCoupledSlab) {
                     int Xmax = ubound(thisDomain.Cells, 1);
@@ -382,7 +382,7 @@ namespace PlantPipingSystemsManager {
                     thisDomain.ShiftTemperaturesForNewTimeStep();
                     thisDomain.DomainNeedsSimulation = true;
                 }
-                thisDomain.PerformIterationLoop(_);
+                thisDomain.PerformIterationLoop(-1);
             }
         }
 
@@ -4168,7 +4168,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void Domain::PerformIterationLoop(Optional<int const> CircuitNum)
+    void Domain::PerformIterationLoop(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5625,7 +5625,7 @@ namespace PlantPipingSystemsManager {
         cell.PipeCellData.Fluid.Temperature = Numerator / Denominator;
     }
 
-    void Domain::DoOneTimeInitializations(Optional<int const> CircuitNum)
+    void Domain::DoOneTimeInitializations(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5646,9 +5646,11 @@ namespace PlantPipingSystemsManager {
                         for (auto & soilCell : cell.PipeCellData.Soil) {
                             soilCell.Properties = this->GroundProperties;
                         }
-                        cell.PipeCellData.Pipe.Properties = circuits[CircuitNum].PipeProperties;
-                        if (circuits[CircuitNum].HasInsulation) {
-                            cell.PipeCellData.Insulation.Properties = circuits[CircuitNum].InsulationProperties;
+                        if (CircuitNum >= 0) {
+                            cell.PipeCellData.Pipe.Properties = circuits[CircuitNum].PipeProperties;
+                            if (circuits[CircuitNum].HasInsulation) {
+                                cell.PipeCellData.Insulation.Properties = circuits[CircuitNum].InsulationProperties;
+                            }
                         }
                         break;
                     case CellType::GeneralField:
@@ -5733,10 +5735,12 @@ namespace PlantPipingSystemsManager {
                         cell.PipeCellData.Pipe.Temperature = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevIteration = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevTimeStep = ThisCellTemp;
-                        if (circuits[CircuitNum].HasInsulation) {
-                            cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
-                            cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
-                            cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
+                        if (CircuitNum >= 0) {
+                            if (circuits[CircuitNum].HasInsulation) {
+                                cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
+                                cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
+                                cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
+                            }
                         }
                         cell.PipeCellData.Fluid.Temperature = ThisCellTemp;
                         cell.PipeCellData.Fluid.Temperature_PrevIteration = ThisCellTemp;
@@ -5747,7 +5751,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void Domain::DoStartOfTimeStepInitializations(Optional<int const> CircuitNum)
+    void Domain::DoStartOfTimeStepInitializations(int const CircuitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5774,7 +5778,7 @@ namespace PlantPipingSystemsManager {
         this->Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
 
         // If pipe circuit present
-        if (present(CircuitNum)) {
+        if (CircuitNum >= 0) {
             auto & thisCircuit = circuits[CircuitNum];
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
@@ -5836,7 +5840,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::Pipe:
                         // If pipe circuit present
-                        if (present(CircuitNum)) {
+                        if (CircuitNum >= 0) {
                             // UPDATE CELL PROPERTY SETS
                             //'first update the outer cell itself
                             CellTemp = cell.Temperature;
