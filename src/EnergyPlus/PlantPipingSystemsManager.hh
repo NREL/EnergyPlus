@@ -54,7 +54,6 @@
 #include <utility>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -635,6 +634,10 @@ namespace PlantPipingSystemsManager {
         PipeSegmentInfo() = default;
 
         void initPipeCells(int x, int y);
+
+        bool operator ==(std::string a) {
+            return this->Name == a;
+        }
     };
 
     struct PipeCircuitInfo : public PlantComponent
@@ -963,7 +966,7 @@ namespace PlantPipingSystemsManager {
     // Object Data
     extern std::vector<FullDomainStructureInfo> PipingSystemDomains;
     extern std::vector<PipeCircuitInfo> PipingSystemCircuits;
-    extern Array1D<PipeSegmentInfo> PipingSystemSegments;
+    extern std::vector<PipeSegmentInfo> PipingSystemSegments;
 
     void clear_state();
 
@@ -993,7 +996,7 @@ namespace PlantPipingSystemsManager {
                                     int NumHorizontalTrenchesInInput,
                                     bool &ErrorsFound);
 
-    void SetupPipingSystemOutputVariables(int TotalNumSegments, int TotalNumCircuits);
+    void SetupPipingSystemOutputVariables();
 
     void IssueSevereInputFieldErrorStringEntry(std::string const &RoutineName,
                                                std::string const &ObjectName,
