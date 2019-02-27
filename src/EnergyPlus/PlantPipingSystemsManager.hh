@@ -223,7 +223,7 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         RadialSizing() = default;
 
-        Real64 inline thickness()
+        Real64 inline thickness() const
         {
             return (this->OuterDia - this->InnerDia) / 2.0;
         }
@@ -248,7 +248,7 @@ namespace PlantPipingSystemsManager {
         }
 
         // Get the XY cross sectional area of the radial cell
-        Real64 inline XY_CrossSectArea()
+        Real64 inline XY_CrossSectArea() const
         {
             return DataGlobals::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
         }
@@ -366,7 +366,7 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         MeshPartition() = default;
 
-        // Member Constructor -- showed unused but it's actually implied in emplace_back calls in createPartitionCenterList
+        // Member Constructor -- shows unused but it's actually implied in emplace_back calls in createPartitionCenterList
         MeshPartition(Real64 const rDimension,
                       PartitionType const partitionType, // From Enum: ParitionType
                       Real64 const TotalWidth)
@@ -416,7 +416,7 @@ namespace PlantPipingSystemsManager {
         {
         }
 
-        bool inline contains(PointF const &p)
+        bool inline contains(PointF const &p) const
         {
             return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) && (p.Y < (this->Y_min + this->Height)));
         }
@@ -697,6 +697,9 @@ namespace PlantPipingSystemsManager {
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
+        bool operator ==(std::string a) {
+            return this->Name == a;
+        }
     };
 
     struct ZoneCoupledSurfaceData
@@ -959,7 +962,7 @@ namespace PlantPipingSystemsManager {
 
     // Object Data
     extern std::vector<FullDomainStructureInfo> PipingSystemDomains;
-    extern Array1D<PipeCircuitInfo> PipingSystemCircuits;
+    extern std::vector<PipeCircuitInfo> PipingSystemCircuits;
     extern Array1D<PipeSegmentInfo> PipingSystemSegments;
 
     void clear_state();

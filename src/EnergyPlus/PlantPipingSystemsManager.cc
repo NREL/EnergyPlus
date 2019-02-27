@@ -122,7 +122,7 @@ namespace PlantPipingSystemsManager {
 
     // MODULE VARIABLE DECLARATIONS:
     std::vector<FullDomainStructureInfo> PipingSystemDomains;
-    Array1D<PipeCircuitInfo> PipingSystemCircuits;
+    std::vector<PipeCircuitInfo> PipingSystemCircuits;
     Array1D<PipeSegmentInfo> PipingSystemSegments;
     std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
     bool GetInputFlag(true); // First time, input is "gotten"
@@ -134,7 +134,7 @@ namespace PlantPipingSystemsManager {
         GetInputFlag = true;
         WriteEIOFlag = true;
         PipingSystemDomains.clear();
-        PipingSystemCircuits.deallocate();
+        PipingSystemCircuits.clear();
         PipingSystemSegments.deallocate();
         GroundDomainUniqueNames.clear();
     }
@@ -462,7 +462,7 @@ namespace PlantPipingSystemsManager {
         // then circuits
         NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
         TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
-        PipingSystemCircuits.allocate(TotalNumCircuits);
+        PipingSystemCircuits.resize(TotalNumCircuits);
 
         // then segments
         NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(ObjName_Segment);
@@ -514,17 +514,23 @@ namespace PlantPipingSystemsManager {
 
             // validate pipe domain-circuit name-to-index references
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = UtilityRoutines::FindItemInList(PipingSystemDomains[DomainNum].CircuitNames[CircuitCtr-1], PipingSystemCircuits);
-                PipingSystemDomains[DomainNum].CircuitIndices.push_back(CircuitIndex);
-                PipingSystemCircuits(CircuitIndex).ParentDomainIndex = DomainNum;
+                auto tryToFindCircuitByName = find(PipingSystemCircuits.begin(), PipingSystemCircuits.end(), PipingSystemDomains[DomainNum].CircuitNames[CircuitCtr-1]);
+                if (tryToFindCircuitByName == PipingSystemCircuits.end()) {
+                    // error, could not find domain-specified-circuit-name in the list of input circuits
+                } else {
+                    int CircuitIndex = (int)distance(PipingSystemCircuits.begin(), tryToFindCircuitByName);
+                    //CircuitIndex = UtilityRoutines::FindItemInList(PipingSystemDomains[DomainNum].CircuitNames[CircuitCtr-1], PipingSystemCircuits);
+                    PipingSystemDomains[DomainNum].CircuitIndices.push_back(CircuitIndex);
+                    PipingSystemCircuits[CircuitIndex].ParentDomainIndex = DomainNum;
+                }
             }
 
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = PipingSystemCircuits[CircuitCtr-1].PipeSegmentIndices[PipeCtr]; // possible diff location
                     PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y =
                         PipingSystemDomains[DomainNum].Extents.yMax - PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y;
                 } // segment loop
@@ -534,8 +540,8 @@ namespace PlantPipingSystemsManager {
             if (PipingSystemDomains[DomainNum].HasBasement && PipingSystemDomains[DomainNum].BasementZone.ShiftPipesByWidth) {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                     CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
-                    for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
-                        ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
+                    for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                        ThisSegmentIndex = PipingSystemCircuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
                         PipingSystemSegments(ThisSegmentIndex).PipeLocation.X += PipingSystemDomains[DomainNum].BasementZone.Width;
                     } // segment loop
                 }     // circuit loop
@@ -548,8 +554,8 @@ namespace PlantPipingSystemsManager {
                 CircuitIndex = PipingSystemDomains[DomainNum].CircuitIndices[CircuitCtr-1];
 
                 // check to make sure it isn't outside the domain
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits(CircuitIndex).PipeSegmentIndices.size()); ++PipeCtr) {
-                    ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndices[PipeCtr];
+                for (PipeCtr = 0; PipeCtr < static_cast<int>(PipingSystemCircuits[CircuitIndex].PipeSegmentIndices.size()); ++PipeCtr) {
+                    ThisSegmentIndex = PipingSystemCircuits[CircuitIndex].PipeSegmentIndices[PipeCtr];
                     if ((PipingSystemSegments(ThisSegmentIndex).PipeLocation.X > PipingSystemDomains[DomainNum].Extents.xMax) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.X < 0.0) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y > PipingSystemDomains[DomainNum].Extents.yMax) ||
@@ -1684,20 +1690,22 @@ namespace PlantPipingSystemsManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
+            auto & thisCircuit = PipingSystemCircuits[PipeCircuitCounter-1];
+            
             // Get the name, validate
-            PipingSystemCircuits(PipeCircuitCounter).Name = cAlphaArgs(1);
-            PipingSystemCircuits(PipeCircuitCounter).CircuitIndex = PipeCircuitCounter;
+            thisCircuit.Name = cAlphaArgs(1);
+            thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             // Read pipe thermal properties, validated by IP
-            PipingSystemCircuits(PipeCircuitCounter).PipeProperties.Conductivity = rNumericArgs(1);
-            PipingSystemCircuits(PipeCircuitCounter).PipeProperties.Density = rNumericArgs(2);
-            PipingSystemCircuits(PipeCircuitCounter).PipeProperties.SpecificHeat = rNumericArgs(3);
+            thisCircuit.PipeProperties.Conductivity = rNumericArgs(1);
+            thisCircuit.PipeProperties.Density = rNumericArgs(2);
+            thisCircuit.PipeProperties.SpecificHeat = rNumericArgs(3);
 
             // Read pipe sizing, validated individually by IP, validated comparison here
-            PipingSystemCircuits(PipeCircuitCounter).PipeSize.InnerDia = rNumericArgs(4);
-            PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia = rNumericArgs(5);
-            if (PipingSystemCircuits(PipeCircuitCounter).PipeSize.InnerDia >= PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia) {
+            thisCircuit.PipeSize.InnerDia = rNumericArgs(4);
+            thisCircuit.PipeSize.OuterDia = rNumericArgs(5);
+            if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 CurIndex = 5;
                 IssueSevereInputFieldErrorStringEntry(RoutineName,
                                                       ObjName_Circuit,
@@ -1709,21 +1717,21 @@ namespace PlantPipingSystemsManager {
             }
 
             // Read design flow rate, validated positive by IP
-            PipingSystemCircuits(PipeCircuitCounter).DesignVolumeFlowRate = rNumericArgs(6);
+            thisCircuit.DesignVolumeFlowRate = rNumericArgs(6);
 
             // Read inlet and outlet node names and validate them
-            PipingSystemCircuits(PipeCircuitCounter).InletNodeName = cAlphaArgs(2);
-            PipingSystemCircuits(PipeCircuitCounter).InletNodeNum = GetOnlySingleNode(
+            thisCircuit.InletNodeName = cAlphaArgs(2);
+            thisCircuit.InletNodeNum = GetOnlySingleNode(
                 cAlphaArgs(2), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            if (PipingSystemCircuits(PipeCircuitCounter).InletNodeNum == 0) {
+            if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
                 IssueSevereInputFieldErrorStringEntry(
                     RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
-            PipingSystemCircuits(PipeCircuitCounter).OutletNodeName = cAlphaArgs(3);
-            PipingSystemCircuits(PipeCircuitCounter).OutletNodeNum = GetOnlySingleNode(
+            thisCircuit.OutletNodeName = cAlphaArgs(3);
+            thisCircuit.OutletNodeNum = GetOnlySingleNode(
                 cAlphaArgs(3), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            if (PipingSystemCircuits(PipeCircuitCounter).OutletNodeNum == 0) {
+            if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
                 IssueSevereInputFieldErrorStringEntry(
                     RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
@@ -1731,13 +1739,13 @@ namespace PlantPipingSystemsManager {
             TestCompSet(ObjName_Circuit, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
-            PipingSystemCircuits(PipeCircuitCounter).Convergence_CurrentToPrevIteration = rNumericArgs(7);
-            PipingSystemCircuits(PipeCircuitCounter).MaxIterationsPerTS = static_cast<int>(rNumericArgs(8));
+            thisCircuit.Convergence_CurrentToPrevIteration = rNumericArgs(7);
+            thisCircuit.MaxIterationsPerTS = static_cast<int>(rNumericArgs(8));
 
             // Radial mesh inputs, validated by IP
             // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-            PipingSystemCircuits(PipeCircuitCounter).NumRadialCells = static_cast<int>(rNumericArgs(9));
-            PipingSystemCircuits(PipeCircuitCounter).RadialMeshThickness = rNumericArgs(10);
+            thisCircuit.NumRadialCells = static_cast<int>(rNumericArgs(9));
+            thisCircuit.RadialMeshThickness = rNumericArgs(10);
 
             // Read number of pipe segments for this circuit, allocate arrays
             NumPipeSegments = static_cast<int>(rNumericArgs(11));
@@ -1755,7 +1763,7 @@ namespace PlantPipingSystemsManager {
                                                           "Expected a pipe segment name, check pipe segment count input field.",
                                                           ErrorsFound);
                 }
-                PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames.push_back(cAlphaArgs(CurIndex));
+                thisCircuit.PipeSegmentNames.push_back(cAlphaArgs(CurIndex));
             }
 
         } // All pipe circuits in input
@@ -1998,30 +2006,31 @@ namespace PlantPipingSystemsManager {
             // PipingSystemDomains.push_back(thisDomain);
 
             //******* We'll next set up the circuit ********
-            PipingSystemCircuits(CircuitCtr).IsActuallyPartOfAHorizontalTrench = true;
-            PipingSystemCircuits(CircuitCtr).Name = HGHX(HorizontalGHXCtr).ObjName;
-            PipingSystemCircuits(CircuitCtr).CircuitIndex = CircuitCtr;
+            auto & thisCircuit = PipingSystemCircuits[CircuitCtr-1];
+            thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
+            thisCircuit.Name = HGHX(HorizontalGHXCtr).ObjName;
+            thisCircuit.CircuitIndex = CircuitCtr - 1;
 
             // Read pipe thermal properties
-            PipingSystemCircuits(CircuitCtr).PipeProperties.Conductivity = HGHX(HorizontalGHXCtr).PipeConductivity;
-            PipingSystemCircuits(CircuitCtr).PipeProperties.Density = HGHX(HorizontalGHXCtr).PipeDensity;
-            PipingSystemCircuits(CircuitCtr).PipeProperties.SpecificHeat = HGHX(HorizontalGHXCtr).PipeSpecificHeat;
+            thisCircuit.PipeProperties.Conductivity = HGHX(HorizontalGHXCtr).PipeConductivity;
+            thisCircuit.PipeProperties.Density = HGHX(HorizontalGHXCtr).PipeDensity;
+            thisCircuit.PipeProperties.SpecificHeat = HGHX(HorizontalGHXCtr).PipeSpecificHeat;
 
             // Pipe sizing
-            PipingSystemCircuits(CircuitCtr).PipeSize.InnerDia = HGHX(HorizontalGHXCtr).PipeID;
-            PipingSystemCircuits(CircuitCtr).PipeSize.OuterDia = HGHX(HorizontalGHXCtr).PipeOD;
-            if (PipingSystemCircuits(CircuitCtr).PipeSize.InnerDia >= PipingSystemCircuits(CircuitCtr).PipeSize.OuterDia) {
+            thisCircuit.PipeSize.InnerDia = HGHX(HorizontalGHXCtr).PipeID;
+            thisCircuit.PipeSize.OuterDia = HGHX(HorizontalGHXCtr).PipeOD;
+            if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 // CurIndex = 5
                 // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                            cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
             }
 
             // Read design flow rate, validated positive by IP
-            PipingSystemCircuits(CircuitCtr).DesignVolumeFlowRate = HGHX(HorizontalGHXCtr).DesignFlowRate;
+            thisCircuit.DesignVolumeFlowRate = HGHX(HorizontalGHXCtr).DesignFlowRate;
 
             // Read inlet and outlet node names and validate them
-            PipingSystemCircuits(CircuitCtr).InletNodeName = HGHX(HorizontalGHXCtr).InletNodeName;
-            PipingSystemCircuits(CircuitCtr).InletNodeNum = GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).InletNodeName,
+            thisCircuit.InletNodeName = HGHX(HorizontalGHXCtr).InletNodeName;
+            thisCircuit.InletNodeNum = GetOnlySingleNode(thisCircuit.InletNodeName,
                                                                               ErrorsFound,
                                                                               ObjName_HorizTrench,
                                                                               HGHX(HorizontalGHXCtr).ObjName,
@@ -2029,13 +2038,13 @@ namespace PlantPipingSystemsManager {
                                                                               NodeConnectionType_Inlet,
                                                                               1,
                                                                               ObjectIsNotParent);
-            if (PipingSystemCircuits(CircuitCtr).InletNodeNum == 0) {
+            if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
                 // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
-            PipingSystemCircuits(CircuitCtr).OutletNodeName = HGHX(HorizontalGHXCtr).OutletNodeName;
-            PipingSystemCircuits(CircuitCtr).OutletNodeNum = GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).OutletNodeName,
+            thisCircuit.OutletNodeName = HGHX(HorizontalGHXCtr).OutletNodeName;
+            thisCircuit.OutletNodeNum = GetOnlySingleNode(thisCircuit.OutletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                HGHX(HorizontalGHXCtr).ObjName,
@@ -2043,32 +2052,32 @@ namespace PlantPipingSystemsManager {
                                                                                NodeConnectionType_Outlet,
                                                                                1,
                                                                                ObjectIsNotParent);
-            if (PipingSystemCircuits(CircuitCtr).OutletNodeNum == 0) {
+            if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
                 // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
             TestCompSet(ObjName_HorizTrench,
                         HGHX(HorizontalGHXCtr).ObjName,
-                        PipingSystemCircuits(CircuitCtr).InletNodeName,
-                        PipingSystemCircuits(CircuitCtr).OutletNodeName,
+                        thisCircuit.InletNodeName,
+                        thisCircuit.OutletNodeName,
                         "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
-            PipingSystemCircuits(CircuitCtr).Convergence_CurrentToPrevIteration = 0.001;
-            PipingSystemCircuits(CircuitCtr).MaxIterationsPerTS = 100;
+            thisCircuit.Convergence_CurrentToPrevIteration = 0.001;
+            thisCircuit.MaxIterationsPerTS = 100;
 
             // Radial mesh inputs, validated by IP
             // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-            PipingSystemCircuits(CircuitCtr).NumRadialCells = 4;
-            PipingSystemCircuits(CircuitCtr).RadialMeshThickness = PipingSystemCircuits(CircuitCtr).PipeSize.InnerDia / 2.0;
+            thisCircuit.NumRadialCells = 4;
+            thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
 
             // Read number of pipe segments for this circuit, allocate arrays
             NumPipeSegments = HGHX(HorizontalGHXCtr).NumPipes;
 
             // Hard-code the segments
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
-                PipingSystemCircuits(CircuitCtr).PipeSegmentNames.push_back("HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter));
+                thisCircuit.PipeSegmentNames.push_back("HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter));
             }
 
             //******* Then we'll do the segments *******!
@@ -2126,63 +2135,65 @@ namespace PlantPipingSystemsManager {
 
         for (int PipeCircuitCounter = 1; PipeCircuitCounter <= TotalNumCircuits; ++PipeCircuitCounter) {
 
-            if (!PipingSystemCircuits(PipeCircuitCounter).IsActuallyPartOfAHorizontalTrench) {
+            auto & thisCircuit = PipingSystemCircuits[PipeCircuitCounter-1];
+            
+            if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
 
                 SetupOutputVariable("Pipe Circuit Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate,
+                                    thisCircuit.CurCircuitFlowRate,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
 
                 SetupOutputVariable("Pipe Circuit Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature,
+                                    thisCircuit.InletTemperature,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
                 SetupOutputVariable("Pipe Circuit Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature,
+                                    thisCircuit.OutletTemperature,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
 
                 SetupOutputVariable("Pipe Circuit Fluid Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss,
+                                    thisCircuit.FluidHeatLoss,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
 
             } else { // it is a horizontal trench
 
                 SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate,
+                                    thisCircuit.CurCircuitFlowRate,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
 
                 SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature,
+                                    thisCircuit.InletTemperature,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
                 SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature,
+                                    thisCircuit.OutletTemperature,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
 
                 SetupOutputVariable("Ground Heat Exchanger Fluid Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss,
+                                    thisCircuit.FluidHeatLoss,
                                     "Plant",
                                     "Average",
-                                    PipingSystemCircuits(PipeCircuitCounter).Name);
+                                    thisCircuit.Name);
             }
         }
     }
@@ -2252,7 +2263,7 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitPipingSystems");
 
-        auto &thisCircuit = PipingSystemCircuits(CircuitNum);
+        auto &thisCircuit = PipingSystemCircuits[CircuitNum];
 
         // Do any one-time initializations
         if (thisCircuit.NeedToFindOnPlantLoop) {
@@ -2296,7 +2307,7 @@ namespace PlantPipingSystemsManager {
 
             // would be OK to do some post-mesh error handling here I think
             for (auto & circuitIndex : this->CircuitIndices) {
-                for (auto & segmentIndex : PipingSystemCircuits(circuitIndex).PipeSegmentIndices) {
+                for (auto & segmentIndex : PipingSystemCircuits[circuitIndex].PipeSegmentIndices) {
                     if (!PipingSystemSegments(segmentIndex).PipeCellCoordinatesSet) {
                         ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                         ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
@@ -2364,8 +2375,8 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int OutletNodeNum = PipingSystemCircuits(CircuitNum).OutletNodeNum;
-        auto const &out_cell(PipingSystemCircuits(CircuitNum).CircuitOutletCell);
+        int OutletNodeNum = PipingSystemCircuits[CircuitNum].OutletNodeNum;
+        auto const &out_cell(PipingSystemCircuits[CircuitNum].CircuitOutletCell);
         DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
     }
 
@@ -2546,14 +2557,14 @@ namespace PlantPipingSystemsManager {
             MaxDivAmount = ThisCellMax;
         }
         //'also do insulation if it exists
-        if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
             ThisCellMax = std::abs(CellToCheck.PipeCellData.Insulation.Temperature - CellToCheck.PipeCellData.Insulation.Temperature_PrevIteration);
             if (ThisCellMax > MaxDivAmount) {
                 MaxDivAmount = ThisCellMax;
             }
         }
 
-        return (MaxDivAmount < PipingSystemCircuits(CircuitNum).Convergence_CurrentToPrevIteration);
+        return (MaxDivAmount < PipingSystemCircuits[CircuitNum].Convergence_CurrentToPrevIteration);
     }
 
     void FullDomainStructureInfo::ShiftTemperaturesForNewTimeStep()
@@ -2932,11 +2943,11 @@ namespace PlantPipingSystemsManager {
         //'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
         //'in input they are measured by depth, but internally they are referred to by distance from y = 0, or the bottom boundary
         for (auto & CircuitIndex: this->CircuitIndices) {
-            auto & thisCircuit = PipingSystemCircuits(CircuitIndex);
+            auto & thisCircuit = PipingSystemCircuits[CircuitIndex];
 
             // set up a convenience variable here
             //'account for the pipe and insulation if necessary
-            if (!PipingSystemCircuits(CircuitIndex).HasInsulation) {
+            if (!thisCircuit.HasInsulation) {
                 PipeCellWidth = thisCircuit.PipeSize.OuterDia;
             } else {
                 PipeCellWidth = thisCircuit.InsulationSize.OuterDia;
@@ -3707,8 +3718,8 @@ namespace PlantPipingSystemsManager {
                     bool HasInsulation(false);
                     RadialSizing PipeSizing;
                     for (auto & FoundOnCircuitIndex : this->CircuitIndices) {
-                        for (int PipeCounter = 0, NumSegments = (int)PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
-                            PipeSegmentInfo const &ThisSegment = PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices[PipeCounter]);
+                        for (int PipeCounter = 0, NumSegments = (int)PipingSystemCircuits[FoundOnCircuitIndex].PipeSegmentIndices.size(); PipeCounter < NumSegments; ++PipeCounter) {
+                            PipeSegmentInfo const &ThisSegment = PipingSystemSegments(PipingSystemCircuits[FoundOnCircuitIndex].PipeSegmentIndices[PipeCounter]);
                             if (XYRectangle.contains(ThisSegment.PipeLocation)) {
                                 //'inform the cell that it is a pipe node
                                 cellType = CellType::Pipe;
@@ -3717,9 +3728,9 @@ namespace PlantPipingSystemsManager {
                                 //'inform the cell of which pipe circuit contains it
                                 CircuitIndex = FoundOnCircuitIndex;
                                 //'inform the pipe of what cell it is inside
-                                PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndices[PipeCounter]).initPipeCells(CellXIndex, CellYIndex);
+                                PipingSystemSegments(PipingSystemCircuits[FoundOnCircuitIndex].PipeSegmentIndices[PipeCounter]).initPipeCells(CellXIndex, CellYIndex);
                                 //'set the number of cells to be generated in this near-pipe region
-                                NumRadialCells = PipingSystemCircuits(FoundOnCircuitIndex).NumRadialCells;
+                                NumRadialCells = PipingSystemCircuits[FoundOnCircuitIndex].NumRadialCells;
                                 //'exit the pipe counter loop
                                 goto CircuitLoop_exit;
                             }
@@ -3741,12 +3752,13 @@ namespace PlantPipingSystemsManager {
 
                     // if we were found on a pipe circuit, get some things for convenience
                     if (CircuitIndex != -1) {
-                        if (PipingSystemCircuits(CircuitIndex).HasInsulation) {
-                            InsulationThickness = PipingSystemCircuits(CircuitIndex).InsulationSize.thickness();
+                        auto const & thisCircuit = PipingSystemCircuits[CircuitIndex];
+                        if (thisCircuit.HasInsulation) {
+                            InsulationThickness = thisCircuit.InsulationSize.thickness();
                         }
-                        PipeSizing = PipingSystemCircuits(CircuitIndex).PipeSize;
-                        RadialMeshThickness = PipingSystemCircuits(CircuitIndex).RadialMeshThickness;
-                        HasInsulation = PipingSystemCircuits(CircuitIndex).HasInsulation;
+                        PipeSizing = thisCircuit.PipeSize;
+                        RadialMeshThickness = thisCircuit.RadialMeshThickness;
+                        HasInsulation = thisCircuit.HasInsulation;
                     }
 
                     //'instantiate the cell class
@@ -4045,7 +4057,7 @@ namespace PlantPipingSystemsManager {
 
             bool CircuitInletCellSet = false;
 
-            for (auto & segmentIndex : PipingSystemCircuits(CircuitIndex).PipeSegmentIndices) {
+            for (auto & segmentIndex : PipingSystemCircuits[CircuitIndex].PipeSegmentIndices) {
                 auto &Segment = PipingSystemSegments(segmentIndex);
                 switch (Segment.FlowDirection) {
                 case SegmentFlow::IncreasingZ:
@@ -4076,7 +4088,7 @@ namespace PlantPipingSystemsManager {
                 CircuitOutletCellZ = SegmentOutletCellZ;
             }
 
-            PipingSystemCircuits(CircuitIndex)
+            PipingSystemCircuits[CircuitIndex]
                 .initInOutCells(cells(CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ),
                                 cells(CircuitOutletCellX, CircuitOutletCellY, CircuitOutletCellZ));
         }
@@ -5090,25 +5102,27 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         Real64 const StagnantFluidConvCoeff(200.0);
 
+        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+        
         // Setup circuit flow conditions -- convection coefficient
-        int CellX = PipingSystemCircuits(CircuitNum).CircuitInletCell.X;
-        int CellY = PipingSystemCircuits(CircuitNum).CircuitInletCell.Y;
-        int CellZ = PipingSystemCircuits(CircuitNum).CircuitInletCell.Z;
+        int CellX = thisCircuit.CircuitInletCell.X;
+        int CellY = thisCircuit.CircuitInletCell.Y;
+        int CellZ = thisCircuit.CircuitInletCell.Z;
 
         // Look up current fluid properties
-        Real64 Density = PipingSystemCircuits(CircuitNum).CurFluidPropertySet.Density;
-        Real64 Viscosity = PipingSystemCircuits(CircuitNum).CurFluidPropertySet.Viscosity;
-        Real64 Conductivity = PipingSystemCircuits(CircuitNum).CurFluidPropertySet.Conductivity;
-        Real64 Prandtl = PipingSystemCircuits(CircuitNum).CurFluidPropertySet.Prandtl;
+        Real64 Density = thisCircuit.CurFluidPropertySet.Density;
+        Real64 Viscosity = thisCircuit.CurFluidPropertySet.Viscosity;
+        Real64 Conductivity = thisCircuit.CurFluidPropertySet.Conductivity;
+        Real64 Prandtl = thisCircuit.CurFluidPropertySet.Prandtl;
 
         // Flow calculations
-        Real64 Area_c = (Pi / 4.0) * pow_2(PipingSystemCircuits(CircuitNum).PipeSize.InnerDia);
-        Real64 Velocity = PipingSystemCircuits(CircuitNum).CurCircuitFlowRate / (Density * Area_c);
+        Real64 Area_c = (Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
+        Real64 Velocity = thisCircuit.CurCircuitFlowRate / (Density * Area_c);
 
         // Determine convection coefficient based on flow conditions
         Real64 ConvCoefficient = 0.0;
         if (Velocity > 0) {
-            Real64 Reynolds = Density * PipingSystemCircuits(CircuitNum).PipeSize.InnerDia * Velocity / Viscosity;
+            Real64 Reynolds = Density * thisCircuit.PipeSize.InnerDia * Velocity / Viscosity;
             Real64 ExponentTerm = 0.0;
             if (this->Cells(CellX, CellY, CellZ).PipeCellData.Fluid.Temperature >
                 this->Cells(CellX, CellY, CellZ).PipeCellData.Pipe.Temperature) {
@@ -5117,13 +5131,13 @@ namespace PlantPipingSystemsManager {
                 ExponentTerm = 0.4;
             }
             Real64 Nusselt = 0.023 * std::pow(Reynolds, 4.0 / 5.0) * std::pow(Prandtl, ExponentTerm);
-            ConvCoefficient = Nusselt * Conductivity / PipingSystemCircuits(CircuitNum).PipeSize.InnerDia;
+            ConvCoefficient = Nusselt * Conductivity / thisCircuit.PipeSize.InnerDia;
         } else {
             ConvCoefficient = StagnantFluidConvCoeff;
         }
 
         // Assign the convection coefficient
-        PipingSystemCircuits(CircuitNum).CurCircuitConvectionCoefficient = ConvCoefficient;
+        thisCircuit.CurCircuitConvectionCoefficient = ConvCoefficient;
     }
 
     void FullDomainStructureInfo::PerformPipeCircuitSimulation(int const CircuitNum)
@@ -5138,21 +5152,23 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CircuitCrossTemp;
 
+        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+        
         // retrieve initial conditions from the data structure
         // these have been set either by the init routine or by the heat pump routine
-        Real64 FlowRate = PipingSystemCircuits(CircuitNum).CurCircuitFlowRate;
-        Real64 EnteringTemp = PipingSystemCircuits(CircuitNum).CurCircuitInletTemp;
+        Real64 FlowRate = thisCircuit.CurCircuitFlowRate;
+        Real64 EnteringTemp = thisCircuit.CurCircuitInletTemp;
 
         // initialize
         int SegmentCellCtr = 0;
         int StartingSegment = 0;
-        int EndingSegment = PipingSystemCircuits(CircuitNum).PipeSegmentIndices.size() - 1;
+        int EndingSegment = thisCircuit.PipeSegmentIndices.size() - 1;
 
         //'loop across all segments (pipes) of the circuit
         auto &cells(this->Cells);
         for (int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr) {
 
-            int SegmentIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndices[SegmentCtr];
+            int SegmentIndex = thisCircuit.PipeSegmentIndices[SegmentCtr];
             int StartingZ = 0;
             int EndingZ = 0;
             int Increment = 0;
@@ -5219,18 +5235,18 @@ namespace PlantPipingSystemsManager {
                 } else if (Zindex == EndingZ) {
                     PipingSystemSegments(SegmentIndex).OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
                     PipingSystemSegments(SegmentIndex).FluidHeatLoss =
-                        FlowRate * PipingSystemCircuits(CircuitNum).CurFluidPropertySet.SpecificHeat *
+                        FlowRate * thisCircuit.CurFluidPropertySet.SpecificHeat *
                         (PipingSystemSegments(SegmentIndex).InletTemperature - PipingSystemSegments(SegmentIndex).OutletTemperature);
                 }
 
                 // Bookkeeping: circuit fluid temperature updates
                 if ((SegmentCtr == StartingSegment) && (Zindex == StartingZ)) {
-                    PipingSystemCircuits(CircuitNum).InletTemperature = EnteringTemp;
+                    thisCircuit.InletTemperature = EnteringTemp;
                 } else if ((SegmentCtr == EndingSegment) && (Zindex == EndingZ)) {
-                    PipingSystemCircuits(CircuitNum).OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
-                    PipingSystemCircuits(CircuitNum).FluidHeatLoss =
-                        FlowRate * PipingSystemCircuits(CircuitNum).CurFluidPropertySet.SpecificHeat *
-                        (PipingSystemCircuits(CircuitNum).InletTemperature - PipingSystemCircuits(CircuitNum).OutletTemperature);
+                    thisCircuit.OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
+                    thisCircuit.FluidHeatLoss =
+                        FlowRate * thisCircuit.CurFluidPropertySet.SpecificHeat *
+                        (thisCircuit.InletTemperature - thisCircuit.OutletTemperature);
                 }
             }
         }
@@ -5246,7 +5262,9 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        for (int Iter = 1; Iter <= PipingSystemCircuits(CircuitNum).MaxIterationsPerTS; ++Iter) {
+        auto & thisCircuit = PipingSystemCircuits[CircuitNum];
+
+        for (int Iter = 1; Iter <= thisCircuit.MaxIterationsPerTS; ++Iter) {
 
             //'shift all the pipe related temperatures for the next internal pipe iteration
             ShiftPipeTemperaturesForNewIteration(ThisCell);
@@ -5267,15 +5285,15 @@ namespace PlantPipingSystemsManager {
                 SimulateInnerMostRadialSoilSlice(CircuitNum, ThisCell);
             }
 
-            if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+            if (thisCircuit.HasInsulation) {
                 SimulateRadialInsulationCell(ThisCell);
             }
 
             //'simulate the pipe cell
-            SimulateRadialPipeCell(CircuitNum, ThisCell, PipingSystemCircuits(CircuitNum).CurCircuitConvectionCoefficient);
+            SimulateRadialPipeCell(CircuitNum, ThisCell, thisCircuit.CurCircuitConvectionCoefficient);
 
             //'simulate the water cell
-            SimulateFluidCell(ThisCell, FlowRate, PipingSystemCircuits(CircuitNum).CurCircuitConvectionCoefficient, EnteringTemp);
+            SimulateFluidCell(ThisCell, FlowRate, thisCircuit.CurCircuitConvectionCoefficient, EnteringTemp);
 
             //'check convergence
             if (IsConverged_PipeCurrentToPrevIteration(CircuitNum, ThisCell)) break; // potential diff source
@@ -5355,7 +5373,7 @@ namespace PlantPipingSystemsManager {
         Real64 ThisRadialCellInnerRadius = outerMostSoilCell.InnerRadius;
         Real64 ThisRadialCellTemperature_PrevTimeStep = outerMostSoilCell.Temperature_PrevTimeStep;
         if (numSoilCells == 1) {
-            if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+            if (PipingSystemCircuits[CircuitNum].HasInsulation) {
                 NextOuterRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
                 NextOuterRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                 NextOuterRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5409,11 +5427,10 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        for (int rCtr = cell.PipeCellData.Soil.size() - 2; rCtr >= 1; --rCtr) {
+        for (int rCtr = (int)cell.PipeCellData.Soil.size() - 2; rCtr >= 1; --rCtr) {
 
             Real64 Numerator = 0.0;
             Real64 Denominator = 0.0;
-            Real64 Resistance = 0.0;
 
             //'convenience variables
             auto & thisSoilCell = cell.PipeCellData.Soil[rCtr];
@@ -5443,7 +5460,7 @@ namespace PlantPipingSystemsManager {
             ++Denominator;
 
             //'add effects from outer cell
-            Resistance =
+            Real64 Resistance =
                 (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) / (2 * Pi * cell.depth() * OuterRadialCellConductivity)) +
                 (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Pi * cell.depth() * ThisRadialCellConductivity));
             Numerator += (Beta / Resistance) * OuterRadialCellTemperature;
@@ -5482,7 +5499,7 @@ namespace PlantPipingSystemsManager {
         Real64 Denominator = 0.0;
 
         //'convenience variables
-        if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
             InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
             InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             InnerNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5599,7 +5616,7 @@ namespace PlantPipingSystemsManager {
         Real64 Resistance;
 
         //'convenience variables
-        if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
             OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             OuterNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
             OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
@@ -5713,9 +5730,9 @@ namespace PlantPipingSystemsManager {
                         for (auto & soilCell : cell.PipeCellData.Soil) {
                             soilCell.Properties = this->GroundProperties;
                         }
-                        cell.PipeCellData.Pipe.Properties = PipingSystemCircuits(CircuitNum).PipeProperties;
-                        if (PipingSystemCircuits(CircuitNum).HasInsulation) {
-                            cell.PipeCellData.Insulation.Properties = PipingSystemCircuits(CircuitNum).InsulationProperties;
+                        cell.PipeCellData.Pipe.Properties = PipingSystemCircuits[CircuitNum].PipeProperties;
+                        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
+                            cell.PipeCellData.Insulation.Properties = PipingSystemCircuits[CircuitNum].InsulationProperties;
                         }
                         break;
                     case CellType::GeneralField:
@@ -5800,7 +5817,7 @@ namespace PlantPipingSystemsManager {
                         cell.PipeCellData.Pipe.Temperature = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevIteration = ThisCellTemp;
                         cell.PipeCellData.Pipe.Temperature_PrevTimeStep = ThisCellTemp;
-                        if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+                        if (PipingSystemCircuits[CircuitNum].HasInsulation) {
                             cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
                             cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
                             cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
@@ -5842,31 +5859,31 @@ namespace PlantPipingSystemsManager {
 
         // If pipe circuit present
         if (present(CircuitNum)) {
+            auto & thisCircuit = PipingSystemCircuits[CircuitNum];
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
-            FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
-                                                             PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+            FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                                                             thisCircuit.InletTemperature,
+                                                             DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
                                                              RoutineName);
-            FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
-                                                             PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+            FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                                                             thisCircuit.InletTemperature,
+                                                             DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
                                                              RoutineName);
-            FluidConductivity = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
-                                                                       PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                                       DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+            FluidConductivity = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                                                                       thisCircuit.InletTemperature,
+                                                                       DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
                                                                        RoutineName);
-            FluidViscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
-                                                                 PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                                 DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+            FluidViscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                                                                 thisCircuit.InletTemperature,
+                                                                 DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
                                                                  RoutineName);
 
             // Doesn't anyone care about poor Ludwig Prandtl?
             FluidPrandtl = 3.0;
 
             // then assign these fluid properties to the current fluid property set for easy lookup as needed
-            PipingSystemCircuits(CircuitNum).CurFluidPropertySet =
-                ExtendedFluidProperties(FluidConductivity, FluidDensity, FluidCp, FluidViscosity, FluidPrandtl);
+            thisCircuit.CurFluidPropertySet = ExtendedFluidProperties(FluidConductivity, FluidDensity, FluidCp, FluidViscosity, FluidPrandtl);
         }
 
         //'now update cell properties
@@ -5928,7 +5945,7 @@ namespace PlantPipingSystemsManager {
                             }
 
                             //'then insulation if it exists
-                            if (PipingSystemCircuits(CircuitNum).HasInsulation) {
+                            if (PipingSystemCircuits[CircuitNum].HasInsulation) {
                                 Beta = this->Cur.CurSimTimeStepSize /
                                        (cell.PipeCellData.Insulation.Properties.Density * cell.PipeCellData.Insulation.XY_CrossSectArea() *
                                         cell.depth() * cell.PipeCellData.Insulation.Properties.SpecificHeat);
@@ -5942,7 +5959,7 @@ namespace PlantPipingSystemsManager {
                             cell.PipeCellData.Pipe.Beta = Beta;
 
                             // now the fluid cell also
-                            cell.PipeCellData.Fluid.Properties = PipingSystemCircuits(CircuitNum).CurFluidPropertySet;
+                            cell.PipeCellData.Fluid.Properties = PipingSystemCircuits[CircuitNum].CurFluidPropertySet;
                             cell.PipeCellData.Fluid.Beta = this->Cur.CurSimTimeStepSize /
                                                            (cell.PipeCellData.Fluid.Properties.Density * cell.PipeCellData.Fluid.Volume *
                                                             cell.PipeCellData.Fluid.Properties.SpecificHeat);
