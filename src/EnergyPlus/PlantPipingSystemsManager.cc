@@ -834,38 +834,6 @@ namespace EnergyPlus {
             int NumNumbers; // Number of Numbers for each GetObjectItem call
             int IOStatus;   // Used in GetObjectItem
 
-            struct GroundDomainData {
-                // Members
-                std::string ObjName;
-                Real64 Depth;
-                Real64 AspectRatio;
-                Real64 PerimeterOffset;
-                Real64 SoilConductivity;
-                Real64 SoilDensity;
-                Real64 SoilSpecificHeat;
-                Real64 MoistureContent;
-                Real64 SaturationMoistureContent;
-                Real64 EvapotranspirationCoeff;
-                Real64 MinSurfTemp;
-                int MonthOfMinSurfTemp;
-                Real64 HorizInsWidth;
-                Real64 VertInsDepth;
-                int OSCMIndex;
-                std::string OSCMName;
-                std::string SlabMaterial;
-                std::string HorizInsMaterial;
-                std::string VertInsMaterial;
-
-                // Default Constructor
-                GroundDomainData()
-                        : Depth(0.0), AspectRatio(0.0), PerimeterOffset(0.0), SoilConductivity(0.0), SoilDensity(0.0),
-                          SoilSpecificHeat(0.0),
-                          MoistureContent(0.0), SaturationMoistureContent(0.0), EvapotranspirationCoeff(0.0),
-                          MinSurfTemp(0.0), MonthOfMinSurfTemp(0),
-                          HorizInsWidth(0.0), VertInsDepth(0.0), OSCMIndex(0) {
-                }
-            };
-
             // initialize these counters properly so they can be incremented within the DO loop
             int DomainCtr = StartingDomainNumForZone - 1;
 
@@ -890,29 +858,27 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                GroundDomainData gdd;
+                auto &thisDomain = domains[DomainCtr - 1];
 
                 // Get the name, validate
-                gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
+                // Domain name
+                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
+
                 GlobalNames::VerifyUniqueInterObjectName(
                         GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the rest of the inputs into the local type for clarity during transition
-                gdd.OSCMName = DataIPShortCuts::cAlphaArgs(4);
-                gdd.Depth = DataIPShortCuts::rNumericArgs(1);
-                gdd.AspectRatio = DataIPShortCuts::rNumericArgs(2);
-                gdd.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
-                gdd.SoilConductivity = DataIPShortCuts::rNumericArgs(4);
-                gdd.SoilDensity = DataIPShortCuts::rNumericArgs(5);
-                gdd.SoilSpecificHeat = DataIPShortCuts::rNumericArgs(6);
-                gdd.MoistureContent = DataIPShortCuts::rNumericArgs(7);
-                gdd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(8);
-                gdd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(9);
-                gdd.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
-                gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
-
-                auto &thisDomain = domains[DomainCtr - 1];
+                thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(1);
+                thisDomain.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
+                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(4);
+                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(5);
+                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(6);
+                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(7) / 100.0;
+                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(8) / 100.0;
+                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(9);
+                thisDomain.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
+                thisDomain.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
 
                 // Set flag for slab in-grade or slab on-grade
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
@@ -922,20 +888,19 @@ namespace EnergyPlus {
                 } else {
                     ShowSevereError(
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError("Found in: " + gdd.ObjName);
+                    ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
-                    gdd.SlabMaterial = DataIPShortCuts::cAlphaArgs(6);
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
                                                                                  DataHeatBalance::Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
                                         DataIPShortCuts::cAlphaArgs(6));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.SlabThickness = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Thickness;
@@ -957,21 +922,20 @@ namespace EnergyPlus {
                     } else {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
                                         DataIPShortCuts::cAlphaArgs(7));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
 
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
-                    gdd.HorizInsMaterial = DataIPShortCuts::cAlphaArgs(8);
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
                                                                                      DataHeatBalance::Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
                                         DataIPShortCuts::cAlphaArgs(8));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.HorizInsThickness = DataHeatBalance::Material(
@@ -988,11 +952,9 @@ namespace EnergyPlus {
                     if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "PERIMETER")) {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
-                        if (gdd.HorizInsWidth > 0.0) {
-                            thisDomain.HorizInsWidth = gdd.HorizInsWidth;
-                        } else {
+                        if (thisDomain.HorizInsWidth <= 0.0) {
                             ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
-                            ShowContinueError("Found in: " + gdd.ObjName);
+                            ShowContinueError("Found in: " + thisDomain.Name);
                             ErrorsFound = true;
                         }
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "FULL")) {
@@ -1000,12 +962,10 @@ namespace EnergyPlus {
                     } else {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" +
                                         DataIPShortCuts::cAlphaArgs(9));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
 
-                    // Horizontal insulation perimeter width
-                    thisDomain.HorizInsWidth = gdd.HorizInsWidth;
                 }
 
                 // set flag for vertical insulation
@@ -1016,20 +976,19 @@ namespace EnergyPlus {
                 } else {
                     ShowSevereError(
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
-                    ShowContinueError("Found in: " + gdd.ObjName);
+                    ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
-                    gdd.VertInsMaterial = DataIPShortCuts::cAlphaArgs(11);
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
                                                                                     DataHeatBalance::Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
                                         DataIPShortCuts::cAlphaArgs(11));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.VertInsThickness = DataHeatBalance::Material(
@@ -1043,18 +1002,12 @@ namespace EnergyPlus {
                     }
 
                     // vertical insulation depth
-                    if (gdd.VertInsDepth > gdd.Depth ||
-                        gdd.VertInsDepth <= 0.0) {
+                    if (thisDomain.VertInsDepth > thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(11));
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
-                    } else {
-                        thisDomain.VertInsDepth = gdd.VertInsDepth;
                     }
                 }
-
-                // Domain perimeter offset
-                thisDomain.PerimeterOffset = gdd.PerimeterOffset;
 
                 // Set simulation interval flag
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "TIMESTEP")) {
@@ -1064,7 +1017,7 @@ namespace EnergyPlus {
                 } else {
                     ShowSevereError(
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + "=" + DataIPShortCuts::cAlphaArgs(12));
-                    ShowContinueError("Found in: " + gdd.ObjName);
+                    ShowContinueError("Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1073,11 +1026,8 @@ namespace EnergyPlus {
                 thisDomain.HasAPipeCircuit = false;
                 thisDomain.HasZoneCoupledSlab = true;
 
-                // Domain name
-                thisDomain.Name = gdd.ObjName;
-
                 // get boundary condition model names and indices -- error check
-                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(gdd.OSCMName, DataSurfaces::OSCM);
+                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataSurfaces::OSCM);
                 if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                     IssueSevereInputFieldError(RoutineName,
                                                ObjName_ZoneCoupled_Slab,
@@ -1112,8 +1062,9 @@ namespace EnergyPlus {
                 thisDomain.SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
 
                 // Surface dimensions
-                thisDomain.SlabWidth = std::sqrt(ThisArea / gdd.AspectRatio);
-                thisDomain.SlabLength = thisDomain.SlabWidth * gdd.AspectRatio;
+                Real64 thisAspectRatio = DataIPShortCuts::rNumericArgs(2);
+                thisDomain.SlabWidth = std::sqrt(ThisArea / thisAspectRatio);
+                thisDomain.SlabLength = thisDomain.SlabWidth * thisAspectRatio;
 
                 // Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical
                 // partition thickness.
@@ -1125,16 +1076,15 @@ namespace EnergyPlus {
                         ShowContinueError(RoutineName + ": Perimeter insulation width is too large.");
                         ShowContinueError("This would cause overlapping insulation. Check inputs.");
                         ShowContinueError("Defaulting to full horizontal insulation.");
-                        ShowContinueError("Found in: " + gdd.ObjName);
+                        ShowContinueError("Found in: " + thisDomain.Name);
                         thisDomain.FullHorizInsPresent = true;
                     }
                 }
 
                 // Set ground domain dimensions
-                thisDomain.Extents.xMax = gdd.PerimeterOffset + thisDomain.SlabWidth / 2;
-                thisDomain.Extents.yMax = gdd.Depth;
-                thisDomain.Extents.zMax =
-                        gdd.PerimeterOffset + thisDomain.SlabLength / 2;
+                thisDomain.Extents.xMax = thisDomain.PerimeterOffset + thisDomain.SlabWidth / 2;
+                // thisDomain.Extents.yMax read above
+                thisDomain.Extents.zMax = thisDomain.PerimeterOffset + thisDomain.SlabLength / 2;
 
                 // Get mesh parameters
 
@@ -1155,15 +1105,6 @@ namespace EnergyPlus {
                 thisDomain.Mesh.Y.RegionMeshCount = MeshCount;
                 thisDomain.Mesh.Z.RegionMeshCount = MeshCount;
 
-                // Soil properties
-                thisDomain.GroundProperties.Conductivity = gdd.SoilConductivity;
-                thisDomain.GroundProperties.Density = gdd.SoilDensity;
-                thisDomain.GroundProperties.SpecificHeat = gdd.SoilSpecificHeat;
-
-                // Moisture properties
-                thisDomain.Moisture.Theta_liq = gdd.MoistureContent / 100.0;
-                thisDomain.Moisture.Theta_sat = gdd.SaturationMoistureContent / 100.0;
-
                 thisDomain.NumSlabCells =
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
@@ -1174,9 +1115,6 @@ namespace EnergyPlus {
                 // Other parameters
                 thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
                 thisDomain.SimControls.MaxIterationsPerTS = 250;
-
-                // additional evapotranspiration parameter, min/max validated by IP
-                thisDomain.Moisture.GroundCoverCoefficient = gdd.EvapotranspirationCoeff;
 
                 // setup output variables
                 thisDomain.SetupZoneCoupledOutputVariables();

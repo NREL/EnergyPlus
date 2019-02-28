@@ -606,7 +606,6 @@ namespace EnergyPlus {
             BaseThermalPropertySet PipeProperties;
             BaseThermalPropertySet InsulationProperties;
             // Flags
-            bool CheckEquipName = true;
             bool NeedToFindOnPlantLoop = true;
             bool IsActuallyPartOfAHorizontalTrench = false;
             // Location of this pipe circuit in the PlantLoop topology
