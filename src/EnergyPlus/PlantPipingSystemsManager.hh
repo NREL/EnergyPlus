@@ -1000,7 +1000,7 @@ namespace PlantPipingSystemsManager {
 
     void SetupPipingSystemOutputVariables();
 
-    void IssueSevereInputFieldErrorStringEntry(std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                                std::string const &ObjectName,
                                                std::string const &InstanceName,
                                                std::string const &FieldName,
@@ -1008,7 +1008,7 @@ namespace PlantPipingSystemsManager {
                                                std::string const &Condition,
                                                bool &ErrorsFound);
 
-    void IssueSevereInputFieldErrorRealEntry(std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                              std::string const &ObjectName,
                                              std::string const &InstanceName,
                                              std::string const &FieldName,

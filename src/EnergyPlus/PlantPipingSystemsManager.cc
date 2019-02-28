@@ -578,7 +578,7 @@ namespace PlantPipingSystemsManager {
                         thisDomain.Mesh.X.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(2),
@@ -607,7 +607,7 @@ namespace PlantPipingSystemsManager {
                         thisDomain.Mesh.Y.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(3),
@@ -636,7 +636,7 @@ namespace PlantPipingSystemsManager {
                         thisDomain.Mesh.Z.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(4),
@@ -661,7 +661,7 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
                 thisDomain.HasBasement = false;
             } else {
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                IssueSevereInputFieldError(RoutineName,
                                                       ObjName_ug_GeneralDomain,
                                                       DataIPShortCuts::cAlphaArgs(1),
                                                       DataIPShortCuts::cAlphaFieldNames(7),
@@ -685,7 +685,7 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 15;
                 thisDomain.BasementZone.Width = DataIPShortCuts::rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Width <= 0.0) {
-                    IssueSevereInputFieldErrorRealEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                         ObjName_ug_GeneralDomain,
                                                         DataIPShortCuts::cAlphaArgs(1),
                                                         DataIPShortCuts::cNumericFieldNames(CurIndex),
@@ -697,7 +697,7 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 16;
                 thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Depth <= 0.0) {
-                    IssueSevereInputFieldErrorRealEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                         ObjName_ug_GeneralDomain,
                                                         DataIPShortCuts::cAlphaArgs(1),
                                                         DataIPShortCuts::cNumericFieldNames(CurIndex),
@@ -713,7 +713,7 @@ namespace PlantPipingSystemsManager {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "NO")) {
                     thisDomain.BasementZone.ShiftPipesByWidth = false;
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -728,7 +728,7 @@ namespace PlantPipingSystemsManager {
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
                     UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -738,7 +738,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     auto const & wallIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.WallBoundaryOSCMIndex);
                     if (wallIndexes.empty()) {
-                        IssueSevereInputFieldErrorStringEntry(
+                        IssueSevereInputFieldError(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
                             DataIPShortCuts::cAlphaArgs(1),
@@ -756,7 +756,7 @@ namespace PlantPipingSystemsManager {
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                     UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_ug_GeneralDomain,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -766,7 +766,7 @@ namespace PlantPipingSystemsManager {
                 } else {
                     auto const & floorIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                     if (floorIndexes.empty()) {
-                        IssueSevereInputFieldErrorStringEntry(
+                        IssueSevereInputFieldError(
                             RoutineName,
                             ObjName_ug_GeneralDomain,
                             DataIPShortCuts::cAlphaArgs(1),
@@ -798,7 +798,7 @@ namespace PlantPipingSystemsManager {
 
             // Initialize ground temperature model and get pointer reference
             thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
-
+            
             // now add this instance to the main vector
             // domains.push_back(thisDomain);
         }
@@ -878,7 +878,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-
+            
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -899,7 +899,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
 
             auto & thisDomain = domains[DomainCtr-1];
-
+            
             // Set flag for slab in-grade or slab on-grade
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
@@ -1040,7 +1040,7 @@ namespace PlantPipingSystemsManager {
             // get boundary condition model names and indices -- error check
             thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(gdd.OSCMName, DataSurfaces::OSCM);
             if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                IssueSevereInputFieldError(RoutineName,
                                                       ObjName_ZoneCoupled_Slab,
                                                       DataIPShortCuts::cAlphaArgs(1),
                                                       DataIPShortCuts::cAlphaFieldNames(4),
@@ -1051,7 +1051,7 @@ namespace PlantPipingSystemsManager {
             } else {
                 int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
                 if (NumSurfacesWithThisOSCM <= 0) {
-                    IssueSevereInputFieldErrorStringEntry(
+                    IssueSevereInputFieldError(
                         RoutineName,
                         ObjName_ZoneCoupled_Slab,
                         DataIPShortCuts::cAlphaArgs(1),
@@ -1139,7 +1139,7 @@ namespace PlantPipingSystemsManager {
 
             // setup output variables
             thisDomain.SetupZoneCoupledOutputVariables();
-
+            
             // add it to the main vector
             // domains.push_back(thisDomain);
         }
@@ -1209,7 +1209,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-
+            
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -1223,7 +1223,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
 
             auto & thisDomain = domains[DomainNum-1];
-
+            
             // Other inputs
             thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
@@ -1259,7 +1259,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                 UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, DataSurfaces::OSCM);
             if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                IssueSevereInputFieldError(RoutineName,
                                                       ObjName_ZoneCoupled_Basement,
                                                       DataIPShortCuts::cAlphaArgs(1),
                                                       DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1269,7 +1269,7 @@ namespace PlantPipingSystemsManager {
             } else {
                 auto const & floorIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                 if (floorIndexes.empty()) {
-                    IssueSevereInputFieldErrorStringEntry(
+                    IssueSevereInputFieldError(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
                         DataIPShortCuts::cAlphaArgs(1),
@@ -1289,7 +1289,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.BasementZone.WallBoundaryOSCMIndex =
                 UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, DataSurfaces::OSCM);
             if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                IssueSevereInputFieldError(RoutineName,
                                                       ObjName_ZoneCoupled_Basement,
                                                       DataIPShortCuts::cAlphaArgs(1),
                                                       DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1300,7 +1300,7 @@ namespace PlantPipingSystemsManager {
             } else {
                 auto const & wallIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.WallBoundaryOSCMIndex);
                 if (wallIndexes.empty()) {
-                    IssueSevereInputFieldErrorStringEntry(
+                    IssueSevereInputFieldError(
                         RoutineName,
                         ObjName_ZoneCoupled_Basement,
                         DataIPShortCuts::cAlphaArgs(1),
@@ -1530,7 +1530,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             auto & thisCircuit = circuits[PipeCircuitCounter-1];
-
+            
             // Get the name, validate
             thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
             thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
@@ -1546,7 +1546,7 @@ namespace PlantPipingSystemsManager {
             thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(5);
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 CurIndex = 5;
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                IssueSevereInputFieldError(RoutineName,
                                                       ObjName_Circuit,
                                                       DataIPShortCuts::cAlphaArgs(1),
                                                       DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1564,7 +1564,7 @@ namespace PlantPipingSystemsManager {
                 DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
-                IssueSevereInputFieldErrorStringEntry(
+                IssueSevereInputFieldError(
                     RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
             thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
@@ -1572,7 +1572,7 @@ namespace PlantPipingSystemsManager {
                 DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
-                IssueSevereInputFieldErrorStringEntry(
+                IssueSevereInputFieldError(
                     RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
             BranchNodeConnections::TestCompSet(ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3), "Piping System Circuit Nodes");
@@ -1595,7 +1595,7 @@ namespace PlantPipingSystemsManager {
             for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                 if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_Circuit,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1668,7 +1668,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             Segment thisSegment;
-
+            
             // Get the name, validate
             thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -1687,7 +1687,7 @@ namespace PlantPipingSystemsManager {
                     thisSegment.FlowDirection = SegmentFlow::DecreasingZ;
                 } else {
                     CurIndex = 2;
-                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                    IssueSevereInputFieldError(RoutineName,
                                                           ObjName_Segment,
                                                           DataIPShortCuts::cAlphaArgs(1),
                                                           DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1720,7 +1720,7 @@ namespace PlantPipingSystemsManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
-
+        
         struct HorizontalTrenchData
         {
             // Members
@@ -1786,7 +1786,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             HorizontalTrenchData htd;
-
+            
             // Get the name, validate
             htd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -1870,7 +1870,7 @@ namespace PlantPipingSystemsManager {
             thisCircuit.PipeSize.OuterDia = htd.PipeOD;
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 // CurIndex = 5
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                            DataIPShortCuts::cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
             }
 
@@ -1889,7 +1889,7 @@ namespace PlantPipingSystemsManager {
                                                          DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
             thisCircuit.OutletNodeName = htd.OutletNodeName;
@@ -1903,7 +1903,7 @@ namespace PlantPipingSystemsManager {
                                                           DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
             BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
@@ -2228,7 +2228,7 @@ namespace PlantPipingSystemsManager {
         DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
     }
 
-    void IssueSevereInputFieldErrorStringEntry(std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                                std::string const &ObjectName,
                                                std::string const &InstanceName,
                                                std::string const &FieldName,
@@ -2248,7 +2248,7 @@ namespace PlantPipingSystemsManager {
         ErrorsFound = true;
     }
 
-    void IssueSevereInputFieldErrorRealEntry(std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                              std::string const &ObjectName,
                                              std::string const &InstanceName,
                                              std::string const &FieldName,
