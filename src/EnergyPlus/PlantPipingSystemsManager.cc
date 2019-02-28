@@ -4518,28 +4518,26 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 Beta = 0.0;
-        Real64 NeighborTemp = 0.0;
-        Real64 HeatFlux;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
+        Real64 NeighborTemp = 0.0;
         Real64 Resistance = 0.0;
         Real64 AdiabaticMultiplier = 1.0;
 
         // add effect from previous time step
         Numerator += cell.Temperature_PrevTimeStep;
         ++Denominator;
-        
+
         switch (cell.cellType) {
             case CellType::BasementWall:
 
                 // we will only have heat flux from the basement wall and heat conduction to the +x cell
 
                 // This is actually only a half-cell since the basement wall slices right through the middle in one direction
-                Beta = cell.Beta / 2.0;
+                Real64 const Beta = cell.Beta / 2.0;
 
                 // get the average basement wall heat flux and add it to the tally
-                HeatFlux = this->GetBasementWallHeatFlux();
+                Real64 const HeatFlux = this->GetBasementWallHeatFlux();
                 Numerator += Beta * HeatFlux * cell.height();
 
                 // then get the +x conduction to continue the heat balance
@@ -4554,10 +4552,10 @@ namespace PlantPipingSystemsManager {
                 // we will only have heat flux from the basement floor and heat conduction to the lower cell
 
                 // This is actually only a half-cell since the basement wall slices right through the middle in one direction
-                Beta = cell.Beta / 2.0;
+                Real64 const Beta = cell.Beta / 2.0;
 
                 // get the average basement floor heat flux and add it to the tally
-                HeatFlux = this->GetBasementFloorHeatFlux();
+                Real64 const HeatFlux = this->GetBasementFloorHeatFlux();
                 Numerator += Beta * HeatFlux * cell.width();
 
                 // then get the -y conduction to continue the heat balance
@@ -4570,7 +4568,7 @@ namespace PlantPipingSystemsManager {
             case CellType::BasementCorner:
 
                 // This is actually only a three-quarter-cell since the basement wall slices right through the middle in both directions
-                Beta = cell.Beta * 3.0 / 4.0;
+                Real64 const Beta = cell.Beta * 3.0 / 4.0;
 
                 // we will only have heat conduction to the +x and -y cells
                 this->EvaluateNeighborCharacteristics(cell, Direction::PositiveX, NeighborTemp, Resistance, AdiabaticMultiplier);
