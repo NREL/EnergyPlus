@@ -1697,21 +1697,14 @@ namespace EnergyPlus {
 
             struct HorizontalTrenchData {
                 // Members
-                //std::string ObjName;
-                std::string InletNodeName;
-                std::string OutletNodeName;
+
                 Real64 AxialLength;
                 Real64 PipeID;
                 Real64 PipeOD;
                 int NumPipes;
                 Real64 BurialDepth;
                 Real64 DesignFlowRate;
-                Real64 SoilConductivity;
-                Real64 SoilDensity;
-                Real64 SoilSpecificHeat;
-                Real64 PipeConductivity;
-                Real64 PipeDensity;
-                Real64 PipeSpecificHeat;
+
                 Real64 InterPipeSpacing;
                 Real64 MoistureContent;
                 Real64 SaturationMoistureContent;
@@ -1722,9 +1715,7 @@ namespace EnergyPlus {
                 // Default Constructor
                 HorizontalTrenchData()
                         : AxialLength(0.0), PipeID(0.0), PipeOD(0.0), NumPipes(0), BurialDepth(0.0),
-                          DesignFlowRate(0.0), SoilConductivity(0.0),
-                          SoilDensity(0.0), SoilSpecificHeat(0.0), PipeConductivity(0.0), PipeDensity(0.0),
-                          PipeSpecificHeat(0.0), InterPipeSpacing(0.0),
+                          DesignFlowRate(0.0), InterPipeSpacing(0.0),
                           MoistureContent(0.0), SaturationMoistureContent(0.0), EvapotranspirationCoeff(0.0),
                           MinSurfTemp(0.0), MonthOfMinSurfTemp(0) {
                 }
@@ -1770,8 +1761,6 @@ namespace EnergyPlus {
                                              ErrorsFound);
 
                 // Read in the rest of the inputs into the local type for clarity during transition
-                std::string inletNodeName = DataIPShortCuts::cAlphaArgs(2);
-                std::string outletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 htd.DesignFlowRate = DataIPShortCuts::rNumericArgs(1);
                 htd.AxialLength = DataIPShortCuts::rNumericArgs(2);
                 htd.NumPipes = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
@@ -1779,12 +1768,7 @@ namespace EnergyPlus {
                 htd.PipeID = DataIPShortCuts::rNumericArgs(5);
                 htd.PipeOD = DataIPShortCuts::rNumericArgs(6);
                 htd.BurialDepth = DataIPShortCuts::rNumericArgs(7);
-                htd.SoilConductivity = DataIPShortCuts::rNumericArgs(8);
-                htd.SoilDensity = DataIPShortCuts::rNumericArgs(9);
-                htd.SoilSpecificHeat = DataIPShortCuts::rNumericArgs(10);
-                htd.PipeConductivity = DataIPShortCuts::rNumericArgs(11);
-                htd.PipeDensity = DataIPShortCuts::rNumericArgs(12);
-                htd.PipeSpecificHeat = DataIPShortCuts::rNumericArgs(13);
+
                 htd.MoistureContent = DataIPShortCuts::rNumericArgs(14);
                 htd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(15);
                 htd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(16);
@@ -1808,17 +1792,13 @@ namespace EnergyPlus {
                 thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
 
                 // Soil properties
-                thisDomain.GroundProperties.Conductivity = htd.SoilConductivity;
-                thisDomain.GroundProperties.Density = htd.SoilDensity;
-                thisDomain.GroundProperties.SpecificHeat = htd.SoilSpecificHeat;
+                thisDomain.GroundProperties.Conductivity = DataIPShortCuts::rNumericArgs(8);
+                thisDomain.GroundProperties.Density = DataIPShortCuts::rNumericArgs(9);
+                thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(10);
 
                 // Moisture properties
                 thisDomain.Moisture.Theta_liq = htd.MoistureContent / 100.0;
                 thisDomain.Moisture.Theta_sat = htd.SaturationMoistureContent / 100.0;
-
-                // Farfield model parameters
-                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
-                                                                                DataIPShortCuts::cAlphaArgs(5));
 
                 // Other parameters
                 thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1840,9 +1820,9 @@ namespace EnergyPlus {
                 thisCircuit.CircuitIndex = CircuitCtr - 1;
 
                 // Read pipe thermal properties
-                thisCircuit.PipeProperties.Conductivity = htd.PipeConductivity;
-                thisCircuit.PipeProperties.Density = htd.PipeDensity;
-                thisCircuit.PipeProperties.SpecificHeat = htd.PipeSpecificHeat;
+                thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(11);
+                thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(12);
+                thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(13);
 
                 // Pipe sizing
                 thisCircuit.PipeSize.InnerDia = htd.PipeID;
@@ -1857,7 +1837,7 @@ namespace EnergyPlus {
                 thisCircuit.DesignVolumeFlowRate = htd.DesignFlowRate;
 
                 // Read inlet and outlet node names and validate them
-                thisCircuit.InletNodeName = inletNodeName;
+                thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
@@ -1871,7 +1851,7 @@ namespace EnergyPlus {
                     // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                     //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
-                thisCircuit.OutletNodeName = outletNodeName;
+                thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
@@ -1899,6 +1879,11 @@ namespace EnergyPlus {
                 // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
                 thisCircuit.NumRadialCells = 4;
                 thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
+
+                // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
+                // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
+                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
+                                                                                DataIPShortCuts::cAlphaArgs(5));
 
                 // Read number of pipe segments for this circuit, allocate arrays
                 int const NumPipeSegments = htd.NumPipes;
