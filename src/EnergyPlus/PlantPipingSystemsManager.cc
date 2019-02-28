@@ -412,29 +412,18 @@ namespace PlantPipingSystemsManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int NumGeneralizedDomains;
-        int NumZoneCoupledDomains;
-        int NumBasements;
-        int PipeCtr;
-        int CircuitIndex;
-        int NumPipeCircuits;
-        int NumHorizontalTrenches;
-        int DomainNum;
-        int TotalNumDomains;
-        int TotalNumCircuits;
-        std::string ThisSegmentName;
 
         // Read number of objects and allocate main data structures - first domains
-        NumGeneralizedDomains = inputProcessor->getNumObjectsFound(ObjName_ug_GeneralDomain);
-        NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
-        NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Slab);
-        NumBasements = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Basement);
-        TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
+        int NumGeneralizedDomains = inputProcessor->getNumObjectsFound(ObjName_ug_GeneralDomain);
+        int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
+        int NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Slab);
+        int NumBasements = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Basement);
+        int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
         domains.resize(TotalNumDomains);
 
         // then circuits
-        NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
-        TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
+        int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
+        int TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
         circuits.resize(TotalNumCircuits);
 
         // Read in raw inputs, don't try to interpret dependencies yet
@@ -455,7 +444,7 @@ namespace PlantPipingSystemsManager {
         SetupPipingSystemOutputVariables();
 
         // Validate DOMAIN-CIRCUIT cross references
-        for (DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
+        for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
             // Convenience
             int const NumCircuitsInThisDomain = static_cast<int>(domains[DomainNum].CircuitNames.size());
@@ -476,8 +465,8 @@ namespace PlantPipingSystemsManager {
             // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
             //                                INPUT WAS MEASURED FROM GROUND SURFACE
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
+                int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
+                for (int PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
                     auto & thisSegment = circuits[CircuitCtr-1].pipeSegments[PipeCtr];
                     thisSegment->PipeLocation.Y = domains[DomainNum].Extents.yMax - thisSegment->PipeLocation.Y;
                 } // segment loop
@@ -486,8 +475,8 @@ namespace PlantPipingSystemsManager {
             // correct segment locations for: BASEMENT X SHIFT
             if (domains[DomainNum].HasBasement && domains[DomainNum].BasementZone.ShiftPipesByWidth) {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
-                    for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
+                    int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
+                    for (int PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
                         auto & thisSegment = circuits[CircuitIndex].pipeSegments[PipeCtr];
                         thisSegment->PipeLocation.X += domains[DomainNum].BasementZone.Width;
                     } // segment loop
@@ -498,10 +487,10 @@ namespace PlantPipingSystemsManager {
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
 
                 // retrieve the index
-                CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
+                int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr-1];
 
                 // check to make sure it isn't outside the domain
-                for (PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
+                for (int PipeCtr = 0; PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
                     auto & thisSegment = circuits[CircuitIndex].pipeSegments[PipeCtr];
                     if ((thisSegment->PipeLocation.X > domains[DomainNum].Extents.xMax) ||
                         (thisSegment->PipeLocation.X < 0.0) ||
@@ -543,9 +532,6 @@ namespace PlantPipingSystemsManager {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int NumCircuitsInThisDomain;
-        int CircuitCtr;
-        int NumAlphasBeforePipeCircOne;
         int CurIndex;
 
         for (int DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
@@ -802,17 +788,17 @@ namespace PlantPipingSystemsManager {
             thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(19);
 
             // Allocate the circuit placeholder arrays
-            NumCircuitsInThisDomain = int(DataIPShortCuts::rNumericArgs(20));
+            int const NumCircuitsInThisDomain = int(DataIPShortCuts::rNumericArgs(20));
 
             // Check for blank or missing or mismatched number...
-            NumAlphasBeforePipeCircOne = 10;
-            for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
+            int const NumAlphasBeforePipeCircOne = 10;
+            for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 thisDomain.CircuitNames.push_back(DataIPShortCuts::cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne));
             }
 
             // Initialize ground temperature model and get pointer reference
             thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
-            
+
             // now add this instance to the main vector
             // domains.push_back(thisDomain);
         }
@@ -831,13 +817,9 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("ReadZoneCoupledDomainInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneCoupledDomainCtr;
-        int DomainCtr;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int NumSurfacesWithThisOSCM;
-        Real64 ThisArea;
 
         struct GroundDomainData
         {
@@ -872,12 +854,12 @@ namespace PlantPipingSystemsManager {
         };
 
         // initialize these counters properly so they can be incremented within the DO loop
-        DomainCtr = StartingDomainNumForZone - 1;
+        int DomainCtr = StartingDomainNumForZone - 1;
 
         // For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone
         // coupled domain. This way, the outer get input routines can handle it as though they were generalized routines
 
-        for (ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr) {
+        for (int ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr) {
 
             // Increment the domain counters here
             ++DomainCtr;
@@ -896,7 +878,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-            
+
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -917,7 +899,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
 
             auto & thisDomain = domains[DomainCtr-1];
-            
+
             // Set flag for slab in-grade or slab on-grade
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
@@ -1067,7 +1049,7 @@ namespace PlantPipingSystemsManager {
                                                       ErrorsFound);
                 ErrorsFound = true;
             } else {
-                NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
+                int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
                 if (NumSurfacesWithThisOSCM <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
                         RoutineName,
@@ -1085,7 +1067,7 @@ namespace PlantPipingSystemsManager {
 
             // Total surface area
             auto lambda = [](Real64 total, ZoneCoupledSurfaceData const & z){return total + z.SurfaceArea;};
-            ThisArea = std::accumulate(thisDomain.ZoneCoupledSurfaces.begin(), thisDomain.ZoneCoupledSurfaces.end(), 0.0, lambda);
+            Real64 const ThisArea = std::accumulate(thisDomain.ZoneCoupledSurfaces.begin(), thisDomain.ZoneCoupledSurfaces.end(), 0.0, lambda);
 
             thisDomain.SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
 
@@ -1157,7 +1139,7 @@ namespace PlantPipingSystemsManager {
 
             // setup output variables
             thisDomain.SetupZoneCoupledOutputVariables();
-            
+
             // add it to the main vector
             // domains.push_back(thisDomain);
         }
@@ -1176,13 +1158,10 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("ReadBasementInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BasementCtr;
-        int DomainNum;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
-        Real64 ThisArea;
 
         struct GroundDomainData
         {
@@ -1206,12 +1185,12 @@ namespace PlantPipingSystemsManager {
         };
 
         // initialize these counters properly so they can be incremented within the DO loop
-        DomainNum = StartingDomainNumForBasement - 1;
+        int DomainNum = StartingDomainNumForBasement - 1;
 
         // For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone
         // coupled domain. This way, the outer get input routines can handle it as though they were generalized routines
 
-        for (BasementCtr = 1; BasementCtr <= NumBasements; ++BasementCtr) {
+        for (int BasementCtr = 1; BasementCtr <= NumBasements; ++BasementCtr) {
 
             // Increment the domain counters here
             ++DomainNum;
@@ -1230,7 +1209,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-            
+
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -1244,7 +1223,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
 
             auto & thisDomain = domains[DomainNum-1];
-            
+
             // Other inputs
             thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
@@ -1467,7 +1446,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.PerimeterOffset = gdd.PerimeterOffset;
 
             // Total surface area
-            ThisArea = 0.0;
+            Real64 ThisArea = 0.0;
 
             for (auto & z : thisDomain.ZoneCoupledSurfaces) {
                 ThisArea += z.SurfaceArea;
@@ -1530,16 +1509,12 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("ReadPipeCircuitInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumPipeSegments;
         int NumAlphas;
         int NumNumbers;
         int IOStatus;
-        int PipeCircuitCounter;
-        int ThisCircuitPipeSegmentCounter;
         int CurIndex;
-        int NumAlphasBeforeSegmentOne;
 
-        for (PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
+        for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
             // Read all the inputs for this pipe circuit
             inputProcessor->getObjectItem(ObjName_Circuit,
@@ -1555,7 +1530,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             auto & thisCircuit = circuits[PipeCircuitCounter-1];
-            
+
             // Get the name, validate
             thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
             thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
@@ -1612,12 +1587,12 @@ namespace PlantPipingSystemsManager {
             thisCircuit.RadialMeshThickness = DataIPShortCuts::rNumericArgs(10);
 
             // Read number of pipe segments for this circuit, allocate arrays
-            NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(11));
+            int const NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(11));
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> segmentNamesToFind;
-            NumAlphasBeforeSegmentOne = 3;
-            for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
+            int const NumAlphasBeforeSegmentOne = 3;
+            for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                 if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
                     IssueSevereInputFieldErrorStringEntry(RoutineName,
@@ -1670,7 +1645,6 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("ReadPipeSegmentInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SegmentCtr;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
@@ -1678,7 +1652,7 @@ namespace PlantPipingSystemsManager {
 
         // Read in all pipe segments
         int NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(ObjName_Segment);
-        for (SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
+        for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
             // Read all inputs for this pipe segment
             inputProcessor->getObjectItem(ObjName_Segment,
@@ -1694,7 +1668,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             Segment thisSegment;
-            
+
             // Get the name, validate
             thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -1742,15 +1716,10 @@ namespace PlantPipingSystemsManager {
         static std::string const RoutineName("ReadHorizontalTrenchInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HorizontalGHXCtr;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
-        int DomainCtr;
-        int CircuitCtr;
-        int NumPipeSegments;
-        int ThisCircuitPipeSegmentCounter;
 
         struct HorizontalTrenchData
         {
@@ -1787,8 +1756,8 @@ namespace PlantPipingSystemsManager {
         };
 
         // initialize these counters properly so they can be incremented within the DO loop
-        DomainCtr = StartingDomainNumForHorizontal - 1;
-        CircuitCtr = StartingCircuitNumForHorizontal - 1;
+        int DomainCtr = StartingDomainNumForHorizontal - 1;
+        int CircuitCtr = StartingCircuitNumForHorizontal - 1;
 
         // For each horizontal, we need to process the inputs into a local array of derived type,
         //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
@@ -1797,7 +1766,7 @@ namespace PlantPipingSystemsManager {
         int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
 
         // Read in all pipe segments
-        for (HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
+        for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
 
             // Increment the domain and circuit counters here
             ++DomainCtr;
@@ -1817,7 +1786,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             HorizontalTrenchData htd;
-            
+
             // Get the name, validate
             htd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -1953,10 +1922,10 @@ namespace PlantPipingSystemsManager {
             thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
 
             // Read number of pipe segments for this circuit, allocate arrays
-            NumPipeSegments = htd.NumPipes;
+            int const NumPipeSegments = htd.NumPipes;
 
             //******* Then we'll do the segments *******!
-            for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
+            for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 Segment segment;
                 segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" + std::to_string(ThisCircuitPipeSegmentCounter);
                 segment.IsActuallyPartOfAHorizontalTrench = true;
