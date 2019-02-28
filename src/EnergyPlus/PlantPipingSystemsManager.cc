@@ -4518,9 +4518,11 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 Beta = 0.0;
+        Real64 NeighborTemp = 0.0;
+        Real64 HeatFlux;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
-        Real64 NeighborTemp = 0.0;
         Real64 Resistance = 0.0;
         Real64 AdiabaticMultiplier = 1.0;
 
@@ -4534,10 +4536,10 @@ namespace PlantPipingSystemsManager {
                 // we will only have heat flux from the basement wall and heat conduction to the +x cell
 
                 // This is actually only a half-cell since the basement wall slices right through the middle in one direction
-                Real64 const Beta = cell.Beta / 2.0;
+                Beta = cell.Beta / 2.0;
 
                 // get the average basement wall heat flux and add it to the tally
-                Real64 const HeatFlux = this->GetBasementWallHeatFlux();
+                HeatFlux = this->GetBasementWallHeatFlux();
                 Numerator += Beta * HeatFlux * cell.height();
 
                 // then get the +x conduction to continue the heat balance
@@ -4552,10 +4554,10 @@ namespace PlantPipingSystemsManager {
                 // we will only have heat flux from the basement floor and heat conduction to the lower cell
 
                 // This is actually only a half-cell since the basement wall slices right through the middle in one direction
-                Real64 const Beta = cell.Beta / 2.0;
+                Beta = cell.Beta / 2.0;
 
                 // get the average basement floor heat flux and add it to the tally
-                Real64 const HeatFlux = this->GetBasementFloorHeatFlux();
+                HeatFlux = this->GetBasementFloorHeatFlux();
                 Numerator += Beta * HeatFlux * cell.width();
 
                 // then get the -y conduction to continue the heat balance
@@ -4568,7 +4570,7 @@ namespace PlantPipingSystemsManager {
             case CellType::BasementCorner:
 
                 // This is actually only a three-quarter-cell since the basement wall slices right through the middle in both directions
-                Real64 const Beta = cell.Beta * 3.0 / 4.0;
+                Beta = cell.Beta * 3.0 / 4.0;
 
                 // we will only have heat conduction to the +x and -y cells
                 this->EvaluateNeighborCharacteristics(cell, Direction::PositiveX, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -4616,10 +4618,8 @@ namespace PlantPipingSystemsManager {
         // Do all neighbor cells
         for (int DirectionCounter = 0; DirectionCounter <= NumFieldCells; ++DirectionCounter) {
             Direction CurDirection = this->NeighborFieldCells[DirectionCounter];
-
             Real64 NeighborTemp = 0.0;
             this->EvaluateNeighborCharacteristics(cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
-
             Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
             Denominator += AdiabaticMultiplier * (Beta / Resistance);
         }
@@ -4627,16 +4627,8 @@ namespace PlantPipingSystemsManager {
         // Then all farfield boundaries
         for (int DirectionCounter = 0; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
             Direction CurDirection = this->NeighborBoundaryCells[DirectionCounter];
-
             Real64 NeighborTemp = 0.0;
             this->EvaluateFarfieldCharacteristics(cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
-
-            // if ( domains( DomainNum ).HasZoneCoupledSlab || domains( DomainNum ).HasZoneCoupledBasement ) {
-            // if ( CurDirection == Direction::PositiveX || CurDirection == Direction::PositiveZ ) {
-            // AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at xMax, Ymin, zMax
-            //}
-            //}
-
             Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
             Denominator += AdiabaticMultiplier * (Beta / Resistance);
         }
@@ -4665,10 +4657,6 @@ namespace PlantPipingSystemsManager {
         // add effect from previous time step
         Numerator += cell.Temperature_PrevTimeStep;
         ++Denominator;
-
-        // catch invalid types
-        assert(std::set<CellType>({CellType::BasementWall, CellType::BasementFloor, CellType::ZoneGroundInterface, CellType::BasementCorner})
-                   .count(cell.cellType) != 0);
 
         if (cell.cellType == CellType::BasementWall) {
             // Get the average basement wall heat flux and add it to the tally
@@ -5143,10 +5131,8 @@ namespace PlantPipingSystemsManager {
         static std::vector<Direction> const Directions = {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Resistance;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
-        Real64 Beta = cell.Beta;
 
         //'add effects from this cell history
         Numerator += cell.Temperature_PrevTimeStep;
@@ -5157,17 +5143,17 @@ namespace PlantPipingSystemsManager {
         Real64 OutermostRadialCellOuterRadius = outerRadialCell.OuterRadius;
         Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
         Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
-        Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) / (2.0 * DataGlobals::Pi * cell.depth() * cell.Properties.Conductivity);
-        Numerator += (Beta / Resistance) * OutermostRadialCellTemperature;
-        Denominator += (Beta / Resistance);
+        Real64 Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) / (2.0 * DataGlobals::Pi * cell.depth() * cell.Properties.Conductivity);
+        Numerator += (cell.Beta / Resistance) * OutermostRadialCellTemperature;
+        Denominator += (cell.Beta / Resistance);
 
         //'add effects from neighboring Cartesian cells
         for (auto & curDirection : Directions) {
             Real64 AdiabaticMultiplier = 1.0;
             Real64 NeighborTemp = 0.0;
             this->EvaluateNeighborCharacteristics(cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
-            Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
-            Denominator += AdiabaticMultiplier * (Beta / Resistance);
+            Numerator += AdiabaticMultiplier * (cell.Beta / Resistance) * NeighborTemp;
+            Denominator += AdiabaticMultiplier * (cell.Beta / Resistance);
         }
 
         //'calculate the new temperature
@@ -5187,12 +5173,10 @@ namespace PlantPipingSystemsManager {
         Real64 NextOuterRadialCellOuterRadius;
         Real64 NextOuterRadialCellRadialCentroid;
         Real64 NextOuterRadialCellConductivity;
-        Real64 NextOuterRadialCellInnerRadius;
         Real64 NextOuterRadialCellTemperature;
 
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
-        Real64 Resistance = 0.0;
 
         //'convenience variables
         int const numSoilCells = static_cast<int>(cell.PipeCellData.Soil.size());
@@ -5207,13 +5191,11 @@ namespace PlantPipingSystemsManager {
                 NextOuterRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
                 NextOuterRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                 NextOuterRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
-                NextOuterRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
                 NextOuterRadialCellTemperature = cell.PipeCellData.Insulation.Temperature;
             } else {
                 NextOuterRadialCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
                 NextOuterRadialCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
                 NextOuterRadialCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
-                NextOuterRadialCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
                 NextOuterRadialCellTemperature = cell.PipeCellData.Pipe.Temperature;
             }
         } else {
@@ -5221,7 +5203,6 @@ namespace PlantPipingSystemsManager {
             NextOuterRadialCellOuterRadius = nextOuterMostSoilCell.OuterRadius;
             NextOuterRadialCellRadialCentroid = nextOuterMostSoilCell.RadialCentroid;
             NextOuterRadialCellConductivity = nextOuterMostSoilCell.Properties.Conductivity;
-            NextOuterRadialCellInnerRadius = nextOuterMostSoilCell.InnerRadius;
             NextOuterRadialCellTemperature = nextOuterMostSoilCell.Temperature;
         }
 
@@ -5233,7 +5214,7 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from interface cell
-        Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity);
+        Real64 Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity);
         Numerator += (Beta / Resistance) * cell.Temperature;
         Denominator += (Beta / Resistance);
 
@@ -5282,9 +5263,6 @@ namespace PlantPipingSystemsManager {
             Real64 OuterRadialCellInnerRadius = plusSoilCell.InnerRadius;
             Real64 OuterRadialCellTemperature = plusSoilCell.Temperature;
 
-            //'any broadly defined variables
-            Real64 Beta = thisSoilCell.Beta;
-
             //'add effects from this cell history
             Numerator += ThisRadialCellTemperature_PrevTimeStep;
             ++Denominator;
@@ -5293,15 +5271,15 @@ namespace PlantPipingSystemsManager {
             Real64 Resistance =
                 (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * OuterRadialCellConductivity)) +
                 (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
-            Numerator += (Beta / Resistance) * OuterRadialCellTemperature;
-            Denominator += (Beta / Resistance);
+            Numerator += (thisSoilCell.Beta / Resistance) * OuterRadialCellTemperature;
+            Denominator += (thisSoilCell.Beta / Resistance);
 
             //'add effects from inner cell
             Resistance =
                 (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
                 (std::log(InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * InnerRadialCellConductivity));
-            Numerator += (Beta / Resistance) * InnerRadialCellTemperature;
-            Denominator += (Beta / Resistance);
+            Numerator += (thisSoilCell.Beta / Resistance) * InnerRadialCellTemperature;
+            Denominator += (thisSoilCell.Beta / Resistance);
 
             //'calculate the new temperature
             thisSoilCell.Temperature = Numerator / Denominator;
@@ -5322,7 +5300,6 @@ namespace PlantPipingSystemsManager {
         Real64 InnerNeighborRadialCellOuterRadius;
         Real64 InnerNeighborRadialCellRadialCentroid;
         Real64 InnerNeighborRadialCellConductivity;
-        Real64 InnerNeighborRadialCellInnerRadius;
         Real64 InnerNeighborRadialCellTemperature;
 
         Real64 Numerator = 0.0;
@@ -5333,13 +5310,11 @@ namespace PlantPipingSystemsManager {
             InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
             InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
             InnerNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
-            InnerNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
             InnerNeighborRadialCellTemperature = cell.PipeCellData.Insulation.Temperature;
         } else {
             InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
             InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
             InnerNeighborRadialCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
-            InnerNeighborRadialCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
             InnerNeighborRadialCellTemperature = cell.PipeCellData.Pipe.Temperature;
         }
 
@@ -5356,9 +5331,6 @@ namespace PlantPipingSystemsManager {
         Real64 OuterNeighborRadialCellInnerRadius = soilOne.InnerRadius;
         Real64 OuterNeighborRadialCellTemperature = soilOne.Temperature;
 
-        //'any broadly defined variables
-        Real64 Beta = soilZero.Beta;
-
         //'add effects from this cell history
         Numerator += ThisRadialCellTemperature_PrevTimeStep;
         ++Denominator;
@@ -5367,15 +5339,15 @@ namespace PlantPipingSystemsManager {
         Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
                       (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
                      (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
-        Numerator += (Beta / Resistance) * OuterNeighborRadialCellTemperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (soilZero.Beta / Resistance) * OuterNeighborRadialCellTemperature;
+        Denominator += (soilZero.Beta / Resistance);
 
         //'add effects from pipe cell
         Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
                      (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
                       (2 * DataGlobals::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
-        Numerator += (Beta / Resistance) * InnerNeighborRadialCellTemperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (soilZero.Beta / Resistance) * InnerNeighborRadialCellTemperature;
+        Denominator += (soilZero.Beta / Resistance);
 
         //'calculate the new temperature
         soilZero.Temperature = Numerator / Denominator;
@@ -5391,7 +5363,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Resistance;
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
 
@@ -5400,27 +5371,24 @@ namespace PlantPipingSystemsManager {
         auto const &ThisInsulationCell = cell.PipeCellData.Insulation;
         auto const &NextInnerRadialCell = cell.PipeCellData.Soil[0];
 
-        //'any broadly defined variables
-        Real64 Beta = ThisInsulationCell.Beta;
-
         //'add effects from this cell history
         Numerator += ThisInsulationCell.Temperature_PrevTimeStep;
         ++Denominator;
 
         //'add effects from outer radial cell
-        Resistance = (std::log(NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius) /
+        Real64 Resistance = (std::log(NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius) /
                       (2 * DataGlobals::Pi * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
                      (std::log(ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid) /
                       (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity));
-        Numerator += (Beta / Resistance) * NextInnerRadialCell.Temperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (ThisInsulationCell.Beta / Resistance) * NextInnerRadialCell.Temperature;
+        Denominator += (ThisInsulationCell.Beta / Resistance);
 
         //'add effects from pipe cell
         Resistance = (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
                       (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
                      (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * PipeCell.Properties.Conductivity));
-        Numerator += (Beta / Resistance) * PipeCell.Temperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (ThisInsulationCell.Beta / Resistance) * PipeCell.Temperature;
+        Denominator += (ThisInsulationCell.Beta / Resistance);
 
         //'calculate the new temperature
         cell.PipeCellData.Insulation.Temperature = Numerator / Denominator;
@@ -5443,7 +5411,6 @@ namespace PlantPipingSystemsManager {
 
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
-        Real64 Resistance;
 
         //'convenience variables
         if (circuits[CircuitNum].HasInsulation) {
@@ -5459,35 +5426,32 @@ namespace PlantPipingSystemsManager {
             OuterNeighborRadialCellTemperature = soilZero.Temperature;
         }
 
-        Real64 ThisPipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
-        Real64 ThisPipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
-        Real64 ThisPipeCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
-        Real64 ThisPipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
-        Real64 ThisPipeCellTemperature_PrevTimeStep = cell.PipeCellData.Pipe.Temperature_PrevTimeStep;
+        Real64 const ThisPipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+        Real64 const ThisPipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+        Real64 const ThisPipeCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
+        Real64 const ThisPipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+        Real64 const ThisPipeCellTemperature_PrevTimeStep = cell.PipeCellData.Pipe.Temperature_PrevTimeStep;
 
-        Real64 FluidCellTemperature = cell.PipeCellData.Fluid.Temperature;
-
-        //'any broadly defined variables
-        Real64 Beta = cell.PipeCellData.Pipe.Beta;
+        Real64 const FluidCellTemperature = cell.PipeCellData.Fluid.Temperature;
 
         //'add effects from this cell history
         Numerator += ThisPipeCellTemperature_PrevTimeStep;
         ++Denominator;
 
         //'add effects from outer radial cell
-        Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
+        Real64 Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
                       (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
                      (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) / (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity));
-        Numerator += (Beta / Resistance) * OuterNeighborRadialCellTemperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * OuterNeighborRadialCellTemperature;
+        Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
 
         //'add effects from water cell
         Real64 PipeConductionResistance =
             std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity);
         Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * ThisPipeCellInnerRadius * cell.depth());
         Resistance = PipeConductionResistance + ConvectiveResistance;
-        Numerator += (Beta / Resistance) * FluidCellTemperature;
-        Denominator += (Beta / Resistance);
+        Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * FluidCellTemperature;
+        Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
 
         //'calculate new temperature
         cell.PipeCellData.Pipe.Temperature = Numerator / Denominator;
@@ -5507,15 +5471,13 @@ namespace PlantPipingSystemsManager {
         Real64 Denominator = 0.0;
 
         //'convenience variables
-        Real64 FluidCellTemperature_PrevTimeStep = cell.PipeCellData.Fluid.Temperature_PrevTimeStep;
-        Real64 FluidCellSpecificHeat = cell.PipeCellData.Fluid.Properties.SpecificHeat;
+        Real64 const FluidCellTemperature_PrevTimeStep = cell.PipeCellData.Fluid.Temperature_PrevTimeStep;
+        Real64 const FluidCellSpecificHeat = cell.PipeCellData.Fluid.Properties.SpecificHeat;
 
-        Real64 PipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
-        Real64 PipeCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
-        Real64 PipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
-        Real64 PipeCellTemperature = cell.PipeCellData.Pipe.Temperature;
-
-        Real64 Beta = cell.PipeCellData.Fluid.Beta;
+        Real64 const PipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+        Real64 const PipeCellConductivity = cell.PipeCellData.Pipe.Properties.Conductivity;
+        Real64 const PipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+        Real64 const PipeCellTemperature = cell.PipeCellData.Pipe.Temperature;
 
         //'add effects from this cell history
         Numerator += FluidCellTemperature_PrevTimeStep;
@@ -5525,14 +5487,14 @@ namespace PlantPipingSystemsManager {
         Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) / (2 * DataGlobals::Pi * cell.depth() * PipeCellConductivity);
         Real64 ConvectiveResistance = 1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * PipeCellInnerRadius * cell.depth());
         Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
-        Numerator += (Beta / TotalPipeResistance) * PipeCellTemperature;
-        Denominator += (Beta / TotalPipeResistance);
+        Numerator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance) * PipeCellTemperature;
+        Denominator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance);
 
         //'add effects from upstream flow
         if (FlowRate > 0.0) {
             Real64 UpstreamResistance = 1 / (FlowRate * FluidCellSpecificHeat);
-            Numerator += (Beta / UpstreamResistance) * EnteringFluidTemp;
-            Denominator += (Beta / UpstreamResistance);
+            Numerator += (cell.PipeCellData.Fluid.Beta / UpstreamResistance) * EnteringFluidTemp;
+            Denominator += (cell.PipeCellData.Fluid.Beta / UpstreamResistance);
         }
 
         //'calculate new temperature
@@ -5549,11 +5511,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         //'initialize cell properties
-        auto &cells(this->Cells);
         for (int X = 0, X_end = this->x_max_index; X <= X_end; ++X) {
             for (int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y) {
                 for (int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z) {
-                    auto &cell(cells(X, Y, Z));
+                    auto &cell(this->Cells(X, Y, Z));
                     switch (cell.cellType) {
                     case CellType::Pipe:
                         cell.Properties = this->GroundProperties;
@@ -5610,7 +5571,7 @@ namespace PlantPipingSystemsManager {
         for (int X = 0, X_end = this->x_max_index; X <= X_end; ++X) {
             for (int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y) {
                 for (int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z) {
-                    auto &cell(cells(X, Y, Z));
+                    auto &cell(this->Cells(X, Y, Z));
                     int NumFieldCells = 0, NumBoundaryCells = 0;
                     this->EvaluateCellNeighborDirections(cell, NumFieldCells, NumBoundaryCells);
                     for (int DirectionCtr = 0; DirectionCtr <= NumFieldCells; ++DirectionCtr) {
@@ -5631,7 +5592,7 @@ namespace PlantPipingSystemsManager {
         for (int X = 0, X_end = this->x_max_index; X <= X_end; ++X) {
             for (int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y) {
                 for (int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z) {
-                    auto &cell(cells(X, Y, Z));
+                    auto &cell(this->Cells(X, Y, Z));
 
                     // On OneTimeInit, the cur sim time should be zero, so this will be OK
                     Real64 ThisCellTemp = this->GetFarfieldTemp(cell);
