@@ -3175,7 +3175,6 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         int cellCountUpToNow = 0;
-        int regionIndex = 0;
         std::vector<Real64> tempCellWidths;
 
         if (PartitionsExist) {
@@ -3192,7 +3191,6 @@ namespace PlantPipingSystemsManager {
                     } else {
                         cellCountUpToNow += potentialCellWidthsCount;
                     }
-                    ++regionIndex;
                     this->getCellWidths(tempRegion, tempRegion.thisRegionType);
                     Regions.push_back(tempRegion);
                 } else if (i == 1 && this->HasZoneCoupledBasement) {
@@ -3212,7 +3210,6 @@ namespace PlantPipingSystemsManager {
                     } else {
                         cellCountUpToNow += potentialCellWidthsCount;
                     }
-                    ++regionIndex;
                     this->getCellWidths(tempRegion, tempRegion.thisRegionType);
                     Regions.push_back(tempRegion);
                 }
@@ -3252,8 +3249,6 @@ namespace PlantPipingSystemsManager {
 
                 // Create region for this partition
                 auto tempRegion(GridRegion(thisPartition.Min, thisPartition.Max, thisPartition.thisRegionType, tempCellWidths));
-                //++cellCountUpToNow;
-                ++regionIndex;
                 this->getCellWidths(tempRegion, tempRegion.thisRegionType);
                 Regions.push_back(tempRegion);
             }
@@ -3861,12 +3856,11 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   Summer 2011
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-        NeighborInformation newItem;
-        newItem.direction = direction;
-        newItem.ThisCentroidToNeighborWall = ThisCentroidToNeighborWall;
-        newItem.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
-        newItem.adiabaticMultiplier = ThisAdiabaticMultiplier;
-        this->Cells(X, Y, Z).NeighborInfo[direction] = newItem;
+        auto & thisNeighborInfo = this->Cells(X, Y, Z).NeighborInfo[direction];
+        thisNeighborInfo.direction = direction;
+        thisNeighborInfo.ThisCentroidToNeighborWall = ThisCentroidToNeighborWall;
+        thisNeighborInfo.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
+        thisNeighborInfo.adiabaticMultiplier = ThisAdiabaticMultiplier;
     }
 
     void Domain::setupPipeCircuitInOutCells()
@@ -3878,22 +3872,21 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SegmentInletCellX;
-        int SegmentInletCellY;
-        int SegmentInletCellZ;
-        int SegmentOutletCellX;
-        int SegmentOutletCellY;
-        int SegmentOutletCellZ;
-        int CircuitInletCellX;
-        int CircuitInletCellY;
-        int CircuitInletCellZ;
-        int CircuitOutletCellX;
-        int CircuitOutletCellY;
-        int CircuitOutletCellZ;
-
         auto const &cells(this->Cells);
         for (auto & CircuitIndex : this->CircuitIndices) {
+
+            int SegmentInletCellX = 0;
+            int SegmentInletCellY = 0;
+            int SegmentInletCellZ = 0;
+            int SegmentOutletCellX = 0;
+            int SegmentOutletCellY = 0;
+            int SegmentOutletCellZ = 0;
+            int CircuitInletCellX = 0;
+            int CircuitInletCellY = 0;
+            int CircuitInletCellZ = 0;
+            int CircuitOutletCellX = 0;
+            int CircuitOutletCellY = 0;
+            int CircuitOutletCellZ = 0;
 
             bool CircuitInletCellSet = false;
 
@@ -3951,9 +3944,6 @@ namespace PlantPipingSystemsManager {
         } else {
             return 1; // it's either a mesh region (X,Y,ZDirection), or it is some form of partition -- so 1
         }
-
-        assert(false);
-
         return 0;
     }
 
@@ -4201,7 +4191,6 @@ namespace PlantPipingSystemsManager {
         Real64 Numerator = 0.0;
         Real64 Denominator = 0.0;
         Real64 AdiabaticMultiplier = 1.0;
-        Real64 Beta = cell.Beta;
 
         // add effect from cell history
         Numerator += cell.Temperature_PrevTimeStep;
@@ -4221,8 +4210,8 @@ namespace PlantPipingSystemsManager {
             //'evaluate the transient expression terms
             this->EvaluateNeighborCharacteristics(cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
 
-            Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
-            Denominator += AdiabaticMultiplier * (Beta / Resistance);
+            Numerator += AdiabaticMultiplier * (cell.Beta / Resistance) * NeighborTemp;
+            Denominator += AdiabaticMultiplier * (cell.Beta / Resistance);
         }
 
         //'now that we have passed all directions, update the temperature
@@ -4537,26 +4526,17 @@ namespace PlantPipingSystemsManager {
         Real64 Resistance = 0.0;
         Real64 AdiabaticMultiplier = 1.0;
 
-        {
-            auto const SELECT_CASE_var(cell.cellType);
-            if ((SELECT_CASE_var == CellType::BasementWall) || (SELECT_CASE_var == CellType::BasementFloor)) {
-                // This is actually only a half-cell since the basement wall slices right through the middle in one direction
-                Beta = cell.Beta / 2.0;
-            } else if (SELECT_CASE_var == CellType::BasementCorner) {
-                // This is actually only a three-quarter-cell since the basement wall slices right through the middle in both directions
-                Beta = cell.Beta * 3.0 / 4.0;
-            }
-        }
-
         // add effect from previous time step
         Numerator += cell.Temperature_PrevTimeStep;
         ++Denominator;
-
-        {
-            auto const SELECT_CASE_var(cell.cellType);
-            if (SELECT_CASE_var == CellType::BasementWall) {
+        
+        switch (cell.cellType) {
+            case CellType::BasementWall:
 
                 // we will only have heat flux from the basement wall and heat conduction to the +x cell
+
+                // This is actually only a half-cell since the basement wall slices right through the middle in one direction
+                Beta = cell.Beta / 2.0;
 
                 // get the average basement wall heat flux and add it to the tally
                 HeatFlux = this->GetBasementWallHeatFlux();
@@ -4567,9 +4547,14 @@ namespace PlantPipingSystemsManager {
                 Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
                 Denominator += AdiabaticMultiplier * (Beta / Resistance);
 
-            } else if (SELECT_CASE_var == CellType::BasementFloor) {
+                break;
+
+            case CellType::BasementFloor:
 
                 // we will only have heat flux from the basement floor and heat conduction to the lower cell
+
+                // This is actually only a half-cell since the basement wall slices right through the middle in one direction
+                Beta = cell.Beta / 2.0;
 
                 // get the average basement floor heat flux and add it to the tally
                 HeatFlux = this->GetBasementFloorHeatFlux();
@@ -4580,7 +4565,12 @@ namespace PlantPipingSystemsManager {
                 Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
                 Denominator += AdiabaticMultiplier * (Beta / Resistance);
 
-            } else if (SELECT_CASE_var == CellType::BasementCorner) {
+                break;
+
+            case CellType::BasementCorner:
+
+                // This is actually only a three-quarter-cell since the basement wall slices right through the middle in both directions
+                Beta = cell.Beta * 3.0 / 4.0;
 
                 // we will only have heat conduction to the +x and -y cells
                 this->EvaluateNeighborCharacteristics(cell, Direction::PositiveX, NeighborTemp, Resistance, AdiabaticMultiplier);
@@ -4590,7 +4580,12 @@ namespace PlantPipingSystemsManager {
                 this->EvaluateNeighborCharacteristics(cell, Direction::NegativeY, NeighborTemp, Resistance, AdiabaticMultiplier);
                 Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
                 Denominator += AdiabaticMultiplier * (Beta / Resistance);
-            }
+
+                break;
+
+            default:
+                // other cell types are not calculated here
+                break;
         }
 
         return Numerator / Denominator;
