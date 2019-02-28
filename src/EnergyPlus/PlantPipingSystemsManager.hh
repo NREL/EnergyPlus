@@ -84,12 +84,14 @@ namespace PlantPipingSystemsManager {
         IncreasingZ,
         DecreasingZ
     };
+
     enum class MeshDistribution
     {
         Uniform,
         SymmetricGeometric,
         Geometric
     };
+
     enum class RegionType
     {
         Pipe,
@@ -108,6 +110,7 @@ namespace PlantPipingSystemsManager {
         HorizInsZSide,
         VertInsLowerEdge
     };
+
     enum class Direction
     {
         PositiveY,
@@ -117,6 +120,7 @@ namespace PlantPipingSystemsManager {
         PositiveZ,
         NegativeZ
     };
+
     enum class PartitionType
     {
         BasementWall,
@@ -133,6 +137,7 @@ namespace PlantPipingSystemsManager {
         VertInsLowerEdge,
         HorizInsZSide
     };
+
     enum class CellType
     {
         Unknown,
@@ -638,6 +643,8 @@ namespace PlantPipingSystemsManager {
         bool operator ==(std::string a) {
             return this->Name == a;
         }
+
+        static Segment *factory(std::string segmentName);
     };
 
     struct Circuit : public PlantComponent
@@ -654,8 +661,7 @@ namespace PlantPipingSystemsManager {
         Point3DInteger CircuitInletCell;
         Point3DInteger CircuitOutletCell;
         // Names and pointers to pipe segments found in this pipe circuit
-        std::vector<std::string> PipeSegmentNames;
-        std::vector<int> PipeSegmentIndices;
+        std::vector<Segment*> pipeSegments;
         // Pointer to the domain which contains this pipe circuit
         int ParentDomainIndex = 0;
         int CircuitIndex = 0;
@@ -978,8 +984,6 @@ namespace PlantPipingSystemsManager {
 
     void GetPipingSystemsAndGroundDomainsInput();
 
-    int GetNumSegmentsForHorizontalTrenches(int NumHorizontalTrenches);
-
     void ReadGeneralDomainInputs(int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
 
     void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
@@ -988,12 +992,10 @@ namespace PlantPipingSystemsManager {
 
     void ReadPipeCircuitInputs(int NumPipeCircuits, bool &ErrorsFound);
 
-    void ReadPipeSegmentInputs(int NumPipeSegmentsInInput, bool &ErrorsFound);
+    void ReadPipeSegmentInputs(bool &ErrorsFound);
 
     void ReadHorizontalTrenchInputs(int StartingDomainNumForHorizontal,
                                     int StartingCircuitNumForHorizontal,
-                                    int StartingSegmentNumForHorizontal,
-                                    int NumHorizontalTrenchesInInput,
                                     bool &ErrorsFound);
 
     void SetupPipingSystemOutputVariables();
