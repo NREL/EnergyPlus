@@ -5678,7 +5678,11 @@ namespace PlantPipingSystemsManager {
             FluidPrandtl = 3.0;
 
             // then assign these fluid properties to the current fluid property set for easy lookup as needed
-            thisCircuit.CurFluidPropertySet = ExtendedFluidProperties(FluidConductivity, FluidDensity, FluidCp, FluidViscosity, FluidPrandtl);
+            thisCircuit.CurFluidPropertySet.Conductivity = FluidConductivity;
+            thisCircuit.CurFluidPropertySet.Density = FluidDensity;
+            thisCircuit.CurFluidPropertySet.SpecificHeat = FluidCp;
+            thisCircuit.CurFluidPropertySet.Viscosity = FluidViscosity;
+            thisCircuit.CurFluidPropertySet.Prandtl = FluidPrandtl;
         }
 
         //'now update cell properties
@@ -5812,11 +5816,11 @@ namespace PlantPipingSystemsManager {
     {
 
         // These vary by domain now, so we must be careful to retrieve them every time
-        Real64 Theta_liq = this->Moisture.Theta_liq;
-        Real64 Theta_sat = this->Moisture.Theta_sat;
+        Real64 const Theta_liq = this->Moisture.Theta_liq;
+        Real64 const Theta_sat = this->Moisture.Theta_sat;
 
         // Assumption
-        Real64 Theta_ice = Theta_liq;
+        Real64 const Theta_ice = Theta_liq;
 
         //'Cp (freezing) calculations
         Real64 const rho_ice = 917.0;  //'Kg / m3
@@ -5942,10 +5946,10 @@ namespace PlantPipingSystemsManager {
         if (cell.Properties.Conductivity > 0.0) NeighborConductivity = cell.Properties.Conductivity;
 
         //'calculate normal surface area
-        Real64 ThisNormalArea = ThisCell.normalArea(CurDirection);
+        Real64 const ThisNormalArea = ThisCell.normalArea(CurDirection);
 
         //'set distance based on cell types
-        auto &TempNeighborInfo = ThisCell.NeighborInfo[CurDirection];
+        auto const &TempNeighborInfo = ThisCell.NeighborInfo[CurDirection];
         if (ThisCell.cellType == CellType::Pipe) {
             //'we need to be a bit careful with pipes, as they are full centroid to centroid in the z direction,
             //' but only centroid to wall in the x and y directions
