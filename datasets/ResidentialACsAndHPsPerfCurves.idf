@@ -28,6 +28,11 @@
 !
 !  Air Conditioner Performance Curves were taken from: Tables 9, 10, 16 and 17:
 !
+!
+!  ISSUES/CURRENT LIMITATIONS
+!  The minimum and maximum curve values have been removed for now as these were not part of Cutler et al. 2013.
+!  This issue is being discussed at: https://github.com/NREL/EnergyPlus/issues/7185
+!
 ! *******************************************************************************************
 ! *******************************************************************************************
 !               Beginning of Single Speed Air Conditioners Performance Curves
@@ -65,8 +70,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -83,8 +88,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -96,8 +101,8 @@
     -0.128705457,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -108,8 +113,8 @@
     0.154712157,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -201,8 +206,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -219,8 +224,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -232,8 +237,8 @@
     -0.172887149,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -244,8 +249,8 @@
     0.230030877,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -263,8 +268,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -281,8 +286,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -294,8 +299,8 @@
     -0.154507638,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -306,8 +311,8 @@
     0.166239001,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -382,8 +387,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -400,8 +405,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -413,8 +418,8 @@
     -0.136638137,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -425,8 +430,8 @@
     -0.004047787,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -479,8 +484,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -497,8 +502,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -510,8 +515,8 @@
     -0.168253446,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -522,8 +527,8 @@
     0.757409168,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -617,8 +622,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -635,8 +640,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -648,8 +653,8 @@
     -0.166894731,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -660,8 +665,8 @@
     0.359845728,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -679,8 +684,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -697,8 +702,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -710,8 +715,8 @@
     -0.187341356,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -722,8 +727,8 @@
     0.343377302,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -794,8 +799,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -812,8 +817,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -825,8 +830,8 @@
     -0.119754733,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -837,8 +842,8 @@
     0.584269478,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -856,8 +861,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -874,8 +879,8 @@
     50,                      !- Maximum Value of x
     0,                       !- Minimum Value of y
     50,                      !- Maximum Value of y
-    0,                       !- Minimum Curve Output
-    5,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -887,8 +892,8 @@
     -0.094701495,            !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
@@ -899,8 +904,8 @@
     0.587593517,             !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1.5,                     !- Maximum Value of x
-    0,                       !- Minimum Curve Output
-    2,                       !- Maximum Curve Output
+    <VALUE>,                 !- Minimum Curve Output ! FIXME: calculate correct value
+    <VALUE>,                 !- Maximum Curve Output ! FIXME: calculate correct value
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
