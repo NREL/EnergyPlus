@@ -1141,26 +1141,6 @@ namespace EnergyPlus {
             int IOStatus;   // Used in GetObjectItem
             int CurIndex;
 
-            struct GroundDomainData {
-                // Members
-                std::string ObjName;
-                Real64 Depth;
-                Real64 AspectRatio;
-                Real64 PerimeterOffset;
-                Real64 MinSurfTemp;
-                int MonthOfMinSurfTemp;
-                Real64 HorizInsWidth;
-                Real64 VertInsDepth;
-                std::string HorizInsMaterial;
-                std::string VertInsMaterial;
-
-                // Default Constructor
-                GroundDomainData()
-                        : Depth(0.0), AspectRatio(0.0), PerimeterOffset(0.0), MinSurfTemp(0.0), MonthOfMinSurfTemp(0),
-                          HorizInsWidth(0.0), VertInsDepth(0.0) {
-                }
-            };
-
             // initialize these counters properly so they can be incremented within the DO loop
             int DomainNum = StartingDomainNumForBasement - 1;
 
@@ -1185,22 +1165,20 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                GroundDomainData gdd;
+                auto &thisDomain = domains[DomainNum - 1];
 
                 // Get the name, validate
-                gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
+                thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
                 GlobalNames::VerifyUniqueInterObjectName(
                         GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the some of the inputs into the local type for clarity during transition
-                gdd.Depth = DataIPShortCuts::rNumericArgs(1);
-                gdd.AspectRatio = DataIPShortCuts::rNumericArgs(2);
-                gdd.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
-                gdd.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
-                gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
-
-                auto &thisDomain = domains[DomainNum - 1];
+                thisDomain.Extents.yMax = DataIPShortCuts::rNumericArgs(1);
+                Real64 const thisAspectRatio = DataIPShortCuts::rNumericArgs(2);
+                thisDomain.PerimeterOffset = DataIPShortCuts::rNumericArgs(3);
+                thisDomain.HorizInsWidth = DataIPShortCuts::rNumericArgs(10);
+                thisDomain.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
 
                 // Other inputs
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
@@ -1226,7 +1204,7 @@ namespace EnergyPlus {
                 // Basement zone depth
                 CurIndex = 11;
                 thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
-                if (thisDomain.BasementZone.Depth >= gdd.Depth ||
+                if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax ||
                     thisDomain.BasementZone.Depth <= 0.0) {
                     ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(CurIndex));
                     ShowContinueError("Found in: " + thisDomain.Name);
@@ -1339,7 +1317,6 @@ namespace EnergyPlus {
 
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
-                    gdd.HorizInsMaterial = DataIPShortCuts::cAlphaArgs(6);
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
                                                                                      DataHeatBalance::Material,
                                                                                      DataHeatBalance::TotMaterials);
@@ -1363,9 +1340,7 @@ namespace EnergyPlus {
                     if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "PERIMETER")) {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
-                        if (gdd.HorizInsWidth > 0.0) {
-                            thisDomain.HorizInsWidth = gdd.HorizInsWidth;
-                        } else {
+                        if (thisDomain.HorizInsWidth <= 0.0) {
                             ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
                             ShowContinueError("Found in: " + thisDomain.Name);
                             ErrorsFound = true;
@@ -1378,9 +1353,6 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
-
-                    // Horizontal insulation perimeter width
-                    thisDomain.HorizInsWidth = gdd.HorizInsWidth;
                 }
 
                 // set flag for vertical insulation
@@ -1398,16 +1370,11 @@ namespace EnergyPlus {
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
                     // Check if vertical insulation is in domain
-                    if (gdd.VertInsDepth >= gdd.Depth || gdd.VertInsDepth <= 0.0) {
+                    if (thisDomain.VertInsDepth >= thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(12));
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
-                    } else {
-                        // Set insulation depth
-                        thisDomain.VertInsDepth = gdd.VertInsDepth;
                     }
-
-                    gdd.VertInsMaterial = DataIPShortCuts::cAlphaArgs(10);
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
                                                                                     DataHeatBalance::Material,
                                                                                     DataHeatBalance::TotMaterials);
@@ -1445,7 +1412,7 @@ namespace EnergyPlus {
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Domain perimeter offset
-                thisDomain.PerimeterOffset = gdd.PerimeterOffset;
+
 
                 // Total surface area
                 Real64 ThisArea = 0.0;
@@ -1455,15 +1422,13 @@ namespace EnergyPlus {
                 }
 
                 // Surface dimensions
-                thisDomain.BasementZone.Width = sqrt(ThisArea / gdd.AspectRatio);
-                thisDomain.BasementZone.Length = thisDomain.BasementZone.Width * gdd.AspectRatio;
+                thisDomain.BasementZone.Width = sqrt(ThisArea / thisAspectRatio);
+                thisDomain.BasementZone.Length = thisDomain.BasementZone.Width * thisAspectRatio;
 
                 // Set ground domain dimensions
                 // get width and length from aspect ratio later
-                thisDomain.Extents.xMax = gdd.PerimeterOffset + thisDomain.BasementZone.Width / 2;
-                thisDomain.Extents.yMax = gdd.Depth;
-                thisDomain.Extents.zMax =
-                        gdd.PerimeterOffset + thisDomain.BasementZone.Length / 2;
+                thisDomain.Extents.xMax = thisDomain.PerimeterOffset + thisDomain.BasementZone.Width / 2;
+                thisDomain.Extents.zMax = thisDomain.PerimeterOffset + thisDomain.BasementZone.Length / 2;
 
                 // Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical
                 // partition thickness.
@@ -1486,9 +1451,6 @@ namespace EnergyPlus {
                 thisDomain.HasZoneCoupledSlab = false;
                 thisDomain.HasBasement = false;
                 thisDomain.HasZoneCoupledBasement = true;
-
-                // Domain name
-                thisDomain.Name = gdd.ObjName;
 
                 // setup output variables
                 thisDomain.SetupZoneCoupledOutputVariables();
