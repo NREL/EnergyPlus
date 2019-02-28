@@ -453,6 +453,19 @@ namespace EnergyPlus {
             }
         };
 
+        struct tCellExtents : MeshExtents {
+            // Members
+            Real64 Xmin;
+            Real64 Ymin;
+            Real64 Zmin;
+
+            // Member Constructor
+            tCellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
+                         Real64 const Ymin, Real64 const Zmin)
+                    : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin) {
+            }
+        };
+
         struct DistributionStructure {
             // Members
             MeshDistribution thisMeshDistribution = MeshDistribution::Uniform;

@@ -1695,32 +1695,6 @@ namespace EnergyPlus {
             int IOStatus;   // Used in GetObjectItem
             int CurIndex;
 
-            struct HorizontalTrenchData {
-                // Members
-
-                Real64 AxialLength;
-                Real64 PipeID;
-                Real64 PipeOD;
-                int NumPipes;
-                Real64 BurialDepth;
-                Real64 DesignFlowRate;
-
-                Real64 InterPipeSpacing;
-                Real64 MoistureContent;
-                Real64 SaturationMoistureContent;
-                Real64 EvapotranspirationCoeff;
-                Real64 MinSurfTemp;
-                int MonthOfMinSurfTemp;
-
-                // Default Constructor
-                HorizontalTrenchData()
-                        : AxialLength(0.0), PipeID(0.0), PipeOD(0.0), NumPipes(0), BurialDepth(0.0),
-                          DesignFlowRate(0.0), InterPipeSpacing(0.0),
-                          MoistureContent(0.0), SaturationMoistureContent(0.0), EvapotranspirationCoeff(0.0),
-                          MinSurfTemp(0.0), MonthOfMinSurfTemp(0) {
-                }
-            };
-
             // initialize these counters properly so they can be incremented within the DO loop
             int DomainCtr = StartingDomainNumForHorizontal - 1;
             int CircuitCtr = StartingCircuitNumForHorizontal - 1;
@@ -1751,8 +1725,6 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                HorizontalTrenchData htd;
-
                 auto &thisDomain = domains[DomainCtr - 1];
 
                 // Get the name, validate
@@ -1760,28 +1732,17 @@ namespace EnergyPlus {
                 UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
 
-                // Read in the rest of the inputs into the local type for clarity during transition
-                htd.DesignFlowRate = DataIPShortCuts::rNumericArgs(1);
-                htd.AxialLength = DataIPShortCuts::rNumericArgs(2);
-                htd.NumPipes = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
-                htd.InterPipeSpacing = DataIPShortCuts::rNumericArgs(4);
-                htd.PipeID = DataIPShortCuts::rNumericArgs(5);
-                htd.PipeOD = DataIPShortCuts::rNumericArgs(6);
-                htd.BurialDepth = DataIPShortCuts::rNumericArgs(7);
-
-                htd.MoistureContent = DataIPShortCuts::rNumericArgs(14);
-                htd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(15);
-                htd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(16);
-
-
+                int const NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
+                Real64 const thisInterPipeSpacing = DataIPShortCuts::rNumericArgs(4);
+                Real64 const thisBurialDepth = DataIPShortCuts::rNumericArgs(7);
 
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
                 thisDomain.IsActuallyPartOfAHorizontalTrench = true;
                 gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
-                thisDomain.Extents.xMax = (double(htd.NumPipes) + 1.0) * htd.InterPipeSpacing;
-                thisDomain.Extents.yMax = 2.0 * htd.BurialDepth;
-                thisDomain.Extents.zMax = htd.AxialLength;
+                thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
+                thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
+                thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);
 
                 // set up the mesh with some default parameters
                 thisDomain.Mesh.X.RegionMeshCount = 4;
@@ -1797,15 +1758,15 @@ namespace EnergyPlus {
                 thisDomain.GroundProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(10);
 
                 // Moisture properties
-                thisDomain.Moisture.Theta_liq = htd.MoistureContent / 100.0;
-                thisDomain.Moisture.Theta_sat = htd.SaturationMoistureContent / 100.0;
+                thisDomain.Moisture.Theta_liq = DataIPShortCuts::rNumericArgs(14) / 100.0;
+                thisDomain.Moisture.Theta_sat = DataIPShortCuts::rNumericArgs(15) / 100.0;
 
                 // Other parameters
                 thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
                 thisDomain.SimControls.MaxIterationsPerTS = 250;
 
                 // additional evapotranspiration parameter, min/max validated by IP
-                thisDomain.Moisture.GroundCoverCoefficient = htd.EvapotranspirationCoeff;
+                thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(16);
 
                 // Allocate the circuit placeholder arrays
                 thisDomain.CircuitNames.push_back(thisTrenchName);
@@ -1825,8 +1786,8 @@ namespace EnergyPlus {
                 thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(13);
 
                 // Pipe sizing
-                thisCircuit.PipeSize.InnerDia = htd.PipeID;
-                thisCircuit.PipeSize.OuterDia = htd.PipeOD;
+                thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(5);
+                thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(6);
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     // CurIndex = 5
                     // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
@@ -1834,7 +1795,7 @@ namespace EnergyPlus {
                 }
 
                 // Read design flow rate, validated positive by IP
-                thisCircuit.DesignVolumeFlowRate = htd.DesignFlowRate;
+                thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(1);
 
                 // Read inlet and outlet node names and validate them
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
@@ -1885,9 +1846,6 @@ namespace EnergyPlus {
                 thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
                                                                                 DataIPShortCuts::cAlphaArgs(5));
 
-                // Read number of pipe segments for this circuit, allocate arrays
-                int const NumPipeSegments = htd.NumPipes;
-
                 //******* Then we'll do the segments *******!
                 for (int ThisCircuitPipeSegmentCounter = 1;
                      ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
@@ -1895,8 +1853,8 @@ namespace EnergyPlus {
                     segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" +
                                    std::to_string(ThisCircuitPipeSegmentCounter);
                     segment.IsActuallyPartOfAHorizontalTrench = true;
-                    segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * htd.InterPipeSpacing,
-                                                  htd.BurialDepth);
+                    segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * thisInterPipeSpacing,
+                                                  thisBurialDepth);
 
                     if (mod(ThisCircuitPipeSegmentCounter, 2) != 0) {
                         segment.FlowDirection = SegmentFlow::IncreasingZ;
@@ -3330,19 +3288,6 @@ namespace EnergyPlus {
             int NumCutawayBasementCells = 0;
             int NumInsulationCells = 0;
             int NumGroundSurfaceCells = 0;
-
-            struct tCellExtents : MeshExtents {
-                // Members
-                Real64 Xmin;
-                Real64 Ymin;
-                Real64 Zmin;
-
-                // Member Constructor
-                tCellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
-                             Real64 const Ymin, Real64 const Zmin)
-                        : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin) {
-                }
-            };
 
             //'subtract 2 in each dimension:
             //'     one for zero based array
