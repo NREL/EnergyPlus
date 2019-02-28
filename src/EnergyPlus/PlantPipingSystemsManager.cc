@@ -1697,7 +1697,7 @@ namespace EnergyPlus {
 
             struct HorizontalTrenchData {
                 // Members
-                std::string ObjName;
+                //std::string ObjName;
                 std::string InletNodeName;
                 std::string OutletNodeName;
                 Real64 AxialLength;
@@ -1762,14 +1762,16 @@ namespace EnergyPlus {
 
                 HorizontalTrenchData htd;
 
+                auto &thisDomain = domains[DomainCtr - 1];
+
                 // Get the name, validate
-                htd.ObjName = DataIPShortCuts::cAlphaArgs(1);
+                std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
                 UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
 
                 // Read in the rest of the inputs into the local type for clarity during transition
-                htd.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
-                htd.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+                std::string inletNodeName = DataIPShortCuts::cAlphaArgs(2);
+                std::string outletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 htd.DesignFlowRate = DataIPShortCuts::rNumericArgs(1);
                 htd.AxialLength = DataIPShortCuts::rNumericArgs(2);
                 htd.NumPipes = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
@@ -1787,7 +1789,7 @@ namespace EnergyPlus {
                 htd.SaturationMoistureContent = DataIPShortCuts::rNumericArgs(15);
                 htd.EvapotranspirationCoeff = DataIPShortCuts::rNumericArgs(16);
 
-                auto &thisDomain = domains[DomainCtr - 1];
+
 
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -1826,7 +1828,7 @@ namespace EnergyPlus {
                 thisDomain.Moisture.GroundCoverCoefficient = htd.EvapotranspirationCoeff;
 
                 // Allocate the circuit placeholder arrays
-                thisDomain.CircuitNames.push_back(htd.ObjName);
+                thisDomain.CircuitNames.push_back(thisTrenchName);
 
                 // add it to the main vector
                 // domains.push_back(thisDomain);
@@ -1834,7 +1836,7 @@ namespace EnergyPlus {
                 //******* We'll next set up the circuit ********
                 auto &thisCircuit = circuits[CircuitCtr - 1];
                 thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
-                thisCircuit.Name = htd.ObjName;
+                thisCircuit.Name = thisTrenchName;
                 thisCircuit.CircuitIndex = CircuitCtr - 1;
 
                 // Read pipe thermal properties
@@ -1855,11 +1857,11 @@ namespace EnergyPlus {
                 thisCircuit.DesignVolumeFlowRate = htd.DesignFlowRate;
 
                 // Read inlet and outlet node names and validate them
-                thisCircuit.InletNodeName = htd.InletNodeName;
+                thisCircuit.InletNodeName = inletNodeName;
                 thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
-                                                                               htd.ObjName,
+                                                                               thisTrenchName,
                                                                                DataLoopNode::NodeType_Water,
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                1,
@@ -1869,11 +1871,11 @@ namespace EnergyPlus {
                     // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                     //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
-                thisCircuit.OutletNodeName = htd.OutletNodeName;
+                thisCircuit.OutletNodeName = outletNodeName;
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
-                                                                                htd.ObjName,
+                                                                                thisTrenchName,
                                                                                 DataLoopNode::NodeType_Water,
                                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                                 1,
@@ -1884,7 +1886,7 @@ namespace EnergyPlus {
                     //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
                 BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
-                                                   htd.ObjName,
+                                                   thisTrenchName,
                                                    thisCircuit.InletNodeName,
                                                    thisCircuit.OutletNodeName,
                                                    "Piping System Circuit Nodes");
