@@ -2139,6 +2139,23 @@ namespace WaterCoils {
                     DataDesOutletAirHumRat = DesCoilExitHumRat; // need to test for dry coil but inlet conditions not yet known
                 }
 
+                // calculate pre-sizing data needed for specific functions (e.g., CoolingWaterDesAirInletTempSizing needs HRin and air flow)
+                // these will be calculated again after other parameters are known
+                if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
+                    TempSize = AutoSize;                                       // coil report
+                } else {
+                    TempSize = WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
+                }
+                RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
+                DataDesInletAirHumRat = TempSize;
+                TempSize = AutoSize;
+                RequestSizing(CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
+                DataCapacityUsedForSizing = TempSize;
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
+                RequestSizing(CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                DataWaterFlowUsedForSizing = TempSize;
+                // end pre-sizing data calculations
+
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;       // do not print this sizing request since this coil does not have a design inlet air temp input field (we
                                           // should print this!)

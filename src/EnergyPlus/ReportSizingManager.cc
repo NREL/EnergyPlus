@@ -1087,6 +1087,7 @@ namespace ReportSizingManager {
                                 AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow,
                                                   ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
                                                   ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+                                // what is this IF block for? Already inside of (SizingType == CoolingAirFlowSizing).
                                 if (SizingType == CoolingAirflowSizing) {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
@@ -1908,8 +1909,8 @@ namespace ReportSizingManager {
                     } else {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).CoolDesHumRat;
                     }
-                    if (AutosizeDes > DataDesInletAirHumRat && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                        UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
+                    if (AutosizeDes > DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
+                                                                UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
                         ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
@@ -1927,8 +1928,8 @@ namespace ReportSizingManager {
                     DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
                     DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
                     if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
-                        if (AutosizeDes < DataDesInletAirHumRat && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                            UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
+                        if (AutosizeDes < DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
+                                                                    UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
                             ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
