@@ -2465,8 +2465,7 @@ namespace EnergyPlus {
             return 0;
         }
 
-        void CartesianPipeCellInformation::ctor(CartesianPipeCellInformation &c,
-                                                Real64 const GridCellWidth,
+        CartesianPipeCellInformation::CartesianPipeCellInformation(Real64 const GridCellWidth,
                                                 RadialSizing const &PipeSizes,
                                                 int const NumRadialNodes,
                                                 Real64 const CellDepth,
@@ -2492,43 +2491,43 @@ namespace EnergyPlus {
 
             //'--we will work from inside out, calculating dimensions and instantiating variables--
             //'first instantiate the water cell
-            c.Fluid = FluidCellInformation(PipeInnerRadius, CellDepth);
+            this->Fluid = FluidCellInformation(PipeInnerRadius, CellDepth);
 
             //'then the pipe cell
-            c.Pipe = RadialCellInformation((PipeOuterRadius + PipeInnerRadius) / 2.0, PipeInnerRadius, PipeOuterRadius);
+            this->Pipe = RadialCellInformation((PipeOuterRadius + PipeInnerRadius) / 2.0, PipeInnerRadius, PipeOuterRadius);
 
             //'then the insulation if we have it
             if (InsulationThickness > 0.0) {
                 InsulationInnerRadius = PipeOuterRadius;
                 InsulationOuterRadius = InsulationInnerRadius + InsulationThickness;
                 InsulationCentroid = (InsulationInnerRadius + InsulationOuterRadius) / 2.0;
-                c.Insulation = RadialCellInformation(InsulationCentroid, InsulationInnerRadius, InsulationOuterRadius);
+                this->Insulation = RadialCellInformation(InsulationCentroid, InsulationInnerRadius, InsulationOuterRadius);
             }
 
             //'determine where to start applying the radial soil cells based on whether we have insulation or not
             if (!SimHasInsulation) {
                 MinimumSoilRadius = PipeOuterRadius;
             } else {
-                MinimumSoilRadius = c.Insulation.OuterRadius;
+                MinimumSoilRadius = this->Insulation.OuterRadius;
             }
 
             //'the radial cells are distributed evenly throughout this region
-            c.RadialSliceWidth = RadialGridExtent / NumRadialNodes;
+            this->RadialSliceWidth = RadialGridExtent / NumRadialNodes;
 
             // first set Rval to the minimum soil radius plus half a slice thickness for the innermost radial node
-            Real64 Rval = MinimumSoilRadius + (c.RadialSliceWidth / 2.0);
+            Real64 Rval = MinimumSoilRadius + (this->RadialSliceWidth / 2.0);
             Real64 ThisSliceInnerRadius = MinimumSoilRadius;
-            c.Soil.emplace_back(Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + c.RadialSliceWidth);
+            this->Soil.emplace_back(Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + this->RadialSliceWidth);
 
             //'then loop through the rest and assign them, each radius is simply one more slice thickness
             for (int RadialCellCtr = 1; RadialCellCtr < NumRadialNodes; ++RadialCellCtr) {
-                Rval += c.RadialSliceWidth;
-                ThisSliceInnerRadius += c.RadialSliceWidth;
-                c.Soil.emplace_back(Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + c.RadialSliceWidth);
+                Rval += this->RadialSliceWidth;
+                ThisSliceInnerRadius += this->RadialSliceWidth;
+                this->Soil.emplace_back(Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + this->RadialSliceWidth);
             }
 
             //'also assign the interface cell surrounding the radial system
-            c.InterfaceVolume = (1.0 - (DataGlobals::Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
+            this->InterfaceVolume = (1.0 - (DataGlobals::Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
         }
 
         void Domain::developMesh() {
@@ -3568,8 +3567,7 @@ namespace EnergyPlus {
                         cell.cellType = cellType;
 
                         if (pipeCell) {
-                            CartesianPipeCellInformation::ctor(cell.PipeCellData,
-                                                               cell.X_max - cell.X_min,
+                            cell.PipeCellData = CartesianPipeCellInformation(cell.X_max - cell.X_min,
                                                                PipeSizing,
                                                                NumRadialCells,
                                                                cell.depth(),

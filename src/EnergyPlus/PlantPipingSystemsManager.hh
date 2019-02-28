@@ -247,9 +247,7 @@ namespace EnergyPlus {
             // Default Constructor
             CartesianPipeCellInformation() = default;
 
-            // Eventually this should be the real constructor
-            static void ctor(CartesianPipeCellInformation &c,
-                             Real64 GridCellWidth,
+            CartesianPipeCellInformation(Real64 GridCellWidth,
                              RadialSizing const &PipeSizes,
                              int NumRadialNodes,
                              Real64 CellDepth,
