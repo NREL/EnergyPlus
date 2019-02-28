@@ -809,7 +809,7 @@ namespace EnergyPlus {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5),
                                                                                 DataIPShortCuts::cAlphaArgs(6));
 
                 // now add this instance to the main vector
@@ -1109,7 +1109,7 @@ namespace EnergyPlus {
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
                 // Farfield model
-                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Other parameters
@@ -1408,7 +1408,7 @@ namespace EnergyPlus {
                 }
 
                 // Farfield ground temperature model
-                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Domain perimeter offset
@@ -1843,7 +1843,7 @@ namespace EnergyPlus {
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-                thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
                                                                                 DataIPShortCuts::cAlphaArgs(5));
 
                 //******* Then we'll do the segments *******!
@@ -3336,7 +3336,7 @@ namespace EnergyPlus {
                         Real64 CellZCenter = (CellZMinValue + CellZMaxValue) / 2;
 
                         //'set up an extent class for this cell
-                        tCellExtents CellExtents = tCellExtents(CellXMaxValue, CellYMaxValue, CellZMaxValue,
+                        CellExtents theseCellExtents = CellExtents(CellXMaxValue, CellYMaxValue, CellZMaxValue,
                                                                 CellXMinValue, CellYMinValue, CellZMinValue);
 
                         //'set up centroid, index, and overall size
@@ -3555,12 +3555,12 @@ namespace EnergyPlus {
                         }
 
                         //'instantiate the cell class
-                        cell.X_min = CellExtents.Xmin;
-                        cell.X_max = CellExtents.xMax;
-                        cell.Y_min = CellExtents.Ymin;
-                        cell.Y_max = CellExtents.yMax;
-                        cell.Z_min = CellExtents.Zmin;
-                        cell.Z_max = CellExtents.zMax;
+                        cell.X_min = theseCellExtents.Xmin;
+                        cell.X_max = theseCellExtents.xMax;
+                        cell.Y_min = theseCellExtents.Ymin;
+                        cell.Y_max = theseCellExtents.yMax;
+                        cell.Z_min = theseCellExtents.Zmin;
+                        cell.Z_max = theseCellExtents.zMax;
                         cell.X_index = CellIndeces.X;
                         cell.Y_index = CellIndeces.Y;
                         cell.Z_index = CellIndeces.Z;
@@ -4876,7 +4876,7 @@ namespace EnergyPlus {
 
             Real64 CurTime = this->Cur.CurSimTimeSeconds;
             Real64 z = this->Extents.yMax - cell.Centroid.Y;
-            return this->Farfield.groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
+            return this->groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
         }
 
         void Domain::PreparePipeCircuitSimulation(int const CircuitNum) {

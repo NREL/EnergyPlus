@@ -158,7 +158,7 @@ namespace EnergyPlus {
             // Default Constructor
             BaseThermalPropertySet() = default;
 
-            Real64 inline diffusivity() {
+            Real64 inline diffusivity() const {
                 return this->Conductivity / (this->Density * this->SpecificHeat);
             }
         };
@@ -453,14 +453,14 @@ namespace EnergyPlus {
             }
         };
 
-        struct tCellExtents : MeshExtents {
+        struct CellExtents : MeshExtents {
             // Members
             Real64 Xmin;
             Real64 Ymin;
             Real64 Zmin;
 
             // Member Constructor
-            tCellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
+            CellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
                          Real64 const Ymin, Real64 const Zmin)
                     : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin) {
             }
@@ -495,10 +495,6 @@ namespace EnergyPlus {
 
             // Default Constructor
             SimulationControl() = default;
-        };
-
-        struct FarfieldInfo {
-            std::shared_ptr<BaseGroundTempsModel> groundTempModel;
         };
 
         struct BasementZoneInfo {
@@ -704,7 +700,7 @@ namespace EnergyPlus {
             BaseThermalPropertySet HorizInsProperties;
             BaseThermalPropertySet VertInsProperties;
             SimulationControl SimControls;
-            FarfieldInfo Farfield;
+            std::shared_ptr<BaseGroundTempsModel> groundTempModel;
             BasementZoneInfo BasementZone;
             MoistureInfo Moisture;
             // "Internal" data structure variables

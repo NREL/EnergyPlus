@@ -82,9 +82,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     domains.resize(2);
 
-    domains[0].Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    domains[0].groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    domains[1].Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    domains[1].groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(domains[0].Farfield.groundTempModel, domains[1].Farfield.groundTempModel);
+    EXPECT_NE(domains[0].groundTempModel, domains[1].groundTempModel);
 }
