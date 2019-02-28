@@ -219,9 +219,7 @@ namespace PlantPipingSystemsManager {
             GetInputFlag = false;
         }
 
-        for (int DomainNum = 0; DomainNum < (int)domains.size(); ++DomainNum) {
-
-            auto &thisDomain(domains[DomainNum]);
+        for (auto &thisDomain : domains) {
 
             // if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
             if (thisDomain.HasAPipeCircuit) continue;
@@ -393,8 +391,7 @@ namespace PlantPipingSystemsManager {
             gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
 
             // Write eio data
-            for (int DomainNum = 0; DomainNum < (int)domains.size(); ++DomainNum) {
-                auto &thisDomain(domains[DomainNum]);
+            for (auto &thisDomain : domains) {
                 gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
                     << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells << thisDomain.NumInsulationCells;
             }
@@ -4982,32 +4979,32 @@ namespace PlantPipingSystemsManager {
         auto & thisCircuit = circuits[CircuitNum];
         
         // Setup circuit flow conditions -- convection coefficient
-        int CellX = thisCircuit.CircuitInletCell.X;
-        int CellY = thisCircuit.CircuitInletCell.Y;
-        int CellZ = thisCircuit.CircuitInletCell.Z;
+        int const CellX = thisCircuit.CircuitInletCell.X;
+        int const CellY = thisCircuit.CircuitInletCell.Y;
+        int const CellZ = thisCircuit.CircuitInletCell.Z;
 
         // Look up current fluid properties
-        Real64 Density = thisCircuit.CurFluidPropertySet.Density;
-        Real64 Viscosity = thisCircuit.CurFluidPropertySet.Viscosity;
-        Real64 Conductivity = thisCircuit.CurFluidPropertySet.Conductivity;
-        Real64 Prandtl = thisCircuit.CurFluidPropertySet.Prandtl;
+        Real64 const Density = thisCircuit.CurFluidPropertySet.Density;
+        Real64 const Viscosity = thisCircuit.CurFluidPropertySet.Viscosity;
+        Real64 const Conductivity = thisCircuit.CurFluidPropertySet.Conductivity;
+        Real64 const Prandtl = thisCircuit.CurFluidPropertySet.Prandtl;
 
         // Flow calculations
-        Real64 Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
-        Real64 Velocity = thisCircuit.CurCircuitFlowRate / (Density * Area_c);
+        Real64 const Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
+        Real64 const Velocity = thisCircuit.CurCircuitFlowRate / (Density * Area_c);
 
         // Determine convection coefficient based on flow conditions
-        Real64 ConvCoefficient = 0.0;
+        Real64 ConvCoefficient;
         if (Velocity > 0) {
             Real64 Reynolds = Density * thisCircuit.PipeSize.InnerDia * Velocity / Viscosity;
-            Real64 ExponentTerm = 0.0;
+            Real64 ExponentTerm;
             if (this->Cells(CellX, CellY, CellZ).PipeCellData.Fluid.Temperature >
                 this->Cells(CellX, CellY, CellZ).PipeCellData.Pipe.Temperature) {
                 ExponentTerm = 0.3;
             } else {
                 ExponentTerm = 0.4;
             }
-            Real64 Nusselt = 0.023 * std::pow(Reynolds, 4.0 / 5.0) * std::pow(Prandtl, ExponentTerm);
+            Real64 const Nusselt = 0.023 * std::pow(Reynolds, 4.0 / 5.0) * std::pow(Prandtl, ExponentTerm);
             ConvCoefficient = Nusselt * Conductivity / thisCircuit.PipeSize.InnerDia;
         } else {
             ConvCoefficient = StagnantFluidConvCoeff;
@@ -5027,19 +5024,19 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CircuitCrossTemp;
+        Real64 CircuitCrossTemp = 0.0;
 
         auto & thisCircuit = circuits[CircuitNum];
         
         // retrieve initial conditions from the data structure
         // these have been set either by the init routine or by the heat pump routine
-        Real64 FlowRate = thisCircuit.CurCircuitFlowRate;
-        Real64 EnteringTemp = thisCircuit.CurCircuitInletTemp;
+        Real64 const FlowRate = thisCircuit.CurCircuitFlowRate;
+        Real64 const EnteringTemp = thisCircuit.CurCircuitInletTemp;
 
         // initialize
         int SegmentCellCtr = 0;
-        int NumSegments = thisCircuit.pipeSegments.size();
-        int segmentNum = 0;
+        unsigned long const NumSegments = thisCircuit.pipeSegments.size();
+        unsigned long segmentNum = 0;
 
         //'loop across all segments (pipes) of the circuit
         auto &cells(this->Cells);
