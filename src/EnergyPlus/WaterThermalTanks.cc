@@ -8815,7 +8815,7 @@ namespace WaterThermalTanks {
                 }
                 Qloss += Qloss_node;
                 const Real64 Qneeded_node = max(-Quse_node - Qsource_node - Qloss_node - Qheat_node, 0.0);
-                const Real64 Qunmet_node = max(Qneeded_node - Qheater1 - Qheater2, 0.0); // FIXME: This is probably a bug, but done this way to match the old model.
+                const Real64 Qunmet_node = max(Qneeded_node - Qheater1 - Qheater2, 0.0);
                 Eunmet += Qunmet_node * dt;
             }
             // More bookkeeping for reporting variables
@@ -8841,8 +8841,17 @@ namespace WaterThermalTanks {
             Eheater1 += Qheater1 * dt;
             Eheater2 += Qheater2 * dt;
 
-
-
+            // Calculation for standard ratings
+            if (!Tank.FirstRecoveryDone) {
+                Real64 Qrecovery;
+                if (Tank.HeaterOn1 || Tank.HeaterOn2) {
+                    Qrecovery = (Qheater1 + Qheater1) / Tank.Efficiency + Tank.OnCycParaLoad;
+                } else {
+                    Qrecovery = Tank.OffCycParaLoad;
+                }
+                Tank.FirstRecoveryFuel += Qrecovery * dt;
+                if (SetPointRecovered) Tank.FirstRecoveryDone = true;
+            }
 
 
         } // end while TimeRemaining > 0.0
