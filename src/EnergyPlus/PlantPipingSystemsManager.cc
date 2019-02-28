@@ -798,7 +798,7 @@ namespace PlantPipingSystemsManager {
 
             // Initialize ground temperature model and get pointer reference
             thisDomain.Farfield.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
-            
+
             // now add this instance to the main vector
             // domains.push_back(thisDomain);
         }
@@ -878,7 +878,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-            
+
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -899,7 +899,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(11);
 
             auto & thisDomain = domains[DomainCtr-1];
-            
+
             // Set flag for slab in-grade or slab on-grade
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
@@ -1139,7 +1139,7 @@ namespace PlantPipingSystemsManager {
 
             // setup output variables
             thisDomain.SetupZoneCoupledOutputVariables();
-            
+
             // add it to the main vector
             // domains.push_back(thisDomain);
         }
@@ -1209,7 +1209,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             GroundDomainData gdd;
-            
+
             // Get the name, validate
             gdd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             GlobalNames::VerifyUniqueInterObjectName(
@@ -1223,7 +1223,7 @@ namespace PlantPipingSystemsManager {
             gdd.VertInsDepth = DataIPShortCuts::rNumericArgs(12);
 
             auto & thisDomain = domains[DomainNum-1];
-            
+
             // Other inputs
             thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
@@ -1530,7 +1530,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             auto & thisCircuit = circuits[PipeCircuitCounter-1];
-            
+
             // Get the name, validate
             thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
             thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
@@ -1668,7 +1668,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             Segment thisSegment;
-            
+
             // Get the name, validate
             thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -1720,7 +1720,7 @@ namespace PlantPipingSystemsManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         int CurIndex;
-        
+
         struct HorizontalTrenchData
         {
             // Members
@@ -1786,7 +1786,7 @@ namespace PlantPipingSystemsManager {
                                           DataIPShortCuts::cNumericFieldNames);
 
             HorizontalTrenchData htd;
-            
+
             // Get the name, validate
             htd.ObjName = DataIPShortCuts::cAlphaArgs(1);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -2333,11 +2333,8 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Point TempPt;
-        TempPt.X = x;
-        TempPt.Y = y;
-
-        this->PipeCellCoordinates = TempPt;
+        this->PipeCellCoordinates.X = x;
+        this->PipeCellCoordinates.Y = y;
         this->PipeCellCoordinatesSet = true;
     }
 
@@ -2372,7 +2369,6 @@ namespace PlantPipingSystemsManager {
                 }
             }
         }
-
         return (LocalMax < this->SimControls.Convergence_CurrentToPrevIteration);
     }
 
@@ -2576,8 +2572,8 @@ namespace PlantPipingSystemsManager {
         Real64 MinimumSoilRadius;
 
         //'calculate pipe radius
-        Real64 PipeOuterRadius = PipeSizes.OuterDia / 2.0;
-        Real64 PipeInnerRadius = PipeSizes.InnerDia / 2.0;
+        Real64 const PipeOuterRadius = PipeSizes.OuterDia / 2.0;
+        Real64 const PipeInnerRadius = PipeSizes.InnerDia / 2.0;
 
         //'--we will work from inside out, calculating dimensions and instantiating variables--
         //'first instantiate the water cell
@@ -3068,7 +3064,7 @@ namespace PlantPipingSystemsManager {
         for (int Index = 0; Index < (int)ThesePartitionCenters.size(); ++Index) {
             auto & thisPartitionCenter = ThesePartitionCenters[Index];
             
-            Real64 ThisCellWidthBy2 = thisPartitionCenter.TotalWidth / 2.0;
+            Real64 const ThisCellWidthBy2 = thisPartitionCenter.TotalWidth / 2.0;
             PartitionType ThisPartitionType = thisPartitionCenter.partitionType;
 
             //'use this half width to validate the region and add it to the collection
