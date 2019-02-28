@@ -151,21 +151,12 @@ namespace EnergyPlus {
 
         struct BaseThermalPropertySet {
             // Members
-            Real64 Conductivity; // W/mK
-            Real64 Density;      // kg/m3
-            Real64 SpecificHeat; // J/kgK
+            Real64 Conductivity = 0.0; // W/mK
+            Real64 Density = 0.0;      // kg/m3
+            Real64 SpecificHeat = 0.0; // J/kgK
 
             // Default Constructor
-            BaseThermalPropertySet() : Conductivity(0.0), Density(0.0), SpecificHeat(0.0) {
-            }
-
-            // Member Constructor
-            BaseThermalPropertySet(Real64 const Conductivity, // W/mK
-                                   Real64 const Density,      // kg/m3
-                                   Real64 const SpecificHeat  // J/kgK
-            )
-                    : Conductivity(Conductivity), Density(Density), SpecificHeat(SpecificHeat) {
-            }
+            BaseThermalPropertySet() = default;
 
             Real64 inline diffusivity() {
                 return this->Conductivity / (this->Density * this->SpecificHeat);
@@ -180,29 +171,18 @@ namespace EnergyPlus {
             // Default Constructor
             ExtendedFluidProperties() = default;
 
-            // Member Constructor
-            ExtendedFluidProperties(Real64 const Conductivity, // W/mK
-                                    Real64 const Density,      // kg/m3
-                                    Real64 const SpecificHeat, // J/kgK
-                                    Real64 const Viscosity,    // kg/m-s
-                                    Real64 const Prandtl       // -
-            )
-                    : BaseThermalPropertySet(Conductivity, Density, SpecificHeat), Viscosity(Viscosity),
-                      Prandtl(Prandtl) {
-            }
         };
 
         struct BaseCell {
             // Members
-            Real64 Temperature;               // C
-            Real64 Temperature_PrevIteration; // C
-            Real64 Temperature_PrevTimeStep;  // C
-            Real64 Beta;                      // K/W
+            Real64 Temperature = 0.0;               // C
+            Real64 Temperature_PrevIteration = 0.0; // C
+            Real64 Temperature_PrevTimeStep = 0.0;  // C
+            Real64 Beta = 0.0;                      // K/W
             BaseThermalPropertySet Properties;
 
             // Default Constructor
-            BaseCell() : Temperature(0.0), Temperature_PrevIteration(0.0), Temperature_PrevTimeStep(0.0), Beta(0.0) {
-            }
+            BaseCell() = default;
         };
 
         struct RadialSizing {
@@ -341,12 +321,15 @@ namespace EnergyPlus {
             // Default Constructor
             MeshPartition() = default;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
             // Member Constructor -- shows unused but it's actually implied in emplace_back calls in createPartitionCenterList
             MeshPartition(Real64 const rDimension,
                           PartitionType const partitionType, // From Enum: ParitionType
                           Real64 const TotalWidth)
                     : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth) {
             }
+#pragma clang diagnostic pop
 
             // used to allow std::find to see if a MeshPartition matches a float (rDimension) value
             bool operator==(Real64 a) {
@@ -586,7 +569,7 @@ namespace EnergyPlus {
 
             void initPipeCells(int x, int y);
 
-            bool operator==(std::string a) {
+            bool operator==(std::string const & a) {
                 return this->Name == a;
             }
 
@@ -653,7 +636,7 @@ namespace EnergyPlus {
             void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
 
-            bool operator==(std::string a) {
+            bool operator==(std::string const & a) {
                 return this->Name == a;
             }
         };

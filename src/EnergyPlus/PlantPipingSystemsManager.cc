@@ -454,17 +454,18 @@ namespace EnergyPlus {
             for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
                 // Convenience
-                int const NumCircuitsInThisDomain = static_cast<int>(domains[DomainNum].CircuitNames.size());
+                auto & thisDomain = domains[DomainNum];
+                int const NumCircuitsInThisDomain = static_cast<int>(thisDomain.CircuitNames.size());
 
                 // validate pipe domain-circuit name-to-index references
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    std::string thisCircuitName = domains[DomainNum].CircuitNames[CircuitCtr - 1];
+                    std::string thisCircuitName = thisDomain.CircuitNames[CircuitCtr - 1];
                     auto tryToFindCircuitByName = std::find(circuits.begin(), circuits.end(), thisCircuitName);
                     if (tryToFindCircuitByName == circuits.end()) {
                         // error, could not find domain-specified-circuit-name in the list of input circuits
                     } else {
                         int thisCircuitIndex = (int) std::distance(circuits.begin(), tryToFindCircuitByName);
-                        domains[DomainNum].CircuitIndices.push_back(thisCircuitIndex);
+                        thisDomain.CircuitIndices.push_back(thisCircuitIndex);
                         circuits[thisCircuitIndex].ParentDomainIndex = DomainNum;
                     }
                 }
@@ -472,22 +473,16 @@ namespace EnergyPlus {
                 // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
                 //                                INPUT WAS MEASURED FROM GROUND SURFACE
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr - 1];
-                    for (int PipeCtr = 0;
-                         PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
-                        auto &thisSegment = circuits[CircuitCtr - 1].pipeSegments[PipeCtr];
-                        thisSegment->PipeLocation.Y = domains[DomainNum].Extents.yMax - thisSegment->PipeLocation.Y;
+                    for (auto &thisSegment : circuits[CircuitCtr - 1].pipeSegments) {
+                        thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
                     } // segment loop
                 }     // circuit loop
 
                 // correct segment locations for: BASEMENT X SHIFT
-                if (domains[DomainNum].HasBasement && domains[DomainNum].BasementZone.ShiftPipesByWidth) {
+                if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
                     for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                        int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr - 1];
-                        for (int PipeCtr = 0;
-                             PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
-                            auto &thisSegment = circuits[CircuitIndex].pipeSegments[PipeCtr];
-                            thisSegment->PipeLocation.X += domains[DomainNum].BasementZone.Width;
+                        for (auto &thisSegment : circuits[CircuitCtr - 1].pipeSegments) {
+                            thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
                         } // segment loop
                     }     // circuit loop
                 }
@@ -496,19 +491,14 @@ namespace EnergyPlus {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
 
                     // retrieve the index
-                    int const CircuitIndex = domains[DomainNum].CircuitIndices[CircuitCtr - 1];
+                    int const CircuitIndex = thisDomain.CircuitIndices[CircuitCtr - 1];
 
                     // check to make sure it isn't outside the domain
-                    for (int PipeCtr = 0;
-                         PipeCtr < static_cast<int>(circuits[CircuitIndex].pipeSegments.size()); ++PipeCtr) {
-                        auto &thisSegment = circuits[CircuitIndex].pipeSegments[PipeCtr];
-                        if ((thisSegment->PipeLocation.X > domains[DomainNum].Extents.xMax) ||
-                            (thisSegment->PipeLocation.X < 0.0) ||
-                            (thisSegment->PipeLocation.Y > domains[DomainNum].Extents.yMax) ||
-                            (thisSegment->PipeLocation.Y < 0.0)) {
-                            ShowSevereError(
-                                    "PipingSystems::" + RoutineName +
-                                    ":A pipe was found to be outside of the domain extents after performing any corrections for basement or burial depth.");
+                    for (auto &thisSegment : circuits[CircuitIndex].pipeSegments) {
+                        if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
+                            (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
+                            ShowSevereError("PipingSystems::" + RoutineName +
+                                            ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                             ShowContinueError("Pipe segment name:" + thisSegment->Name);
                             ShowContinueError("Corrected pipe location: ( x,y )=( " +
                                               General::TrimSigDigits(thisSegment->PipeLocation.X, 2) + ',' +
@@ -4662,7 +4652,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // FUNCTION LOCAL VARIABLE DECLARATIONS:
-            Real64 Beta = 0.0;
+            Real64 Beta;
             Real64 NeighborTemp = 0.0;
             Real64 HeatFlux;
             Real64 Numerator = 0.0;
