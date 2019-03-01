@@ -645,6 +645,8 @@ namespace EnergyPlus {
             bool operator==(std::string const & a) {
                 return this->Name == a;
             }
+
+            static Circuit *factory(std::string circuit);
         };
 
         struct ZoneCoupledSurfaceData {
@@ -676,8 +678,7 @@ namespace EnergyPlus {
             // ID
             std::string Name;
             // Names and pointers to circuits found in this domain
-            std::vector<std::string> CircuitNames;
-            std::vector<int> CircuitIndices;
+            std::vector<Circuit *> circuits;
             int MaxIterationsPerTS;
             // Flag variables
             bool OneTimeInit;
@@ -936,7 +937,7 @@ namespace EnergyPlus {
 
         void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
 
-        void ReadPipeCircuitInputs(int NumPipeCircuits, bool &ErrorsFound);
+        void ReadPipeCircuitInputs(bool &ErrorsFound);
 
         void ReadPipeSegmentInputs(bool &ErrorsFound);
 

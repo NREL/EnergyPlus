@@ -102,6 +102,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
       ADD_CXX_DEFINITIONS("-Wno-aggressive-loop-optimizations")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+      ADD_CXX_DEFINITIONS("-Wno-vexing-parse")
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 

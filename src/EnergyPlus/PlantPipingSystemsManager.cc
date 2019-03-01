@@ -124,12 +124,14 @@ namespace EnergyPlus {
         std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
         bool GetInputFlag(true); // First time, input is "gotten"
         bool GetSegmentInputFlag(true);
+        bool GetCircuitInputFlag(true);
         bool WriteEIOFlag(true); // False after EIO is written
 #pragma clang diagnostic pop
 
         void clear_state() {
             GetInputFlag = true;
             GetSegmentInputFlag = true;
+            GetCircuitInputFlag = true;
             WriteEIOFlag = true;
             domains.clear();
             circuits.clear();
@@ -428,12 +430,10 @@ namespace EnergyPlus {
 
             // then circuits
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
-            int TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
-            circuits.resize(TotalNumCircuits);
 
             // Read in raw inputs, don't try to interpret dependencies yet
             ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
-            ReadPipeCircuitInputs(NumPipeCircuits, ErrorsFound);
+            //ReadPipeCircuitInputs(ErrorsFound);
             ReadHorizontalTrenchInputs(NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
@@ -455,46 +455,33 @@ namespace EnergyPlus {
 
                 // Convenience
                 auto & thisDomain = domains[DomainNum];
-                int const NumCircuitsInThisDomain = static_cast<int>(thisDomain.CircuitNames.size());
 
                 // validate pipe domain-circuit name-to-index references
-                for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    std::string thisCircuitName = thisDomain.CircuitNames[CircuitCtr - 1];
-                    auto tryToFindCircuitByName = std::find(circuits.begin(), circuits.end(), thisCircuitName);
-                    if (tryToFindCircuitByName == circuits.end()) {
-                        // error, could not find domain-specified-circuit-name in the list of input circuits
-                    } else {
-                        int thisCircuitIndex = (int) std::distance(circuits.begin(), tryToFindCircuitByName);
-                        thisDomain.CircuitIndices.push_back(thisCircuitIndex);
-                        circuits[thisCircuitIndex].ParentDomainIndex = DomainNum;
-                    }
+                for (auto & thisCircuit : thisDomain.circuits) {
+                    thisCircuit->ParentDomainIndex = DomainNum;
                 }
 
                 // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
                 //                                INPUT WAS MEASURED FROM GROUND SURFACE
-                for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    for (auto &thisSegment : circuits[CircuitCtr - 1].pipeSegments) {
+                for (auto & thisCircuit : thisDomain.circuits) {
+                    for (auto &thisSegment : thisCircuit->pipeSegments) {
                         thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
-                    } // segment loop
-                }     // circuit loop
+                    }
+                }
 
                 // correct segment locations for: BASEMENT X SHIFT
                 if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
-                    for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                        for (auto &thisSegment : circuits[CircuitCtr - 1].pipeSegments) {
+                    for (auto & thisCircuit : thisDomain.circuits) {
+                        for (auto &thisSegment : thisCircuit->pipeSegments) {
                             thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
-                        } // segment loop
-                    }     // circuit loop
+                        }
+                    }
                 }
 
                 // now we will have good values of pipe segment locations, we can validate them
-                for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-
-                    // retrieve the index
-                    int const CircuitIndex = thisDomain.CircuitIndices[CircuitCtr - 1];
-
+                for (auto & thisCircuit : thisDomain.circuits) {
                     // check to make sure it isn't outside the domain
-                    for (auto &thisSegment : circuits[CircuitIndex].pipeSegments) {
+                    for (auto &thisSegment : thisCircuit->pipeSegments) {
                         if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                             (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
                             ShowSevereError("PipingSystems::" + RoutineName +
@@ -505,7 +492,6 @@ namespace EnergyPlus {
                                               General::TrimSigDigits(thisSegment->PipeLocation.Y, 2) + " )");
                         }
                     } // segment loop
-
                 } // circuit loop
 
             } // domain loop
@@ -801,19 +787,34 @@ namespace EnergyPlus {
                 // Allocate the circuit placeholder arrays
                 int const NumCircuitsInThisDomain = int(DataIPShortCuts::rNumericArgs(20));
 
-                // Check for blank or missing or mismatched number...
+                // Need to store the ground temp stuff because it will get wiped out in the call to the circuit factory
+                std::string const groundTempType = DataIPShortCuts::cAlphaArgs(5);
+                std::string const groundTempName = DataIPShortCuts::cAlphaArgs(6);
+
+                // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
+                std::vector<std::string> circuitNamesToFind;
                 int const NumAlphasBeforePipeCircOne = 10;
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
-                    thisDomain.CircuitNames.push_back(
-                            DataIPShortCuts::cAlphaArgs(CircuitCtr + NumAlphasBeforePipeCircOne));
+                    CurIndex = CircuitCtr + NumAlphasBeforePipeCircOne;
+                    if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
+                        IssueSevereInputFieldError(RoutineName,
+                                                   ObjName_Segment,
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaFieldNames(CurIndex),
+                                                   DataIPShortCuts::cAlphaArgs(CurIndex),
+                                                   "Expected a pipe circuit name, check pipe circuit count input field.",
+                                                   ErrorsFound);
+                    }
+                    circuitNamesToFind.push_back(DataIPShortCuts::cAlphaArgs(CurIndex));
+                }
+                // then we can loop through and allow the factory to be called and carry on
+                for (auto &circuitNameToFind : circuitNamesToFind) {
+                    thisDomain.circuits.push_back(Circuit::factory(circuitNameToFind));
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5),
-                                                                                DataIPShortCuts::cAlphaArgs(6));
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(groundTempType, groundTempName);
 
-                // now add this instance to the main vector
-                // domains.push_back(thisDomain);
             }
         }
 
@@ -1407,16 +1408,13 @@ namespace EnergyPlus {
                     ErrorsFound = true;
                 }
 
-                // Farfield ground temperature model
+                // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
+                // so any other processing below this line won't have access to the cAlphaArgs, etc., here
                 thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
-                // Domain perimeter offset
-
-
                 // Total surface area
                 Real64 ThisArea = 0.0;
-
                 for (auto &z : thisDomain.ZoneCoupledSurfaces) {
                     ThisArea += z.SurfaceArea;
                 }
@@ -1460,7 +1458,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadPipeCircuitInputs(int const NumPipeCircuits, bool &ErrorsFound) {
+        void ReadPipeCircuitInputs(bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1477,7 +1475,14 @@ namespace EnergyPlus {
             int IOStatus;
             int CurIndex;
 
+            int OverallCircuitIndex = -1;
+
+            // get all of the actual generalized pipe circuit objects
+
+            int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
             for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
+
+                OverallCircuitIndex++;
 
                 // Read all the inputs for this pipe circuit
                 inputProcessor->getObjectItem(ObjName_Circuit,
@@ -1492,7 +1497,7 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                auto &thisCircuit = circuits[PipeCircuitCounter - 1];
+                Circuit thisCircuit = Circuit();
 
                 // Get the name, validate
                 thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
@@ -1585,7 +1590,103 @@ namespace EnergyPlus {
                     thisCircuit.pipeSegments.push_back(Segment::factory(segmentNameToFind));
                 }
 
+                circuits.push_back(thisCircuit);
+
             } // All pipe circuits in input
+
+            // now get all the pipe circuits related to horizontal trenches
+
+            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
+
+            // Read in all pipe segments
+            for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
+
+                OverallCircuitIndex++;
+
+                // Read all inputs for this pipe segment
+                inputProcessor->getObjectItem(ObjName_HorizTrench,
+                                              HorizontalGHXCtr,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              NumAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
+                                              DataIPShortCuts::cNumericFieldNames);
+                std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
+
+                Circuit thisCircuit;
+                thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
+                thisCircuit.Name = thisTrenchName;
+                thisCircuit.CircuitIndex = OverallCircuitIndex;
+
+                // Read pipe thermal properties
+                thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(11);
+                thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(12);
+                thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(13);
+
+                // Pipe sizing
+                thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(5);
+                thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(6);
+                if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
+                    // CurIndex = 5
+                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                    //                            DataIPShortCuts::cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
+                }
+
+                // Read design flow rate, validated positive by IP
+                thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(1);
+
+                // Read inlet and outlet node names and validate them
+                thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
+                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
+                                                                               ErrorsFound,
+                                                                               ObjName_HorizTrench,
+                                                                               thisTrenchName,
+                                                                               DataLoopNode::NodeType_Water,
+                                                                               DataLoopNode::NodeConnectionType_Inlet,
+                                                                               1,
+                                                                               DataLoopNode::ObjectIsNotParent);
+                if (thisCircuit.InletNodeNum == 0) {
+                    CurIndex = 2;
+                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
+                }
+                thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
+                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
+                                                                                ErrorsFound,
+                                                                                ObjName_HorizTrench,
+                                                                                thisTrenchName,
+                                                                                DataLoopNode::NodeType_Water,
+                                                                                DataLoopNode::NodeConnectionType_Outlet,
+                                                                                1,
+                                                                                DataLoopNode::ObjectIsNotParent);
+                if (thisCircuit.OutletNodeNum == 0) {
+                    CurIndex = 3;
+                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
+                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
+                }
+                BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
+                                                   thisTrenchName,
+                                                   thisCircuit.InletNodeName,
+                                                   thisCircuit.OutletNodeName,
+                                                   "Piping System Circuit Nodes");
+
+                // Convergence tolerance values, validated by IP
+                thisCircuit.Convergence_CurrentToPrevIteration = 0.001;
+                thisCircuit.MaxIterationsPerTS = 100;
+
+                // Radial mesh inputs, validated by IP
+                // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
+                thisCircuit.NumRadialCells = 4;
+                thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
+
+                // add it to the main vector, then get a reference to it here
+                circuits.push_back(thisCircuit);
+            }
+
         }
 
         Segment *Segment::factory(std::string segmentName) {
@@ -1602,7 +1703,26 @@ namespace EnergyPlus {
             }
             // If we didn't find it, fatal
             ShowFatalError(
-                    "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + segmentName); // LCOV_EXCL_LINE
+                    "PipeSegmentInfoFactory: Error getting inputs for segment named: " + segmentName); // LCOV_EXCL_LINE
+            // Shut up the compiler
+            return nullptr; // LCOV_EXCL_LINE
+        }
+
+        Circuit *Circuit::factory(std::string circuitName) {
+            if (GetCircuitInputFlag) {
+                bool errorsFound = false;
+                ReadPipeCircuitInputs(errorsFound);
+                GetCircuitInputFlag = false;
+            }
+            // Now look for this particular segment in the list
+            for (auto &circuit : circuits) {
+                if (circuit.Name == circuitName) {
+                    return &circuit;
+                }
+            }
+            // If we didn't find it, fatal
+            ShowFatalError(
+                    "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + circuitName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
         }
@@ -1768,78 +1888,9 @@ namespace EnergyPlus {
                 // additional evapotranspiration parameter, min/max validated by IP
                 thisDomain.Moisture.GroundCoverCoefficient = DataIPShortCuts::rNumericArgs(16);
 
-                // Allocate the circuit placeholder arrays
-                thisDomain.CircuitNames.push_back(thisTrenchName);
-
-                // add it to the main vector
-                // domains.push_back(thisDomain);
-
                 //******* We'll next set up the circuit ********
-                auto &thisCircuit = circuits[CircuitCtr - 1];
-                thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
-                thisCircuit.Name = thisTrenchName;
-                thisCircuit.CircuitIndex = CircuitCtr - 1;
-
-                // Read pipe thermal properties
-                thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(11);
-                thisCircuit.PipeProperties.Density = DataIPShortCuts::rNumericArgs(12);
-                thisCircuit.PipeProperties.SpecificHeat = DataIPShortCuts::rNumericArgs(13);
-
-                // Pipe sizing
-                thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(5);
-                thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(6);
-                if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                    // CurIndex = 5
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                            DataIPShortCuts::cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
-                }
-
-                // Read design flow rate, validated positive by IP
-                thisCircuit.DesignVolumeFlowRate = DataIPShortCuts::rNumericArgs(1);
-
-                // Read inlet and outlet node names and validate them
-                thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
-                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
-                                                                               ErrorsFound,
-                                                                               ObjName_HorizTrench,
-                                                                               thisTrenchName,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
-                                                                               1,
-                                                                               DataLoopNode::ObjectIsNotParent);
-                if (thisCircuit.InletNodeNum == 0) {
-                    CurIndex = 2;
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
-                }
-                thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
-                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
-                                                                                ErrorsFound,
-                                                                                ObjName_HorizTrench,
-                                                                                thisTrenchName,
-                                                                                DataLoopNode::NodeType_Water,
-                                                                                DataLoopNode::NodeConnectionType_Outlet,
-                                                                                1,
-                                                                                DataLoopNode::ObjectIsNotParent);
-                if (thisCircuit.OutletNodeNum == 0) {
-                    CurIndex = 3;
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
-                }
-                BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
-                                                   thisTrenchName,
-                                                   thisCircuit.InletNodeName,
-                                                   thisCircuit.OutletNodeName,
-                                                   "Piping System Circuit Nodes");
-
-                // Convergence tolerance values, validated by IP
-                thisCircuit.Convergence_CurrentToPrevIteration = 0.001;
-                thisCircuit.MaxIterationsPerTS = 100;
-
-                // Radial mesh inputs, validated by IP
-                // -- mesh thickness should be considered slightly dangerous until mesh dev engine can trap erroneous values
-                thisCircuit.NumRadialCells = 4;
-                thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
+                // then we can loop through and allow the factory to be called and carry on
+                thisDomain.circuits.push_back(Circuit::factory(thisTrenchName));
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
@@ -1869,7 +1920,7 @@ namespace EnergyPlus {
                 int const newSizeSegmentVector = static_cast<int>(segments.size());
                 for (int segmentIndexToGrab = newSizeSegmentVector - NumPipeSegments;
                      segmentIndexToGrab < newSizeSegmentVector; ++segmentIndexToGrab) {
-                    thisCircuit.pipeSegments.push_back(&segments[segmentIndexToGrab]);
+                    thisDomain.circuits[0]->pipeSegments.push_back(&segments[segmentIndexToGrab]);
                 }
             }
         }
@@ -2034,7 +2085,7 @@ namespace EnergyPlus {
             // SUBROUTINE PARAMETER DEFINITIONS:
             static std::string const RoutineName("InitPipingSystems");
 
-            auto &thisCircuit = circuits[CircuitNum];
+            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
 
             // Do any one-time initializations
             if (thisCircuit.NeedToFindOnPlantLoop) {
@@ -2078,8 +2129,8 @@ namespace EnergyPlus {
                 this->developMesh();
 
                 // would be OK to do some post-mesh error handling here I think
-                for (auto &circuitIndex : this->CircuitIndices) {
-                    for (auto &segment : circuits[circuitIndex].pipeSegments) {
+                for (auto &thisCircuit : this->circuits) {
+                    for (auto &segment : thisCircuit->pipeSegments) {
                         if (!segment->PipeCellCoordinatesSet) {
                             ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                             ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
@@ -2148,8 +2199,8 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            int OutletNodeNum = circuits[CircuitNum].OutletNodeNum;
-            auto const &out_cell(circuits[CircuitNum].CircuitOutletCell);
+            int OutletNodeNum = PlantPipingSystemsManager::circuits[CircuitNum].OutletNodeNum;
+            auto const &out_cell(PlantPipingSystemsManager::circuits[CircuitNum].CircuitOutletCell);
             DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
@@ -2708,21 +2759,20 @@ namespace EnergyPlus {
 
             //'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
             //'in input they are measured by depth, but internally they are referred to by distance from y = 0, or the bottom boundary
-            for (auto &CircuitIndex: this->CircuitIndices) {
-                auto &thisCircuit = circuits[CircuitIndex];
+            for (auto &thisCircuit: this->circuits) {
 
                 // set up a convenience variable here
                 //'account for the pipe and insulation if necessary
-                if (!thisCircuit.HasInsulation) {
-                    PipeCellWidth = thisCircuit.PipeSize.OuterDia;
+                if (!thisCircuit->HasInsulation) {
+                    PipeCellWidth = thisCircuit->PipeSize.OuterDia;
                 } else {
-                    PipeCellWidth = thisCircuit.InsulationSize.OuterDia;
+                    PipeCellWidth = thisCircuit->InsulationSize.OuterDia;
                 }
 
                 //'then add the radial mesh thickness on both sides of the pipe/insulation construct
-                PipeCellWidth += 2 * thisCircuit.RadialMeshThickness;
+                PipeCellWidth += 2 * thisCircuit->RadialMeshThickness;
 
-                for (auto &segment : thisCircuit.pipeSegments) {
+                for (auto &segment : thisCircuit->pipeSegments) {
                     if (std::find(this->Partitions.X.begin(), this->Partitions.X.end(), segment->PipeLocation.X) ==
                         this->Partitions.X.end()) {
                         this->Partitions.X.emplace_back(segment->PipeLocation.X, PartitionType::Pipe, PipeCellWidth);
@@ -3349,7 +3399,6 @@ namespace EnergyPlus {
                         //'if this is a pipe node, some flags are needed
                         bool pipeCell = false;
                         int NumRadialCells = -1;
-                        int CircuitIndex = -1;
 
                         // Adiabatic behavior is now achieved in the SetupCellNeighbors routine, these are simply farfield for now.
                         CellType const ZWallCellType = CellType::FarfieldBoundary;
@@ -3510,19 +3559,20 @@ namespace EnergyPlus {
                         Real64 RadialMeshThickness(0.0);
                         bool HasInsulation(false);
                         RadialSizing PipeSizing;
-                        for (auto &FoundOnCircuitIndex : this->CircuitIndices) {
-                            for (auto &segment : circuits[FoundOnCircuitIndex].pipeSegments) {
+                        Circuit * circuitReference = nullptr;
+                        for (auto &thisCircuit : this->circuits) {
+                            for (auto &segment : thisCircuit->pipeSegments) {
                                 if (XYRectangle.contains(segment->PipeLocation)) {
                                     //'inform the cell that it is a pipe node
                                     cellType = CellType::Pipe;
                                     //'inform the cell of which pipe it contains
                                     pipeCell = true;
                                     //'inform the cell of which pipe circuit contains it
-                                    CircuitIndex = FoundOnCircuitIndex;
+                                    circuitReference = thisCircuit;
                                     //'inform the pipe of what cell it is inside
                                     segment->initPipeCells(CellXIndex, CellYIndex);
                                     //'set the number of cells to be generated in this near-pipe region
-                                    NumRadialCells = circuits[FoundOnCircuitIndex].NumRadialCells;
+                                    NumRadialCells = thisCircuit->NumRadialCells;
                                     //'exit the pipe counter loop
                                     goto CircuitLoop_exit;
                                 }
@@ -3543,14 +3593,13 @@ namespace EnergyPlus {
                         }
 
                         // if we were found on a pipe circuit, get some things for convenience
-                        if (CircuitIndex != -1) {
-                            auto const &thisCircuit = circuits[CircuitIndex];
-                            if (thisCircuit.HasInsulation) {
-                                InsulationThickness = thisCircuit.InsulationSize.thickness();
+                        if (circuitReference) {
+                            if (circuitReference->HasInsulation) {
+                                InsulationThickness = circuitReference->InsulationSize.thickness();
                             }
-                            PipeSizing = thisCircuit.PipeSize;
-                            RadialMeshThickness = thisCircuit.RadialMeshThickness;
-                            HasInsulation = thisCircuit.HasInsulation;
+                            PipeSizing = circuitReference->PipeSize;
+                            RadialMeshThickness = circuitReference->RadialMeshThickness;
+                            HasInsulation = circuitReference->HasInsulation;
                         }
 
                         //'instantiate the cell class
@@ -3833,7 +3882,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             auto const &cells(this->Cells);
-            for (auto &CircuitIndex : this->CircuitIndices) {
+            for (auto &thisCircuit : this->circuits) {
 
                 int SegmentInletCellX = 0;
                 int SegmentInletCellY = 0;
@@ -3850,7 +3899,7 @@ namespace EnergyPlus {
 
                 bool CircuitInletCellSet = false;
 
-                for (auto &segment : circuits[CircuitIndex].pipeSegments) {
+                for (auto &segment : thisCircuit->pipeSegments) {
                     switch (segment->FlowDirection) {
                         case SegmentFlow::IncreasingZ:
                             SegmentInletCellX = segment->PipeCellCoordinates.X;
@@ -3880,8 +3929,7 @@ namespace EnergyPlus {
                     CircuitOutletCellZ = SegmentOutletCellZ;
                 }
 
-                circuits[CircuitIndex]
-                        .initInOutCells(cells(CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ),
+                thisCircuit->initInOutCells(cells(CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ),
                                         cells(CircuitOutletCellX, CircuitOutletCellY, CircuitOutletCellZ));
             }
         }
@@ -4888,7 +4936,7 @@ namespace EnergyPlus {
             // SUBROUTINE ARGUMENT DEFINITIONS:
             Real64 const StagnantFluidConvCoeff(200.0);
 
-            auto &thisCircuit = circuits[CircuitNum];
+            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
 
             // Setup circuit flow conditions -- convection coefficient
             int const CellX = thisCircuit.CircuitInletCell.X;
@@ -4937,7 +4985,7 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             Real64 CircuitCrossTemp = 0.0;
 
-            auto &thisCircuit = circuits[CircuitNum];
+            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
 
             // retrieve initial conditions from the data structure
             // these have been set either by the init routine or by the heat pump routine
@@ -5050,7 +5098,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            auto &thisCircuit = circuits[CircuitNum];
+            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
 
             for (int Iter = 1; Iter <= thisCircuit.MaxIterationsPerTS; ++Iter) {
 
@@ -5502,9 +5550,9 @@ namespace EnergyPlus {
                                     soilCell.Properties = this->GroundProperties;
                                 }
                                 if (CircuitNum >= 0) {
-                                    cell.PipeCellData.Pipe.Properties = circuits[CircuitNum].PipeProperties;
-                                    if (circuits[CircuitNum].HasInsulation) {
-                                        cell.PipeCellData.Insulation.Properties = circuits[CircuitNum].InsulationProperties;
+                                    cell.PipeCellData.Pipe.Properties = PlantPipingSystemsManager::circuits[CircuitNum].PipeProperties;
+                                    if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
+                                        cell.PipeCellData.Insulation.Properties = PlantPipingSystemsManager::circuits[CircuitNum].InsulationProperties;
                                     }
                                 }
                                 break;
@@ -5592,7 +5640,7 @@ namespace EnergyPlus {
                             cell.PipeCellData.Pipe.Temperature_PrevIteration = ThisCellTemp;
                             cell.PipeCellData.Pipe.Temperature_PrevTimeStep = ThisCellTemp;
                             if (CircuitNum >= 0) {
-                                if (circuits[CircuitNum].HasInsulation) {
+                                if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
                                     cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
                                     cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
                                     cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
@@ -5634,7 +5682,7 @@ namespace EnergyPlus {
 
             // If pipe circuit present
             if (CircuitNum >= 0) {
-                auto &thisCircuit = circuits[CircuitNum];
+                auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
                 // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
                 // but need to verify the value of inlet temperature during warm up, etc.
                 FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
@@ -5730,7 +5778,7 @@ namespace EnergyPlus {
                                     }
 
                                     //'then insulation if it exists
-                                    if (circuits[CircuitNum].HasInsulation) {
+                                    if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
                                         Beta = this->Cur.CurSimTimeStepSize /
                                                (cell.PipeCellData.Insulation.Properties.Density *
                                                 cell.PipeCellData.Insulation.XY_CrossSectArea() *
@@ -5746,7 +5794,7 @@ namespace EnergyPlus {
                                     cell.PipeCellData.Pipe.Beta = Beta;
 
                                     // now the fluid cell also
-                                    cell.PipeCellData.Fluid.Properties = circuits[CircuitNum].CurFluidPropertySet;
+                                    cell.PipeCellData.Fluid.Properties = PlantPipingSystemsManager::circuits[CircuitNum].CurFluidPropertySet;
                                     cell.PipeCellData.Fluid.Beta = this->Cur.CurSimTimeStepSize /
                                                                    (cell.PipeCellData.Fluid.Properties.Density *
                                                                     cell.PipeCellData.Fluid.Volume *
