@@ -184,16 +184,15 @@ namespace EnergyPlus {
                                bool const EP_UNUSED(RunFlag)) {
             // Retrieve the parent domain index for this pipe circuit
             auto &thisDomain(domains[this->ParentDomainIndex]);
-            int CircuitNum = this->CircuitIndex;
 
             // Do any initialization here
-            thisDomain.InitPipingSystems(CircuitNum);
+            thisDomain.InitPipingSystems(this);
 
             // Update the temperature field
-            thisDomain.PerformIterationLoop(CircuitNum);
+            thisDomain.PerformIterationLoop(this);
 
             // Update outlet nodes, etc.
-            thisDomain.UpdatePipingSystems(CircuitNum);
+            thisDomain.UpdatePipingSystems(this);
         }
 
         void SimulateGroundDomains(bool initOnly) {
@@ -239,7 +238,7 @@ namespace EnergyPlus {
                 if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) ||
                     (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
-                    thisDomain.DoOneTimeInitializations(-1);
+                    thisDomain.DoOneTimeInitializations(nullptr);
 
                     if (thisDomain.HasZoneCoupledSlab) {
                         int Xmax = ubound(thisDomain.Cells, 1);
@@ -389,7 +388,7 @@ namespace EnergyPlus {
                         thisDomain.ShiftTemperaturesForNewTimeStep();
                         thisDomain.DomainNeedsSimulation = true;
                     }
-                    thisDomain.PerformIterationLoop(-1);
+                    thisDomain.PerformIterationLoop();
                 }
             }
 
@@ -1475,14 +1474,10 @@ namespace EnergyPlus {
             int IOStatus;
             int CurIndex;
 
-            int OverallCircuitIndex = -1;
-
             // get all of the actual generalized pipe circuit objects
 
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
             for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
-
-                OverallCircuitIndex++;
 
                 // Read all the inputs for this pipe circuit
                 inputProcessor->getObjectItem(ObjName_Circuit,
@@ -1501,7 +1496,6 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
-                thisCircuit.CircuitIndex = PipeCircuitCounter - 1;
                 UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
 
@@ -1601,8 +1595,6 @@ namespace EnergyPlus {
             // Read in all pipe segments
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
 
-                OverallCircuitIndex++;
-
                 // Read all inputs for this pipe segment
                 inputProcessor->getObjectItem(ObjName_HorizTrench,
                                               HorizontalGHXCtr,
@@ -1620,7 +1612,6 @@ namespace EnergyPlus {
                 Circuit thisCircuit;
                 thisCircuit.IsActuallyPartOfAHorizontalTrench = true;
                 thisCircuit.Name = thisTrenchName;
-                thisCircuit.CircuitIndex = OverallCircuitIndex;
 
                 // Read pipe thermal properties
                 thisCircuit.PipeProperties.Conductivity = DataIPShortCuts::rNumericArgs(11);
@@ -1813,7 +1804,6 @@ namespace EnergyPlus {
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
             int NumNumbers; // Number of Numbers for each GetObjectItem call
             int IOStatus;   // Used in GetObjectItem
-            int CurIndex;
 
             // initialize these counters properly so they can be incremented within the DO loop
             int DomainCtr = StartingDomainNumForHorizontal - 1;
@@ -2074,7 +2064,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(int const CircuitNum) {
+        void Domain::InitPipingSystems(Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2085,25 +2075,23 @@ namespace EnergyPlus {
             // SUBROUTINE PARAMETER DEFINITIONS:
             static std::string const RoutineName("InitPipingSystems");
 
-            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
-
             // Do any one-time initializations
-            if (thisCircuit.NeedToFindOnPlantLoop) {
+            if (thisCircuit->NeedToFindOnPlantLoop) {
 
                 int TypeToLookFor;
-                if (thisCircuit.IsActuallyPartOfAHorizontalTrench) {
+                if (thisCircuit->IsActuallyPartOfAHorizontalTrench) {
                     TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
                 } else {
                     TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(thisCircuit.Name,
+                PlantUtilities::ScanPlantLoopsForObject(thisCircuit->Name,
                                                         TypeToLookFor,
-                                                        thisCircuit.LoopNum,
-                                                        thisCircuit.LoopSideNum,
-                                                        thisCircuit.BranchNum,
-                                                        thisCircuit.CompNum,
+                                                        thisCircuit->LoopNum,
+                                                        thisCircuit->LoopSideNum,
+                                                        thisCircuit->BranchNum,
+                                                        thisCircuit->CompNum,
                                                         errFlag,
                                                         _,
                                                         _,
@@ -2116,12 +2104,12 @@ namespace EnergyPlus {
                 }
 
                 // Once we find ourselves on the plant loop, we can do other things
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
+                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
-                thisCircuit.DesignMassFlowRate = thisCircuit.DesignVolumeFlowRate * rho;
-                thisCircuit.NeedToFindOnPlantLoop = false;
+                thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
+                thisCircuit->NeedToFindOnPlantLoop = false;
             }
 
             if (this->DomainNeedsToBeMeshed) {
@@ -2129,8 +2117,8 @@ namespace EnergyPlus {
                 this->developMesh();
 
                 // would be OK to do some post-mesh error handling here I think
-                for (auto &thisCircuit : this->circuits) {
-                    for (auto &segment : thisCircuit->pipeSegments) {
+                for (auto &thisDomainCircuit : this->circuits) {
+                    for (auto &segment : thisDomainCircuit->pipeSegments) {
                         if (!segment->PipeCellCoordinatesSet) {
                             ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
                             ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
@@ -2157,10 +2145,10 @@ namespace EnergyPlus {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
-                thisCircuit.CurCircuitInletTemp = DataLoopNode::Node(thisCircuit.InletNodeNum).Temp;
-                thisCircuit.InletTemperature = thisCircuit.CurCircuitInletTemp;
+                thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
+                thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
-                this->DoOneTimeInitializations(CircuitNum);
+                this->DoOneTimeInitializations(thisCircuit);
 
                 this->BeginSimInit = false;
                 this->BeginSimEnvironment = false;
@@ -2176,22 +2164,22 @@ namespace EnergyPlus {
             }
 
             // Get the mass flow and inlet temperature to use for this time step
-            int InletNodeNum = thisCircuit.InletNodeNum;
-            int OutletNodeNum = thisCircuit.OutletNodeNum;
-            thisCircuit.CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+            int InletNodeNum = thisCircuit->InletNodeNum;
+            int OutletNodeNum = thisCircuit->OutletNodeNum;
+            thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
-            thisCircuit.CurCircuitFlowRate = thisCircuit.DesignMassFlowRate;
-            PlantUtilities::SetComponentFlowRate(thisCircuit.CurCircuitFlowRate,
+            thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
+            PlantUtilities::SetComponentFlowRate(thisCircuit->CurCircuitFlowRate,
                                                  InletNodeNum,
                                                  OutletNodeNum,
-                                                 thisCircuit.LoopNum,
-                                                 thisCircuit.LoopSideNum,
-                                                 thisCircuit.BranchNum,
-                                                 thisCircuit.CompNum);
+                                                 thisCircuit->LoopNum,
+                                                 thisCircuit->LoopSideNum,
+                                                 thisCircuit->BranchNum,
+                                                 thisCircuit->CompNum);
         }
 
-        void Domain::UpdatePipingSystems(int const CircuitNum) {
+        void Domain::UpdatePipingSystems(Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2199,8 +2187,8 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            int OutletNodeNum = PlantPipingSystemsManager::circuits[CircuitNum].OutletNodeNum;
-            auto const &out_cell(PlantPipingSystemsManager::circuits[CircuitNum].CircuitOutletCell);
+            int OutletNodeNum = thisCircuit->OutletNodeNum;
+            auto const &out_cell(thisCircuit->CircuitOutletCell);
             DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
@@ -2342,7 +2330,7 @@ namespace EnergyPlus {
             return (LocalMax < this->SimControls.Convergence_CurrentToPrevIteration);
         }
 
-        bool IsConverged_PipeCurrentToPrevIteration(int const CircuitNum, CartesianCell const &CellToCheck) {
+        bool IsConverged_PipeCurrentToPrevIteration(Circuit * thisCircuit, CartesianCell const &CellToCheck) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2372,7 +2360,7 @@ namespace EnergyPlus {
                 MaxDivAmount = ThisCellMax;
             }
             //'also do insulation if it exists
-            if (circuits[CircuitNum].HasInsulation) {
+            if (thisCircuit->HasInsulation) {
                 ThisCellMax = std::abs(CellToCheck.PipeCellData.Insulation.Temperature -
                                        CellToCheck.PipeCellData.Insulation.Temperature_PrevIteration);
                 if (ThisCellMax > MaxDivAmount) {
@@ -2380,7 +2368,7 @@ namespace EnergyPlus {
                 }
             }
 
-            return (MaxDivAmount < circuits[CircuitNum].Convergence_CurrentToPrevIteration);
+            return (MaxDivAmount < thisCircuit->Convergence_CurrentToPrevIteration);
         }
 
         void Domain::ShiftTemperaturesForNewTimeStep() {
@@ -4087,7 +4075,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::PerformIterationLoop(int const CircuitNum) {
+        void Domain::PerformIterationLoop() {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4096,11 +4084,42 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // Always do start of time step inits
-            this->DoStartOfTimeStepInitializations(CircuitNum);
+            this->DoStartOfTimeStepInitializations();
+
+            // Begin iterating for this time step
+            for (int IterationIndex = 1; IterationIndex <= this->SimControls.MaxIterationsPerTS; ++IterationIndex) {
+                this->ShiftTemperaturesForNewIteration();
+                if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate();
+                bool FinishedIterationLoop = false;
+                this->DoEndOfIterationOperations(FinishedIterationLoop);
+                if (FinishedIterationLoop) break;
+            }
+
+            // Update the basement surface temperatures, if any
+            if (this->HasBasement || this->HasZoneCoupledBasement) {
+                this->UpdateBasementSurfaceTemperatures();
+            }
+
+            // Update the slab surface temperatures, if any
+            if (this->HasZoneCoupledSlab) {
+                this->UpdateZoneSurfaceTemperatures();
+            }
+        }
+
+        void Domain::PerformIterationLoop(Circuit * thisCircuit) {
+
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         Edwin Lee
+            //       DATE WRITTEN   Summer 2011
+            //       MODIFIED       na
+            //       RE-ENGINEERED  na
+
+            // Always do start of time step inits
+            this->DoStartOfTimeStepInitializations(thisCircuit);
 
             // Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
             if (this->HasAPipeCircuit) {
-                this->PreparePipeCircuitSimulation(CircuitNum);
+                this->PreparePipeCircuitSimulation(thisCircuit);
             }
 
             // Begin iterating for this time step
@@ -4109,7 +4128,7 @@ namespace EnergyPlus {
                 this->ShiftTemperaturesForNewIteration();
 
                 if (this->HasAPipeCircuit) {
-                    this->PerformPipeCircuitSimulation(CircuitNum);
+                    this->PerformPipeCircuitSimulation(thisCircuit);
                 }
 
                 if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate();
@@ -4925,7 +4944,7 @@ namespace EnergyPlus {
             return this->groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
         }
 
-        void Domain::PreparePipeCircuitSimulation(int const CircuitNum) {
+        void Domain::PreparePipeCircuitSimulation(Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4936,27 +4955,25 @@ namespace EnergyPlus {
             // SUBROUTINE ARGUMENT DEFINITIONS:
             Real64 const StagnantFluidConvCoeff(200.0);
 
-            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
-
             // Setup circuit flow conditions -- convection coefficient
-            int const CellX = thisCircuit.CircuitInletCell.X;
-            int const CellY = thisCircuit.CircuitInletCell.Y;
-            int const CellZ = thisCircuit.CircuitInletCell.Z;
+            int const CellX = thisCircuit->CircuitInletCell.X;
+            int const CellY = thisCircuit->CircuitInletCell.Y;
+            int const CellZ = thisCircuit->CircuitInletCell.Z;
 
             // Look up current fluid properties
-            Real64 const Density = thisCircuit.CurFluidPropertySet.Density;
-            Real64 const Viscosity = thisCircuit.CurFluidPropertySet.Viscosity;
-            Real64 const Conductivity = thisCircuit.CurFluidPropertySet.Conductivity;
-            Real64 const Prandtl = thisCircuit.CurFluidPropertySet.Prandtl;
+            Real64 const Density = thisCircuit->CurFluidPropertySet.Density;
+            Real64 const Viscosity = thisCircuit->CurFluidPropertySet.Viscosity;
+            Real64 const Conductivity = thisCircuit->CurFluidPropertySet.Conductivity;
+            Real64 const Prandtl = thisCircuit->CurFluidPropertySet.Prandtl;
 
             // Flow calculations
-            Real64 const Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit.PipeSize.InnerDia);
-            Real64 const Velocity = thisCircuit.CurCircuitFlowRate / (Density * Area_c);
+            Real64 const Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit->PipeSize.InnerDia);
+            Real64 const Velocity = thisCircuit->CurCircuitFlowRate / (Density * Area_c);
 
             // Determine convection coefficient based on flow conditions
             Real64 ConvCoefficient;
             if (Velocity > 0) {
-                Real64 Reynolds = Density * thisCircuit.PipeSize.InnerDia * Velocity / Viscosity;
+                Real64 Reynolds = Density * thisCircuit->PipeSize.InnerDia * Velocity / Viscosity;
                 Real64 ExponentTerm;
                 if (this->Cells(CellX, CellY, CellZ).PipeCellData.Fluid.Temperature >
                     this->Cells(CellX, CellY, CellZ).PipeCellData.Pipe.Temperature) {
@@ -4965,16 +4982,16 @@ namespace EnergyPlus {
                     ExponentTerm = 0.4;
                 }
                 Real64 const Nusselt = 0.023 * std::pow(Reynolds, 4.0 / 5.0) * std::pow(Prandtl, ExponentTerm);
-                ConvCoefficient = Nusselt * Conductivity / thisCircuit.PipeSize.InnerDia;
+                ConvCoefficient = Nusselt * Conductivity / thisCircuit->PipeSize.InnerDia;
             } else {
                 ConvCoefficient = StagnantFluidConvCoeff;
             }
 
             // Assign the convection coefficient
-            thisCircuit.CurCircuitConvectionCoefficient = ConvCoefficient;
+            thisCircuit->CurCircuitConvectionCoefficient = ConvCoefficient;
         }
 
-        void Domain::PerformPipeCircuitSimulation(int const CircuitNum) {
+        void Domain::PerformPipeCircuitSimulation(Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4985,21 +5002,19 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             Real64 CircuitCrossTemp = 0.0;
 
-            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
-
             // retrieve initial conditions from the data structure
             // these have been set either by the init routine or by the heat pump routine
-            Real64 const FlowRate = thisCircuit.CurCircuitFlowRate;
-            Real64 const EnteringTemp = thisCircuit.CurCircuitInletTemp;
+            Real64 const FlowRate = thisCircuit->CurCircuitFlowRate;
+            Real64 const EnteringTemp = thisCircuit->CurCircuitInletTemp;
 
             // initialize
             int SegmentCellCtr = 0;
-            unsigned long const NumSegments = thisCircuit.pipeSegments.size();
+            unsigned long const NumSegments = thisCircuit->pipeSegments.size();
             unsigned long segmentNum = 0;
 
             //'loop across all segments (pipes) of the circuit
             auto &cells(this->Cells);
-            for (auto &segment : thisCircuit.pipeSegments) {
+            for (auto &segment : thisCircuit->pipeSegments) {
 
                 segmentNum++;
                 int StartingZ = 0;
@@ -5035,13 +5050,13 @@ namespace EnergyPlus {
 
                     if (SegmentCellCtr == 1) {
                         //'we have the very first cell, need to pass in circuiting entering temperature
-                        this->PerformPipeCellSimulation(CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate,
+                        this->PerformPipeCellSimulation(thisCircuit, cells(PipeX, PipeY, Zindex), FlowRate,
                                                         EnteringTemp);
                     } else {
                         //'we don't have the first cell so just normal simulation
                         if (Zindex == EndingZ) {
                             // simulate current cell using upstream as entering conditions
-                            this->PerformPipeCellSimulation(CircuitNum,
+                            this->PerformPipeCellSimulation(thisCircuit,
                                                             cells(PipeX, PipeY, Zindex),
                                                             FlowRate,
                                                             cells(PipeX, PipeY,
@@ -5050,11 +5065,11 @@ namespace EnergyPlus {
                             CircuitCrossTemp = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
                         } else if (Zindex == StartingZ) {
                             // we are starting another segment, use the previous cross temperature
-                            this->PerformPipeCellSimulation(CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate,
+                            this->PerformPipeCellSimulation(thisCircuit, cells(PipeX, PipeY, Zindex), FlowRate,
                                                             CircuitCrossTemp);
                         } else {
                             // we are in an interior node, so just get the upstream cell and use the main simulation
-                            this->PerformPipeCellSimulation(CircuitNum,
+                            this->PerformPipeCellSimulation(thisCircuit,
                                                             cells(PipeX, PipeY, Zindex),
                                                             FlowRate,
                                                             cells(PipeX, PipeY,
@@ -5071,25 +5086,25 @@ namespace EnergyPlus {
                         }
                     } else if (Zindex == EndingZ) {
                         segment->OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
-                        segment->FluidHeatLoss = FlowRate * thisCircuit.CurFluidPropertySet.SpecificHeat *
+                        segment->FluidHeatLoss = FlowRate * thisCircuit->CurFluidPropertySet.SpecificHeat *
                                                  (segment->InletTemperature - segment->OutletTemperature);
                     }
 
                     // Bookkeeping: circuit fluid temperature updates
                     if ((segmentNum == 1) && (Zindex == StartingZ)) {
-                        thisCircuit.InletTemperature = EnteringTemp;
+                        thisCircuit->InletTemperature = EnteringTemp;
                     } else if ((segmentNum == NumSegments) && (Zindex == EndingZ)) {
-                        thisCircuit.OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
-                        thisCircuit.FluidHeatLoss =
-                                FlowRate * thisCircuit.CurFluidPropertySet.SpecificHeat *
-                                (thisCircuit.InletTemperature - thisCircuit.OutletTemperature);
+                        thisCircuit->OutletTemperature = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
+                        thisCircuit->FluidHeatLoss =
+                                FlowRate * thisCircuit->CurFluidPropertySet.SpecificHeat *
+                                (thisCircuit->InletTemperature - thisCircuit->OutletTemperature);
                     }
                 }
             }
         }
 
         void
-        Domain::PerformPipeCellSimulation(int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate,
+        Domain::PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 const FlowRate,
                                           Real64 const EnteringTemp) {
 
             // SUBROUTINE INFORMATION:
@@ -5098,9 +5113,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
-
-            for (int Iter = 1; Iter <= thisCircuit.MaxIterationsPerTS; ++Iter) {
+            for (int Iter = 1; Iter <= thisCircuit->MaxIterationsPerTS; ++Iter) {
 
                 //'shift all the pipe related temperatures for the next internal pipe iteration
                 ShiftPipeTemperaturesForNewIteration(ThisCell);
@@ -5109,7 +5122,7 @@ namespace EnergyPlus {
                 this->SimulateRadialToCartesianInterface(ThisCell);
 
                 //'simulate the outermost radial slice
-                SimulateOuterMostRadialSoilSlice(CircuitNum, ThisCell);
+                SimulateOuterMostRadialSoilSlice(thisCircuit, ThisCell);
 
                 //'we only need to simulate these if they actually exist!
                 if (!ThisCell.PipeCellData.Soil.empty()) {
@@ -5118,21 +5131,21 @@ namespace EnergyPlus {
                     SimulateAllInteriorRadialSoilSlices(ThisCell);
 
                     //'simulate the innermost radial soil slice
-                    SimulateInnerMostRadialSoilSlice(CircuitNum, ThisCell);
+                    SimulateInnerMostRadialSoilSlice(thisCircuit, ThisCell);
                 }
 
-                if (thisCircuit.HasInsulation) {
+                if (thisCircuit->HasInsulation) {
                     SimulateRadialInsulationCell(ThisCell);
                 }
 
                 //'simulate the pipe cell
-                SimulateRadialPipeCell(CircuitNum, ThisCell, thisCircuit.CurCircuitConvectionCoefficient);
+                SimulateRadialPipeCell(thisCircuit, ThisCell, thisCircuit->CurCircuitConvectionCoefficient);
 
                 //'simulate the water cell
-                SimulateFluidCell(ThisCell, FlowRate, thisCircuit.CurCircuitConvectionCoefficient, EnteringTemp);
+                SimulateFluidCell(ThisCell, FlowRate, thisCircuit->CurCircuitConvectionCoefficient, EnteringTemp);
 
                 //'check convergence
-                if (IsConverged_PipeCurrentToPrevIteration(CircuitNum, ThisCell)) break; // potential diff source
+                if (IsConverged_PipeCurrentToPrevIteration(thisCircuit, ThisCell)) break; // potential diff source
             }
         }
 
@@ -5180,7 +5193,7 @@ namespace EnergyPlus {
             cell.Temperature = Numerator / Denominator;
         }
 
-        void SimulateOuterMostRadialSoilSlice(int const CircuitNum, CartesianCell &cell) {
+        void SimulateOuterMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &cell) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5206,7 +5219,7 @@ namespace EnergyPlus {
             Real64 ThisRadialCellInnerRadius = outerMostSoilCell.InnerRadius;
             Real64 ThisRadialCellTemperature_PrevTimeStep = outerMostSoilCell.Temperature_PrevTimeStep;
             if (numSoilCells == 1) {
-                if (circuits[CircuitNum].HasInsulation) {
+                if (thisCircuit->HasInsulation) {
                     NextOuterRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
                     NextOuterRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                     NextOuterRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5310,7 +5323,7 @@ namespace EnergyPlus {
             }
         }
 
-        void SimulateInnerMostRadialSoilSlice(int const CircuitNum, CartesianCell &cell) {
+        void SimulateInnerMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &cell) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5329,7 +5342,7 @@ namespace EnergyPlus {
             Real64 Denominator = 0.0;
 
             //'convenience variables
-            if (circuits[CircuitNum].HasInsulation) {
+            if (thisCircuit->HasInsulation) {
                 InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
                 InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                 InnerNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
@@ -5419,7 +5432,7 @@ namespace EnergyPlus {
             cell.PipeCellData.Insulation.Temperature = Numerator / Denominator;
         }
 
-        void SimulateRadialPipeCell(int const CircuitNum, CartesianCell &cell, Real64 const ConvectionCoefficient) {
+        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &cell, Real64 const ConvectionCoefficient) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5437,7 +5450,7 @@ namespace EnergyPlus {
             Real64 Denominator = 0.0;
 
             //'convenience variables
-            if (circuits[CircuitNum].HasInsulation) {
+            if (thisCircuit->HasInsulation) {
                 OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
                 OuterNeighborRadialCellConductivity = cell.PipeCellData.Insulation.Properties.Conductivity;
                 OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
@@ -5530,7 +5543,7 @@ namespace EnergyPlus {
             cell.PipeCellData.Fluid.Temperature = Numerator / Denominator;
         }
 
-        void Domain::DoOneTimeInitializations(int const CircuitNum) {
+        void Domain::DoOneTimeInitializations(Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5549,10 +5562,10 @@ namespace EnergyPlus {
                                 for (auto &soilCell : cell.PipeCellData.Soil) {
                                     soilCell.Properties = this->GroundProperties;
                                 }
-                                if (CircuitNum >= 0) {
-                                    cell.PipeCellData.Pipe.Properties = PlantPipingSystemsManager::circuits[CircuitNum].PipeProperties;
-                                    if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
-                                        cell.PipeCellData.Insulation.Properties = PlantPipingSystemsManager::circuits[CircuitNum].InsulationProperties;
+                                if (thisCircuit) {
+                                    cell.PipeCellData.Pipe.Properties = thisCircuit->PipeProperties;
+                                    if (thisCircuit->HasInsulation) {
+                                        cell.PipeCellData.Insulation.Properties = thisCircuit->InsulationProperties;
                                     }
                                 }
                                 break;
@@ -5639,8 +5652,8 @@ namespace EnergyPlus {
                             cell.PipeCellData.Pipe.Temperature = ThisCellTemp;
                             cell.PipeCellData.Pipe.Temperature_PrevIteration = ThisCellTemp;
                             cell.PipeCellData.Pipe.Temperature_PrevTimeStep = ThisCellTemp;
-                            if (CircuitNum >= 0) {
-                                if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
+                            if (thisCircuit) {
+                                if (thisCircuit->HasInsulation) {
                                     cell.PipeCellData.Insulation.Temperature = ThisCellTemp;
                                     cell.PipeCellData.Insulation.Temperature_PrevIteration = ThisCellTemp;
                                     cell.PipeCellData.Insulation.Temperature_PrevTimeStep = ThisCellTemp;
@@ -5655,65 +5668,14 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoStartOfTimeStepInitializations(int const CircuitNum) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Edwin Lee
-            //       DATE WRITTEN   Summer 2011
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        void Domain::DoStartOfTimeStepInitializations() {
             static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
-            Real64 Beta;
-            Real64 CellTemp;
-            Real64 CellRhoCp;
-            Real64 FluidCp;
-            Real64 FluidDensity;
-            Real64 FluidConductivity;
-            Real64 FluidViscosity;
-            Real64 FluidPrandtl;
 
             // Update environmental conditions
             this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
             this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
             this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
             this->Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
-
-            // If pipe circuit present
-            if (CircuitNum >= 0) {
-                auto &thisCircuit = PlantPipingSystemsManager::circuits[CircuitNum];
-                // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
-                // but need to verify the value of inlet temperature during warm up, etc.
-                FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
-                                                                 thisCircuit.InletTemperature,
-                                                                 DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
-                                                                 RoutineName);
-                FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
-                                                                 thisCircuit.InletTemperature,
-                                                                 DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
-                                                                 RoutineName);
-                FluidConductivity = FluidProperties::GetConductivityGlycol(
-                        DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
-                        thisCircuit.InletTemperature,
-                        DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
-                        RoutineName);
-                FluidViscosity = FluidProperties::GetViscosityGlycol(
-                        DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
-                        thisCircuit.InletTemperature,
-                        DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
-                        RoutineName);
-
-                // Doesn't anyone care about poor Ludwig Prandtl?
-                FluidPrandtl = 3.0;
-
-                // then assign these fluid properties to the current fluid property set for easy lookup as needed
-                thisCircuit.CurFluidPropertySet.Conductivity = FluidConductivity;
-                thisCircuit.CurFluidPropertySet.Density = FluidDensity;
-                thisCircuit.CurFluidPropertySet.SpecificHeat = FluidCp;
-                thisCircuit.CurFluidPropertySet.Viscosity = FluidViscosity;
-                thisCircuit.CurFluidPropertySet.Prandtl = FluidPrandtl;
-            }
 
             //'now update cell properties
             auto &cells(this->Cells);
@@ -5730,81 +5692,139 @@ namespace EnergyPlus {
                             case CellType::BasementWall:
                                 // UPDATE CELL PROPERTY SETS
                                 //'main ground cells, update with soil properties
-                                CellTemp = cell.Temperature;
-                                this->EvaluateSoilRhoCp(CellTemp, CellRhoCp);
+                                Real64 CellRhoCp;
+                                this->EvaluateSoilRhoCp(cell.Temperature, CellRhoCp);
                                 cell.Properties.SpecificHeat = CellRhoCp / cell.Properties.Density;
                                 // UPDATE BETA VALUE
                                 //'these are basic cartesian calculation cells
-                                Beta = this->Cur.CurSimTimeStepSize /
-                                       (cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat);
-                                cell.Beta = Beta;
+                                cell.Beta = this->Cur.CurSimTimeStepSize /
+                                            (cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat);
                                 break;
                             case CellType::HorizInsulation:
                             case CellType::VertInsulation:
                             case CellType::Slab:
                             case CellType::ZoneGroundInterface:
-                                Beta = this->Cur.CurSimTimeStepSize /
-                                       (cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat);
-                                this->Cells(X, Y, Z).Beta = Beta;
+                                this->Cells(X, Y, Z).Beta = this->Cur.CurSimTimeStepSize /
+                                                            (cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat);
                                 break;
                             case CellType::Pipe:
-                                // If pipe circuit present
-                                if (CircuitNum >= 0) {
-                                    // UPDATE CELL PROPERTY SETS
-                                    //'first update the outer cell itself
-                                    CellTemp = cell.Temperature;
-                                    this->EvaluateSoilRhoCp(CellTemp, CellRhoCp);
-                                    cell.Properties.SpecificHeat = CellRhoCp / cell.Properties.Density;
-                                    //'then update all the soil radial cells
-                                    for (auto &soilCell : cell.PipeCellData.Soil) {
-                                        CellTemp = soilCell.Temperature;
-                                        this->EvaluateSoilRhoCp(CellTemp, CellRhoCp);
-                                        soilCell.Properties.SpecificHeat = CellRhoCp / soilCell.Properties.Density;
-                                    }
-
-                                    // UPDATE BETA VALUES
-                                    //'set the interface cell
-                                    Beta = this->Cur.CurSimTimeStepSize /
-                                           (cell.Properties.Density * cell.PipeCellData.InterfaceVolume *
-                                            cell.Properties.SpecificHeat);
-                                    cell.Beta = Beta;
-
-                                    //'set the radial soil cells
-                                    for (auto &soilCell : cell.PipeCellData.Soil) {
-                                        Beta = this->Cur.CurSimTimeStepSize /
-                                               (soilCell.Properties.Density * soilCell.XY_CrossSectArea() *
-                                                cell.depth() * soilCell.Properties.SpecificHeat);
-                                        soilCell.Beta = Beta;
-                                    }
-
-                                    //'then insulation if it exists
-                                    if (PlantPipingSystemsManager::circuits[CircuitNum].HasInsulation) {
-                                        Beta = this->Cur.CurSimTimeStepSize /
-                                               (cell.PipeCellData.Insulation.Properties.Density *
-                                                cell.PipeCellData.Insulation.XY_CrossSectArea() *
-                                                cell.depth() * cell.PipeCellData.Insulation.Properties.SpecificHeat);
-                                        cell.PipeCellData.Insulation.Beta = Beta;
-                                    }
-
-                                    //'set the pipe cell
-                                    Beta = this->Cur.CurSimTimeStepSize /
-                                           (cell.PipeCellData.Pipe.Properties.Density *
-                                            cell.PipeCellData.Pipe.XY_CrossSectArea() * cell.depth() *
-                                            cell.PipeCellData.Pipe.Properties.SpecificHeat);
-                                    cell.PipeCellData.Pipe.Beta = Beta;
-
-                                    // now the fluid cell also
-                                    cell.PipeCellData.Fluid.Properties = PlantPipingSystemsManager::circuits[CircuitNum].CurFluidPropertySet;
-                                    cell.PipeCellData.Fluid.Beta = this->Cur.CurSimTimeStepSize /
-                                                                   (cell.PipeCellData.Fluid.Properties.Density *
-                                                                    cell.PipeCellData.Fluid.Volume *
-                                                                    cell.PipeCellData.Fluid.Properties.SpecificHeat);
-                                }
+                                // No pipe circuit with this call
                                 break;
                             case CellType::BasementCutaway:
                                 break;
                             case CellType::Unknown:
                                 assert(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        void Domain::DoStartOfTimeStepInitializations(Circuit * thisCircuit) {
+
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         Edwin Lee
+            //       DATE WRITTEN   Summer 2011
+            //       MODIFIED       na
+            //       RE-ENGINEERED  na
+
+            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+            static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
+            Real64 CellTemp;
+            Real64 CellRhoCp;
+            Real64 FluidCp;
+            Real64 FluidDensity;
+            Real64 FluidConductivity;
+            Real64 FluidViscosity;
+            Real64 FluidPrandtl;
+
+            // do the regular, non-circuit related inits
+            this->DoStartOfTimeStepInitializations();
+
+            // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
+            // but need to verify the value of inlet temperature during warm up, etc.
+            FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             thisCircuit->InletTemperature,
+                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             RoutineName);
+            FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             thisCircuit->InletTemperature,
+                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             RoutineName);
+            FluidConductivity = FluidProperties::GetConductivityGlycol(
+                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    thisCircuit->InletTemperature,
+                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    RoutineName);
+            FluidViscosity = FluidProperties::GetViscosityGlycol(
+                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    thisCircuit->InletTemperature,
+                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    RoutineName);
+
+            // Doesn't anyone care about poor Ludwig Prandtl?
+            FluidPrandtl = 3.0;
+
+            // then assign these fluid properties to the current fluid property set for easy lookup as needed
+            thisCircuit->CurFluidPropertySet.Conductivity = FluidConductivity;
+            thisCircuit->CurFluidPropertySet.Density = FluidDensity;
+            thisCircuit->CurFluidPropertySet.SpecificHeat = FluidCp;
+            thisCircuit->CurFluidPropertySet.Viscosity = FluidViscosity;
+            thisCircuit->CurFluidPropertySet.Prandtl = FluidPrandtl;
+
+            //'now update cell properties
+            auto &cells(this->Cells);
+            for (int X = 0, X_end = this->x_max_index; X <= X_end; ++X) {
+                for (int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y) {
+                    for (int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z) {
+                        auto &cell(cells(X, Y, Z));
+                        if (cell.cellType == CellType::Pipe) {
+                            // UPDATE CELL PROPERTY SETS
+                            //'first update the outer cell itself
+                            CellTemp = cell.Temperature;
+                            this->EvaluateSoilRhoCp(CellTemp, CellRhoCp);
+                            cell.Properties.SpecificHeat = CellRhoCp / cell.Properties.Density;
+                            //'then update all the soil radial cells
+                            for (auto &soilCell : cell.PipeCellData.Soil) {
+                                CellTemp = soilCell.Temperature;
+                                this->EvaluateSoilRhoCp(CellTemp, CellRhoCp);
+                                soilCell.Properties.SpecificHeat = CellRhoCp / soilCell.Properties.Density;
+                            }
+
+                            // UPDATE BETA VALUES
+                            //'set the interface cell
+                            cell.Beta = this->Cur.CurSimTimeStepSize /
+                                        (cell.Properties.Density * cell.PipeCellData.InterfaceVolume *
+                                         cell.Properties.SpecificHeat);
+
+                            //'set the radial soil cells
+                            for (auto &soilCell : cell.PipeCellData.Soil) {
+                                soilCell.Beta = this->Cur.CurSimTimeStepSize /
+                                                (soilCell.Properties.Density * soilCell.XY_CrossSectArea() *
+                                                 cell.depth() * soilCell.Properties.SpecificHeat);
+                            }
+
+                            //'then insulation if it exists
+                            if (thisCircuit->HasInsulation) {
+                                cell.PipeCellData.Insulation.Beta = this->Cur.CurSimTimeStepSize /
+                                                                    (cell.PipeCellData.Insulation.Properties.Density *
+                                                                     cell.PipeCellData.Insulation.XY_CrossSectArea() *
+                                                                     cell.depth() * cell.PipeCellData.Insulation.Properties.SpecificHeat);
+                            }
+
+                            //'set the pipe cell
+                            cell.PipeCellData.Pipe.Beta = this->Cur.CurSimTimeStepSize /
+                                                          (cell.PipeCellData.Pipe.Properties.Density *
+                                                           cell.PipeCellData.Pipe.XY_CrossSectArea() * cell.depth() *
+                                                           cell.PipeCellData.Pipe.Properties.SpecificHeat);
+
+                            // now the fluid cell also
+                            cell.PipeCellData.Fluid.Properties = thisCircuit->CurFluidPropertySet;
+                            cell.PipeCellData.Fluid.Beta = this->Cur.CurSimTimeStepSize /
+                                                           (cell.PipeCellData.Fluid.Properties.Density *
+                                                            cell.PipeCellData.Fluid.Volume *
+                                                            cell.PipeCellData.Fluid.Properties.SpecificHeat);
+
                         }
                     }
                 }

@@ -599,7 +599,6 @@ namespace EnergyPlus {
             std::vector<Segment *> pipeSegments;
             // Pointer to the domain which contains this pipe circuit
             int ParentDomainIndex = 0;
-            int CircuitIndex = 0;
             // Misc inputs
             RadialSizing PipeSize;
             RadialSizing InsulationSize;
@@ -876,18 +875,20 @@ namespace EnergyPlus {
 
             void DoEndOfIterationOperations(bool &Finished);
 
-            void DoOneTimeInitializations(int CircuitNum);
+            void DoOneTimeInitializations(Circuit * thisCircuit);
 
-            void DoStartOfTimeStepInitializations(int CircuitNum);
+            void DoStartOfTimeStepInitializations();
+
+            void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
 
             Real64 GetFarfieldTemp(CartesianCell const &cell);
 
-            void PreparePipeCircuitSimulation(int CircuitNum);
+            void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
-            void PerformPipeCircuitSimulation(int CircuitNum);
+            void PerformPipeCircuitSimulation(Circuit * thisCircuit);
 
             void
-            PerformPipeCellSimulation(int CircuitNum, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
+            PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
 
             void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
@@ -906,11 +907,13 @@ namespace EnergyPlus {
             void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                                  Real64 &resistance, Real64 &adiabaticMultiplier);
 
-            void PerformIterationLoop(int CircuitNum);
+            void PerformIterationLoop();
 
-            void InitPipingSystems(int CircuitNum);
+            void PerformIterationLoop(Circuit * thisCircuit);
 
-            void UpdatePipingSystems(int CircuitNum);
+            void InitPipingSystems(Circuit * thisCircuit);
+
+            void UpdatePipingSystems(Circuit * thisCircuit);
 
             void SetupZoneCoupledOutputVariables();
 
@@ -982,20 +985,20 @@ namespace EnergyPlus {
         std::vector<Real64>
         CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
 
-        void SimulateOuterMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
+        void SimulateOuterMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
 
         void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
 
-        void SimulateInnerMostRadialSoilSlice(int CircuitNum, CartesianCell &ThisCell);
+        void SimulateInnerMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
 
         void SimulateRadialInsulationCell(CartesianCell &ThisCell);
 
-        void SimulateRadialPipeCell(int CircuitNum, CartesianCell &ThisCell, Real64 ConvectionCoefficient);
+        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 ConvectionCoefficient);
 
         void SimulateFluidCell(CartesianCell &ThisCell, Real64 FlowRate, Real64 ConvectionCoefficient,
                                Real64 EnteringFluidTemp);
 
-        bool IsConverged_PipeCurrentToPrevIteration(int CircuitNum, CartesianCell const &CellToCheck);
+        bool IsConverged_PipeCurrentToPrevIteration(Circuit * thisCircuit, CartesianCell const &CellToCheck);
 
     } // namespace PlantPipingSystemsManager
 
