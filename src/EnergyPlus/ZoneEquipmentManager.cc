@@ -4941,7 +4941,7 @@ namespace ZoneEquipmentManager {
                                     ShowContinueErrorTimeStamp("");
                                     ShowContinueError(
                                         "  Flows [m3/s]: Inlets: " + General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate/DataEnvironment::StdRhoAir, 6) +
-                                        "  Unbalanced exhausts: " + General::RoundSigDigits(sysUnbalancedVolFlow, 6) +
+                                        "  Unbalanced exhausts: " + General::RoundSigDigits(sysUnbalExhaust / DataEnvironment::StdRhoAir, 6) +
                                         "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow/DataEnvironment::StdRhoAir, 6));
                                     ShowContinueError(
                                         "  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone)/rhoZone, 6) +
