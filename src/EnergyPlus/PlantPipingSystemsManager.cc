@@ -5139,10 +5139,10 @@ namespace EnergyPlus {
                 }
 
                 //'simulate the pipe cell
-                SimulateRadialPipeCell(thisCircuit, ThisCell, thisCircuit->CurCircuitConvectionCoefficient);
+                SimulateRadialPipeCell(thisCircuit, ThisCell);
 
                 //'simulate the water cell
-                SimulateFluidCell(ThisCell, FlowRate, thisCircuit->CurCircuitConvectionCoefficient, EnteringTemp);
+                SimulateFluidCell(thisCircuit, ThisCell, FlowRate, EnteringTemp);
 
                 //'check convergence
                 if (IsConverged_PipeCurrentToPrevIteration(thisCircuit, ThisCell)) break; // potential diff source
@@ -5432,7 +5432,7 @@ namespace EnergyPlus {
             cell.PipeCellData.Insulation.Temperature = Numerator / Denominator;
         }
 
-        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &cell, Real64 const ConvectionCoefficient) {
+        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &cell) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5488,7 +5488,7 @@ namespace EnergyPlus {
                     std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) /
                     (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * ThisPipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobals::Pi * ThisPipeCellInnerRadius * cell.depth());
             Resistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * FluidCellTemperature;
             Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
@@ -5497,7 +5497,7 @@ namespace EnergyPlus {
             cell.PipeCellData.Pipe.Temperature = Numerator / Denominator;
         }
 
-        void SimulateFluidCell(CartesianCell &cell, Real64 const FlowRate, Real64 const ConvectionCoefficient,
+        void SimulateFluidCell(Circuit * thisCircuit, CartesianCell &cell, Real64 const FlowRate,
                                Real64 const EnteringFluidTemp) {
 
             // SUBROUTINE INFORMATION:
@@ -5527,7 +5527,7 @@ namespace EnergyPlus {
             Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) /
                                               (2 * DataGlobals::Pi * cell.depth() * PipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (ConvectionCoefficient * 2 * DataGlobals::Pi * PipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobals::Pi * PipeCellInnerRadius * cell.depth());
             Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance) * PipeCellTemperature;
             Denominator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance);

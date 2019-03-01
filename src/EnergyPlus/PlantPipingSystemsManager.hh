@@ -993,10 +993,9 @@ namespace EnergyPlus {
 
         void SimulateRadialInsulationCell(CartesianCell &ThisCell);
 
-        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 ConvectionCoefficient);
+        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &ThisCell);
 
-        void SimulateFluidCell(CartesianCell &ThisCell, Real64 FlowRate, Real64 ConvectionCoefficient,
-                               Real64 EnteringFluidTemp);
+        void SimulateFluidCell(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringFluidTemp);
 
         bool IsConverged_PipeCurrentToPrevIteration(Circuit * thisCircuit, CartesianCell const &CellToCheck);
 
