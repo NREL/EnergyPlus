@@ -4916,7 +4916,7 @@ namespace ZoneEquipmentManager {
                 }
                 // Check zone flow balance but not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
-                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration) {
+                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration && !DataGlobals::DoingHVACSizingSimulations) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
                         Real64 sysUnbalExhaust = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced);
