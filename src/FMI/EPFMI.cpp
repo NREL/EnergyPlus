@@ -277,7 +277,7 @@ unsigned int terminateSim(const char *log) {
   time_cv.notify_one();
 
   epthread->join();
-  //delete epthread;
+  delete epthread;
 
   return 0;
 }
