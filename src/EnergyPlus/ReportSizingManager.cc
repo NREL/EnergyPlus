@@ -1930,10 +1930,15 @@ namespace ReportSizingManager {
                     if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
                         if (AutosizeDes < DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                                                                     UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
-                            ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                             "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
+                            ShowWarningError(
+                                CallingRoutine + ":" + " Coil=\"" + CompName +
+                                "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
+                                "temperature > coil entering air humidity ratio.");
                             ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
+                            ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
+                            ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
+                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [KGWATER/KGDRYAIR]");
                             AutosizeDes = DataDesInletAirHumRat;
                             ShowContinueError("....coil leaving humidity ratio will be reset to:");
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
@@ -2996,10 +3001,9 @@ namespace ReportSizingManager {
                     if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
                         if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                             UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
-                            ShowWarningError(
-                                CallingRoutine + ":" + " Coil=\"" + CompName +
-                                "\", Cooling Coil is running dry for sizing because minimum humidity ratio for water coil air inlet is > "
-                                "design air leaving humidity ratio.");
+                            ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                                             "\", Cooling Coil is running dry for sizing because minimum humidity ratio at saturation for inlet "
+                                             "chilled water temperature > design air entering humidity ratio.");
                             ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [KGWATER/KGDRYAIR]");
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
                             ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
