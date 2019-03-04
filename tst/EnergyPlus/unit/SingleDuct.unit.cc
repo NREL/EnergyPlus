@@ -81,7 +81,6 @@ using DataHeatBalance::Zone;
 TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  Zone,",
         "    Zone 1;                !- Name",
         "ZoneHVAC:EquipmentConnections,",
@@ -234,7 +233,6 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "  Zone,",
         "    Zone 1;                !- Name",
         "ZoneHVAC:EquipmentConnections,",
@@ -410,8 +408,6 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     // DATE WRITTEN: Sep 2015
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         " Output:Diagnostics, DisplayExtraWarnings;",
         "  Timestep, 4;",
 
@@ -2641,7 +2637,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  Zone,",
         "    Zone 1;                !- Name",
         "ZoneHVAC:EquipmentConnections,",

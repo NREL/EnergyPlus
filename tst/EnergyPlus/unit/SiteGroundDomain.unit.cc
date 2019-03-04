@@ -60,7 +60,6 @@ using namespace PlantPipingSystemsManager;
 TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
         "KA1,						!- Name of object",
         "1.8,						!- Soil Thermal Conductivity {W/m-K}",

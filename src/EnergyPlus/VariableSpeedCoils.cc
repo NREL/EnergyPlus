@@ -3286,12 +3286,12 @@ namespace VariableSpeedCoils {
                                         VarSpeedCoil(DXCoilNum).LoopSide,
                                         VarSpeedCoil(DXCoilNum).BranchNum,
                                         VarSpeedCoil(DXCoilNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitVarSpeedCoil: Program terminated for previous conditions.");
                 }

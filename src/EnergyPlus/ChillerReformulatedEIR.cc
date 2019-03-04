@@ -945,12 +945,12 @@ namespace ChillerReformulatedEIR {
                                     ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                     ElecReformEIRChiller(EIRChillNum).CWBranchNum,
                                     ElecReformEIRChiller(EIRChillNum).CWCompNum,
+                                    errFlag,
                                     ElecReformEIRChiller(EIRChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     ElecReformEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ElecReformEIRChiller(EIRChillNum).CondenserType != AirCooled) {
                 ScanPlantLoopsForObject(ElecReformEIRChiller(EIRChillNum).Name,
                                         TypeOf_Chiller_ElectricReformEIR,
@@ -958,12 +958,12 @@ namespace ChillerReformulatedEIR {
                                         ElecReformEIRChiller(EIRChillNum).CDLoopSideNum,
                                         ElecReformEIRChiller(EIRChillNum).CDBranchNum,
                                         ElecReformEIRChiller(EIRChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElecReformEIRChiller(EIRChillNum).CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElecReformEIRChiller(EIRChillNum).CWLoopNum,
                                               ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElecReformEIRChiller(EIRChillNum).CDLoopNum,
@@ -978,12 +978,12 @@ namespace ChillerReformulatedEIR {
                                         ElecReformEIRChiller(EIRChillNum).HRLoopSideNum,
                                         ElecReformEIRChiller(EIRChillNum).HRBranchNum,
                                         ElecReformEIRChiller(EIRChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElecReformEIRChiller(EIRChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElecReformEIRChiller(EIRChillNum).CWLoopNum,
                                               ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElecReformEIRChiller(EIRChillNum).HRLoopNum,

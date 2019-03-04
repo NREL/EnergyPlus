@@ -540,12 +540,12 @@ namespace FourPipeBeam {
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
                                         this->cWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->cWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }
@@ -557,12 +557,12 @@ namespace FourPipeBeam {
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,
                                         this->hWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->hWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }

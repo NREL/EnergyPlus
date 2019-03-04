@@ -281,8 +281,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.4;",
-
         " Coil:Cooling:Water,",
         "	AHU cooling coil,	!- Name",
         "	AvailSched,			!- Availability Schedule Name",
@@ -494,8 +492,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     int OutletNode(0); // Heat Recovery primary air outlet node number
 
     std::string const idf_objects = delimited_string({
-
-        "Version,8.4;",
 
         "SimulationControl,",
         "    Yes,                     !- Do Zone Sizing Calculation",
@@ -2576,10 +2572,14 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE1-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE2-1 Equipment,      !- Name",
@@ -2588,10 +2588,14 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE2-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE3-1 Equipment,      !- Name",
@@ -2600,10 +2604,14 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE3-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE4-1 Equipment,      !- Name",
@@ -2612,10 +2620,14 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE4-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE5-1 Equipment,      !- Name",
@@ -2624,10 +2636,14 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE5-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentConnections,",
         "    SPACE1-1,                !- Zone Name",
@@ -3876,8 +3892,6 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     int ExchNum = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "  HeatExchanger:AirToAir:SensibleAndLatent,",
         "    HEATRECOVERY HX IN ERV,  !- Name",
         "    ,                        !- Availability Schedule Name",

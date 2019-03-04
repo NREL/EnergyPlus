@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataSurfaces.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -71,7 +71,6 @@
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
-using namespace DataAirflowNetwork;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
 using namespace DataGlobals;
@@ -117,7 +116,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,FreeRunningSeason,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -168,7 +167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     GetAirflowNetworkInput();
 
-    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();
@@ -213,7 +212,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,FreeRunningSeason,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -266,7 +265,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     GetAirflowNetworkInput();
 
-    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();

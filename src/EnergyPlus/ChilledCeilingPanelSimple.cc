@@ -820,7 +820,7 @@ namespace CoolingPanelSimple {
             if (allocated(PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(
-                    ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, _, _, _, _, _, errFlag);
+                    ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitCoolingPanel: Program terminated for previous conditions.");
                 }
