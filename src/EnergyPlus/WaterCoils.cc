@@ -2225,7 +2225,7 @@ namespace WaterCoils {
                     } else {
                         FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
                         bPRINT = true;
-                        TempSize = DataDesInletAirHumRat;
+                        TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
                     }
                     RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
