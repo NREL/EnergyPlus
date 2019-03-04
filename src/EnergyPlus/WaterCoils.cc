@@ -2167,7 +2167,6 @@ namespace WaterCoils {
                     TempSize = WaterCoil(CoilNum).DesInletAirTemp; // preserve input if entered
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
                 }
-                DataFlowUsedForSizing = DataAirFlowUsedForSizing; // used by air loop coils
 
                 RequestSizing(CompType, CompName, CoolingWaterDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesInletAirTemp = TempSize;
@@ -2183,7 +2182,6 @@ namespace WaterCoils {
                     TempSize = WaterCoil(CoilNum).DesInletWaterTemp; // preserve input if entered
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
                 }
-                DataFlowUsedForSizing = DataAirFlowUsedForSizing;
                 RequestSizing(CompType, CompName, CoolingWaterDesWaterInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesInletWaterTemp = TempSize;
 
@@ -2198,7 +2196,6 @@ namespace WaterCoils {
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat;                     // preserve input if entered
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
                     }
-                    DataFlowUsedForSizing = DataAirFlowUsedForSizing;
                     RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize;
                 }
@@ -2215,7 +2212,6 @@ namespace WaterCoils {
                 }
 
                 DataDesInletWaterTemp = WaterCoil(CoilNum).DesInletWaterTemp; // used for warning messages
-                DataDesInletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
                 RequestSizing(CompType, CompName, CoolingWaterDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesOutletAirTemp = TempSize;
                 DataDesOutletAirTemp = TempSize;
@@ -2229,10 +2225,9 @@ namespace WaterCoils {
                     } else {
                         FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
                         bPRINT = true;
-                        TempSize = WaterCoil(CoilNum).DesInletAirHumRat;                     // preserve input if entered
+                        TempSize = DataDesInletAirHumRat;
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
                     }
-                    DataFlowUsedForSizing = DataAirFlowUsedForSizing;
                     RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize;
                 }
@@ -2247,10 +2242,6 @@ namespace WaterCoils {
                     TempSize = WaterCoil(CoilNum).DesOutletAirHumRat;                    // preserve input if entered
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
                 }
-                DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterCoolingCoilRate; // used for warning messages
-                DataDesInletAirTemp = WaterCoil(CoilNum).DesInletAirTemp;
-                DataDesInletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
-                DataDesInletWaterTemp = WaterCoil(CoilNum).DesInletWaterTemp;
                 RequestSizing(CompType, CompName, CoolingWaterDesAirOutletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesOutletAirHumRat = TempSize;
                 DataDesOutletAirHumRat = TempSize;
