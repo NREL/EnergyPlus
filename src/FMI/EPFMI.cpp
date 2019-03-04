@@ -155,7 +155,7 @@ unsigned int setupExperiment(double tStart,
     epstatus = EPStatus::WORKING;
   }
 
-  epthread = new std::thread(EnergyPlusPgm, "");
+  epthread = new std::thread(RunEnergyPlus, "");
 
   {
     // Wait for E+ to go back to IDLE
@@ -277,7 +277,7 @@ unsigned int terminateSim(const char *log) {
   time_cv.notify_one();
 
   epthread->join();
-  delete epthread;
+  //delete epthread;
 
   return 0;
 }

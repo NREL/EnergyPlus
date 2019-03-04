@@ -88,7 +88,9 @@ TEST( EPFMI, static_lib ) {
 	  std::cout << "OutDryBulbTemp: " << EnergyPlus::DataEnvironment::OutDryBulbTemp << std::endl;
     std::cout << "Attic Temp is: " << atticTemp << std::endl;
   }
-
+  
   terminateSim(nullptr);
+
+  std::cout << "epfmi test is now complete" << std::endl;
 }
 

@@ -593,7 +593,9 @@ int AbortEnergyPlus()
 #endif
     std::cerr << "Program terminated: "
               << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-    CloseOutOpenFiles();
+    //TODO: figure out why this fails on spawn branch
+    // something related to unit number 6 and 101 which in testing came after the stdin unit numbers
+    //CloseOutOpenFiles();
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
     // indicating that E+ terminated with an error.
     if (NumExternalInterfaces > 0) CloseSocket(-1);
@@ -850,7 +852,9 @@ int EndEnergyPlus()
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
-    CloseOutOpenFiles();
+    //TODO: figure out why this fails on spawn branch
+    // something related to unit number 6 and 101 which in testing came after the stdin unit numbers
+    //CloseOutOpenFiles();
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
