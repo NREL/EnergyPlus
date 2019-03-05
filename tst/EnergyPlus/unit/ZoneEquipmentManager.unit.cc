@@ -571,9 +571,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     EXPECT_EQ(Node(returnNode3).MassFlowRate, 0.0);
 
     // Case 2 - send zero, expect sum of inlet flow back
-    StdTotalReturnMassFlow = 0.0;
-    FinalTotalReturnMassFlow = 0.0;
-
     Node(inletNode2).MassFlowRate = 2.0;
     Node(inletNode1).MassFlowRate = 1.0;
     Node(inletNode3).MassFlowRate = 3.0;
@@ -815,9 +812,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     EXPECT_EQ(Node(returnNode3).MassFlowRate, 0.0);
 
     // Case 2 - send sum of inlet flow back, except system 2 back at 0.9 
-    StdTotalReturnMassFlow = 0.0;
-    FinalTotalReturnMassFlow = 0.0;
-
     Node(inletNode2).MassFlowRate = 2.0;
     Node(inletNode1).MassFlowRate = 1.0;
     Node(inletNode3).MassFlowRate = 3.0;
@@ -840,9 +834,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     DataAirLoop::AirLoopFlow(2).DesReturnFrac = 0.9;
     DataAirLoop::AirLoopFlow(2).MaxOutAir = 0.0;
     DataAirLoop::AirLoopFlow(2).OAFlow = 0.0;
-
-    StdTotalReturnMassFlow = 0.0;
-    FinalTotalReturnMassFlow = 0.0;
 
     Node(inletNode2).MassFlowRate = 2.0;
     Node(inletNode1).MassFlowRate = 1.0;

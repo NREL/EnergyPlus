@@ -4638,7 +4638,6 @@ namespace ZoneEquipmentManager {
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
         using DataAirSystems::PrimaryAirSystem;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::AddInfiltrationFlow;
         using DataHeatBalance::AdjustInfiltrationFlow;
         using DataHeatBalance::AllZones;
@@ -4915,8 +4914,8 @@ namespace ZoneEquipmentManager {
                     }
                 }
                 // Check zone flow balance but not when zone air mass balance is active
-                if (!ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc &&
-                    !DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !FirstHVACIteration && !DataGlobals::DoingHVACSizingSimulations) {
+                if (!ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::DoingSizing && !DataGlobals::DoingHVACSizingSimulations &&
+                    !DataGlobals::WarmupFlag && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
                         Real64 sysUnbalExhaust = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced);
@@ -5051,7 +5050,7 @@ namespace ZoneEquipmentManager {
                 // Return node 1 is special
                 if (returnNum == 1) {
                     // Make no return air flow adjustments during sizing
-                    if ((DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing) && numRetNodes == 1) {
+                    if ((DataGlobals::DoingSizing) && numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                         if (airLoop > 0) {
                             if (!DataAirSystems::PrimaryAirSystem(airLoop).OASysExists || (DataAirLoop::AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
@@ -5059,7 +5058,7 @@ namespace ZoneEquipmentManager {
                                 returnNodeMassFlow = ExpTotalReturnMassFlow;
                             }
                         }
-                    } else if (!DataGlobals::DoingSizing && !DataGlobals::isPulseZoneSizing) {
+                    } else if (!DataGlobals::DoingSizing) {
                         if (thisZoneEquip.NumReturnFlowBasisNodes > 0) {
                             // Set base return air flow rate for node 1 using basis node flow rates
                             Real64 basisNodesMassFlow = 0.0;
