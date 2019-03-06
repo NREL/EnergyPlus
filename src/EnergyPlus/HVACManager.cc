@@ -103,7 +103,7 @@
 #include <SystemAvailabilityManager.hh>
 #include <SystemReports.hh>
 //#include <ThermalChimney.hh>
-#include <../FMI/EPFMIData.hpp>
+#include <FMIDataGlobals.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>

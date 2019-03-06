@@ -1,3 +1,4 @@
+#include "EPFMI_Export.hpp"
 #include <cstddef>
 #include <fmi2FunctionTypes.h>
 
@@ -12,7 +13,7 @@
 
 extern "C" {
 
-unsigned int instantiate(const char *input,
+EPFMI_API unsigned int instantiate(const char *input,
                          const char *weather,
                          const char *idd,
                          const char *instanceName,
@@ -27,27 +28,27 @@ unsigned int instantiate(const char *input,
                          size_t nOut,
                          const char *log);
 
-unsigned int setupExperiment(double tStart,
+EPFMI_API unsigned int setupExperiment(double tStart,
                              bool stopTimeDefined,
                              const char *log);
 
-unsigned int setTime(double time,
+EPFMI_API unsigned int setTime(double time,
                      const char *log);
 
-unsigned int setVariables(const unsigned int valueReferences[],
+EPFMI_API unsigned int setVariables(const unsigned int valueReferences[],
                           const double variablePointers[],
                           size_t nVars1,
                           const char *log);
 
-unsigned int getVariables(const unsigned int valueReferences[],
+EPFMI_API unsigned int getVariables(const unsigned int valueReferences[],
                           double variablePointers[],
                           size_t nVars2,
                           const char *log);
 
-unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
+EPFMI_API unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
                               const char *log);
 
-unsigned int terminateSim(const char *log);
+EPFMI_API unsigned int terminateSim(const char *log);
 
 }
 

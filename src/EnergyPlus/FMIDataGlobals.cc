@@ -1,4 +1,4 @@
-#include "EPFMIData.hpp"
+#include "FMIDataGlobals.hh"
 
 FMUTimeInfo fmutimeinfo;
 std::condition_variable time_cv;

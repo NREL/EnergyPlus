@@ -230,6 +230,8 @@ SET( SRC
   FluidCoolers.hh
   FluidProperties.cc
   FluidProperties.hh
+  FMIDataGlobals.cc
+  FMIDataGlobals.hh
   FuelCellElectricGenerator.cc
   FuelCellElectricGenerator.hh
   Furnaces.cc

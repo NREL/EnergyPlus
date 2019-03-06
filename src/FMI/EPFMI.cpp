@@ -1,5 +1,4 @@
 #include "EPFMI.hpp"
-#include "EPFMIData.hpp"
 #include "../EnergyPlus/public/EnergyPlusPgm.hh"
 #include "../EnergyPlus/CommandLineInterface.hh"
 #include "../EnergyPlus/ZoneTempPredictorCorrector.hh"
@@ -7,6 +6,7 @@
 #include "../EnergyPlus/DataHeatBalFanSys.hh"
 #include "../EnergyPlus/DataHeatBalance.hh"
 #include "../EnergyPlus/DataEnvironment.hh"
+#include "../EnergyPlus/FMIDataGlobals.hh"
 #include <functional>
 #include <map>
 #include <memory>

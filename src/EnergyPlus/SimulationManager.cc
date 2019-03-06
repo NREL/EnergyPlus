@@ -63,7 +63,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <../FMI/EPFMIData.hpp>
+#include <FMIDataGlobals.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CommandLineInterface.hh>
