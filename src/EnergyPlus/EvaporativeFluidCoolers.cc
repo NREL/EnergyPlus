@@ -1389,12 +1389,12 @@ namespace EvaporativeFluidCoolers {
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum,
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum,
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum,
+                                    ErrorsFound,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    ErrorsFound);
+                                    _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
@@ -3281,6 +3281,8 @@ namespace EvaporativeFluidCoolers {
 
     void clear_state()
     {
+        NumSimpleEvapFluidCoolers = 0;
+        CheckEquipName.clear();
         UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
     }

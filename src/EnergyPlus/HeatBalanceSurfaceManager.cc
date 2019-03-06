@@ -59,11 +59,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <ChilledCeilingPanelSimple.hh>
 #include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
 #include <DElightManagerF.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataDElight.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
@@ -1456,6 +1456,9 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea.dimension(TotSurfaces, 0.0);
         QRadOutReport.dimension(TotSurfaces, 0.0);
 
+        QAirExtReport.dimension(TotSurfaces, 0.0);
+        QHeatEmiReport.dimension(TotSurfaces, 0.0);
+
         OpaqSurfInsFaceConduction.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceConductionFlux.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceCondGainRep.dimension(TotSurfaces, 0.0);
@@ -1750,6 +1753,18 @@ namespace HeatBalanceSurfaceManager {
                                     "Zone",
                                     "State",
                                     Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    QAirExtReport(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Heat Emission to Air Rate",
+                                    OutputProcessor::Unit::W,
+                                    QHeatEmiReport(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
                 if (Surface(loop).Class != SurfaceClass_Window) {
                     SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate",
                                         OutputProcessor::Unit::W,
@@ -2014,6 +2029,9 @@ namespace HeatBalanceSurfaceManager {
             // CurrentModuleObject='Zone'
             SetupOutputVariable("Zone Mean Radiant Temperature", OutputProcessor::Unit::C, ZoneMRT(loop), "Zone", "State", Zone(loop).Name);
         }
+
+        SetupOutputVariable(
+            "Site Total Surface Heat Emission to Air", OutputProcessor::Unit::J, SumSurfaceHeatEmission, "Zone", "Sum", "Environment");
     }
 
     void InitThermalAndFluxHistories()
@@ -2117,6 +2135,8 @@ namespace HeatBalanceSurfaceManager {
         QRadOutReport = 0.0;
         QdotRadOutRep = 0.0;
         QdotRadOutRepPerArea = 0.0;
+        QAirExtReport = 0.0;
+        QHeatEmiReport = 0.0;
         OpaqSurfInsFaceConduction = 0.0;
         OpaqSurfInsFaceConductionFlux = 0.0;
         OpaqSurfInsFaceConductionEnergy = 0.0;
@@ -4998,6 +5018,8 @@ namespace HeatBalanceSurfaceManager {
         int ZoneNum;
         static int TimeStepInDay(0);
 
+        SumSurfaceHeatEmission = 0.0;
+
         ZoneMRT({1, NumOfZones}) = MRT({1, NumOfZones});
 
         ReportSurfaceShading();
@@ -5101,9 +5123,10 @@ namespace HeatBalanceSurfaceManager {
                 }
 
             } // opaque heat transfer surfaces.
-
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec;
+            }
         } // loop over surfaces
-
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = ZoneOpaqSurfInsFaceCond(ZoneNum);
@@ -5780,9 +5803,7 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
             }
-
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
-
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
@@ -6834,8 +6855,6 @@ namespace HeatBalanceSurfaceManager {
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
     {
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using General::RoundSigDigits;
 
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
@@ -6853,7 +6872,7 @@ namespace HeatBalanceSurfaceManager {
                             } else {
                                 ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
-                            if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                            if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                                 ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                                 ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
@@ -6894,7 +6913,7 @@ namespace HeatBalanceSurfaceManager {
                             } else {
                                 ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
-                            if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                            if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                                 ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                                 ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
@@ -6949,7 +6968,7 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
@@ -6975,7 +6994,7 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
@@ -7275,6 +7294,12 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea(SurfNum) = QdotRadOutRep(SurfNum) / Surface(SurfNum).Area;
 
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+
+        // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
+        QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+        QHeatEmiReport(SurfNum) =
+            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {
 

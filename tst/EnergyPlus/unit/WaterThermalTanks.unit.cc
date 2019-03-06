@@ -327,10 +327,14 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
         "    SPACE4-1 AirSys,            !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 2 Object Type",
         "    Zone4HeatPumpWaterHeater,!- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
         "  NodeList,",
         "    SPACE4-1 In Nodes,       !- Name",
         "    SPACE4-1 In Node,        !- Node 1 Name",
@@ -354,8 +358,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 {
     // Unit test for #5127
 
-    std::vector<std::string> idf_lines({"Version, 8.4;",
-                                        "Schedule:Constant,DummySch,,1.0;",
+    std::vector<std::string> idf_lines({"Schedule:Constant,DummySch,,1.0;",
                                         "Curve:Biquadratic,",
                                         "    HPWH-Htg-Cap-fT,         !- Name",
                                         "    0.563,                   !- Coefficient1 Constant",
@@ -544,7 +547,6 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     using WaterThermalTanks::WaterThermalTank;
 
     std::string idf_objects = delimited_string({
-        "Version, 8.4;",
         "Schedule:Constant,",
         "    WaterHeaterSP1Schedule,  !- Name",
         "    ,             !- Schedule Type Limits Name",
@@ -997,10 +999,14 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
         "    SPACE4-1 AirSys,            !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 2 Object Type",
         "    Zone4HeatPumpWaterHeater,!- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
         "  NodeList,",
         "    SPACE4-1 In Nodes,       !- Name",
         "    SPACE4-1 In Node,        !- Node 1 Name",

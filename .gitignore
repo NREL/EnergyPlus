@@ -25,6 +25,7 @@ Energy+.schema.epJSON.in
 
 # now that we have python, ignore some things
 *.pyc
+venv
 
 # build folder, if the dev chooses to put it there
 #  could also do a wildcard for build-* if we suggest that naming approach
@@ -43,6 +44,7 @@ cmake-build-*
 .cproject
 .idea
 .se
+.vs
 
 # vim temp file:
 *.swp

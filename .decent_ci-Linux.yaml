@@ -69,3 +69,4 @@ compilers:
     commands:
       - ./scripts/dev/license-check.py
       - ./scripts/dev/verify_formatting.sh
+      - ./scripts/dev/check_stray_fields_in_idd.py

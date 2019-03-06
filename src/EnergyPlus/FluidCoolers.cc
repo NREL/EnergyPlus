@@ -1031,12 +1031,12 @@ namespace FluidCoolers {
                                     SimpleFluidCooler(FluidCoolerNum).LoopSideNum,
                                     SimpleFluidCooler(FluidCoolerNum).BranchNum,
                                     SimpleFluidCooler(FluidCoolerNum).CompNum,
+                                    ErrorsFound,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    ErrorsFound);
+                                    _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitFluidCooler: Program terminated due to previous condition(s).");

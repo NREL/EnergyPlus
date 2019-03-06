@@ -122,11 +122,8 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 
 TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
 {
-    // AUTHOR: R. Raustad, FSEC
-    // DATE WRITTEN: Nov 2015
 
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Output:Diagnostics, DisplayExtraWarnings;",
         " Timestep, 4;",
         " BUILDING, BranchNodeConnections_ReturnPlenumNodeCheckFailure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
@@ -1133,11 +1130,8 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
 
 TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
 {
-    // AUTHOR: R. Raustad, FSEC
-    // DATE WRITTEN: Nov 2015
 
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Output:Diagnostics, DisplayExtraWarnings;",
         " Timestep, 4;",
         " BUILDING, BranchNodeConnections_ReturnPlenumNodeCheck, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",

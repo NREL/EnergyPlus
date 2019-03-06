@@ -960,12 +960,12 @@ namespace SolarCollectors {
                                                         Collector(CollectorNum).WLoopSideNum,
                                                         Collector(CollectorNum).WLoopBranchNum,
                                                         Collector(CollectorNum).WLoopCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");
                 }
