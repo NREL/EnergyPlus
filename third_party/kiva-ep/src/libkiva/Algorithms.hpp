@@ -5,9 +5,8 @@
 #define ConvectionAlgorithms_HPP
 
 #include <cmath>
+#include <functional>
 #include <map>
-
-//#include "PixelCounter.hpp"
 
 #define MEMOIZE_DECL(NAME)                                                                         \
   namespace Memo {                                                                                 \
@@ -15,12 +14,16 @@
   double NAME(double x);                                                                           \
   }
 
+#define CONST_CONV(HC) [=](double, double, double, double, double) -> double { return HC; };
+
 namespace Kiva {
 
 MEMOIZE_DECL(cos)
 MEMOIZE_DECL(pow025)
 MEMOIZE_DECL(pow089)
 MEMOIZE_DECL(pow0617)
+
+typedef std::function<double(double, double, double, double, double)> ConvectionAlgorithm;
 
 double cbrt_a(double x);
 

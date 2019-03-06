@@ -106,7 +106,7 @@ Foundation::Foundation()
       reductionStrategy(RS_BOUNDARY), exposedFraction(1.0), useDetailedExposedPerimeter(false),
       buildingHeight(0.0), hasWall(true), hasSlab(true), perimeterSurfaceWidth(0.0),
       hasPerimeterSurface(false), mesh(Mesh()), numericalScheme(NS_ADI), fADI(0.00001),
-      tolerance(1.0e-6), maxIterations(100000), convectionCalculationMethod(CCM_AUTO) {}
+      tolerance(1.0e-6), maxIterations(100000) {}
 
 void Foundation::createMeshData() {
   std::size_t nV = polygon.outer().size();
@@ -2800,19 +2800,6 @@ void Foundation::createMeshData() {
   xMeshData.intervals = xIntervals;
   yMeshData.intervals = yIntervals;
   zMeshData.intervals = zIntervals;
-}
-
-double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
-                                      bool isExterior, double cosTilt) const {
-  if (convectionCalculationMethod == Foundation::CCM_AUTO)
-    return getDOE2ConvectionCoeff(Tsurf, Tamb, hfGlass, roughness, cosTilt);
-  else // if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
-  {
-    if (isExterior)
-      return exteriorConvectiveCoefficient;
-    else
-      return interiorConvectiveCoefficient;
-  }
 }
 
 } // namespace Kiva

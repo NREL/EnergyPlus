@@ -44,10 +44,6 @@ protected:
     fnd.wall.interior.absorptivity = 0.0;
     fnd.wall.exterior.absorptivity = 0.0;
 
-    fnd.convectionCalculationMethod = Foundation::CCM_CONSTANT_COEFFICIENT;
-    fnd.interiorConvectiveCoefficient = 99999;
-    fnd.exteriorConvectiveCoefficient = 99999;
-
     fnd.numericalScheme = Foundation::NS_STEADY_STATE;
     fnd.mesh.maxNearGrowthCoeff = 1.0;
 
@@ -57,6 +53,11 @@ protected:
     bcs.slabRadiantTemp = 303.15;
     bcs.wallRadiantTemp = 303.15;
     bcs.deepGroundTemperature = 283.15;
+
+    bcs.slabConvectionAlgorithm = CONST_CONV(99999.);
+    bcs.intWallConvectionAlgorithm = CONST_CONV(99999.);
+    bcs.extWallConvectionAlgorithm = CONST_CONV(99999.);
+    bcs.gradeConvectionAlgorithm = CONST_CONV(99999.);
 
     outputMap = {Surface::ST_SLAB_CORE};
   };

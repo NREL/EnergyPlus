@@ -4,6 +4,8 @@
 #ifndef BoundaryConditions_HPP
 #define BoundaryConditions_HPP
 
+#include "Algorithms.hpp"
+
 namespace Kiva {
 
 class BoundaryConditions {
@@ -23,11 +25,20 @@ public:
   double wallAbsRadiation;
   double deepGroundTemperature;
 
+  ConvectionAlgorithm slabConvectionAlgorithm;
+  ConvectionAlgorithm intWallConvectionAlgorithm;
+  ConvectionAlgorithm extWallConvectionAlgorithm;
+  ConvectionAlgorithm gradeConvectionAlgorithm;
+
   BoundaryConditions()
       : indoorTemp(293.15), slabRadiantTemp(293.15), wallRadiantTemp(293.15), outdoorTemp(273.15),
         localWindSpeed(0.0), windDirection(0.0), solarAzimuth(3.14), solarAltitude(0.0),
         directNormalFlux(0.0), diffuseHorizontalFlux(0.0), skyEmissivity(0.0),
-        slabAbsRadiation(0.0), wallAbsRadiation(0.0), deepGroundTemperature(283.15) {}
+        slabAbsRadiation(0.0), wallAbsRadiation(0.0), deepGroundTemperature(283.15),
+        slabConvectionAlgorithm(&getDOE2ConvectionCoeff),
+        intWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
+        extWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
+        gradeConvectionAlgorithm(&getDOE2ConvectionCoeff) {}
 };
 
 } // namespace Kiva
