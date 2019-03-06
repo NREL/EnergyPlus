@@ -1,5 +1,5 @@
 module VCompareGlobalRoutines
-USE DataGlobals, ONLY: MaxNameLength, ShowFatalError
+USE DataGlobals, ONLY: MaxNameLength, ShowFatalError, ShowWarningError
 USE DataVCompareGlobals
 USE DataStringGlobals, ONLY: PrognameConversion
 PUBLIC
@@ -541,9 +541,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-10)/3
               ! Replace in existing with Autocalculate
               OutArgs(10) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(10) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -583,9 +586,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-3)/3
               ! Replace in existing with Autocalculate
               OutArgs(3) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(3) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -629,9 +635,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-4)/3
               ! Replace in existing with Autocalculate
               OutArgs(4) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(4) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -802,9 +811,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-10)/3
               ! Replace in existing with Autocalculate
               OutArgs(10) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(10) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -845,9 +857,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
                 NVert=(CurArgs-10)/3
                 ! Replace in existing with Autocalculate
                 OutArgs(10) = 'Autocalculate'
-                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                     ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                     TRIM(TrimSigDigits(NVert)) //')')
+              ELSE
+                ! Silently trim any float to an integer
+                OutArgs(10) = TrimSigDigits(NVert)
               ENDIF
             ENDIF
 
@@ -886,9 +901,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
                 NVert=(CurArgs-9)/3
                 ! Replace in existing with Autocalculate
                 OutArgs(9) = 'Autocalculate'
-                CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+                CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                    ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                    TRIM(TrimSigDigits(NVert)) //')')
+              ELSE
+                ! Silently trim any float to an integer
+                OutArgs(9) = TrimSigDigits(NVert)
               ENDIF
             ENDIF
 
@@ -929,9 +947,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-9)/3
               ! Replace in existing with Autocalculate
               OutArgs(9) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(9) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -971,9 +992,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-3)/3
               ! Replace in existing with Autocalculate
               OutArgs(3) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(3) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
@@ -1013,9 +1037,12 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               NVert=(CurArgs-4)/3
               ! Replace in existing with Autocalculate
               OutArgs(4) = 'Autocalculate'
-              CALL DisplayString('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
+              CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not an integer, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')')
+            ELSE
+              ! Silently trim any float to an integer
+              OutArgs(4) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
