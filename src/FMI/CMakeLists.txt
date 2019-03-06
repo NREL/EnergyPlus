@@ -21,20 +21,6 @@ set_target_properties( epfmi PROPERTIES OUTPUT_NAME "epfmi-${ENERGYPLUS_VERSION}
 
 target_link_libraries( epfmi energypluslib )
 
-
-if( BUILD_TESTING )
-  configure_file( Test/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/test-config.h.in2" )
-  #file(GENERATE OUTPUT output-file
-  #     <INPUT input-file|CONTENT content>
-  #     [CONDITION expression])
-  
-  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test-config.h" INPUT "${CMAKE_CURRENT_BINARY_DIR}/test-config.h.in2")
-  
-  #add_executable( libfmi_dll_test Test/EPFMI_DLL_Test.c )
-  #add_dependencies( libfmi_dll_test epfmi )
-  #target_link_libraries( libfmi_dll_test ${CMAKE_DL_LIBS} )
-endif()
-
 install( TARGETS epfmi
   RUNTIME DESTINATION ./bin
   LIBRARY DESTINATION ./lib
@@ -49,6 +35,8 @@ set(test_src
   Test/EPFMI_Test.cpp
   Test/main.cc
 )
+
+configure_file( Test/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/test-config.h" )
 
 CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
 
