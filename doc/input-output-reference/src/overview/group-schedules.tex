@@ -574,7 +574,9 @@ Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
 
 The Schedule:File:Shading object allows shading schedules to be imported altogether from a file. The object can also be used to read in hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
 
-The format for the data file is Comma-separated values (CSV). The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued.
+The format for the data file is Comma-separated values (CSV). The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. The sunlit fraction is only overwritten and used when the sun is above horizon at a certain time step. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued.
+
+The first row of the CSV file should be the header, and the first column of the CSV file should be the timestamp and is not imported. 
 
 With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining Schedule:File objects.
 

@@ -649,12 +649,15 @@ namespace ScheduleManager {
                             CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
                         }
                     } else {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            ++numerrors;
-                            columnValue = 0.0;
+                        // skip header
+                        if (colCnt > 1) {
+                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            if (errFlag) {
+                                ++numerrors;
+                                columnValue = 0.0;
+                            }
+                            CSVAllColumnNameAndValues[colCnt](rowCnt - 1) = columnValue;
                         }
-                        CSVAllColumnNameAndValues[colCnt](rowCnt - 1) = columnValue;
                     }
                 }
 

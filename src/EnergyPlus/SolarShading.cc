@@ -743,11 +743,11 @@ namespace SolarShading {
         }
         int ExtShadingSchedNum;
         if (UseImportedSunlitFrac) {
-            for (auto surf : Surface) {
-                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(surf.Name + "_shading");
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
-                    surf.SchedExternalShadingFrac = true;
-                    surf.ExternalShadingSchInd = ExtShadingSchedNum;
+                    Surface(SurfNum).SchedExternalShadingFrac = true;
+                    Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
                 }
             }
         }
@@ -4676,6 +4676,7 @@ namespace SolarShading {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
+        using DataSystemVariables::UseImportedSunlitFrac;
         using ScheduleManager::LookUpScheduleValue;
 
         // Locals
@@ -4713,7 +4714,7 @@ namespace SolarShading {
             CosIncAng(iTimeStep, iHour, SurfNum) = CTHETA(SurfNum);
         }
 
-        if (UseScheduledSunlitFrac) {
+        if (UseScheduledSunlitFrac || UseImportedSunlitFrac) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
