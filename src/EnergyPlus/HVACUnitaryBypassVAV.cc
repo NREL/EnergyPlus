@@ -1537,12 +1537,12 @@ namespace HVACUnitaryBypassVAV {
                                             CBVAV(CBVAVNum).LoopSide,
                                             CBVAV(CBVAVNum).BranchNum,
                                             CBVAV(CBVAVNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
                     if (ErrorFlag) {
                         ShowFatalError("InitCBVAV: Program terminated for previous conditions.");
                     }
@@ -1567,12 +1567,12 @@ namespace HVACUnitaryBypassVAV {
                                             CBVAV(CBVAVNum).LoopSide,
                                             CBVAV(CBVAVNum).BranchNum,
                                             CBVAV(CBVAVNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
 
                     if (ErrorFlag) {
                         ShowFatalError("InitCBVAV: Program terminated for previous conditions.");

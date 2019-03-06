@@ -2782,12 +2782,12 @@ namespace CondenserLoopTowers {
                                     SimpleTower(TowerNum).LoopSideNum,
                                     SimpleTower(TowerNum).BranchNum,
                                     SimpleTower(TowerNum).CompNum,
+                                    ErrorsFound,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    ErrorsFound);
+                                    _);
             if (ErrorsFound) {
                 ShowFatalError("InitTower: Program terminated due to previous condition(s).");
             }

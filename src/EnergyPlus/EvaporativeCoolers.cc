@@ -5022,8 +5022,14 @@ namespace EvaporativeCoolers {
 
     void clear_state()
     {
+        NumEvapCool = 0;
+        NumZoneEvapUnits = 0;
+        GetInputEvapComponentsFlag = false;
         GetInputZoneEvapUnit = true;
         UniqueEvapCondNames.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
+        CheckZoneEvapUnitName.clear();
     }
 
 } // namespace EvaporativeCoolers

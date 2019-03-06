@@ -206,7 +206,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  People,                                                                 ",
         "    Space People,   !- Name                                      ",
         "    Space,     !- Zone or ZoneList Name                     ",

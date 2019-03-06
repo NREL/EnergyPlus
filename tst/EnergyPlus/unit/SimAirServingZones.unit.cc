@@ -306,8 +306,6 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
 {
     // this unit test is related to issue #5973 checks for controller economizer lockout
     std::string const idf_objects = delimited_string({
-        " Version,8.8;",
-
         " Coil:Cooling:Water,",
         "	AHU cooling coil,	!- Name",
         "	,       			!- Availability Schedule Name",
@@ -475,8 +473,6 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
 {
     // this unit test is related to issue #5973 checks for controller economizer lockout
     std::string const idf_objects = delimited_string({
-        " Version,8.8;",
-
         " Coil:Cooling:Water,",
         "	AHU cooling coil,	!- Name",
         "	,       			!- Availability Schedule Name",

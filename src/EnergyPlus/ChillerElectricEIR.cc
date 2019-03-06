@@ -1186,12 +1186,12 @@ namespace ChillerElectricEIR {
                                     ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
                                     ElectricEIRChiller(EIRChillNum).CWBranchNum,
                                     ElectricEIRChiller(EIRChillNum).CWCompNum,
+                                    errFlag,
                                     ElectricEIRChiller(EIRChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     ElectricEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ElectricEIRChiller(EIRChillNum).CondenserType != AirCooled && ElectricEIRChiller(EIRChillNum).CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(ElectricEIRChiller(EIRChillNum).Name,
                                         TypeOf_Chiller_ElectricEIR,
@@ -1199,12 +1199,12 @@ namespace ChillerElectricEIR {
                                         ElectricEIRChiller(EIRChillNum).CDLoopSideNum,
                                         ElectricEIRChiller(EIRChillNum).CDBranchNum,
                                         ElectricEIRChiller(EIRChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricEIRChiller(EIRChillNum).CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricEIRChiller(EIRChillNum).CWLoopNum,
                                               ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElectricEIRChiller(EIRChillNum).CDLoopNum,
@@ -1219,12 +1219,12 @@ namespace ChillerElectricEIR {
                                         ElectricEIRChiller(EIRChillNum).HRLoopSideNum,
                                         ElectricEIRChiller(EIRChillNum).HRBranchNum,
                                         ElectricEIRChiller(EIRChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricEIRChiller(EIRChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricEIRChiller(EIRChillNum).CWLoopNum,
                                               ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElectricEIRChiller(EIRChillNum).HRLoopNum,
