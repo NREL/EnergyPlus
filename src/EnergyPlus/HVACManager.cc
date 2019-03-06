@@ -61,6 +61,7 @@
 //#include <CoolTower.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -1687,6 +1688,9 @@ namespace HVACManager {
                 }
             }
         }
+
+        CheckAirLoopFlowBalance();
+
         // Set node setpoints to a flag value so that controllers can check whether their sensed nodes
         // have a setpoint
         if (!ZoneSizingCalc && !SysSizingCalc) {
@@ -3074,6 +3078,30 @@ namespace HVACManager {
                 tmpRealARR = ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
                 ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = Node(NodeNum).Temp;
                 ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, ConvergLogStackDepth}) = tmpRealARR({1, ConvergLogStackDepth - 1});
+            }
+        }
+    }
+
+    void CheckAirLoopFlowBalance()
+    {
+        // Check for unbalanced airloop
+        if (!DataGlobals::WarmupFlag && AirLoopsSimOnce) {
+            for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+                auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
+                if (!thisAirLoopFlow.FlowError) {
+                    Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
+                    if (unbalancedExhaustDelta > SmallMassFlow) {
+                        ShowSevereError("CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
+                            " is unbalanced. Supply is > return plus outdoor air.");
+                        ShowContinueErrorTimeStamp("");
+                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" + General::RoundSigDigits(thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir, 6) +
+                            "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir, 6) +
+                            "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta / DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  This error will only be reported once per system.");
+                        thisAirLoopFlow.FlowError = true;
+                    }
+                }
             }
         }
     }
