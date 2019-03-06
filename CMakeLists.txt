@@ -210,7 +210,7 @@ include(cmake/179DReporting.cmake)
 if( BUILD_TESTING )
   #ADD_SUBDIRECTORY(third_party/gtest)
   #ADD_SUBDIRECTORY(testfiles)
-  ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
+  #ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
 
