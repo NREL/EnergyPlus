@@ -631,26 +631,26 @@ namespace ScheduleManager {
                         }
                         break;
                     }
-                    if (rowCnt == 1) {
-                        if (subString == BlankString) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
-                            errFlag = true;
-                        } else if (CSVAllColumnNames.count(subString)) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
-                                             "\".");
-                            ShowContinueError("The first occurence of the same surface name would be used.");
-                            errFlag = true;
-                        }
-                        if (!errFlag) {
-                            NumCSVAllColumnsSchedules++;
-                            Array1D<Real64> hourlyColumnValues;
-                            hourlyColumnValues.allocate(8784);
-                            CSVAllColumnNames[subString] = colCnt;
-                            CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
-                        }
-                    } else {
-                        // skip header
-                        if (colCnt > 1) {
+                    // skip time stamp column
+                    if (colCnt > 1) {
+                        if (rowCnt == 1) {
+                            if (subString == BlankString) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+                                errFlag = true;
+                            } else if (CSVAllColumnNames.count(subString)) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
+                                                 "\".");
+                                ShowContinueError("The first occurence of the same surface name would be used.");
+                                errFlag = true;
+                            }
+                            if (!errFlag) {
+                                NumCSVAllColumnsSchedules++;
+                                Array1D<Real64> hourlyColumnValues;
+                                hourlyColumnValues.allocate(8784);
+                                CSVAllColumnNames[subString] = colCnt;
+                                CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
+                            }
+                        } else {
                             columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                             if (errFlag) {
                                 ++numerrors;
@@ -1882,6 +1882,7 @@ namespace ScheduleManager {
                     if (colCnt == curcolCount) {
                         columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                         if (errFlag) {
+                            std::string test = subString;
                             ++numerrors;
                             columnValue = 0.0;
                         }
