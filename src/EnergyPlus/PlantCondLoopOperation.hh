@@ -90,7 +90,7 @@ namespace PlantCondLoopOperation {
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
-                                     Optional_bool LoadDistributionWasPerformed = _);
+                                     bool &LoadDistributionWasPerformed);
 
     // Beginning of GetInput subroutines for the Module
     //******************************************************************************

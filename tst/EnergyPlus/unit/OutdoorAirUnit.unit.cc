@@ -112,8 +112,6 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     int ZoneInletNode(0);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "Output:Diagnostics, DisplayExtraWarnings;",
         " ",
         "Zone,",
@@ -377,9 +375,6 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "    9.0;                     !- Version Identifier",
-
         "Zone,",
         "    Thermal Zone 1,          !- Name",
         "    ,                        !- Direction of Relative North {deg}",
@@ -689,9 +684,6 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "    9.0;                     !- Version Identifier",
-
         "Zone,",
         "    Thermal Zone 1,          !- Name",
         "    ,                        !- Direction of Relative North {deg}",

@@ -91,16 +91,16 @@ namespace PlantUtilities {
     Real64 RegulateCondenserCompFlowReqOp(
         int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest);
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum, int const MixNum);
+    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum);
 
     bool AnyPlantSplitterMixerLacksContinuity();
 
     void
-    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, int const SplitNum, int const MixNum, bool const FirstHVACIteration);
+    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
 
     void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum);
 
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum, int const SplitNum);
+    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum);
 
     void SetAllFlowLocks(int const Value);
 
@@ -186,12 +186,12 @@ namespace PlantUtilities {
                                  int &LoopSideNum,
                                  int &BranchNum,
                                  int &CompNum,
+                                 bool &errFlag,
                                  Optional<Real64 const> LowLimitTemp = _,
                                  Optional<Real64 const> HighLimitTemp = _,
                                  Optional_int CountMatchPlantLoops = _,
                                  Optional_int_const InletNodeNumber = _,
-                                 Optional_int_const SingleLoopSearch = _,
-                                 Optional_bool errFlag = _);
+                                 Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(std::string const &CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned

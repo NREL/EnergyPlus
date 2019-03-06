@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "    8.4;                     !- Version Identifier",
 
         "	BuildingSurface:Detailed,",
         "    T3-RF1 - Floor:n,        !- Name",

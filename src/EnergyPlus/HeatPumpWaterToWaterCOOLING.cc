@@ -299,19 +299,19 @@ namespace HeatPumpWaterToWaterCOOLING {
 
             GSHP(GSHPNum).LoadSideUACoeff = NumArray(8);
             if (NumArray(9) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Load Side Heat Transfer Coefficient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).SourceSideUACoeff = NumArray(9);
             if (NumArray(8) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Source Side Heat Transfer Coefficient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).CompPistonDisp = NumArray(10);
             if (NumArray(10) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Compressor Piston displacement/Stroke = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -513,24 +513,24 @@ namespace HeatPumpWaterToWaterCOOLING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     GSHP(GSHPNum).WWHPPlantTypeOfNum,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (!errFlag) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
@@ -590,24 +590,24 @@ namespace HeatPumpWaterToWaterCOOLING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     TypeOf_HPWaterPECooling,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGshp: Program terminated due to previous condition(s).");
             }

@@ -223,9 +223,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "    8.4;                     !- Version Identifier",
-
         " BuildingSurface:Detailed,",
         "    Surface 1 - Triangle,    !- Name",
         "    Floor,                   !- Surface Type",
@@ -614,7 +611,6 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "BuildingSurface:Detailed,",
         " FRONT-1,                  !- Name",
         " WALL,                     !- Surface Type",
@@ -776,9 +772,6 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,                                                        ",
-        "	8.6;                     !- Version Identifier               ",
-        "	                                                             ",
         "FenestrationSurface:Detailed,                                   ",
         "	Surface-1-Rectangle,     !- Name                             ",
         "	Window,                  !- Surface Type                     ",
@@ -2960,9 +2953,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,                                                        ",
-        "	8.6;                     !- Version Identifier               ",
-        "	                                                             ",
         "Material,",
         "  8 in.Concrete Block Basement Wall,     !- Name",
         "  MediumRough,                            !- Roughness",
@@ -3401,9 +3391,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,                                                        ",
-        "	8.9;                     !- Version Identifier               ",
-        "	                                                             ",
         "Material,",
         "    Gypsum Board,            !- Name",
         "    MediumSmooth,            !- Roughness",
@@ -3574,8 +3561,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version, 9.0;",
-        "",
         "Material,",
         "  8 in.Concrete Block Basement Wall,      !- Name",
         "  MediumRough,                            !- Roughness",

@@ -874,12 +874,12 @@ namespace CTElectricGenerator {
                                     CTGenerator(GeneratorNum).HRLoopSideNum,
                                     CTGenerator(GeneratorNum).HRBranchNum,
                                     CTGenerator(GeneratorNum).HRCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitCTGenerators: Program terminated due to previous condition(s).");
             }

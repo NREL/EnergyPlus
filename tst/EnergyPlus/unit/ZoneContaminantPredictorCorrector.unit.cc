@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -87,13 +88,13 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace SimulationManager;
 using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
@@ -149,8 +150,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     DataContaminantBalance::ZoneAirDensityCO.allocate(1);
     DataContaminantBalance::ZoneCO2Gain.allocate(1);
+    DataContaminantBalance::ZoneCO2GainExceptPeople.allocate(1);
     DataContaminantBalance::ZoneGCGain.allocate(1);
     DataContaminantBalance::ZoneCO2Gain(1) = 0.0001;
+    DataContaminantBalance::ZoneCO2GainExceptPeople = 0.0001;
     DataContaminantBalance::ZoneGCGain(1) = 0.0000001;
     DataContaminantBalance::MixingMassFlowCO2(1) = 0.0;
     DataContaminantBalance::MixingMassFlowGC(1) = 0.0;
@@ -199,6 +202,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Zone(1).ZoneVolCapMultpMoist = 1.0;
     OutBaroPress = 101325.0;
 
+    HybridModelZone.allocate(1);
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
+
     NumZoneReturnPlenums = 0;
     NumZoneSupplyPlenums = 0;
 
@@ -212,7 +219,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -303,6 +310,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     DataContaminantBalance::ZoneAirDensityCO.allocate(1);
     DataContaminantBalance::ZoneCO2Gain.allocate(1);
+    DataContaminantBalance::ZoneCO2GainExceptPeople.allocate(1);
     DataContaminantBalance::ZoneGCGain.allocate(1);
     DataContaminantBalance::ZoneCO2Gain(1) = 0.0001;
     DataContaminantBalance::ZoneGCGain(1) = 0.0001;
@@ -350,6 +358,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     Zone(1).ZoneVolCapMultpMoist = 1.0;
     OutBaroPress = 101325.0;
 
+    HybridModelZone.allocate(1);
+    HybridModelZone(1).InfiltrationCalc_C = false;
+    HybridModelZone(1).PeopleCountCalc_C = false;
+
     NumZoneReturnPlenums = 0;
     NumZoneSupplyPlenums = 0;
 
@@ -360,7 +372,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     MDotOA.allocate(1);
     MDotOA(1) = 0.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -404,7 +416,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataGlobals::NumOfZones = 3;
 
     DataContaminantBalance::Contaminant.CO2Simulation = true;
- 
+
     DataContaminantBalance::AZ.allocate(3);
     DataContaminantBalance::BZ.allocate(3);
     DataContaminantBalance::CZ.allocate(3);
@@ -544,7 +556,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -579,7 +591,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZT(3) = 24.5;
     MixingMassFlowZone = 0.0;
 
-    Node(6).MassFlowRate = 0.01; 
+    Node(6).MassFlowRate = 0.01;
     Node(7).MassFlowRate = 0.01;
     Node(8).MassFlowRate = 0.01;
     Node(9).MassFlowRate = 0.01;
@@ -604,7 +616,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     EXPECT_NEAR(1.0416921806, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
     EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
-
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTest)
@@ -632,7 +643,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     DataContaminantBalance::DSGCZoneTimeMinus1.allocate(3);
     DataContaminantBalance::DSGCZoneTimeMinus2.allocate(3);
     DataContaminantBalance::DSGCZoneTimeMinus3.allocate(3);
-    
+
     DataContaminantBalance::MixingMassFlowGC.allocate(3);
     DataContaminantBalance::ZoneAirGCTemp.allocate(3);
     DataContaminantBalance::ZoneGC1.allocate(3);
@@ -668,8 +679,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     DataContaminantBalance::ZoneAirGC(1) = DataContaminantBalance::ZoneGC1(1);
     DataContaminantBalance::ZoneAirGC(2) = DataContaminantBalance::ZoneGC1(2);
     DataContaminantBalance::ZoneAirGC(3) = DataContaminantBalance::ZoneGC1(3);
-    
-    
+
     Real64 PriorTimeStep;
 
     TimeStepSys = 15.0 / 60.0; // System timestep in hours
@@ -751,7 +761,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -785,15 +795,15 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZoneAirHumRat(3) = 0.008;
     ZT(3) = 24.5;
     MixingMassFlowZone = 0.0;
-    
+
     Node(6).MassFlowRate = 0.01;
-    
+
     Node(7).MassFlowRate = 0.01;
     Node(8).MassFlowRate = 0.01;
     Node(9).MassFlowRate = 0.01;
-    
+
     DataContaminantBalance::GCPredictedRate.allocate(3);
-        
+
     DataContaminantBalance::ZoneSysContDemand.allocate(3);
     DataContaminantBalance::NumContControlledZones = 3;
 
@@ -814,5 +824,4 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     EXPECT_NEAR(19.549478386, DataContaminantBalance::GCPredictedRate(1), 0.00001);
     EXPECT_NEAR(20.887992514, DataContaminantBalance::GCPredictedRate(2), 0.00001);
     EXPECT_NEAR(21.251538064, DataContaminantBalance::GCPredictedRate(3), 0.00001);
-
 }

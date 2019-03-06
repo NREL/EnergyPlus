@@ -68,7 +68,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -140,7 +139,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -212,7 +210,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -284,7 +281,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -356,7 +352,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -428,7 +423,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -500,7 +494,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -572,7 +565,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -644,7 +636,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -716,7 +707,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -788,7 +778,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -860,7 +849,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Slab,",
         "CoupledSlab,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -932,7 +920,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1004,7 +991,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1076,7 +1062,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1148,7 +1133,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1220,7 +1204,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1292,7 +1275,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1364,7 +1346,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1436,7 +1417,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1508,7 +1488,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",
@@ -1580,7 +1559,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Site:GroundDomain:Basement,",
         "CoupledBasement,	!- Name",
         "5,				!- Ground Domain Depth {m}",

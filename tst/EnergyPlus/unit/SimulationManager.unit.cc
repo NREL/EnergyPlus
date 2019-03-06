@@ -59,8 +59,6 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, CheckThreading)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
-
         "ProgramControl,",
         "	1;",
 
@@ -69,7 +67,7 @@ TEST_F(EnergyPlusFixture, CheckThreading)
     EXPECT_FALSE(process_idf(idf_objects, false));
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Line: 2 Index: 14 - \"ProgramControl\" is not a valid Object Type.",
+        "   ** Severe  ** Line: 1 Index: 14 - \"ProgramControl\" is not a valid Object Type.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));

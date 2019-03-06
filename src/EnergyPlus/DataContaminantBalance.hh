@@ -72,8 +72,9 @@ namespace DataContaminantBalance {
     extern Array1D<Real64> ZoneCO2SetPoint;
     extern Array1D<Real64> CO2PredictedRate;
 
-    extern Array1D<Real64> ZoneCO2Gain;           // CO2 gain from each Zone (People, equipment)
-    extern Array1D<Real64> ZoneCO2GainFromPeople; // CO2 gain from each Zone (From People only)
+    extern Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
+    extern Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
+    extern Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model CO2 gain from each Zone (Except People)
 
     // Zone Air Contaminant conditions variables
     extern Array1D<Real64> ZoneAirCO2Avg;       // AIR CO2 averaged over the zone time step
@@ -356,6 +357,7 @@ namespace DataContaminantBalance {
     extern Array1D<ZoneContamGenericDataBLDiff> ZoneContamGenericBLDiff;
     extern Array1D<ZoneContamGenericDataDVS> ZoneContamGenericDVS;
     extern Array1D<ZoneContamGenericDataDRS> ZoneContamGenericDRS;
+
 
     // Clears the global data in DataContaminantBalance.
     // Needed for unit tests, should not be normally called.

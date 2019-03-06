@@ -847,12 +847,12 @@ namespace ChillerExhaustAbsorption {
                                     ExhaustAbsorber(ChillNum).CWLoopSideNum,
                                     ExhaustAbsorber(ChillNum).CWBranchNum,
                                     ExhaustAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     ExhaustAbsorber(ChillNum).CHWLowLimitTemp,
                                     _,
                                     _,
                                     ExhaustAbsorber(ChillNum).ChillReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
@@ -863,12 +863,12 @@ namespace ChillerExhaustAbsorption {
                                     ExhaustAbsorber(ChillNum).HWLoopSideNum,
                                     ExhaustAbsorber(ChillNum).HWBranchNum,
                                     ExhaustAbsorber(ChillNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     ExhaustAbsorber(ChillNum).HeatReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
@@ -880,12 +880,12 @@ namespace ChillerExhaustAbsorption {
                                         ExhaustAbsorber(ChillNum).CDLoopSideNum,
                                         ExhaustAbsorber(ChillNum).CDBranchNum,
                                         ExhaustAbsorber(ChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ExhaustAbsorber(ChillNum).CondReturnNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
                 }
