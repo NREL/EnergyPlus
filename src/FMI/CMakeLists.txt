@@ -40,3 +40,10 @@ configure_file( Test/config.h.in "${CMAKE_CURRENT_BINARY_DIR}/test-config.h" )
 
 CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
 
+option(BUILD_SWIG_EPFMI_BINDINGS "Build SWIG EPFMI bindings" OFF)
+if(BUILD_SWIG_EPFMI_BINDINGS)
+  include(swig_epfmi.cmake)
+  MAKE_SWIG_TARGET("epfmi" "epfmi" "EPFMI.i" "EPFMI.i" "epfmi" "")
+endif()
+
+
