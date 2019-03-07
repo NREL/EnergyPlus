@@ -329,7 +329,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaInstanceMap::setBoundaryConditions()
     {
-        bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
+        bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;  // TODO: Use Surface().TAirRef
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
         bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.grade.roughness);
         bcs.windDirection = DataEnvironment::WindDir * DataGlobals::DegToRadians;
@@ -1227,6 +1227,7 @@ namespace HeatBalanceKivaManager {
                 results.Tavg = Tavg - DataGlobals::KelvinConv;
 
                 surfaceResults[surfNum] = results;
+                DataHeatBalance::HConvIn(surfNum) = SurfaceGeometry::kivaManager.surfaceResults[surfNum].h;
             }
         }
     }

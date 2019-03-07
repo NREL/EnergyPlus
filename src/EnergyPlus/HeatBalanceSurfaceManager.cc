@@ -775,15 +775,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
-                !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances();
-            }
-        }
-
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -6125,6 +6116,16 @@ namespace HeatBalanceSurfaceManager {
             if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
                 QAdditionalHeatSourceInside(SurfNum) =
                     EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+            }
+        }
+
+        // Calculate Kiva instances
+        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            SurfaceGeometry::kivaManager.initKivaInstances();
+            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+                !WarmupFlag) {
+                SurfaceGeometry::kivaManager.calcKivaInstances();
             }
         }
 
