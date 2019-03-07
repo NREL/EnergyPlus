@@ -31,8 +31,8 @@ endif()
 
 # need python
 # TODO: add support for 3.x
-find_package(PythonInterp 2.7 REQUIRED)
-find_package(PythonLibs 2.7 REQUIRED)
+find_package(PythonInterp 3.0 REQUIRED)
+find_package(PythonLibs 3.0 REQUIRED)
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 set(ALL_PYTHON_BINDINGS "") # global list of python bindings
 set(ALL_PYTHON_BINDING_DEPENDS "") # global list of library dependencies of the generated wrapper cxx files
@@ -215,9 +215,9 @@ macro(MAKE_SWIG_TARGET NAME SIMPLENAME KEY_I_FILE I_FILES PARENT_TARGET PARENT_S
 
   set_target_properties(${swig_target} PROPERTIES OUTPUT_NAME _${LOWER_NAME})
   set_target_properties(${swig_target} PROPERTIES PREFIX "")
-  set_target_properties(${swig_target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/python/")
-  set_target_properties(${swig_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/python/")
-  set_target_properties(${swig_target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/python/")
+  set_target_properties(${swig_target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/")
+  set_target_properties(${swig_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/")
+  set_target_properties(${swig_target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
   if(MSVC)
     set_target_properties(${swig_target} PROPERTIES COMPILE_FLAGS "/bigobj /wd4996 /wd4005") ## /wd4996 suppresses deprecated warning, /wd4005 suppresses macro redefinition warning
     set_target_properties(${swig_target} PROPERTIES SUFFIX ".pyd")
@@ -228,10 +228,17 @@ macro(MAKE_SWIG_TARGET NAME SIMPLENAME KEY_I_FILE I_FILES PARENT_TARGET PARENT_S
       set_target_properties(${swig_target} PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations")
     endif()
   endif()
-
-  target_link_libraries(${swig_target} ${PARENT_TARGET} ${PYTHON_LIBRARY})
+  
+  if(MSVC)
+    target_link_libraries(${swig_target} ${PARENT_TARGET})
+    target_link_libraries( ${swig_target} debug ${PYTHON_DEBUG_LIBRARY})
+    target_link_libraries( ${swig_target} optimized ${PYTHON_LIBRARY})
+  else()
+    target_link_libraries(${swig_target} ${PARENT_TARGET} ${PYTHON_LIBRARY})
+  endif()
 
   add_dependencies(${swig_target} ${PARENT_TARGET})
+  add_dependencies(${swig_target} ${DEPENDS})
 
   # add this target to a "global" variable so python tests can require these
   list(APPEND ALL_PYTHON_BINDINGS "${swig_target}")
