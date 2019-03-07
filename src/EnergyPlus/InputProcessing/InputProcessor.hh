@@ -108,6 +108,8 @@ public:
 
     void initializeMaps();
 
+    void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
+
     void processInput();
 
     int getNumSectionsFound(std::string const &SectionWord);
@@ -117,6 +119,10 @@ public:
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
