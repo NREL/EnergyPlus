@@ -43,7 +43,7 @@ CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
 option(BUILD_SWIG_EPFMI_BINDINGS "Build SWIG EPFMI bindings" OFF)
 if(BUILD_SWIG_EPFMI_BINDINGS)
   include(swig_epfmi.cmake)
-  MAKE_SWIG_TARGET("epfmi" "epfmi" "EPFMI.i" "EPFMI.i" "epfmi" "")
+  MAKE_SWIG_TARGET("epfmi" "epfmi" "${CMAKE_CURRENT_SOURCE_DIR}/EPFMI.i" "${CMAKE_CURRENT_SOURCE_DIR}/EPFMI.i" "epfmi" "")
 endif()
 
 

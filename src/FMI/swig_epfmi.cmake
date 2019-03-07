@@ -155,6 +155,7 @@ macro(MAKE_SWIG_TARGET NAME SIMPLENAME KEY_I_FILE I_FILES PARENT_TARGET PARENT_S
   # http://docs.python.org/2/tutorial/modules.html
   # http://docs.python.org/2/library/imp.html
 
+  string(TOLOWER "${NAME}" LOWER_NAME)
   set(MODULE ${LOWER_NAME})
 
   set(SWIG_WRAPPER "python_${NAME}_wrap.cxx")
