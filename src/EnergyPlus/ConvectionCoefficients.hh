@@ -70,9 +70,6 @@ namespace ConvectionCoefficients {
     extern Real64 const AdaptiveHcInsideLowLimit;  // W/m2-K
     extern Real64 const AdaptiveHcOutsideLowLimit; // W/m2-K
 
-    extern Real64 const MinFlow; // Minimum mass flow rate
-    extern Real64 const MaxACH;  // Maximum ceiling diffuser correlation limit
-
     extern Real64 const OneThird;   // 1/3 in highest precision
     extern Real64 const OneFourth;  // 1/4 in highest precision
     extern Real64 const OneFifth;   // 1/5 in highest precision
@@ -501,6 +498,10 @@ namespace ConvectionCoefficients {
                                     Array1S<Real64> HcIn,                      // Interior Convection Coeff Array
                                     Optional<Array1S<Real64> const> Vhc = _    // Velocity array for forced convection coeff calculation
     );
+
+    Real64 CalcCeilingDiffuserACH(int const ZoneNum);
+
+    Real64 CalcCeilingDiffuserSurface(Real64 Tilt, Real64 ACH);
 
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum); // zone number for which coefficients are being calculated
 

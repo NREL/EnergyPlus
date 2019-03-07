@@ -122,8 +122,6 @@ namespace ConvectionCoefficients {
     static gio::Fmt fmtx("(A,I4,1x,A,1x,6f16.8)");
     static gio::Fmt fmty("(A,1x,6f16.8)");
 
-    Real64 const MinFlow(0.01); // Minimum mass flow rate
-    Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
     static std::string const BlankString;
 
     Real64 const OneThird(1.0 / 3.0);   // 1/3 in highest precision
@@ -4264,9 +4262,52 @@ namespace ConvectionCoefficients {
         if (HcIn(SurfNum) < LowHConvLimit) HcIn(SurfNum) = LowHConvLimit;
     }
 
-    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum) // zone number for which coefficients are being calculated
+    Real64 CalcCeilingDiffuserACH(int const ZoneNum)
     {
+      // Using/Aliasing
+      using DataEnvironment::OutBaroPress;
+      using Psychrometrics::PsyRhoAirFnPbTdbW;
+      using Psychrometrics::PsyWFnTdpPb;
 
+      Real64 const MinFlow(0.01); // Minimum mass flow rate
+      Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
+
+      Real64 ACH;              // Air changes per hour
+
+      // FLOW:
+      if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
+        ACH = 0.0;
+      } else {
+        // Set local variables
+        Real64 ZoneMassFlowRate;
+        Real64 ZoneVolume = Zone(ZoneNum).Volume;
+        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;  // Zone node as defined in system simulation
+        Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        Real64 AirDensity;       // zone air density
+        if (!BeginEnvrnFlag && ZoneNode > 0) {
+          AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+          ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+        } else { // because these are not updated yet for new environment
+          AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, 0.0, PsyWFnTdpPb(0.0, OutBaroPress));
+          ZoneMassFlowRate = 0.0;
+        }
+
+        if (ZoneMassFlowRate < MinFlow) {
+          ACH = 0.0;
+        } else {
+          // Calculate ACH
+          ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * SecInHour;
+          // Limit ACH to range of correlation
+          ACH = min(ACH, MaxACH);
+          ACH = max(ACH, 0.0);
+        }
+      }
+
+      return ACH;
+    }
+
+    Real64 CalcCeilingDiffuserSurface(Real64 Tilt, Real64 ACH)
+    {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -4289,69 +4330,40 @@ namespace ConvectionCoefficients {
         // in the reference above (Fisher 1997).  They have been reformulated with an outlet
         // temperature reference in order to accomodate the structure of the EnergyPlus code.
 
-        // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using Psychrometrics::PsyWFnTdpPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;             // DO loop counter for surfaces
-        Real64 ACH;              // Air changes per hour
-        int ZoneNode;            // Zone node as defined in system simulation
-        Real64 ZoneVolume;       // Zone node as defined in system simulation
-        Real64 ZoneMassFlowRate; // Zone node as defined in system simulation
-        Real64 AirDensity;       // zone air density
-        Real64 ZoneMult;
-
-        // FLOW:
-        if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
-            ACH = 0.0;
-        } else {
-            // Set local variables
-            ZoneVolume = Zone(ZoneNum).Volume;
-            ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            if (!BeginEnvrnFlag) {
-                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
-            } else { // because these are not updated yet for new environment
-                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, 0.0, PsyWFnTdpPb(0.0, OutBaroPress));
-                ZoneMassFlowRate = 0.0;
-            }
-
-            if (ZoneMassFlowRate < MinFlow) {
-                ACH = 0.0;
-            } else {
-                // Calculate ACH
-                ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * SecInHour;
-                // Limit ACH to range of correlation
-                ACH = min(ACH, MaxACH);
-                ACH = max(ACH, 0.0);
-            }
-        }
 
         // If the Ceiling Diffuser option is selected the following correlations are used.
         // The development of the ceiling diffuser convection correlations is shown in reference 4.
         // The correlations shown below differ from (and are less accurate than) those shown in reference 4 because they have been
         // reformulated with an outlet temperature reference in order to accomodate the structure of the
         // EnergyPlus code.
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+
+        // Set HConvIn using the proper correlation based on Surface Tilt
+        if (Tilt > 135.0) {
+            return CalcFisherPedersenCeilDiffuserFloor(ACH); // Floor correlation
+        } else if (Tilt < 45.0) {
+            return CalcFisherPedersenCeilDiffuserCeiling(ACH); // Ceiling correlation
+        } else {
+            return CalcFisherPedersenCeilDiffuserWalls(ACH); // Wall correlation
+        }
+    }
+
+    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum) // zone number for which coefficients are being calculated
+    {
+
+        Real64 ACH = CalcCeilingDiffuserACH(ZoneNum);
+
+        for (auto SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-            // Set HConvIn using the proper correlation based on Surface Tilt
-            if (Surface(SurfNum).Tilt > 135.0) {
-                HConvIn(SurfNum) = CalcFisherPedersenCeilDiffuserFloor(ACH); // Floor correlation
-            } else if (Surface(SurfNum).Tilt < 45.0) {
-                HConvIn(SurfNum) = CalcFisherPedersenCeilDiffuserCeiling(ACH); // Ceiling correlation
-            } else {
-                HConvIn(SurfNum) = CalcFisherPedersenCeilDiffuserWalls(ACH); // Wall correlation
+            HConvIn(SurfNum) = CalcCeilingDiffuserSurface(Surface(SurfNum).Tilt, ACH);
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+            {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [=](double, double, double, double, double) -> double {
+                    return CalcCeilingDiffuserSurface(Surface(SurfNum).Tilt, ACH);
+                };
             }
             // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
             if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
-
         } // SurfNum
     }
 
@@ -4393,6 +4405,8 @@ namespace ConvectionCoefficients {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 const MinFlow(0.01); // Minimum mass flow rate
+        Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
         Real64 ACH;              // Air changes per hour
         int ZoneNode;            // Zone node as defined in system simulation
         Real64 ZoneVolume;       // Zone node as defined in system simulation
@@ -5958,46 +5972,19 @@ namespace ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserFloor) {
                 ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    AirChangeRate = min(AirChangeRate, MaxACH);
-                    AirChangeRate = max(AirChangeRate, 0.0);
-                } else {
-                    AirChangeRate = 0.0;
-                }
+                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
                 ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    AirChangeRate = min(AirChangeRate, MaxACH);
-                    AirChangeRate = max(AirChangeRate, 0.0);
-                } else {
-                    AirChangeRate = 0.0;
-                }
+                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
                 ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    AirChangeRate = min(AirChangeRate, MaxACH);
-                    AirChangeRate = max(AirChangeRate, 0.0);
-                } else {
-                    AirChangeRate = 0.0;
-                }
+                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 

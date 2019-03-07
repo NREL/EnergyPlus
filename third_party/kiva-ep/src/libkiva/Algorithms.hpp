@@ -8,6 +8,8 @@
 #include <functional>
 #include <map>
 
+#include "libkiva_export.h"
+
 #define MEMOIZE_DECL(NAME)                                                                         \
   namespace Memo {                                                                                 \
   static std::map<double, double> NAME##_map;                                                      \
@@ -28,8 +30,8 @@ typedef std::function<double(double, double, double, double, double)> Convection
 double cbrt_a(double x);
 
 // TODO: use defaulting inputs
-double getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
-                              double cosTilt);
+double LIBKIVA_EXPORT getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfGlass,
+                                             double roughness, double cosTilt);
 
 bool isWindward(double cosTilt, double azimuth, double windDirection);
 
