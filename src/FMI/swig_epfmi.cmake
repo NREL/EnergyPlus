@@ -170,7 +170,13 @@ macro(MAKE_SWIG_TARGET NAME SIMPLENAME KEY_I_FILE I_FILES PARENT_TARGET PARENT_S
   if(BUILD_DOCUMENTATION)
     set(PYTHON_AUTODOC -features autodoc=1)
   endif()
-
+  
+  set(this_depends ${ParentSWIGWrappers})
+  list(APPEND this_depends ${PARENT_TARGET}_GeneratedHeaders)
+  list(APPEND this_depends ${RequiredHeaders})
+  list(REMOVE_DUPLICATES this_depends)
+  set(${NAME}_SWIG_Depends "${this_depends}")
+  set(${NAME}_SWIG_Depends "${this_depends}" PARENT_SCOPE)
 
   # Add the -py3 flag if the version used is Python 3
   set(SWIG_PYTHON_3_FLAG "")

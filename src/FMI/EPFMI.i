@@ -3,21 +3,37 @@
 
 %module epfmi
 
+///////////////////////////////////////////////////////////////////////////////
+%include typemaps.i 					// Grab the standard typemap library
+
+%apply double *OUTPUT { double *variablePointers };
+
 // This tells SWIG to treat char ** as a special case
 %typemap(in) char ** {
   /* Check if is a list */
   if (PyList_Check($input)) {
     int size = PyList_Size($input);
+    printf("size %d\n", size);
     int i = 0;
     $1 = (char **) malloc((size+1)*sizeof(char *));
     for (i = 0; i < size; i++) {
+      printf("i %d\n", size);
       PyObject *o = PyList_GetItem($input,i);
-      if (PyString_Check(o))
-	$1[i] = PyString_AsString(PyList_GetItem($input,i));
-      else {
-	PyErr_SetString(PyExc_TypeError,"list must contain strings");
-	free($1);
-	return NULL;
+
+      if (PyString_Check(o)){
+        $1[i] = PyString_AsString(o);
+      } else {
+        int tmpres = 0;
+        char *tmpbuf = 0;
+        int alloctmp = 0;
+        tmpres = SWIG_AsCharPtrAndSize(o, &tmpbuf, NULL, &alloctmp);
+        if (!SWIG_IsOK(tmpres)) {
+          PyErr_SetString(PyExc_TypeError,"list must contain strings");
+          free($1);
+          return NULL;
+        }
+        $1[i] = reinterpret_cast< char * >(tmpbuf);
+        printf("%s\n", $1[i]);
       }
     }
     $1[i] = 0;
@@ -31,6 +47,95 @@
 %typemap(freearg) char ** {
   free((char *) $1);
 }
+
+
+
+
+%typemap(in) int * {
+  /* Check if is a list */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    printf("size %d\n", size);
+    int i = 0;
+    $1 = (int *) malloc((size+1)*sizeof(int));
+    for (i = 0; i < size; i++) {
+      printf("i %d\n", i);
+      PyObject *o = PyList_GetItem($input,i);
+
+      if (!PyInt_Check(o)) {
+          free($1);
+          PyErr_SetString(PyExc_ValueError, "List items must be integers");
+          return NULL;
+      }
+      $1[i] = PyInt_AsLong(o);
+    }
+ } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) int * {
+   if ($1) free($1);
+}
+
+%typemap(in) unsigned int * {
+  /* Check if is a list */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    printf("size %d\n", size);
+    int i = 0;
+    $1 = (unsigned *) malloc((size+1)*sizeof(unsigned));
+    for (i = 0; i < size; i++) {
+      printf("i %d\n", i);
+      PyObject *o = PyList_GetItem($input,i);
+
+      if (!PyInt_Check(o)) {
+          free($1);
+          PyErr_SetString(PyExc_ValueError, "List items must be integers");
+          return NULL;
+      }
+      $1[i] = PyInt_AsLong(o);
+    }
+ } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) unsigned int * {
+   if ($1) free($1);
+}
+
+%typemap(in) double * {
+  /* Check if is a list */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    printf("size %d\n", size);
+    int i = 0;
+    $1 = (double *) malloc((size+1)*sizeof(double));
+    for (i = 0; i < size; i++) {
+      printf("i %d\n", i);
+      PyObject *o = PyList_GetItem($input,i);
+
+      if (!PyInt_Check(o)) {
+          free($1);
+          PyErr_SetString(PyExc_ValueError, "List items must be integers");
+          return NULL;
+      }
+      $1[i] = PyLong_AsDouble(o);
+    }
+ } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) double * {
+   if ($1) free($1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 %{
   #include "EPFMI.hpp"
@@ -78,13 +183,13 @@ EPFMI_API unsigned int instantiate(const char *input,
                          const char *idd,
                          const char *instanceName,
                          const char ** parameterNames,
-                         const unsigned int parameterValueReferences[],
+                         const unsigned int* parameterValueReferences,
                          size_t nPar,
                          const char ** inputNames,
-                         const unsigned int inputValueReferences[],
+                         const unsigned int* inputValueReferences,
                          size_t nInp,
                          const char ** outputNames,
-                         const unsigned int outputValueReferences[],
+                         const unsigned int* outputValueReferences,
                          size_t nOut,
                          const char *log);
 
@@ -95,13 +200,13 @@ EPFMI_API unsigned int setupExperiment(double tStart,
 EPFMI_API unsigned int setTime(double time,
                      const char *log);
 
-EPFMI_API unsigned int setVariables(const unsigned int valueReferences[],
-                          const double variablePointers[],
+EPFMI_API unsigned int setVariables(const unsigned int* valueReferences,
+                          const double* variablePointers,
                           size_t nVars1,
                           const char *log);
 
-EPFMI_API unsigned int getVariables(const unsigned int valueReferences[],
-                          double variablePointers[],
+EPFMI_API unsigned int getVariables(const unsigned int* valueReferences,
+                          double* variablePointers,
                           size_t nVars2,
                           const char *log);
 
