@@ -3784,9 +3784,8 @@ namespace InternalHeatGains {
                         ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
                         ErrorsFound = true;
                     }
-                    else {
-                        ZoneITEq(Loop).RecircFLTCurve = 0;
-                    }
+                } else {
+                    ZoneITEq(Loop).RecircFLTCurve = 0;
                 }
 
                 if (!lAlphaFieldBlanks(16)) {
@@ -3796,9 +3795,8 @@ namespace InternalHeatGains {
                         ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
                         ErrorsFound = true;
                     }
-                    else {
-                        ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
-                    }
+                } else {
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
                 }
 
                 // Environmental class
