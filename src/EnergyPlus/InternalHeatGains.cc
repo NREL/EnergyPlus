@@ -3777,18 +3777,28 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
-                if (ZoneITEq(Loop).RecircFLTCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
-                    ErrorsFound = true;
+                if (!lAlphaFieldBlanks(15)) {
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    if (ZoneITEq(Loop).RecircFLTCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
+                        ErrorsFound = true;
+                    }
+                    else {
+                        ZoneITEq(Loop).RecircFLTCurve = 0;
+                    }
                 }
 
-                ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
-                if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
-                    ErrorsFound = true;
+                if (!lAlphaFieldBlanks(16)) {
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
+                        ErrorsFound = true;
+                    }
+                    else {
+                        ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
+                    }
                 }
 
                 // Environmental class
