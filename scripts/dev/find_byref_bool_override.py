@@ -29,9 +29,16 @@ import json
 import glob as gb
 import warnings
 
-SRC_DIR = '../../src/EnergyPlus'
+
 INCLUDE_WARNINGS = True
 IS_CI = True
+
+# Get a path that'll work if run directly from this folder (when running
+# locally usually) or the root of the repo (decent_ci for eg)
+SRC_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                 "../../src/EnergyPlus"))
+
 
 # Files for which to ignore missing header warning
 EXPECT_MISSING_HEADER = ['main.cc',
