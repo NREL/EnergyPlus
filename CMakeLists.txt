@@ -289,31 +289,6 @@ if (BUILD_DOCS)
   set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 endif()
 
-# Add Color Output if Using Ninja
-macro(AddCXXFlagIfSupported flag test)
-   CHECK_CXX_COMPILER_FLAG(${flag} ${test})
-   if( ${${test}} )
-      message("adding ${flag}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
-   endif()
-endmacro()
-
-if("Ninja" STREQUAL ${CMAKE_GENERATOR})
-  include(CheckCXXCompilerFlag)
-  # Clang
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    AddCXXFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fcolor-diagnostics)
-  endif()
-
-  # g
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # For some reason it doesn't say its supported, but it works...
-    # AddCXXFlagIfSupported(-fdiagnostics-color COMPILER_SUPPORTS_fdiagnostics-color)
-    # message("Forcing -fdiagnostics-color=always")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
-  endif()
-endif()
-
 # some parameters are simply not needed for everyday building
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 mark_as_advanced(BUILD_SHARED_LIBS)
