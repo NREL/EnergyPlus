@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
                           "ElectricEquipment:ITE:AirCooled,",
                           "  Data Center Servers,     !- Name",
                           "  Zone1,                   !- Zone Name",
-                          "  ,",
+                          "  ,                        !- Air Flow Calculation Method",
                           "  Watts/Unit,              !- Design Power Input Calculation Method",
                           "  500,                     !- Watts per Unit {W}",
                           "  100,                     !- Number of Units",
@@ -676,8 +676,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
                           "  ,                        !- Air Outlet Room Air Model Node Name",
                           "  Main Zone Inlet Node,    !- Supply Air Node Name",
                           "  0.1,                     !- Design Recirculation Fraction",
+                          // This one should be assumed to always 1
                           "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
                           "  0.9,                     !- Design Electric Power Supply Efficiency",
+                          // This one should be assumed to always 1
                           "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
                           "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
                           "  ITE-CPU,                 !- CPU End-Use Subcategory",
@@ -745,8 +747,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     InternalHeatGains::GetInternalHeatGainsInput();
     InternalHeatGains::CalcZoneITEq();
+
+    // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
     Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
                              max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
     ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
+
 }

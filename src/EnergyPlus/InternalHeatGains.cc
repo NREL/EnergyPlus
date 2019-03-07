@@ -3777,19 +3777,11 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 }
 
+                // If this curve is left blank, then the curve is assumed to always equal 1.0.
                 ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
-                if (ZoneITEq(Loop).RecircFLTCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
-                    ErrorsFound = true;
-                }
 
+                // If this curve is left blank, then the curve is assumed to always equal 1.0.
                 ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
-                if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
-                    ErrorsFound = true;
-                }
 
                 // Environmental class
                 if (UtilityRoutines::SameString(AlphaName(10), "None")) {
