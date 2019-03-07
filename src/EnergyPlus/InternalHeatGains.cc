@@ -3777,11 +3777,31 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 }
 
-                // If this curve is left blank, then the curve is assumed to always equal 1.0.
-                ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                if (!lAlphaFieldBlanks(15)) {
+                    // If this field isn't blank, it must point to a valid curve
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    if (ZoneITEq(Loop).RecircFLTCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
+                    ZoneITEq(Loop).RecircFLTCurve = 0;
+                }
 
-                // If this curve is left blank, then the curve is assumed to always equal 1.0.
-                ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                if (!lAlphaFieldBlanks(16)) {
+                    // If this field isn't blank, it must point to a valid curve
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
+                }
 
                 // Environmental class
                 if (UtilityRoutines::SameString(AlphaName(10), "None")) {
