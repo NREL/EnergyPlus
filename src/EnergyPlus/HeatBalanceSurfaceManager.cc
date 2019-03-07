@@ -1001,6 +1001,9 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
                         computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
+                        curAzimuth = round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchOpAzimuth, surfName, curAzimuth);
                         curTilt = Surface(iSurf).Tilt;
                         PreDefTableEntry(pdchOpTilt, surfName, curTilt);
@@ -1062,6 +1065,8 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchFenVisTr, surfName, TransVisNorm, 3);
                         PreDefTableEntry(pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        curAzimuth =  round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchFenAzimuth, surfName, curAzimuth);
                         isNorth = false;
                         curTilt = Surface(iSurf).Tilt;
