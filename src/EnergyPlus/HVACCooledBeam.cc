@@ -447,6 +447,7 @@ namespace HVACCooledBeam {
             for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                 if (CoolBeam(CBNum).AirOutNode == AirDistUnit(ADUNum).OutletNodeNum) {
                     CoolBeam(CBNum).ADUNum = ADUNum;
+                    AirDistUnit(ADUNum).InletNodeNum = CoolBeam(CBNum).AirInNode;
                 }
             }
             // one assumes if there isn't one assigned, it's an error?
@@ -563,12 +564,12 @@ namespace HVACCooledBeam {
                                     CoolBeam(CBNum).CWLoopSideNum,
                                     CoolBeam(CBNum).CWBranchNum,
                                     CoolBeam(CBNum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitCoolBeam: Program terminated for previous conditions.");
             }
@@ -636,6 +637,7 @@ namespace HVACCooledBeam {
                 if (CoolBeam(CBNum).CtrlZoneNum > 0 && CoolBeam(CBNum).ctrlZoneInNodeIndex > 0) {
                     CoolBeam(CBNum).AirLoopNum =
                         DataZoneEquipment::ZoneEquipConfig(CoolBeam(CBNum).CtrlZoneNum).InletNodeAirLoopNum(CoolBeam(CBNum).ctrlZoneInNodeIndex);
+                    AirDistUnit(CoolBeam(CBNum).ADUNum).AirLoopNum = CoolBeam(CBNum).AirLoopNum;
                 }
             }
 

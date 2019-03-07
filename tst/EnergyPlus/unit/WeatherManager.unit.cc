@@ -72,8 +72,6 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, SkyTempTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "8.3;",
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
@@ -495,7 +493,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
 TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",

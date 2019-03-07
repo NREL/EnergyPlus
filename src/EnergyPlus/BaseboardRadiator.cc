@@ -627,12 +627,12 @@ namespace BaseboardRadiator {
                                     Baseboard(BaseboardNum).LoopSideNum,
                                     Baseboard(BaseboardNum).BranchNum,
                                     Baseboard(BaseboardNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitBaseboard: Program terminated for previous conditions.");
             }

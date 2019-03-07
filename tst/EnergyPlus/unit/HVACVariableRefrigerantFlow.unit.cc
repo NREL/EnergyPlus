@@ -131,8 +131,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     int VRFCond(1);            // index to VRF condenser
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,                         ",
         " VRF Heat Pump,           !- Name                                                          ",
         " ,                        !- Availability Schedule Name                                    ",
@@ -2473,8 +2471,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3195,8 +3191,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     int VRFTUNum(1);         // index to VRF terminal unit
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3821,7 +3815,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     Real64 CondVolFlowRate(0.0);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
         " ",
         "AirConditioner:VariableRefrigerantFlow,",
@@ -4777,8 +4770,6 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,8.4;",
 
         "  ScheduleTypeLimits,",
         "    Fraction,                !- Name",

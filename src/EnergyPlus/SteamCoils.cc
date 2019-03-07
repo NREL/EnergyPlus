@@ -540,12 +540,12 @@ namespace SteamCoils {
                                     SteamCoil(CoilNum).LoopSide,
                                     SteamCoil(CoilNum).BranchNum,
                                     SteamCoil(CoilNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitSteamCoil: Program terminated for previous conditions.");
             }

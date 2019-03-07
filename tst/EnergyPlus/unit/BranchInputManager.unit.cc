@@ -66,7 +66,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Branch,",
         "VAV Sys 1 Main Branch,   !- Name",
         ",                        !- Pressure Drop Curve Name",
@@ -161,7 +160,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Branch,",
         "VAV Sys 1 Main Branch,   !- Name",
         ",                        !- Pressure Drop Curve Name",
@@ -338,7 +336,6 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
 
         "AirLoopHVAC,",
         "  DOAS,                    !- Name",
@@ -428,7 +425,6 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
 
         "Branch,",
         "  DOAS Main Branch,        !- Name",

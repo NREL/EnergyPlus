@@ -135,7 +135,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -447,7 +446,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -761,7 +759,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1149,7 +1146,6 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1458,7 +1454,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1812,7 +1807,6 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",

@@ -1879,7 +1879,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum);
+                ScanPlantLoopsForObject(TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {

@@ -1,3 +1,10 @@
+# Use ccache if available, has to be before "project()"
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  # Support both Unix Makefiles and Ninja
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
@@ -9,10 +16,10 @@ endif()
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 9 )
-set( CMAKE_VERSION_MINOR 0 )
-set( CMAKE_VERSION_PATCH 1 )
+set( CMAKE_VERSION_MINOR 1 )
+set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "40101ea" )
+set( PREV_RELEASE_SHA "bb7ca4f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -96,10 +103,16 @@ if( ENABLE_REGRESSION_TESTING )
   string(STRIP "${REGRESSION_SCRIPT_PATH}" REG_PATH_STRIPPED)
   string(STRIP "${REGRESSION_BASELINE_PATH}" REG_BASELINE_STRIPPED)
   if (REG_PATH_STRIPPED STREQUAL "" OR REG_BASELINE_STRIPPED STREQUAL "")
-    message( "Regression testing is enabled, but no script or baseline has been provided" )
+    message(AUTHOR_WARNING "Regression testing is enabled, but no script or baseline has been provided, turning it off." )
     set( DO_REGRESSION_TESTING OFF )
   else()
-    set( DO_REGRESSION_TESTING ON )
+    if( BUILD_FORTRAN )
+      # No Problem
+      set( DO_REGRESSION_TESTING ON )
+    else()
+      message(AUTHOR_WARNING "For regression testing, you must enable BUILD_FORTRAN in order to call ReadVarEso, turning it off.")
+      set( DO_REGRESSION_TESTING OFF )
+    endif()
   endif()
 endif()
 
@@ -224,9 +237,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V8-9-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-0-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 8-9-0 to 9-0-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-0-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-1-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -251,6 +264,7 @@ if( BUILD_PACKAGE )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Slab/;Slab;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/CalcSoilSurfTemp/;CalcSoilSurfTemp;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/AppGPostProcess/;AppGPostProcess;ALL;/")
   endif()
 
   include(cmake/Install.cmake)
@@ -273,6 +287,31 @@ if (BUILD_DOCS)
   endif()
   set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX." FORCE)
   set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
+endif()
+
+# Add Color Output if Using Ninja
+macro(AddCXXFlagIfSupported flag test)
+   CHECK_CXX_COMPILER_FLAG(${flag} ${test})
+   if( ${${test}} )
+      message("adding ${flag}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+   endif()
+endmacro()
+
+if("Ninja" STREQUAL ${CMAKE_GENERATOR})
+  include(CheckCXXCompilerFlag)
+  # Clang
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    AddCXXFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fcolor-diagnostics)
+  endif()
+
+  # g
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # For some reason it doesn't say its supported, but it works...
+    # AddCXXFlagIfSupported(-fdiagnostics-color COMPILER_SUPPORTS_fdiagnostics-color)
+    # message("Forcing -fdiagnostics-color=always")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+  endif()
 endif()
 
 # some parameters are simply not needed for everyday building

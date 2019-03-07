@@ -886,12 +886,12 @@ namespace WaterToAirHeatPumpSimple {
                                     SimpleWatertoAirHP(HPNum).LoopSide,
                                     SimpleWatertoAirHP(HPNum).BranchNum,
                                     SimpleWatertoAirHP(HPNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitSimpleWatertoAirHP: Program terminated for previous conditions.");
             }

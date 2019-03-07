@@ -3564,7 +3564,6 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete)
     {
         std::string const idf_objects = delimited_string({
-            "Version,8.3;",
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
             "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
@@ -3828,7 +3827,7 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom)
     {
         std::string const idf_objects = delimited_string(
-            {"Version,8.6;", "Meter:Custom,", "CustomMeter1,               !- Name", "Generic,                    !- Fuel Type",
+            {"Meter:Custom,", "CustomMeter1,               !- Name", "Generic,                    !- Fuel Type",
              ",                           !- Key Name 1", "DistrictHeating:Facility;   !- Variable or Meter 1 Name", "Meter:Custom,",
              "CustomMeter2,               !- Name", "Generic,                    !- Fuel Type", ",                           !- Key Name 1",
              "CustomMeter1;               !- Variable or Meter 1 Name", "Output:Meter,CustomMeter1,Hourly;", "Output:Meter,CustomMeter2,Hourly;"});

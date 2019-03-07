@@ -127,7 +127,17 @@ In addition to the canned Surface reports (view the Reports section later in thi
 \item
   Zone,Average,Zone Total Internal Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Zone Mean Air Temperature {[}C{]}
+  HVAC,Average,Zone Exfiltration Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Exfiltration Latent Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Exhaust Air Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}
 \item
   HVAC,Average,Zone Air Temperature {[}C{]}
 \item
@@ -290,6 +300,30 @@ These output variables represent the sum of latent gains from specific internal 
 \subsubsection{Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
 These output variables represent the sum of all heat gains throughout the zone in Watts (for rate) or joules. This includes all heat gains from People, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+
+\subsubsection{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
+
+\subsubsection{Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-sensible-heat-transfer-rate-w}
+
+\subsubsection{Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-latent-heat-transfer-rate-w}
+
+These output variables represent the heat emitted to ambient from exfiltration in Watts. The exfiltration rate is calculated by solving a mass flow balance on the zone including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. Positive values indicate the zone injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
+
+\subsubsection{Zone Exhaust Air Heat Transfer Rate {[}W{]}}\label{zone-exhaust-heat-transfer-rate-w}
+
+\subsubsection{Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}}\label{zone-exhaust-sensible-heat-transfer-rate-w}
+
+\subsubsection{Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}}\label{zone-exhaust-latent-heat-transfer-rate-w}
+
+These output variables represent the heat emitted to ambient from exhaust air in Watts. The zone exhaust air flow rate is aggregated from the zone exhaust nodes. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
+
+\subsubsection{Site Total Zone Exfiltration Heat Loss {[}W{]}}\label{site-total-exfiltration-heat-transfer-rate-w}
+
+These output variables represent the total amount of heat emitted to ambient from all zones by exfiltration in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exfiltration.
+
+\subsubsection{Site Total Zone Exhaust Air Heat Loss {[}W{]}}\label{site-total-exhaust-heat-transfer-rate-w}
+
+These output variables represent the total amount of heat emitted to ambient from all zones by exhaust air in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exhaust air.
 
 \subsection{ZoneList}\label{zonelist}
 
@@ -2416,6 +2450,8 @@ Zone,Average,Surface Anisotropic Sky Multiplier []
 Zone,Average,Surface Window BSDF Beam Direction Number []
 Zone,Average,Surface Window BSDF Beam Theta Angle [rad]
 Zone,Average,Surface Window BSDF Beam Phi Angle [rad]
+Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+Zone,Average,Surface Outside Face Heat Emission to Air Rate [W]
 \end{lstlisting}
 
 Output variables applicable to opaque heat transfer surfaces (FLOOR, WALL, ROOF, DOOR). \textbf{Note -- these are advanced variables -- you must read the descriptions and understand before use -- then you must use the Diagnostics object to allow reporting.}
@@ -2758,6 +2794,14 @@ This is the coefficient that describes thermal radiation heat transfer between t
 \subsubsection{Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-outside-face-thermal-radiation-to-ground-heat-transfer-coefficient-wm2-k}
 
 This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface. It is the value of ``Hr'' in the classic linearized model for thermal radiation Q = Hr * A * (T\_surf -- T\_odb) when applied to the ground. Where T\_surf = Surface Outside Face Temperature, and T\_odb = Site Outdoor Air Drybulb Temperature (used as an approximation for the ground surface temperature). Former Name: Prior to version 7.1, this output was called ``Surface Ext Rad to Ground Coeff.''
+
+\subsubsection{Surface Outside Face Thermal Radiation to Air Heat Transfer Rate {[}W{]}}\label{surface-outside-face-thermal-radiation-to-air-heat-transfer-rate-w}
+
+This is thermal radiation heat transfer rate between the outside face and the air mass surrounding the surface.
+
+\subsubsection{Surface Outside Face Heat Emission to Air Rate {[}W{]}}\label{surface-outside-face-heat-emission-to-air-heat-transfer-rate-w}
+
+This is total heat transfer rate between the outside face and the air mass surrounding the surface by convection and thermal radiation.
 
 \subsubsection{Surface Outside Face Solar Radiation Heat Gain Rate {[}W{]}}\label{surface-outside-face-solar-radiation-heat-gain-rate-w}
 

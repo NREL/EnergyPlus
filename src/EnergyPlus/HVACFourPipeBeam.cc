@@ -423,6 +423,7 @@ namespace FourPipeBeam {
         for (aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex) {
             if (thisBeam->airOutNodeNum == AirDistUnit(aDUIndex).OutletNodeNum) {
                 thisBeam->aDUNum = aDUIndex;
+                AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
             }
         }
         // assumes if there isn't one assigned, it's an error
@@ -541,12 +542,12 @@ namespace FourPipeBeam {
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
                                         this->cWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->cWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }
@@ -558,12 +559,12 @@ namespace FourPipeBeam {
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,
                                         this->hWLocation.compNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         this->hWInNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(routineName + " Program terminated for previous conditions.");
                 }

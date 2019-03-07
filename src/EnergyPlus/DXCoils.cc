@@ -12351,7 +12351,9 @@ namespace DXCoils {
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of Power
+                // Input
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12364,7 +12366,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
 
                 // Energy use for other fuel types
@@ -12581,10 +12587,13 @@ namespace DXCoils {
                 // Waste heat
                 if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 // Energy use for other fuel types
@@ -13086,7 +13095,7 @@ namespace DXCoils {
                 }
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -13099,7 +13108,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
 
@@ -13312,12 +13325,15 @@ namespace DXCoils {
                     OutletAirEnthalpy = InletAirEnthalpy + DXCoil(DXCoilNum).TotalHeatingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {

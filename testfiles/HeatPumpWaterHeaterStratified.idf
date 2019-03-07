@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Building,
     Building,                !- Name
@@ -3137,7 +3137,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -3145,7 +3147,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -3153,7 +3157,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -3162,14 +3168,20 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     3,                       !- Zone Equipment 1 Cooling Sequence
     3,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     WaterHeater:HeatPump:PumpedCondenser,  !- Zone Equipment 2 Object Type
     Zone4HeatPumpWaterHeater,!- Zone Equipment 2 Name
     1,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction
     WaterHeater:HeatPump:PumpedCondenser,  !- Zone Equipment 3 Object Type
     Zone4bHeatPumpWaterHeater,  !- Zone Equipment 3 Name
     2,                       !- Zone Equipment 3 Cooling Sequence
-    2;                       !- Zone Equipment 3 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 3 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -3178,10 +3190,14 @@
     Zone5HeatPumpWaterHeater,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name

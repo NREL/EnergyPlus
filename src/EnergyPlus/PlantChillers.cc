@@ -2992,12 +2992,12 @@ namespace PlantChillers {
                                     ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                     ElectricChiller(ChillNum).Base.CWBranchNum,
                                     ElectricChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     ElectricChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     ElectricChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ElectricChiller(ChillNum).Base.CondenserType != AirCooled && ElectricChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(ElectricChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_Electric,
@@ -3005,12 +3005,12 @@ namespace PlantChillers {
                                         ElectricChiller(ChillNum).Base.CDLoopSideNum,
                                         ElectricChiller(ChillNum).Base.CDBranchNum,
                                         ElectricChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricChiller(ChillNum).Base.CWLoopNum,
                                               ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                               ElectricChiller(ChillNum).Base.CDLoopNum,
@@ -3025,12 +3025,12 @@ namespace PlantChillers {
                                         ElectricChiller(ChillNum).HRLoopSideNum,
                                         ElectricChiller(ChillNum).HRBranchNum,
                                         ElectricChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricChiller(ChillNum).Base.CWLoopNum,
                                               ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                               ElectricChiller(ChillNum).HRLoopNum,
@@ -3389,12 +3389,12 @@ namespace PlantChillers {
                                     EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                     EngineDrivenChiller(ChillNum).Base.CWBranchNum,
                                     EngineDrivenChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     EngineDrivenChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     EngineDrivenChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (EngineDrivenChiller(ChillNum).Base.CondenserType != AirCooled && EngineDrivenChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_EngineDriven,
@@ -3402,12 +3402,12 @@ namespace PlantChillers {
                                         EngineDrivenChiller(ChillNum).Base.CDLoopSideNum,
                                         EngineDrivenChiller(ChillNum).Base.CDBranchNum,
                                         EngineDrivenChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         EngineDrivenChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).Base.CWLoopNum,
                                               EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                               EngineDrivenChiller(ChillNum).Base.CDLoopNum,
@@ -3422,12 +3422,12 @@ namespace PlantChillers {
                                         EngineDrivenChiller(ChillNum).HRLoopSideNum,
                                         EngineDrivenChiller(ChillNum).HRBranchNum,
                                         EngineDrivenChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).Base.CWLoopNum,
                                               EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                               EngineDrivenChiller(ChillNum).HRLoopNum,
@@ -3733,12 +3733,12 @@ namespace PlantChillers {
                                     GTChiller(ChillNum).Base.CWLoopSideNum,
                                     GTChiller(ChillNum).Base.CWBranchNum,
                                     GTChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     GTChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     GTChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (GTChiller(ChillNum).Base.CondenserType != AirCooled && GTChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(GTChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_CombTurbine,
@@ -3746,12 +3746,12 @@ namespace PlantChillers {
                                         GTChiller(ChillNum).Base.CDLoopSideNum,
                                         GTChiller(ChillNum).Base.CDBranchNum,
                                         GTChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GTChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(GTChiller(ChillNum).Base.CWLoopNum,
                                               GTChiller(ChillNum).Base.CWLoopSideNum,
                                               GTChiller(ChillNum).Base.CDLoopNum,
@@ -3766,12 +3766,12 @@ namespace PlantChillers {
                                         GTChiller(ChillNum).HRLoopSideNum,
                                         GTChiller(ChillNum).HRBranchNum,
                                         GTChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GTChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(GTChiller(ChillNum).Base.CWLoopNum,
                                               GTChiller(ChillNum).Base.CWLoopSideNum,
                                               GTChiller(ChillNum).HRLoopNum,
@@ -4060,12 +4060,12 @@ namespace PlantChillers {
                                     ConstCOPChiller(ChillNum).Base.CWLoopSideNum,
                                     ConstCOPChiller(ChillNum).Base.CWBranchNum,
                                     ConstCOPChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     ConstCOPChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ConstCOPChiller(ChillNum).Base.CondenserType != AirCooled && ConstCOPChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(ConstCOPChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_ConstCOP,
@@ -4073,12 +4073,12 @@ namespace PlantChillers {
                                         ConstCOPChiller(ChillNum).Base.CDLoopSideNum,
                                         ConstCOPChiller(ChillNum).Base.CDBranchNum,
                                         ConstCOPChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ConstCOPChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ConstCOPChiller(ChillNum).Base.CWLoopNum,
                                               ConstCOPChiller(ChillNum).Base.CWLoopSideNum,
                                               ConstCOPChiller(ChillNum).Base.CDLoopNum,

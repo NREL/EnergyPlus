@@ -819,12 +819,12 @@ namespace HWBaseboardRadiator {
                                         HWBaseboard(BaseboardNum).LoopSideNum,
                                         HWBaseboard(BaseboardNum).BranchNum,
                                         HWBaseboard(BaseboardNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitHWBaseboard: Program terminated for previous conditions.");
                 }
