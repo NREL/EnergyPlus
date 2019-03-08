@@ -4441,7 +4441,7 @@ namespace ReportSizingManager {
         int PeakLoadType;
         int DDAtTotPeak;
         int TimeStepAtTotPeak;
-        int TimeStepAtPeak;
+        int TimeStepAtPeak(0);
         Real64 ZoneCoolLoadSum(0); // sum of zone cooling loads at the peak [W]
         Real64 AvgZoneTemp(0);     // average zone temperature [C]
         Real64 AvgSupTemp;         // average supply temperature for bypass control [C]
@@ -4451,16 +4451,18 @@ namespace ReportSizingManager {
         CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
         PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
         DDAtSensPeak = SysSizPeakDDNum(SysNum).SensCoolPeakDD;
-        TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
-        DDAtFlowPeak = SysSizPeakDDNum(SysNum).CoolFlowPeakDD;
-        TimeStepAtFlowPeak = SysSizPeakDDNum(SysNum).TimeStepAtCoolFlowPk(DDAtFlowPeak);
-        DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
-        TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
+        if (DDAtSensPeak > 0) {
+            TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
+            DDAtFlowPeak = SysSizPeakDDNum(SysNum).CoolFlowPeakDD;
+            TimeStepAtFlowPeak = SysSizPeakDDNum(SysNum).TimeStepAtCoolFlowPk(DDAtFlowPeak);
+            DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
+            TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
 
-        if (PeakLoadType == TotalCoolingLoad) {
-            TimeStepAtPeak = TimeStepAtTotPeak;
-        } else {
-            TimeStepAtPeak = TimeStepAtSensPeak;
+            if (PeakLoadType == TotalCoolingLoad) {
+                TimeStepAtPeak = TimeStepAtTotPeak;
+            } else {
+                TimeStepAtPeak = TimeStepAtSensPeak;
+            }
         }
         if (CoolCapCtrl == VAV) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
@@ -4468,6 +4470,9 @@ namespace ReportSizingManager {
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
             DesFlow = DataAirFlowUsedForSizing;
+        } else if (TimeStepAtPeak == 0) {
+            ShowFatalError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                           " Central Cooling Capacity Control Method requires zone thermostats to calculate timestep loads.");
         } else if (CoolCapCtrl == VT) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
