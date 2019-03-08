@@ -10406,7 +10406,7 @@ namespace UnitarySystems {
                 //      and if coolReheat, check hum rat as well
                 if (((NoLoadTempOut - DesOutTemp) < Acc) && ((NoLoadHumRatOut - DesOutHumRat) < HumRatAcc)) {
                     PartLoadFrac = 0.0;
-                } else if (SensibleLoad) { // need to turn on compressor to see if load is met
+                } else { // need to turn on compressor to see if load is met
                     PartLoadFrac = 1.0;
                     CompOn = 1;
                     m_WSHPRuntimeFrac = 1.0;
@@ -10571,7 +10571,9 @@ namespace UnitarySystems {
                                (this->m_TESOpMode == PackagedThermalStorageCoil::OffMode ||
                                 this->m_TESOpMode == PackagedThermalStorageCoil::ChargeOnlyMode)) {
                         PartLoadFrac = 0.0;
-                    } else {
+                    } else if (!SensibleLoad) {
+                        PartLoadFrac = 0.0;
+                    } else if (SensibleLoad) {
 
                         Par[9] = double(AirLoopNum);
                         Par[10] = 0.0;
@@ -10866,6 +10868,7 @@ namespace UnitarySystems {
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
                                      (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
                                       Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                        FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         //   Check to see if the system can meet the load with the compressor off
                         //   If NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
@@ -10906,6 +10909,7 @@ namespace UnitarySystems {
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
                                      (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
                                       Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                        FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
                         // Check that this is the case; IF not set PartLoadFrac = 0.0 (off) and return
