@@ -131,7 +131,7 @@ namespace ZoneEquipmentManager {
                                     Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
     );
 
-    void CalcZoneMassBalance();
+    void CalcZoneMassBalance(bool const FirstHVACIteration);
 
     void CalcZoneReturnFlows(int const ZoneNum,
                              Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
