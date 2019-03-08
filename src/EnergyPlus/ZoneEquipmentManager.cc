@@ -3478,8 +3478,6 @@ namespace ZoneEquipmentManager {
 
             SetZoneEquipSimOrder(ControlledZoneNum, ActualZoneNum);
 
-            DistributeSystemOutputRequired(ControlledZoneNum, FirstHVACIteration);
-
             // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
             TurnFansOn = false;
@@ -4119,6 +4117,7 @@ namespace ZoneEquipmentManager {
 
         DataZoneEnergyDemands::CurDeadBandOrSetback(ZoneNum) = DataZoneEnergyDemands::DeadBandOrSetback(ZoneNum);
 
+        DistributeSystemOutputRequired(ZoneNum, FirstHVACIteration);
     }
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration)
