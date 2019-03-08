@@ -10,6 +10,7 @@
 
 #include "util/util.h"
 #include "util/logging.h"
+#include "util/pod_array.h"
 #include "re2/stringpiece.h"
 #include "re2/prog.h"
 #include "re2/re2.h"
@@ -55,20 +56,19 @@ int RE2::Set::Add(const StringPiece& pattern, string* error) {
   re2::Regexp* m = re2::Regexp::HaveMatch(n, pf);
   if (re->op() == kRegexpConcat) {
     int nsub = re->nsub();
-    re2::Regexp** sub = new re2::Regexp*[nsub + 1];
+    PODArray<re2::Regexp*> sub(nsub + 1);
     for (int i = 0; i < nsub; i++)
       sub[i] = re->sub()[i]->Incref();
     sub[nsub] = m;
     re->Decref();
-    re = re2::Regexp::Concat(sub, nsub + 1, pf);
-    delete[] sub;
+    re = re2::Regexp::Concat(sub.data(), nsub + 1, pf);
   } else {
     re2::Regexp* sub[2];
     sub[0] = re;
     sub[1] = m;
     re = re2::Regexp::Concat(sub, 2, pf);
   }
-  elem_.emplace_back(pattern.ToString(), re);
+  elem_.emplace_back(string(pattern), re);
   return n;
 }
 
@@ -87,16 +87,15 @@ bool RE2::Set::Compile() {
               return a.first < b.first;
             });
 
-  re2::Regexp** sub = new re2::Regexp*[size_];
-  for (size_t i = 0; i < elem_.size(); i++)
+  PODArray<re2::Regexp*> sub(size_);
+  for (int i = 0; i < size_; i++)
     sub[i] = elem_[i].second;
   elem_.clear();
   elem_.shrink_to_fit();
 
   Regexp::ParseFlags pf = static_cast<Regexp::ParseFlags>(
     options_.ParseFlags());
-  re2::Regexp* re = re2::Regexp::Alternate(sub, size_, pf);
-  delete[] sub;
+  re2::Regexp* re = re2::Regexp::Alternate(sub.data(), size_, pf);
 
   prog_ = Prog::CompileSet(re, anchor_, options_.max_mem());
   re->Decref();
@@ -104,8 +103,15 @@ bool RE2::Set::Compile() {
 }
 
 bool RE2::Set::Match(const StringPiece& text, std::vector<int>* v) const {
+  return Match(text, v, NULL);
+}
+
+bool RE2::Set::Match(const StringPiece& text, std::vector<int>* v,
+                     ErrorInfo* error_info) const {
   if (!compiled_) {
     LOG(DFATAL) << "RE2::Set::Match() called before compiling";
+    if (error_info != NULL)
+      error_info->kind = kNotCompiled;
     return false;
   }
   bool dfa_failed = false;
@@ -121,17 +127,26 @@ bool RE2::Set::Match(const StringPiece& text, std::vector<int>* v) const {
       LOG(ERROR) << "DFA out of memory: size " << prog_->size() << ", "
                  << "bytemap range " << prog_->bytemap_range() << ", "
                  << "list count " << prog_->list_count();
+    if (error_info != NULL)
+      error_info->kind = kOutOfMemory;
     return false;
   }
-  if (ret == false)
+  if (ret == false) {
+    if (error_info != NULL)
+      error_info->kind = kNoError;
     return false;
+  }
   if (v != NULL) {
     if (matches->empty()) {
-      LOG(DFATAL) << "RE2::Set::Match() matched, but matches unknown";
+      LOG(DFATAL) << "RE2::Set::Match() matched, but no matches returned?!";
+      if (error_info != NULL)
+        error_info->kind = kInconsistent;
       return false;
     }
     v->assign(matches->begin(), matches->end());
   }
+  if (error_info != NULL)
+    error_info->kind = kNoError;
   return true;
 }
 
