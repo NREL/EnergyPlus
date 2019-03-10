@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -4729,11 +4729,9 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::PlantLoop;
@@ -4925,12 +4923,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSide,
                                             Furnace(FurnaceNum).BranchNum,
                                             Furnace(FurnaceNum).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -4952,12 +4950,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSide,
                                             Furnace(FurnaceNum).BranchNum,
                                             Furnace(FurnaceNum).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -4994,12 +4992,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSideSupp,
                                             Furnace(FurnaceNum).BranchNumSupp,
                                             Furnace(FurnaceNum).CompNumSupp,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5020,12 +5018,12 @@ namespace Furnaces {
                                             Furnace(FurnaceNum).LoopSideSupp,
                                             Furnace(FurnaceNum).BranchNumSupp,
                                             Furnace(FurnaceNum).CompNumSupp,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
@@ -5258,7 +5256,7 @@ namespace Furnaces {
             MassFlowRate = Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
             if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp)
                 MinHumRat = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat;
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
                                 Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -5787,7 +5785,7 @@ namespace Furnaces {
         }
 
         // AirflowNetwork global variable
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
         }
     }
@@ -6013,6 +6011,24 @@ namespace Furnaces {
         DXCoolCap = 0.0;
         UnitaryHeatCap = 0.0;
         SuppHeatCap = 0.0;
+
+        if (Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
+        } else {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
+        }
+        if (Furnace(FurnaceNum).FanPlace == BlowThru) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+        } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+        }
+
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
             SimDXCoil(BlankString, On, true, Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
@@ -9450,9 +9466,6 @@ namespace Furnaces {
         // Update global variables used by AirflowNetwork module.
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9469,7 +9482,8 @@ namespace Furnaces {
         }
 
         // Set mass flow rates during on and off cylce using an OnOff fan
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = Furnace(FurnaceNum).OpMode;
@@ -9487,8 +9501,13 @@ namespace Furnaces {
                         CompOnMassFlow > 0.0) {
                         ratio = max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) / CompOnMassFlow;
                         AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio * ratio;
-                     }
+                    }
                 }
+            }
+        }
+        if (Furnace(FurnaceNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
             }
         }
         DataHVACGlobals::OnOffFanPartLoadFraction =

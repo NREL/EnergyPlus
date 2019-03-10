@@ -21,7 +21,7 @@
 ! Note, this file was completely changed from Ver. 1.1.1 to 1.2 to add tests for different PV generators
 ! note  this file was changed for Ver. 1.2.2 to add new strategies for ventilated mounting configurations
 
-  Version,9.0;
+  Version,9.1;
 
   Timestep,4;
 
@@ -119,7 +119,7 @@
     1,                       !- End Month
     7,                       !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -134,7 +134,7 @@
     7,                       !- End Month
     7,                       !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -587,7 +587,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone1Air,                !- Name

@@ -1,17 +1,15 @@
-! PurchAirWithDaylighting.idf
+! PurchAirWithDaylightingAndShadeControl.idf
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              daylighting with auto dimming; electrochromic (switchable) glazing
+! Highlights:              daylighting with auto dimming; electrochromic (switchable) glazing; multiple window shading controls in one zone
 !
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days
-!                          Run Control executes 2 design days
+! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 12 design days
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Monthly 2% Dry Bulb Design Conditions DB (2013)
 !
 ! Run Period (Weather File): none
 !
@@ -109,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Timestep,6;
 
@@ -143,66 +141,342 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-
-  SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
-    1,                       !- Month
-    21,                      !- Day of Month
-    WinterDesignDay,         !- Day Type
-    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
-    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
-    ,                        !- Dry-Bulb Temperature Range Modifier Type
-    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    Wetbulb,                 !- Humidity Condition Type
-    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    ,                        !- Humidity Condition Day Schedule Name
-    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    4.9,                     !- Wind Speed {m/s}
-    270,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.0;                     !- Sky Clearness
-
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-
-  SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
-    7,                       !- Month
-    21,                      !- Day of Month
-    SummerDesignDay,         !- Day Type
-    31.5,                    !- Maximum Dry-Bulb Temperature {C}
-    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
-    ,                        !- Dry-Bulb Temperature Range Modifier Type
-    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    Wetbulb,                 !- Humidity Condition Type
-    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    ,                        !- Humidity Condition Day Schedule Name
-    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    5.3,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.0;                     !- Sky Clearness
-
+ ! Chicago Ohare Arpt IL USA January (DB=>MCWB) 2%, MaxDB=9.1°C MWB=6.8°C taub=0.288 taud=2.524
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt January 2% Condns DB=>MCWB,     !- Name
+          1,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+        9.1,      !- Maximum Dry-Bulb Temperature {C}
+        7.4,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+        6.8,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.288,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.524;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA February (DB=>MCWB) 2%, MaxDB=11.2°C MWB=7.8°C taub=0.305 taud=2.474
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt February 2% Condns DB=>MCWB,     !- Name
+          2,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       11.2,      !- Maximum Dry-Bulb Temperature {C}
+        7.7,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+        7.8,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.305,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.474;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA March (DB=>MCWB) 2%, MaxDB=19.8°C MWB=14.1°C taub=0.325 taud=2.473
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt March 2% Condns DB=>MCWB,     !- Name
+          3,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       19.8,      !- Maximum Dry-Bulb Temperature {C}
+        9.1,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       14.1,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.325,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.473;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA April (DB=>MCWB) 2%, MaxDB=24.7°C MWB=16.4°C taub=0.359 taud=2.343
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt April 2% Condns DB=>MCWB,     !- Name
+          4,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       24.7,      !- Maximum Dry-Bulb Temperature {C}
+       10.4,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       16.4,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.359,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.343;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA May (DB=>MCWB) 2%, MaxDB=28.9°C MWB=20.3°C taub=0.369 taud=2.310
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt May 2% Condns DB=>MCWB,     !- Name
+          5,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       28.9,      !- Maximum Dry-Bulb Temperature {C}
+       11.1,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       20.3,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.369,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.310;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA June (DB=>MCWB) 2%, MaxDB=32.3°C MWB=22.3°C taub=0.383 taud=2.285
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt June 2% Condns DB=>MCWB,     !- Name
+          6,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       32.3,      !- Maximum Dry-Bulb Temperature {C}
+       11.1,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       22.3,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.383,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.285;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA July (DB=>MCWB) 2%, MaxDB=33.4°C MWB=24.3°C taub=0.415 taud=2.209
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt July 2% Condns DB=>MCWB,     !- Name
+          7,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       33.4,      !- Maximum Dry-Bulb Temperature {C}
+       10.2,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       24.3,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.415,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.209;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA August (DB=>MCWB) 2%, MaxDB=32.2°C MWB=24°C taub=0.416 taud=2.242
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt August 2% Condns DB=>MCWB,     !- Name
+          8,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       32.2,      !- Maximum Dry-Bulb Temperature {C}
+        9.5,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+         24,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.416,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.242;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA September (DB=>MCWB) 2%, MaxDB=29.4°C MWB=20.8°C taub=0.392 taud=2.343
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt September 2% Condns DB=>MCWB,     !- Name
+          9,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       29.4,      !- Maximum Dry-Bulb Temperature {C}
+       10.4,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       20.8,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.392,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.343;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA October (DB=>MCWB) 2%, MaxDB=24.5°C MWB=17.4°C taub=0.344 taud=2.487
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt October 2% Condns DB=>MCWB,     !- Name
+         10,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       24.5,      !- Maximum Dry-Bulb Temperature {C}
+        9.9,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       17.4,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.344,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.487;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA November (DB=>MCWB) 2%, MaxDB=17.7°C MWB=13.6°C taub=0.306 taud=2.629
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt November 2% Condns DB=>MCWB,     !- Name
+         11,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       17.7,      !- Maximum Dry-Bulb Temperature {C}
+          8,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       13.6,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.306,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.629;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
+ ! Chicago Ohare Arpt IL USA December (DB=>MCWB) 2%, MaxDB=11.1°C MWB=8.6°C taub=0.294 taud=2.584
+ SizingPeriod:DesignDay,
+  Chicago Ohare Arpt December 2% Condns DB=>MCWB,     !- Name
+         12,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       11.1,      !- Maximum Dry-Bulb Temperature {C}
+        7.1,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+        8.6,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98886.,      !- Barometric Pressure {Pa}
+        5.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        220,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.294,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.584;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+ 
   Material,
     A1 - 1 IN STUCCO,        !- Name
     Smooth,                  !- Roughness
@@ -1133,10 +1407,10 @@
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    0.548000,0.0000000E+00,2.5000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 2 {m}
-    5.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 3 {m}
-    5.548000,0.0000000E+00,2.5000;  !- X,Y,Z ==> Vertex 4 {m}
+    5.048000000000,0.000000000000,2.500000000000,  !- X,Y,Z ==> Vertex 1 {m}
+    5.048000000000,0.000000000000,0.500000000000,  !- X,Y,Z ==> Vertex 2 {m}
+    5.448000000000,0.000000000000,0.500000000000,  !- X,Y,Z ==> Vertex 3 {m}
+    5.448000000000,0.000000000000,2.500000000000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
@@ -1538,7 +1812,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1546,7 +1822,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1554,7 +1832,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone3Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone1Air,                !- Name
@@ -1684,62 +1964,6 @@
   Output:Variable,*,Zone Air Temperature,hourly;
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly;
-
-  Output:Variable,*,System Node Temperature,hourly;
-
-  Output:Variable,*,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Humidity Ratio,hourly;
-
-  Output:Variable,*,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,*,System Node Setpoint High Temperature,hourly;
-
-  Output:Variable,*,System Node Setpoint Low Temperature,hourly;
-
-  Output:Variable,*,System Node Setpoint Humidity Ratio,hourly;
-
-  Output:Variable,*,System Node Setpoint Minimum Humidity Ratio,hourly;
-
-  Output:Variable,*,System Node Setpoint Maximum Humidity Ratio,hourly;
-
-  Output:Variable,*,System Node Relative Humidity,hourly;
-
-  Output:Variable,*,System Node Pressure,hourly;
-
-  Output:Variable,*,System Node Standard Density Volume Flow Rate,hourly;
-
-  Output:Variable,*,System Node Current Density Volume Flow Rate,hourly;
-
-  Output:Variable,*,System Node Enthalpy,hourly;
-
-  Output:Variable,*,System Node Wetbulb Temperature,hourly;
-
-  Output:Variable,*,System Node Minimum Temperature,hourly;
-
-  Output:Variable,*,System Node Maximum Temperature,hourly;
-
-  Output:Variable,*,System Node Minimum Limit Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Maximum Limit Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Minimum Available Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Maximum Available Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Setpoint Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Quality,hourly;
-
-  Output:Variable,*,System Node Height,hourly;
-
-  Output:Variable,*,Surface Inside Face Temperature,daily;
-
-  Output:Variable,*,Surface Outside Face Temperature,daily;
-
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
-
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
 
   Output:VariableDictionary,IDF;
 

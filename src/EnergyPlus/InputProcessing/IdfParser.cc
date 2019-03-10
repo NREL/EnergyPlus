@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -196,6 +196,14 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
     for (auto it = schema_properties.begin(); it != schema_properties.end(); ++it) {
         std::string key = convertToUpper(it.key());
         objectTypeMap.emplace(std::move(key), it.key());
+    }
+
+    if (idf.size() > 3) {
+        // UTF-8 Byte Order Mark
+        if (idf[0] == '\xEF' && idf[1] == '\xBB' && idf[2] == '\xBF') {
+            index += 3;
+            index_into_cur_line += 3;
+        }
     }
 
     int idfObjectCount = 0;
@@ -461,7 +469,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const double_val = stod(num_str, nullptr);
             val = double_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const double_val = stold(num_str, nullptr);
             val = double_val;
         }
@@ -469,7 +477,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const int_val = stoi(num_str, nullptr);
             val = int_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const int_val = stoll(num_str, nullptr);
             val = int_val;
         }
@@ -572,30 +580,6 @@ std::string IdfParser::parse_string(std::string const &idf, size_t &index, bool 
             complete = true;
             decrement_both_index(index, index_into_cur_line);
             break;
-        } else if (c == '\\') {
-            if (index == idf.size()) break;
-            char next_c = idf[index];
-            increment_both_index(index, index_into_cur_line);
-            if (next_c == '"') {
-                s += '"';
-            } else if (next_c == '\\') {
-                s += '\\';
-            } else if (next_c == '/') {
-                s += '/';
-            } else if (next_c == 'b') {
-                s += '\b';
-            } else if (next_c == 't') {
-                s += '\t';
-            } else if (next_c == 'n') {
-                complete = false;
-                break;
-            } else if (next_c == 'r') {
-                complete = false;
-                break;
-            } else {
-                s += c;
-                s += next_c;
-            }
         } else {
             s += c;
         }
@@ -683,14 +667,11 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
     case ';':
         return Token::SEMICOLON;
     default:
-        static std::string const search_chars("-:.#/\\[]{}_@$%^&*()|+=<>?'\"~");
         static std::string const numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
             return Token::NUMBER;
-        } else if (isalnum(c) || (std::string::npos != search_chars.find_first_of(c))) {
-            return Token::STRING;
         }
-        break;
+        return Token::STRING;
     }
     decrement_both_index(index, index_into_cur_line);
     return Token::NONE;

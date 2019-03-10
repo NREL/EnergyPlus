@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -205,12 +205,19 @@ void InputProcessor::initializeMaps()
         objectCache.inputObjectIterators.reserve(objects.size());
         for (auto epJSON_obj_iter = objects.begin(); epJSON_obj_iter != objects.end(); ++epJSON_obj_iter) {
             objectCache.inputObjectIterators.emplace_back(epJSON_obj_iter);
-            auto const *const obj_ptr = epJSON_obj_iter.value().get_ptr<const json::object_t *const>();
-            unusedInputs.emplace(obj_ptr, ObjectInfo(objectType, epJSON_obj_iter.key()));
+            unusedInputs.emplace(objectType, epJSON_obj_iter.key());
         }
         auto const schema_iter = schema_properties.find(objectType);
         objectCache.schemaIterator = schema_iter;
         objectCacheMap.emplace(schema_iter.key(), objectCache);
+    }
+}
+
+void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::string &objectName)
+{
+    auto const find_unused = unusedInputs.find({objectType, objectName});
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
     }
 }
 
@@ -252,42 +259,51 @@ void InputProcessor::processInput()
         return;
     }
 
-    if (!DataGlobals::isEpJSON) {
-        bool success = true;
-        epJSON = idf_parser->decode(input_file, schema, success);
-        //			bool hasErrors = processErrors();
-        //			if ( !success || hasErrors ) {
-        //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-        //			}
-        if (DataGlobals::outputEpJSONConversion) {
-            input_file = epJSON.dump(4);
-            std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
-            FileSystem::makeNativePath(convertedIDF);
-            std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-            convertedFS << input_file << std::endl;
+    try {
+        if (!DataGlobals::isEpJSON) {
+            bool success = true;
+            epJSON = idf_parser->decode(input_file, schema, success);
+            //			bool hasErrors = processErrors();
+            //			if ( !success || hasErrors ) {
+            //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+            //			}
+            if (DataGlobals::outputEpJSONConversion) {
+                input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
+                std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
+                FileSystem::makeNativePath(convertedIDF);
+                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
+                convertedFS << input_file << std::endl;
+            }
+        } else if (DataGlobals::isCBOR) {
+            epJSON = json::from_cbor(input_file);
+        } else if (DataGlobals::isMsgPack) {
+            epJSON = json::from_msgpack(input_file);
+        } else {
+            epJSON = json::parse(input_file);
         }
-    } else if (DataGlobals::isCBOR) {
-        epJSON = json::from_cbor(input_file);
-    } else if (DataGlobals::isMsgPack) {
-        epJSON = json::from_msgpack(input_file);
-    } else {
-        epJSON = json::parse(input_file);
-    }
-
-    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
-        std::string const encoded = idf_parser->encode(epJSON, schema);
-        std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
-        FileSystem::makeNativePath(convertedEpJSON);
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-        convertedFS << encoded << std::endl;
+    } catch (const std::exception &e) {
+        ShowSevereError(e.what());
+        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors();
+    bool versionMatch = checkVersionMatch();
 
     if (!is_valid || hasErrors) {
-        checkVersionMatch();
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+    }
+
+    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
+        if (versionMatch) {
+            std::string const encoded = idf_parser->encode(epJSON, schema);
+            std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
+            FileSystem::makeNativePath(convertedEpJSON);
+            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
+            convertedFS << encoded << std::endl;
+        } else {
+            ShowWarningError("Skipping conversion of epJSON to IDF due to mismatched Version.");
+        }
     }
 
     initializeMaps();
@@ -305,7 +321,7 @@ void InputProcessor::processInput()
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 }
 
-void InputProcessor::checkVersionMatch()
+bool InputProcessor::checkVersionMatch()
 {
     using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
@@ -324,10 +340,12 @@ void InputProcessor::checkVersionMatch()
                 }
                 if (Which != 0) {
                     ShowWarningError("Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    return false;
                 }
             }
         }
     }
+    return true;
 }
 
 bool InputProcessor::processErrors()
@@ -453,6 +471,42 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
+bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
+{
+    auto find_iterators = objectCacheMap.find(objectWord);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            return false;
+        }
+        find_iterators = objectCacheMap.find(tmp_umit->second);
+    }
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
+    bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
+    return defaultFound;
+}
+
+bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value)
+{
+    auto find_iterators = objectCacheMap.find(objectWord);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            return false;
+        }
+        find_iterators = objectCacheMap.find(tmp_umit->second);
+    }
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
+    bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
+    return defaultFound;
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;
@@ -461,7 +515,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = true;
     } else {
         output.first = field_value;
-        output.second = field_value.empty();
+        output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
         output.first = UtilityRoutines::MakeUPPERCase(output.first);
@@ -492,15 +546,18 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
     int adjustedNumber = getJSONObjNum(Object, Number); // if incoming input is idf, then use idf object order
 
-    auto find_iterators = objectCacheMap.find(Object);
+    auto objectInfo = ObjectInfo();
+    objectInfo.objectType = Object;
     // auto sorted_iterators = find_iterators;
 
+    auto find_iterators = objectCacheMap.find(Object);
     if (find_iterators == objectCacheMap.end()) {
         auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return;
         }
-        find_iterators = objectCacheMap.find(tmp_umit->second);
+        objectInfo.objectType = tmp_umit->second;
+        find_iterators = objectCacheMap.find(objectInfo.objectType);
     }
 
     NumAlphas = 0;
@@ -514,12 +571,6 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &epJSON_it = find_iterators->second.inputObjectIterators.at(adjustedNumber - 1);
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-
-    auto const *const obj_ptr = epJSON_it.value().get_ptr<const json::object_t *const>();
-    auto const find_unused = unusedInputs.find(obj_ptr);
-    if (find_unused != unusedInputs.end()) {
-        unusedInputs.erase(find_unused);
-    }
 
     // Locations in JSON schema relating to normal fields
     auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
@@ -554,6 +605,13 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &obj = epJSON_it;
     auto const &obj_val = obj.value();
 
+    objectInfo.objectName = obj.key();
+
+    auto const find_unused = unusedInputs.find(objectInfo);
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
+    }
+
     size_t idf_max_fields = 0;
     auto found_idf_max_fields = obj_val.find("idf_max_fields");
     if (found_idf_max_fields != obj_val.end()) {
@@ -580,11 +638,11 @@ void InputProcessor::getObjectItem(std::string const &Object,
         if (field == "name" && schema_name_field != epJSON_schema_it_val.end()) {
             auto const &name_iter = schema_name_field.value();
             if (name_iter.find("retaincase") != name_iter.end()) {
-                Alphas(alpha_index) = obj.key();
+                Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(obj.key());
+                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(objectInfo.objectName);
             }
-            if (is_AlphaBlank) AlphaBlank()(alpha_index) = obj.key().empty();
+            if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
                 AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
             }
@@ -1161,8 +1219,8 @@ void InputProcessor::reportOrphanRecordObjects()
 
     bool first_iteration = true;
     for (auto it = unusedInputs.begin(); it != unusedInputs.end(); ++it) {
-        auto const &object_type = it->second.objectType;
-        auto const &name = it->second.objectName;
+        auto const &object_type = it->objectType;
+        auto const &name = it->objectName;
 
         // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
         // !DisplayAllWarnings
@@ -1461,7 +1519,11 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
-                addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                try {
+                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                } catch (...) {
+                    continue; // blank or erroneous fields are handled at the get input function for the object
+                }
             }
         }
     }
@@ -1477,7 +1539,11 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
-                addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                try {
+                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                } catch (...) {
+                    continue; // blank or erroneous fields are handled at the get input function for the object
+                }
             }
         }
     }
@@ -1493,13 +1559,17 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
-                auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
-                if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
-                    for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
-                        addVariablesForMonthlyReport(DataOutputs::MonthlyNamedReports(i));
+                try {
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
+                    if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
+                        for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
+                            addVariablesForMonthlyReport(DataOutputs::MonthlyNamedReports(i));
+                        }
+                    } else {
+                        addVariablesForMonthlyReport(report_name);
                     }
-                } else {
-                    addVariablesForMonthlyReport(report_name);
+                } catch (...) {
+                    continue; // blank or erroneous fields should be warned about during actual get input routines
                 }
             }
         }
@@ -1849,6 +1919,13 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
 
+    } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
+        // Place holder
+        addRecordToOutputVariableStructure("*", "Site Total Surface Heat Emission to Air");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exfiltration Heat Loss");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exhaust Air Heat Loss");
+        addRecordToOutputVariableStructure("*", "Air System Relief Air Total Heat Loss Energy");
+        addRecordToOutputVariableStructure("*", "HVAC System Total Heat Rejection Energy");
     } else {
     }
 }
@@ -1874,11 +1951,16 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
     } else {
         vnameLen = len_trim(VariableName.substr(0, rbpos));
     }
+
     std::string const VarName(VariableName.substr(0, vnameLen));
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables> data;
+        std::unordered_map<std::string,
+                           DataOutputs::OutputReportingVariables,
+                           UtilityRoutines::case_insensitive_hasher,
+                           UtilityRoutines::case_insensitive_comparator>
+            data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));

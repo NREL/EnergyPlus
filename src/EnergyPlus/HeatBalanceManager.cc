@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -347,8 +347,12 @@ namespace HeatBalanceManager {
             ManageHeatBalanceGetInputFlag = false;
         }
 
+        bool anyRan;
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
+
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -358,7 +362,6 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
-        bool anyRan;
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance();                                             // Do any heat balance related record keeping
 
@@ -5019,7 +5022,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataDaylighting::ZoneDaylight;
-        using HybridModel::FlagHybridModel;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5135,15 +5137,6 @@ namespace HeatBalanceManager {
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
         SetupOutputVariable(
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
-
-        if (FlagHybridModel) {
-            SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
-                                OutputProcessor::Unit::ach,
-                                Zone(ZoneLoop).InfilOAAirChangeRateHM,
-                                "Zone",
-                                "Average",
-                                Zone(ZoneLoop).Name);
-        }
     }
 
     // End of Get Input subroutines for the HB Module
@@ -5248,6 +5241,11 @@ namespace HeatBalanceManager {
                 e.ThetaFace = 296.15;
                 e.EffInsSurfTemp = 23.0;
             }
+        }
+
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
         }
 
         if (TotStormWin > 0) {
@@ -5400,6 +5398,7 @@ namespace HeatBalanceManager {
         ZoneInfiltrationFlag.dimension(NumOfZones, false);
         ZoneReOrder = 0;
         ZoneLatentGain.dimension(NumOfZones, 0.0);
+        ZoneLatentGainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
         OAMFL.dimension(NumOfZones, 0.0);
         VAMFL.dimension(NumOfZones, 0.0);
         ZTAV.dimension(NumOfZones, 23.0);

@@ -2535,6 +2535,12 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
   HVAC,Sum,AFN Zone Mixing Volume {[}m3{]}
 \item
   HVAC,Sum,AFN Zone Mixing Mass {[}kg{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Latent Heat Transfer Rate {[}W{]}
 \end{itemize}
 
 \textbf{The following output variables are reported only when a Fan:OnOff object is used:}
@@ -2725,24 +2731,24 @@ When modulation is in effect the value of the multiplier is between 0.0 and 1.0.
 
 % table 25
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Value of opening factor multiplier for different venting conditions. \label{table:value-of-opening-factor-multiplier-for}} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \label{table:value-of-opening-factor-multiplier-for} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Value of opening factor multiplier for different venting conditions.} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endhead
 
-Yes & Temperature & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Enthalpy & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Constant & Yes & 1.0 \tabularnewline
-NoVent & No & -1.0 \tabularnewline
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+   & \raisebox{1.5ex}{Temperature} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+  Yes & \raisebox{1.5ex}{Enthalpy} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & Constant & Yes & 1.0 \tabularnewline \cmidrule{2-4}
+   & NoVent & No & -1.0 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3085,3 +3091,11 @@ This is the RoomAirflowNetwork node humidity ratio output in kgWater/kgDryAir.
 \paragraph{RoomAirflowNetwork Node Total Pressure {[}Pa{]}}\label{roomairflownetwork-node-total-pressure-pa}
 
 This is the RoomAirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node's relative height.
+
+\paragraph{AFN Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-heat-transfer-rate-w}
+
+\subsubsection{AFN Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-sensible-heat-transfer-rate-w}
+
+\subsubsection{AFN Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-latent-heat-transfer-rate-w}
+
+These output variables represent the heat emitted to ambient from exfiltration in Watts. The exfiltration rate is calculated by solving a mass flow balance on the zone airflow network including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. Positive values indicate the zone injects heat to the environment, while negative values indicate the building extracts heat from the environment. 

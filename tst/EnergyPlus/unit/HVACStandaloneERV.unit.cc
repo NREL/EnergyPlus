@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,6 +74,39 @@ using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 {
+    std::string const idf_objects = delimited_string({
+        "  Fan:OnOff,",
+        "    ERV Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    20000.0,                 !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Supply Outlet Node,   !- Air Inlet Node Name",
+        "    Supply Fan Outlet Node;  !- Air Outlet Node Name",
+
+        "  Fan:OnOff,",
+        "    ERV Exhaust Fan,         !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    20000.0,                 !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Secondary Outlet Node,!- Air Inlet Node Name",
+        "    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
+
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -82,6 +115,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     Zone(1).Name = ZoneEquipConfig(1).ZoneName;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
+    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
     TotPeople = 2; // Total number of people statements
     People.allocate(TotPeople);
@@ -96,8 +130,15 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     // size on floor area
     StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
     StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
+    StandAloneERV(1).SupplyAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    StandAloneERV(1).SupplyAirFanName = "ERV SUPPLY FAN";
+    StandAloneERV(1).SupplyAirFanIndex = 1;
+    StandAloneERV(1).ExhaustAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
+    StandAloneERV(1).ExhaustAirFanIndex = 2;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(1);
@@ -105,6 +146,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     // size on occupancy
     StandAloneERV(1).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     StandAloneERV(1).AirVolFlowPerFloorArea = 0.0;
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
@@ -114,6 +156,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     // size on floor area and occupancy
     StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
@@ -123,6 +166,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     // size on floor area and occupancy using zone multiplier
     StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     Zone(1).Multiplier = 5.0;
     SizeStandAloneERV(1);
     EXPECT_EQ(20000.0, StandAloneERV(1).SupplyAirVolFlow);
@@ -132,8 +176,6 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
-
         "  Fan:OnOff,",
         "    ERV Supply Fan,          !- Name",
         "    FanAndCoilAvailSched,    !- Availability Schedule Name",
@@ -219,7 +261,6 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     SizeStandAloneERV(1);
 
     EXPECT_EQ(1.0, StandAloneERV(1).SupplyAirVolFlow);
-    EXPECT_EQ(1.0, StandAloneERV(1).DesignHXVolFlowRate);
     EXPECT_EQ(1.2, StandAloneERV(1).DesignSAFanVolFlowRate);
     EXPECT_EQ(1.2, StandAloneERV(1).DesignEAFanVolFlowRate);
 }

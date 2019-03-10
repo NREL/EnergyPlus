@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2284,7 +2284,18 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
             }
         }
-
+        SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            DataHeatBalance::SysTotalHVACReliefHeatLoss,
+                            "HVAC",
+                            "Sum",
+                            "SimHVAC");
+        SetupOutputVariable("HVAC System Total Heat Rejection Energy",
+                            OutputProcessor::Unit::J,
+                            DataHeatBalance::SysTotalHVACRejectHeatLoss,
+                            "HVAC",
+                            "Sum",
+                            "SimHVAC");
         for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
             if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'
@@ -4619,7 +4630,7 @@ namespace SystemReports {
                             ZFAUZoneVentLoad += 0.0;
                         }
 
-                    } else if (SELECT_CASE_var == ZoneUnitarySystem_Num) {
+                    } else if (SELECT_CASE_var == ZoneUnitarySys_Num) {
                         // add accounting for OA when unitary system is used as zone equipment
 
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {

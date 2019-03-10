@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -551,6 +551,8 @@ namespace EMSManager {
         using DataGlobals::emsCallFromBeforeHVACManagers;
         using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
+        using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
+        using DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
         using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
         using DataGlobals::emsCallFromComponentGetInput;
         using DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
@@ -951,6 +953,10 @@ namespace EMSManager {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginZoneTimestepAfterInitHeatBalance;
                     } else if (SELECT_CASE_var == "BEGINTIMESTEPBEFOREPREDICTOR") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginTimestepBeforePredictor;
                     } else if (SELECT_CASE_var == "AFTERPREDICTORBEFOREHVACMANAGERS") {
@@ -1563,6 +1569,12 @@ namespace EMSManager {
                                  "[degree]",
                                  Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
+                for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed; ActuatorUsedLoop++) {
+                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") && UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
+                        Node(NodeNum).IsLocalNode = true;
+                        break;
+                    }
+                }
             }
         }
     }

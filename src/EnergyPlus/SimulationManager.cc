@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,8 +124,8 @@ extern "C" {
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ResultsSchema.hh>
 #include <ReportCoilSelection.hh>
-#include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SimulationManager.hh>
@@ -238,9 +238,9 @@ namespace SimulationManager {
         using DataEnvironment::CurrentOverallSimDay;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
+        using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataEnvironment::TotalOverallSimDays;
         using DataHVACGlobals::TimeStepSys;
 
         using BranchInputManager::InvalidBranchDefinitions;
@@ -253,12 +253,12 @@ namespace SimulationManager {
         using DataErrorTracking::AskForConnectionsReport;
         using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
-        using EMSManager::CheckIfAnyEMS;
-        using EMSManager::ManageEMS;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
         using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
+        using EMSManager::CheckIfAnyEMS;
+        using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
         using HVACControllers::DumpAirLoopStatistics;
@@ -282,8 +282,8 @@ namespace SimulationManager {
         using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using OutputProcessor::isFinalYear;
+        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
@@ -532,11 +532,19 @@ namespace SimulationManager {
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
-                    DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
-                    DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
@@ -698,9 +706,9 @@ namespace SimulationManager {
         using DataEnvironment::IgnoreBeamRadiation;
         using DataEnvironment::IgnoreDiffuseRadiation;
         using DataEnvironment::IgnoreSolarRadiation;
-        using DataHVACGlobals::LimitNumSysSteps;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
+        using DataHVACGlobals::LimitNumSysSteps;
         using General::RoundSigDigits;
         using namespace DataIPShortCuts;
 
@@ -1380,6 +1388,151 @@ namespace SimulationManager {
         }
     }
 
+    void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream)
+    {
+        int write_stat;
+        unitNumber = GetNewUnitNumber();
+        {
+            IOFlags flags;
+            flags.ACTION("write");
+            flags.STATUS("UNKNOWN");
+            gio::open(unitNumber, fileName, flags);
+            write_stat = flags.ios();
+        }
+        if (write_stat != 0) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+        }
+        out_stream = gio::out_stream(unitNumber);
+    }
+
+    void OpenOutputJsonFiles()
+    {
+
+        //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                OpenStreamFile(DataStringGlobals::outputJsonFileName, jsonOutputStreams.OutputFileJson, jsonOutputStreams.json_stream);
+            }
+            if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                OpenStreamFile(DataStringGlobals::outputCborFileName, jsonOutputStreams.OutputFileCBOR, jsonOutputStreams.cbor_stream);
+            }
+            if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                OpenStreamFile(DataStringGlobals::outputMsgPackFileName, jsonOutputStreams.OutputFileMsgPack, jsonOutputStreams.msgpack_stream);
+            }
+        }
+        //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
+        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+            // Output detailed Zone time series file
+            if (ResultsFramework::OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSZoneJsonFileName, jsonOutputStreams.OutputFileTSZoneJson,
+                                   jsonOutputStreams.json_TSstream_Zone);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSZoneCborFileName, jsonOutputStreams.OutputFileTSZoneCBOR,
+                                   jsonOutputStreams.cbor_TSstream_Zone);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSZoneMsgPackFileName, jsonOutputStreams.OutputFileTSZoneMsgPack,
+                                   jsonOutputStreams.msgpack_TSstream_Zone);
+                }
+            }
+
+            // Output detailed HVAC time series file
+            if (ResultsFramework::OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSHvacJsonFileName, jsonOutputStreams.OutputFileTSHVACJson,
+                                   jsonOutputStreams.json_TSstream_HVAC);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSHvacCborFileName, jsonOutputStreams.OutputFileTSHVACCBOR,
+                                   jsonOutputStreams.cbor_TSstream_HVAC);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSHvacMsgPackFileName, jsonOutputStreams.OutputFileTSHVACMsgPack,
+                                   jsonOutputStreams.msgpack_TSstream_HVAC);
+                }
+            }
+
+            // Output timestep time series file
+            if (ResultsFramework::OutputSchema->RITimestepTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSJsonFileName, jsonOutputStreams.OutputFileTSJson, jsonOutputStreams.json_TSstream);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSCborFileName, jsonOutputStreams.OutputFileTSCBOR, jsonOutputStreams.cbor_TSstream);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputTSMsgPackFileName, jsonOutputStreams.OutputFileTSMsgPack,
+                                   jsonOutputStreams.msgpack_TSstream);
+                }
+            }
+
+            // Output hourly time series file
+            if (ResultsFramework::OutputSchema->RIHourlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputHRJsonFileName, jsonOutputStreams.OutputFileHRJson, jsonOutputStreams.json_HRstream);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputHRCborFileName, jsonOutputStreams.OutputFileHRCBOR, jsonOutputStreams.cbor_HRstream);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputHRMsgPackFileName, jsonOutputStreams.OutputFileHRMsgPack,
+                                   jsonOutputStreams.msgpack_HRstream);
+                }
+            }
+
+            // Output daily time series file
+            if (ResultsFramework::OutputSchema->RIDailyTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputDYJsonFileName, jsonOutputStreams.OutputFileDYJson, jsonOutputStreams.json_DYstream);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputDYCborFileName, jsonOutputStreams.OutputFileDYCBOR, jsonOutputStreams.cbor_DYstream);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputDYMsgPackFileName, jsonOutputStreams.OutputFileDYMsgPack,
+                                   jsonOutputStreams.msgpack_DYstream);
+                }
+            }
+
+            // Output monthly time series file
+            if (ResultsFramework::OutputSchema->RIMonthlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputMNJsonFileName, jsonOutputStreams.OutputFileMNJson, jsonOutputStreams.json_MNstream);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputMNCborFileName, jsonOutputStreams.OutputFileMNCBOR, jsonOutputStreams.cbor_MNstream);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputMNMsgPackFileName, jsonOutputStreams.OutputFileMNMsgPack,
+                                   jsonOutputStreams.msgpack_MNstream);
+                }
+            }
+
+            // Output run period time series file
+            if (ResultsFramework::OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() ||
+                ResultsFramework::OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputSMJsonFileName, jsonOutputStreams.OutputFileSMJson, jsonOutputStreams.json_SMstream);
+                }
+                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputSMCborFileName, jsonOutputStreams.OutputFileSMCBOR, jsonOutputStreams.cbor_SMstream);
+                }
+                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                    OpenStreamFile(DataStringGlobals::outputSMMsgPackFileName, jsonOutputStreams.OutputFileSMMsgPack,
+                                   jsonOutputStreams.msgpack_SMstream);
+                }
+            }
+        }
+    }
+
     void OpenOutputFiles()
     {
 
@@ -1517,8 +1670,8 @@ namespace SimulationManager {
         using OutputProcessor::NumTotalIVariable;
         using OutputProcessor::NumTotalRVariable;
         using OutputProcessor::NumVarMeterArrays;
-        using OutputReportTabular::MonthlyFieldSetInputCount;
         using OutputReportTabular::maxUniqueKeyCount;
+        using OutputReportTabular::MonthlyFieldSetInputCount;
         using SolarShading::MAXHCArrayBounds;
         using SolarShading::maxNumberOfFigures;
         using namespace DataRuntimeLanguage;
@@ -1988,7 +2141,6 @@ namespace SimulationManager {
         int Count;
         int Count1;
         int LoopSideNum;
-        int Num;
         static bool WarningOut(true);
         int NumOfControlledZones;
 
@@ -2117,124 +2269,121 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumSplitters; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                                                           PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1) <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
+                    gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
+                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn)
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1))
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713)
-                                << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameIn + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                       LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        }
+                        gio::write(OutputFileBNDetails, Format_713)
+                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
+                                   LoopString;
                     }
                 }
+
                 //  Plant Supply Side Mixer
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumMixers; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes;
-                        gio::write(OutputFileBNDetails, Format_713)
-                            << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                   PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1) <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).MixerExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    gio::write(OutputFileBNDetails, Format_713)
+                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1))
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut)
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameIn(Count1) +
-                                                                               ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameOut +
-                                                                               ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                        }
+                        gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
+                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
+                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
                     }
                 }
             }
@@ -2281,124 +2430,121 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumSplitters; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                                                           PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).TotalOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1) <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
+                    gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
+                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumIn)
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).BranchNumOut(Count1))
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713)
-                                << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).Name + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameIn + ',' +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter(Num).NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                       LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        }
+                        gio::write(OutputFileBNDetails, Format_713)
+                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
+                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
+                                   LoopString;
                     }
                 }
+
                 //  Plant Supply Side Mixer
-                for (Num = 1; Num <= PlantLoop(Count).LoopSide(LoopSideNum).NumMixers; ++Num) {
-                    if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Exists) {
-                        gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes;
-                        gio::write(OutputFileBNDetails, Format_713)
-                            << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                   PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                        for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).TotalInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            ChrOut2 = BlankString;
-                            ChrOut3 = BlankString;
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1) <= 0) {
-                                ChrOut2 = errstring;
-                            }
-                            if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut <= 0) {
-                                ChrOut3 = errstring;
-                            }
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
+                    gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    gio::write(OutputFileBNDetails, Format_713)
+                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
+                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                        gio::write(ChrOut, fmtLD) << Count1;
+                        ChrOut2 = BlankString;
+                        ChrOut3 = BlankString;
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                            ChrOut2 = errstring;
+                        }
+                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            ChrOut3 = errstring;
+                        }
+                        {
+                            IOFlags flags;
+                            flags.ADVANCE("No");
+                            gio::write(OutputFileBNDetails, Format_713, flags)
+                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
+                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
+                        }
+                        if (ChrOut2 != errstring) {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
                                 gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',';
-                            }
-                            if (ChrOut2 != errstring) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags)
-                                        << PlantLoop(Count)
-                                                   .LoopSide(LoopSideNum)
-                                                   .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumIn(Count1))
-                                                   .Name +
-                                               ',';
-                                }
-                            } else {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                                }
-                            }
-                            if (ChrOut3 != errstring) {
-                                gio::write(OutputFileBNDetails, Format_713)
                                     << PlantLoop(Count)
                                                .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).BranchNumOut)
+                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
                                                .Name +
-                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
-                            } else {
-                                gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                                           ',';
                             }
-                            gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).Name + ',' +
-                                                                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameIn(Count1) +
-                                                                               ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer(Num).NodeNameOut +
-                                                                               ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            {
+                                IOFlags flags;
+                                flags.ADVANCE("No");
+                                gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
+                            }
                         }
+                        if (ChrOut3 != errstring) {
+                            gio::write(OutputFileBNDetails, Format_713)
+                                << PlantLoop(Count)
+                                           .LoopSide(LoopSideNum)
+                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                           .Name +
+                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        } else {
+                            gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
+                        }
+                        gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
+                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
+                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
+                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
                     }
                 }
             }
@@ -2813,15 +2959,15 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
     using DemandManager::DemandManagerHBIterations;
     using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
-    using HVACManager::SimHVAC;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
+    using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     // using HVACManager::CalcAirFlowSimple;
     using DataContaminantBalance::Contaminant;
-    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using DataHeatBalance::ZoneAirMassFlow;
+    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
     // using ZoneEquipmentManager::CalcAirFlowSimple;

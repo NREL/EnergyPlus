@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
         "    Perimeter_top_ZN_4 4pipe Beam, !- Name",
         "    , !- Primary Air Availability Schedule Name",

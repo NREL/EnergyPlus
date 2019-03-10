@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -2217,8 +2217,6 @@ namespace HeatBalFiniteDiffManager {
         // Use methodology similar to HBSurfaceManager
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2241,7 +2239,7 @@ namespace HeatBalFiniteDiffManager {
                         } else {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(Zone(ZoneNum).InternalHeatGains, 3) + "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(Zone(ZoneNum).NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(Zone(ZoneNum).NominalMixing, 3) + "] m3/s");
                         } else {
@@ -2285,7 +2283,7 @@ namespace HeatBalFiniteDiffManager {
                         } else {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(Zone(ZoneNum).InternalHeatGains, 3) + "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(Zone(ZoneNum).NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(Zone(ZoneNum).NominalMixing, 3) + "] m3/s");
                         } else {

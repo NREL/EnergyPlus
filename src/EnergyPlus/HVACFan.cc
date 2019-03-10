@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -826,6 +826,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFlowRatio * locRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;
@@ -877,6 +879,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFanRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
                                         (locFanRunTimeFraction <= m_flowFractionAtSpeed[loop + 1])) {

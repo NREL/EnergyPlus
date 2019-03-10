@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -652,8 +652,9 @@ namespace StandardRatings {
             }
         }
 
-        PreDefTableEntry(pdchMechIPLVSI, ChillerName, RoundSigDigits(IPLVValueSI, 2));
-        PreDefTableEntry(pdchMechIPLVIP, ChillerName, RoundSigDigits(IPLVValueIP, 2));
+        // Note: We don't want unit conversio, here, but it's ok since W/W will convert to itself since the column heading has "SI" as a hint
+        PreDefTableEntry(pdchMechIPLVSI, ChillerName, IPLVValueSI, 2);
+        PreDefTableEntry(pdchMechIPLVIP, ChillerName, IPLVValueIP, 2);
     }
 
     void CheckCurveLimitsForIPLV(std::string const &ChillerName, // Name of Chiller
@@ -2453,10 +2454,12 @@ namespace StandardRatings {
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, RoundSigDigits(EERValueSI, 2));
-                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, RoundSigDigits(EERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, RoundSigDigits(IEERValueIP, 2));
+                // W/W is the same as Btuh/Btuh so that's fine too
+                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
@@ -2472,8 +2475,9 @@ namespace StandardRatings {
                 PreDefTableEntry(pdchDXHeatCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
                 PreDefTableEntry(pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
-                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, RoundSigDigits(HSPFValueIP, 2));
-                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RoundSigDigits(RegionNum));
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
+                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RegionNum);
                 addFootNoteSubTable(pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
@@ -2487,7 +2491,7 @@ namespace StandardRatings {
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else {
@@ -2576,14 +2580,21 @@ namespace StandardRatings {
                         << RoundSigDigits(TotElectricPowerRated(Num + 3), 1) << RoundSigDigits(NetCoolingCapRated(Num + 4), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 4), 1);
                     PreDefTableEntry(pdchDXCoolCoilType, CompNameNew, CompType);
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 4), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 4), 1));
+                    // Note: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
+                    // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
+                    // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
+                    // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
+
+                    // These will stay in W, so it doesn't matter as much, but let's be consistent
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, TotElectricPowerRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, TotElectricPowerRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, TotElectricPowerRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, TotElectricPowerRated(Num + 4), 1);
+
                     addFootNoteSubTable(pdstDXCoolCoil2, "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
                 }
 

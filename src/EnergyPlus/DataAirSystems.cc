@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,7 +47,8 @@
 
 // EnergyPlus Headers
 #include <DataAirSystems.hh>
-#include <DataPrecisionGlobals.hh>
+#include <Fans.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -73,7 +74,6 @@ namespace DataAirSystems {
     // USE STATEMENTS:
     // Use statements for data only modules (only modules that should be used here and sparingly)
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataPlant;
 
     // Data
@@ -115,6 +115,29 @@ namespace DataAirSystems {
         AirSysCompToPlant.deallocate();       // Connections between loops
         AirSysSubCompToPlant.deallocate();    // Connections between loops
         AirSysSubSubCompToPlant.deallocate(); // Connections
+    }
+
+    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    {
+        Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
+
+        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
+
+        switch (dataFanEnumType) {
+        case DataAirSystems::structArrayLegacyFanModels: {
+            fanDesHeatLoad = Fans::FanDesHeatGain(dataFanIndex, desVolFlow);
+            break;
+        }
+        case DataAirSystems::objectVectorOOFanSystemModel: {
+            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(desVolFlow);
+            break;
+        }
+        case DataAirSystems::fanModelTypeNotYetSet: {
+            // do nothing
+            break;
+        }
+        } // end switch
+        return fanDesHeatLoad;
     }
 
 } // namespace DataAirSystems

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1110,24 +1110,22 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFTemp(1),   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(5));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {2},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFTemp(1),
-                        cAlphaFields(5),
-                        Alphas(5),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(5),
+                                                Alphas(5),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
-
             }
 
             DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(6)); // convert curve name to number
@@ -1142,21 +1140,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(6));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFFlow(1),
-                        cAlphaFields(6),
-                        Alphas(6),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -1172,24 +1165,22 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFTemp(1),   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(7));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {2},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFTemp(1),
-                        cAlphaFields(7),
-                        Alphas(7),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp(1),
+                                                cAlphaFields(7),
+                                                Alphas(7),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
-
             }
 
             DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(Alphas(8)); // convert curve name to number
@@ -1204,21 +1195,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(8));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFFlow(1),
-                        cAlphaFields(8),
-                        Alphas(8),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -1234,13 +1220,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).PLFFPLR(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(9));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1437,13 +1422,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFTemp(1),   // Curve index
-                        {2},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(15));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                                {2},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(15));             // Field Name
                 }
             }
 
@@ -1454,13 +1438,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFFlow(1),   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(16));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                                {1},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(16));             // Field Name
                 }
             }
 
@@ -1647,22 +1630,21 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(
-                                    DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),   // Curve index
-                                    {2},                            // Valid dimensions
-                                    RoutineName,                    // Routine name
-                                    CurrentModuleObject,            // Object Type
-                                    DXCoil(DXCoilNum).Name,         // Object Name
-                                    cAlphaFields2(2));              // Field Name
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
+                                                                            {2},                                      // Valid dimensions
+                                                                            RoutineName,                              // Routine name
+                                                                            CurrentModuleObject,                      // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                            cAlphaFields2(2));                        // Field Name
 
                                 if (!ErrorsFound) {
                                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                        DXCoil(DXCoilNum).Name,
-                                        DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),
-                                        cAlphaFields2(2),
-                                        Alphas2(2),
-                                        RatedInletWetBulbTemp,
-                                        RatedOutdoorAirTemp);
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),
+                                                                cAlphaFields2(2),
+                                                                Alphas2(2),
+                                                                RatedInletWetBulbTemp,
+                                                                RatedOutdoorAirTemp);
                                 }
                             }
 
@@ -1678,21 +1660,20 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(
-                                    DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),   // Curve index
-                                    {1},                            // Valid dimensions
-                                    RoutineName,                    // Routine name
-                                    CurrentModuleObject,            // Object Type
-                                    DXCoil(DXCoilNum).Name,         // Object Name
-                                    cAlphaFields2(3));              // Field Name
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
+                                                                            {1},                                      // Valid dimensions
+                                                                            RoutineName,                              // Routine name
+                                                                            CurrentModuleObject,                      // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                            cAlphaFields2(3));                        // Field Name
 
                                 if (!ErrorsFound) {
                                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                        DXCoil(DXCoilNum).Name,
-                                        DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),
-                                        cAlphaFields2(3),
-                                        Alphas2(3),
-                                        1.0);
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),
+                                                                cAlphaFields2(3),
+                                                                Alphas2(3),
+                                                                1.0);
                                 }
                             }
 
@@ -1708,22 +1689,21 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(
-                                    DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),   // Curve index
-                                    {2},                            // Valid dimensions
-                                    RoutineName,                    // Routine name
-                                    CurrentModuleObject,            // Object Type
-                                    DXCoil(DXCoilNum).Name,         // Object Name
-                                    cAlphaFields2(4));              // Field Name
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
+                                                                            {2},                                     // Valid dimensions
+                                                                            RoutineName,                             // Routine name
+                                                                            CurrentModuleObject,                     // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                            cAlphaFields2(4));                       // Field Name
 
                                 if (!ErrorsFound) {
                                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                        DXCoil(DXCoilNum).Name,
-                                        DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),
-                                        cAlphaFields2(4),
-                                        Alphas2(4),
-                                        RatedInletWetBulbTemp,
-                                        RatedOutdoorAirTemp);
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),
+                                                                cAlphaFields2(4),
+                                                                Alphas2(4),
+                                                                RatedInletWetBulbTemp,
+                                                                RatedOutdoorAirTemp);
                                 }
                             }
 
@@ -1739,21 +1719,20 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(
-                                    DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),   // Curve index
-                                    {1},                            // Valid dimensions
-                                    RoutineName,                    // Routine name
-                                    CurrentModuleObject,            // Object Type
-                                    DXCoil(DXCoilNum).Name,         // Object Name
-                                    cAlphaFields2(5));              // Field Name
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
+                                                                            {1},                                     // Valid dimensions
+                                                                            RoutineName,                             // Routine name
+                                                                            CurrentModuleObject,                     // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                            cAlphaFields2(5));                       // Field Name
 
                                 if (!ErrorsFound) {
                                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                        DXCoil(DXCoilNum).Name,
-                                        DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),
-                                        cAlphaFields2(5),
-                                        Alphas2(5),
-                                        1.0);
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),
+                                                                cAlphaFields2(5),
+                                                                Alphas2(5),
+                                                                1.0);
                                 }
                             }
 
@@ -1769,13 +1748,12 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                                ErrorsFound |= CurveManager::CheckCurveDims(
-                                    DXCoil(DXCoilNum).PLFFPLR(PerfModeNum),   // Curve index
-                                    {1},                            // Valid dimensions
-                                    RoutineName,                    // Routine name
-                                    CurrentModuleObject,            // Object Type
-                                    DXCoil(DXCoilNum).Name,         // Object Name
-                                    cAlphaFields2(6));              // Field Name
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
+                                                                            {1},                                    // Valid dimensions
+                                                                            RoutineName,                            // Routine name
+                                                                            CurrentModuleObject,                    // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                 // Object Name
+                                                                            cAlphaFields2(6));                      // Field Name
 
                                 if (!ErrorsFound) {
                                     //             Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1893,13 +1871,12 @@ namespace DXCoils {
                                     ShowContinueError("...not found " + cAlphaFields2(9) + "=\"" + Alphas2(9) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    ErrorsFound |= CurveManager::CheckCurveDims(
-                                        DXCoil(DXCoilNum).SHRFTemp(PerfModeNum),   // Curve index
-                                        {2},                            // Valid dimensions
-                                        RoutineName,                    // Routine name
-                                        CurrentModuleObject,            // Object Type
-                                        DXCoil(DXCoilNum).Name,         // Object Name
-                                        cAlphaFields2(9));              // Field Name
+                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
+                                                                                {2},                                     // Valid dimensions
+                                                                                RoutineName,                             // Routine name
+                                                                                CurrentModuleObject,                     // Object Type
+                                                                                DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                                cAlphaFields2(9));                       // Field Name
                                 }
                             }
 
@@ -1910,13 +1887,12 @@ namespace DXCoils {
                                     ShowContinueError("...not found " + cAlphaFields2(10) + "=\"" + Alphas2(10) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    ErrorsFound |= CurveManager::CheckCurveDims(
-                                        DXCoil(DXCoilNum).SHRFFlow(PerfModeNum),   // Curve index
-                                        {1},                            // Valid dimensions
-                                        RoutineName,                    // Routine name
-                                        CurrentModuleObject,            // Object Type
-                                        DXCoil(DXCoilNum).Name,         // Object Name
-                                        cAlphaFields2(10));              // Field Name
+                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
+                                                                                {1},                                     // Valid dimensions
+                                                                                RoutineName,                             // Routine name
+                                                                                CurrentModuleObject,                     // Object Type
+                                                                                DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                                cAlphaFields2(10));                      // Field Name
                                 }
                             }
                             if (DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) > 0 && DXCoil(DXCoilNum).SHRFFlow(PerfModeNum) > 0) {
@@ -2081,30 +2057,29 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFTemp(1),   // Curve index
-                    {1, 2},                         // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(5));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {1, 2},                         // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
                     if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).CCapFTemp(1),
-                            cAlphaFields(5),
-                            Alphas(5),
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).CCapFTemp(1),
+                                                    cAlphaFields(5),
+                                                    Alphas(5),
+                                                    RatedOutdoorAirTempHeat);
                     } else {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).CCapFTemp(1),
-                            cAlphaFields(5),
-                            Alphas(5),
-                            RatedInletAirTempHeat,
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).CCapFTemp(1),
+                                                    cAlphaFields(5),
+                                                    Alphas(5),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -2121,21 +2096,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(6));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFFlow(1),
-                        cAlphaFields(6),
-                        Alphas(6),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -2151,30 +2121,29 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFTemp(1),   // Curve index
-                    {1, 2},                         // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(7));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {1, 2},                        // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
                     if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).EIRFTemp(1),
-                            cAlphaFields(7),
-                            Alphas(7),
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).EIRFTemp(1),
+                                                    cAlphaFields(7),
+                                                    Alphas(7),
+                                                    RatedOutdoorAirTempHeat);
                     } else {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).EIRFTemp(1),
-                            cAlphaFields(7),
-                            Alphas(7),
-                            RatedInletAirTempHeat,
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).EIRFTemp(1),
+                                                    cAlphaFields(7),
+                                                    Alphas(7),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -2191,21 +2160,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(8));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFFlow(1),
-                        cAlphaFields(8),
-                        Alphas(8),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -2221,13 +2185,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).PLFFPLR(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(9));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2281,22 +2244,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).DefrostEIRFT,   // Curve index
-                        {2},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(10));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                                {2},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(10));              // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).DefrostEIRFT,
-                            cAlphaFields(10),
-                            Alphas(10),
-                            RatedInletAirTempHeat,
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).DefrostEIRFT,
+                                                    cAlphaFields(10),
+                                                    Alphas(10),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -2529,22 +2491,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFTemp(1),   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(5));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {2},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFTemp(1),
-                        cAlphaFields(5),
-                        Alphas(5),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(5),
+                                                Alphas(5),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2560,21 +2521,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(6));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFFlow(1),
-                        cAlphaFields(6),
-                        Alphas(6),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -2590,22 +2546,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFTemp(1),   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(7));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {2},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFTemp(1),
-                        cAlphaFields(7),
-                        Alphas(7),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp(1),
+                                                cAlphaFields(7),
+                                                Alphas(7),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2621,21 +2576,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFFlow(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(8));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFFlow(1),
-                        cAlphaFields(8),
-                        Alphas(8),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -2651,13 +2601,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).PLFFPLR(1),   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(9));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2720,22 +2669,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFTemp2,   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(10));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp2, // Curve index
+                                                            {2},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(10));            // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFTemp2,
-                        cAlphaFields(10),
-                        Alphas(10),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp2,
+                                                cAlphaFields(10),
+                                                Alphas(10),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2751,22 +2699,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).EIRFTemp2,   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DXCoil(DXCoilNum).Name,         // Object Name
-                    cAlphaFields(11));              // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp2, // Curve index
+                                                            {2},                         // Valid dimensions
+                                                            RoutineName,                 // Routine name
+                                                            CurrentModuleObject,         // Object Type
+                                                            DXCoil(DXCoilNum).Name,      // Object Name
+                                                            cAlphaFields(11));           // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).EIRFTemp2,
-                        cAlphaFields(11),
-                        Alphas(11),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp2,
+                                                cAlphaFields(11),
+                                                Alphas(11),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2920,13 +2867,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFTemp(1),   // Curve index
-                        {2},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(17));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                                {2},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(17));             // Field Name
                 }
             }
 
@@ -2938,13 +2884,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(18) + "=\"" + Alphas(18) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFFlow(1),   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(18));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                                {1},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(18));             // Field Name
                 }
             }
 
@@ -2955,13 +2900,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFTemp2,   // Curve index
-                        {2},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(19));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp2, // Curve index
+                                                                {2},                         // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(19));           // Field Name
                 }
             }
 
@@ -2972,13 +2916,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(20) + "=\"" + Alphas(20) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).SHRFFlow2,   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        DXCoil(DXCoilNum).Name,         // Object Name
-                        cAlphaFields(20));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow2, // Curve index
+                                                                {1},                         // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(20));           // Field Name
                 }
             }
             if (DXCoil(DXCoilNum).SHRFTemp(1) > 0 && DXCoil(DXCoilNum).SHRFFlow(1) > 0 && DXCoil(DXCoilNum).SHRFTemp2 > 0 &&
@@ -3220,30 +3163,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCapFTemp,   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(10));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(10));           // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCapFTemp,
-                                cAlphaFields(10),
-                                Alphas(10),
-                                InletAirTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(10),
+                                                        Alphas(10),
+                                                        InletAirTemp);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCapFTemp,
-                                cAlphaFields(10),
-                                Alphas(10),
-                                InletAirTemp,
-                                InletWaterTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(10),
+                                                        Alphas(10),
+                                                        InletAirTemp,
+                                                        InletWaterTemp);
                         }
                     }
                 }
@@ -3257,21 +3199,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCapFAirFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(11));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(11));              // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCapFAirFlow,
-                            cAlphaFields(11),
-                            Alphas(11),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFAirFlow,
+                                                    cAlphaFields(11),
+                                                    Alphas(11),
+                                                    1.0);
                     }
                 }
             }
@@ -3284,21 +3225,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCapFWaterFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(12));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(12));                // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCapFWaterFlow,
-                            cAlphaFields(12),
-                            Alphas(12),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFWaterFlow,
+                                                    cAlphaFields(12),
+                                                    Alphas(12),
+                                                    1.0);
                     }
                 }
             }
@@ -3311,30 +3251,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCOPFTemp,   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(13));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(13));           // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCOPFTemp,
-                                cAlphaFields(13),
-                                Alphas(13),
-                                InletAirTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(13),
+                                                        Alphas(13),
+                                                        InletAirTemp);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCOPFTemp,
-                                cAlphaFields(13),
-                                Alphas(13),
-                                InletAirTemp,
-                                InletWaterTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(13),
+                                                        Alphas(13),
+                                                        InletAirTemp,
+                                                        InletWaterTemp);
                         }
                     }
                 }
@@ -3348,21 +3287,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCOPFAirFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(14));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(14));              // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCOPFAirFlow,
-                            cAlphaFields(14),
-                            Alphas(14),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFAirFlow,
+                                                    cAlphaFields(14),
+                                                    Alphas(14),
+                                                    1.0);
                     }
                 }
             }
@@ -3375,21 +3313,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCOPFWaterFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(15));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(15));                // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCOPFWaterFlow,
-                            cAlphaFields(15),
-                            Alphas(15),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFWaterFlow,
+                                                    cAlphaFields(15),
+                                                    Alphas(15),
+                                                    1.0);
                     }
                 }
             }
@@ -3402,13 +3339,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).PLFFPLR(1),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(16));             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                                {1},                          // Valid dimensions
+                                                                RoutineName,                  // Routine name
+                                                                CurrentModuleObject,          // Object Type
+                                                                DXCoil(DXCoilNum).Name,       // Object Name
+                                                                cAlphaFields(16));            // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -3624,30 +3560,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCapFTemp,   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(6));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(6));            // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCapFTemp,
-                                cAlphaFields(6),
-                                Alphas(6),
-                                InletAirTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(6),
+                                                        Alphas(6),
+                                                        InletAirTemp);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCapFTemp,
-                                cAlphaFields(6),
-                                Alphas(6),
-                                InletAirTemp,
-                                InletWaterTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(6),
+                                                        Alphas(6),
+                                                        InletAirTemp,
+                                                        InletWaterTemp);
                         }
                     }
                 }
@@ -3661,21 +3596,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCapFAirFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(7));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(7));               // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCapFAirFlow,
-                            cAlphaFields(7),
-                            Alphas(7),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFAirFlow,
+                                                    cAlphaFields(7),
+                                                    Alphas(7),
+                                                    1.0);
                     }
                 }
             }
@@ -3688,30 +3622,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCOPFTemp,   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(8));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(8));            // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCOPFTemp,
-                                cAlphaFields(8),
-                                Alphas(8),
-                                InletAirTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(8),
+                                                        Alphas(8),
+                                                        InletAirTemp);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).HCOPFTemp,
-                                cAlphaFields(8),
-                                Alphas(8),
-                                InletAirTemp,
-                                InletWaterTemp);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(8),
+                                                        Alphas(8),
+                                                        InletAirTemp,
+                                                        InletWaterTemp);
                         }
                     }
                 }
@@ -3725,21 +3658,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).HCOPFAirFlow,   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(9));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(9));               // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).HCOPFAirFlow,
-                            cAlphaFields(9),
-                            Alphas(9),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFAirFlow,
+                                                    cAlphaFields(9),
+                                                    Alphas(9),
+                                                    1.0);
                     }
                 }
             }
@@ -3752,13 +3684,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).PLFFPLR(1),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(10));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                                {1},                          // Valid dimensions
+                                                                RoutineName,                  // Routine name
+                                                                CurrentModuleObject,          // Object Type
+                                                                DXCoil(DXCoilNum).Name,       // Object Name
+                                                                cAlphaFields(10));            // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4066,22 +3997,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSCCapFTemp(I),   // Curve index
-                        {2},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(13 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(13 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSCCapFTemp(I),
-                            cAlphaFields(13 + (I - 1) * 6),
-                            Alphas(13 + (I - 1) * 6),
-                            RatedInletWetBulbTemp,
-                            RatedOutdoorAirTemp);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFTemp(I),
+                                                    cAlphaFields(13 + (I - 1) * 6),
+                                                    Alphas(13 + (I - 1) * 6),
+                                                    RatedInletWetBulbTemp,
+                                                    RatedOutdoorAirTemp);
                     }
                 }
 
@@ -4097,21 +4027,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSCCapFFlow(I),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(14 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(14 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSCCapFFlow(I),
-                            cAlphaFields(14 + (I - 1) * 6),
-                            Alphas(14 + (I - 1) * 6),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFFlow(I),
+                                                    cAlphaFields(14 + (I - 1) * 6),
+                                                    Alphas(14 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4127,22 +4056,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSEIRFTemp(I),   // Curve index
-                        {2},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(15 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(15 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSEIRFTemp(I),
-                            cAlphaFields(15 + (I - 1) * 6),
-                            Alphas(15 + (I - 1) * 6),
-                            RatedInletWetBulbTemp,
-                            RatedOutdoorAirTemp);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFTemp(I),
+                                                    cAlphaFields(15 + (I - 1) * 6),
+                                                    Alphas(15 + (I - 1) * 6),
+                                                    RatedInletWetBulbTemp,
+                                                    RatedOutdoorAirTemp);
                     }
                 }
 
@@ -4158,21 +4086,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSEIRFFlow(I),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(16 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(16 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSEIRFFlow(I),
-                            cAlphaFields(16 + (I - 1) * 6),
-                            Alphas(16 + (I - 1) * 6),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFFlow(I),
+                                                    cAlphaFields(16 + (I - 1) * 6),
+                                                    Alphas(16 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4188,13 +4115,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSPLFFPLR(I),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(17 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(17 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4272,13 +4198,12 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            DXCoil(DXCoilNum).MSWasteHeat(I),   // Curve index
-                            {2},                           // Valid dimensions
-                            RoutineName,                   // Routine name
-                            CurrentModuleObject,           // Object Type
-                            DXCoil(DXCoilNum).Name,        // Object Name
-                            cAlphaFields(18 + (I - 1) * 6));  // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                    {2},                              // Valid dimensions
+                                                                    RoutineName,                      // Routine name
+                                                                    CurrentModuleObject,              // Object Type
+                                                                    DXCoil(DXCoilNum).Name,           // Object Name
+                                                                    cAlphaFields(18 + (I - 1) * 6));  // Field Name
 
                         if (!ErrorsFound) {
                             CurveVal = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
@@ -4420,22 +4345,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).DefrostEIRFT,   // Curve index
-                        {2},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(5));              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                                {2},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(5));               // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).DefrostEIRFT,
-                            cAlphaFields(5),
-                            Alphas(5),
-                            RatedInletWetBulbTempHeat,
-                            RatedOutdoorAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).DefrostEIRFT,
+                                                    cAlphaFields(5),
+                                                    Alphas(5),
+                                                    RatedInletWetBulbTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -4560,30 +4484,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSCCapFTemp(I),   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(10 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {1, 2},                           // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(10 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).MSCCapFTemp(I),
-                                cAlphaFields(10 + (I - 1) * 6),
-                                Alphas(10 + (I - 1) * 6),
-                                RatedOutdoorAirTempHeat);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSCCapFTemp(I),
+                                                        cAlphaFields(10 + (I - 1) * 6),
+                                                        Alphas(10 + (I - 1) * 6),
+                                                        RatedOutdoorAirTempHeat);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).MSCCapFTemp(I),
-                                cAlphaFields(10 + (I - 1) * 6),
-                                Alphas(10 + (I - 1) * 6),
-                                RatedInletAirTempHeat,
-                                RatedOutdoorAirTempHeat);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSCCapFTemp(I),
+                                                        cAlphaFields(10 + (I - 1) * 6),
+                                                        Alphas(10 + (I - 1) * 6),
+                                                        RatedInletAirTempHeat,
+                                                        RatedOutdoorAirTempHeat);
                         }
                     }
                 }
@@ -4600,21 +4523,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSCCapFFlow(I),   // Curve index
-                        {1},                           // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(11 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(11 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSCCapFFlow(I),
-                            cAlphaFields(11 + (I - 1) * 6),
-                            Alphas(11 + (I - 1) * 6),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFFlow(I),
+                                                    cAlphaFields(11 + (I - 1) * 6),
+                                                    Alphas(11 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4630,30 +4552,29 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSEIRFTemp(I),   // Curve index
-                        {1, 2},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(12 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {1, 2},                          // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(12 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).MSEIRFTemp(I),
-                                cAlphaFields(12 + (I - 1) * 6),
-                                Alphas(12 + (I - 1) * 6),
-                                RatedOutdoorAirTempHeat);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSEIRFTemp(I),
+                                                        cAlphaFields(12 + (I - 1) * 6),
+                                                        Alphas(12 + (I - 1) * 6),
+                                                        RatedOutdoorAirTempHeat);
                         } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).MSEIRFTemp(I),
-                                cAlphaFields(12 + (I - 1) * 6),
-                                Alphas(12 + (I - 1) * 6),
-                                RatedInletAirTempHeat,
-                                RatedOutdoorAirTempHeat);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSEIRFTemp(I),
+                                                        cAlphaFields(12 + (I - 1) * 6),
+                                                        Alphas(12 + (I - 1) * 6),
+                                                        RatedInletAirTempHeat,
+                                                        RatedOutdoorAirTempHeat);
                         }
                     }
                 }
@@ -4670,21 +4591,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSEIRFFlow(I),   // Curve index
-                        {1},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(13 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(13 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).MSEIRFFlow(I),
-                            cAlphaFields(13 + (I - 1) * 6),
-                            Alphas(13 + (I - 1) * 6),
-                            1.0);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFFlow(I),
+                                                    cAlphaFields(13 + (I - 1) * 6),
+                                                    Alphas(13 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4700,13 +4620,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        DXCoil(DXCoilNum).MSPLFFPLR(I),   // Curve index
-                        {1},                        // Valid dimensions
-                        RoutineName,                   // Routine name
-                        CurrentModuleObject,           // Object Type
-                        DXCoil(DXCoilNum).Name,        // Object Name
-                        cAlphaFields(14 + (I - 1) * 6));  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(14 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4751,22 +4670,21 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            DXCoil(DXCoilNum).MSWasteHeat(I),   // Curve index
-                            {2},                           // Valid dimensions
-                            RoutineName,                   // Routine name
-                            CurrentModuleObject,           // Object Type
-                            DXCoil(DXCoilNum).Name,        // Object Name
-                            cAlphaFields(15 + (I - 1) * 6));  // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                    {2},                              // Valid dimensions
+                                                                    RoutineName,                      // Routine name
+                                                                    CurrentModuleObject,              // Object Type
+                                                                    DXCoil(DXCoilNum).Name,           // Object Name
+                                                                    cAlphaFields(15 + (I - 1) * 6));  // Field Name
 
                         if (!ErrorsFound) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                DXCoil(DXCoilNum).Name,
-                                DXCoil(DXCoilNum).MSWasteHeat(I),
-                                cAlphaFields(15 + (I - 1) * 6),
-                                Alphas(15 + (I - 1) * 6),
-                                RatedOutdoorAirTempHeat,
-                                RatedInletAirTempHeat);
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSWasteHeat(I),
+                                                        cAlphaFields(15 + (I - 1) * 6),
+                                                        Alphas(15 + (I - 1) * 6),
+                                                        RatedOutdoorAirTempHeat,
+                                                        RatedInletAirTempHeat);
                         }
                     }
                 }
@@ -4859,30 +4777,29 @@ namespace DXCoils {
 
             DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(3));
             // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(
-                DXCoil(DXCoilNum).CCapFTemp(1),   // Curve index
-                {1, 2},                        // Valid dimensions
-                RoutineName,                   // Routine name
-                CurrentModuleObject,           // Object Type
-                DXCoil(DXCoilNum).Name,        // Object Name
-                cAlphaFields(3));  // Field Name
+            ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                        {1, 2},                         // Valid dimensions
+                                                        RoutineName,                    // Routine name
+                                                        CurrentModuleObject,            // Object Type
+                                                        DXCoil(DXCoilNum).Name,         // Object Name
+                                                        cAlphaFields(3));               // Field Name
 
             if (!ErrorsFound) {
                 if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFTemp(1),
-                        cAlphaFields(3),
-                        Alphas(3),
-                        RatedInletWetBulbTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(3),
+                                                Alphas(3),
+                                                RatedInletWetBulbTemp);
                 } else {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFTemp(1),
-                        cAlphaFields(3),
-                        Alphas(3),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(3),
+                                                Alphas(3),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -4898,21 +4815,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Linear, Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFFlow(1),   // Curve index
-                    {1},                           // Valid dimensions
-                    RoutineName,                   // Routine name
-                    CurrentModuleObject,           // Object Type
-                    DXCoil(DXCoilNum).Name,        // Object Name
-                    cAlphaFields(4));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(4));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFFlow(1),
-                        cAlphaFields(4),
-                        Alphas(4),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(4), Alphas(4), 1.0);
                 }
             }
 
@@ -5003,22 +4915,21 @@ namespace DXCoils {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFTemp(1),   // Curve index
-                    {1, 2},                        // Valid dimensions
-                    RoutineName,                   // Routine name
-                    CurrentModuleObject,           // Object Type
-                    DXCoil(DXCoilNum).Name,        // Object Name
-                    cAlphaFields(5));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {1, 2},                         // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
                     if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                            DXCoil(DXCoilNum).Name,
-                            DXCoil(DXCoilNum).CCapFTemp(1),
-                            cAlphaFields(5),
-                            Alphas(5),
-                            RatedInletAirTempHeat);
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).CCapFTemp(1),
+                                                    cAlphaFields(5),
+                                                    Alphas(5),
+                                                    RatedInletAirTempHeat);
                     } else {
                         // Can't check this here, don't know if using outdoor dry-bulb or outdoor wet-bulb temp as input. Make this check in VRF TU
                         // GetInput.
@@ -5038,21 +4949,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    DXCoil(DXCoilNum).CCapFFlow(1),   // Curve index
-                    {1},                           // Valid dimensions
-                    RoutineName,                   // Routine name
-                    CurrentModuleObject,           // Object Type
-                    DXCoil(DXCoilNum).Name,        // Object Name
-                    cAlphaFields(6));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                        DXCoil(DXCoilNum).Name,
-                        DXCoil(DXCoilNum).CCapFFlow(1),
-                        cAlphaFields(6),
-                        Alphas(6),
-                        1.0);
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
         }
@@ -5133,7 +5039,8 @@ namespace DXCoils {
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) + " type for this object = " + CurveManager::PerfCurve(indexSHCurve).ObjectType);
+                        ShowContinueError("...illegal " + cAlphaFields(5) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexSHCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -5228,7 +5135,8 @@ namespace DXCoils {
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) + " type for this object = " + CurveManager::PerfCurve(indexSCCurve).ObjectType);
+                        ShowContinueError("...illegal " + cAlphaFields(5) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexSCCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -12431,7 +12339,9 @@ namespace DXCoils {
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of Power
+                // Input
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12444,7 +12354,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
 
                 // Energy use for other fuel types
@@ -12661,10 +12575,13 @@ namespace DXCoils {
                 // Waste heat
                 if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 // Energy use for other fuel types
@@ -13033,7 +12950,7 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1)  {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -13041,7 +12958,7 @@ namespace DXCoils {
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFac * EIRFlowModFac;
                 // High Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1)  {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -13166,7 +13083,7 @@ namespace DXCoils {
                 }
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -13179,7 +13096,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
 
@@ -13392,12 +13313,15 @@ namespace DXCoils {
                     OutletAirEnthalpy = InletAirEnthalpy + DXCoil(DXCoilNum).TotalHeatingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
@@ -13508,13 +13432,13 @@ namespace DXCoils {
         // Fills some of the report variables for the DX coils
 
         // Using/Aliasing
+        using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::LoopDXCoilRTF;
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::DXElecHeatingPower;
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
-        using DataAirLoop::AirLoopAFNInfo;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoWater;
@@ -13523,17 +13447,18 @@ namespace DXCoils {
         Real64 SpecHumIn;
         Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            DXCoil(DXCoilNum).reportCoilFinalSizes) {
-            Real64 ratedSensCap(0.0);
-            ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
-            coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
-                                                      DXCoil(DXCoilNum).DXCoilType,
-                                                      DXCoil(DXCoilNum).RatedTotCap(1),
-                                                      ratedSensCap,
-                                                      DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
-                                                      -999.0);
-            DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+        if (DXCoil(DXCoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                Real64 ratedSensCap(0.0);
+                ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
+                coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
+                                                          DXCoil(DXCoilNum).DXCoilType,
+                                                          DXCoil(DXCoilNum).RatedTotCap(1),
+                                                          ratedSensCap,
+                                                          DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
+                                                          -999.0);
+                DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+            }
         }
 
         ReportingConstant = TimeStepSys * SecInHour;
@@ -13623,7 +13548,8 @@ namespace DXCoils {
 
         LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         if (DXCoil(DXCoilNum).AirLoopNum > 0) {
-            AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+            AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+                max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         }
     }
 
@@ -14078,10 +14004,12 @@ namespace DXCoils {
         }
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
-        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 1));
-        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
+        // W to tons
+        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 1);
+        // These will convert with a factor of 1 which is ok
+        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
         PreDefTableEntry(pdchDXCoolCoilSEERIP, DXCoil(DXCoilNum).Name, "N/A");
         addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
@@ -14091,20 +14019,20 @@ namespace DXCoils {
         } else {
             PreDefTableEntry(pdchVAVDXFanName, DXCoil(DXCoilNum).Name, "None");
         }
-        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(1), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(2), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(3), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(4), 4));
+        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(1), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(2), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(3), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(4), 4);
     }
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
@@ -17101,7 +17029,7 @@ namespace DXCoils {
         } else {
             ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + CoilName + "\"");
         }
-    }// must match coil names for the coil type
+    } // must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.

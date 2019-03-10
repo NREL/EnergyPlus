@@ -41,6 +41,7 @@ set( test_src
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSizing.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
@@ -92,7 +93,6 @@ set( test_src
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitaryBypassVAV.unit.cc
-  HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
@@ -101,6 +101,7 @@ set( test_src
   InputProcessor.unit.cc
   IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
+  JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MoistureBalanceEMPD.unit.cc
@@ -108,6 +109,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   OASystemHWPreheatCoil.unit.cc
+  OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
@@ -121,10 +123,12 @@ set( test_src
   Plant/Branch.unit.cc
   Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantCentralGSHP.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
+  PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
@@ -162,7 +166,9 @@ set( test_src
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
@@ -172,6 +178,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc

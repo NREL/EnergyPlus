@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -283,6 +283,7 @@ namespace Furnaces {
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
         int iterationCounter;       // track time step iterations
         Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
+        bool FirstPass;             // used to determine when first call is made
 
         // Default Constructor
         FurnaceEquipConditions()
@@ -314,7 +315,7 @@ namespace Furnaces {
               IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(MaxSpedLevels, 0.0),
               HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0), CoolMassFlowRate(MaxSpedLevels, 0.0),
               MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
-              ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0)
+              ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }
     };

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1234,13 +1234,12 @@ namespace WaterThermalTanks {
                                             cAlphaFieldNames(4) + " not found = " + cAlphaArgs(4));
                             ErrorsFound = true;
                         } else {
-                            ErrorsFound |= CurveManager::CheckCurveDims(
-                                WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,   // Curve index
-                                {2},                            // Valid dimensions
-                                RoutineName,                    // Routine name
-                                cCurrentModuleObject,            // Object Type
-                                WaterHeaterDesuperheater(DesuperheaterNum).Name,   // Object Name
-                                cAlphaFieldNames(4));  // Field Name
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
+                                                                        {2},                                                  // Valid dimensions
+                                                                        RoutineName,                                          // Routine name
+                                                                        cCurrentModuleObject,                                 // Object Type
+                                                                        WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
+                                                                        cAlphaFieldNames(4));                                 // Field Name
 
                             if (!ErrorsFound) {
                                 if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
@@ -2787,13 +2786,12 @@ namespace WaterThermalTanks {
                                 ErrorsFound = true;
                             }
 
-                            ErrorsFound |= CurveManager::CheckCurveDims(
-                                WaterThermalTank(WaterThermalTankNum).PLFCurve,   // Curve index
-                                {1},                            // Valid dimensions
-                                RoutineName,                    // Routine name
-                                cCurrentModuleObject,            // Object Type
-                                WaterThermalTank(WaterThermalTankNum).Name,   // Object Name
-                                cAlphaFieldNames(5));  // Field Name
+                            ErrorsFound |= CurveManager::CheckCurveDims(WaterThermalTank(WaterThermalTankNum).PLFCurve, // Curve index
+                                                                        {1},                                            // Valid dimensions
+                                                                        RoutineName,                                    // Routine name
+                                                                        cCurrentModuleObject,                           // Object Type
+                                                                        WaterThermalTank(WaterThermalTankNum).Name,     // Object Name
+                                                                        cAlphaFieldNames(5));                           // Field Name
                         }
                     }
 
@@ -5810,7 +5808,6 @@ namespace WaterThermalTanks {
         // Check 0 and 1
         if (CurveValue(CurveIndex, 0.0) <= 0) IsValid = false;
         if (CurveValue(CurveIndex, 1.0) <= 0) IsValid = false;
-
     }
 
     void SetupStratifiedNodes(int const WaterThermalTankNum) // Water Heater being simulated
@@ -6101,7 +6098,6 @@ namespace WaterThermalTanks {
         using DataHVACGlobals::HPWHInletDBTemp;
         using DataHVACGlobals::HPWHInletWBTemp;
         using DataLoopNode::Node;
-        using DataSizing::AutoSize;
         using DataSizing::CurZoneEqNum;
         using DataSizing::DataNonZoneNonAirloopValue;
         using DataSizing::ZoneEqSizing;
@@ -6202,12 +6198,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         UseInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
@@ -6236,12 +6232,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).UseSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         UseInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
@@ -6269,12 +6265,12 @@ namespace WaterThermalTanks {
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantLoopSide,
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantBranchNum,
                                                         WaterThermalTank(WaterThermalTankNum).SourceSidePlantCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         SourceInletNode,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (UseInletNode > 0) {
                     InterConnectTwoPlantLoopSides(WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopNum,
                                                   WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
@@ -10958,30 +10954,11 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // looping
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataSizing::AutoSize;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PlantLoopNum; // Used for looking up plant info
         int LoopSideNum;  // Used for looking up plant info
         // unused  INTEGER             :: BranchNum               ! Used for looking up plant info
         //  INTEGER             :: CompNum                 ! Used for looking up plant info
-        int SplitNum;        // used for checking series parallel in plant
         int UseInletNode;    // Water heater use inlet node number
         int SourceInletNode; // Water heater source inlet node number
         bool ErrorsFound;
@@ -11004,13 +10981,11 @@ namespace WaterThermalTanks {
                 ErrorsFound = true;
             }
             // Is this wh Use side plumbed in series (default) or are there other branches in parallel?
-            if (allocated(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter)) {
-                for (SplitNum = 1; SplitNum <= PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).NumSplitters; ++SplitNum) {
-                    if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumOut,
-                               UseInletNode)) { // this wh is on the splitter
-                        if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes > 1) {
-                            WaterThermalTank(WaterThermalTankNum).UseSideSeries = false;
-                        }
+            if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).SplitterExists) {
+                if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut,
+                           UseInletNode)) { // this wh is on the splitter
+                    if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes > 1) {
+                        WaterThermalTank(WaterThermalTankNum).UseSideSeries = false;
                     }
                 }
             }
@@ -11029,13 +11004,11 @@ namespace WaterThermalTanks {
                 ErrorsFound = true;
             }
             // Is this wh Source side plumbed in series (default) or are there other branches in parallel?
-            if (allocated(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter)) {
-                for (SplitNum = 1; SplitNum <= PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).NumSplitters; ++SplitNum) {
-                    if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).NodeNumOut,
-                               SourceInletNode)) { // this wh is on the splitter
-                        if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter(SplitNum).TotalOutletNodes > 1) {
-                            WaterThermalTank(WaterThermalTankNum).SourceSideSeries = false;
-                        }
+            if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).SplitterExists) {
+                if (any_eq(PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut,
+                           SourceInletNode)) { // this wh is on the splitter
+                    if (PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes > 1) {
+                        WaterThermalTank(WaterThermalTankNum).SourceSideSeries = false;
                     }
                 }
             }
@@ -11705,7 +11678,6 @@ namespace WaterThermalTanks {
         // BA benchmark report for residential design mode
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using namespace OutputReportPredefined;
@@ -12159,7 +12131,6 @@ namespace WaterThermalTanks {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using DataSurfaces::Surface;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
