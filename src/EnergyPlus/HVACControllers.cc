@@ -1280,54 +1280,23 @@ namespace HVACControllers {
                 }
 
             } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
-                ControllerProps(ControlNum).SensedValue = Node(SensedNode).Temp;
-                // Setpoint temp calculated once each HVAC time step to identify approach temp and whether or not humrat control is necessary
-                // WARNING: The scheme for computing the setpoint for the dual temperature and humidity ratio
-                //          control strategy breaks down whenever the sensed node temperature is modified by
-                //          a controller fired after the current one. Indeed the final sensed node temperature
-                //          is likely to have changed in the meantime if the other controller is active,
-                //          thereby invalidating the setpoint calculation for the other controller performed
-                //          earlier on the air loop.
+                if (ControllerProps(ControlNum).HumRatCtrlOverride) {
+                    // Humidity ratio control
+                    ControllerProps(ControlNum).SensedValue = Node(SensedNode).HumRat;
+                } else {
+                    // Temperature control
+                    ControllerProps(ControlNum).SensedValue = Node(SensedNode).Temp;
+                }
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
-                    // NOTE: For TEMPANDHUMRAT control the computed value ControllerProps(ControlNum)%SetPointValue
-                    //       depends on:
-                    //       - Node(SensedNode)%HumRatMax
-                    //       - Node(SensedNode)%Temp
-                    //       - Node(SensedNode)%HumRat
-                    if ((Node(SensedNode).HumRatMax > 0) && (Node(SensedNode).HumRat > Node(SensedNode).HumRatMax)) {
-                        // Setpoint can only be computed once per time step
-                        // Check if outlet air humidity ratio is greater than the set point. If so, calculate new temperature based set point.
-                        // See routine CalcSimpleController() for the sequence of operations.
-                        // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-                        ApproachTemp = Node(SensedNode).Temp - PsyTdpFnWPb(Node(SensedNode).HumRat, OutBaroPress);
-                        // Calculate the dew point temperature at the SA humidity ratio setpoint
-                        DesiredDewPoint = PsyTdpFnWPb(Node(SensedNode).HumRatMax, OutBaroPress);
-                        // Adjust the calculated dew point temperature by the approach temp. Should be within 0.3C of air temperature.
-                        HumidityControlTempSetPoint = DesiredDewPoint + min(0.3, ApproachTemp);
-                        // NOTE: The next line introduces a potential discontinuity into the residual function
-                        //       which could prevent the root finder from finding the root it if were done at each
-                        //       controller iteration. For this reason we perform the setpoint calculation only
-                        //       once at the beginning of the controller and air loop simulation.
-                        //       Use lower of temperature and humidity based set point.
-                        //       See routine CalcSimpleController() for the sequence of operations.
-                        ControllerProps(ControlNum).SetPointValue = min(
-                            Node(SensedNode).TempSetPoint,
-                            HumidityControlTempSetPoint); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
-                        // Don't allow set point temperature to be below the actuator node water temperature
-                        ControllerProps(ControlNum).SetPointValue =
-                            max(ControllerProps(ControlNum).SetPointValue, Node(ControllerProps(ControlNum).ActuatedNode).Temp);
-                        // Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
-                        // account the humidity ratio setpoint.
-                        // NOTE: Check that this does not create side-effects somewhere else in the code.
-                        Node(SensedNode).TempSetPoint = ControllerProps(ControlNum).SetPointValue;
-                        // Finally indicate thate the setpoint has been computed
-                        ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
+                    if (ControllerProps(ControlNum).HumRatCtrlOverride) {
+                        // Humidity ratio control
+                        ControllerProps(ControlNum).SetPointValue = Node(SensedNode).HumRatMax;
                     } else {
                         // Pure temperature setpoint control strategy
                         ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint;
-                        // Finally indicate thate the setpoint has been computed
-                        ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                     }
+                    // Finally indicate thate the setpoint has been computed
+                    ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                 }
 
             } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
@@ -1465,6 +1434,10 @@ namespace HVACControllers {
                 (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
             ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
+            if (ControllerProps(ControlNum).ControlVar == HVACControllers::iTemperatureAndHumidityRatio) {
+                // for temperature and humidity control, need tighter tolerance if humidity control kicks in
+                ControllerProps(ControlNum).Offset = ControllerProps(ControlNum).Offset*0.1;
+            }
             ReportSizingOutput(ControllerProps(ControlNum).ControllerType,
                                ControllerProps(ControlNum).ControllerName,
                                "Controller Convergence Tolerance",
@@ -1587,33 +1560,8 @@ namespace HVACControllers {
                 FindRootSimpleController(ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName);
 
             } else {
-
-                // We need to evaluate the sensed node temperature with the max actuated value before
-                // we can compute the actual setpoint for the dual humidity ratio / temperature strategy.
-                {
-                    auto const SELECT_CASE_var(ControllerProps(ControlNum).ControlVar);
-                    if ((SELECT_CASE_var == iTemperature) || (SELECT_CASE_var == iHumidityRatio) || (SELECT_CASE_var == iFlow)) {
-                        // Always start with min point by default for the other control strategies
-                        ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
-
-                    } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
-                        if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
-                            // Always start with max point if setpoint not yet computed. See routine InitController().
-                            ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MaxPoint.X;
-                        } else {
-                            // If setpoint already exists (i.e., HumRatMax <= 0) then try min point first as in simple
-                            // temperature control case.
-                            ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
-                        }
-
-                    } else {
-                        // Should never happen
-                        ShowSevereError("CalcSimpleController: HVAC controller failed at " + CreateHVACStepFullString());
-                        ShowContinueError(" Controller name=" + ControllerProps(ControlNum).ControllerName);
-                        ShowContinueError(" Unrecognized control variable type=" + TrimSigDigits(ControllerProps(ControlNum).ControlVar));
-                        ShowFatalError("Preceding error causes program termination.");
-                    }
-                }
+                // Always start with min point by default
+                ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
             }
 
             // Process current iterate and compute next candidate if needed

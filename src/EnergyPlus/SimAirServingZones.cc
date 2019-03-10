@@ -2864,6 +2864,9 @@ namespace SimAirServingZones {
         // E.g., actuator inlet water flow
         for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++AirLoopControlNum) {
 
+            // For temperature and humidity control reset humidity control override
+            HVACControllers::ControllerProps(PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum)).HumRatCtrlOverride = false;
+
             // BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
             // ControllerConvergedFlag is returned true here for water coils in OA system
             ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
@@ -2960,6 +2963,31 @@ namespace SimAirServingZones {
                     // not converge
                     ControllerConvergedFlag = PrimaryAirSystem(AirLoopNum).ControlConverged(AirLoopControlNum);
                     IsUpToDateFlag = true;
+                } else {
+                    {
+                        auto &thisController(HVACControllers::ControllerProps(PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum)));
+                        if (thisController.ControlVar == HVACControllers::iTemperatureAndHumidityRatio) {
+                            // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
+                            if (!thisController.HumRatCtrlOverride) {
+                                if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + thisController.Offset)) {
+                                    // Turn on humdity control and restart controller
+                                    ControllerConvergedFlag = false;
+                                    thisController.HumRatCtrlOverride = true;
+                                    IsUpToDateFlag = false;
+                                    ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+                                                      PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                                                      FirstHVACIteration,
+                                                      AirLoopNum,
+                                                      iControllerOpWarmRestart,
+                                                      ControllerConvergedFlag,
+                                                      IsUpToDateFlag,
+                                                      BypassOAController,
+                                                      AllowWarmRestartFlag);
+                                    SimAirLoopComponents(AirLoopNum, FirstHVACIteration);
+                                }
+                            }
+                        }
+                    }
                 }
 
             } // End of the Convergence Iteration
