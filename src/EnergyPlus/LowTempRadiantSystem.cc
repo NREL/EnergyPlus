@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1793,12 +1793,12 @@ namespace LowTempRadiantSystem {
                                             HydrRadSys(RadSysNum).HWLoopSide,
                                             HydrRadSys(RadSysNum).HWBranchNum,
                                             HydrRadSys(RadSysNum).HWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1810,12 +1810,12 @@ namespace LowTempRadiantSystem {
                                             HydrRadSys(RadSysNum).CWLoopSide,
                                             HydrRadSys(RadSysNum).CWBranchNum,
                                             HydrRadSys(RadSysNum).CWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1836,12 +1836,12 @@ namespace LowTempRadiantSystem {
                                             CFloRadSys(RadSysNum).HWLoopSide,
                                             CFloRadSys(RadSysNum).HWBranchNum,
                                             CFloRadSys(RadSysNum).HWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             CFloRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1853,12 +1853,12 @@ namespace LowTempRadiantSystem {
                                             CFloRadSys(RadSysNum).CWLoopSide,
                                             CFloRadSys(RadSysNum).CWBranchNum,
                                             CFloRadSys(RadSysNum).CWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             CFloRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }

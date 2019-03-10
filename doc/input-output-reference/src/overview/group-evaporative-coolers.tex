@@ -157,17 +157,22 @@ This field specifies the effectiveness at design flow rate that is applied to th
 
 This curve modifies the effectiveness design value specified the previous field by multiplying the value by the result of this curve. The modifying curve is a function of flow fraction, which is the ratio of the current primary air flow rates divided by the design primary air flow rates. If this input field is left blank, the effectiveness is assumed to be constant. Any curve or table with one independent variable can be used. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
-\paragraph{Field:Primary Design Air Flow Rate}\label{fieldprimary-design-air-flow-rate}
+\paragraph{Field: Primary Design Air Flow Rate}\label{field-primary-design-air-flow-rate}
 
-This numeric input field is the primary air design air flow rate in m3/s. This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the maximum of the the outdoor air design flow rate and the half of the primary air flow rate on the main air loop branch.
+This numeric input field is the primary air design air flow rate in \si{\volumeFlowRate}. This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the maximum of the the outdoor air design flow rate and the half of the primary air flow rate on the main air loop branch.
 
-\paragraph{Field: Recirculationg Water Pump Design Power}\label{field-recirculationg-water-pump-design-power}
+\paragraph{Field: Recirculating Water Pump Design Power}\label{field-recirculating-water-pump-design-power}
 
-This numeric input field is the recirculating and spray pump electric power at Secondary Design Air Flow Rate in W. This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness. This input field is autosizable. Average Pump Power sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example files is about 90.0 {[}W/(m3/s){]} ( = 90.0 \textasciitilde{} Pump Power / Primary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 {[}W/(m3/s){]}.
+This numeric input field is the recirculating and spray pump electric power at the Primary Design Air Flow Rate in \si{\watt}.
+This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness.
+This input field is autosizable, see Water Pump Power Sizing Factor.
 
 \paragraph{Field: Water Pump Power Sizing Factor}\label{field-water-pump-power-sizing-factor}
 
-This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate. This input field is autosizable. Average Pump Power sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example files is about 90.0 {[}W/(m3/s){]} ( = 90.0 \textasciitilde{} Pump Power / Primary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 {[}W/(m3/s){]}.
+This numeric input field value is recirculating water pump sizing factor in \si{\wattperVolumeFlowRate}.
+This field is used when the previous field is set to autosize. The pump design electric power is scaled with Primary Design Air Flow Rate. This input field is autosizable.
+Average Pump Power sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example files and
+is about \SI{90.0}{\wattperVolumeFlowRate} ( = 90.0 \textasciitilde{} Pump Power / Primary Air Design Flow Rate). The factor ranges from 55.0 to \SI{150.0}{\wattperVolumeFlowRate}.
 
 \paragraph{Field: Water Pump Power Modifier Curve Name}\label{field-water-pump-power-modifier-curve-name}
 
@@ -199,15 +204,15 @@ This field is optional and can be used to model additional water consumed by the
 
 \paragraph{Field: Evaporative Cooler Operation Minimum Drybulb Temperature}\label{field-evaporative-cooler-operation-minimum-drybulb-temperature}
 
-This numeric field defines the evaporative cooler inlet node drybulb temperature minimum limit in degrees Celsius. The evaporative cooler will be turned off when evaporator cooler air inlet node dry-bulb temperature falls below this value. The typical minimum value is 16 °C. Users are allowed to specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler inlet node drybulb temperature minimum limit in degrees Celsius. The evaporative cooler will be turned off when evaporator cooler air inlet node dry-bulb temperature falls below this value. The typical minimum value is \SI{16}{\celsius}. Users are allowed to specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.
 
 \paragraph{Field: Evaporative Operation Maximum Limit Wetbulb Temperature}\label{field-evaporative-operation-maximum-limit-wetbulb-temperature}
 
-This numeric field defines the evaporative cooler air inlet node air wetbulb temperature maximum limits in degree Celsius. When the evaporative cooler air inlet node air wetbulb temperature exceeds this limit, then the evaporative cooler is turns off. The typical maximum value is 24 °C. If this input field is left blank, then there is no wetbulb temperature upper limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler air inlet node air wetbulb temperature maximum limits in degree Celsius. When the evaporative cooler air inlet node air wetbulb temperature exceeds this limit, then the evaporative cooler is turns off. The typical maximum value is \SI{24}{\celsius}. If this input field is left blank, then there is no wetbulb temperature upper limit for evaporative cooler operation.
 
 \paragraph{Field: Evaporative Operation Maximum Limit Drybulb Temperature}\label{field-evaporative-operation-maximum-limit-drybulb-temperature}
 
-This numeric field defines the evaporative cooler air inlet node drybulb temperature maximum limits in degree Celsius. The evaporative cooler will be turned off when the evaporative cooler air inlet node drybulb temperature exceeds this value. The typical maximum value is 28 °C. If this input field is left blank, then there is no upper drybulb temperature limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler air inlet node drybulb temperature maximum limits in degree Celsius. The evaporative cooler will be turned off when the evaporative cooler air inlet node drybulb temperature exceeds this value. The typical maximum value is \SI{28}{\celsius}. If this input field is left blank, then there is no upper drybulb temperature limit for evaporative cooler operation.
 
 An example IDF entry is
 
@@ -215,18 +220,19 @@ An example IDF entry is
 
 EvaporativeCooler:Direct:ResearchSpecial,
   Direct Evap Cooler, !- Name
-  ALWAYS_ON, !- Availability Schedule Name
-  0.7 , !- Cooler Design Effectiveness
-  ,     !- Effectiveness Flow Ratio Modifier Curve Name
-  30.0 , !- Recirculating Water Pump Design Power
-  ,     !- Water Pump Power Sizing Factor
-  ,     !- Water Pump Power Modifier Curve Name
+  ALWAYS_ON,          !- Availability Schedule Name
+  0.7 ,               !- Cooler Design Effectiveness
+  ,                   !- Effectiveness Flow Ratio Modifier Curve Name
+  autosize,           !- Primary Air Design Flow Rate {m3/s}
+  30.0 ,              !- Recirculating Water Pump Design Power
+  ,                   !- Water Pump Power Sizing Factor
+  ,                   !- Water Pump Power Modifier Curve Name
   OAIndRDD Evap Cooler- OADirect Evap CoolerNode , !- Air Inlet Node Name
   OADirect Evap Cooler- OAMixing BoxNode, !- Air Outlet Node Name
   OADirect Evap Cooler- OAMixing BoxNode, !- Sensor Node Name
-  , !- Water Supply Storage Tank Name
-  0.0, !- Drift Loss Fraction
-  3; !- Blowdown Concentration Ratio
+  ,                   !- Water Supply Storage Tank Name
+  0.0,                !- Drift Loss Fraction
+  3;                  !- Blowdown Concentration Ratio
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-009}
@@ -633,7 +639,7 @@ This numeric input field is the recirculating pump electric power at Secondary D
 
 \paragraph{Field: Water Pump Power Sizing Factor}\label{field-water-pump-power-sizing-factor-1}
 
-This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate. Average Pump Power sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example files is about 90.0 {[}W/(m3/s){]} ( = 90.0 \textasciitilde{} Pump Power / Secondary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 {[}W/(m3/s){]}.
+This numeric input field value is recirculating water pump sizing factor in \si{\wattperVolumeFlowRate}. This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate. Average Pump Power sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example files is about 90.0 \si{\wattperVolumeFlowRate} ( = 90.0 \textasciitilde{} Pump Power / Secondary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 \si{\wattperVolumeFlowRate}.
 
 \paragraph{Field: Water Pump Power Modifier Curve Name}\label{field-water-pump-power-modifier-curve-name-1}
 
@@ -641,7 +647,7 @@ This alpha input field is the name of a dimensionless normalized pump power modi
 
 \paragraph{Field: Secondary Air Design Flow Rate}\label{field-secondary-air-design-flow-rate}
 
-This field is used to specify the secondary air fan flow rate and is specified in m\(^{3}\)/s. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path. If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system s design supply air flow rate (which is the maximum required for heating and cooling). If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose. This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
+This field is used to specify the secondary air fan flow rate and is specified in \si{\volumeFlowRate}. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path. If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system s design supply air flow rate (which is the maximum required for heating and cooling). If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose. This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
 
 \paragraph{Field: Secondary Air Flow Scaling Factor}\label{field-secondary-air-flow-scaling-factor}
 

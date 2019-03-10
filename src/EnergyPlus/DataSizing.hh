@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -515,7 +515,7 @@ namespace DataSizing {
         int TimeStepNumAtHeatMax;     // time step number (in day) at Heating peak
         int TimeStepNumAtCoolMax;     // time step number (in day) at cooling peak
         int HeatDDNum;                // design day index of design day causing heating peak
-        int CoolDDNum;                // design day index of design day causing heating peak
+        int CoolDDNum;                // design day index of design day causing cooling peak
         std::string cHeatDDDate;      // date of design day causing heating peak
         std::string cCoolDDDate;      // date of design day causing cooling peak
         Real64 MinOA;                 // design minimum outside air in m3/s

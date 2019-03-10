@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,8 +86,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     int ControlZoneNum(0);   // index to control zone
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        "  ",
         "Zone,",
         "  EAST ZONE,              !- Name",
         "  0,                      !- Direction of Relative North{ deg }",
@@ -413,7 +411,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
     DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+        false; // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = mySys->AirInNode;
     OutletNode = mySys->AirOutNode;

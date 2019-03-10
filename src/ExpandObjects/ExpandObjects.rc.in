@@ -1,0 +1,25 @@
+1 RT_MANIFEST "${CMAKE_CURRENT_SOURCE_DIR}/ExpandObjects.exe.manifest"
+1 VERSIONINFO
+FILEVERSION ${CMAKE_VERSION_MAJOR},${CMAKE_VERSION_MINOR},${CMAKE_VERSION_PATCH}
+PRODUCTVERSION ${CMAKE_VERSION_MAJOR},${CMAKE_VERSION_MINOR},${CMAKE_VERSION_PATCH}
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "U.S. Department of Energy\0"
+            VALUE "FileDescription",  "EnergyPlus Template Preprocessor\0"
+            VALUE "FileVersion",      "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}\0"
+            VALUE "InternalName",     "ExpandObjects\0"
+            VALUE "LegalCopyright",   "Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All rights reserved.\0"
+            VALUE "LegalTrademarks",  "EnergyPlus (TM) is a trademark of the US Department of Energy.\0"
+            VALUE "OriginalFilename", "ExpandObjects.exe\0"
+            VALUE "ProductName",      "EnergyPlus\0"
+            VALUE "ProductVersion",   "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

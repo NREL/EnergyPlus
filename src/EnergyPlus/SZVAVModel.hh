@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,6 @@
 #include <EnergyPlus.hh>
 #include <FanCoilUnits.hh>
 #include <General.hh>
-#include <HVACUnitarySystem.hh>
 #include <PackagedTerminalHeatPump.hh>
 #include <UnitarySystem.hh>
 
@@ -92,18 +91,6 @@ namespace SZVAVModel {
     // PUBLIC  ErfFunction
 
     // Functions
-
-    void calcSZVAVModel(HVACUnitarySystem::UnitarySystemData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
 
     void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
@@ -143,8 +130,7 @@ namespace SZVAVModel {
                         bool const &HXUnitOn,
                         int const &AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
-    );
+                        int const &CompressorONFlag);
 
 } // namespace SZVAVModel
 

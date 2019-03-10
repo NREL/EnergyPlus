@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -587,14 +587,14 @@ namespace MixedAir {
         using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using HeatRecovery::SimHeatRecovery;
-        using Humidifiers::SimHumidifier;
         using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+        using HeatRecovery::SimHeatRecovery;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using Humidifiers::SimHumidifier;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -910,7 +910,6 @@ namespace MixedAir {
         InitOAController(OAControllerNum, FirstHVACIteration, AirLoopNum);
 
         OAController(OAControllerNum).CalcOAController(AirLoopNum, FirstHVACIteration);
-
         OAController(OAControllerNum).UpdateOAController();
     }
 
@@ -3196,6 +3195,27 @@ namespace MixedAir {
                                         "Average",
                                         airloopName);
 
+                    SetupOutputVariable("Air System Relief Air Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelTotalLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+
+                    SetupOutputVariable("Air System Relief Air Sensible Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelSensiLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+
+                    SetupOutputVariable("Air System Relief Air Latent Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        loopOAController.RelLatentLossRate,
+                                        "System",
+                                        "Average",
+                                        airloopName);
+
                     if (loopOAController.MixedAirSPMNum > 0) {
                         SetupOutputVariable("Air System Outdoor Air Maximum Flow Fraction",
                                             OutputProcessor::Unit::None,
@@ -3575,6 +3595,7 @@ namespace MixedAir {
                 curAirLoopFlow.OAFrac = 0.0;                      // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.OAMinFrac = 0.0;                   // DataAirLoop variable (AirloopHVAC)
                 curAirLoopFlow.MinOutAir = 0.0;
+                curAirLoopFlow.OAFlow = 0.0;
             }
 
             return;
@@ -3683,11 +3704,13 @@ namespace MixedAir {
         }
 
         // Apply Maximum Fraction of Outdoor Air Schedule
+        Real64 currentMaxOAMassFlowRate = this->MaxOAMassFlowRate;
         if (this->MaxOAflowSchPtr > 0) {
             Real64 MaxOAflowfracVal = GetCurrentScheduleValue(this->MaxOAflowSchPtr);
             MaxOAflowfracVal = min(max(MaxOAflowfracVal, 0.0), 1.0);
+            currentMaxOAMassFlowRate = min(this->MaxOAMassFlowRate, this->MixMassFlow * MaxOAflowfracVal);
             OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
-            this->OAMassFlow = min(this->OAMassFlow, this->MixMassFlow * MaxOAflowfracVal);
+            this->OAMassFlow = min(this->OAMassFlow, currentMaxOAMassFlowRate);
         }
 
         // Don't let the OA flow be > than the max OA limit. OA for high humidity control is allowed to be greater than max OA.
@@ -3714,17 +3737,23 @@ namespace MixedAir {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
             curAirLoopFlow.OAMinFrac = OutAirMinFrac;
-            curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            if (this->FixedMin) {
+                curAirLoopFlow.MinOutAir = min(OutAirMinFrac * curAirLoopFlow.DesSupply, this->MixMassFlow);
+            } else {
+                curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            }
             if (this->MixMassFlow > 0.0) {
                 curAirLoopFlow.OAFrac = this->OAMassFlow / this->MixMassFlow;
+                curAirLoopFlow.OAFlow = this->OAMassFlow;
             } else {
                 curAirLoopFlow.OAFrac = 0.0;
+                curAirLoopFlow.OAFlow = 0.0;
             }
             this->MinOAFracLimit = OutAirMinFrac;
             if (HighHumidityOperationFlag && OASignal > 1.0) {
                 curAirLoopFlow.MaxOutAir = this->MaxOAMassFlowRate * OASignal;
             } else {
-                curAirLoopFlow.MaxOutAir = this->MaxOAMassFlowRate;
+                curAirLoopFlow.MaxOutAir = currentMaxOAMassFlowRate;
             }
 
             // MJW - Not sure if this is necessary but keeping it for now
@@ -3767,6 +3796,11 @@ namespace MixedAir {
                 this->OAFractionRpt = 0.0;
             }
         }
+        this->RelTemp = this->RetTemp;
+        this->RelEnth = this->RetEnth;
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
+        this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 
     void VentilationMechanicalProps::CalcMechVentController(
@@ -4568,10 +4602,18 @@ namespace MixedAir {
                     // simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, ect.)
 
                     // 1 - check min OA flow result
-                    Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * Node(this->MixNode).MassFlowRate);
-                    Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
-                    // save actual OA flow frac for use as min value for RegulaFalsi call
-                    minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    if (this->FixedMin) {
+                        Node(this->OANode).MassFlowRate =
+                            min(max(this->ExhMassFlow, OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply), Node(this->MixNode).MassFlowRate);
+                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        // save actual OA flow frac for use as min value for RegulaFalsi call
+                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    } else {
+                        Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * Node(this->MixNode).MassFlowRate);
+                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        // save actual OA flow frac for use as min value for RegulaFalsi call
+                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    }
                     SimOASysComponents(AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
                     lowFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
 
@@ -4650,6 +4692,7 @@ namespace MixedAir {
             if (AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked) {
                 this->OAMassFlow = AirLoopFlow(AirLoopNum).MinOutAir;
                 AirLoopFlow(AirLoopNum).OAFrac = this->OAMassFlow / this->MixMassFlow;
+                AirLoopFlow(AirLoopNum).OAFlow = this->OAMassFlow;
             }
 
             // Check heat exchanger bypass control

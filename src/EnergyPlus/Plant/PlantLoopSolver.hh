@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,20 +85,7 @@ namespace PlantLoopSolver {
     struct PlantLoopSolverClass
     {
 
-        struct m_FlowControlValidator
-        {
-            // Members
-            bool Valid;          // Assume true
-            Location ErrorPoint; // Branch where the error was thrown
-            std::string Reason;  // Brief description of error
-
-            // Default Constructor
-            m_FlowControlValidator() : Valid(true)
-            {
-            }
-        };
-
-        m_FlowControlValidator ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
+        void ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
 
         Real64 SetupLoopFlowRequest(int const LoopNum, int const ThisSide, int const OtherSide);
 
@@ -113,13 +100,14 @@ namespace PlantLoopSolver {
                                          int const LastBranchNum,
                                          Real64 const FlowRequest,
                                          bool const FirstHVACIteration,
-                                         bool &LoopShutDownFlag,
-                                         bool const StartingNewLoopSidePass = false);
+                                         bool &LoopShutDownFlag);
 
         void SimulateAllLoopSidePumps(int const LoopNum,
                                       int const ThisSide,
                                       Optional<Location const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
+
+        void SimulateSinglePump(Location const SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         Real64 CalcOtherSideDemand(int const LoopNum, int const ThisSide, Real64 ThisLoopSideFlow);
 

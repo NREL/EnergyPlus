@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -203,7 +203,6 @@ namespace PlantLoopEquip {
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
         using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
         using HeatPumpWaterToWaterHEATING::SimHPWatertoWaterHEATING;
-        using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
         using OutsideEnergySources::SimOutsideEnergy;
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
@@ -313,7 +312,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_PipingSystemPipeCircuit) {
-                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration);
+                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Pipe Type=" + sim_component.TypeOf);
@@ -604,52 +603,16 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_HPWaterEFCooling) {
-                SimHPWatertoWaterSimple(sim_component.TypeOf,
-                                        EquipTypeNum,
-                                        sim_component.Name,
-                                        EquipNum,
-                                        FirstHVACIteration,
-                                        InitLoopEquip,
-                                        CurLoad,
-                                        MaxLoad,
-                                        MinLoad,
-                                        OptLoad,
-                                        LoopNum,
-                                        GetCompSizFac,
-                                        SizingFac);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HPWaterEFHeating) {
-                SimHPWatertoWaterSimple(sim_component.TypeOf,
-                                        EquipTypeNum,
-                                        sim_component.Name,
-                                        EquipNum,
-                                        FirstHVACIteration,
-                                        InitLoopEquip,
-                                        CurLoad,
-                                        MaxLoad,
-                                        MinLoad,
-                                        OptLoad,
-                                        LoopNum,
-                                        GetCompSizFac,
-                                        SizingFac);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_HeatPumpEIRCooling) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_HeatPumpEIRHeating) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HeatPumpVRF) {
 
@@ -1085,7 +1048,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
-                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration);
+                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
