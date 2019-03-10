@@ -592,6 +592,7 @@ namespace Boilers {
                                     m_loopSideIndex,
                                     m_branchIndex,
                                     m_componentIndex,
+                                    errFlag,
                                     _,
                                     m_designOutletTemperatureLimit,
                                     _,
