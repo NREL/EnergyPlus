@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -186,6 +186,7 @@ namespace SizingManager {
         using OutputReportTabular::ComputeLoadComponentDecayCurve;
         using OutputReportTabular::DeallocateLoadComponentArrays;
         using OutputReportTabular::isCompLoadRepReq;
+        using OutputReportTabular::hasSizingPeriodsDays;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ManageSizing: ");
@@ -248,13 +249,21 @@ namespace SizingManager {
         // determine if the second set of zone sizing calculations should be performed
         // that include a pulse for the load component reporting
         isUserReqCompLoadReport = isCompLoadRepReq(); // check getinput structure if load component report is requested
-        if (DoZoneSizing && (NumZoneSizingInput > 0)) {
+        bool fileHasSizingPeriodDays =
+            hasSizingPeriodsDays(); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
+        if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
             CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
-                ShowWarningError(
-                    RoutineName +
-                    "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
+                if (fileHasSizingPeriodDays) {
+                    ShowWarningError(
+                        RoutineName +
+                        "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
+                } else {
+                    ShowWarningError(
+                        RoutineName +
+                        "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                }
             }
         }
         if (CompLoadReportIsReq) { // if that report is created then zone sizing calculations are repeated

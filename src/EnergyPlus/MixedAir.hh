@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -238,6 +238,12 @@ namespace MixedAir {
         Real64 MixSetTemp;
         Real64 MinOAMassFlowRate; // Minimum outside air flow (kg/s)
         Real64 MaxOAMassFlowRate; // Maximum outside air flow (kg/s)
+        Real64 RelTemp;
+        Real64 RelEnth;
+        Real64 RelSensiLossRate; // Heat lost to ambient from relief air (W)
+        Real64 RelLatentLossRate;
+        Real64 RelTotalLossRate;
+
         int ZoneEquipZoneNum;
         std::string VentilationMechanicalName; // Name of ventilation:mechanical object used for DCV
         int VentMechObjectNum;                 // Index to VENTILATION:MECHANICAL object for this controller
@@ -284,13 +290,14 @@ namespace MixedAir {
               EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(0), EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0),
               MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0), ExhMassFlow(0.0), MixMassFlow(0.0), InletTemp(0.0), InletEnth(0.0), InletPress(0.0),
               InletHumRat(0.0), OATemp(0.0), OAEnth(0.0), OAPress(0.0), OAHumRat(0.0), RetTemp(0.0), RetEnth(0.0), MixSetTemp(0.0),
-              MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0), HumidistatZoneNum(0),
-              NodeNumofHumidistatZone(0), HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0), MinOAflowSchPtr(0),
-              MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0),
-              HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
-              EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
-              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false),
-              EconmizerFaultNum(0), NumFaultyEconomizer(0)
+              MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0), RelEnth(0.0), RelSensiLossRate(0.0), RelLatentLossRate(0.0),
+              RelTotalLossRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0), HumidistatZoneNum(0), NodeNumofHumidistatZone(0),
+              HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0), MinOAflowSchPtr(0), MaxOAflowSchPtr(0),
+              EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0), HighHumCtrlStatus(0),
+              OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false), EMSOARateValue(0.0),
+              HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0), MaxOAFracBySetPoint(0),
+              MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false), EconmizerFaultNum(0),
+              NumFaultyEconomizer(0)
         {
         }
 

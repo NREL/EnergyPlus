@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -375,6 +375,35 @@ namespace CommandLineInterface {
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+
+        outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
+        outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
+        outputTSHvacJsonFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.json";
+        outputTSJsonFileName = outputFilePrefix + normalSuffix + "_timestep.json";
+        outputYRJsonFileName = outputFilePrefix + normalSuffix + "_yearly.json";
+        outputMNJsonFileName = outputFilePrefix + normalSuffix + "_monthly.json";
+        outputDYJsonFileName = outputFilePrefix + normalSuffix + "_daily.json";
+        outputHRJsonFileName = outputFilePrefix + normalSuffix + "_hourly.json";
+        outputSMJsonFileName = outputFilePrefix + normalSuffix + "_runperiod.json";
+        outputCborFileName = outputFilePrefix + normalSuffix + ".cbor";
+        outputTSZoneCborFileName = outputFilePrefix + normalSuffix + "_detailed_zone.cbor";
+        outputTSHvacCborFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.cbor";
+        outputTSCborFileName = outputFilePrefix + normalSuffix + "_timestep.cbor";
+        outputYRCborFileName = outputFilePrefix + normalSuffix + "_yearly.cbor";
+        outputMNCborFileName = outputFilePrefix + normalSuffix + "_monthly.cbor";
+        outputDYCborFileName = outputFilePrefix + normalSuffix + "_daily.cbor";
+        outputHRCborFileName = outputFilePrefix + normalSuffix + "_hourly.cbor";
+        outputSMCborFileName = outputFilePrefix + normalSuffix + "_runperiod.cbor";
+        outputMsgPackFileName = outputFilePrefix + normalSuffix + ".msgpack";
+        outputTSZoneMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_zone.msgpack";
+        outputTSHvacMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.msgpack";
+        outputTSMsgPackFileName = outputFilePrefix + normalSuffix + "_timestep.msgpack";
+        outputYRMsgPackFileName = outputFilePrefix + normalSuffix + "_yearly.msgpack";
+        outputMNMsgPackFileName = outputFilePrefix + normalSuffix + "_monthly.msgpack";
+        outputDYMsgPackFileName = outputFilePrefix + normalSuffix + "_daily.msgpack";
+        outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
+        outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
+
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
         outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";

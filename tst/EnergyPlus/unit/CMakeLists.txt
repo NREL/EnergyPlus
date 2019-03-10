@@ -101,6 +101,7 @@ set( test_src
   InputProcessor.unit.cc
   IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
+  JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MoistureBalanceEMPD.unit.cc
@@ -122,10 +123,12 @@ set( test_src
   Plant/Branch.unit.cc
   Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantCentralGSHP.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
+  PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
@@ -175,6 +178,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc

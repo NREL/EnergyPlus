@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 {
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Coil:Cooling:Water,",
         "	Chilled Water Coil,	!- Name",
         "	AvailSched,			!- Availability Schedule Name",
@@ -273,8 +272,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Coil:Cooling:Water,",
         "    Main Cooling Coil 1,     !- Name",
         "    CoolingCoilAvailSched,   !- Availability Schedule Name",
@@ -455,8 +452,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA Sys 1 Controllers,    !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",
@@ -558,8 +553,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA System Controllers,   !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",

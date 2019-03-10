@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,6 +137,8 @@ namespace DataGlobals {
     Real64 const StefanBoltzmann(5.6697E-8);     // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 const UniversalGasConst(8314.462175); // (J/mol*K)
 
+    Real64 const convertJtoGJ(1.0E-9); // Conversion factor for J to GJ
+
     // Parameters for EMS Calling Points
     int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
     int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
@@ -156,6 +158,8 @@ namespace DataGlobals {
     int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
     int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
     int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
+    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 
@@ -180,20 +184,21 @@ namespace DataGlobals {
     bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
     bool EndDesignDayEnvrnsFlag(false); // True at the end of the last design day environment
     // (last time step of last hour of last day of environ which is a design day)
-    bool EndDayFlag(false);                          // True at the end of each day (last time step of last hour of day)
-    bool EndHourFlag(false);                         // True at the end of each hour (last time step of hour)
-    int PreviousHour(0);                             // Previous Hour Index
-    int HourOfDay(0);                                // Counter for hours in a simulation day
-    Real64 WeightPreviousHour(0.0);                  // Weighting of value for previous hour
-    Real64 WeightNow(0.0);                           // Weighting of value for current hour
-    int NumOfDayInEnvrn(0);                          // Number of days in the simulation for a particular environment
-    int NumOfTimeStepInHour(0);                      // Number of time steps in each hour of the simulation
-    int NumOfZones(0);                               // Total number of Zones for simulation
-    int TimeStep(0);                                 // Counter for time steps (fractional hours)
-    Real64 TimeStepZone(0.0);                        // Zone time step in fractional hours
-    bool WarmupFlag(false);                          // True during the warmup portion of a simulation
-    int OutputFileStandard(0);                       // Unit number for the standard output file (hourly data only)
-    std::ostream *eso_stream(nullptr);               // Internal stream used for eso output (used for performance)
+    bool EndDayFlag(false);            // True at the end of each day (last time step of last hour of day)
+    bool EndHourFlag(false);           // True at the end of each hour (last time step of hour)
+    int PreviousHour(0);               // Previous Hour Index
+    int HourOfDay(0);                  // Counter for hours in a simulation day
+    Real64 WeightPreviousHour(0.0);    // Weighting of value for previous hour
+    Real64 WeightNow(0.0);             // Weighting of value for current hour
+    int NumOfDayInEnvrn(0);            // Number of days in the simulation for a particular environment
+    int NumOfTimeStepInHour(0);        // Number of time steps in each hour of the simulation
+    int NumOfZones(0);                 // Total number of Zones for simulation
+    int TimeStep(0);                   // Counter for time steps (fractional hours)
+    Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
+    bool WarmupFlag(false);            // True during the warmup portion of a simulation
+    int OutputFileStandard(0);         // Unit number for the standard output file (hourly data only)
+    std::ostream *eso_stream(nullptr); // Internal stream used for eso output (used for performance)
+    JsonOutputStreams jsonOutputStreams;
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,7 @@
 
 // EnergyPlus Headers
 #include <ConvectionCoefficients.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
@@ -107,7 +107,6 @@ namespace DisplacementVentMgr {
     using DataHVACGlobals::ShortenTimeStepSysRoomAir;
     using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
-    using namespace DataAirflowNetwork;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -745,9 +744,9 @@ namespace DisplacementVentMgr {
         SumMCp = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
         SumMCpT =
             MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone) {
-            SumMCp = AirflowNetworkExchangeData(ZoneNum).SumMCp + AirflowNetworkExchangeData(ZoneNum).SumMMCp;
-            SumMCpT = AirflowNetworkExchangeData(ZoneNum).SumMCpT + AirflowNetworkExchangeData(ZoneNum).SumMMCpT;
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+            SumMCp = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCp + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCp;
+            SumMCpT = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCpT + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCpT;
         }
 
         MCp_Total = SumMCp + SumSysMCp;
@@ -777,19 +776,19 @@ namespace DisplacementVentMgr {
         // outflowing. The lower apertures have to be located below 0.8m and the upper apertures
         // have to be located above 1.8m.
 
-        if (NumOfLinksMultiZone > 0) {
+        if (AirflowNetwork::NumOfLinksMultiZone > 0) {
             for (Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Loop) {
                 // direct AirflowNetwork surface
 
-                if (Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone == ZoneNum) {
+                if (Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone == ZoneNum) {
 
                     if ((SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax < 0.8 &&
-                         AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0)) {
+                         AirflowNetwork::AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0)) {
                         FlagApertures = 0;
                         break;
                     }
                     if (SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin > 1.8 &&
-                        AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                        AirflowNetwork::AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                         FlagApertures = 0;
                         break;
                     }
@@ -805,35 +804,39 @@ namespace DisplacementVentMgr {
                 } else {
 
                     if (SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
                                 Zone(ZoneNum).OriginZ <
                             0.8 &&
-                        AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                        AirflowNetwork::AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if (SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
                                 Zone(ZoneNum).OriginZ >
                             1.8 &&
-                        AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
+                        AirflowNetwork::AirflowNetworkLinkSimu(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if ((SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                     .OriginZ -
                                  Zone(ZoneNum).OriginZ >
                              0.8 &&
                          SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                     .OriginZ -
                                  Zone(ZoneNum).OriginZ <
                              1.8) ||
                         (SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                     .OriginZ -
                                  Zone(ZoneNum).OriginZ >
                              0.8 &&
                          SurfParametersCVDV(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 Zone(Surface(MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                     .OriginZ -
                                  Zone(ZoneNum).OriginZ <
                              1.8)) {
                         FlagApertures = 0;

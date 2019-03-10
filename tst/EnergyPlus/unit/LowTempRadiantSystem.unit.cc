@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -452,8 +452,6 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  Building,",
         "    NONE,                    !- Name",
         "    0.0000000E+00,           !- North Axis {deg}",
@@ -1146,12 +1144,12 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
                                             HydrRadSys(RadSysNum).HWLoopSide,
                                             HydrRadSys(RadSysNum).HWBranchNum,
                                             HydrRadSys(RadSysNum).HWCompNum,
+                                            ErrorsFound,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            ErrorsFound);
+                                            _);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -1161,12 +1159,12 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
                                             HydrRadSys(RadSysNum).CWLoopSide,
                                             HydrRadSys(RadSysNum).CWBranchNum,
                                             HydrRadSys(RadSysNum).CWCompNum,
+                                            ErrorsFound,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            ErrorsFound);
+                                            _);
     EXPECT_FALSE(ErrorsFound);
 
     DataSizing::CurZoneEqNum = 1;
