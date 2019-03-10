@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -437,6 +438,11 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // Test for #7053:
+    // Fake that there is at least one UnitarySystemPerformance:Multispeed object
+    UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
+    UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);
+
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData();
@@ -573,7 +579,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
 
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",

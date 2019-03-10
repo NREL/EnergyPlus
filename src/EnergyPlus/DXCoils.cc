@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -12339,7 +12339,9 @@ namespace DXCoils {
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of Power
+                // Input
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12352,7 +12354,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
 
                 // Energy use for other fuel types
@@ -12569,10 +12575,13 @@ namespace DXCoils {
                 // Waste heat
                 if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 // Energy use for other fuel types
@@ -13074,7 +13083,7 @@ namespace DXCoils {
                 }
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -13087,7 +13096,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
 
@@ -13300,12 +13313,15 @@ namespace DXCoils {
                     OutletAirEnthalpy = InletAirEnthalpy + DXCoil(DXCoilNum).TotalHeatingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
@@ -13988,10 +14004,12 @@ namespace DXCoils {
         }
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
-        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 1));
-        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
+        // W to tons
+        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 1);
+        // These will convert with a factor of 1 which is ok
+        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
         PreDefTableEntry(pdchDXCoolCoilSEERIP, DXCoil(DXCoilNum).Name, "N/A");
         addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
@@ -14001,20 +14019,20 @@ namespace DXCoils {
         } else {
             PreDefTableEntry(pdchVAVDXFanName, DXCoil(DXCoilNum).Name, "None");
         }
-        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(1), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(2), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(3), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(4), 4));
+        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(1), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(2), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(3), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(4), 4);
     }
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)

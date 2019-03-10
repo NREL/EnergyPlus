@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -702,7 +702,7 @@ namespace NodeInputManager {
         Array1D_string cAlphas;
         Array1D<Real64> rNumbers;
 
-        ErrorsFound = false;
+        bool localErrorsFound = false;
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
@@ -716,7 +716,7 @@ namespace NodeInputManager {
         NCount = 0;
         for (Loop = 1; Loop <= NumOfNodeLists; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
-            if (UtilityRoutines::IsNameEmpty(cAlphas(1), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
             ++NCount;
             NodeLists(NCount).Name = cAlphas(1);
@@ -731,7 +731,7 @@ namespace NodeInputManager {
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
                 }
-                ErrorsFound = true;
+                localErrorsFound = true;
                 continue;
             }
             //  Put all in, then determine unique
@@ -742,16 +742,16 @@ namespace NodeInputManager {
                     --NodeLists(NCount).NumOfNodesInList;
                     if (NodeLists(NCount).NumOfNodesInList <= 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
-                        ErrorsFound = true;
+                        localErrorsFound = true;
                         break;
                     }
                     continue;
                 }
-                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, ErrorsFound);
+                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
                 if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
                     ShowContinueError("... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
-                    ErrorsFound = true;
+                    localErrorsFound = true;
                 }
             }
             // Error on any duplicates
@@ -766,7 +766,7 @@ namespace NodeInputManager {
                     ShowContinueError("...list item=" + TrimSigDigits(Loop1) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop1)) +
                                       "\", duplicate list item=" + TrimSigDigits(Loop2) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop2)) +
                                       "\".");
-                    ErrorsFound = true;
+                    localErrorsFound = true;
                 }
             }
         }
@@ -781,7 +781,7 @@ namespace NodeInputManager {
                                       "\", duplicates NodeList Name.");
                     ShowContinueError("... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
                     ShowContinueError("... Items in NodeLists must not be the name of another NodeList.");
-                    ErrorsFound = true;
+                    localErrorsFound = true;
                 }
             }
         }
@@ -789,8 +789,9 @@ namespace NodeInputManager {
         cAlphas.deallocate();
         rNumbers.deallocate();
 
-        if (ErrorsFound) {
+        if (localErrorsFound) {
             ShowFatalError(RoutineName + CurrentModuleObject + ": Error getting input - causes termination.");
+            ErrorsFound = true;
         }
     }
 

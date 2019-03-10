@@ -33,6 +33,8 @@ public:
        const std::size_t &j, const std::size_t &k, std::size_t *stepsize,
        const Foundation &foundation, Surface *surfacePtr, Block *blockPtr, Mesher *mesh);
 
+  virtual ~Cell() {};
+
   std::size_t coords[3], index;
   std::size_t *stepsize;
   std::size_t dims[3];

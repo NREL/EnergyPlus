@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,7 +129,7 @@ namespace ZoneEquipmentManager {
                                     Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
     );
 
-    void CalcZoneMassBalance();
+    void CalcZoneMassBalance(bool const FirstHVACIteration);
 
     void CalcZoneReturnFlows(int const ZoneNum,
                              Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate

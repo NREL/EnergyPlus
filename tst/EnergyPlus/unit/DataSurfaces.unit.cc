@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,",
-        "    8.4;                     !- Version Identifier",
 
         "	BuildingSurface:Detailed,",
         "    T3-RF1 - Floor:n,        !- Name",
@@ -278,6 +276,25 @@ TEST(SurfaceTest, AverageHeightRectangle)
         s.SinTilt = std::sin(s.Tilt * DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0 / s.SinTilt );
+
+        s.Vertex = { Vector(0, 0, 0), Vector(0, 1, 0), Vector(0, 1, 1), Vector(0, 0, 1) };
+        Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+        s.SinAzim = std::sin(s.Azimuth * DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * DegToRadians);
+
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0);
+
+        s.Vertex = { Vector(1, -1, 0), Vector(1, -1, -1), Vector(0, 0, -1), Vector(0, 0, 0) };
+        Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+        s.SinAzim = std::sin(s.Azimuth * DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * DegToRadians);
+
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0);
+
     }
 }
 

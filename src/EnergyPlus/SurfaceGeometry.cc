@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3269,7 +3269,13 @@ namespace SurfaceGeometry {
         for (int i = 1; i <= SurfNum; i++) {
             if (SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface && SurfaceTmp(i).ExtBoundCondName != "") {
                 ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
-                if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                // If we cannot find the referenced surface
+                if (ExtSurfNum == 0) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name
+                                    + "\" references an outside boundary surface that cannot be found:" + SurfaceTmp(i).ExtBoundCondName);
+                    ErrorsFound = true;
+                // If vertex size mistmatch
+                } else if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name + "\", Vertex size mismatch between base surface :" +
                                     SurfaceTmp(i).Name + " and outside boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
                     ShowContinueError("The vertex sizes are " + TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and " +
@@ -7270,6 +7276,7 @@ namespace SurfaceGeometry {
                         ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                     }
                     --SurfaceTmp(SurfNum).Sides;
+                    SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                 } else {
                     if (DisplayExtraWarnings) {
                         ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7303,6 +7310,7 @@ namespace SurfaceGeometry {
                                 ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7323,6 +7331,7 @@ namespace SurfaceGeometry {
                                 SurfaceTmp(SurfNum).Vertex(n).z = SurfaceTmp(SurfNum).Vertex(n + 1).z;
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +

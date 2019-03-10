@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,7 @@
 // C++ Headers
 #include <cmath>
 #include <fstream>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -598,9 +599,9 @@ namespace GroundHeatExchangers {
 
         // save data for later
         if (!DataSystemVariables::DisableGLHECaching) {
-            myCacheData["Response Factors"]["time"] = myRespFactors->time;
-            myCacheData["Response Factors"]["LNTTS"] = myRespFactors->LNTTS;
-            myCacheData["Response Factors"]["GFNC"] = myRespFactors->GFNC;
+            myCacheData["Response Factors"]["time"] = std::vector<Real64>(myRespFactors->time.begin(), myRespFactors->time.end());
+            myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(myRespFactors->LNTTS.begin(), myRespFactors->LNTTS.end());
+            myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(myRespFactors->GFNC.begin(), myRespFactors->GFNC.end());
             writeGLHECacheToFile();
         }
     }
@@ -3337,7 +3338,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag);
+            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3446,7 +3447,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag);
+            ScanPlantLoopsForObject(name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }

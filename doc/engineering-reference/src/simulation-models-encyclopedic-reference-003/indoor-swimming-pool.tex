@@ -66,15 +66,15 @@ Q_{conv} = h \cdot A \cdot (T_p - T_a)
 h = 0.22 \cdot (T_p - T_a)^{1/3}
 \end{equation}
 
-where
+where:
 
-\(Q_{conv}\) = Convective heat transfer rate (W/m²)
+\(Q_{conv}\) is the convective heat transfer rate (W/m\(^2\))
 
-\(h\) = Convection heat transfer coefficient (W/m²·°C)
+\(h\) is the convection heat transfer coefficient (W/m\(^2\)-\(^{\circ}\)C)
 
-\(T_p\) = Pool water temperature (°C)
+\(T_p\) is the pool water temperature (\(^{\circ}\)C)
 
-\(T_a\) = Air temperature over pool (°C)
+\(T_a\) is the air temperature over pool (\(^{\circ}\)C).
 
 When a cover is present, the cover and the cover convection factor reduce the heat transfer coefficient proportionally. For example, if the pool is half covered and the pool cover reduces convection by 50\%, the convective heat transfer coefficient is reduced by 25\% from the value calculated using the above equation.
 
@@ -100,21 +100,22 @@ There are 5 main variables used to calculate the evaporation rate (\(Q_{evap}\))
 \dot{m}_{evap} = 0.1 \cdot A \cdot AF \cdot (P_w - P_{dp})
 \end{equation}
 
-where
+where:
 
-\(\dot{m}_{evap}\) = Evaporation Rate of pool water (lb/h)
+\(\dot{m}_{evap}\) is the evaporation rate of pool water (lb/h)
 
-\(A\) = Surface area of pool water (ft²)
+\(A\) is the surface area of pool water (ft\(^2\))
 
-\(AF\) = Activity factor
+\(AF\) is the activity factor
 
-\(P_w\) = Saturation vapor pressure at surface of pool water (in. Hg)
+\(P_w\) is the saturation vapor pressure at surface of pool water (in. Hg)
 
-\(P_{dp}\) = Partial vapor pressure at room air dew point (in. Hg)
+\(P_{dp}\) is the partial vapor pressure at room air dew point (in. Hg).
 
-Typical Activity Factor (AF)
+
 
 \begin{longtable}[c]{@{}ll@{}}
+\caption{Typical Activity Factor (AF) \label{table:typical-activity-factor-af}} \tabularnewline
 \toprule 
 Type of Pool & Activity Factor (AF) \tabularnewline
 \midrule
@@ -157,19 +158,19 @@ The model ignores 2-d effects of pool walls and assume that pool depth is much l
 Q_{fw} = \dot{m}_{fw} \cdot cw \cdot (T_p - T_{fw})
 \end{equation}
 
-where
+where:
 
-\(m_{fw}\) = Mass flow rate of fresh water (kg/s)
+\(m_{fw}\) is the mass flow rate of fresh water (kg/s)
 
-\(c_w\) = Specific heat of water (J/kg·°C)
+\(c_w\) is the specific heat of water (J/kg-\(^{\circ}\)C)
 
-\(T_p\) = Pool water temperature (°C)
+\(T_p\) is the pool water temperature (\(^{\circ}\)C)
 
-\(T_{fw}\) = Fresh water supply temperature (°C)
+\(T_{fw}\) is the fresh water supply temperature (\(^{\circ}\)C).
 
 \subsection{Heat Gain from People}\label{heat-gain-from-people}
 
-The input for the swimming pool requires that the user enter the maximum number of people in the pool, a schedule modifying the maximum number of people for different pool occupancies, and a heat gain per person schedule for differing activities. These three parameters allow for the calculation of a total heat gain from people ̇during a given time. It is assumed that all of the heat gain from people is via convection to the pool water.
+The input for the swimming pool requires that the user enter the maximum number of people in the pool, a schedule modifying the maximum number of people for different pool occupancies, and a heat gain per person schedule for differing activities. These three parameters allow for the calculation of a total heat gain from people during a given time. It is assumed that all of the heat gain from people is via convection to the pool water.
 
 \subsection{Heat from auxiliary pool heater}\label{heat-from-auxiliary-pool-heater}
 
@@ -177,15 +178,15 @@ The input for the swimming pool requires that the user enter the maximum number 
 Q_{fw} = \dot{m}_{hw} \cdot c_w \cdot (T_p - T_{hw})
 \end{equation}
 
-where
+where:
 
 \(m_{hw}\) = Mass flow rate (kg/s)
 
-\(c_w\) = Specific heat of water (J/kg·°C)
+\(c_w\) = Specific heat of water (J/kg-\(^{\circ}\)C)
 
-\(T_p\) = Pool water temperature (°C)
+\(T_p\) = Pool water temperature (\(^{\circ}\)C)
 
-\(T_{hw}\) = Heated water supply temperature (°C)
+\(T_{hw}\) = Heated water supply temperature (\(^{\circ}\)C).
 
 \subsection{Pool Heating to Control the Pool Water Temperature}\label{pool-heating-to-control-the-pool-water-temperature}
 
@@ -195,21 +196,21 @@ The equation used to determine the flow rate request of hot water from the plant
 \frac{m_w c_p}{\Delta t} (T_{set}-T_{old}) = \dot{m}_p \cdot c_p \cdot (T_{in} - T_{set} )
 \end{equation}
 
-where
+where:
 
-\(m_w\) = mass of pool water (kg)
+\(m_w\) is the mass of pool water (kg)
 
-\(cp\) = specific heat of water (J/kg·°C)
+\(cp\) is the specific heat of water (J/kg-\(^{\circ}\)C)
 
-\(\Delta t\) = time step length (s)
+\(\Delta t\) is the time step length (s)
 
-\(T_{set}\) = desired pool water temperature (°C)
+\(T_{set}\) is the desired pool water temperature (\(^{\circ}\)C)
 
-\(T_{old}\) = temperature of water at the last time step (°C)
+\(T_{old}\) is the temperature of water at the last time step (\(^{\circ}\)C)
 
-\(m_p\) = needed mass flow rate of water from the plant (kg/s)
+\(m_p\) is the needed mass flow rate of water from the plant (kg/s)
 
-\(T_{in}\) = inlet water temperature from the plant (°C)
+\(T_{in}\) is the inlet water temperature from the plant (\(^{\circ}\)C).
 
 This equation is rearranged to solve for the needed mass flow rate of water from the plant since all of the other terms are known or given based on user input. This establishes a flow request to the plant and is capped at the maximum value defined in input by the user.
 
@@ -221,25 +222,25 @@ The following equation is the basis for the pool/surface heat balance. As has be
 \frac{m_w \cdot c_p}{\Delta t} (T_{set} - T_{old}) = Q_{cond} + Q_{conv} + Q_{lwrad} + Q_{swrad} + Q_{damp} + Q_{muw} + Q_{heater} + Q_{evap}
 \end{equation}
 
-where
+where:
 
-\(\frac{m_w \cdot c_p}{\Delta t} (T_{set} - T_{old} )\) = the change in energy stored in the pool water
+\(\frac{m_w \cdot c_p}{\Delta t} (T_{set} - T_{old} )\) is the change in energy stored in the pool water
 
-\(Q_{cond}\) = net conduction to/from the pool water to the floor
+\(Q_{cond}\) is the net conduction to/from the pool water to the floor
 
-\(Q_{conv}\) = net convection between the pool water and the zone air
+\(Q_{conv}\) is the net convection between the pool water and the zone air
 
-\(Q_{lwrad}\) = net long-wavelength radiation between the pool water/floor and the surrounding surfaces as well as from internal heat gains
+\(Q_{lwrad}\) is the net long-wavelength radiation between the pool water/floor and the surrounding surfaces as well as from internal heat gains
 
-\(Q_{swrad}\) = net short-wavelength radiation to the pool water/floor from solar and internal heat gains
+\(Q_{swrad}\) is the net short-wavelength radiation to the pool water/floor from solar and internal heat gains
 
-\(Q_{damp}\) = standard damping term used in the inside heat balance to avoid large swings in the radiation balance that sometimes cause instability in the solution (see the standard heat balance information for more details)
+\(Q_{damp}\) is the standard damping term used in the inside heat balance to avoid large swings in the radiation balance that sometimes cause instability in the solution (see the standard heat balance information for more details)
 
-\(Q_{muw}\) = net gain/loss from replacing water evaporated from the pool with makeup water
+\(Q_{muw}\) is the net gain/loss from replacing water evaporated from the pool with makeup water
 
-\(Q_{heater}\) = net heat added to the pool via the plant loop (controlled to maintain a setpoint temperature as described above)
+\(Q_{heater}\) is the net heat added to the pool via the plant loop (controlled to maintain a setpoint temperature as described above)
 
-\(Q_{evap}\) = net heat loss due to evaporation of pool water to the zone air
+\(Q_{evap}\) is the net heat loss due to evaporation of pool water to the zone air.
 
 Details on each of these terms was either provided in previous parts of this section or in the standard EnergyPlus heat balance discussion elsewhere in the Engineering Reference.
 
@@ -277,16 +278,17 @@ Most codes require a minimum of 6 ACH, except where mechanical cooling is used. 
   Therapeutic pools, 4 \textasciitilde{} 6 ACH
 \end{itemize}
 
-Typical Swimming Pool Design Conditions
+
 
 \begin{longtable}[c]{@{}lll@{}}
+\caption{Typical Swimming Pool Design Conditions \label{table:typical-swimming-pool-design-conditions}} \tabularnewline
 \toprule 
-Type of Pool & Air Temperature, ⁰C & Water Temperature, ⁰C \tabularnewline
+Type of Pool & Air Temperature (\(^{\circ}\)C) & Water Temperature (\(^{\circ}\)C) \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Type of Pool & Air Temperature, ⁰C & Water Temperature, ⁰C \tabularnewline
+Type of Pool & Air Temperature (\(^{\circ}\)C) & Water Temperature (\(^{\circ}\)C) \tabularnewline
 \midrule
 \endhead
 

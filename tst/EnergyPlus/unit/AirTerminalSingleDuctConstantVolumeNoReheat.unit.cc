@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,7 +91,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -173,7 +172,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -260,7 +258,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",
         "    AvailSchedule,           !- Availability Schedule Name",
@@ -395,7 +392,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
 
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    SDCVNoReheatAT1,         !- Name",

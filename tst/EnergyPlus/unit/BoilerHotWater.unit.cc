@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -170,4 +170,38 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingTemperatureTest)
 
     // see if boiler nominal capacity returned is autosized value
     EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), NomCapBoilerExpected);
+}
+
+// Cf: https://github.com/NREL/EnergyPlus/issues/6164
+// This boiler has empty field for "Design Water Flow Rate", IDD now should make default='Autosize'
+TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,9.0;",
+
+        "Boiler:HotWater,",
+        "  Boiler 1,                !- Name",
+        "  NaturalGas,              !- Fuel Type",
+        "  2344000,                 !- Nominal Capacity {W}",
+        "  0.8,                     !- Nominal Thermal Efficiency",
+        "  ,                        !- Efficiency Curve Temperature Evaluation Variable",
+        "  ,                        !- Normalized Boiler Efficiency Curve Name",
+        "  ,                        !- Design Water Flow Rate {m3/s}",
+        "  ,                        !- Minimum Part Load Ratio",
+        "  1,                       !- Maximum Part Load Ratio",
+        "  1,                       !- Optimum Part Load Ratio",
+        "  Node boiler 1 inlet,     !- Boiler Water Inlet Node Name",
+        "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
+        "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
+        "  NotModulated,            !- Boiler Flow Mode",
+        "  ,                        !- Parasitic Electric Load {W}",
+        "  1;                       !- Sizing Factor",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    Boilers::GetBoilerInput();
+
+    EXPECT_EQ(1, Boilers::NumBoilers);
+    EXPECT_EQ(AutoSize, Boiler(1).VolFlowRate);
+
 }

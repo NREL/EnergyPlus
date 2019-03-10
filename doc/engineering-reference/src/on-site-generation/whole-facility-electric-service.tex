@@ -3,20 +3,20 @@
 Whenever an EnergyPlus model includes anything that consumes electricity the program will do some basic modeling of what can be thought of as the main panel where utility grid connects to the building and HVAC loads.  The following output variables and meters are created and filled to report on the overall, whole-facility power flows at the main panel: 
 
 \begin{tabular}{c|c|c}
-  ${P_{purch}}$ &    Facility Total Purchased Electric Power & [W] \tabularnewline
-  ${Q_{purch}}$ &    Facility Total Purchased Electric Energy & [J] \tabularnewline
-  ${P_{net,purch}}$ &    Facility Net Purchased Electric Power & [W] \tabularnewline
-  ${Q_{net,purch}}$ &    Facility Net Purchased Electric Energy & [J] \tabularnewline
-  ${P_{surp}}$ &    Facility Total Surplus Electric Power & [W] \tabularnewline
-  ${Q_{surp}}$ &    Facility Total Surplus Electric Energy & [J] \tabularnewline
-  ${P_{bldg,dmd}}$ &    Facility Total Building Electric Demand Power & [W] \tabularnewline
-  ${P_{HVAC,dmd}}$ &    Facility Total HVAC Electric Demand Power & [W] \tabularnewline
-  ${P_{dmd}}$ &    Facility Total Electric Demand Power & [W] \tabularnewline
-  ${P_{prod}}$ &    Facility Total Produced Electric Power & [W] \tabularnewline
-  ${Q_{prod}}$ &   Facility Total Produced Electric Energy & [J]
+  ${P_{purch}}$ &    Facility Total Purchased Electric Power & (W) \tabularnewline
+  ${Q_{purch}}$ &    Facility Total Purchased Electric Energy & (J) \tabularnewline
+  ${P_{net,purch}}$ &    Facility Net Purchased Electric Power & (W) \tabularnewline
+  ${Q_{net,purch}}$ &    Facility Net Purchased Electric Energy & (J) \tabularnewline
+  ${P_{surp}}$ &    Facility Total Surplus Electric Power & (W) \tabularnewline
+  ${Q_{surp}}$ &    Facility Total Surplus Electric Energy & (J) \tabularnewline
+  ${P_{bldg,dmd}}$ &    Facility Total Building Electric Demand Power & (W) \tabularnewline
+  ${P_{HVAC,dmd}}$ &    Facility Total HVAC Electric Demand Power & (W) \tabularnewline
+  ${P_{dmd}}$ &    Facility Total Electric Demand Power & (W) \tabularnewline
+  ${P_{prod}}$ &    Facility Total Produced Electric Power & (W) \tabularnewline
+  ${Q_{prod}}$ &   Facility Total Produced Electric Energy & (J)
 \end{tabular}
 
-The models for electric power service use the meter reporting system inside EnergyPlus to obtain data from all the other models in EnergyPlus for the electric power demand (and maybe power production).  The ElectricPowerServiceManager uses a query routine called "GetInstantMeterValue" which returns the sum for all the metered equipment for the specified meter.  Values for   $P_{bldg,dmd}$ and $P_{HVAC,dmd}$ are both filled from the "Electricity:Facility" meter.  $P_{bldg,dmd}$ is filled by passing an argument that triggers to return the "Building" electric load, which is at the zone timestep, while $P_{HVAC,dmd}$ is filled by passing an argument that returns the "HVAC" electric load, which is at the system timestep.  The modeling is based on average power levels for the duration of the timestep. The return values are converted from energy in Joules to power in Watts by dividing by the number of seconds in the zone timestep for building loads and by the system timestep for the HVAC loads.  Then the total facility power demand is the sum of the building loads and the HVAC loads. 
+The models for electric power service use the meter reporting system inside EnergyPlus to obtain data from all the other models in EnergyPlus for the electric power demand (and maybe power production).  The ElectricPowerServiceManager uses a query routine called "GetInstantMeterValue" which returns the sum for all the metered equipment for the specified meter.  Values for $P_{bldg,dmd}$ and $P_{HVAC,dmd}$ are both filled from the "Electricity:Facility" meter.  $P_{bldg,dmd}$ is filled by passing an argument that triggers to return the "Building" electric load, which is at the zone timestep, while $P_{HVAC,dmd}$ is filled by passing an argument that returns the "HVAC" electric load, which is at the system timestep.  The modeling is based on average power levels for the duration of the timestep. The return values are converted from energy in Joules to power in Watts by dividing by the number of seconds in the zone timestep for building loads and by the system timestep for the HVAC loads.  Then the total facility power demand is the sum of the building loads and the HVAC loads. 
 
 \begin{equation}
   P_{dmd} = P_{bldg,dmd} + P_{HVAC,dmd}
