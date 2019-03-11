@@ -4433,20 +4433,20 @@ namespace ReportSizingManager {
         using DataEnvironment::StdRhoAir;
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int DDAtSensPeak;
-        int TimeStepAtSensPeak;
-        int DDAtFlowPeak;
-        int TimeStepAtFlowPeak;
+        int DDAtSensPeak(0);
+        int TimeStepAtSensPeak(0);
+        int DDAtFlowPeak(0);
+        int TimeStepAtFlowPeak(0);
         int CoolCapCtrl; // type of coil capacity control
         int PeakLoadType;
-        int DDAtTotPeak;
-        int TimeStepAtTotPeak;
+        int DDAtTotPeak(0);
+        int TimeStepAtTotPeak(0);
         int TimeStepAtPeak(0);
         Real64 ZoneCoolLoadSum(0); // sum of zone cooling loads at the peak [W]
         Real64 AvgZoneTemp(0);     // average zone temperature [C]
-        Real64 AvgSupTemp;         // average supply temperature for bypass control [C]
-        Real64 TotFlow;            // total flow for bypass control [m3/s]
-        Real64 MixTemp;            // mixed air temperature at the peak [C]
+        Real64 AvgSupTemp(0.0);         // average supply temperature for bypass control [C]
+        Real64 TotFlow(0.0);            // total flow for bypass control [m3/s]
+        Real64 MixTemp(0.0);            // mixed air temperature at the peak [C]
 
         CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
         PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
@@ -4463,16 +4463,21 @@ namespace ReportSizingManager {
             } else {
                 TimeStepAtPeak = TimeStepAtSensPeak;
             }
+        } else {
+            if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
+                ShowWarningError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                                 "has no time of peak cooling load for sizing.");
+                ShowContinueError("Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
+                CoolCapCtrl = VAV;
+            }
         }
+
         if (CoolCapCtrl == VAV) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
             DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / StdRhoAir;
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
             DesFlow = DataAirFlowUsedForSizing;
-        } else if (TimeStepAtPeak == 0) {
-            ShowFatalError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
-                           " Central Cooling Capacity Control Method requires zone thermostats to calculate timestep loads.");
         } else if (CoolCapCtrl == VT) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
