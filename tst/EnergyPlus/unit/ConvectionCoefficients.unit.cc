@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     // Test 2: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
     Hc = 0.0;
-    HcExpectedValue = 6.333;
+    HcExpectedValue = 2.234;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
 
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     // Test 3: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
     Hc = 0.0;
-    HcExpectedValue = 2.220;
+    HcExpectedValue = 1.208;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
 
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
