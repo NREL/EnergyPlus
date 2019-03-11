@@ -483,10 +483,14 @@ namespace ConvectionCoefficients {
                                          Real64 const SurfWindSpeed // Current wind speed, m/s
     );
 
+    Real64 ASHRAESimpleIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
+
     void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                       Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
+
+    Real64 ASHRAEDetailedIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
 
     void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
@@ -501,7 +505,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcCeilingDiffuserACH(int const ZoneNum);
 
-    Real64 CalcCeilingDiffuserSurface(Real64 Tilt, Real64 ACH);
+    Real64 CeilingDiffuserIntConv(Real64 const Tilt, Real64 const ACH);
 
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum); // zone number for which coefficients are being calculated
 

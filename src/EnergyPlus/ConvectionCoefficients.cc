@@ -3983,12 +3983,8 @@ namespace ConvectionCoefficients {
         return CalcASHRAESimpExtConvectCoeff;
     }
 
-    void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
-                                      Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
-                                      Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
-    )
+    Real64 ASHRAESimpleIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -4026,44 +4022,46 @@ namespace ConvectionCoefficients {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 DeltaTemp; // Temperature difference between the zone air and the surface
+        if (std::abs(cosTilt) >= 0.3827) { // Recalculate HConvIn
 
-        if (std::abs(Surface(SurfNum).CosTilt) >= 0.3827) { // Recalculate HConvIn
-
-            DeltaTemp = ZoneMeanAirTemperature - SurfaceTemperature;
+            Real64 DeltaTemp = Tamb - Tsurf;
 
             // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface
-            if (std::abs(Surface(SurfNum).CosTilt) >= 0.9239) { // Horizontal Surface
-
-                if (DeltaTemp * Surface(SurfNum).CosTilt < 0.0) { // Horizontal, Reduced Convection
-
-                    HConvIn(SurfNum) = 0.948;
-
-                } else if (DeltaTemp * Surface(SurfNum).CosTilt == 0.0) { // Vertical Surface
-
-                    HConvIn(SurfNum) = 3.076;
-
-                } else if (DeltaTemp * Surface(SurfNum).CosTilt > 0.0) { // Horizontal, Enhanced Convection
-
-                    HConvIn(SurfNum) = 4.040;
+            if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
+                if (DeltaTemp * cosTilt < 0.0) { // Horizontal, Reduced Convection
+                    return 0.948;
+                } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
+                    return 3.076;
+                } else if (DeltaTemp * cosTilt > 0.0) { // Horizontal, Enhanced Convection
+                    return 4.040;
                 }
-
             } else { // Tilted Surface
-
-                if (DeltaTemp * Surface(SurfNum).CosTilt < 0.0) { // Tilted, Reduced Convection
-
-                    HConvIn(SurfNum) = 2.281;
-
-                } else if (DeltaTemp * Surface(SurfNum).CosTilt == 0.0) { // Vertical Surface
-
-                    HConvIn(SurfNum) = 3.076;
-
-                } else if (DeltaTemp * Surface(SurfNum).CosTilt > 0.0) { // Tilted, Enhanced Convection
-
-                    HConvIn(SurfNum) = 3.870;
+                if (DeltaTemp * cosTilt < 0.0) { // Tilted, Reduced Convection
+                    return 2.281;
+                } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
+                    return 3.076;
+                } else if (DeltaTemp * cosTilt > 0.0) { // Tilted, Enhanced Convection
+                    return 3.870;
                 }
+            }
+        }
+    }
 
-            } // ...end of correlation selection IF-THEN block
+    void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
+                                      Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                      Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+    )
+    {
+
+        if (std::abs(Surface(SurfNum).CosTilt) >= 0.3827) { // Recalculate HConvIn
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+            {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                    return ASHRAESimpleIntConv(Tsurf, Tamb, cosTilt);
+                };
+            } else {
+                HConvIn(SurfNum) = ASHRAESimpleIntConv(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
+            }
 
         } // ...end of HConvIn recalculation IF-THEN block
 
@@ -4071,12 +4069,8 @@ namespace ConvectionCoefficients {
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
     }
 
-    void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
-                                        Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
-                                        Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
-    )
+    Real64 ASHRAEDetailedIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -4117,30 +4111,43 @@ namespace ConvectionCoefficients {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 DeltaTemp; // Temperature difference between the zone air and the surface
-
         // FLOW:
 
-        DeltaTemp = SurfaceTemperature - ZoneMeanAirTemperature;
+        Real64 DeltaTemp = Tsurf - Tamb;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Surface (Cosine Tilt)
 
-        if ((DeltaTemp == 0.0) || (Surface(SurfNum).CosTilt == 0.0)) { // Vertical Surface
+        if ((DeltaTemp == 0.0) || (cosTilt == 0.0)) { // Vertical Surface
 
-            HConvIn(SurfNum) = CalcASHRAEVerticalWall(DeltaTemp);
+            return CalcASHRAEVerticalWall(DeltaTemp);
 
-        } else if (((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
-                   ((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Enhanced Convection
+        } else if (((DeltaTemp < 0.0) && (cosTilt > 0.0)) ||
+                   ((DeltaTemp > 0.0) && (cosTilt < 0.0))) { // Enhanced Convection
 
-            HConvIn(SurfNum) = CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, Surface(SurfNum).CosTilt);
+            return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
 
-        } else if (((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
-                   ((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Reduced Convection
+        } else if (((DeltaTemp > 0.0) && (cosTilt > 0.0)) ||
+                   ((DeltaTemp < 0.0) && (cosTilt < 0.0))) { // Reduced Convection
 
-            HConvIn(SurfNum) = CalcWaltonStableHorizontalOrTilt(DeltaTemp, Surface(SurfNum).CosTilt);
+            return CalcWaltonStableHorizontalOrTilt(DeltaTemp, cosTilt);
 
         } // ...end of IF-THEN block to set HConvIn
+    }
+
+    void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
+                                        Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                        Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+    )
+    {
+
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+        {
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                return ASHRAEDetailedIntConv(Tsurf, Tamb, cosTilt);
+            };
+        } else {
+            HConvIn(SurfNum) = ASHRAEDetailedIntConv(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
+        }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
@@ -4300,7 +4307,7 @@ namespace ConvectionCoefficients {
       return ACH;
     }
 
-    Real64 CalcCeilingDiffuserSurface(Real64 Tilt, Real64 ACH)
+    Real64 CeilingDiffuserIntConv(Real64 Tilt, Real64 ACH)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -4349,15 +4356,16 @@ namespace ConvectionCoefficients {
         for (auto SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-            HConvIn(SurfNum) = CalcCeilingDiffuserSurface(Surface(SurfNum).Tilt, ACH);
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
             {
                 SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [=](double, double, double, double, double) -> double {
-                    return CalcCeilingDiffuserSurface(Surface(SurfNum).Tilt, ACH);
+                    return CeilingDiffuserIntConv(Surface(SurfNum).Tilt, ACH);
                 };
+            } else {
+                HConvIn(SurfNum) = CeilingDiffuserIntConv(Surface(SurfNum).Tilt, ACH);
+                // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
             }
-            // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-            if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
         } // SurfNum
     }
 
