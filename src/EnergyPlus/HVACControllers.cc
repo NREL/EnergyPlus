@@ -413,24 +413,19 @@ namespace HVACControllers {
         {
             auto const SELECT_CASE_var(Operation);
             if (SELECT_CASE_var == iControllerOpColdStart) {
+                // For temperature and humidity control reset humidity control override
+                HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
+
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
                 ResetController(ControlNum, FirstHVACIteration, false, IsConvergedFlag);
-                //    CALL InitController(ControlNum, FirstHVACIteration, IsConvergedFlag)
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
-
-                // Report the current Controller
-                ReportController(ControlNum);
 
             } else if (SELECT_CASE_var == iControllerOpWarmRestart) {
                 // If a iControllerOpWarmRestart call, set the actuator inlet flows to previous solution
                 ResetController(ControlNum, FirstHVACIteration, true, IsConvergedFlag);
-                //   CALL InitController(ControlNum, FirstHVACIteration, IsConvergedFlag)
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
-
-                // Report the current Controller
-                ReportController(ControlNum);
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // With the correct ControlNum Initialize all Controller related parameters
@@ -452,8 +447,8 @@ namespace HVACControllers {
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
-                // Report the current Controller
-                ReportController(ControlNum);
+                CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag, FirstHVACIteration);
+
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
@@ -472,9 +467,6 @@ namespace HVACControllers {
                         ShowFatalError("Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
                     }
                 }
-
-                // Report the current Controller
-                ReportController(ControlNum);
 
             } else {
                 ShowFatalError("ManageControllers: Invalid Operation passed=" + TrimSigDigits(Operation) + ", Controller name=" + ControllerName);
@@ -2245,51 +2237,30 @@ namespace HVACControllers {
     //        End of Update subroutines for the Controller Module
     // *****************************************************************************
 
-    // Beginning of Reporting subroutines for the Controller Module
-    // *****************************************************************************
-
-    void ReportController(int const EP_UNUSED(ControlNum)) // unused1208
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag, bool const FirstHVACIteration)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // Still needs to report the Controller power from this component
-        // Write(*,*)=ControllerProps(ControlNum)%ControllerPower
+        {
+            auto &thisController(ControllerProps(ControlNum));
+            if (IsConvergedFlag) {
+                if (thisController.ControlVar == iTemperatureAndHumidityRatio) {
+                    // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
+                    if (!thisController.HumRatCtrlOverride) {
+                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + thisController.Offset)) {
+                            // Turn on humdity control and restart controller
+                            IsConvergedFlag = false;
+                            thisController.HumRatCtrlOverride = true;
+                            // IsUpToDateFlag = false;
+                            // Do a cold start reset, same as iControllerOpColdStart
+                            ResetController(ControlNum, FirstHVACIteration, false, IsConvergedFlag);
+                            // Update the current Controller to the outlet nodes
+                            UpdateController(ControlNum);
+                        }
+                    }
+                }
+            }
+        }
     }
-
-    //        End of Reporting subroutines for the Controller Module
-    // *****************************************************************************
 
     void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag)
     {

@@ -352,6 +352,8 @@ namespace HVACControllers {
 
     bool CheckMaxActiveController(int const ControlNum);
 
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag, bool const FirstHVACIteration);
+
     void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag);
 
     // End Algorithm Section of the Module
@@ -363,14 +365,6 @@ namespace HVACControllers {
     void UpdateController(int const ControlNum);
 
     //        End of Update subroutines for the Controller Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Controller Module
-    // *****************************************************************************
-
-    void ReportController(int const ControlNum); // unused1208
-
-    //        End of Reporting subroutines for the Controller Module
     // *****************************************************************************
 
     void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
