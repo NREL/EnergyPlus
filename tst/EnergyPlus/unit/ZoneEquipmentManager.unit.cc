@@ -2091,15 +2091,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);  // Distribute System Output required is called within this
-    SetZoneEquipSimOrder(ZoneNum, ZoneNum);
-    DistributeSequentialSystemOutputRequired(ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired * 0.6);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(4), energy.TotalOutputRequired);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP * 0.6);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(4), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
@@ -2133,9 +2132,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);  // Distribute System Output required is called within this
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
     SetZoneEquipSimOrder(ZoneNum, ZoneNum);
-    DistributeSequentialSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
