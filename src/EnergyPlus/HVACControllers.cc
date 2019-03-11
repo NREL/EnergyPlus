@@ -935,7 +935,6 @@ namespace HVACControllers {
         //       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
         //       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
         //                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for  initializations of the Controller Components.
@@ -943,11 +942,6 @@ namespace HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -969,35 +963,14 @@ namespace HVACControllers {
         using SetPointManager::iCtrlVarType_MaxHumRat;
         using SetPointManager::iCtrlVarType_MinHumRat;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitController");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
         int SensedNode;
         int ControllerIndex;
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MySizeFlag;
         static Array1D_bool MyPlantIndexsFlag;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true ); // InitControllerOneTimeFlag
-        // static bool MySetPointCheckFlag( true ); // InitControllerSetPointCheckFlag
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Supply Air Temp Setpoint when 'TemperatureAndHumidityRatio' control is used
-        Real64 HumidityControlTempSetPoint;
-        // Difference between SA dry-bulb and dew-point temperatures
-        Real64 ApproachTemp;
-        // Desired dew point temperature setpoint for 'TemperatureAndHumidityRatio' control
-        Real64 DesiredDewPoint;
         Real64 rho; // local fluid density
 
         if (InitControllerOneTimeFlag) {
