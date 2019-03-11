@@ -401,7 +401,7 @@ namespace HVACControllers {
         if (ControllerProps(ControlNum).InitFirstPass) {
             // Coil must first be sized to:
             // Initialize ControllerProps(ControlNum)%MinActuated and ControllerProps(ControlNum)%MaxActuated
-            InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+            InitController(ControlNum, IsConvergedFlag);
             ControllerProps(ControlNum).InitFirstPass = false;
         }
 
@@ -417,19 +417,19 @@ namespace HVACControllers {
                 HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
-                ResetController(ControlNum, FirstHVACIteration, false, IsConvergedFlag);
+                ResetController(ControlNum, false, IsConvergedFlag);
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
             } else if (SELECT_CASE_var == iControllerOpWarmRestart) {
                 // If a iControllerOpWarmRestart call, set the actuator inlet flows to previous solution
-                ResetController(ControlNum, FirstHVACIteration, true, IsConvergedFlag);
+                ResetController(ControlNum, true, IsConvergedFlag);
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+                InitController(ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Simulate the correct Controller with the current ControlNum
@@ -447,12 +447,12 @@ namespace HVACControllers {
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
-                CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag, FirstHVACIteration);
+                CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag);
 
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+                InitController(ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Check convergence for the correct Controller with the current ControlNum
@@ -805,7 +805,7 @@ namespace HVACControllers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void ResetController(int const ControlNum, bool const EP_UNUSED(FirstHVACIteration), bool const DoWarmRestartFlag, bool &IsConvergedFlag)
+    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -917,7 +917,6 @@ namespace HVACControllers {
     }
 
     void InitController(int const ControlNum,
-                        bool const EP_UNUSED(FirstHVACIteration), // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &IsConvergedFlag)
     {
 
@@ -2237,7 +2236,7 @@ namespace HVACControllers {
     //        End of Update subroutines for the Controller Module
     // *****************************************************************************
 
-    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag, bool const FirstHVACIteration)
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag)
     {
 
         {
@@ -2252,9 +2251,7 @@ namespace HVACControllers {
                             thisController.HumRatCtrlOverride = true;
                             // IsUpToDateFlag = false;
                             // Do a cold start reset, same as iControllerOpColdStart
-                            ResetController(ControlNum, FirstHVACIteration, false, IsConvergedFlag);
-                            // Update the current Controller to the outlet nodes
-                            UpdateController(ControlNum);
+                            ResetController(ControlNum, false, IsConvergedFlag);
                         }
                     }
                 }

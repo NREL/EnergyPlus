@@ -318,10 +318,9 @@ namespace HVACControllers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void ResetController(int const ControlNum, bool const FirstHVACIteration, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
+    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
 
     void InitController(int const ControlNum,
-                        bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &IsConvergedFlag);
 
     void SizeController(int const ControlNum);
@@ -352,7 +351,7 @@ namespace HVACControllers {
 
     bool CheckMaxActiveController(int const ControlNum);
 
-    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag, bool const FirstHVACIteration);
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag);
 
     void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag);
 
