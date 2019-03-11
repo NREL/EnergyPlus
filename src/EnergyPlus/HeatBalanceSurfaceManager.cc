@@ -775,6 +775,11 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
+        // Initialize Kiva instances
+        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            SurfaceGeometry::kivaManager.initKivaInstances();
+        }
+
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -6126,7 +6131,6 @@ namespace HeatBalanceSurfaceManager {
 
         // Calculate Kiva instances
         if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
             if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
                  SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !WarmupFlag) {
