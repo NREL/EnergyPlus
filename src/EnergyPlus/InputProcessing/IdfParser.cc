@@ -198,6 +198,14 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
         objectTypeMap.emplace(std::move(key), it.key());
     }
 
+    if (idf.size() > 3) {
+        // UTF-8 Byte Order Mark
+        if (idf[0] == '\xEF' && idf[1] == '\xBB' && idf[2] == '\xBF') {
+            index += 3;
+            index_into_cur_line += 3;
+        }
+    }
+
     int idfObjectCount = 0;
     while (true) {
         token = look_ahead(idf, index);
