@@ -44,7 +44,15 @@ double cbrt_a(double x) {
   return b;
 }
 
-double getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
+double getMoWiTTForcedTerm(double cosTilt, double azimuth, double windDir, double windSpeed) {
+  if (isWindward(cosTilt, azimuth, windDir)) {
+    return Memo::pow089(3.26 * windSpeed);
+  } else {
+    return Memo::pow0617(3.55 * windSpeed);
+  }
+}
+
+double getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfTerm, double roughness,
                               double cosTilt) {
   /* Based on the DOE-2 convection model as used in EnergyPlus
    *
@@ -73,7 +81,7 @@ double getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double 
     hn = 1.810 * dT3rd / (1.382 + fabs(cosTilt));
   }
 
-  double hcGlass = sqrt(hn * hn + hfGlass * hfGlass);
+  double hcGlass = sqrt(hn * hn + hfTerm * hfTerm);
 
   double rf = 1 + roughness / 0.004; // convert meters to milimeters
 

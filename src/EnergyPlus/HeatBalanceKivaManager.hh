@@ -139,7 +139,14 @@ namespace HeatBalanceKivaManager {
         FoundationKiva defaultFoundation;
         std::vector<FoundationKiva> foundationInputs;
         std::vector<KivaInstanceMap> kivaInstances;
-        std::map<int, Kiva::ConvectionAlgorithm> surfaceConvMap;
+
+        struct ConvectionAlgorithms {
+            Kiva::ConvectionAlgorithm in;
+            Kiva::ConvectionAlgorithm out;
+            Kiva::ForcedConvectionTerm f;  // Separated out for faster execution
+        };
+
+        std::map<int, ConvectionAlgorithms> surfaceConvMap;
         Real64 timestep;
 
         struct SurfaceResults {

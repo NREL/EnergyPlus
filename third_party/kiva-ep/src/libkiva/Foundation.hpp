@@ -137,7 +137,7 @@ public:
   double radiantTemperature;
   ConvectionAlgorithm convectionAlgorithm;
 
-  double hfGlass; // calculate once per time step to speed up convection calculations
+  double hfTerm; // calculate once per time step to speed up convection calculations
   double effectiveLWViewFactorQtr; // F^0.25, calculate once per time step to speed up long wave
                                    // calculations
 

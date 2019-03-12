@@ -342,7 +342,7 @@ void Ground::calculateSurfaceAverages() {
 
           for (auto index : surface.indices) {
             auto this_cell = domain.cell[index];
-            double hc = surface.convectionAlgorithm(TNew[index], Tair, surface.hfGlass,
+            double hc = surface.convectionAlgorithm(TNew[index], Tair, surface.hfTerm,
                                                     surface.propPtr->roughness, surface.cosTilt);
             double hr = getSimpleInteriorIRCoeff(surface.propPtr->emissivity, TNew[index], Trad);
             double q = this_cell->heatGain;
@@ -699,11 +699,9 @@ void Ground::setBoundaryConditions() {
       }
 
       // convection
-      if (isWindward(surface.cosTilt, surface.azimuth, bcs.windDirection)) {
-        surface.hfGlass = Memo::pow089(3.26 * bcs.localWindSpeed);
-      } else {
-        surface.hfGlass = Memo::pow0617(3.55 * bcs.localWindSpeed);
-      }
+      ForcedConvectionTerm hfFunc = isWall ? bcs.extWallForcedTerm : bcs.gradeForcedTerm;
+      surface.hfTerm = hfFunc(surface.cosTilt, surface.azimuth, bcs.windDirection, bcs.localWindSpeed);
+
       surface.convectionAlgorithm =
           isWall ? bcs.extWallConvectionAlgorithm : bcs.gradeConvectionAlgorithm;
 
@@ -723,7 +721,7 @@ void Ground::setBoundaryConditions() {
       surface.radiantTemperature = isWall ? bcs.wallRadiantTemp : bcs.slabRadiantTemp;
 
       // convection
-      surface.hfGlass = 0.0; // Assume no air movement inside
+      surface.hfTerm = 0.0; // Assume no air movement inside
       surface.convectionAlgorithm =
           isWall ? bcs.intWallConvectionAlgorithm : bcs.slabConvectionAlgorithm;
 

@@ -30,6 +30,9 @@ public:
   ConvectionAlgorithm extWallConvectionAlgorithm;
   ConvectionAlgorithm gradeConvectionAlgorithm;
 
+  ForcedConvectionTerm extWallForcedTerm;
+  ForcedConvectionTerm gradeForcedTerm;
+
   BoundaryConditions()
       : indoorTemp(293.15), slabRadiantTemp(293.15), wallRadiantTemp(293.15), outdoorTemp(273.15),
         localWindSpeed(0.0), windDirection(0.0), solarAzimuth(3.14), solarAltitude(0.0),
@@ -38,7 +41,8 @@ public:
         slabConvectionAlgorithm(&getDOE2ConvectionCoeff),
         intWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
         extWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
-        gradeConvectionAlgorithm(&getDOE2ConvectionCoeff) {}
+        gradeConvectionAlgorithm(&getDOE2ConvectionCoeff),
+        extWallForcedTerm(&getMoWiTTForcedTerm), gradeForcedTerm(&getMoWiTTForcedTerm) {}
 };
 
 } // namespace Kiva

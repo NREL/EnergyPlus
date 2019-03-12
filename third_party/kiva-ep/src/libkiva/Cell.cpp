@@ -747,7 +747,7 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
   double Tair = bcs.indoorTemp;                                                                    \
   double Trad = surfacePtr->radiantTemperature;                                                    \
   double cosTilt = surfacePtr->cosTilt;                                                            \
-  double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfGlass,                \
+  double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfTerm,                 \
                                               surfacePtr->propPtr->roughness, cosTilt);            \
   double hr = getSimpleInteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr, Trad);
 
@@ -755,7 +755,7 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
   double Tair = bcs.outdoorTemp;                                                                   \
   double cosTilt = surfacePtr->cosTilt;                                                            \
   double Fqtr = surfacePtr->effectiveLWViewFactorQtr;                                              \
-  double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfGlass,                \
+  double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfTerm,                 \
                                               surfacePtr->propPtr->roughness, cosTilt);            \
   double hr = getExteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr, Tair, Fqtr);
 
