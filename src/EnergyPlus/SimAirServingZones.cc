@@ -4011,7 +4011,7 @@ namespace SimAirServingZones {
                                    ScalableSM + "Supply Air Flow Rate [m3/s]",
                                    PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
                 // Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is CalcOAController
-                if (PrimaryAirSystem(AirLoopNum).OASysExists)
+                if (PrimaryAirSystem(AirLoopNum).isAllOA)
                     AirLoopFlow(AirLoopNum).MaxOutAir = PrimaryAirSystem(AirLoopNum).DesignVolFlowRate * DataEnvironment::StdRhoAir;
             }
 

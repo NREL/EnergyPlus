@@ -335,6 +335,40 @@ TEST_F(InputProcessorFixture, decode_encode_3)
     EXPECT_EQ(expected, encoded);
 }
 
+TEST_F(InputProcessorFixture, byte_order_mark)
+{
+    auto const idf(delimited_string(
+            {
+                    "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+            }));
+
+    auto const expected(delimited_string(
+            {
+                    "Building,",
+                    "  Bldg,",
+                    "  0.0,",
+                    "  Suburbs,",
+                    "  0.04,",
+                    "  0.4,",
+                    "  FullExterior,",
+                    "  25.0,",
+                    "  6.0;",
+                    "",
+                    "GlobalGeometryRules,",
+                    "  UpperLeftCorner,",
+                    "  Counterclockwise,",
+                    "  Relative,",
+                    "  Relative,",
+                    "  Relative;",
+                    ""
+            }));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
 TEST_F(InputProcessorFixture, parse_empty_fields)
 {
     std::string const idf(delimited_string({
@@ -2876,7 +2910,10 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-        "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2958,9 +2995,9 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
 
-    EXPECT_EQ(2, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false}), lNumericBlanks2));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1}), Numbers2));
+    EXPECT_EQ(4, NumNumbers2);
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, true, true}), lNumericBlanks2));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1, 1, 1}), Numbers2));
     EXPECT_EQ(1, IOStatus);
 }
 

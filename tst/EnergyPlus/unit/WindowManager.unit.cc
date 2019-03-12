@@ -462,6 +462,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
     DataHeatBalance::TempEffBulkAir.allocate(3);
@@ -2571,6 +2572,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
     DataHeatBalance::TempEffBulkAir.allocate(3);

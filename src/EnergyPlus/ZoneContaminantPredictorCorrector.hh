@@ -103,6 +103,14 @@ namespace ZoneContaminantPredictorCorrector {
 
     void RevertZoneTimestepHistories();
 
+    void InverseModelCO2(int const ZoneNum,           // Zone number
+                         Real64 &CO2Gain,             // Zone total CO2 gain
+                         Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
+                         Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
+                         Real64 &CO2MassFlowRate,     // Zone air CO2 mass flow rate
+                         Real64 &RhoAir               // Air density
+    );
+
     void CorrectZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
