@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.48" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.50" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -295,12 +295,14 @@ Public Const specFormNo = 1
 Public checkRangeOnSave As Integer
 Public Const checkRangeYes = 1
 Public Const checkRangeNo = 2
+Public ignoreValidatingMacros As Boolean
 
 Public useWordWrap As Boolean
 
 Public previousVersion As String 'saved version of IDF Editor for displaying whats new dialog
 
 Public searchTerm As String
+Public replaceTerm As String
 
 Type recentFilesType
   nameOnly As String
@@ -626,7 +628,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub setUnits()
 Dim i As Long
-maxUsedConvUnits = 153
+maxUsedConvUnits = 154
 unitsDimensionless = 56
 ReDim convUnits(maxUsedConvUnits)
 ' the following is pasted in from the unitsIPandSI.xls file
@@ -783,6 +785,7 @@ convUnits(150).siName = "m3/hr-person"
 convUnits(151).siName = "m3/m2"
 convUnits(152).siName = "m3/hr-m2"
 convUnits(153).siName = "m3/hr"
+convUnits(154).siName = "W/((m3/s)-Pa)"
 
 convUnits(1).ipName = "ft"
 convUnits(2).ipName = "in"
@@ -937,6 +940,7 @@ convUnits(150).ipName = "gal/hr-person"
 convUnits(151).ipName = "gal/ft2"
 convUnits(152).ipName = "gal/hr-ft2"
 convUnits(153).ipName = "gal/hr"
+convUnits(154).ipName = "W/((ft3/min)-inH2O)"
 
 convUnits(1).mult = 3.28083989501312
 convUnits(2).mult = 39.3700787401575
@@ -1091,6 +1095,7 @@ convUnits(150).mult = 264.172037284185
 convUnits(151).mult = 24.5423853466941
 convUnits(152).mult = 24.5423853466941
 convUnits(153).mult = 264.172037284185
+convUnits(154).mult = 0.117556910599482
 
 convUnits(7).offset = 32
 convUnits(19).offset = 7.686
@@ -1113,6 +1118,7 @@ convUnits(150).alt = True
 convUnits(151).alt = True
 convUnits(152).alt = True
 convUnits(153).alt = True
+convUnits(154).alt = True
 
 convUnits(1).multiUnitName = "Distance"
 convUnits(3).multiUnitName = "Capacity"
@@ -1139,6 +1145,7 @@ convUnits(121).multiUnitName = "Mode"
 convUnits(122).multiUnitName = "Control"
 convUnits(123).multiUnitName = "Availability"
 convUnits(129).multiUnitName = "VolumetricFlowPerPower"
+convUnits(144).multiUnitName = "Wavelength"
 End Sub
 
 '-----------------------------------------------------------------------------

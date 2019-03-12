@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,34 +55,30 @@ namespace EnergyPlus {
 
 namespace CostEstimateManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
+    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
-	// Functions
+    // Functions
 
-	void
-	SimCostEstimate();
+    void SimCostEstimate();
 
-	void
-	GetCostEstimateInput();
+    void GetCostEstimateInput();
 
-	void
-	CheckCostEstimateInput( bool & ErrorsFound ); // Set to true if errors in input, fatal at end of routine
+    void CheckCostEstimateInput(bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
 
-	void
-	CalcCostEstimate();
+    void CalcCostEstimate();
 
-} // CostEstimateManager
+} // namespace CostEstimateManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

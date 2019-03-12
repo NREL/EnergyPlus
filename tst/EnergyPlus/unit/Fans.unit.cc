@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -51,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace DataGlobals;
@@ -64,32 +65,36 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Fans;
 
-TEST_F( EnergyPlusFixture, Fans_FanSizing )
+TEST_F(EnergyPlusFixture, Fans_FanSizing)
 {
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
-	NumFans = 1;
-	Fan.allocate( NumFans );
-	FanNumericFields.allocate( NumFans );
-	FanNumericFields( NumFans ).FieldNames.allocate( 3 );
+    CurZoneEqNum = 0;
+    CurSysNum = 0;
+    CurOASysNum = 0;
+    NumFans = 1;
+    Fan.allocate(NumFans);
+    FanNumericFields.allocate(NumFans);
+    FanNumericFields(NumFans).FieldNames.allocate(3);
 
-	int FanNum = 1;
-	Fan( FanNum ).FanName = "Test Fan";
-	Fan( FanNum ).FanType = "Fan:OnOff";
-	Fan( FanNum ).FanType_Num = FanType_SimpleOnOff;
-	Fan( FanNum ).MaxAirFlowRate = AutoSize;
-	Fan( FanNum ).FanEff = 0.4; // Prevent divide by zero computing RatedPower
+    int FanNum = 1;
+    Fan(FanNum).FanName = "Test Fan";
+    Fan(FanNum).FanType = "Fan:OnOff";
+    Fan(FanNum).FanType_Num = FanType_SimpleOnOff;
+    Fan(FanNum).MaxAirFlowRate = AutoSize;
+    Fan(FanNum).DeltaPress = 500.0;
+    Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
 
-	FanNumericFields( FanNum ).FieldNames( 3 ) = "Maximum Flow Rate";
+    DataEnvironment::StdRhoAir = 1.2;
 
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
+    FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 
-	// DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-	DataNonZoneNonAirloopValue = 1.00635;
-	SizeFan( FanNum );
-	EXPECT_DOUBLE_EQ( 1.00635, Fan( FanNum ).MaxAirFlowRate );
-	DataNonZoneNonAirloopValue = 0.0;
+    CurZoneEqNum = 0;
+    CurSysNum = 0;
+    CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataNonZoneNonAirloopValue = 1.00635;
+    SizeFan(FanNum);
+    EXPECT_DOUBLE_EQ(1.00635, Fan(FanNum).MaxAirFlowRate);
+    DataNonZoneNonAirloopValue = 0.0;
+    EXPECT_NEAR(1.0371, Fan(FanNum).DesignPointFEI, 0.0001);
 }

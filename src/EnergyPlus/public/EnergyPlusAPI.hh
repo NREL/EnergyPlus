@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -48,13 +49,13 @@
 #define ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
 
 #if _WIN32 || _MSC_VER
- #if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
-  #define ENERGYPLUSLIB_API __declspec(dllexport)
- #else
-  #define ENERGYPLUSLIB_API __declspec(dllimport)
- #endif
+#if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
+#define ENERGYPLUSLIB_API __declspec(dllexport)
 #else
- #define ENERGYPLUSLIB_API
+#define ENERGYPLUSLIB_API __declspec(dllimport)
+#endif
+#else
+#define ENERGYPLUSLIB_API
 #endif
 
 #endif

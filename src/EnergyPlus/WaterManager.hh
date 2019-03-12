@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,97 +58,74 @@ namespace EnergyPlus {
 
 namespace WaterManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
-	// pointers for water storage tanks and their supply arrays
-	// pointers for water storage tanks and their demand arrays
+    // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
+    // pointers for water storage tanks and their supply arrays
+    // pointers for water storage tanks and their demand arrays
 
-	// Functions
+    // Functions
 
-	void
-	ManageWater();
+    void ManageWater();
 
-	void
-	ManageWaterInits();
+    void ManageWaterInits();
 
-	void
-	GetWaterManagerInput();
+    void GetWaterManagerInput();
 
-	void
-	UpdatePrecipitation();
+    void UpdatePrecipitation();
 
-	void
-	UpdateIrrigation();
+    void UpdateIrrigation();
 
-	void
-	SizeWaterManager();
+    void SizeWaterManager();
 
-	void
-	CalcWaterStorageTank( int const TankNum ); // Index of storage tank
+    void CalcWaterStorageTank(int const TankNum); // Index of storage tank
 
-	void
-	SetupTankSupplyComponent(
-		std::string const & CompName,
-		std::string const & CompType,
-		std::string const & TankName,
-		bool & ErrorsFound,
-		int & TankIndex,
-		int & WaterSupplyIndex
-	);
+    void SetupTankSupplyComponent(std::string const &CompName,
+                                  std::string const &CompType,
+                                  std::string const &TankName,
+                                  bool &ErrorsFound,
+                                  int &TankIndex,
+                                  int &WaterSupplyIndex);
 
-	void
-	InternalSetupTankSupplyComponent(
-		std::string const & CompName,
-		std::string const & CompType,
-		std::string const & TankName,
-		bool & ErrorsFound,
-		int & TankIndex,
-		int & WaterSupplyIndex
-	);
+    void InternalSetupTankSupplyComponent(std::string const &CompName,
+                                          std::string const &CompType,
+                                          std::string const &TankName,
+                                          bool &ErrorsFound,
+                                          int &TankIndex,
+                                          int &WaterSupplyIndex);
 
-	void
-	SetupTankDemandComponent(
-		std::string const & CompName,
-		std::string const & CompType,
-		std::string const & TankName,
-		bool & ErrorsFound,
-		int & TankIndex,
-		int & WaterDemandIndex
-	);
+    void SetupTankDemandComponent(std::string const &CompName,
+                                  std::string const &CompType,
+                                  std::string const &TankName,
+                                  bool &ErrorsFound,
+                                  int &TankIndex,
+                                  int &WaterDemandIndex);
 
-	void
-	InternalSetupTankDemandComponent(
-		std::string const & CompName,
-		std::string const & CompType,
-		std::string const & TankName,
-		bool & ErrorsFound,
-		int & TankIndex,
-		int & WaterDemandIndex
-	);
+    void InternalSetupTankDemandComponent(std::string const &CompName,
+                                          std::string const &CompType,
+                                          std::string const &TankName,
+                                          bool &ErrorsFound,
+                                          int &TankIndex,
+                                          int &WaterDemandIndex);
 
-	void
-	CalcRainCollector( int const RainColNum ); // Index of rain collector
+    void CalcRainCollector(int const RainColNum); // Index of rain collector
 
-	void
-	CalcGroundwaterWell( int const WellNum ); // Index of well
+    void CalcGroundwaterWell(int const WellNum); // Index of well
 
-	void
-	UpdateWaterManager();
+    void UpdateWaterManager();
 
-	void
-	ReportWaterManager();
+    void ReportWaterManager();
 
-} // WaterManager
+} // namespace WaterManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

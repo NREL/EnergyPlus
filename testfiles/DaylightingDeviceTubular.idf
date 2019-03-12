@@ -15,7 +15,7 @@
 ! FCW, 6/17/04: changed height for daylighting illuminance map from 0.0m to 0.8m to correspond
 !               to reference point height
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     Tubular Daylighting Device Example,  !- Name
@@ -51,7 +51,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -81,7 +81,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -115,8 +115,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -818,7 +820,6 @@
     Daylit Attic Roof,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.0,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -834,7 +835,6 @@
     Daylit Ceiling,          !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.0,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -861,7 +861,6 @@
     Daylit Attic Roof,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.0,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -877,7 +876,6 @@
     Daylit Ceiling,          !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.0,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -985,7 +983,7 @@
     Daylit Zone Inlets,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Daylit Zone Air Node,    !- Zone Air Node Name
-    Daylit Zone Return Node; !- Zone Return Air Node Name
+    Daylit Zone Return Node; !- Zone Return Air Node or NodeList Name
 
   ThermostatSetpoint:SingleHeatingOrCooling,
     Heating Cooling Setpoint,!- Name
@@ -1000,16 +998,20 @@
 
   ZoneHVAC:EquipmentList,
     Daylit Zone Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Daylit Zone Air,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Daylit Zone Air,         !- Name
     ,                        !- Availability Schedule Name
     Daylit Zone Supply Node, !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1043,11 +1045,7 @@
     Standard Zone Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Standard Zone Air Node,  !- Zone Air Node Name
-    Standard Zone Return Node;  !- Zone Return Air Node Name
-
-  ThermostatSetpoint:SingleHeatingOrCooling,
-    Heating Cooling Setpoint,!- Name
-    Zone Temp Sch;           !- Setpoint Temperature Schedule Name
+    Standard Zone Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Standard Zone Thermostat,!- Name
@@ -1058,16 +1056,20 @@
 
   ZoneHVAC:EquipmentList,
     Standard Zone Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Standard Zone Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Standard Zone Air,       !- Name
     ,                        !- Availability Schedule Name
     Standard Zone Supply Node,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

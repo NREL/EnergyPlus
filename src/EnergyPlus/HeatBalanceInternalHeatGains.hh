@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -55,21 +56,20 @@
 
 namespace EnergyPlus {
 
-void
-SetupZoneInternalGain(
-	int const ZoneNum,
-	std::string const & cComponentObject, // object class name for device contributing internal gain
-	std::string const & cComponentName, // user unique name for device
-	int const IntGainComp_TypeOfNum,
-	Optional< Real64 > ConvectionGainRate = _, // pointer target for remote convection gain value to be accessed
-	Optional< Real64 > ReturnAirConvectionGainRate = _,
-	Optional< Real64 > ThermalRadiationGainRate = _, // pointer target for remote IR radiation gain value to be accessed
-	Optional< Real64 > LatentGainRate = _,
-	Optional< Real64 > ReturnAirLatentGainRate = _,
-	Optional< Real64 > CarbonDioxideGainRate = _,
-	Optional< Real64 > GenericContamGainRate = _
+void SetupZoneInternalGain(int const ZoneNum,
+                           std::string const &cComponentObject, // object class name for device contributing internal gain
+                           std::string const &cComponentName,   // user unique name for device
+                           int const IntGainComp_TypeOfNum,
+                           Optional<Real64> ConvectionGainRate = _, // pointer target for remote convection gain value to be accessed
+                           Optional<Real64> ReturnAirConvectionGainRate = _,
+                           Optional<Real64> ThermalRadiationGainRate = _, // pointer target for remote IR radiation gain value to be accessed
+                           Optional<Real64> LatentGainRate = _,
+                           Optional<Real64> ReturnAirLatentGainRate = _,
+                           Optional<Real64> CarbonDioxideGainRate = _,
+                           Optional<Real64> GenericContamGainRate = _,
+                           Optional<int> RetNodeNum = _ // for return air heat gains
 );
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

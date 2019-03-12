@@ -10,15 +10,24 @@ set( test_src
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
+  PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
+  AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
+  BoilerHotWater.unit.cc
+  BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
+  ChillerConstantCOP.unit.cc
+  ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -28,8 +37,11 @@ set( test_src
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
+  DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSizing.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
@@ -40,6 +52,7 @@ set( test_src
   DOASEffectOnZoneSizing.unit.cc
   DualDuct.unit.cc
   DXCoils.unit.cc
+  EarthTube.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
   ElectricBaseboardRadiator.unit.cc
@@ -53,9 +66,12 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
+  GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
+  HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -67,42 +83,63 @@ set( test_src
   HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
+  HVACDXSystem.unit.cc
+  HVACFan.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc
   HVACInterfaceManager.unit.cc
+  HVACHXAssistedCoolingCoil.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
-  HVACUnitarySystem.unit.cc
+  HVACUnitaryBypassVAV.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
+  HybridModel.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
   IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
+  JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  OASystemHWPreheatCoil.unit.cc
+  OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
+  OutputReports.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Pipes.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantCentralGSHP.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantComponentTemperatureSources.unit.cc
+  PlantChillers.unit.cc
+  PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
+  PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
+  PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RunPeriod.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
@@ -114,17 +151,24 @@ set( test_src
   SiteFCFactorMethodGroundTemperatures.unit.cc
   SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
+  SizeWaterHeatingCoil.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
+  TranspiredCollector.unit.cc
+  UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
@@ -134,9 +178,15 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
+  WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
+  WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc

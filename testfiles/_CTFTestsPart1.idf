@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,8.6;
+  Version,9.1;
 
   Timestep,4;
 
@@ -48,8 +48,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -66,7 +68,7 @@
 
  ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
- ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Htg 99.6% Condns DB,  !- Name
@@ -98,7 +100,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt No Solar Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -130,7 +132,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -369,7 +371,7 @@
     R26WALL WALLS,           !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -379,7 +381,7 @@
   Zone,
     MIXEDWALL WALLS,         !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
+    30.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -390,8 +392,8 @@
   Zone,
     MIXEDWALL2 WALLS,        !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -401,7 +403,7 @@
   Zone,
     MIXEDWALL3 WALLS,        !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
+    60.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -412,8 +414,8 @@
   Zone,
     12INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    60.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -423,7 +425,7 @@
   Zone,
     12INCHHWCONCREV WALLS,   !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
+    90.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -434,8 +436,8 @@
   Zone,
     FOOTOFHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    90.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -445,7 +447,7 @@
   Zone,
     10LAYERWALL WALLS,       !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
+    120.0000000E+00,         !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -456,8 +458,8 @@
   Zone,
     SLOWHWCONCWALL WALLS,    !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    120.0000000E+00,         !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -473,7 +475,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
@@ -550,10 +552,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Roof001,           !- Name
@@ -566,10 +568,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn002:Wall001,           !- Name
@@ -646,10 +648,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn002:Roof001,           !- Name
@@ -662,10 +664,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn003:Wall001,           !- Name
@@ -742,10 +744,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn003:Roof001,           !- Name
@@ -758,10 +760,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn004:Wall001,           !- Name
@@ -838,10 +840,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn004:Roof001,           !- Name
@@ -854,10 +856,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn005:Wall001,           !- Name
@@ -934,10 +936,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn005:Roof001,           !- Name
@@ -950,10 +952,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn006:Wall001,           !- Name
@@ -1030,10 +1032,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn006:Roof001,           !- Name
@@ -1046,10 +1048,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn007:Wall001,           !- Name
@@ -1126,10 +1128,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn007:Roof001,           !- Name
@@ -1142,10 +1144,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn008:Wall001,           !- Name
@@ -1222,10 +1224,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn008:Roof001,           !- Name
@@ -1238,10 +1240,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn009:Wall001,           !- Name
@@ -1318,10 +1320,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn009:Roof001,           !- Name
@@ -1334,10 +1336,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn010:Wall001,           !- Name
@@ -1414,10 +1416,10 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,4.572000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn010:Roof001,           !- Name
@@ -1430,10 +1432,10 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     autocalculate,           !- Number of Vertices
-    0.0000000E+00,4.572000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.572000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.572000,4.572000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,0,4.572000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,15.24,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
@@ -1453,29 +1455,9 @@
 
   Output:VariableDictionary,regular;
 
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary;
-
   Output:Surfaces:Drawing,dxf;
 
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Carbon Equivalent:Facility,hourly;
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
 

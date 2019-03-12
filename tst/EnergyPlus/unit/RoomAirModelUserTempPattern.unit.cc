@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,10 +58,10 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::RoomAirModelUserTempPattern;
 
-TEST_F( EnergyPlusFixture, RoomAirModelUserTempPattern_OutdoorDryBulbGradTest )
+TEST_F(EnergyPlusFixture, RoomAirModelUserTempPattern_OutdoorDryBulbGradTest)
 {
-	EXPECT_EQ( 8, OutdoorDryBulbGrad(20, 10, 8, 0, 2));
-	EXPECT_EQ( 2, OutdoorDryBulbGrad(-5, 10, 8, 0, 2));
-	EXPECT_EQ( 2, OutdoorDryBulbGrad( 5, 10, 8, 10, 2));
-	EXPECT_NEAR( 4.307, OutdoorDryBulbGrad( 5, 13, 8, 0, 2), .001);
+    EXPECT_EQ(8, OutdoorDryBulbGrad(20, 10, 8, 0, 2));
+    EXPECT_EQ(2, OutdoorDryBulbGrad(-5, 10, 8, 0, 2));
+    EXPECT_EQ(2, OutdoorDryBulbGrad(5, 10, 8, 10, 2));
+    EXPECT_NEAR(4.307, OutdoorDryBulbGrad(5, 13, 8, 0, 2), .001);
 }

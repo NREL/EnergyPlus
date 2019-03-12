@@ -17,8 +17,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -30,7 +30,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     Building,                !- Name
@@ -166,8 +166,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -189,7 +191,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -219,7 +221,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -420,14 +422,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -523,26 +517,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -881,7 +857,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -897,7 +872,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1092,7 +1066,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1267,7 +1240,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1283,7 +1255,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1458,7 +1429,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2086,7 +2056,7 @@
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2094,7 +2064,7 @@
     SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2102,7 +2072,7 @@
     SPACE3-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2110,7 +2080,7 @@
     SPACE4-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2118,7 +2088,7 @@
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
@@ -2198,38 +2168,53 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -2915,7 +2900,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name
-    81.,                     !- Design Water Outlet Temperature {C}
     autosize,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio
@@ -3368,7 +3352,7 @@
     0.0;                     !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    WaterTariffEnergyCharge, !- Name
+    WaterTariffEnergyCharge, !- Utility Cost Charge Simple Name
     Water Tariff,            !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4406,7 +4390,7 @@
     2.51;                    !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    FlatEnergyCharge,        !- Name
+    FlatEnergyCharge,        !- Utility Cost Charge Simple Name
     ExampleA,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4426,7 +4410,7 @@
     15.;                     !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    FlatEnergyCharge-Gas,    !- Name
+    FlatEnergyCharge-Gas,    !- Utility Cost Charge Simple Name
     ExampleA-Gas,            !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4448,7 +4432,7 @@
     VariableFixedCharge;     !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    FlatEnergyCharge,        !- Name
+    FlatEnergyCharge,        !- Utility Cost Charge Simple Name
     ExampleAWithVariableMonthlyCharge,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4487,7 +4471,7 @@
     5.75;                    !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Block,
-    BlockEnergyCharge,       !- Name
+    BlockEnergyCharge,       !- Utility Cost Charge Block Name
     ExampleB,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4509,7 +4493,7 @@
     KWh;                     !- Conversion Factor Choice
 
   UtilityCost:Charge:Block,
-    BlockEnergyCharge,       !- Name
+    BlockEnergyCharge,       !- Utility Cost Charge Block Name
     ExampleC,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4524,7 +4508,7 @@
     0.0383;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    BlockDemandCharge,       !- Name
+    BlockDemandCharge,       !- Utility Cost Charge Block Name
     ExampleC,                !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -4554,7 +4538,7 @@
     150.00;                  !- Minimum Monthly Charge or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterEnergyCost,        !- Name
+    WinterEnergyCost,        !- Utility Cost Charge Block Name
     ExampleD,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -4569,7 +4553,7 @@
     0.03704;                 !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerEnergyCost,        !- Name
+    SummerEnergyCost,        !- Utility Cost Charge Block Name
     ExampleD,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4618,7 +4602,7 @@
     150.00;                  !- Minimum Monthly Charge or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterEnergyCost,        !- Name
+    WinterEnergyCost,        !- Utility Cost Charge Block Name
     ExampleDWithRatchet,     !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -4633,7 +4617,7 @@
     0.03704;                 !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerEnergyCost,        !- Name
+    SummerEnergyCost,        !- Utility Cost Charge Block Name
     ExampleDWithRatchet,     !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4648,7 +4632,7 @@
     0.07103;                 !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterDemandCost,        !- Name
+    WinterDemandCost,        !- Utility Cost Charge Block Name
     ExampleDWithRatchet,     !- Tariff Name
     BillingDemand1,          !- Source Variable
     Winter,                  !- Season
@@ -4663,7 +4647,7 @@
     3.00;                    !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerDemandCost,        !- Name
+    SummerDemandCost,        !- Utility Cost Charge Block Name
     ExampleDWithRatchet,     !- Tariff Name
     BillingDemand1,          !- Source Variable
     Summer,                  !- Season
@@ -4715,7 +4699,7 @@
     14;                      !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Block,
-    BlockEnergyCharge,       !- Name
+    BlockEnergyCharge,       !- Utility Cost Charge Block Name
     ExampleE,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4744,7 +4728,7 @@
     37.75;                   !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeak,            !- Name
+    SummerOnPeak,            !- Utility Cost Charge Simple Name
     ExampleF,                !- Tariff Name
     peakEnergy,              !- Source Variable
     summer,                  !- Season
@@ -4752,7 +4736,7 @@
     0.14009;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeak,           !- Name
+    SummerOffPeak,           !- Utility Cost Charge Simple Name
     ExampleF,                !- Tariff Name
     offPeakEnergy,           !- Source Variable
     summer,                  !- Season
@@ -4760,7 +4744,7 @@
     0.06312;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOnPeak,            !- Name
+    WinterOnPeak,            !- Utility Cost Charge Simple Name
     ExampleF,                !- Tariff Name
     peakEnergy,              !- Source Variable
     winter,                  !- Season
@@ -4768,7 +4752,7 @@
     0.08315;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOffPeak,           !- Name
+    WinterOffPeak,           !- Utility Cost Charge Simple Name
     ExampleF,                !- Tariff Name
     offPeakEnergy,           !- Source Variable
     winter,                  !- Season
@@ -4776,7 +4760,7 @@
     0.02420;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand,               !- Name
+    MinDemand,               !- Utility Cost Qualify Name
     ExampleF,                !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -4832,7 +4816,7 @@
     37.75;                   !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeak,            !- Name
+    SummerOnPeak,            !- Utility Cost Charge Simple Name
     ExampleFmc,              !- Tariff Name
     peakEnergy,              !- Source Variable
     summer,                  !- Season
@@ -4840,7 +4824,7 @@
     0.14009;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeak,           !- Name
+    SummerOffPeak,           !- Utility Cost Charge Simple Name
     ExampleFmc,              !- Tariff Name
     offPeakEnergy,           !- Source Variable
     summer,                  !- Season
@@ -4848,7 +4832,7 @@
     0.06312;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOnPeak,            !- Name
+    WinterOnPeak,            !- Utility Cost Charge Simple Name
     ExampleFmc,              !- Tariff Name
     peakEnergy,              !- Source Variable
     winter,                  !- Season
@@ -4856,7 +4840,7 @@
     0.08315;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOffPeak,           !- Name
+    WinterOffPeak,           !- Utility Cost Charge Simple Name
     ExampleFmc,              !- Tariff Name
     offPeakEnergy,           !- Source Variable
     winter,                  !- Season
@@ -4864,7 +4848,7 @@
     0.02420;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand,               !- Name
+    MinDemand,               !- Utility Cost Qualify Name
     ExampleFmc,              !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -4930,7 +4914,7 @@
     35;                      !- Monthly Charge or Variable Name
 
   UtilityCost:Charge:Block,
-    EnergyFirst200kWhPerkW,  !- Name
+    EnergyFirst200kWhPerkW,  !- Utility Cost Charge Block Name
     ExampleG,                !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4941,7 +4925,7 @@
     1;                       !- Block 1 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    CostOfFirst200kWhPerkW,  !- Name
+    CostOfFirst200kWhPerkW,  !- Utility Cost Charge Block Name
     ExampleG,                !- Tariff Name
     EnergyFirst200kWhPerkW,  !- Source Variable
     Annual,                  !- Season
@@ -4958,7 +4942,7 @@
     0.0427;                  !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    CostOfRestOfEnergy,      !- Name
+    CostOfRestOfEnergy,      !- Utility Cost Charge Block Name
     ExampleG,                !- Tariff Name
     restOfEnergy,            !- Source Variable
     Annual,                  !- Season
@@ -5028,7 +5012,7 @@
     sellToUtility;           !- Buy Or Sell
 
   UtilityCost:Charge:Simple,
-    GeneratedElectricSold,   !- Name
+    GeneratedElectricSold,   !- Utility Cost Charge Simple Name
     ExampleI-Sell,           !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5053,7 +5037,7 @@
     netMetering;             !- Buy Or Sell
 
   UtilityCost:Charge:Simple,
-    NetMeteredCharge,        !- Name
+    NetMeteredCharge,        !- Utility Cost Charge Simple Name
     ExampleI-NetMeter,       !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5127,7 +5111,7 @@
     0;                       !- Annual escalation rate
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Commercial-Electricity,  !- Name
+    MidWest  Commercial-Electricity,  !- LCC Price Escalation Name
     ElectricityPurchased,    !- Resource
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
@@ -5140,30 +5124,30 @@
     1.0429,                  !- Year 7 Escalation
     1.0410,                  !- Year 8 Escalation
     1.0406,                  !- Year 9 Escalation
-    1.0444,                  !- Year 10 Escalation
-    1.0505,                  !- Year 11 Escalation
-    1.0535,                  !- Year 12 Escalation
-    1.0524,                  !- Year 13 Escalation
-    1.0478,                  !- Year 14 Escalation
-    1.0429,                  !- Year 15 Escalation
-    1.0391,                  !- Year 16 Escalation
-    1.0372,                  !- Year 17 Escalation
-    1.0360,                  !- Year 18 Escalation
-    1.0341,                  !- Year 19 Escalation
-    1.0319,                  !- Year 20 Escalation
-    1.0288,                  !- Year 21 Escalation
-    1.0341,                  !- Year 22 Escalation
-    1.0425,                  !- Year 23 Escalation
-    1.0508,                  !- Year 24 Escalation
-    1.0569,                  !- Year 25 Escalation
-    1.0626,                  !- Year 26 Escalation
-    1.0694,                  !- Year 27 Escalation
-    1.0721,                  !- Year 28 Escalation
-    1.0744,                  !- Year 29 Escalation
-    1.0774;                  !- Year 30 Escalation
+    1.0444,                  !- <none>
+    1.0505,                  !- <none>
+    1.0535,                  !- <none>
+    1.0524,                  !- <none>
+    1.0478,                  !- <none>
+    1.0429,                  !- <none>
+    1.0391,                  !- <none>
+    1.0372,                  !- <none>
+    1.0360,                  !- <none>
+    1.0341,                  !- <none>
+    1.0319,                  !- <none>
+    1.0288,                  !- <none>
+    1.0341,                  !- <none>
+    1.0425,                  !- <none>
+    1.0508,                  !- <none>
+    1.0569,                  !- <none>
+    1.0626,                  !- <none>
+    1.0694,                  !- <none>
+    1.0721,                  !- <none>
+    1.0744,                  !- <none>
+    1.0774;                  !- <none>
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Commercial-Electricity,  !- Name
+    MidWest  Commercial-Electricity,  !- LCC Price Escalation Name
     ElectricitySurplusSold,  !- Resource
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
@@ -5176,30 +5160,30 @@
     1.0429,                  !- Year 7 Escalation
     1.0410,                  !- Year 8 Escalation
     1.0406,                  !- Year 9 Escalation
-    1.0444,                  !- Year 10 Escalation
-    1.0505,                  !- Year 11 Escalation
-    1.0535,                  !- Year 12 Escalation
-    1.0524,                  !- Year 13 Escalation
-    1.0478,                  !- Year 14 Escalation
-    1.0429,                  !- Year 15 Escalation
-    1.0391,                  !- Year 16 Escalation
-    1.0372,                  !- Year 17 Escalation
-    1.0360,                  !- Year 18 Escalation
-    1.0341,                  !- Year 19 Escalation
-    1.0319,                  !- Year 20 Escalation
-    1.0288,                  !- Year 21 Escalation
-    1.0341,                  !- Year 22 Escalation
-    1.0425,                  !- Year 23 Escalation
-    1.0508,                  !- Year 24 Escalation
-    1.0569,                  !- Year 25 Escalation
-    1.0626,                  !- Year 26 Escalation
-    1.0694,                  !- Year 27 Escalation
-    1.0721,                  !- Year 28 Escalation
-    1.0744,                  !- Year 29 Escalation
-    1.0774;                  !- Year 30 Escalation
+    1.0444,                  !- <none>
+    1.0505,                  !- <none>
+    1.0535,                  !- <none>
+    1.0524,                  !- <none>
+    1.0478,                  !- <none>
+    1.0429,                  !- <none>
+    1.0391,                  !- <none>
+    1.0372,                  !- <none>
+    1.0360,                  !- <none>
+    1.0341,                  !- <none>
+    1.0319,                  !- <none>
+    1.0288,                  !- <none>
+    1.0341,                  !- <none>
+    1.0425,                  !- <none>
+    1.0508,                  !- <none>
+    1.0569,                  !- <none>
+    1.0626,                  !- <none>
+    1.0694,                  !- <none>
+    1.0721,                  !- <none>
+    1.0744,                  !- <none>
+    1.0774;                  !- <none>
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Commercial-Natural gas,  !- Name
+    MidWest  Commercial-Natural gas,  !- LCC Price Escalation Name
     NaturalGas,              !- Resource
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
@@ -5212,27 +5196,27 @@
     1.0113,                  !- Year 7 Escalation
     1.0289,                  !- Year 8 Escalation
     1.0616,                  !- Year 9 Escalation
-    1.1031,                  !- Year 10 Escalation
-    1.1321,                  !- Year 11 Escalation
-    1.1484,                  !- Year 12 Escalation
-    1.1623,                  !- Year 13 Escalation
-    1.1786,                  !- Year 14 Escalation
-    1.1925,                  !- Year 15 Escalation
-    1.2025,                  !- Year 16 Escalation
-    1.2138,                  !- Year 17 Escalation
-    1.2289,                  !- Year 18 Escalation
-    1.2453,                  !- Year 19 Escalation
-    1.2642,                  !- Year 20 Escalation
-    1.2818,                  !- Year 21 Escalation
-    1.3182,                  !- Year 22 Escalation
-    1.3560,                  !- Year 23 Escalation
-    1.3899,                  !- Year 24 Escalation
-    1.4151,                  !- Year 25 Escalation
-    1.4491,                  !- Year 26 Escalation
-    1.4881,                  !- Year 27 Escalation
-    1.4818,                  !- Year 28 Escalation
-    1.4931,                  !- Year 29 Escalation
-    1.5145;                  !- Year 30 Escalation
+    1.1031,                  !- <none>
+    1.1321,                  !- <none>
+    1.1484,                  !- <none>
+    1.1623,                  !- <none>
+    1.1786,                  !- <none>
+    1.1925,                  !- <none>
+    1.2025,                  !- <none>
+    1.2138,                  !- <none>
+    1.2289,                  !- <none>
+    1.2453,                  !- <none>
+    1.2642,                  !- <none>
+    1.2818,                  !- <none>
+    1.3182,                  !- <none>
+    1.3560,                  !- <none>
+    1.3899,                  !- <none>
+    1.4151,                  !- <none>
+    1.4491,                  !- <none>
+    1.4881,                  !- <none>
+    1.4818,                  !- <none>
+    1.4931,                  !- <none>
+    1.5145;                  !- <none>
 
   LifeCycleCost:UseAdjustment,
     NoElectricUseAdjustment, !- Name

@@ -3,20 +3,22 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 
-# Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
-if(NOT PROFILE_USE)
-  configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
-  configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
+if(WIN32)
+  configure_file( energyplus.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
+  configure_file( energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 
+configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
+file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
+
 SET( SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
-  Timer.h
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
-  AirflowNetworkSolver.cc
-  AirflowNetworkSolver.hh
   AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
@@ -50,7 +52,8 @@ SET( SRC
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
   ConductionTransferFunctionCalc.hh
-  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh"
+  ConfiguredFunctions.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
   CoolTower.cc
@@ -71,8 +74,6 @@ SET( SRC
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh
-  DataAirflowNetwork.cc
-  DataAirflowNetwork.hh
   DataBSDFWindow.cc
   DataBSDFWindow.hh
   DataBranchAirLoopPlant.cc
@@ -131,8 +132,6 @@ SET( SRC
   DataPhotovoltaics.hh
   DataPlant.cc
   DataPlant.hh
-  DataPlantPipingSystems.cc
-  DataPlantPipingSystems.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -256,6 +255,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFan.cc
+  HVACFan.hh
   HVACFourPipeBeam.cc
   HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
@@ -274,14 +275,14 @@ SET( SRC
   HVACStandAloneERV.hh
   HVACUnitaryBypassVAV.cc
   HVACUnitaryBypassVAV.hh
-  HVACUnitarySystem.cc
-  HVACUnitarySystem.hh
   HVACVariableRefrigerantFlow.cc
   HVACVariableRefrigerantFlow.hh
   HWBaseboardRadiator.cc
   HWBaseboardRadiator.hh
   HeatBalFiniteDiffManager.cc
   HeatBalFiniteDiffManager.hh
+  HeatBalanceKivaManager.cc
+  HeatBalanceKivaManager.hh
   HeatBalanceAirManager.cc
   HeatBalanceAirManager.hh
   HeatBalanceHAMTManager.cc
@@ -310,6 +311,12 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
+  HybridEvapCoolingModel.cc
+  HybridEvapCoolingModel.hh
+  HybridModel.cc
+  HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
@@ -326,8 +333,15 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
-  InputProcessor.cc
-  InputProcessor.hh
+  InputProcessing/DataStorage.hh
+  InputProcessing/EmbeddedEpJSONSchema.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
+  InputProcessing/IdfParser.cc
+  InputProcessing/IdfParser.hh
+  InputProcessing/InputProcessor.cc
+  InputProcessing/InputProcessor.hh
+  InputProcessing/InputValidation.cc
+  InputProcessing/InputValidation.hh
   IntegratedHeatPump.cc
   IntegratedHeatPump.hh
   InternalHeatGains.cc
@@ -374,6 +388,8 @@ SET( SRC
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
   PackagedThermalStorageCoil.hh
+  PhaseChangeModeling/HysteresisModel.cc
+  PhaseChangeModeling/HysteresisModel.hh
   PhotovoltaicThermalCollectors.cc
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
@@ -383,6 +399,27 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
+  Plant/CallingOrder.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/LoopSideReportVars.hh
+  Plant/MeterData.hh
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
+  Plant/ReportLoopData.hh
+  Plant/ReportVars.hh
+  Plant/Branch.hh
+  Plant/Component.hh
+  Plant/ConnectedLoopData.hh
+  Plant/Connection.hh
+  Plant/Loop.hh
+  Plant/LoopSide.hh
+  Plant/MixerData.hh
+  Plant/SplitterData.hh
+  Plant/Subcomponents.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers.cc
@@ -396,13 +433,13 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
-  PlantLocation.hh
+  Plant/PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
-  PlantLoopSolver.cc
-  PlantLoopSolver.hh
-  PlantManager.cc
-  PlantManager.hh
+  Plant/PlantLoopSolver.cc
+  Plant/PlantLoopSolver.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc
@@ -424,10 +461,18 @@ SET( SRC
   Pumps.hh
   PurchasedAirManager.cc
   PurchasedAirManager.hh
+  PVWatts.cc
+  PVWatts.hh
+  PVWattsSSC.cc
+  PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
+  ReportCoilSelection.cc
+  ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
+  ResultsSchema.cc
+  ResultsSchema.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
   RoomAirModelAirflowNetwork.cc
@@ -485,6 +530,8 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc
@@ -516,6 +563,8 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc
@@ -540,6 +589,9 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
+  WaterToWaterHeatPumpEIR.cc
+  WaterToWaterHeatPumpEIR.hh
+  WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
   WeatherManager.cc
@@ -554,6 +606,14 @@ SET( SRC
   WindowEquivalentLayer.hh
   WindowManager.cc
   WindowManager.hh
+  WindowManagerExteriorData.cc
+  WindowManagerExteriorData.hh
+  WindowManagerExteriorThermal.cc
+  WindowManagerExteriorThermal.hh
+  WindowManagerExteriorOptical.cc
+  WindowManagerExteriorOptical.hh
+  WindowModel.cc
+  WindowModel.hh
   ZoneAirLoopEquipmentManager.cc
   ZoneAirLoopEquipmentManager.hh
   ZoneContaminantPredictorCorrector.cc
@@ -568,15 +628,35 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
+CREATE_SRC_GROUPS( "${SRC}" )
+
 if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
+add_custom_target( GenerateEmbeddedEpJSONSchema
+                   COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
+                           -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
+                           -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
+                           -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
+                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   DEPENDS generate_embeddedable_epJSON_schema )
+
+add_subdirectory(AirflowNetwork)
+#message( $<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES> )
+#include_directories($<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES>)
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva Windows-CalcEngine airflownetworklib )
+add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
+if(BUILD_GROUND_PLOT)
+  set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
+  target_link_libraries( energypluslib groundplot )
+endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()
@@ -585,7 +665,11 @@ if (WIN32)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+if (APPLE OR UNIX)
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+else()  # windows
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
+endif()
 target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
@@ -599,16 +683,12 @@ install( TARGETS energyplusapi
   ARCHIVE DESTINATION ./
 )
 
-if (MINGW)
-  add_executable( energyplus main.cc  )
-  target_link_libraries( energyplus energyplusapi )
-elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( energyplus energypluslib )
-else()
-  add_executable( energyplus main.cc  )
-  target_link_libraries( energyplus energyplusapi )
+if (APPLE OR UNIX)
+  add_executable( energyplus main.cc )
+else()  # windows
+  add_executable( energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
 endif()
+target_link_libraries( energyplus energyplusapi )
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
@@ -633,4 +713,3 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
-

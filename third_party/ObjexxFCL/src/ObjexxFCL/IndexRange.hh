@@ -3,9 +3,9 @@
 
 // IndexRange: Index Range Class
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -94,11 +94,11 @@ public: // Creation
 			u_ = 0;
 			break;
 		case 1: // {l}
-			l_ = *i;
+			l_ = int( *i );
 			u_ = l_ - 2; // Unbounded
 			break;
 		case 2: // {l,u}
-			l_ = *i;
+			l_ = int( *i );
 			u_ = clean_u( *(++i) );
 			break;
 		}
@@ -207,11 +207,11 @@ public: // Assignment
 			u_ = 0;
 			break;
 		case 1: // {l}
-			l_ = *i;
+			l_ = int( *i );
 			u_ = l_ - 2; // Unbounded
 			break;
 		case 2: // {l,u}
-			l_ = *i;
+			l_ = int( *i );
 			u_ = clean_u( *(++i) );
 			break;
 		}

@@ -18,7 +18,7 @@
 ! Plant:    None.
 !
 
-  Version,8.6;
+  Version,9.1;
 
   Timestep,4;
 
@@ -45,7 +45,7 @@
     -7.00,                   !- Time Zone {hr}
     1712.00;                 !- Elevation {m}
 
- ! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8°C
+ ! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Htg 99% Condns DB,  !- Name
@@ -75,7 +75,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9°C MWB=14.8°C
+ ! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9Â°C MWB=14.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -109,8 +109,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -439,7 +441,6 @@
     Zn001:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -535,7 +536,6 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices
@@ -689,7 +689,6 @@
     Zn003:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.000000,                !- Multiplier
     4,                       !- Number of Vertices

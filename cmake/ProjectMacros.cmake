@@ -9,7 +9,7 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(NAME ${test_name} 
+        add_test(NAME ${test_name}
                  COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
@@ -46,7 +46,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
     endif()
 
     CREATE_SRC_GROUPS( "${SRC}" )
-    
+
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
     if ("${BASE_NAME_TYPE}" STREQUAL "EXECUTABLE")
       # don't link base name
@@ -55,20 +55,20 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
       # also link base name
       set(ALL_DEPENDENCIES ${BASE_NAME} ${DEPENDENCIES} )
     endif()
-      
-    target_link_libraries( ${BASE_NAME}_tests 
-      ${ALL_DEPENDENCIES} 
-      gtest 
+
+    target_link_libraries( ${BASE_NAME}_tests
+      ${ALL_DEPENDENCIES}
+      gtest
     )
 
     ADD_GOOGLE_TESTS( ${BASE_NAME}_tests ${SRC} )
   endif()
 endmacro()
 
-# Named arguments 
+# Named arguments
 # IDF_FILE <filename> IDF input file
 # EPW_FILE <filename> EPW weather file
-# 
+#
 # Optional Arguments
 # DESIGN_DAY_ONLY force design day simulation
 # ANNUAL_SIMULATION force annual simulation
@@ -82,29 +82,43 @@ function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL PERFORMANCE)
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
+  # CMake Parse Arguments: will set the value of variables starting with 'ADD_SIM_TEST_', eg: 'ADD_SIM_TEST_IDF_FILE'
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
-
-  if( DESIGN_DAY_ONLY )
+  if( ADD_SIM_TEST_DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
-  elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION  )
+  # If passed argument "ANNUAL_SIMULATION" or global cache variables
+  elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION )
     set(ANNUAL_SIMULATION true)
   else()
     set(ANNUAL_SIMULATION false)
   endif()
 
+  # Note JM 2018-11-23: -r means "Call ReadVarEso", which unless you actually have BUILD_FORTRAN=TRUE shouldn't exist
   if(ANNUAL_SIMULATION)
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a -r" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
   else()
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
   endif()
-  
-  get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
-  if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
-    message("Setting ANNUAL_SIMULATION to true for ${IDF_NAME} for the purpose of PGO training")
-    set(ANNUAL_SIMULATION true)
+  # Add -r flag if BUILD_FORTRAN is on, regardless of whether we run regression/performance tests
+  # So that it'll produce the CSV output automatically for convenience
+  if (BUILD_FORTRAN)
+    set( ENERGYPLUS_FLAGS "${ENERGYPLUS_FLAGS} -r")
+  else()
+    # Now, if you don't have BUILD_FORTRAN, but you actually need that because of regression/performance testing, we issue messages
+
+    if( ADD_SIM_TEST_PERFORMANCE )
+      # For performance testing, it's more problematic, because that'll cut on the ReadVarEso time
+      message(WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
+    elseif(DO_REGRESSION_TESTING)
+      # DO_REGRESSION_TESTING shouldn't really occur here since EnergyPlus/CMakeLists.txt will throw an error if BUILD_FORTRAN isn't enabled
+      # Not that bad, just a dev warning
+      message(AUTHOR_WARNING "Will not be able to call ReadVarEso unless BUILD_FORTRAN=TRUE, skipping flag -r.")
+    endif()
   endif()
+
+  get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
   if (ADD_SIM_TEST_PERFORMANCE)
     set(TEST_CATEGORY "performance")
@@ -132,7 +146,7 @@ function( ADD_SIMULATION_TEST )
     -DRUN_CALLGRIND:BOOL=${RUN_CALLGRIND}
     -DVALGRIND=${VALGRIND}
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-  )  
+  )
 
   # MSVC's profile generator does not work with parallel runs
   #if( MSVC AND PROFILE_GENERATE )
@@ -152,11 +166,6 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
-
-  if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
-    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
-  endif()
-
 
   if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
@@ -211,18 +220,11 @@ function(fixup_executable EXECUTABLE_PATH )
   endforeach()
 endfunction()
 
-# On Mac and linux this function copies in dependencies of target
-# On windows it just installs the target
-function(install_and_fixup_exe_target TARGET_NAME INSTALL_PATH)
-  install( TARGETS ${TARGET_NAME} DESTINATION ${INSTALL_PATH} )
-  #Warning this is only ok because we are counting on static linked executables on windows.
-  if(NOT WIN32)
-    if(NOT EXISTS "/etc/redhat-release")
-      install(CODE "
-        include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
-        fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
-      ")
-    endif()
-  endif()
+# On dynamic exes, this function copies in dependencies of the target
+function(install_target_prereqs TARGET_NAME INSTALL_PATH)
+  install(CODE "
+    include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
+    fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
+  ")
 endfunction()
 

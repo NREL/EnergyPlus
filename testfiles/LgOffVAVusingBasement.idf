@@ -16,8 +16,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,9.1;
 
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
@@ -132,8 +132,10 @@
     Jan,                     !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -145,8 +147,10 @@
     Jul,                     !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -154,7 +158,7 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -184,7 +188,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -614,7 +618,6 @@
     EW1-P1T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -726,7 +729,6 @@
     EW1-P2T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -838,7 +840,6 @@
     EW1-P3T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -950,7 +951,6 @@
     EW1-P4T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1158,7 +1158,6 @@
     EW1-P1F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1270,7 +1269,6 @@
     EW1-P2F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1382,7 +1380,6 @@
     EW1-P3F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1494,7 +1491,6 @@
     EW1-P4F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1702,7 +1698,6 @@
     EW1-P1I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1814,7 +1809,6 @@
     EW1-P2I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1926,7 +1920,6 @@
     EW1-P3I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -2038,7 +2031,6 @@
     EW1-P4I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -3334,7 +3326,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     6766.,                   !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0.3,                     !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -4624,7 +4616,7 @@
     P1TInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P1T Node,                !- Zone Air Node Name
-    P1T Outlet Node;         !- Zone Return Air Node Name
+    P1T Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-2T,                  !- Zone Name
@@ -4632,7 +4624,7 @@
     P2TInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P2T Node,                !- Zone Air Node Name
-    P2T Outlet Node;         !- Zone Return Air Node Name
+    P2T Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-3T,                  !- Zone Name
@@ -4640,7 +4632,7 @@
     P3TInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P3T Node,                !- Zone Air Node Name
-    P3T Outlet Node;         !- Zone Return Air Node Name
+    P3T Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-4T,                  !- Zone Name
@@ -4648,7 +4640,7 @@
     P4TInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P4T Node,                !- Zone Air Node Name
-    P4T Outlet Node;         !- Zone Return Air Node Name
+    P4T Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     COR-T,                   !- Zone Name
@@ -4656,7 +4648,7 @@
     C1TInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     C1T Node,                !- Zone Air Node Name
-    C1T Outlet Node;         !- Zone Return Air Node Name
+    C1T Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-1F,                  !- Zone Name
@@ -4664,7 +4656,7 @@
     P1FInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P1F Node,                !- Zone Air Node Name
-    P1F Outlet Node;         !- Zone Return Air Node Name
+    P1F Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-2F,                  !- Zone Name
@@ -4672,7 +4664,7 @@
     P2FInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P2F Node,                !- Zone Air Node Name
-    P2F Outlet Node;         !- Zone Return Air Node Name
+    P2F Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-3F,                  !- Zone Name
@@ -4680,7 +4672,7 @@
     P3FInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P3F Node,                !- Zone Air Node Name
-    P3F Outlet Node;         !- Zone Return Air Node Name
+    P3F Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-4F,                  !- Zone Name
@@ -4688,7 +4680,7 @@
     P4FInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P4F Node,                !- Zone Air Node Name
-    P4F Outlet Node;         !- Zone Return Air Node Name
+    P4F Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     COR-F,                   !- Zone Name
@@ -4696,7 +4688,7 @@
     C1FInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     C1F Node,                !- Zone Air Node Name
-    C1F Outlet Node;         !- Zone Return Air Node Name
+    C1F Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-1I,                  !- Zone Name
@@ -4704,7 +4696,7 @@
     P1IInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P1I Node,                !- Zone Air Node Name
-    P1I Outlet Node;         !- Zone Return Air Node Name
+    P1I Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-2I,                  !- Zone Name
@@ -4712,7 +4704,7 @@
     P2IInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P2I Node,                !- Zone Air Node Name
-    P2I Outlet Node;         !- Zone Return Air Node Name
+    P2I Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-3I,                  !- Zone Name
@@ -4720,7 +4712,7 @@
     P3IInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P3I Node,                !- Zone Air Node Name
-    P3I Outlet Node;         !- Zone Return Air Node Name
+    P3I Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     PER-4I,                  !- Zone Name
@@ -4728,7 +4720,7 @@
     P4IInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     P4I Node,                !- Zone Air Node Name
-    P4I Outlet Node;         !- Zone Return Air Node Name
+    P4I Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     COR-I,                   !- Zone Name
@@ -4736,112 +4728,157 @@
     C1IInlet,                !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     C1I Node,                !- Zone Air Node Name
-    C1I Outlet Node;         !- Zone Return Air Node Name
+    C1I Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     P1TEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P1T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P2TEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P2T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P3TEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P3T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P4TEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P4T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     C1TEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     C1T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P1FEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P1F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P2FEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P2F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P3FEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P3F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P4FEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P4F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     C1FEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     C1F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P1IEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P1I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P2IEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P2I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P3IEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P3I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     P4IEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     P4I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     C1IEquipment,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     C1I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     P1T AHU,                 !- Name
@@ -5435,7 +5472,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name
-    81.,                     !- Design Water Outlet Temperature {C}
     autosize,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio

@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  VERSION,8.6;
+  Version,9.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -43,9 +43,11 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1,                       !- Temperature Capacity Multiplier
-    1,                       !- Humidity Capacity Multiplier
-    1,                       !- Carbon Dioxide Capacity Multiplier
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
 
 !-   ===========  ALL OBJECTS IN CLASS: RUN CONTROL ===========
@@ -63,8 +65,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     YES,                     !- Use Weather File Holidays and Special Days
     NO,                      !- Use Weather File Daylight Saving Period
@@ -403,7 +407,6 @@
     ZONE SURFACE WEST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -419,7 +422,6 @@
     ZONE SURFACE EAST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -969,7 +971,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     200.0,                   !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.000,                   !- Fraction Latent
     0.600,                   !- Fraction Radiant
     0.000;                   !- Fraction Lost
@@ -1195,16 +1197,19 @@
     ZONE ONE Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE ONE Zone Air Node,  !- Zone Air Node Name
-    ZONE ONE Return Outlet;  !- Zone Return Air Node Name
+    ZONE ONE Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE EQUIPMENT LIST ===========
 
   ZoneHVAC:EquipmentList,
     ZONE ONE Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZONE ONE Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 !-   ===========  ALL OBJECTS IN CLASS: FURNACE:HEATCOOL ===========
 
@@ -1314,7 +1319,7 @@
     ,                        !- Temperature Setpoint Node Name
     0,                       !- Parasitic Electric Load {W}
     AHU 1 Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Gas Load {W}
+    0;                       !- Parasitic Fuel Load {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:COOLINGBYPASSFACTOREMPIRICAL ===========
 
@@ -1358,7 +1363,7 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,Monthly;
+  Output:Variable,*,Heating Coil Heating Energy,Monthly;
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,Monthly;
 

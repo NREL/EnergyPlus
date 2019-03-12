@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -52,337 +53,339 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
+#include <EnergyPlus.hh>
+#include <HeatBalanceKivaManager.hh>
+
+// C++ Headers
+#include <map>
 
 namespace EnergyPlus {
 
 namespace SurfaceGeometry {
 
-	// Using/Aliasing
-	using DataSurfaces::SurfaceData;
-	using DataVectorTypes::Vector;
+    // Using/Aliasing
+    using DataSurfaces::SurfaceData;
+    using DataVectorTypes::Vector;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern Array1D_string const BaseSurfCls;
-	extern Array1D_string const SubSurfCls;
-	extern Array1D_int const BaseSurfIDs;
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern Array1D_string const BaseSurfCls;
+    extern Array1D_string const SubSurfCls;
+    extern Array1D_int const BaseSurfIDs;
 
-	extern Array1D_int const SubSurfIDs;
+    extern Array1D_int const SubSurfIDs;
 
-	extern int const UnenteredAdjacentZoneSurface; // allows users to enter one zone surface ("Zone")
-	// referencing another in adjacent zone
-	extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
-	// surface names in other zones
+    extern int const UnenteredAdjacentZoneSurface; // allows users to enter one zone surface ("Zone")
+    // referencing another in adjacent zone
+    extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
+    // surface names in other zones
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	// Following are used only during getting vertices, so are module variables here.
-	extern Real64 CosBldgRelNorth; // Cosine of the building rotation (relative north) (includes appendix G rotation)
-	extern Real64 SinBldgRelNorth; // Sine of the building rotation (relative north)   (includes appendix G rotation)
-	extern Real64 CosBldgRotAppGonly; // Cosine of the building rotation for appendix G only(relative north)
-	extern Real64 SinBldgRotAppGonly; // Sine of the building rotation for appendix G only (relative north)
-	extern Array1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-	extern Array1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
+    // MODULE VARIABLE DECLARATIONS:
+    // Following are used only during getting vertices, so are module variables here.
+    extern Real64 CosBldgRelNorth;          // Cosine of the building rotation (relative north) (includes appendix G rotation)
+    extern Real64 SinBldgRelNorth;          // Sine of the building rotation (relative north)   (includes appendix G rotation)
+    extern Real64 CosBldgRotAppGonly;       // Cosine of the building rotation for appendix G only(relative north)
+    extern Real64 SinBldgRotAppGonly;       // Sine of the building rotation for appendix G only (relative north)
+    extern Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+    extern Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
-	extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
-	// outside environment are used but no ground temperature object was input.
-	extern bool NoFCGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
-	// outside environment are used but no FC ground temperatures was input.
-	extern bool RectSurfRefWorldCoordSystem; // GlobalGeometryRules=World (true) or Relative (false)
-	extern int Warning1Count; // counts of Modify Window 5/6 windows
-	extern int Warning2Count; // counts of overriding exterior windows with Window 5/6 glazing systems
-	extern int Warning3Count; // counts of overriding interior windows with Window 5/6 glazing systems
+    extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
+    // outside environment are used but no ground temperature object was input.
+    extern bool NoFCGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
+    // outside environment are used but no FC ground temperatures was input.
+    extern bool RectSurfRefWorldCoordSystem; // GlobalGeometryRules=World (true) or Relative (false)
+    extern int Warning1Count;                // counts of Modify Window 5/6 windows
+    extern int Warning2Count;                // counts of overriding exterior windows with Window 5/6 glazing systems
+    extern int Warning3Count;                // counts of overriding interior windows with Window 5/6 glazing systems
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
-	// Object Data
-	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+    // Object Data
+    extern Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
+    extern HeatBalanceKivaManager::KivaManager kivaManager;
 
-	// Functions
+    // Functions
 
-	// Clears the global data in HeatBalanceManager.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    // Clears the global data in HeatBalanceManager.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-	void
-	SetupZoneGeometry( bool & ErrorsFound );
+    void SetupZoneGeometry(bool &ErrorsFound);
 
-	void
-	AllocateModuleArrays();
+    void AllocateModuleArrays();
 
-	void
-	GetSurfaceData( bool & ErrorsFound ); // If errors found in input
+    void GetSurfaceData(bool &ErrorsFound); // If errors found in input
 
+    void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
+                                SurfaceData &subSurface,  // Subsurface data (in)
+                                bool &surfaceError        // True if there is subsurface error that requires a fatal
+    );
 
-	void
-	checkSubSurfAzTiltNorm(
-		SurfaceData & baseSurface, // Base surface data (in)
-		SurfaceData & subSurface, // Subsurface data (in)
-		bool & surfaceError // True if there is subsurface error that requires a fatal
-	);
+    void GetGeometryParameters(bool &ErrorsFound); // set to true if errors found during input
 
-	void
-	GetGeometryParameters( bool & ErrorsFound ); // set to true if errors found during input
+    void GetDetShdSurfaceData(bool &ErrorsFound,          // Error flag indicator (true if errors found)
+                              int &SurfNum,               // Count of Current SurfaceNumber
+                              int const TotDetachedFixed, // Number of Fixed Detached Shading Surfaces to obtain
+                              int const TotDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
+    );
 
-	void
-	GetDetShdSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotDetachedFixed, // Number of Fixed Detached Shading Surfaces to obtain
-		int const TotDetachedBldg // Number of Building Detached Shading Surfaces to obtain
-	);
+    void GetRectDetShdSurfaceData(bool &ErrorsFound,              // Error flag indicator (true if errors found)
+                                  int &SurfNum,                   // Count of Current SurfaceNumber
+                                  int const TotRectDetachedFixed, // Number of Fixed Detached Shading Surfaces to obtain
+                                  int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
+    );
 
-	void
-	GetRectDetShdSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotRectDetachedFixed, // Number of Fixed Detached Shading Surfaces to obtain
-		int const TotRectDetachedBldg // Number of Building Detached Shading Surfaces to obtain
-	);
+    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+                          int &SurfNum,                     // Count of Current SurfaceNumber
+                          int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
+                          int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
+                          int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
+                          int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
+                          Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
+                          Array1S_int const BaseSurfIDs,
+                          int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
+    );
 
-	void
-	GetHTSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotHTSurfs, // Number of Heat Transfer Base Surfaces to obtain
-		int const TotDetailedWalls, // Number of Wall:Detailed items to obtain
-		int const TotDetailedRoofs, // Number of RoofCeiling:Detailed items to obtain
-		int const TotDetailedFloors, // Number of Floor:Detailed items to obtain
-		Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-		Array1S_int const BaseSurfIDs,
-		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-	);
+    void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
+                         int &SurfNum,                  // Count of Current SurfaceNumber
+                         int const TotRectExtWalls,     // Number of Exterior Walls to obtain
+                         int const TotRectIntWalls,     // Number of Adiabatic Walls to obtain
+                         int const TotRectIZWalls,      // Number of Interzone Walls to obtain
+                         int const TotRectUGWalls,      // Number of Underground to obtain
+                         int const TotRectRoofs,        // Number of Roofs to obtain
+                         int const TotRectCeilings,     // Number of Adiabatic Ceilings to obtain
+                         int const TotRectIZCeilings,   // Number of Interzone Ceilings to obtain
+                         int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
+                         int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
+                         int const TotRectIZFloors,     // Number of Interzone Floors to obtain
+                         Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+                         int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
+    );
 
-	void
-	GetRectSurfaces(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotRectExtWalls, // Number of Exterior Walls to obtain
-		int const TotRectIntWalls, // Number of Adiabatic Walls to obtain
-		int const TotRectIZWalls, // Number of Interzone Walls to obtain
-		int const TotRectUGWalls, // Number of Underground to obtain
-		int const TotRectRoofs, // Number of Roofs to obtain
-		int const TotRectCeilings, // Number of Adiabatic Ceilings to obtain
-		int const TotRectIZCeilings, // Number of Interzone Ceilings to obtain
-		int const TotRectGCFloors, // Number of Floors with Ground Contact to obtain
-		int const TotRectIntFloors, // Number of Adiabatic Walls to obtain
-		int const TotRectIZFloors, // Number of Interzone Floors to obtain
-		Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
-		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-	);
+    void MakeRectangularVertices(int const SurfNum,
+                                 Real64 const XCoord,
+                                 Real64 const YCoord,
+                                 Real64 const ZCoord,
+                                 Real64 const Length,
+                                 Real64 const Height,
+                                 bool const SurfWorldCoordSystem);
 
-	void
-	MakeRectangularVertices(
-		int const SurfNum,
-		Real64 const XCoord,
-		Real64 const YCoord,
-		Real64 const ZCoord,
-		Real64 const Length,
-		Real64 const Height,
-		bool const SurfWorldCoordSystem
-	);
+    void GetHTSubSurfaceData(bool &ErrorsFound,               // Error flag indicator (true if errors found)
+                             int &SurfNum,                    // Count of Current SurfaceNumber
+                             int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
+                             Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
+                             Array1S_int const SubSurfIDs,    // ID Assignments for valid sub surface classes
+                             int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
+                             int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
+    );
 
-	void
-	GetHTSubSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotHTSubs, // Number of Heat Transfer SubSurfaces to obtain
-		Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
-		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
-		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-	);
+    void GetRectSubSurfaces(bool &ErrorsFound,            // Error flag indicator (true if errors found)
+                            int &SurfNum,                 // Count of Current SurfaceNumber
+                            int const TotWindows,         // Number of Window SubSurfaces to obtain
+                            int const TotDoors,           // Number of Door SubSurfaces to obtain
+                            int const TotGlazedDoors,     // Number of Glass Door SubSurfaces to obtain
+                            int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
+                            int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
+                            int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
+                            Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+                            int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
+                            int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
+    );
 
-	void
-	GetRectSubSurfaces(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotWindows, // Number of Window SubSurfaces to obtain
-		int const TotDoors, // Number of Door SubSurfaces to obtain
-		int const TotGlazedDoors, // Number of Glass Door SubSurfaces to obtain
-		int const TotIZWindows, // Number of Interzone Window SubSurfaces to obtain
-		int const TotIZDoors, // Number of Interzone Door SubSurfaces to obtain
-		int const TotIZGlazedDoors, // Number of Interzone Glass Door SubSurfaces to obtain
-		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
-		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
-		int & NeedToAddSubSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-	);
+    void CheckWindowShadingControlFrameDivider(std::string const &cRoutineName, // routine name calling this one (for error messages)
+                                               bool &ErrorsFound,               // true if errors have been found or are found here
+                                               int const SurfNum,               // current surface number
+                                               int const FrameField             // field number for frame/divider
+    );
 
-	void
-	CheckWindowShadingControlFrameDivider(
-		std::string const & cRoutineName, // routine name calling this one (for error messages)
-		bool & ErrorsFound, // true if errors have been found or are found here
-		int const SurfNum, // current surface number
-		int const FrameField // field number for frame/divider
-	);
+    void CheckSubSurfaceMiscellaneous(std::string const &cRoutineName,           // routine name calling this one (for error messages)
+                                      bool &ErrorsFound,                         // true if errors have been found or are found here
+                                      int const SurfNum,                         // current surface number
+                                      std::string const &SubSurfaceName,         // name of the surface
+                                      std::string const &SubSurfaceConstruction, // name of the construction
+                                      int &AddedSubSurfaces);
 
-	void
-	CheckSubSurfaceMiscellaneous(
-		std::string const & cRoutineName, // routine name calling this one (for error messages)
-		bool & ErrorsFound, // true if errors have been found or are found here
-		int const SurfNum, // current surface number
-		std::string const & SubSurfaceName, // name of the surface
-		std::string const & SubSurfaceConstruction, // name of the construction
-		int & AddedSubSurfaces
-	);
+    void MakeRelativeRectangularVertices(int const BaseSurfNum, // Base surface
+                                         int const SurfNum,
+                                         Real64 const XCoord,
+                                         Real64 const ZCoord,
+                                         Real64 const Length,
+                                         Real64 const Height);
 
-	void
-	MakeRelativeRectangularVertices(
-		int const BaseSurfNum, // Base surface
-		int const SurfNum,
-		Real64 const XCoord,
-		Real64 const ZCoord,
-		Real64 const Length,
-		Real64 const Height
-	);
-	
-	void
-	MakeEquivalentRectangle(
-		int const SurfNum, // Surface number
-		bool & ErrorsFound // Error flag indicator (true if errors found)
-	);
-	
-	void
-	GetAttShdSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotShdSubs // Number of Attached Shading SubSurfaces to obtain
-	);
+    void MakeEquivalentRectangle(int const SurfNum, // Surface number
+                                 bool &ErrorsFound  // Error flag indicator (true if errors found)
+    );
 
-	void
-	GetSimpleShdSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotOverhangs, // Number of Overhangs to obtain
-		int const TotOverhangsProjection, // Number of Overhangs (projection) to obtain
-		int const TotFins, // Number of Fins to obtain
-		int const TotFinsProjection // Number of Fins (projection) to obtain
-	);
+    void GetAttShdSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
+                              int &SurfNum,        // Count of Current SurfaceNumber
+                              int const TotShdSubs // Number of Attached Shading SubSurfaces to obtain
+    );
 
-	void
-	GetIntMassSurfaceData(
-		bool & ErrorsFound, // Error flag indicator (true if errors found)
-		int & SurfNum, // Count of Current SurfaceNumber
-		int const TotIntMass // Number of Internal Mass Surfaces to obtain
-	);
+    void GetSimpleShdSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+                                 int &SurfNum,                     // Count of Current SurfaceNumber
+                                 int const TotOverhangs,           // Number of Overhangs to obtain
+                                 int const TotOverhangsProjection, // Number of Overhangs (projection) to obtain
+                                 int const TotFins,                // Number of Fins to obtain
+                                 int const TotFinsProjection       // Number of Fins (projection) to obtain
+    );
 
-	void
-	GetShadingSurfReflectanceData( bool & ErrorsFound ); // If errors found in input
+    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
+                               int &SurfNum,        // Count of Current SurfaceNumber
+                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    );
 
-	void
-	GetHTSurfExtVentedCavityData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+    void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
-	void
-	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound );
+    void GetSurfaceSrdSurfsData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-	void
-	GetVertices(
-		int const SurfNum, // Current surface number
-		int const NSides, // Number of sides to figure
-		Array1S< Real64 > const Vertices // Vertices, in specified order
-	);
+    void GetSurfaceLocalEnvData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-	void
-	ReverseAndRecalculate(
-		int const SurfNum, // Surface number for the surface
-		int const NSides, // number of sides to surface
-		Real64 & SurfAzimuth, // Surface Facing angle (will be 0 for roofs/floors)
-		Real64 & SurfTilt // Surface tilt (
-	);
+    void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-	void
-	MakeMirrorSurface( int & SurfNum ); // In=>Surface to Mirror, Out=>new Surface index
+    void GetSurfaceHeatTransferAlgorithmOverrides(bool &ErrorsFound);
 
-	void
-	GetWindowShadingControlData( bool & ErrorsFound ); // If errors found in input
+    class ExposedFoundationPerimeter
+    {
+    public:
+        void getData(bool &ErrorsFound);
+        struct Data
+        {
+            double exposedFraction = -1;  // hush up cppcheck
+            std::vector<bool> isExposedPerimeter;
+            bool useDetailedExposedPerimeter;
+        };
+        std::map<int, Data> surfaceMap;
+    };
 
-	void
-	GetStormWindowData( bool & ErrorsFound ); // If errors found in input
+    extern ExposedFoundationPerimeter exposedFoundationPerimeter;
 
-	void
-	GetWindowGapAirflowControlData( bool & ErrorsFound ); // If errors found in input
+    void GetVertices(int const SurfNum,             // Current surface number
+                     int const NSides,              // Number of sides to figure
+                     Array1S<Real64> const Vertices // Vertices, in specified order
+    );
 
-	void
-	GetOSCData( bool & ErrorsFound );
+    void ReverseAndRecalculate(int const SurfNum,   // Surface number for the surface
+                               int const NSides,    // number of sides to surface
+                               Real64 &SurfAzimuth, // Surface Facing angle (will be 0 for roofs/floors)
+                               Real64 &SurfTilt     // Surface tilt (
+    );
 
-	void
-	GetOSCMData( bool & ErrorsFound );
+    void MakeMirrorSurface(int &SurfNum); // In=>Surface to Mirror, Out=>new Surface index
 
-	void
-	GetMovableInsulationData( bool & ErrorsFound ); // If errors found in input
+    void GetWindowShadingControlData(bool &ErrorsFound); // If errors found in input
 
-	void
-	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
-		Array1S_bool const CeilingHeightEntered
-	);
+    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum);
 
-	void
-	ProcessSurfaceVertices(
-		int const ThisSurf, // Surface Number
-		bool & ErrorsFound
-	);
+    void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
 
-	void
-	CalcCoordinateTransformation(
-		int const SurfNum, // Surface Number
-		Vector & CompCoordTranslVector // Coordinate Translation Vector
-	);
+    void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 
-	void
-	CreateShadedWindowConstruction(
-		int const SurfNum, // Surface number
-		int const WSCPtr, // Pointer to WindowShadingControl for SurfNum
-		int const ShDevNum // Shading device material number for WSCptr
-	);
+    void GetWindowGapAirflowControlData(bool &ErrorsFound); // If errors found in input
 
-	void
-	CreateStormWindowConstructions();
+    void GetOSCData(bool &ErrorsFound);
 
-	void
-	ModifyWindow(
-		int const SurfNum, // SurfNum has construction of glazing system from Window5 Data File;
-		bool & ErrorsFound, // Set to true if errors found
-		int & AddedSubSurfaces // Subsurfaces added when window references a
-	);
+    void GetOSCMData(bool &ErrorsFound);
 
-	void
-	AddWindow(
-		int const SurfNum, // SurfNum has construction of glazing system from Window5 Data File;
-		bool & ErrorsFound, // Set to true if errors found
-		int & AddedSubSurfaces // Subsurfaces added when window references a
-	);
+    void GetFoundationData(bool &ErrorsFound);
 
-	void
-	TransformVertsByAspect(
-		int const SurfNum, // Current surface number
-		int const NSides // Number of sides to figure
-	);
+    void GetMovableInsulationData(bool &ErrorsFound); // If errors found in input
 
-	void
-	CalcSurfaceCentroid();
+    void CalculateZoneVolume(Array1S_bool const CeilingHeightEntered);
 
-	void
-	SetupShadeSurfacesForSolarCalcs();
+    struct EdgeOfSurf
+    {
+        int surfNum;
+        Vector start;
+        Vector end;
+        EdgeOfSurf() : surfNum(0), start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
+        {
+        }
+    };
 
-	void
-	CheckConvexity(
-		int const SurfNum, // Current surface number
-		int const NSides // Number of sides to figure
-	);
+    bool isEnclosedVolume(DataVectorTypes::Polyhedron const &zonePoly, std::vector<EdgeOfSurf> &edgeNot2);
 
-	bool
-	isRectangle(
-		int const ThisSurf // Current surface number
-	);
-		
-} // SurfaceGeometry
+    std::vector<EdgeOfSurf> edgesInBoth(std::vector<EdgeOfSurf> edges1, std::vector<EdgeOfSurf> edges2);
 
-} // EnergyPlus
+    bool edgesEqualOnSameSurface(EdgeOfSurf a, EdgeOfSurf b);
+
+    std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> const &uniqueVertices);
+
+    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices);
+
+    DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
+                                                                           std::vector<Vector> const &uniqVertices);
+
+    void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
+
+    bool areFloorAndCeilingSame(DataVectorTypes::Polyhedron const &zonePoly);
+
+    bool areWallHeightSame(DataVectorTypes::Polyhedron const &zonePoly);
+
+    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(DataVectorTypes::Polyhedron const &zonePoly);
+
+    bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
+
+    std::vector<int> listOfFacesFacingAzimuth(DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+
+    int findPossibleOppositeFace(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+
+    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
+
+    bool isAlmostEqual3dPt(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+
+    bool isAlmostEqual2dPt(DataVectorTypes::Vector_2d v1, DataVectorTypes::Vector_2d v2);
+
+    int findIndexOfVertex(DataVectorTypes::Vector vertexToFind, std::vector<DataVectorTypes::Vector> listOfVertices);
+
+    Real64 distance(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+
+    bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
+
+    void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
+                                bool &ErrorsFound);
+
+    void CalcCoordinateTransformation(int const SurfNum,            // Surface Number
+                                      Vector &CompCoordTranslVector // Coordinate Translation Vector
+    );
+
+    void CreateShadedWindowConstruction(int const SurfNum, // Surface number
+                                        int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
+                                        int const ShDevNum // Shading device material number for WSCptr
+    );
+
+    void CreateStormWindowConstructions();
+
+    void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
+                      bool &ErrorsFound,    // Set to true if errors found
+                      int &AddedSubSurfaces // Subsurfaces added when window references a
+    );
+
+    void AddWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
+                   bool &ErrorsFound,    // Set to true if errors found
+                   int &AddedSubSurfaces // Subsurfaces added when window references a
+    );
+
+    void TransformVertsByAspect(int const SurfNum, // Current surface number
+                                int const NSides   // Number of sides to figure
+    );
+
+    void CalcSurfaceCentroid();
+
+    void SetupShadeSurfacesForSolarCalcs();
+
+    void CheckConvexity(int const SurfNum, // Current surface number
+                        int const NSides   // Number of sides to figure
+    );
+
+    bool isRectangle(int const ThisSurf // Current surface number
+    );
+
+} // namespace SurfaceGeometry
+
+} // namespace EnergyPlus
 
 #endif

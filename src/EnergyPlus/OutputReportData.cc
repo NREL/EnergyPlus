@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -58,46 +59,42 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <OutputReportData.hh>
-#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
+#include <OutputReportData.hh>
 
 namespace EnergyPlus {
 
-	AnnualFieldSet::AnnualFieldSet( std::string varName, AnnualFieldSet::AggregationKind kindOfAggregation, int numDigitsShown )
-	{
-		m_variMeter = varName;
-		m_aggregate = kindOfAggregation;
-		m_showDigits = numDigitsShown;
-	}
+AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationKind kindOfAggregation, int numDigitsShown)
+{
+    m_variMeter = varName;
+    m_aggregate = kindOfAggregation;
+    m_showDigits = numDigitsShown;
+}
 
-	int
-	AnnualFieldSet::getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, std::string &unitsVar )
-	{
-		int numkeys;
-		GetVariableKeyCountandType( m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar );  //call outputprocessor routine with member variable
-		return numkeys;
-	}
+int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(int &typeVar,
+                                                        OutputProcessor::StoreType &avgSumVar,
+                                                        int &stepTypeVar,
+                                                        OutputProcessor::Unit &unitsVar)
+{
+    int numkeys;
+    GetVariableKeyCountandType(m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar); // call outputprocessor routine with member variable
+    return numkeys;
+}
 
-	void
-	AnnualFieldSet::getVariableKeysFromFldSt( int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int>  &indexesForKeyVar )
-	{
-		// this hides the Objexx arrays and returns regular vectors
-		Array1D_string tempNamesOfKeys;
-		Array1D_int tempIndexesForKeyVar;
-		tempNamesOfKeys.allocate( keyCount );
-		tempIndexesForKeyVar.allocate( keyCount );
-		GetVariableKeys( m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar ); //call outputprocessor routine with member variable
-		namesOfKeys.clear();
-		indexesForKeyVar.clear();
-		for ( int iKey = 1; iKey <= keyCount; ++iKey ) {
-			namesOfKeys.push_back( tempNamesOfKeys( iKey ) );
-			indexesForKeyVar.push_back( tempIndexesForKeyVar( iKey ) );
-		}
-	}
+void AnnualFieldSet::getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
+{
+    // this hides the Objexx arrays and returns regular vectors
+    Array1D_string tempNamesOfKeys;
+    Array1D_int tempIndexesForKeyVar;
+    tempNamesOfKeys.allocate(keyCount);
+    tempIndexesForKeyVar.allocate(keyCount);
+    GetVariableKeys(m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar); // call outputprocessor routine with member variable
+    namesOfKeys.clear();
+    indexesForKeyVar.clear();
+    for (int iKey = 1; iKey <= keyCount; ++iKey) {
+        namesOfKeys.push_back(tempNamesOfKeys(iKey));
+        indexesForKeyVar.push_back(tempIndexesForKeyVar(iKey));
+    }
+}
 
-
-
-} // EnergyPlus
-
-
+} // namespace EnergyPlus

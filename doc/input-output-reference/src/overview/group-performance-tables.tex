@@ -34,11 +34,11 @@ A unique user assigned name for an instance of a performance table. When a table
 
 \paragraph{Field: Curve Type}\label{field-curve-type}
 
-The form of the polynomial equation used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic} and \emph{Exponent}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input infers the polynomial order (or degree). This input also specifies the number of interpolation points if the next field, Interpolation Method is set to LagrangeInterpolationLinearExtrapolation. The number of interpolation points for Linear, Quadratic, Cubic, Quartic, BiQuadratic and QuadraticLinear are set at 2, 3, 4, 5, 6 and 6, respectively.
+The form of the polynomial equation used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, and \emph{Quartic}. This field is required when the next field, Interpolation Method, is set to \emph{EvaluateCurveToLimits}, where this input infers the polynomial order (or degree) used for curve fitting. If the next field is set to \emph{LagrangeInterpolationLinearExtrapolation}, this field determines the number of interpolation points. For Linear, Quadratic, Cubic, and Quartic the number of interpolation points is set at 2, 3, 4 and 5, respectively. If left blank, the number of interpolation points is set to 4. In a few cases, this field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects).
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method}
 
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4, 5, 6 and 6 data pairs for Linear, Quadratic, Cubic, Quartic, BiQuadratic and QuadraticLinear curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4 and 5 data pairs for Linear, Quadratic, Cubic and Quartic curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-000}
 
@@ -157,11 +157,13 @@ A unique user assigned name for an instance of a performance table. When a table
 
 \paragraph{Field: Curve Type}\label{field-curve-type-1}
 
-The form of the polynomial equation represented by the entered data. The only valid choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular equipment model (i.e., if this type of polynomial is allowed to be used as the curve type for specific input fields). A minimum of 6 data pairs are required when selecting \emph{EvaluateCurveToLimits} in the following field. This input also specifies the number of interpolation points if the next field, Interpolation Method, is set to LagrangeInterpolationLinearExtrapolation.
+The form of the polynomial equation used to represent the tabular data. Choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is required when the next field, Interpolation Method, is set to \emph{EvaluateCurveToLimits}, where this input infers the polynomial order (or degree) used for curve fitting (a minimum of 6 data pairs are required). If the next field is set to \emph{LagrangeInterpolationLinearExtrapolation}, this field determines the number of interpolation points. If left blank, the number of interpolation points is set to 4. In a few cases, this field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects).
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method-1}
 
 The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+
+When the input data are optical properties, the LinearInterpolationOfTable choice is forced.
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-1-000}
 
@@ -204,6 +206,8 @@ This field is used to indicate the kind of units that may be associated with the
   Distance
 \item
   Power
+\item
+  Angle
 \end{itemize}
 
 \paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-000}
@@ -223,6 +227,8 @@ This field is used to indicate the kind of units that may be associated with the
   Distance
 \item
   Power
+\item
+  Wavelength
 \end{itemize}
 
 \paragraph{Field: Output Unit Type}\label{field-output-unit-type-1-000}
@@ -241,6 +247,12 @@ This field is used to indicate the kind of units that may be associated with the
 \paragraph{Field: Normalization Reference}\label{field-normalization-reference-1}
 
 The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized as applicable. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
+
+\paragraph{Field: External File Name}\label{field-external-file-name}
+
+The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., Xn, Yn, Zn, and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+When the External File Name is entered, the following input fields are ignored. 
 
 \paragraph{Data Pairs}\label{data-pairs-1}
 
@@ -341,7 +353,7 @@ This field specifies the number of data points to be used in the lookup table in
 
 \paragraph{Field: Curve Type}\label{field-curve-type-2}
 
-The order of the polynomial used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic, BiQuadratic, QaudraticLinear, BuCibic}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input also infers the polynomial order (or degree).
+The order of the polynomial used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic, BiQuadratic, QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input also infers the polynomial order (or degree).
 
 
 \paragraph{Field: Table Data Format}\label{field-table-data-format}

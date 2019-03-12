@@ -67,7 +67,7 @@
 ! ExtWallConstruction=Steel-Framed
 ! End SimMetaData
 
-  Version,8.6;
+  Version,9.1;
 
   Timestep,6;
 
@@ -82,15 +82,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
   SurfaceConvectionAlgorithm:Inside,TARP;
 
@@ -213,7 +214,7 @@
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
     28.10;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -243,7 +244,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -998,201 +999,6 @@
     ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    Std MAT-CC05 4  MW CONCRETE,  !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std MAT-CC05 4  MW CONCRETE;  !- Layer 2
-
-  ComponentCost:LineItem,
-    Interior Floor,          !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-UNDERSIDE,     !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    INT-CEILING_SIMPLE,      !- Name
-    PW05_Plywood3/4_in;      !- Outside Layer
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    Air Wall,                !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    AIR-WALL,                !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Swinging Door_con,   !- Name
-    Std Opaque Door panel_con;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_con,   !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Swinging Door_semi,  !- Name
-    Std Opaque Door panel_semi;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Semi-conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_semi,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Overhead Door,       !- Name
-    Std Overhead Door Panel; !- Outside Layer
-
-  ComponentCost:LineItem,
-    Overhead Door,           !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Overhead Door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
     window_south,            !- Name
     Theoretical Glass [66];  !- Outside Layer
 
@@ -1201,82 +1007,6 @@
     ,                        !- Type
     Construction,            !- Line Item Type
     window_south,            !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    215.9700,                !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    window_east,             !- Name
-    Theoretical Glass [67];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    east:window_east,        !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    window_east,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    209.7290,                !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    window_north,            !- Name
-    Theoretical Glass [67];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    north:window_north,      !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    window_north,            !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    209.7290,                !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    window_west,             !- Name
-    Theoretical Glass [67];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    west:window_west,        !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    window_west,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    209.7290,                !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    window_SkylightConst,    !- Name
-    Theoretical Glass [81];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    SkylightConst:window_SkylightConst,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    window_SkylightConst,    !- Item Name
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     215.9700,                !- Cost per Area {$/m2}
@@ -1369,48 +1099,6 @@
     ;                        !- Quantity {dimensionless}
 
   Construction,
-    exposed-floor,           !- Name
-    Floor Insulation [2],    !- Outside Layer
-    MAT-CC05 8 HW CONCRETE,  !- Layer 2
-    CP02 CARPET PAD;         !- Layer 3
-
-  ComponentCost:LineItem,
-    exposed-floor:exposed-floor,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    exposed-floor,           !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    34.6727,                 !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    attic-floor,             !- Name
-    1/2IN Gypsum Top,        !- Outside Layer
-    AtticFloor Insulation,   !- Layer 2
-    1/2IN Gypsum Bottom;     !- Layer 3
-
-  ComponentCost:LineItem,
-    attic-floor:attic-floor, !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    attic-floor,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15.0182,                 !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
     door,                    !- Name
     METAL Door Medium 18Ga_1,!- Outside Layer
     AIR,                     !- Layer 2
@@ -1421,27 +1109,6 @@
     ,                        !- Type
     Construction,            !- Line Item Type
     door,                    !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000,                  !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    non-swinging-door,       !- Name
-    METAL Door Medium 18Ga_1,!- Outside Layer
-    AIR [1],                 !- Layer 2
-    METAL Door Medium 18Ga_2;!- Layer 3
-
-  ComponentCost:LineItem,
-    non-swinging-door:non-swinging-door,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    non-swinging-door,       !- Item Name
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     1.0000,                  !- Cost per Area {$/m2}
@@ -1538,7 +1205,6 @@
     LGstore1_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1554,7 +1220,6 @@
     LGstore1_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1602,7 +1267,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1618,7 +1282,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1634,7 +1297,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1650,7 +1312,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1666,7 +1327,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1682,7 +1342,6 @@
     LGstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1872,7 +1531,7 @@
     LGstore1 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LGstore1 Air Node,       !- Zone Air Node Name
-    LGstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     LGstore1 Inlet Nodes,    !- Name
@@ -1880,10 +1539,13 @@
 
   ZoneHVAC:EquipmentList,
     LGstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LGstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     LGstore1 Direct Air,     !- Name
@@ -1955,7 +1617,6 @@
     SMstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1971,7 +1632,6 @@
     SMstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1987,7 +1647,6 @@
     SMstore1_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2051,7 +1710,6 @@
     SMstore1_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2257,7 +1915,7 @@
     SMstore1 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore1 Air Node,       !- Zone Air Node Name
-    SMstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore1 Inlet Nodes,    !- Name
@@ -2265,10 +1923,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore1 Direct Air,     !- Name
@@ -2340,7 +2001,6 @@
     SMstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2356,7 +2016,6 @@
     SMstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2372,7 +2031,6 @@
     SMstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2436,7 +2094,6 @@
     SMstore2_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2642,7 +2299,7 @@
     SMstore2 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore2 Air Node,       !- Zone Air Node Name
-    SMstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore2 Inlet Nodes,    !- Name
@@ -2650,10 +2307,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore2 Direct Air,     !- Name
@@ -2725,7 +2385,6 @@
     SMstore3_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2741,7 +2400,6 @@
     SMstore3_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2757,7 +2415,6 @@
     SMstore3_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -2821,7 +2478,6 @@
     SMstore3_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3027,7 +2683,7 @@
     SMstore3 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore3 Air Node,       !- Zone Air Node Name
-    SMstore3 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore3 Inlet Nodes,    !- Name
@@ -3035,10 +2691,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore3 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore3 Direct Air,     !- Name
@@ -3110,7 +2769,6 @@
     SMstore4_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3126,7 +2784,6 @@
     SMstore4_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3142,7 +2799,6 @@
     SMstore4_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3206,7 +2862,6 @@
     SMstore4_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3412,7 +3067,7 @@
     SMstore4 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore4 Air Node,       !- Zone Air Node Name
-    SMstore4 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore4 Inlet Nodes,    !- Name
@@ -3420,10 +3075,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore4 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore4 Direct Air,     !- Name
@@ -3527,7 +3185,6 @@
     LGstore2_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3543,7 +3200,6 @@
     LGstore2_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3591,7 +3247,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3607,7 +3262,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3623,7 +3277,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3639,7 +3292,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3655,7 +3307,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3671,7 +3322,6 @@
     LGstore2_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3861,7 +3511,7 @@
     LGstore2 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LGstore2 Air Node,       !- Zone Air Node Name
-    LGstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     LGstore2 Inlet Nodes,    !- Name
@@ -3869,10 +3519,13 @@
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LGstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     LGstore2 Direct Air,     !- Name
@@ -3944,7 +3597,6 @@
     SMstore5_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3960,7 +3612,6 @@
     SMstore5_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3976,7 +3627,6 @@
     SMstore5_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4040,7 +3690,6 @@
     SMstore5_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4246,7 +3895,7 @@
     SMstore5 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore5 Air Node,       !- Zone Air Node Name
-    SMstore5 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore5 Inlet Nodes,    !- Name
@@ -4254,10 +3903,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore5 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore5 Direct Air,     !- Name
@@ -4329,7 +3981,6 @@
     SMstore6_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4345,7 +3996,6 @@
     SMstore6_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4361,7 +4011,6 @@
     SMstore6_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4425,7 +4074,6 @@
     SMstore6_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4631,7 +4279,7 @@
     SMstore6 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore6 Air Node,       !- Zone Air Node Name
-    SMstore6 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore6 Inlet Nodes,    !- Name
@@ -4639,10 +4287,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore6 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore6 Direct Air,     !- Name
@@ -4714,7 +4365,6 @@
     SMstore7_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4730,7 +4380,6 @@
     SMstore7_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4746,7 +4395,6 @@
     SMstore7_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4810,7 +4458,6 @@
     SMstore7_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5016,7 +4663,7 @@
     SMstore7 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore7 Air Node,       !- Zone Air Node Name
-    SMstore7 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore7 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore7 Inlet Nodes,    !- Name
@@ -5024,10 +4671,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore7 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore7 Direct Air,     !- Name
@@ -5099,7 +4749,6 @@
     SMstore8_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5115,7 +4764,6 @@
     SMstore8_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5131,7 +4779,6 @@
     SMstore8_Wall_1,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5195,7 +4842,6 @@
     SMstore8_Wall_3,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5401,7 +5047,7 @@
     SMstore8 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore8 Air Node,       !- Zone Air Node Name
-    SMstore8 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore8 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore8 Inlet Nodes,    !- Name
@@ -5409,10 +5055,13 @@
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore8 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     SMstore8 Direct Air,     !- Name
@@ -5494,6 +5143,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -5778,6 +5428,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -6062,6 +5713,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -6346,6 +5998,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -6630,6 +6283,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -6914,6 +6568,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7198,6 +6853,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7482,6 +7138,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7766,6 +7423,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8050,6 +7708,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8338,7 +7997,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8355,7 +8014,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8370,7 +8029,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8378,7 +8037,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8386,7 +8045,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8394,7 +8053,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8402,7 +8061,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8410,7 +8069,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8418,7 +8077,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8426,7 +8085,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -8436,7 +8095,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -8462,7 +8121,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8479,7 +8138,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8487,7 +8146,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8495,7 +8154,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8503,7 +8162,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8511,7 +8170,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8519,7 +8178,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8527,7 +8186,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8535,7 +8194,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -8545,7 +8204,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -8569,7 +8228,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8594,7 +8253,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

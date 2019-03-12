@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,68 +58,55 @@ namespace EnergyPlus {
 
 namespace HVACManager {
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	//MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
-	extern int RepIterAir;
+    extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
+    extern int RepIterAir;
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-	// and zone equipment simulations
+    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
+    // and zone equipment simulations
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageHVAC();
+    void ManageHVAC();
 
-	void
-	SimHVAC();
+    void SimHVAC();
 
-	void
-	SimSelectedEquipment(
-		bool & SimAirLoops, // True when the air loops need to be (re)simulated
-		bool & SimZoneEquipment, // True when zone equipment components need to be (re)simulated
-		bool & SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
-		bool & SimPlantLoops, // True when the main plant loops need to be (re)simulated
-		bool & SimElecCircuits, // True when electic circuits need to be (re)simulated
-		bool & FirstHVACIteration, // True when solution technique on first iteration
-		bool const LockPlantFlows
-	);
+    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+                              bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
+                              bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
+                              bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
+                              bool &SimElecCircuits,     // True when electic circuits need to be (re)simulated
+                              bool &FirstHVACIteration,  // True when solution technique on first iteration
+                              bool const LockPlantFlows);
 
-	void
-	ResetTerminalUnitFlowLimits();
+    void ResetTerminalUnitFlowLimits();
 
-	void
-	ResolveAirLoopFlowLimits();
+    void ResolveAirLoopFlowLimits();
 
-	void
-	ResolveLockoutFlags( bool & SimAir ); // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(bool &SimAir); // TRUE means air loops must be (re)simulated
 
-	void
-	ResetHVACControl();
+    void ResetHVACControl();
 
-	void
-	ResetNodeData();
+    void ResetNodeData();
 
-	void
-	UpdateZoneListAndGroupLoads();
+    void UpdateZoneListAndGroupLoads();
 
-	void
-	ReportAirHeatBalance();
+    void ReportAirHeatBalance();
 
-	void
-	SetHeatToReturnAirFlag();
+    void SetHeatToReturnAirFlag();
 
-	void
-	UpdateZoneInletConvergenceLog();
+    void UpdateZoneInletConvergenceLog();
 
-} // HVACManager
+    void CheckAirLoopFlowBalance();
 
-} // EnergyPlus
+} // namespace HVACManager
+
+} // namespace EnergyPlus
 
 #endif

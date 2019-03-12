@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -52,213 +53,183 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
 namespace SimAirServingZones {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// coil operation
-	extern int const CoilOn; // normal coil operation
-	extern int const CoilOff; // signal coil shouldn't run
-	extern int const BeforeBranchSim;
-	extern int const AfterBranchSim;
-	// CompType numerics -- for this module
-	// component types addressed by this module
-	extern int const OAMixer_Num;
-	extern int const Fan_Simple_CV;
-	extern int const Fan_Simple_VAV;
-	extern int const WaterCoil_SimpleCool;
-	extern int const WaterCoil_Cooling;
-	extern int const WaterCoil_SimpleHeat;
-	extern int const SteamCoil_AirHeat;
-	extern int const WaterCoil_DetailedCool;
-	extern int const Coil_ElectricHeat;
-	extern int const Coil_GasHeat;
-	extern int const WaterCoil_CoolingHXAsst;
-	extern int const DXCoil_CoolingHXAsst;
-	extern int const Coil_DeSuperHeat;
-	extern int const DXSystem;
-	extern int const HeatXchngr;
-	extern int const Desiccant;
-	extern int const Unglazed_SolarCollector;
-	extern int const EvapCooler;
-	extern int const UnitarySystem;
-	extern int const Furnace_UnitarySys;
-	extern int const Humidifier;
-	extern int const Duct;
-	extern int const UnitarySystem_BypassVAVSys;
-	extern int const UnitarySystem_MSHeatPump;
-	extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
-	extern int const DXHeatPumpSystem;
-	extern int const CoilUserDefined;
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // coil operation
+    extern int const CoilOn;  // normal coil operation
+    extern int const CoilOff; // signal coil shouldn't run
+    extern int const BeforeBranchSim;
+    extern int const AfterBranchSim;
+    // CompType numerics -- for this module
+    // component types addressed by this module
+    extern int const OAMixer_Num;
+    extern int const Fan_Simple_CV;
+    extern int const Fan_Simple_VAV;
+    extern int const Fan_System_Object;
+    extern int const WaterCoil_SimpleCool;
+    extern int const WaterCoil_Cooling;
+    extern int const WaterCoil_SimpleHeat;
+    extern int const SteamCoil_AirHeat;
+    extern int const WaterCoil_DetailedCool;
+    extern int const Coil_ElectricHeat;
+    extern int const Coil_GasHeat;
+    extern int const WaterCoil_CoolingHXAsst;
+    extern int const DXCoil_CoolingHXAsst;
+    extern int const Coil_DeSuperHeat;
+    extern int const DXSystem;
+    extern int const HeatXchngr;
+    extern int const Desiccant;
+    extern int const Unglazed_SolarCollector;
+    extern int const EvapCooler;
+    extern int const Furnace_UnitarySys_HeatOnly;
+    extern int const Furnace_UnitarySys_HeatCool;
+    extern int const Humidifier;
+    extern int const Duct;
+    extern int const UnitarySystem_BypassVAVSys;
+    extern int const UnitarySystem_MSHeatPump;
+    extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
+    extern int const DXHeatPumpSystem;
+    extern int const CoilUserDefined;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystemModel;
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D< Real64 > VbzByZone; // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
-	extern bool GetAirLoopInputFlag; // Flag set to make sure you get input once
-	extern int NumOfTimeStepInDay; // number of zone time steps in a day
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
+    extern bool GetAirLoopInputFlag; // Flag set to make sure you get input once
+    extern int NumOfTimeStepInDay;   // number of zone time steps in a day
 
-	// Get Input routines for module
+    // Subroutine Specifications for the Module
+    // Driver/Manager Routines
 
-	// Initialization routines for module
+    // Get Input routines for module
 
-	// Simulation subroutines for the module
+    // Initialization routines for module
 
-	// Functions
-	void
-	clear_state();
+    // Simulation subroutines for the module
 
-	void
-	ManageAirLoops(
-		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
-		bool & SimAir, // TRUE means air loops must be (re)simulated
-		bool & SimZoneEquipment // TRUE means zone equipment must be (re) simulated
-	);
+    // Functions
+    void clear_state();
 
-	// Get Input Section of the Module
-	//******************************************************************************
+    void ManageAirLoops(bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+                        bool &SimAir,                  // TRUE means air loops must be (re)simulated
+                        bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
+    );
 
-	void
-	GetAirPathData();
+    // Get Input Section of the Module
+    //******************************************************************************
 
-	// End of Get Input subroutines for the Module
-	//******************************************************************************
+    void GetAirPathData();
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    // End of Get Input subroutines for the Module
+    //******************************************************************************
 
-	void
-	InitAirLoops( bool const FirstHVACIteration ); // TRUE if first full HVAC iteration in an HVAC timestep
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+    void InitAirLoops(bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
-	void
-	SimAirLoops(
-		bool const FirstHVACIteration,
-		bool & SimZoneEquipment
-	);
+    void ConnectReturnNodes();
 
-	void
-	SimAirLoop(
-		bool const FirstHVACIteration,
-		int const AirLoopNum,
-		int const AirLoopPass,
-		int & AirLoopIterMax,
-		int & AirLoopIterTot,
-		int & AirLoopNumCalls
-	);
+    // Begin Algorithm Section of the Module
+    //******************************************************************************
 
-	void
-	SolveAirLoopControllers(
-		bool const FirstHVACIteration,
-		int const AirLoopPass,
-		int const AirLoopNum,
-		bool & AirLoopConvergedFlag,
-		int & IterMax,
-		int & IterTot,
-		int & NumCalls
-	);
+    void SimAirLoops(bool const FirstHVACIteration, bool &SimZoneEquipment);
 
-	void
-	ReSolveAirLoopControllers(
-		bool const FirstHVACIteration,
-		int const AirLoopPass,
-		int const AirLoopNum,
-		bool & AirLoopConvergedFlag,
-		int & IterMax,
-		int & IterTot,
-		int & NumCalls
-	);
+    void SimAirLoop(
+        bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls);
 
-	void
-	SimAirLoopComponents(
-		int const AirLoopNum, // Index of the air loop being currently simulated
-		bool const FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
-	);
+    void SolveAirLoopControllers(
+        bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-	void
-	SimAirLoopComponent(
-		std::string const & CompName, // the component Name
-		int const CompType_Num, // numeric equivalent for component type
-		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
-		int const AirLoopNum, // Primary air loop number
-		int & CompIndex // numeric pointer for CompType/CompName -- passed back from other routines
-	);
+    void SolveWaterCoilController(bool const FirstHVACIteration,
+                                  int const AirLoopNum,
+                                  std::string const &CompName,
+                                  int &CompIndex,
+                                  std::string const &ControllerName,
+                                  int ControllerIndex,
+                                  bool const HXAssistedWaterCoil);
 
-	void
-	UpdateBranchConnections(
-		int const AirLoopNum, // primary air system number
-		int const BranchNum, // branch reference number
-		int const Update // 1=BeforeBranchSim; 2=AfterBranchSim
-	);
+    void ReSolveAirLoopControllers(
+        bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-	void
-	ResolveSysFlow(
-		int const SysNum, // the primary air system number
-		bool & SysReSim // Set to TRUE if mass balance fails and resimulation is needed
-	);
+    void SimAirLoopComponents(int const AirLoopNum,         // Index of the air loop being currently simulated
+                              bool const FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
+    );
 
-	void
-	SizeAirLoops();
+    void SimAirLoopComponent(std::string const &CompName,   // the component Name
+                             int const CompType_Num,        // numeric equivalent for component type
+                             bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+                             int const AirLoopNum,          // Primary air loop number
+                             int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
+                             UnitarySystems::UnitarySys *CompPointer);
 
-	void
-	SizeAirLoopBranches(
-		int const AirLoopNum,
-		int const BranchNum
-	);
+    void UpdateBranchConnections(int const AirLoopNum, // primary air system number
+                                 int const BranchNum,  // branch reference number
+                                 int const Update      // 1=BeforeBranchSim; 2=AfterBranchSim
+    );
 
-	void
-	SetUpSysSizingArrays();
+    void ResolveSysFlow(int const SysNum, // the primary air system number
+                        bool &SysReSim    // Set to TRUE if mass balance fails and resimulation is needed
+    );
 
-	void
-	UpdateSysSizing( int const CallIndicator );
+    void SizeAirLoops();
 
-	void
-	UpdateSysSizingForScalableInputs( int const AirLoopNum );
+    void SizeAirLoopBranches(int const AirLoopNum, int const BranchNum);
 
-	Real64
-	GetHeatingSATempForSizing(
-		int const IndexAirLoop // air loop index 
-	);
+    void SetUpSysSizingArrays();
 
-	Real64
-	GetHeatingSATempHumRatForSizing(
-		int const IndexAirLoop // air loop index 
-	);
+    void SizeSysOutdoorAir();
 
-	// End Algorithm Section of the Module
-	// *****************************************************************************
+    void UpdateSysSizing(int const CallIndicator);
 
-	// Beginning of Reporting subroutines for the SimAir Module
-	// *****************************************************************************
+    void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 
-	//        End of Reporting subroutines for the SimAir Module
-	// *****************************************************************************
+    Real64 GetHeatingSATempForSizing(int const IndexAirLoop // air loop index
+    );
 
-	//        Utility Subroutines for the SimAir Module
-	// *****************************************************************************
+    Real64 GetHeatingSATempHumRatForSizing(int const IndexAirLoop // air loop index
+    );
 
-	void
-		LimitZoneVentEff(
-		Real64 Xs,  // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
-		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
-		int CtrlZoneNum, //controlled zone number
-		Real64 & SystemCoolingEv // system ventilation efficiency
-		);
+    // End Algorithm Section of the Module
+    // *****************************************************************************
 
-	//        End of Utility subroutines for the SimAir Module
-	// *****************************************************************************
+    // Beginning of Reporting subroutines for the SimAir Module
+    // *****************************************************************************
 
-} // SimAirServingZones
+    //        End of Reporting subroutines for the SimAir Module
+    // *****************************************************************************
 
-} // EnergyPlus
+    //        Utility Subroutines for the SimAir Module
+    // *****************************************************************************
+
+    void LimitZoneVentEff(Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+                          Real64 Voz,             // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
+                          int CtrlZoneNum,        // controlled zone number
+                          Real64 &SystemCoolingEv // system ventilation efficiency
+    );
+
+    void CheckWaterCoilIsOnAirLoop(int const CoilTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop);
+
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(int const CoilTypeNum, std::string const CompName);
+
+    bool CheckWaterCoilOnOASystem(int const CoilTypeNum, std::string const CompName);
+
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const CoilTypeNum, std::string const CompName);
+
+    //        End of Utility subroutines for the SimAir Module
+    // *****************************************************************************
+
+} // namespace SimAirServingZones
+
+} // namespace EnergyPlus
 
 #endif

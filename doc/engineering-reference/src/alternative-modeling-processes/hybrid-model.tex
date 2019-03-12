@@ -1,0 +1,326 @@
+\section{Hybrid Model}\label{hybrid-model}
+
+\subsection{Overview}
+
+The hybrid modeling integrates physics-based and data-driven modeling methods which combines forward and inverse physics-based modeling taking advantage of easily measurable zone air temperature, humidity ratio, or CO$_2$ concentration data to solve hard-to-measure zone parameters including internal thermal mass, air infiltration rate, or zone people count. It aims to enhance the current energy retrofit practices not only offering more user-friendly energy modeling environments but also providing more accurate estimates of energy savings at the same time. Parameters such as interior thermal mass, air infiltration rates, and people count are required in physics-based models, and they have significant impacts as they are driving factors for the dynamic performance of buildings. An accurate estimate of interior thermal mass has been a difficult problem because the building usually has various amounts of furniture and changeable partitions. The air infiltration rate changes in time and dynamically interacts with indoor and outdoor climatic conditions. However the accurate estimation of the data is almost impossible to collect without a fan pressurized test, which can not be easily done by typical energy modelers (Gowri et al. 2009). The high uncertainty of occupants’ presence and behavior have significant impacts on building energy modeling (Clevenger \& Haymaker, 2001). However, people count is usually hard to measure in reality, which result in simplification of occupancy schedule assumptions in energy modeling. The hybrid model introduces an approach estimate the zone level interior thermal masss, air infiltration rate, and people count with measured zone air parameters in EnergyPlus.
+
+Solving building energy and environmental problems inversely using measured data gets more attention as more data are easily and freely available. (Yinping Zhang et al. 2015). Measurements are to supplement to reduce discrepancies or to identify model parameters, nevertheless the majority of efforts go into the derivation of the dynamic inverse modeling. Inverse modeling is a discipline that applies mathematical techniques to combine measurements and models. Inverse modeling can provide solutions when direct measurements of model parameters are not widely available, rendering the use of numerical techniques. Temperature, humidity, and CO$_2$ concentration data are easily available nowadays and are used for controls of indoor environments due to a wider use of low-cost thermostats with data loggers, which bring opportunities to inversely solve other hard-to-measure parameters.
+
+The new hybrid modeling approach uses the inverse modeling method to improve the accuracy of the building energy simulation for existing buildings, which adds measured data to solve uncertain model parameters. The hybrid modeling approach builds upon the virtue of the physics-based model taking advantage of measured data. The approach uses measured zone air temperature, humidity ratio, or CO$_2$ concentration to solve highly uncertain parameters such as internal thermal mass, infiltration airflow rate, and people count with the reformulated zone heat, moisture, or CO$_2$ balance equations. Figure~\ref{fig:hybrid-model-solution-diagram} shows the relationship among the measurements and unkonwn parameters. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=295pt]{media/img_HybridModel-0.png}
+\caption{Relationship among measurements and unknown parameters}\protect \label{fig:hybrid-model-solution-diagram}
+\end{center}
+\end{figure}
+
+
+Figure~\ref{fig:hybrid-model-conceptual-diagram} illustrates a conceptual diagram that easily express the concept of the hybrid modeling approach with measured air temperature. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=295pt]{media/img_HybridModel-1.png}
+\caption{Hybrid model conceptual diagram}\protect \label{fig:hybrid-model-conceptual-diagram}
+\end{center}
+\end{figure}
+
+
+
+\begin{table}
+\caption{Nomenclature for the Hybrid Model}
+\begin{tabular}{ll}
+$Q_{int}$ & Internal heat gain\\
+$h_s$ & Convective heat transfer coefficient\\
+$A_s$ & Zone surface area\\
+$T_s$ & Zone surface temperature\\
+$T_z$ & Zone air temperature\\
+$T_{iz}$ & Interzone air temperature\\
+$T_o$ & Outdoor air temperature\\
+$T_{sup}$ & Air system supply air temperature\\
+$q_{inf}$ & Infiltration air flow rate\\
+$\dot{m}_i$z & Interzone air mass flow rate\\
+$\dot{m}_{sys}$ & Air system mass flow rate\\
+$V$ & Zone volume\\
+$\rho_{air}$ & Air density\\
+$C_z$ & Heat capacity of zone air and internal thermal mass\\
+$C_p$ & Zone air specific heat\\
+$C_T$ & Heat capacity multiplier\\
+\end{tabular}
+\end{table}
+
+
+\subsection{Zone Balance Algorithms}\label{Zone-air-balance-algorithms}
+The hybrid model algorithms are built upon the physics-based zone air balance equations reformulated to solve a partially inverse problem. The hybrid model approach inverses the physics-based energy model, reformulating the heat, moisture, and CO$_2$ balance algorithms with measured zone air temperature, humidity ratio, and CO$_2$ concentration data (traditionally results/output of the physics-based model) to solve highly unknown parameters.
+
+EnergyPlus provides algorithms of 3rd order backward difference and analytical solution to solve the zone air energy balance equation. The 3rd order finite difference approximation provides stability without requiring a prohibitively small time step, the method still has truncation errors and requires a fixed time step length for the previous three simulation time steps. Therefore, different time step lengths for the previous three simulation time steps may make the temperature coefficients invalid. The analytical solution algorithm is an integration approach that provides a possible way to obtain solutions without truncation errors and independent of time step length and only requires the zone air temperature for one previous time step. The hybrid modeling approach uses the analytical solution for internal thermal mass inverse calculation and the 3rd order backward difference for infiltration inverse calculation. The basis for the zone air system integration is to formulate energy balances for the zone air as shown in following equations and solve the resulting ordinary differential equations. 
+
+\subsubsection{Zone air heat balance algorithm}\label{Zone-air-heat-balance-algorithm}
+The sum of zone loads and the provided air system energy equals the change in energy stored in the zone. Typically the zone capacitance, $C_z$ includes the zone air only when formulating energy balances for the zone air. The internal thermal mass, including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The infiltration airflow rate, $\dot{m}_{inf}$ changes for different conditions depending on outdoor temperature, wind speed, and HVAC system operations. The energy provided from systems to the zone is represented as $Q_{sys}$.
+
+\begin{equation}
+C_z \frac {dT_z} {dt} = \Sigma Q_i +\Sigma[h_i A_i (T_{si} - T_z)] + \Sigma [\dot{m}_i C_p (T_{zi}-T_z)] + \dot{m}_{inf} C_p (T_o - T_z) + Q_{sys}
+\end{equation}
+\begin{equation}
+C_z = V \rho_{air} C_p C_T
+\end{equation}
+
+\begin{align*}
+\text{Where: }\\
+  \rho_{air} &: \text{Zone air density} ~ [kg/m^{3}], \\
+  V_{z} &: \text{Zone air volume} ~ [m^{3}],\\
+  C_{p} &: \text{Zone air specific heat} ~ [kJ/kg \cdot K],\\
+  T_{z} &: \text{Zone air temperature at the current time step} ~[K],\\
+  T_{zi} &: \text{Nearby zone air temperature at the current time step} ~[K],\\
+  T_{o} &: \text{Outdoor air temperature at the current time step} ~[K],\\
+  T_{sys} &: \text{System supply air temperature at the current time step} ~[K],\\
+  t &: \text{Current time},\\
+  \Sigma{Q_{in}} &: \text{Sum of internal sensible heat gain} ~ ,\\
+  \Sigma{h_i A_i (T_{si}-T_z)} &: \text{Convective heat transfer from the zone surfaces} ~ [kW],\\
+  \Sigma{\dot{m}_{zi}C_p(T_{zi}-T_z)} &: \text{Heat transfer due to interzone air mixing} ~ [kW],\\
+  \dot{m}_{inf} (T_o - T_z)&: \text{Heat transfer due to infiltration of outside air} ~ [kW],\\
+  \dot{m}_{sys} (T_{sys} - T_z)&: \text{Heat transfer due to air supplied by HVAC system} ~ [kW],\\
+\end{align*}
+
+
+\subsubsection{Zone air moisture balance algorithm}\label{Zone-air-moisture-balance-algorithm}
+The moisture balance equation is in the following form. The sum of zone moisture loads and the provided air system moisture content equals the change in moisture content stored in the zone. 
+\begin{equation}
+\begin{aligned}
+\rho_{air} V_{z} C_{w}\frac {dW_z} {dt} = &\Sigma{kg_{mass_{sched}}} + \Sigma{A_i h_i rho_{air} (W_{si} - W_z)} + \Sigma{\dot{m}_{zi} C_p (W_{zi}-W_z)} \\
+& + \dot{m}_{inf} (W_o - W_z) + \dot{m}_{sys} (W_{sys} - W_z)
+\end{aligned}
+\end{equation}
+
+\begin{align*}
+\text{Where: }\\
+  \rho_{air} &: \text{Zone air density} ~ [kg/m^{3}], \\
+  V_{z} &: \text{Zone air volume} ~ [m^{3}],\\
+  C_{w} &: \text{Zone air humidity capacity multiplier},\\
+  W_{z} &: \text{Zone air humidity ratio} ~ [kg_w/kg_{dry\cdot air}],\\
+  W_{zi} &: \text{Nearby zone air humidity ratio} ~ [kg_w/kg_{dry\cdot air}],\\
+  W_{o} &: \text{Outdoor air humidity ratio} ~ [kg_w/kg_{dry\cdot air}],\\
+  W_{sys} &: \text{System supply air humidity ratio} ~ [kg_w/kg_{dry\cdot air}],\\
+  t &: \text{Current time},\\
+  \Sigma{kg_{mass_{sched}}} &: \text{sum of scheduled internal moisture load} ~ [kg/s],\\
+  \Sigma{ṁ_{zi}(W_{zi}-W_z)} &: \text{Moisture transfer due to interzone air mixing} ~ [kg/s],\\
+  \dot{m}_{inf} (W_o - W_z) &: \text{Moisture transfer due to infiltration} ~ [kg/s],\\
+  \dot{m}_{sys} (W_{sys} - W_z) &: \text{Moisture transfer due to HVAC supply air} ~ [kg/s],\\
+\end{align*}
+
+\subsubsection{Zone air CO$_2$ balance algorithm}\label{Zone-air-CO$_2$-balance-algorithm}
+Similarly, there is a CO$_2$ balance equation in the following form. The sum of zone CO$_2$ loads and the provided air system CO$_2$ content equals the change in CO$_2$ content stored in the zone. 
+
+\begin{equation}
+\begin{aligned}
+\rho_{air} V_{z} C_{CO_{2}}\frac {dC_z} {dt} = &\Sigma{kg_{mass_{sched}}}\times 10^{6} + \Sigma{\dot{m}_{zi}(C_{zi}-C_z)} \\
+& + \dot{m}_{inf} (C_o - C_z) + \dot{m}_{sys} (C_{sys} - C_z)
+\end{aligned}
+\end{equation}
+\begin{align*}
+\text{Where: }\\
+  \rho_{air} &: \text{Zone air density} ~ [kg/m^{3}], \\
+  V_{z} &: \text{Zone air volume} ~ [m^{3}],\\
+  C_{CO_{2}} &: \text{Zone carbon dioxide capacity multiplier [dimensionless]},\\
+  C_{z} &: \text{Zone air carbon dioxide concentration at the current time step} ~ [ppm],\\
+  C_{zi} &: \text{Nearby zone air carbon dioxide concentration} ~ [ppm],\\
+  C_o&: \text{Carbon dioxide concentration in outdoor air} ~ [ppm],\\
+  C_{sys}&: \text{Carbon dioxide concentration in the system supply airstream}~ [ppm],\\
+  t &: \text{Current time},\\
+  \Sigma{kg_{mass_{sched}}} &: \text{Sum of scheduled internal carbon dioxide loads} ~ [kg/s],\\
+  \Sigma{\dot{m}_{zi}(C_{zi}-C_z)} &: \text{Carbon dioxide transfer due to interzone air mixing} ~ [ppm \cdot kg/s],\\
+  \dot{m}_{inf} (C_o - C_z)&: \text{Carbon dioxide transfer due to infiltration and ventilation of outdoor air} ~ [ppm \cdot kg/
+s],\\
+  \dot{m}_{sys} (C_{sys} - C_z)&: \text{Carbon dioxide transfer due to system supply} ~ [ppm \cdot kg/s],\\
+\end{align*}
+
+
+\subsection{Internal thermal mass hybrid modeling method}\label{internal-thermal-mass-hybrid-modeling method}
+There are two approaches to model internal thermal mass in EnergyPlus. One approach is to use the internal mass objects to define construction specifications of internal furnishing materials, and the other is to use the temperature capacitance multipliers. The multiplier increases zone air capacity as it represents the effective storage capacity of the zone interior thermal mass. Figure~\ref {fig:two-approaches-of-representing-interior-thermal-mass-in-EnergyPlus} illustrates two approaches of representing interior thermal mass in EnergyPlus.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=428pt]{media/img_HybridModel-2.png}
+\caption{Two approaches of representing interior thermal mass in EnergyPlus}\protect \label{fig:two-approaches-of-representing-interior-thermal-mass-in-EnergyPlus}
+\end{center}
+\end{figure}
+
+\subsubsection{Interior mass objects in EnergyPlus modeling}\label{interior-mass-objects-in-EnergyPlus-modeling}
+
+The EnergyPlus object, ``InternalMass'', is used to specify the construction materials and area of interior mass within the space, which are important to heat transfer calculations. Internal mass objects participate in the zone air heat balance and the longwave radiant exchange. The geometry of the internal mass construction is greatly simplified due to the difficulty of measurement. They do not directly interact with the solar heat gain because internal mass objects do not have a specific location in space. Internal mass objects can represent multiple pieces of interior mass (furniture, partitions) with different constructions. Internal mass exchanges energy through its both surfaces with the zone by convection. 
+
+\subsubsection{Zone capacitance multiplier}\label{zone-capacitance-multiplier}
+
+There is an object, ``ZoneCapacitanceMultiplier:ResearchSpecial'', an advanced feature to specify the effective storage capacity of a zone. The capacitance multiplier of 1.0 by default indicates the capacitance comes from only the air in the zone. This multiplier can be increased if the zone air capacitance needs to be increased for stability of the simulation or to allow modeling higher or lower levels of damping behavior over time. This multiplier is used in the zone predictor-correction algorithm to adjust the zone air thermal capacity. The current EnergyPlus assumes the same constant capacitance multiplier for all zones. Although it allows users modifying this multiplier, it is not easy to determine the accurate value and not common for a typical use.
+
+The use of the internal mass multiplier, the zone temperature capacitance multiplier only corrects the zone air heat capacity reflecting heat stored in the internal mass. Assumptions are not different from the approach used in InternalMass object, which ignores the geometrical construction of the internal mass, and do not contribute to the heat transfer across surfaces and the solar heat gain through windows.  The approach in this hybrid modeling method derives the interior mass by solving the zone temperature capacity multiplier. The derivation is based on the inverse modeling method replacing the input of interior thermal mass with the measured zone air temperature. The zone air temperature is the only additional requirement for the proposed approach.
+
+
+\subsubsection{Inverse algorithm for zone capacitance multiplier}\label{Inverse-algorithm-for-zone-capacitance-multiplier}
+
+The interior thermal mass including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The interior thermal mass is assumed to be in equilibrium with the zone air. The interior mass in the current EnergyPlus model uses a capacitance multiplier, $C_T$ indicating the capacitance as part of the air in the volume of the specified zone. The default value is given as 1.0 corresponding to the total capacitance for the zone's volume of air at current zone conditions. The hybrid model to derive internal thermal mass uses the capacitance multiplier that indicates the capacitance added to the zone air. The added internal thermal mass capacitance will be represented in the multiplier, which the value would be greater than 1.0. The formulation starts with the heat balance on the zone air. The following equation calculates the time-series zone air temperature, $T_z$, reformulating the above equation using the analytical solution method.
+
+\begin{equation}
+\begin{aligned}
+T_z^t = &\left[T_z^{t-\delta t} - \frac {\Sigma Q_i + \Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) +\dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_pT_{sup}^t} {\Sigma (h_i A_i)  + \Sigma(\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_sys C_p}\right]\\ &\times e^{ - \frac {\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p \dot{m}_{inf} C_p)+ \dot{m}_{sys} C_p} {C_z^t } \delta t} \\ &+ \frac {\Sigma Q_i +\Sigma(h_i A_i T_{si}) + \Sigma(\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma(h_i A_i) +\Sigma(\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p }
+\end{aligned}
+\end{equation}
+
+The hybrid modeling approach derives the internal mass by solving the heat capacity of zone air and internal thermal mass, $C_z$. The equation below shows the inverse heat balance algorithm that replacing the zone air temperature, $T_z$ with the measured zone air temperature. The current timestep measured temperature, $T_z^t$  and the previous timestep measured temperature, $T_z^{t-\delta t}$ are given from inputs, them the zone air heat capacity, $C_z^t$ for each timestep is expressed as following. 
+
+\begin{equation}
+C_z^t = - \frac {[\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p \dot{m}_{inf} C_p) + \dot{m}_{sys} C_p ] \delta t}{ ln⁡ \left[ \frac { T_z^t - \frac { \Sigma Q_i +\Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}} {T_z^{t-\delta t} - \frac {\Sigma Q_i +\Sigma (h_i A_i T_si)  + \Sigma (\dot{m}_i C_p T_zi) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}} \right]}
+\end{equation}
+
+There are different conditions in deriving the interior thermal mass depending on the air system operation. The initial process assumes that calculation is conducted when HVAC systems are off. If HVAC systems are turned off during unoccupied hours, the zone heat capacity can be determined without additional inputs of the supply air temperature for the above condition. The condition when the air system is off, $Q_{sys}=0$, this induces $T_{sup}^t=T_z^t$.  Zone air capacitance with internal mass, $C_z$  remains constant, not changing with the given time series. When the air system is operating, $Q_{sys}$ is not zero. This requires input values of the supply air temperature as denoted as $T_{sup}^t$ and supply air volume. These are additional inputs when estimating interior thermal mass under the condition when HVAC system is operating. When the air system is operating, $C_z \frac {dT_z} {dt}$ becomes zero or almost zero. The zone temperature is maintained at the set-point temperature, thus the temperature difference between $T_z^t$  and $T_z^{t-\delta t}$ is zero. For those hours zone temperatures are maintained at the set-point temperature, the interior thermal mass, $C_z^t$ is not calculated. 
+
+Zone air heat capacity needs to be derived from the stabilized internal zone air temperature data that fully captures the stored heat in the air and internal thermal mass. It is recommended the measured zone temperature needs to be at least one week of data for more reliable result. Zone heat capacity is an important component for buildings as it stabilizes interior temperatures, thus at least one week of the measured interior temperature can capture the stored heat in the interior thermal mass. The temperature capacity multiplier i.e., internal mass multiplier, $C_T^t$ is calculated for each time step using the equation below.
+
+
+\begin{equation}
+C_T^t = \frac{C_z^t} {V\rho_{air} C_p}
+\end{equation}
+
+The default value is 1.0. Ideally the zone heat capacity shall remain constant for the same condition of the interior environment in the zone heat balance equation. An underlying assumption is that the zone heat capacity is treated as constant for the equilibrium of the inversed heat balance model. However the measured temperatures are not the same as the simulated zone air temperatures which is the result of the energy simulation in Equation (3). This causes the internal mass multiplier, $C_T^t$, the result from the inverse model is not constant during the course of the simulation period. The hybrid model will determine a time span when $|T_z^t - T_z^{t-\delta t}| > 0.05^{\circ}C$ that $C_z^t$ remains more constant. Internal mass multiplier calculations are only done when the zone air temperature difference between timesteps meets the condition. This filter is needed for more reliable inverse calculation to avoid the anomaly conditions due to the use of the inverse model.  
+
+\subsection{Infiltration hybrid modeling method}\label{Infiltration hybrid modeling method}
+
+\subsubsection{Infiltration airflow modeling}\label{Infiltration airflow modeling}
+
+Infiltration is an uncontrolled outside air into a building depending on the air-tightness of the building envelope and indoor / outdoor climate conditions. A large percentage of the total energy loss of a building can occur through envelope leakage, resulting in excessive heating and cooling loads. Infiltration is represented as the volumetric flow rate of outside air into a building. Infiltration inputs in energy modeling rarely reflect the actual building operating conditions, as the infiltration airflow rate is dynamic and difficult to measure. It is generally understood that the infiltration rate of a building is a function of its age, its construction quality, and weather conditions. Wind speed and temperature at the zone height are driving factors which cause the pressure difference between the outside and the inside of the building.
+
+The infiltration modeling is relatively simplified in the energy simulation because of the lack of knowledge about the sizes and distribution of cracks in the building envelope, the permeability of the envelope, the air flow to the building, and the pressure distribution in and around the building. EnergyPlus allows a simple approach to model the infiltration for users. This requires to define a design flow rate and coefficients for temperature and wind velocity using the ZoneInfiltration:DesignFlowRate object. EnergyPlus calculates airflow rates by adjusting for the indoor-outdoor temperature differences and the outdoor wind speed using the following equation.
+
+\begin{equation}
+\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} \left[A+B|T_z -T_o|+C (\text{WindSpeed})+D(\text{WindSpeed}^2 )\right]
+\end{equation}
+Where $A$ is the constant term coefficient, $B$ is the temperature term coefficient, $C$ is the velocity term coefficient, $D$ is the velocity squared coefficient, and $F_\text{schedule}$ is a user-defined schedule value between 0 and 1.
+
+The simplified infiltration model using a constant infiltration flow rate is designed to capture the average effect over the year and in different locations. The simple infiltration approach has an empirical correlation that modifies the infiltration as a function of wind speed and temperature difference across the envelope. The difficulty in using this approach the determination of valid coefficients for each building type in each location. These coefficients vary and provide very different results that cause great uncertainty. This is not easy to identify correct ones for typical modeling practices. The current EnergyPlus simplified infiltration modeling method uses a fixed infiltration rate that can represent the average impact over a year. This may not be realistic for accurate energy modeling when capturing hourly dynamics. More complicated flow network simulations are necessary for detailed modeling. Other infiltration related EnergyPlus models that add details and complexities are the ``Effective Leakage Area'' model (Jokisalo et al. 2009) using the ZoneInfiltration:EffectiveLeakageArea object  and ``Flow Coefficient'' model (Walker \& Wilson 1998), using the ZoneInfiltration:FlowCoefficient object.
+
+\subsubsection{Infiltration inverse modeling}\label{Infiltration inverse modeling}
+
+It is not easy to estimate as the infiltration is caused by various sources of unknown leakages. The development of the hybrid model fills the gap when estimating the infiltration that reflects all complexities of design flow rate, coefficients, and climate conditions by only requiring easily attainable zone air temperature, humidity ratio, or CO$_2$ concentration data. The development of the infiltration hybrid modeling algorithm is consistent with the EnergyPlus source code. The approach derives the infiltration mass flow rate, $\dot{m}_{inf}$ by reformulating the zone air heat. moisture, or CO$_2$ balance equations. The 3rd order backward difference method is used for the inverse model development for the infiltration hybrid modeling. The inverse model using the analytical solution cannot be realized in a mathematical form. The time-series zone air temperature, $T_z$ using the 3rd order method is shown in the following equation.
+
+\begin{equation}
+T_z^t = \\ \frac {\left(\begin{aligned}\Sigma Q_i &+ \Sigma(h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o\\ &+ \dot{m}_{sys} C_p T_{sup}^t - \frac{C_z}{\delta t}\left(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}\right)\end{aligned}\right)} { \frac {11}{6} \frac {C_z} {\delta t} + \Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}
+\end{equation}
+
+The equation below shows the inverse algorithm for infiltration hybrid modeling method to derive the zone infiltration mass flow rate using the measured zone air temperature.
+
+\begin{equation}
+\dot{m}_{inf} = \frac{\left(\begin{aligned}& C_z\frac {\frac{11}{6}T_{z}^{t}-3T_{z}^{t-\delta t}+\frac{3}{2}T_{z}^{t-2\delta t}-\frac{1}{3}T_{z}^{t-3\delta t}} {\delta t}\\ & - \left(\Sigma{Q_{in}}+\Sigma{h_i A_i (T_{si}-T_z)} + \Sigma{\dot{m}_{zi}C_p(T_{zi}-T_z)} + \dot{m}_{sys}C_p(T_{sys} - T_z)\right)\end{aligned}\right)} {C_p(T_o - T_{z}^{t})}
+\end{equation}
+
+Similarly, the infiltration air flow rate can be derived with the measured zone air humidity rate:
+
+\begin{equation}
+\dot{m}_{inf} = \frac{\left(\begin{aligned}& C_{wz}\frac {\frac{11}{6}W_{z}^{t}-3W_{z}^{t-\delta t}+\frac{3}{2}W_{z}^{t-2\delta t}-\frac{1}{3}W_{z}^{t-3\delta t}} {\delta t}\\ & - \left(\Sigma{kg_{mass_{sched}}} + \Sigma{A_i h_i \rho_{air} (W_{si} - W_{z}^{t})} + \Sigma{\dot{m}_{zi} (W_{zi}-W_{z}^{t})}\right)\end{aligned}\right)} {W_o - W_{z}^{t}}
+\end{equation}
+
+The infiltration air flow rate can also be derived with the measured zone air CO$_2$ concentration:
+
+\begin{equation}
+\dot{m}_{inf} = \frac{\left(\begin{aligned}& C_{CO_{2}z}\frac {\frac{11}{6}C_{z}^{t}-3C_{z}^{t-\delta t}+\frac{3}{2}C_{z}^{t-2\delta t}-\frac{1}{3}C_{z}^{t-3\delta t}} {\delta t}\\ & - \left(\Sigma{kg_{mass_{sched}}}\times 10^{6} + \Sigma{\dot{m}_{zi}(C_{zi}-C_z)} + \dot{m}_{sys} (C_{sys} - C_z)\right)\end{aligned}\right)} {C_o - C_{z}^{t}}
+\end{equation}
+
+
+The infiltration air flow rate, $q_{inf}$ is then calculated from the derived infiltration mass flow rate from the following equation.
+
+\begin{equation}
+q_{inf}= \frac {\dot{m}_{inf}} {ρ_{air}}
+\end{equation}
+
+% For the infiltration mode of the hybrid model simulation, the calculation is only done when the zone air temperature difference between the current and previous timestep is less than 0.1°C and the zone air and outdoor air temperature difference is greater than 5 °C as depicted $|T_z^t ┤-├ T_o^t ┤|>5.0 °C$ and $|T_z^t ┤-├ T_z^{t-\delta t} ┤|<0.1°C$
+
+
+\subsection{People count hybrid modeling method}\label{People count hybrid modeling method}
+
+People count is highly unpredictable due to the uncertain people movements and behaviors in buildings. Therefore, simplified occupancy schedules are usually used in real-world building energy modeling and simulation cases. The development of the hybrid model offers a new approach to estimate people count in buildings by leveraging the physics-based zone air heat, moisture, or CO$_2$ balance equations. Like the inverse modeling for infiltration air flow estimation, the 3rd order backward difference method is used for inversely solving people count. The total sensible heat, moisture, or CO$_2$ gains from people is solved with the inversed zone balance equations with measured zone air and supply air temperature, humidity ratio, or CO$_2$ concentration as the inputs. The number of people is then derived by dividing the total sensible, moisture, or CO$_2$ gains from people by the assumed single person sensible heat, moisture, or CO$_2$ dissipation amount. This process is shown in the following equations. \\
+
+\noindent(1). Solve people count with measured zone air temperature. \\
+\noindent The sum of internal sensible heat gains is:
+\begin{align*}
+  \Sigma{Q_{in}} &= C_z\frac {\frac{11}{6}T_{z}^{t}-3T_{z}^{t-\delta t}+\frac{3}{2}T_{z}^{t-2\delta t}-\frac{1}{3}T_{z}^{t-3\delta t}} {\delta t} \\
+  &-  [\Sigma{h_i A_i (T_{si}-T_z)} + \Sigma{ṁ_{zi}C_p(T_{zi}-T_z)} + \dot{m}_{inf}C_p(T_o - T_z) + \dot{m}_{sys}C_p(T_{sys} - T_z)] \numberthis
+\end{align*}
+The sum of internal sensible heat gains from people is:
+\begin{align*}
+  \Sigma{Q_{people}} = \Sigma{Q_{in}} - \Sigma{Q_{others}}\numberthis
+\end{align*}
+Finally, the number of people could be solved:
+\begin{align*}
+  N = \frac {\Sigma{Q_{people}}}{Q_{single}} \numberthis
+\end{align*}
+\begin{align*}
+\text{Where: }\\
+  Q_{single} &: \text{Sensible heat rate per person} ~ [W] \\
+\end{align*}
+
+\noindent (2). Solve people count with measured zone air humidity ratio. \\
+\noindent The sum of internal moisture gains is:
+\begin{align*}
+  \Sigma{kg_{mass_{sched}}} &= C_{wz}\frac {\frac{11}{6}W_{z}^{t}-3W_{z}^{t-\delta t}+\frac{3}{2}W_{z}^{t-2\delta t}-\frac{1}{3}W_{z}^{t-3\delta t}} {\delta t} \\
+  &-  [\Sigma{A_i h_i \rho_{air} (W_{si} - W_{z}^{t})} + \Sigma{ṁ_{zi} C_p (W_{zi}-W_{z}^{t})}] \numberthis
+\end{align*}
+The sum of internal moisture gains from people is:
+\begin{align*}
+  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}} \numberthis
+\end{align*}
+Finally, the number of people could be solved:
+\begin{align*}
+  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}} \numberthis
+\end{align*}
+\begin{align*}
+\text{Where: }\\
+  kg_{mass_{single}} &: \text{Moisture dissipation rate per person} ~ [kg / s] \\
+\end{align*}
+
+\noindent (3). Solve people count with measured zone air CO$_2$ concentration. \\
+\noindent The sum of internal CO$_2$ gains is:
+\begin{align*}
+  \Sigma{kg_{mass_{sched}}}\times 10^{6} &= C_{CO_{2}z}\frac {\frac{11}{6}C_{z}^{t}-3C_{z}^{t-\delta t}+\frac{3}{2}C_{z}^{t-2\delta t}-\frac{1}{3}C_{z}^{t-3\delta t}} {\delta t} \\
+  &-  [\Sigma{ṁ_{zi}(C_{zi}-C_z)} \dot{m}_{inf} (C_o - C_z) + \dot{m}_{sys} (C_{sys} - C_z)] \numberthis
+\end{align*}
+The sum of internal CO$_2$ gains from people is:
+\begin{align*}
+  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}} \numberthis
+\end{align*}
+Finally, the number of people could be solved:
+\begin{align*}
+  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}} \numberthis
+\end{align*}
+\begin{align*}
+\text{Where: }\\
+  kg_{mass_{single}} &: \text{CO$_2$ generation rate per person} ~ [m^{3}/(s \cdot W)] \\
+\end{align*}
+
+\subsection{References}\label{references}
+
+Balaras, C. a., 1996. The role of thermal mass on the cooling load of buildings. An overview of computational methods. Energy and Buildings, 24(1), pp.1–10.
+
+Braun, J.E. \& Chaturvedi, N., 2002. An Inverse Gray-Box Model for Transient Building Load Prediction. HVAC\&R Research, 8(1), pp.73–99.
+
+Clevenger, C. M., \& Haymaker, J. (2001). THE IMPACT OF THE BUILDING OCCUPANT ON ENERGY MODELING SIMULATIONS, 1–10.
+
+Deru, M., Field, K., Studer, D., Benne, K., Griffith, B., Torcellini, P., Liu, B., et al. 2011. U . S . Department of Energy Commercial Reference Building Models of the National Building Stock.
+
+Gowri, K., Winiarski, D. \& Jarnagin, R., 2009. PNNL-18898: Infiltration Modeling Guidelines for Commercial Building Energy Analysis, PNNL.
+
+Jokisalo, J. et al., 2009. Building leakage, infiltration, and energy performance analyses for Finnish detached houses. Building and Environment, 44(2), pp.377–387.
+
+Karlsson, J., 2012. Possibilities of using thermal mass in buildings to save energy, cut power consumption peaks and increase the thermal comfort, Lund Institute of Technology.
+
+Lee, K. \& Braun, J.E., 2008. Model-based demand-limiting control of building thermal mass. Building and Environment, 43(10), pp.1633–1646.
+
+Ma, P. \& Guo, N., 2015. Modeling of Thermal Mass in a Small Commercial Building and Potential Improvement by Applying TABS. American Journal of Mechanical Engineering, 3(2), pp.55–62.
+
+Walker, I.S. \& Wilson, D.J., 1998. Field validation of equations for stack and wind driven air infiltration calculations. ASHRAE HVAC\&R Research Journal, 4(2), pp.119–139.
+
+Wang, S. \& Xu, X., 2006. Parameter estimation of internal thermal mass of building dynamic models using genetic algorithm. Energy Conversion and Management, 47(13-14), pp.1927–1941.
+
+Xu, P. \& Zagreus, L., 2010. Demand Shifting with Thermal Mass in Light and Heavy Mass Commercial Buildings. 2009 ASHRAE Annual Conference, (June 2009).
+
+Zeng, R. et al., 2011. New concepts and approach for developing energy efficient buildings: Ideal specific heat for building internal thermal mass. Energy and Buildings, 43(5), pp.1081–1090.
+
+Zhang, Y. et al., 2015. A new approach, based on the inverse problem and variation method, for solving building energy and environment problems: Preliminary study and illustrative examples. Building and Environment, 91, pp.204–218.

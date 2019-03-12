@@ -3,9 +3,9 @@
 
 // ubyte: Unsigned One-Byte Integer
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -196,7 +196,7 @@ public: // Math
 	ubyte
 	operator -() const
 	{
-		return ubyte( static_cast< unsigned char const >( -static_cast< short int const >( b_ ) ) );
+		return ubyte( static_cast< unsigned char >( -static_cast< short int >( b_ ) ) );
 	}
 
 	// ubyte + ubyte

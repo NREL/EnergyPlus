@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     Multistory Example,      !- Name
@@ -143,7 +143,7 @@
     1.2,                     !- Cooling Sizing Factor
     ;                        !- Timesteps in Averaging Window
 
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -173,7 +173,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -207,8 +207,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -404,12 +406,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    Int Wall,                !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
     Floor,                   !- Name
     E5 - ACOUSTIC TILE,      !- Outside Layer
     E4 - CEILING AIRSPACE,   !- Layer 2
@@ -480,7 +476,7 @@
     Watts/Person,            !- Design Level Calculation Method
     ,                        !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    31.1,                    !- Power per Person {W/Person}
+    31.1,                    !- Power per Person {W/person}
     0.2,                     !- Fraction Latent
     0.1,                     !- Fraction Radiant
     0.5,                     !- Fraction Lost
@@ -750,7 +746,6 @@
     Gnd West S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -766,7 +761,6 @@
     Gnd West N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -782,7 +776,6 @@
     Gnd West W Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -828,7 +821,7 @@
     Gnd West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Gnd West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Gnd West Air Node,       !- Zone Air Node Name
-    Gnd West Return Node;    !- Zone Return Air Node Name
+    Gnd West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd West Thermostat,     !- Name
@@ -839,14 +832,19 @@
 
   ZoneHVAC:EquipmentList,
     Gnd West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Gnd West Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Gnd West Window AC,      !- Name
@@ -1033,7 +1031,6 @@
     Gnd Center S Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1049,7 +1046,6 @@
     Gnd Center N Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1095,7 +1091,7 @@
     Gnd Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Gnd Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Gnd Center Air Node,     !- Zone Air Node Name
-    Gnd Center Return Node;  !- Zone Return Air Node Name
+    Gnd Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd Center Thermostat,   !- Name
@@ -1106,14 +1102,19 @@
 
   ZoneHVAC:EquipmentList,
     Gnd Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Gnd Center Baseboard,    !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Gnd Center Window AC,    !- Name
@@ -1293,7 +1294,6 @@
     Gnd East S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1309,7 +1309,6 @@
     Gnd East N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1325,7 +1324,6 @@
     Gnd East E Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1371,7 +1369,7 @@
     Gnd East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Gnd East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Gnd East Air Node,       !- Zone Air Node Name
-    Gnd East Return Node;    !- Zone Return Air Node Name
+    Gnd East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd East Thermostat,     !- Name
@@ -1382,14 +1380,19 @@
 
   ZoneHVAC:EquipmentList,
     Gnd East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Gnd East Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Gnd East Window AC,      !- Name
@@ -1580,7 +1583,6 @@
     Mid West S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1596,7 +1598,6 @@
     Mid West N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1612,7 +1613,6 @@
     Mid West W Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1658,7 +1658,7 @@
     Mid West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Mid West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Mid West Air Node,       !- Zone Air Node Name
-    Mid West Return Node;    !- Zone Return Air Node Name
+    Mid West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid West Thermostat,     !- Name
@@ -1669,14 +1669,19 @@
 
   ZoneHVAC:EquipmentList,
     Mid West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Mid West Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Mid West Window AC,      !- Name
@@ -1856,7 +1861,6 @@
     Mid Center S Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1872,7 +1876,6 @@
     Mid Center N Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1918,7 +1921,7 @@
     Mid Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Mid Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Mid Center Air Node,     !- Zone Air Node Name
-    Mid Center Return Node;  !- Zone Return Air Node Name
+    Mid Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid Center Thermostat,   !- Name
@@ -1929,14 +1932,19 @@
 
   ZoneHVAC:EquipmentList,
     Mid Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Mid Center Baseboard,    !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Mid Center Window AC,    !- Name
@@ -2116,7 +2124,6 @@
     Mid East S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2132,7 +2139,6 @@
     Mid East N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2148,7 +2154,6 @@
     Mid East E Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2194,7 +2199,7 @@
     Mid East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Mid East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Mid East Air Node,       !- Zone Air Node Name
-    Mid East Return Node;    !- Zone Return Air Node Name
+    Mid East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid East Thermostat,     !- Name
@@ -2205,14 +2210,19 @@
 
   ZoneHVAC:EquipmentList,
     Mid East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Mid East Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Mid East Window AC,      !- Name
@@ -2403,7 +2413,6 @@
     Top West S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2419,7 +2428,6 @@
     Top West N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2435,7 +2443,6 @@
     Top West W Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2481,7 +2488,7 @@
     Top West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Top West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Top West Air Node,       !- Zone Air Node Name
-    Top West Return Node;    !- Zone Return Air Node Name
+    Top West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top West Thermostat,     !- Name
@@ -2492,14 +2499,19 @@
 
   ZoneHVAC:EquipmentList,
     Top West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Top West Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Top West Window AC,      !- Name
@@ -2679,7 +2691,6 @@
     Top Center S Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2695,7 +2706,6 @@
     Top Center N Wall,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2741,7 +2751,7 @@
     Top Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Top Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Top Center Air Node,     !- Zone Air Node Name
-    Top Center Return Node;  !- Zone Return Air Node Name
+    Top Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top Center Thermostat,   !- Name
@@ -2752,14 +2762,19 @@
 
   ZoneHVAC:EquipmentList,
     Top Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Top Center Baseboard,    !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Top Center Window AC,    !- Name
@@ -2939,7 +2954,6 @@
     Top East S Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2955,7 +2969,6 @@
     Top East N Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2971,7 +2984,6 @@
     Top East E Wall,         !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     3,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3017,7 +3029,7 @@
     Top East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Top East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Top East Air Node,       !- Zone Air Node Name
-    Top East Return Node;    !- Zone Return Air Node Name
+    Top East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top East Thermostat,     !- Name
@@ -3028,14 +3040,19 @@
 
   ZoneHVAC:EquipmentList,
     Top East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Top East Baseboard,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:WindowAirConditioner,
     Top East Window AC,      !- Name

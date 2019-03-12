@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -39,15 +39,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     9,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     9,                       !- End Day of Month
+    ,                        !- End Year
     SUNDAY,                  !- Day of Week for Start Day
     NO,                      !- Use Weather File Holidays and Special Days
     NO,                      !- Use Weather File Daylight Saving Period
     NO,                      !- Apply Weekend Holiday Rule
     NO,                      !- Use Weather File Rain Indicators
-    NO,                      !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    NO;                      !- Use Weather File Snow Indicators
 
   Timestep,12;
 
@@ -68,7 +69,7 @@
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -98,7 +99,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5Â°C MCWB=  23.0Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -207,7 +208,7 @@
     Garage inlet,            !- Zone Air Inlet Node or NodeList Name
     SOFC device air intakes, !- Zone Air Exhaust Node or NodeList Name
     Garage Air Node,         !- Zone Air Node Name
-    Garage return;           !- Zone Return Air Node Name
+    Garage return;           !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SOFC device air intakes, !- Name
@@ -216,16 +217,20 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone1Air,                !- Name
     ,                        !- Availability Schedule Name
     Garage inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -870,7 +875,7 @@
 
   Output:Variable,*,Generator Fuel Cell Model Iteration Count,timestep;
 
-  Output:Variable,*,Generator Regula Falsi Iteration Count,timestep;
+  Output:Variable,*,Generator Root Solver Iteration Count,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 

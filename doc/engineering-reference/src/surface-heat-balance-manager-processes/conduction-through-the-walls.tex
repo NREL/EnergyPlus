@@ -2,10 +2,11 @@
 
 \subsection{Conduction Transfer Function Module}\label{conduction-transfer-function-module}
 
-The most basic time series solution is the response factor equation which relates the flux at one surface of an element to an infinite series of temperature histories at both sides as shown by Equation :
+The most basic time series solution is the response factor equation which relates the flux at one surface of an element to an infinite series of temperature histories at both sides as shown by Equation~\ref{eq:BaseResponseFactorEquation}:
 
 \begin{equation}
 {q''_{ko}}(t) = \sum\limits_{j = 0}^\infty  {{X_j}} {T_{o,t - j\delta }} - \sum\limits_{j = 0}^\infty  {{Y_j}} {T_{i,t - j\delta }}
+\label{eq:BaseResponseFactorEquation}
 \end{equation}
 
 where q'' is heat flux, T is temperature, i signifies the inside of the building element, o signifies the outside of the building element, t represents the current time step, and X and Y are the response factors.
@@ -42,7 +43,7 @@ T\emph{\(_{o}\)} = Outside face temperature
 
 \(q''\) ~ = Conduction heat flux on inside face
 
-The subscript following the comma indicates the time period for the quantity in terms of the time step d.~ Note that the first terms in the series (those with subscript 0) have been separated from the rest in order to facilitate solving for the current temperature in the solution scheme.~ These equations state that the heat flux at either face of the surface of any generic building element is linearly related to the current and some of the previous temperatures at both the interior and exterior surface as well as some of the previous flux values at the interior surface.
+The subscript following the comma indicates the time period for the quantity in terms of the time step (\(\delta\)).~ Note that the first terms in the series (those with subscript 0) have been separated from the rest in order to facilitate solving for the current temperature in the solution scheme.~ These equations state that the heat flux at either face of the surface of any generic building element is linearly related to the current and some of the previous temperatures at both the interior and exterior surface as well as some of the previous flux values at the interior surface.
 
 The final CTF solution form reveals why it is so elegant and powerful.~ With a single, relatively simple, linear equation with constant coefficients, the conduction heat transfer through an element can be calculated.~ The coefficients (CTFs) in the equation are constants that only need to be determined once for each construction type.~ The only storage of data required are the CTFs themselves and a limited number of temperature and flux terms.~ The formulation is valid for any surface type and does not require the calculation or storage of element interior temperatures.
 
@@ -72,7 +73,7 @@ This formulation can be used to solve the transient heat conduction equation by 
 
 where T1, T2, \ldots{}, Tn-1, Tn~are the finite difference nodal temperatures, n is the number of nodes, Ti~and To~are the interior and exterior environmental temperatures, and q``i~and q''o~are the heat fluxes (desired output).
 
-Seem (1987) shows that for a simple one layer slab with two interior nodes as in Figure~\ref{fig:idealized-variable-volume-system-operation.} and convection at both sides the resulting finite difference equations are given by:
+Seem (1987) shows that for a simple one layer slab with two interior nodes as in Figure~\ref{fig:two-node-state-space-example.} and convection at both sides the resulting finite difference equations are given by:
 
 \begin{equation}
 C\frac{{d{T_1}}}{{dt}} = hA\left( {{T_o} - {T_1}} \right) + \frac{{{T_2} - {T_1}}}{R}

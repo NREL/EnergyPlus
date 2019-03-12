@@ -1,8 +1,8 @@
 // String Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -15,7 +15,7 @@
 
 namespace ObjexxFCL {
 
-// Predicate
+// Predicate /////
 
 // Has a Prefix Case-Optionally?
 bool
@@ -41,7 +41,7 @@ has_prefix( std::string const & s, std::string const & pre, bool const exact_cas
 
 // Has a Prefix Case-Optionally?
 bool
-has_prefix( std::string const & s, c_cstring const pre, bool const exact_case )
+has_prefix( std::string const & s, char const * const pre, bool const exact_case )
 {
 	std::string::size_type const pre_len( std::strlen( pre ) );
 	if ( pre_len == 0 ) {
@@ -103,7 +103,7 @@ has_suffix( std::string const & s, std::string const & suf, bool const exact_cas
 
 // Has a Suffix Case-Optionally?
 bool
-has_suffix( std::string const & s, c_cstring const suf, bool const exact_case )
+has_suffix( std::string const & s, char const * const suf, bool const exact_case )
 {
 	std::string::size_type const suf_len( std::strlen( suf ) );
 	if ( suf_len == 0 ) {
@@ -142,7 +142,7 @@ has_suffix( std::string const & s, char const pre, bool const exact_case )
 	}
 }
 
-// Modifier
+// Modifier /////
 
 // Lowercase a string
 std::string &
@@ -168,7 +168,7 @@ uppercase( std::string & s )
 
 // Left Justify a string
 std::string &
-left_justify( std::string & s )
+ljustify( std::string & s )
 {
 	std::string::size_type const off( s.find_first_not_of( ' ' ) );
 	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
@@ -179,7 +179,7 @@ left_justify( std::string & s )
 
 // Right Justify a string
 std::string &
-right_justify( std::string & s )
+rjustify( std::string & s )
 {
 	std::string::size_type const s_len_trim( len_trim( s ) );
 	std::string::size_type const off( s.length() - s_len_trim );
@@ -377,26 +377,45 @@ size( std::string & s, std::string::size_type const len )
 	return s;
 }
 
+// Left-Size a string to a Specified Length
+std::string &
+lsize( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) { // Left pad
+		s.insert( 0, len - s_len, ' ' );
+	} else if ( s_len > len ) { // Left truncate
+		s.erase( 0, s_len - len );
+	}
+	return s;
+}
+
+// Right-Size a string to a Specified Length
+std::string &
+rsize( std::string & s, std::string::size_type const len )
+{
+	std::string::size_type const s_len( s.length() );
+	if ( s_len < len ) { // Pad
+		s.append( len - s_len, ' ' );
+	} else if ( s_len > len ) { // Truncate
+		s.erase( len );
+	}
+	return s;
+}
+
 // Center a string wrt its Whitespace
 std::string &
 center( std::string & s )
 {
-	std::string::size_type const s_len( s.length() );
-	s = centered( strip_whitespace( s ), s_len );
+	s = centered( s, s.length() );
 	return s;
 }
 
-// Center a string with a Specified Length
+// Center a string to a Specified Length
 std::string &
 center( std::string & s, std::string::size_type const len )
 {
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Pad
-		std::string::size_type const off( ( len - s_len ) / 2 );
-		s = std::string( off, ' ' ).append( s ).append( std::string( len - s_len - off, ' ' ) );
-	} else if ( s_len > len ) { // Truncate
-		s.erase( len );
-	}
+	s = centered( s, len );
 	return s;
 }
 
@@ -439,7 +458,7 @@ overlay( std::string & s, std::string const & t, std::string::size_type const po
 	return s;
 }
 
-// Generator
+// Generator /////
 
 // Lowercased Copy of a string
 std::string
@@ -467,7 +486,7 @@ uppercased( std::string const & s )
 
 // Left-Justified Copy of a string
 std::string
-left_justified( std::string const & s )
+ljustified( std::string const & s )
 {
 	std::string::size_type const off( s.find_first_not_of( ' ' ) );
 	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
@@ -479,7 +498,7 @@ left_justified( std::string const & s )
 
 // Right-Justified Copy of a string
 std::string
-right_justified( std::string const & s )
+rjustified( std::string const & s )
 {
 	std::string::size_type const s_len_trim( len_trim( s ) );
 	std::string::size_type const off( s.length() - s_len_trim );
@@ -707,22 +726,38 @@ lsized( std::string const & s, std::string::size_type const len )
 	} else if ( s_len == len ) { // Unchanged
 		return s;
 	} else { // Truncated
-		return s.substr( 0, len );
+		return s.substr( s_len - len );
 	}
 }
 
-// Centered in a string of Specified Length Copy of a string
+// Right-Sized to a Specified Length Copy of a string
 std::string
-centered( std::string const & s, std::string::size_type const len )
+rsized( std::string const & s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) { // Padded
-		std::string::size_type const off( ( len - s_len ) / 2 );
-		return std::string( off, ' ' ).append( s ).append( std::string( len - s_len - off, ' ' ) );
+	if ( s_len < len ) { // Right-padded
+		return s + std::string( len - s_len, ' ' );
 	} else if ( s_len == len ) { // Unchanged
 		return s;
 	} else { // Truncated
 		return s.substr( 0, len );
+	}
+}
+
+// Centered String to Specified Length
+std::string
+centered( std::string const & s, std::string::size_type const len )
+{
+	std::string const t( stripped_whitespace( s ) );
+	std::string::size_type const t_len( t.length() );
+	if ( t_len < len ) { // Padded
+		std::string::size_type const off( ( len - t_len ) / 2 );
+		return std::string( off, ' ' ).append( t ).append( std::string( len - t_len - off, ' ' ) );
+	} else if ( t_len == len ) { // Unchanged
+		return t;
+	} else { // Truncated
+		std::string::size_type const off( ( t_len - len ) / 2 );
+		return t.substr( off, len );
 	}
 }
 
@@ -738,6 +773,47 @@ uniqued( std::string const & s )
 		}
 	}
 	return u;
+}
+
+// Overlayed string with Another string, Expanding Size as Needed
+std::string
+overlayed( std::string const & s, std::string const & t, std::string::size_type const pos )
+{
+	std::string::size_type const s_len( s.length() );
+	std::string::size_type const t_len( t.length() );
+	std::string::size_type const l_len( pos + t_len ); // Lower bound on new string length
+	std::string o( s );
+	if ( l_len > s_len ) o.resize( l_len, ' ' ); // Expand
+	o.replace( pos, t_len, t ); // Overlay the string
+	return o;
+}
+
+// Repeated Copies
+std::string
+repeated( std::string const & s, int const n )
+{
+	if ( n <= 0 ) return std::string();
+	std::string::size_type const l( s.length() );
+	std::string o;
+	o.reserve( n * l );
+	for ( int i = 0; i < n; ++i ) {
+		o += s;
+	}
+	return o;
+}
+
+// Repeated Copies
+std::string
+repeat( std::string const & s, int const n )
+{
+	if ( n <= 0 ) return std::string();
+	std::string::size_type const l( s.length() );
+	std::string o;
+	o.reserve( n * l );
+	for ( int i = 0; i < n; ++i ) {
+		o += s;
+	}
+	return o;
 }
 
 // Space-Free Head Copy of a string

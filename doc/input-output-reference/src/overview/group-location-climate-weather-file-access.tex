@@ -6,9 +6,9 @@ This group of objects describes the ambient conditions for the simulation.
 
 The location class describes the parameters for the building's location. Only one location is allowed. Weather data file location, if it exists, will override any location data in the IDF. Thus, for an annual simulation, a Location does not need to be entered.
 
-\subsubsection{Inputs}\label{inputs-026}
+\subsubsection{Inputs}\label{inputs-201709281625}
 
-\paragraph{Field: Name}\label{field-name-025}
+\paragraph{Field: Name}\label{field-name-201709281626}
 
 This alpha field is used as an identifying field in output reports.
 
@@ -44,6 +44,69 @@ Most examples in this document include the comment lines that illustrate each da
 Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
 \end{lstlisting}
 
+
+\subsection{Site:VariableLocation}\label{sitevariablelocation}
+
+This variable location class describes the parameters for a moving and/or rotating building's location.
+The applications for this include:
+
+\begin{itemize}
+ \item a vehicle driving along the road, 
+ \item a rotating building, such as for experimental testing at different orientations, or
+ \item if combind with a ``SurfaceProperty:Underwater'' boundary condition, it could apply to ships and vessels.
+\end{itemize} 
+
+The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``Site:Location'' object.
+
+\subsubsection{Inputs}\label{inputs-026}
+
+\paragraph{Field: Name}\label{field-name-025}
+
+This alpha field is used as an identifying field in output reports.
+
+\paragraph{Field: Building Location Latitude Schedule}\label{field-building-location-latitude-schedule}
+
+This field represents the latitude (in degrees) of the facility. By convention, North Latitude is represented as positive; South Latitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
+
+\paragraph{Field: Building Location Longitude Schedule}\label{field-building-location-longitude-schedule}
+
+This field represents the longitude (in degrees) of the facility. By convention, East Longitude is represented as positive; West Longitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
+
+\paragraph{Field: Building Location Orientation Schedule}\label{field-building-location-orientation-schedule}
+
+This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{th}\) meridian). Time zones west of GMT (e.g. North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g. 6:30 is 6.5).
+
+As shown in an IDF:
+
+\begin{lstlisting}
+Site:VariableLocation,
+  MovingAndRotatingBuilding, !- Name
+  LatitudeSchedule,          !- Building Location Latitude Schedule
+  LongitudeSchedule,         !- Building Location Longitude Schedule
+  OrientationSchedule;       !- Building Location Orientation Schedule
+ 
+Schedule:File,
+  LatitudeSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  2,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+
+Schedule:File,
+  LongitudeSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  3,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+
+Schedule:File,
+  OrientationSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  4,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+\end{lstlisting}
+
 \subsection{SizingPeriod:DesignDay}\label{sizingperioddesignday}
 
 The design day input describes the parameters to effect a ``design day'' simulation, often used for load calculations or sizing equipment. Using the values in these fields, EnergyPlus ``creates'' a complete days' worth of weather data (air temperatures, solar radiation, etc.) Normal operation uses the default range multipliers as shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} though users may choose to input their own multiplier schedule. Likewise, normal operation specifies one ``humidity indicating condition'' which is used to calculate the humidity ratio at maximum temperature -- this is used as the constant humidity ratio for the entire day. Again, this can be overridden by specifying a relative humidity schedule or requesting generation of an hourly wet-bulb temperature profile. Multiple design days may be specified.
@@ -51,7 +114,7 @@ The design day input describes the parameters to effect a ``design day'' simulat
 We refer you to the ASHRAE Handbook of Fundamentals for philosophy of what parameters are important for use as ``design conditions'' in sizing equipment.
 
 \begin{callout}
-  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{http://www.energyplus.gov/cfm/weather_data.cfm} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
+  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{https://www.energyplus.net/weather} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-1-024}
@@ -223,7 +286,7 @@ This field specifies whether to consider this day to be a Daylight Saving Day. Y
 
 \paragraph{Field: Solar Model Indicator}\label{field-solar-model-indicator}
 
-This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, Zhang\-Huang, or Sche\-dule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAE\-Clear\-Sky and Zhang\-Huang use the Clearness value as part of their calculations. ASHRAE\-Tau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
+This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, ASHRAE\-Tau2017, Zhang\-Huang, or Sche\-dule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAE\-Clear\-Sky and Zhang\-Huang use the Clearness value as part of their calculations. ASHRAE\-Tau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below) and ASHRAE\-Tau2017 invokes the revised model specified in Chapter 14 of the ASHRAE 2017 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
 
 \paragraph{Field: Beam Solar Day Schedule Name}\label{field-beam-solar-day-schedule-name}
 
@@ -235,11 +298,12 @@ This field allows the option for you to put in your own day profile of diffuse s
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)}\label{field-ashrae-clear-sky-optical-depth-for-beam-irradiance-taub}
 
-Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau. See next field.
+Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. See next field.
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)}\label{field-ashrae-clear-sky-optical-depth-for-diffuse-irradiance-taud}
 
-Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
+Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE HOF. 
+ASHRAETau model Taub and Taud values are used from the 2009 ASHRAE HOF and ASHRAETau2017 model Taub and Taud values are used from either 2013 or 2017 ASHRAE HOF as needed.
 
 \paragraph{Field: Sky Clearness}\label{field-sky-clearness}
 
@@ -503,182 +567,177 @@ SizingPeriod:WeatherFileConditionType,
 
 \subsection{RunPeriod}\label{runperiod}
 
-The RunPeriod object describes the elements necessary to create a weather file simulation. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). These files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod object allows the user to override the use of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
-
-\subsubsection{Inputs}\label{inputs-4-018}
-
-\paragraph{Field: Name}\label{field-name-4-015}
-
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
-
-\paragraph{Field: Begin Month}\label{field-begin-month-1}
-
-This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the annual run period desired.
-
-\paragraph{Field: Begin Day of Month}\label{field-begin-day-of-month-1}
-
-This numeric field should contain the starting day of the starting month (must be valid for month) for the annual run period desired.
-
-\paragraph{Field: End Month}\label{field-end-month-1}
-
-This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the annual run period desired.
-
-\paragraph{Field: End Day of Month}\label{field-end-day-of-month-1}
-
-This numeric field should contain the ending day of the ending month (must be valid for month) for the annual run period desired.
-
-\paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day-2}
-
-For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this run period and subsequent days will be implemented. If a blank or UseWeatherFile is entered here, then the starting day type will be calculated from the weather file (ref: Auxiliary Programs document about Data Periods).
-
-\paragraph{Field: Use Weather File Holidays and Special Days}\label{field-use-weather-file-holidays-and-special-days}
-
-Weather files can contain holiday designations or other kinds of special days. These day types cause a corresponding day's schedule (see SCHEDULE definitions below) to be used during that day. This field should contain the word \textbf{Yes} if holidays or other special days indicated directly on the weather file should retain their ``day type'' or \textbf{No} if holidays or other special days on the weather file should be ignored. Reference the RunPeriodControl:SpecialDays object below to enter your own special days and holidays.
-
-Note that a blank or null field in this field will indicate \textbf{Yes}.
-
-\paragraph{Field: Use Weather File Daylight Saving Period}\label{field-use-weather-file-daylight-saving-period-2}
-
-Weather files can contain indicators of Daylight Saving period days. For flexibility, you may want to ignore these designations on the weather file. This field should contain the word \textbf{Yes} if you will accept daylight saving period days as contained on the weather file (note: not all weather files may actually have this period) or \textbf{No} if you wish to ignore Daylight Saving period days that may be on the weather file.
-
-Note that a blank or null field in this field will indicate \textbf{Yes}.
-
-\paragraph{Field: Apply Weekend Holiday Rule}\label{field-apply-weekend-holiday-rule}
-
-In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination). If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
-
-Note that a blank or null field in this field will indicate \textbf{No}.
-
-\begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
-\end{callout}
-
-\paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators}
-
-Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain''; entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
-
-\paragraph{Field: Use Weather File Snow Indicators}\label{field-use-weather-file-snow-indicators}
-
-Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
-
-\paragraph{Field: Number of Times Runperiod to be Repeated}\label{field-number-of-times-runperiod-to-be-repeated}
-
-This numeric field represents the number of times (usually years) the simulation has to be carried out in a multi runperiod simulation. The default value is set to 1. The number of years of simulation, in case of a Ground Loop Heat Exchanger (GLHE) simulation, should be equal to the length of simulation field in GLHE object. Note that you can specify a number of simulation years with a shorter run period (e.g. 1 week) and EnergyPlus will repeat the simulation of the shorter run period for that many times. Note that repeating will work with any weather file that contains the start date and end date in a ``Data Period'' (refer to Auxiliary Programs document for more documentation on weather file contents).
-
-\paragraph{Field: Increment Day of Week on Repeat}\label{field-increment-day-of-week-on-repeat}
-
-When repeating RunPeriods (see previous field), you can choose to increment the day of week at the end of the period to have a more continuous day type. Enter \textbf{Yes} to increment the day of the week (default). An entry of \textbf{No} will keep the same day of week values as in the first time through.
-
-\paragraph{Field: Start Year}\label{field-start-year}
-
-When repeating a period, you might (for whatever reason), choose to have a specific year as a starting year. Enter an appropriate 4 digit year in this field. Refer to Auxiliary Programs document for more documentation on weather file contents, particularly in using leap year data (or not) within weather files.
-
-And, as shown in an IDF:
-
-\begin{lstlisting}
-RunPeriod,  ! Winter Simulation
-  Winter Simulation,  !- Name
-  12,  !- Begin Month
-  1,  !- Begin Day of Month
-  3,  !- End Month
-  31,  !- End Day of Month
-  UseWeatherFile,  !- Day of Week for Start Day
-  Yes,  !- Use Weather File Holidays and Special Days
-  Yes,  !- Use Weather File Daylight Saving Period
-  No,  !- Apply Weekend Holiday Rule
-  Yes,  !- Use Weather File Rain Indicators
-  Yes;  !- Use Weather File Snow Indicators
-
-! Multiple year simulation example
-RunPeriod,
-  Multiple Years,  !- Name
-  1,    !- Begin Month
-  1,    !- Begin Day of Month
-  12,   !- End Month
-  31,   !- End Day of Month
-  UseWeatherFile,  !- Day of Week for Start Day
-  Yes,  !- Use Weather File Holidays and Special Days
-  Yes,  !- Use Weather File Daylight Saving Period
-  No,   !- Apply Weekend Holiday Rule
-  Yes,  !- Use Weather File Rain Indicators
-  Yes,  !- Use Weather File Snow Indicators
-  3;    !- Number of Times Runperiod to be Repeated
-\end{lstlisting}
-
-\subsection{RunPeriod:CustomRange}\label{runperiodcustomrange}
-
-The RunPeriod:CustomRange object describes the elements necessary to use a specially crafted (likely multiple year) weather file in a simulation. These kinds of weather files and simulations might be useful for matching utility periods or simulating several years of differing weather data. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). In order to effectively use this object, however, you will need to use a text editor (EnergyPlus weather files area simple text files) or possibly a spreadsheet program and then save to a csv (comma separated variable) file. Weather files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod:CustomRange object allows the user to override the use of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
+The RunPeriod object describes the elements necessary to create a weather file simulation. Multiple run
+periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format
+(described briefly below this document and in more detail in the Auxiliary Programs document). These files
+can describe Daylight Saving Time periods as well as holidays within their definitions. Note that the weather
+file also may contain design condition information, typical and extreme period information, ground
+temperatures based on air temperature calculations. The RunPeriod object allows the user to override the use
+of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather
+file. The object also describes the elements necessary to use a specially crafted (likely multiple year)
+weather file in a simulation. These kinds of weather files and simulations might be useful for matching
+utility periods or simulating several years of differing weather data. Leap days are required when using
+actual weather (see ``Treat as Actual Weather'' below), but will be processed and used during leap years
+when the days are present in the weather file and enabled in the weather file header. Note that when the
+weather is treated as non-actual, the leap day will be skipped if it is not present, resulting in incorrect
+day types for the remainder of the year.
 
 \subsubsection{Inputs}\label{inputs-5-016}
 
 \paragraph{Field: Name}\label{field-name-5-012}
 
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
+This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file
+location name is used. Note that the weather file location name will be appended to this name in
+tabular/summary reports.
 
 \paragraph{Field: Begin Month}\label{field-begin-month-2}
 
-This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the annual run period desired.
+This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the annual
+run period desired.
 
 \paragraph{Field: Begin Day of Month}\label{field-begin-day-of-month-2}
 
-This numeric field should contain the starting day of the starting month (must be valid for month) for the annual run period desired.
+This numeric field should contain the starting day of the starting month (must be valid for month) for the
+annual run period desired.
 
 \paragraph{Field: Begin Year}\label{field-begin-year}
 
-This numeric field should contain the beginning year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the begin date specified by these three fields (i.e. Begin Month, Begin Day of Month, Begin Year).
+This optional numeric field may contain the beginning year for the range. If this field is specified
+along with the \textbf{Day of Week for Start Day}, the inputs are validated to make sure that the date is
+valid. If this field is not specified, then a year will be selected based upon other inputs (which, in the
+case of the day of the week, may be defaulted). 
 
 \paragraph{Field: End Month}\label{field-end-month-2}
 
-This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the annual run period desired.
+This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the annual
+run period desired.
 
 \paragraph{Field: End Day of Month}\label{field-end-day-of-month-2}
 
-This numeric field should contain the ending day of the ending month (must be valid for month) for the annual run period desired.
+This numeric field should contain the ending day of the ending month (must be valid for month) for the
+annual run period desired.
 
 \paragraph{Field: End Year}\label{field-end-year}
 
-This numeric field should contain the end year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the end date specified by these three fields (i.e. End Month, End Day of Month, End Year).
+This optional numeric field should contain the end year for the range. It is only allowed to be specified
+when the \textbf{Begin Year} is given and must be after the \textbf{Begin Year}. If it is not specified,
+it will be set to be the first occurrence of \textbf{End Month/End Day of Month} after the start date. Note
+that this could be several years after the start date (e.g. if the end date is specified as a leap day 2/29).
 
 \paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day-3}
 
-For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this run period and subsequent days will be implemented. If a blank or UseWeatherFile is entered here, then the starting day type will be calculated from the weather file (ref: Auxiliary Programs document about Data Periods).
+This field allows the start day of the week to be specified. Valid days of the week (Sunday, Monday, Tuesday,
+Wednesday, Thursday, Friday, Saturday) may be entered in this field. To clarify, this value will be used as
+the Start Day (type) for this run period and subsequent days will be implemented. If the field is blank,
+then the starting day type defaults to Sunday.
 
 \paragraph{Field: Use Weather File Holidays and Special Days}\label{field-use-weather-file-holidays-and-special-days-1}
 
-Weather files can contain holiday designations or other kinds of special days. These day types cause a corresponding day's schedule (see SCHEDULE definitions below) to be used during that day. This field should contain the word \textbf{Yes} if holidays or other special days indicated directly on the weather file should retain their ``day type'' or \textbf{No} if holidays or other special days on the weather file should be ignored. Reference the RunPeriodControl:SpecialDays object below to enter your own special days and holidays.
+Weather files can contain holiday designations or other kinds of special days. These day types cause a
+corresponding day's schedule (see SCHEDULE definitions below) to be used during that day. This field
+should contain the word \textbf{Yes} if holidays or other special days indicated directly on the weather
+file should retain their ``day type'' or \textbf{No} if holidays or other special days on the weather file
+should be ignored. Reference the RunPeriodControl:SpecialDays object below to enter your own special days
+and holidays.
 
 Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Use Weather File Daylight Saving Period}\label{field-use-weather-file-daylight-saving-period-3}
 
-Weather files can contain indicators of Daylight Saving period days. For flexibility, you may want to ignore these designations on the weather file. This field should contain the word \textbf{Yes} if you will accept daylight saving period days as contained on the weather file (note: not all weather files may actually have this period) or \textbf{No} if you wish to ignore Daylight Saving period days that may be on the weather file.
+Weather files can contain indicators of Daylight Saving period days. For flexibility, you may want to ignore
+these designations on the weather file. This field should contain the word \textbf{Yes} if you will accept
+daylight saving period days as contained on the weather file (note: not all weather files may actually have
+this period) or \textbf{No} if you wish to ignore Daylight Saving period days that may be on the weather file.
 
 Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Apply Weekend Holiday Rule}\label{field-apply-weekend-holiday-rule-1}
 
-In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination). If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
+In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday
+close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday;
+if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in
+this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day,
+will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a
+day-month combination). If the field is blank or \textbf{No}, then the holiday will be shown on the
+day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run
+will use the rule -- there is no override for individual special days.
 
 Note that a blank or null field in this field will indicate \textbf{No}.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather}
+have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced
+from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object
+for certain locations.
 \end{callout}
 
 \paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators-1}
 
-Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain''; entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the
+AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection
+coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering
+``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain''; entering
+``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this
+to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 \paragraph{Field: Use Weather File Snow Indicators}\label{field-use-weather-file-snow-indicators-1}
 
-Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates
+``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this
+reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent
+``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might
+use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+
+\paragraph{Field: Treat Weather as Actual}\label{field-treat-weather-as-actual}
+
+This field determines how stringent date matching between this object and the weather file is. Though all
+EnergyPlus (EPW) weather files contain a year field, this data is not typically used. Specifying
+``\textbf{Yes}'' in this field causes the program to look specifically for the begin date (i.e. Begin Month,
+Begin Day of Month, Begin Year) and for the end date (i.e. End Month, End Day of Month, End Year) and require
+that leap days be present for leap years.
+
+And, as shown in an IDF:
+
+\begin{lstlisting}
+RunPeriod,  ! Winter Simulation
+Winter Simulation,  !- Name
+12,  !- Begin Month
+1,   !- Begin Day of Month
+,    !- Begin Year
+3,   !- End Month
+31,  !- End Day of Month
+,    !- End Year
+UseWeatherFile,  !- Day of Week for Start Day
+Yes,  !- Use Weather File Holidays and Special Days
+Yes,  !- Use Weather File Daylight Saving Period
+No,   !- Apply Weekend Holiday Rule
+Yes,  !- Use Weather File Rain Indicators
+Yes;  !- Use Weather File Snow Indicators
+
+! Actual weather simulation example
+RunPeriod,
+Multiple Years,  !- Name
+1,    !- Begin Month
+1,    !- Begin Day of Month
+2010, !- Begin Year
+12,   !- End Month
+31,   !- End Day of Month
+,     !- End Year
+UseWeatherFile,  !- Day of Week for Start Day
+Yes,  !- Use Weather File Holidays and Special Days
+Yes,  !- Use Weather File Daylight Saving Period
+No,   !- Apply Weekend Holiday Rule
+Yes,  !- Use Weather File Rain Indicators
+Yes,  !- Use Weather File Snow Indicators
+Yes;  !- Treat Weather as Actual
+\end{lstlisting}
 
 \subsection{RunPeriodControl:SpecialDays}\label{runperiodcontrolspecialdays}
 
 For weather file run periods, special day run periods can be described. These will always be in effect for the selected days in the run period. Depending on the Use Special Days value in the RunPeriod:* object(s), these can augment any special days included on the weather file.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-6-013}
@@ -739,7 +798,7 @@ RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
 Similar to a special day period, a daylight saving period may be entered to be applied to weather file run periods. These will always be in effect, regardless of the value entered on the RunPeriod object. Note that this period will always override any daylight saving period specified in a weather file.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period.
 
 \warning{Note: For EnergyPlus Output:Variable and Output:Meter reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
 \end{callout}
@@ -781,7 +840,14 @@ This name references an existing design period (i.e., SizingPeriod:DesignDay, Si
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
-Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}. In each case the following field must specify a valid schedule name. \textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature. \textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are used as a difference to the drybulb temperature value (+values would then be greater than the drybulb temperature, -values would then be less than the drybulb temperature) for the resulting sky temperature value. \textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are used as a difference to the dewpoint temperature value (+values would then be greater than the dewpoint temperature, -values would then be less than the dewpoint temperature) for the resulting sky temperature value.
+Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
+In each case the following field must specify a valid schedule name.
+
+\textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature.
+
+\textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are \emph{subtracted} from the drybulb temperature value (+values would then be less than the drybulb temperature, -values would then be greater than the drybulb temperature) for the resulting sky temperature value.
+
+\textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are \emph{subtracted} from the dewpoint temperature value (+values would then be less than the dewpoint temperature, -values would then be greater than the dewpoint temperature) for the resulting sky temperature value.
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
@@ -1274,6 +1340,14 @@ Numeric field indicates the depth measured in meters from the ground surface to 
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include ``timestep'' and ``hourly''.
 
+\paragraph{Field: Geometric Mesh Coefficient}
+
+This numeric field represents the compression of cell distribution A value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution. Values for this field should be limited from $1.0$ to $2.0$. If this field is omitted, the default value is 1.6.
+
+\paragraph{Field: Mesh Density Parameter}
+
+This numeric integer field represents the number of cells to be placed between any two ``domain partitions'' during mesh development.~ A domain partition may be thought of as a slab edge or insulation edge. Once these components are laid out in the domain, this field number of cells are placed between the partitions. If this field is omitted, the default value is 6.
+
 An IDF example of an in-grade slab.
 
 \begin{lstlisting}
@@ -1617,7 +1691,7 @@ Water mains temperatures are a function of outdoor climate conditions and vary w
   maximum difference in monthly average outdoor air temperatures
 \end{itemize}
 
-These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{http://www.energyplus.gov}{www.energyplus.gov}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
+These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{https://energyplus.net/weather}{www.energyplus.net}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. If the calculation method selected is "\textbf{CorrelationFromWeatherFile}", energyplus calculates these two values internally from either ``.stat'' or weather file. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 
@@ -1627,23 +1701,23 @@ If there is no Site:WaterMainsTemperature object in the input file, a default co
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method}
 
-This field selects the calculation method and must have the keyword Schedule or Correlation.
+This field selects the calculation method and must have the keyword Schedule, Correlation or CorrelationFromWeatherFile. If calculation method is CorrelationFromWeatherFile, the two numeric input fields below are ignored. Instead, EnergyPlus calculates them from weather file.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-003}
 
-If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation, this field is ignored.
+If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation or CorrelationFromWeatherFile, this field is ignored.
 
 \paragraph{Field: Annual Average Outdoor Air Temperature}\label{field-annual-average-outdoor-air-temperature}
 
-If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule, this field is ignored.
+If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored. 
 
 \paragraph{Field: Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{field-maximum-difference-in-monthly-average-outdoor-air-temperatures}
 
-If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}\(\Delta\)C{]}. If the calculation method is Schedule, this field is ignored.
+If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}\(\Delta\)C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored.
 
 \begin{lstlisting}
 Site:WaterMainsTemperature,
-  Correlation,  !- Calculation Method {SCHEDULE | CORRELATION}
+  Correlation,  !- Calculation Method {SCHEDULE | CORRELATION | CORRELATIONFROMWEATHERFILE}
   ,             !- Schedule Name
   9.69,         !- Annual Average Outdoor Air Temperature {C}
   28.1;         !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}

@@ -667,17 +667,19 @@ Enter the fraction of the motor heat that is added to the air stream. A value of
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type}
 
-There are two coil types available:
+There are three coil types available:
 
 \begin{itemize}
 \item
-  ChilledWater
+  \emph{ChilledWater} uses the Coil:Cooling:Water object with the DetailedAnalysis option. This is the preferred coil model for most applications.
 \item
-  ChilledWaterDetailedFlatModel
+   \emph{ChilledWaterDetailedFlatModel} uses the Coil:Cooling:Water:DetailedGeometry object. This option is available for special applications.
+\item
+   \emph{HeatExchangerAssistedChilledWater} uses CoilSystem:Cooling:Water:HeatExchangerAssisted with Coil:Cooling:Water for enhanced dehumidification.
 \end{itemize}
 
-\emph{Chilled Water} uses theCoil:Cooling:Water object with the DetailedAnalysis option. This is the preferred coil model for most applications. \emph{ChilledWaterDetailedFlatModel} uses the Coil:Cooling:Water:DetailedGeometry object. This option is available for special applications. The default is \emph{ChilledWater}.
-
+ The default is \emph{ChilledWater}.
+ 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name}
 
 Usually set to blank, which allows the cooling coil to be available anytime the system is operating. If a schedule name is specified, it defines when the coil is available. This is most often used when cooling is only available seasonally. A schedule value of one indicates that the cooling coil can be on during a given time period. A value of zero denotes that the cooling coil cannot be used during that time period.
@@ -688,15 +690,7 @@ This is the design supply air temperature in C used to size the cooling supply a
 
 \paragraph{Field: Heating Coil Type}\label{field-heating-coil-type}
 
-Only one possible value may be entered here:
-
-\begin{itemize}
-\tightlist
-\item
-  HotWater
-\end{itemize}
-
-Future versions may have additional heating coil types.
+There are two types available, \emph{HotWater} and \emph{Electric}. The default is \emph{HotWater}.
 
 \paragraph{Field: Heating Coil Availability Schedule Name}\label{field-heating-coil-availability-schedule-name}
 
@@ -736,7 +730,23 @@ This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution
 
 \paragraph{Field: Fan Coil Capacity Control Method}\label{field-fan-coil-capacity-control-method}
 
-This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \emph{ConstantFanVariableFlow}, \emph{CyclingFan}, \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow}. For \emph{ConstantFanVariableFlow}, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For \emph{CyclingFan}, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For \emph{VariableFanVariableFlow} both air and water flow rates are varied to match the load. For \emph{VariableFanConstantFlow,} the water flow rate is at full flow and the fan speed varies to meet the load. If this field is left blank, it will default to \emph{CyclingFan} if a Dedicated Outdoor Air System is specified (see above), otherwise it will default to \emph{ConstantFanVariableFlow.}
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are:
+\begin{itemize}
+\item
+  \emph{ConstantFanVariableFlow}: The fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. 
+\item
+  \emph{CyclingFan}: The fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load.
+\item
+  \emph{VariableFanVariableFlow}: Both air and water flow rates are varied to match the load.
+\item
+  \emph{VariableFanConstantFlow}: The water flow rate is at full flow and the fan speed varies to meet the load.
+\item
+  \emph{MultiSpeedFan}: The water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
+\item
+  \emph{ASHRAE90VariableFan}: The fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. 
+\end{itemize}
+  
+The default is \emph{ConstantFanVariableFlow} except when a Dedicated Outdoor Air System is specified (see above) the default is  \emph{CyclingFan}.
 
 \paragraph{Field: Low Speed Supply Air Flow Ratio}\label{field-low-speed-supply-air-flow-ratio}
 
@@ -1008,6 +1018,11 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts. Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTAC system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTAC system.
 
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the ZoneHVAC:PackagedTerminalAirConditioner input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel and Coil:Heating:Electric. If alternate coil types are used they are modeled using the load based control method. 
+
+
 As shown in an IDF:
 
 \begin{lstlisting}
@@ -1051,7 +1066,8 @@ HVACTemplate:Zone:PTAC,
   ,            !- Design Specification Zone Air Distribution Object Name
   None,        !- Baseboard Heating Type
   ,            !- Baseboard Heating Availability Schedule Name
-  Autosize;    !- Baseboard Heating Capacity {W}
+  Autosize,    !- Baseboard Heating Capacity {W}
+  None;        !- Capacity Control Method
 \end{lstlisting}
 
 \subsection{HVACTemplate:Zone:PTHP}\label{hvactemplatezonepthp}
@@ -1288,6 +1304,10 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts. Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
 
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the ZoneHVAC:PackagedTerminalHeatPump input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil type is Coil:Heating:DX:SingleSpeed.
+
 As shown in an IDF:
 
 \begin{lstlisting}
@@ -1341,7 +1361,8 @@ HVACTemplate:Zone:PTHP,
   ,            !- Design Specification Zone Air Distribution Object Name
   None,        !- Baseboard Heating Type
   ,            !- Baseboard Heating Availability Schedule Name
-  Autosize;    !- Baseboard Heating Capacity {W}
+  Autosize,    !- Baseboard Heating Capacity {W}
+  None;        !- Capacity Control Method
 \end{lstlisting}
 
 \subsection{HVACTemplate:Zone:WaterToAirHeatPump}\label{hvactemplatezonewatertoairheatpump}

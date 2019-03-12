@@ -9,7 +9,7 @@
 ! System:   None.
 ! Plant:    Plant loop with one WaterHeater:Stratified object with heat pump water heating connected to two water use equipment
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     Water Heater DHW Plant Loop Example,  !- Name
@@ -35,7 +35,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -65,7 +65,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -99,8 +99,10 @@
     April,                   !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     3,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -290,7 +292,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -437,16 +439,22 @@
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
-  Fan:OnOff,
+  Fan:SystemModel,
     HPWHPlantFan,            !- Name
     PlantHPWHSch,            !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    2.6852,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     HPPlantAirInletNode,     !- Air Inlet Node Name
-    HPPlantFanAirOutletNode; !- Air Outlet Node Name
+    HPPlantFanAirOutletNode, !- Air Outlet Node Name
+    2.6852,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
   OutdoorAir:Node,
     HPPlantAirInletNode;     !- Name

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -50,44 +51,40 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
-#include "EnergyPlus/DataPlantPipingSystems.hh"
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace DataPlantPipingSystems;
 using namespace PlantPipingSystemsManager;
 
-TEST_F( EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking )
+TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 {
-	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
-		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-			"KA1,						!- Name of object",
-			"1.8,						!- Soil Thermal Conductivity {W/m-K}",
-			"3200,						!- Soil Density {kg/m3}",
-			"836,						!- Soil Specific Heat {J/kg-K}",
-			"15.5,						!- Annual average surface temperature {C}",
-			"12.8,						!- Annual amplitude of surface temperature {delta C}",
-			"17.3;						!- Phase shift of minimum surface temperature {days}",
-		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-			"KA2,						!- Name of object",
-			"1.8,						!- Soil Thermal Conductivity {W/m-K}",
-			"3200,						!- Soil Density {kg/m3}",
-			"836,						!- Soil Specific Heat {J/kg-K}",
-			"15.5,						!- Annual average surface temperature {C}",
-			"12.8,						!- Annual amplitude of surface temperature {delta C}",
-			"17.3;						!- Phase shift of minimum surface temperature {days}",
-	});
+    std::string const idf_objects = delimited_string({
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "KA1,						!- Name of object",
+        "1.8,						!- Soil Thermal Conductivity {W/m-K}",
+        "3200,						!- Soil Density {kg/m3}",
+        "836,						!- Soil Specific Heat {J/kg-K}",
+        "15.5,						!- Annual average surface temperature {C}",
+        "12.8,						!- Annual amplitude of surface temperature {delta C}",
+        "17.3;						!- Phase shift of minimum surface temperature {days}",
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "KA2,						!- Name of object",
+        "1.8,						!- Soil Thermal Conductivity {W/m-K}",
+        "3200,						!- Soil Density {kg/m3}",
+        "836,						!- Soil Specific Heat {J/kg-K}",
+        "15.5,						!- Annual average surface temperature {C}",
+        "12.8,						!- Annual amplitude of surface temperature {delta C}",
+        "17.3;						!- Phase shift of minimum surface temperature {days}",
+    });
 
-	EXPECT_FALSE( process_idf( idf_objects ) );
+    EXPECT_TRUE(process_idf(idf_objects));
 
-	PipingSystemDomains.allocate( 2 );
+    PipingSystemDomains.allocate(2);
 
-	PipingSystemDomains( 1 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1" );
+    PipingSystemDomains(1).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-	PipingSystemDomains( 2 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2" );
+    PipingSystemDomains(2).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-	EXPECT_NE( PipingSystemDomains( 1 ).Farfield.groundTempModel, PipingSystemDomains( 2 ).Farfield.groundTempModel );
-
+    EXPECT_NE(PipingSystemDomains(1).Farfield.groundTempModel, PipingSystemDomains(2).Farfield.groundTempModel);
 }

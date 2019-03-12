@@ -13,8 +13,8 @@
 !
 ! Location:                San Francisco, CA
 !
-! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
-!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6°C MWB=16.6°C
+! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4Â°C
+!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6Â°C MWB=16.6Â°C
 !
 ! Run Period (Weather File): 7/28 - 7/29,  USA_CA_SanFrancisco TMY2-23234
 !
@@ -43,7 +43,7 @@
 ! Detached Shading:               None
 ! Daylight:                       None
 ! Natural Ventilation (AirflowNetwork):    Yes
-!                                 A lower level inflow window is used on the north façade (outlet on the top of the south
+!                                 A lower level inflow window is used on the north faÂ°ade (outlet on the top of the south
 !                                 window, near the shading element). The inflow and outflow apertures have 1.5m2.
 !                                 No wind effects were considered (Cp=0).
 ! Compact Schedules:              Yes
@@ -69,7 +69,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,9.1;
 
   Building,
     NONE,                    !- Name
@@ -107,9 +107,11 @@
     ,                        !- Name
     7,                       !- Begin Month
     28,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     29,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -123,7 +125,7 @@
     -8.00,                   !- Time Zone {hr}
     5.00;                    !- Elevation {m}
 
-! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
+! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4Â°C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Htg 99% Condns DB,  !- Name
@@ -153,7 +155,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6°C MWB=16.6°C
+! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6Â°C MWB=16.6Â°C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -388,7 +390,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -404,7 +405,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -420,7 +420,6 @@
     Zn001:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -436,7 +435,6 @@
     Zn001:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -549,7 +547,6 @@
     VENT,                    !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    CPNAME,                  !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
@@ -687,12 +684,12 @@
   AirflowNetwork:MultiZone:ExternalNode,
     No1,                     !- Name
     1.524,                   !- External Node Height {m}
-    No1_WPCValue;            !- Wind Pressure Coefficient Values Object Name
+    No1_WPCValue;            !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     No2,                     !- Name
     1.524,                   !- External Node Height {m}
-    No2_WPCValue;            !- Wind Pressure Coefficient Values Object Name
+    No2_WPCValue;            !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:WindPressureCoefficientArray,
     CPNAME,                  !- Name

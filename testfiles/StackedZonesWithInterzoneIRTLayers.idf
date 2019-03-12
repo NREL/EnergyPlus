@@ -12,7 +12,7 @@
 !  Location:                CHAMPAIGN_URBANA_IL_USA
 !
 !  Design Days:             CHAMPAIGN_URBANA_IL_USA Annual Heating Wind 99% Design Conditions WS=>MCDB, WS=12.8m/s
-!                           CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9캜 MWB=25캜
+!                           CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9째C MWB=25째C
 !
 !  Run Period (Weather File): 6/1 - 6/2, USA_IL_University.of.Illinois-Willard.AP_TMY3
 !
@@ -23,7 +23,7 @@
 !
 !
 
-  Version,8.6;
+  Version,9.1;
 
 !=============================
 !  Building North Axis,{Deg}
@@ -63,6 +63,8 @@
 !========================
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier
@@ -79,15 +81,16 @@
     ,                        !- Name
     6,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     6,                       !- End Month
     2,                       !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 ! Latitude {deg}
 ! Longitude {deg}
@@ -149,7 +152,7 @@
 
 ! CHAMPAIGN_URBANA Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=240
 ! Hottest Month=July
-! CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9캜 MWB=25캜
+! CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9째C MWB=25째C
 
   SizingPeriod:DesignDay,
     CHAMPAIGN_URBANA Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -714,7 +717,6 @@
     SecondLevel:South Wall,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -737,7 +739,6 @@
     ThirdLevel:South Wall,   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -967,7 +968,7 @@
     Bottom-Inlets,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Bottom-ZoneAirNode,      !- Zone Air Node Name
-    Bottom-ReturnAirNode;    !- Zone Return Air Node Name
+    Bottom-ReturnAirNode;    !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -977,7 +978,7 @@
     SecondLevel-Inlets,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SecondLevel-ZoneAirNode, !- Zone Air Node Name
-    SecondLevel-ReturnAirNode;  !- Zone Return Air Node Name
+    SecondLevel-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -987,7 +988,7 @@
     ThirdLevel-Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ThirdLevel-ZoneAirNode,  !- Zone Air Node Name
-    ThirdLevel-ReturnAirNode;!- Zone Return Air Node Name
+    ThirdLevel-ReturnAirNode;!- Zone Return Air Node or NodeList Name
 
 ! =========================
 !Cooling Priority (Highest)
@@ -995,10 +996,13 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-Bottom,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Bottom-Air,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 ! =========================
 !Cooling Priority (Highest)
@@ -1006,10 +1010,13 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-SecondLevel,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     SecondLevel-Air,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 ! =========================
 !Cooling Priority (Highest)
@@ -1017,10 +1024,13 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-ThirdLevel,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ThirdLevel-Air,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 ! =========================
 ! Heating Limit
@@ -1031,6 +1041,7 @@
     ,                        !- Availability Schedule Name
     Bottom-Inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1063,6 +1074,7 @@
     ,                        !- Availability Schedule Name
     SecondLevel-Inlet,       !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1095,6 +1107,7 @@
     ,                        !- Availability Schedule Name
     ThirdLevel-Inlet,        !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
