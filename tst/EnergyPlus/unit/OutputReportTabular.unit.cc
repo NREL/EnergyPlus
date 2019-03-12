@@ -70,7 +70,9 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -7145,4 +7147,146 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 
     EXPECT_EQ("2.8", s);
+}
+
+
+// Test for #7046
+// Ensures that we get consistency between the displayed Azimuth and its cardinal classification
+TEST_F(EnergyPlusFixture, AzimuthToCardinal)
+{
+    // >= 45 and < 135 => E
+    // >= 135 and < 225 => S
+    // >= 225 and < 315 => W
+    // >= 315 and < 45 => N
+    std::vector<std::pair<double, std::string> > expectedAzimuthToCards {
+        {45.0, "E"},
+        {45.01, "E"},
+        {134.991, "E"}, // Rounds to 134.99, so classified as E
+        {134.99978, "S"}, // Gets rounded to 135.00, so classified as S
+        {135.0, "S"},
+        {135.001, "S"},
+        {136, "S"},
+        {314.991, "W"},
+        {314.9999, "N"},
+        {315.0, "N"},
+        {315.00001, "N"},
+    };
+
+    int nTests = expectedAzimuthToCards.size();
+
+    // Allocate some needed arrays
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Construct.allocate(1);
+    DataHeatBalance::Construct(1).Name = "A Construction";
+    // Avoid trigerring CalcNominalWindowCond
+    DataHeatBalance::Construct(1).SummerSHGC = 0.70;
+    DataHeatBalance::Construct(1).VisTransNorm = 0.80;
+
+    DataHeatBalance::NominalU.allocate(1);
+    DataHeatBalance::NominalU(1) = 0.2;
+
+    // Create one wall and one window with each azimuth from expectedAzimuthToCards
+    // Azimuth & Cardinal entries happen in two separate blocks,
+    // so test both to increase coverage and make sure both are correct
+
+    DataSurfaces::TotSurfaces = 2 * nTests ;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+
+    for (int i = 1; i <= nTests * 2; ++i) {
+
+        DataSurfaces::Surface(i).HeatTransSurf = true;
+        DataSurfaces::Surface(i).ExtBoundCond = ExternalEnvironment;
+        DataSurfaces::Surface(i).GrossArea = 200.;
+        DataSurfaces::Surface(i).Tilt = 90.;
+        DataSurfaces::Surface(i).Zone = 1;
+        DataSurfaces::Surface(i).Construction = 1;
+
+        // Actual interesting stuff
+        int entryIndex = (i-1) / 2;
+        double azimuth = expectedAzimuthToCards[entryIndex].first;
+        DataSurfaces::Surface(i).Azimuth = azimuth;
+
+        if (i % 2 == 1) {
+            // It's a wall
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Name = "ExtWall_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+        } else {
+            // It's a window
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Window;
+            DataSurfaces::Surface(i).Name = "ExtWindow_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+            // Window references the previous wall
+            DataSurfaces::Surface(i).BaseSurf = i - 1;
+        }
+
+    }
+
+    // Setup pre def tables
+    OutputReportPredefined::SetPredefinedTables();
+
+    // Call the routine that fills up the table we care about
+    HeatBalanceSurfaceManager::GatherForPredefinedReport();
+
+
+    // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
+    // SubTable 'Opaque Exterior' (pdstOpaque)
+    // Entry 'Azimuth [deg]' (pdchOpAzimuth)
+    // Entry 'Cardinal Direction' (pdchOpDir)
+
+
+    // Note: Unused because we don't need SQL
+    //// We enable the report we care about, making sure it's the right one
+    //EXPECT_EQ("EnvelopeSummary", OutputReportPredefined::reportName(2).name);
+    //OutputReportPredefined::reportName(2).show = true;
+    //// Write the Predef Tables
+    //OutputReportTabular::WritePredefinedTables();
+
+    // Integer to find surfaces
+    int i = 1;
+    for (const auto& expectedAzimuthToCard: expectedAzimuthToCards) {
+        double oriAzimuth = expectedAzimuthToCard.first;
+        std::string cardinalDir = expectedAzimuthToCard.second;
+
+        // Internal: Just to ensure that we gets the same one with round
+        EXPECT_EQ(General::RoundSigDigits(round(oriAzimuth * 100.0) / 100.0, 2),
+                  General::RoundSigDigits(oriAzimuth, 2));
+
+        /****************************************************************************
+        *                            Wall (odd entries)                             *
+        *****************************************************************************/
+
+        // Internal: Dumb check to ensure we didn't mess up in the indexation
+        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+
+        // Check that the azimuth entry is the rounded version indeed
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth,
+                                                                   DataSurfaces::Surface(i).Name),
+                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+        // Check that we do get the expected cardinal direction
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpDir,
+                                                                   DataSurfaces::Surface(i).Name),
+                  cardinalDir)
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i).Name << "'.";
+
+
+        /****************************************************************************
+        *                           Window (even entries)                           *
+        *****************************************************************************/
+
+        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+
+        // Check that the azimuth entry is the rounded version indeed
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth,
+                                                                   DataSurfaces::Surface(i+1).Name),
+                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        // Check that we do get the expected cardinal direction
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenDir,
+                                                                   DataSurfaces::Surface(i+1).Name),
+                  cardinalDir)
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i+1).Name << "'.";
+
+        // Increment twice
+        i = i + 2;
+    }
 }

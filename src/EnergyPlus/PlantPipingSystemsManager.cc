@@ -1758,13 +1758,13 @@ namespace PlantPipingSystemsManager {
             PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia = rNumericArgs(5);
             if (PipingSystemCircuits(PipeCircuitCounter).PipeSize.InnerDia >= PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia) {
                 CurIndex = 5;
-                IssueSevereInputFieldErrorStringEntry(RoutineName,
-                                                      ObjName_Circuit,
-                                                      cAlphaArgs(1),
-                                                      cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex),
-                                                      "Outer diameter must be greater than inner diameter.",
-                                                      ErrorsFound);
+                IssueSevereInputFieldErrorRealEntry(RoutineName,
+                                                    ObjName_Circuit,
+                                                    cAlphaArgs(1),
+                                                    cNumericFieldNames(CurIndex),
+                                                    rNumericArgs(CurIndex),
+                                                    "Outer diameter must be greater than inner diameter.",
+                                                    ErrorsFound);
             }
 
             // Read design flow rate, validated positive by IP
@@ -2004,6 +2004,15 @@ namespace PlantPipingSystemsManager {
             HGHX(HorizontalGHXCtr).InterPipeSpacing = rNumericArgs(4);
             HGHX(HorizontalGHXCtr).PipeID = rNumericArgs(5);
             HGHX(HorizontalGHXCtr).PipeOD = rNumericArgs(6);
+
+            // Issue a severe if Inner >= Outer diameter
+            if (HGHX(HorizontalGHXCtr).PipeID >= HGHX(HorizontalGHXCtr).PipeOD) {
+                ShowSevereError(RoutineName + ": " + ObjName_HorizTrench + "=\"" + cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                ShowContinueError("Outer diameter [" + General::TrimSigDigits(HGHX(HorizontalGHXCtr).PipeOD, 3)
+                        + "] must be greater than inner diameter [" + General::TrimSigDigits(HGHX(HorizontalGHXCtr).PipeID, 3) + "].");
+                ErrorsFound = true;
+            }
+
             HGHX(HorizontalGHXCtr).BurialDepth = rNumericArgs(7);
             HGHX(HorizontalGHXCtr).SoilConductivity = rNumericArgs(8);
             HGHX(HorizontalGHXCtr).SoilDensity = rNumericArgs(9);
@@ -2067,11 +2076,6 @@ namespace PlantPipingSystemsManager {
             // Pipe sizing
             PipingSystemCircuits(CircuitCtr).PipeSize.InnerDia = HGHX(HorizontalGHXCtr).PipeID;
             PipingSystemCircuits(CircuitCtr).PipeSize.OuterDia = HGHX(HorizontalGHXCtr).PipeOD;
-            if (PipingSystemCircuits(CircuitCtr).PipeSize.InnerDia >= PipingSystemCircuits(CircuitCtr).PipeSize.OuterDia) {
-                // CurIndex = 5
-                // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                //                            cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
-            }
 
             // Read design flow rate, validated positive by IP
             PipingSystemCircuits(CircuitCtr).DesignVolumeFlowRate = HGHX(HorizontalGHXCtr).DesignFlowRate;
