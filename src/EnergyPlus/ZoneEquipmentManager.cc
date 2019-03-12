@@ -3464,7 +3464,7 @@ namespace ZoneEquipmentManager {
             ZoneEquipConfig(ControlledZoneNum).PlenumMassFlow = 0.0;
             CurZoneEqNum = ControlledZoneNum;
 
-            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration);
+            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration, true);
 
             // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
@@ -3999,7 +3999,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration)
+    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4030,7 +4030,7 @@ namespace ZoneEquipmentManager {
         moisture.RemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
         moisture.UnadjRemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
 
-        if (FirstHVACIteration) {
+        if (ResetSimOrder) {
             const int ControlledZoneNum = [&]{
                 for (int i = 1; i <= NumOfZones; ++i) {
                     if (ZoneEquipConfig(i).ActualZoneNum == ZoneNum) return i;

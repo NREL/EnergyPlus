@@ -118,7 +118,7 @@ namespace ZoneEquipmentManager {
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration);
+    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder = false);
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
 
