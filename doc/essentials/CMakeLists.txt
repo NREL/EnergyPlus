@@ -12,6 +12,7 @@ SET( INCLUDED_TEX
 SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/essentials/media/coordinatesystem.png
   ${CMAKE_SOURCE_DIR}/doc/essentials/media/energyplusfolder.png
+  ${CMAKE_SOURCE_DIR}/doc/essentials/media/ep.png
   ${CMAKE_SOURCE_DIR}/doc/essentials/media/eplaunch2.png
   ${CMAKE_SOURCE_DIR}/doc/essentials/media/eplaunch3.png
   ${CMAKE_SOURCE_DIR}/doc/essentials/media/idfeditor.png
