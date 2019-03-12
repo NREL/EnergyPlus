@@ -123,8 +123,6 @@ namespace ZoneEquipmentManager {
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
 
-    void DistributeSequentialSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
-
     void UpdateSystemOutputRequired(int const ZoneNum,
                                     Real64 const SysOutputProvided,         // sensible output provided by zone equipment (W)
                                     Real64 const LatOutputProvided,         // latent output provided by zone equipment (kg/s)
