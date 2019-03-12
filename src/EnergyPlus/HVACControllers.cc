@@ -413,8 +413,17 @@ namespace HVACControllers {
         {
             auto const SELECT_CASE_var(Operation);
             if (SELECT_CASE_var == iControllerOpColdStart) {
-                // For temperature and humidity control reset humidity control override
-                HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
+                // For temperature and humidity control reset humidity control override if it was set
+                if (HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride) {
+                    HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
+                    // Put the controller tolerance (offset) back to it's original value
+                    RootFinder::SetupRootFinder(RootFinders(ControlNum),
+                        iSlopeDecreasing,
+                        iMethodBrent,
+                        constant_zero,
+                        1.0e-6,
+                        ControllerProps(ControlNum).Offset);
+                }
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
                 ResetController(ControlNum, false, IsConvergedFlag);
@@ -1398,10 +1407,6 @@ namespace HVACControllers {
                 (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
             ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
-            if (ControllerProps(ControlNum).ControlVar == HVACControllers::iTemperatureAndHumidityRatio) {
-                // for temperature and humidity control, need tighter tolerance if humidity control kicks in
-                ControllerProps(ControlNum).Offset = ControllerProps(ControlNum).Offset*0.1;
-            }
             ReportSizingOutput(ControllerProps(ControlNum).ControllerType,
                                ControllerProps(ControlNum).ControllerName,
                                "Controller Convergence Tolerance",
@@ -2245,11 +2250,15 @@ namespace HVACControllers {
                 if (thisController.ControlVar == iTemperatureAndHumidityRatio) {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
                     if (!thisController.HumRatCtrlOverride) {
-                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + thisController.Offset)) {
+                        // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
+                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-4)) {
                             // Turn on humdity control and restart controller
                             IsConvergedFlag = false;
                             thisController.HumRatCtrlOverride = true;
-                            // IsUpToDateFlag = false;
+                            if (thisController.Action == iReverseAction) {
+                                // Cooling coil controller should always be ReverseAction, but skip this if not
+                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, 1.0e-4);
+                            }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);
                         }
