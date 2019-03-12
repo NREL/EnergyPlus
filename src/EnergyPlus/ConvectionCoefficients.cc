@@ -580,7 +580,17 @@ namespace ConvectionCoefficients {
 
                     if (SELECT_CASE_var1 == ASHRAESimple) {
 
-                        HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
+                        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                        {
+                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double windSpeed) -> double {
+                                return windSpeed;
+                            };
+                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double, double, double hfTerm, double, double) -> double {
+                                return CalcASHRAESimpExtConvectCoeff(Roughness, hfTerm);
+                            };
+                        } else {
+                            HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
+                        }
 
                     } else if ((SELECT_CASE_var1 == ASHRAETARP) || (SELECT_CASE_var1 == BLASTHcOutside) || (SELECT_CASE_var1 == TarpHcOutside)) {
                         //   Convection is split into forced and natural components. The total
@@ -4053,14 +4063,13 @@ namespace ConvectionCoefficients {
         if (std::abs(Surface(SurfNum).CosTilt) >= 0.3827) { // Recalculate HConvIn
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
             {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                     return ASHRAESimpleIntConv(Tsurf, Tamb, cosTilt);
                 };
             } else {
                 HConvIn(SurfNum) = ASHRAESimpleIntConv(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
             }
-
-        } // ...end of HConvIn recalculation IF-THEN block
+        }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
@@ -4139,7 +4148,7 @@ namespace ConvectionCoefficients {
 
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
         {
-            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return ASHRAEDetailedIntConv(Tsurf, Tamb, cosTilt);
             };
         } else {
@@ -4355,7 +4364,7 @@ namespace ConvectionCoefficients {
 
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
             {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum] = [=](double, double, double, double, double) -> double {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=](double, double, double, double, double) -> double {
                     return CeilingDiffuserIntConv(Surface(SurfNum).Tilt, ACH);
                 };
             } else {
