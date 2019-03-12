@@ -4114,7 +4114,10 @@ namespace ZoneEquipmentManager {
 
         int ctrlZoneNum = DataHeatBalance::Zone(ActualZoneNum).ZoneEqNum;
         // Do nothing on FirstHVACIteration if not UniformLoading and not SequentialLoading
-        if (FirstHVACIteration && (ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading)) return;
+        if (FirstHVACIteration && (ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading) &&
+            (ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading)) {
+            return;
+        }
 
         auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ActualZoneNum));
         auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ActualZoneNum));
@@ -4367,7 +4370,7 @@ namespace ZoneEquipmentManager {
         // Distribute the loads for the sequential output scheme. This needs to be done after the simulation order is set.
 
         // Do nothing on FirstHVACIteration
-        if (FirstHVACIteration) return;
+        if (FirstHVACIteration) return;  // FIXME: probably should remove this
 
         // Do nothing on sizing
         if (DataGlobals::ZoneSizingCalc) return;
@@ -4385,38 +4388,52 @@ namespace ZoneEquipmentManager {
         auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ActualZoneNum));
         auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ActualZoneNum));
 
-        for( int equipNum = 1; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
+        // Create some local bookkeeping variables
+        Real64 RemainingOutputRequired = energy.TotalOutputRequired;
+        Real64 RemainingOutputRequiredToHeatingSP = energy.OutputRequiredToHeatingSP;
+        Real64 RemainingOutputRequiredToCoolingSP = energy.OutputRequiredToCoolingSP;
+        Real64 RemainingMoistureOutputRequired = moisture.TotalOutputRequired;
+        Real64 RemainingOutputRequiredToHumidifyingSP = moisture.OutputRequiredToHumidifyingSP;
+        Real64 RemainingOutputRequiredToDehumidifyingSP = moisture.OutputRequiredToDehumidifyingSP;
+
+        // Loop through the equipment in priority simulation order
+        for( int priorityNum = 1; priorityNum <= thisZEqList.NumOfEquipTypes; ++priorityNum ) {
+            const int &equipNum = PrioritySimOrder(priorityNum).EquipPtr;
+
+            // Determine whether we're heating or cooling and choose the appropriate fraction
             const Real64 &heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
             const Real64 &coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
-            if (energy.TotalOutputRequired >= 0.0) {
-                energy.RemainingOutputRequired = energy.TotalOutputRequired * heatLoadRatio;
-                energy.SequencedOutputRequired(equipNum) = energy.RemainingOutputRequired;
-                energy.RemainingOutputReqToHeatSP = energy.OutputRequiredToHeatingSP * heatLoadRatio;
-                energy.SequencedOutputRequiredToHeatingSP(equipNum) = energy.RemainingOutputReqToHeatSP;
-                energy.RemainingOutputReqToCoolSP = energy.OutputRequiredToCoolingSP;
-                energy.SequencedOutputRequiredToCoolingSP(equipNum) = energy.RemainingOutputReqToCoolSP;
-                moisture.RemainingOutputRequired = moisture.TotalOutputRequired * heatLoadRatio;
-                moisture.SequencedOutputRequired(equipNum) = moisture.RemainingOutputRequired;
-                moisture.RemainingOutputReqToHumidSP = moisture.OutputRequiredToHumidifyingSP * heatLoadRatio;
-                moisture.SequencedOutputRequiredToHumidSP(equipNum) = moisture.RemainingOutputReqToHumidSP;
-                moisture.RemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
-                moisture.SequencedOutputRequiredToDehumidSP(equipNum) = moisture.RemainingOutputReqToDehumidSP;
-            } else {
-                energy.RemainingOutputRequired = energy.TotalOutputRequired * coolLoadRatio;
-                energy.SequencedOutputRequired(equipNum) = energy.RemainingOutputRequired;
-                energy.RemainingOutputReqToHeatSP = energy.OutputRequiredToHeatingSP;
-                energy.SequencedOutputRequiredToHeatingSP(equipNum) = energy.RemainingOutputReqToHeatSP;
-                energy.RemainingOutputReqToCoolSP = energy.OutputRequiredToCoolingSP * coolLoadRatio;
-                energy.SequencedOutputRequiredToCoolingSP(equipNum) = energy.RemainingOutputReqToCoolSP;
-                moisture.RemainingOutputRequired = moisture.TotalOutputRequired * coolLoadRatio;
-                moisture.SequencedOutputRequired(equipNum) = moisture.RemainingOutputRequired;
-                moisture.RemainingOutputReqToHumidSP = moisture.OutputRequiredToHumidifyingSP;
-                moisture.SequencedOutputRequiredToHumidSP(equipNum) = moisture.RemainingOutputReqToHumidSP;
-                moisture.RemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP * coolLoadRatio;
-                moisture.SequencedOutputRequiredToDehumidSP(equipNum) = moisture.RemainingOutputReqToDehumidSP;
-            }
+            const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
+
+            // For each of the loads, multiply the remaining load required by the applicable fraction
+            // Then, assuming that the equipment will meet the load, subtract it from the remaining load
+            // This gives a good first cut at these loads. They will be updated later on as equipment runs.
+
+            // Energy loads
+            energy.SequencedOutputRequired(equipNum) = RemainingOutputRequired * loadRatio;
+            RemainingOutputRequired -= energy.SequencedOutputRequired(equipNum);
+            energy.SequencedOutputRequiredToHeatingSP(equipNum) = RemainingOutputRequiredToHeatingSP * loadRatio;
+            RemainingOutputRequiredToHeatingSP -= energy.SequencedOutputRequiredToHeatingSP(equipNum);
+            energy.SequencedOutputRequiredToCoolingSP(equipNum) = RemainingOutputRequiredToCoolingSP * loadRatio;
+            RemainingOutputRequiredToCoolingSP -= energy.SequencedOutputRequiredToCoolingSP(equipNum);
+
+            // Moisture loads
+            moisture.SequencedOutputRequired(equipNum) = RemainingMoistureOutputRequired * loadRatio;
+            RemainingMoistureOutputRequired -= moisture.SequencedOutputRequired(equipNum);
+            moisture.SequencedOutputRequiredToHumidSP(equipNum) = RemainingOutputRequiredToHumidifyingSP * loadRatio;
+            RemainingOutputRequiredToHumidifyingSP -= moisture.SequencedOutputRequiredToHumidSP(equipNum);
+            moisture.SequencedOutputRequiredToDehumidSP(equipNum) = RemainingOutputRequiredToDehumidifyingSP * loadRatio;
+            RemainingOutputRequiredToDehumidifyingSP -= moisture.SequencedOutputRequiredToDehumidSP(equipNum);
         }
 
+        // Set the overall remaining loads to the sequenced load of the equipment running first.
+        const int &equipNum = PrioritySimOrder(1).EquipPtr;
+        energy.RemainingOutputRequired = energy.SequencedOutputRequired(equipNum);
+        energy.RemainingOutputReqToHeatSP = energy.SequencedOutputRequiredToHeatingSP(equipNum);
+        energy.RemainingOutputReqToCoolSP = energy.SequencedOutputRequiredToCoolingSP(equipNum);
+        moisture.RemainingOutputRequired = moisture.SequencedOutputRequired(equipNum);
+        moisture.RemainingOutputReqToHumidSP = moisture.SequencedOutputRequiredToHumidSP(equipNum);
+        moisture.RemainingOutputReqToDehumidSP = moisture.SequencedOutputRequiredToDehumidSP(equipNum);
 
     }
 
@@ -4537,40 +4554,30 @@ namespace ZoneEquipmentManager {
                 moisture.UnadjRemainingOutputReqToHumidSP -= LatOutputProvided;
                 moisture.UnadjRemainingOutputReqToDehumidSP -= LatOutputProvided;
 
-                if (present(EquipPriorityNum)) {
+                if (present(EquipPriorityNum) && EquipPriorityNum < thisZEqList.NumOfEquipTypes) {
 
-                    const int nextHeatingSystem = PrioritySimOrder(EquipPriorityNum).HeatingPriority + 1;
-                    Real64 heatingLoadFrac = (nextHeatingSystem <= energy.NumZoneEquipment) ? thisZEqList.SequentialHeatingFraction(nextHeatingSystem) : 1.0;
+                    // Look up the next system in priority order
+                    int nextEquipPriorityNum = EquipPriorityNum + 1;
+                    const int &nextSystem = PrioritySimOrder(nextEquipPriorityNum).EquipPtr;
 
-                    const int nextCoolingSystem = PrioritySimOrder(EquipPriorityNum).CoolingPriority + 1;
-                    Real64 coolingLoadFrac = (nextCoolingSystem <= energy.NumZoneEquipment) ? thisZEqList.SequentialCoolingFraction(nextCoolingSystem) : 1.0;
-                    int nextSystem = 0;
+                    // Determine the load ratio based on whether we're heating or cooling
+                    const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? thisZEqList.SequentialHeatingFraction(nextSystem) : thisZEqList.SequentialCoolingFraction(nextSystem);
 
-                    if (energy.TotalOutputRequired >= 0.0) {
-                        energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired * heatingLoadFrac;
-                        moisture.RemainingOutputRequired = moisture.UnadjRemainingOutputRequired * heatingLoadFrac;
-                        coolingLoadFrac = 1.0;
-                        nextSystem = nextHeatingSystem;
-                    } else {
-                        energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired * coolingLoadFrac;
-                        moisture.RemainingOutputRequired = moisture.UnadjRemainingOutputRequired * coolingLoadFrac;
-                        heatingLoadFrac = 1.0;
-                        nextSystem = nextCoolingSystem;
-                    }
+                    // Update the zone energy demands
+                    energy.RemainingOutputRequired = loadRatio * energy.UnadjRemainingOutputRequired;
+                    energy.RemainingOutputReqToHeatSP = loadRatio * energy.UnadjRemainingOutputReqToHeatSP;
+                    energy.RemainingOutputReqToCoolSP = loadRatio * energy.UnadjRemainingOutputReqToCoolSP;
+                    moisture.RemainingOutputRequired = loadRatio * moisture.UnadjRemainingOutputRequired;
+                    moisture.RemainingOutputReqToHumidSP = loadRatio * moisture.UnadjRemainingOutputReqToHumidSP;
+                    moisture.RemainingOutputReqToDehumidSP = loadRatio * moisture.UnadjRemainingOutputReqToDehumidSP;
 
-                    // now store remaining load at the by sequence level
-                    if (nextSystem <= energy.NumZoneEquipment) {
-                        energy.SequencedOutputRequired(nextSystem) = energy.RemainingOutputRequired;
-                        moisture.SequencedOutputRequired(nextSystem) = moisture.RemainingOutputRequired;
-                        energy.RemainingOutputReqToHeatSP = heatingLoadFrac * energy.UnadjRemainingOutputReqToHeatSP;
-                        energy.SequencedOutputRequiredToHeatingSP(nextSystem) = energy.RemainingOutputReqToHeatSP;
-                        moisture.RemainingOutputReqToHumidSP = heatingLoadFrac * moisture.UnadjRemainingOutputReqToHumidSP;
-                        moisture.SequencedOutputRequiredToHumidSP(nextSystem) = moisture.RemainingOutputReqToHumidSP;
-                        energy.RemainingOutputReqToCoolSP = coolingLoadFrac * energy.UnadjRemainingOutputReqToCoolSP;
-                        energy.SequencedOutputRequiredToCoolingSP(nextSystem) = energy.RemainingOutputReqToCoolSP;
-                        moisture.RemainingOutputReqToDehumidSP = coolingLoadFrac * moisture.UnadjRemainingOutputReqToDehumidSP;
-                        moisture.SequencedOutputRequiredToDehumidSP(nextSystem) = moisture.RemainingOutputReqToDehumidSP;
-                    }
+                    // now store remaining load at the sequence level
+                    energy.SequencedOutputRequired(nextSystem) = energy.RemainingOutputRequired;
+                    energy.SequencedOutputRequiredToHeatingSP(nextSystem) = energy.RemainingOutputReqToHeatSP;
+                    energy.SequencedOutputRequiredToCoolingSP(nextSystem) = energy.RemainingOutputReqToCoolSP;
+                    moisture.SequencedOutputRequired(nextSystem) = moisture.RemainingOutputRequired;
+                    moisture.SequencedOutputRequiredToHumidSP(nextSystem) = moisture.RemainingOutputReqToHumidSP;
+                    moisture.SequencedOutputRequiredToDehumidSP(nextSystem) = moisture.RemainingOutputReqToDehumidSP;
                 } else {
                     // SequentialLoading, use original method for remaining output
                     energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired;
