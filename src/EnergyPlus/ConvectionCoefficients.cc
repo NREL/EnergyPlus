@@ -666,9 +666,10 @@ namespace ConvectionCoefficients {
                         }
                         if (HMovInsul > 0.0) {
                             TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                            Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                            // Better if there was iteration for movable insulation?
                         }
+
+                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
+                        // Better if there was iteration for movable insulation?
 
                         HExt = Hn + Hf;
 
@@ -9695,7 +9696,7 @@ namespace ConvectionCoefficients {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // calculate DOE-2 Hc equation for windward surfaces
+        // calculate DOE-2 Hf equation for windward surfaces
 
         // METHODOLOGY EMPLOYED:
         // encapsulate model equation in a function
@@ -9708,9 +9709,9 @@ namespace ConvectionCoefficients {
 
         Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
 
-        Real64 Hf = CalcMoWITTHfWindward(WindAtZ);
+        Real64 HfSmooth = CalcMoWITTHfWindward(WindAtZ);
 
-        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(Hf));
+        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
         return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
     }
 
@@ -9724,7 +9725,7 @@ namespace ConvectionCoefficients {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // calculate DOE-2 Hc equation for leeward surfaces
+        // calculate DOE-2 Hf equation for leeward surfaces
 
         // METHODOLOGY EMPLOYED:
         // encapsulate model equation in a function
@@ -9736,9 +9737,9 @@ namespace ConvectionCoefficients {
         //   ASHRAE Transactions 100(1):  1087.
 
         Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
-        Real64 Hf = CalcMoWITTHfLeeward(WindAtZ);
+        Real64 HfSmooth = CalcMoWITTHfLeeward(WindAtZ);
 
-        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(Hf));
+        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
 
         return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
     }
