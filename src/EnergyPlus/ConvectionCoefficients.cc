@@ -515,9 +515,6 @@ namespace ConvectionCoefficients {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //  REAL(r64),    INTENT(IN)  :: WindSpeedExt  ! Exterior wind speed (m/s)  **No longer used
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MoWiTTTurbulentConstant(0.84); // Turbulent natural convection constant
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TAir; // Absolute dry bulb temperature of outdoor air (K)
         //  REAL(r64) :: TSky           ! Absolute temperature of the sky (K)
@@ -610,61 +607,63 @@ namespace ConvectionCoefficients {
                         // due to outlying calculations when perimeter is very small compared to area, use Perimeter
                         // approximation calculation
 
-                        if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
-                            rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
-                            Hf = CalcHfExteriorSparrow(SurfWindSpeed,
-                                                       Surface(BaseSurf).GrossArea,
-                                                       rCalcPerimeter,
-                                                       Surface(SurfNum).CosTilt,
-                                                       Surface(SurfNum).Azimuth,
-                                                       Roughness,
-                                                       SurfWindDir);
+                        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                        {
+                            if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
+                                    // Assume 1'x20' strip for walls.
+                                    const double length = 1.0;
+                                    const double width = 20.0;
+                                    const double area = length*width;
+                                    const double perim = 2.0 * (length + width);
+                                    // Average windward and leeward since all walls use same algorithm
+                                    double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
+                                    double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
+                                    return (windwardHf + leewardHf)/2.0;
+                                };
+                            } else {  // Slab (used for exterior grade convection)
+                                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double) -> double {
+                                    return 0.0; // CalcHfExteriorSparrow when A is really big
+                                };
+                            }
+                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
+                                Real64 Ts = Tsurf;
+                                if (HMovInsul > 0.0) Ts = (HMovInsul * Tsurf + hfTerm * Tamb) / (HMovInsul + hfTerm);
+                                return CalcHnASHRAETARPExterior(Ts, Tamb, cosTilt) + hfTerm;
+                            };
                         } else {
-                            Hf = 0.0;
-                        }
+                            if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
+                                rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
+                                Hf = CalcHfExteriorSparrow(SurfWindSpeed,
+                                                           Surface(BaseSurf).GrossArea,
+                                                           rCalcPerimeter,
+                                                           Surface(SurfNum).CosTilt,
+                                                           Surface(SurfNum).Azimuth,
+                                                           Roughness,
+                                                           SurfWindDir);
+                            } else {
+                                Hf = 0.0;
+                            }
 
-                        if (HMovInsul > 0.0) TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                        HExt = Hn + Hf;
+                            if (HMovInsul > 0.0) TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
+                            Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
+                            HExt = Hn + Hf;
+                        }
 
                     } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
-                        //   The MoWiTT model is based on measurements taken at the Mobile Window
-                        //   Thermal Test (MoWiTT) facility.  Appropriate for very smooth surfaces.
-                        //   REFERENCES:
-                        //   Yazdanian, M. and J.H. Klems.  1994.  Measurement of the exterior convective
-                        //   film coefficient for windows in low-rise buildings.
-                        //   ASHRAE Transactions 100(1):  1087.
-
-                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            ConstantA = 3.26;
-                            ConstantB = 0.89;
-                        } else { // leeward
-                            ConstantA = 3.55;
-                            ConstantB = 0.617;
-                        }
-
                         // NOTE: Movable insulation is not taken into account here
-                        HExt = std::sqrt(pow_2(MoWiTTTurbulentConstant * std::pow(std::abs(TAir - TSurf), OneThird)) +
-                                         pow_2(ConstantA * std::pow(SurfWindSpeed, ConstantB)));
+                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
+                            HExt = CalcMoWITTWindward(TAir - TSurf, SurfWindSpeed);
+                        } else { // leeward
+                            HExt = CalcMoWITTLeeward(TAir - TSurf, SurfWindSpeed);
+                        }
 
                     } else if (SELECT_CASE_var1 == DOE2HcOutside) {
-                        //   The DOE-2 convection model is a combination of the MoWiTT and the BLAST
-                        //   convection models. However, it calculates the coefficient for very smooth
-                        //   surfaces (glass) first and then modified for other surfaces.
-                        //   REFERENCES:
-                        //   Lawrence Berkeley Laboratory.  1994.  DOE2.1E-053 source code.
-
                         if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            ConstantA = 3.26;
-                            ConstantB = 0.89;
+                            Hf = CalcDOE2Windward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
                         } else { // leeward
-                            ConstantA = 3.55;
-                            ConstantB = 0.617;
+                            Hf = CalcDOE2Leeward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
                         }
-
-                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                        HcGlass = std::sqrt(pow_2(Hn) + pow_2(ConstantA * std::pow(SurfWindSpeed, ConstantB)));
-                        Hf = RoughnessMultiplier(Roughness) * (HcGlass - Hn);
                         if (HMovInsul > 0.0) {
                             TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
                             Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
@@ -765,7 +764,7 @@ namespace ConvectionCoefficients {
                         }
 
                         // NOTE: Movable insulation is not taken into account here
-                        HExt = std::sqrt(pow_2(MoWiTTTurbulentConstant * std::pow(std::abs(TAir - TSurf), OneThird)) +
+                        HExt = std::sqrt(pow_2(0.84 * std::pow(std::abs(TAir - TSurf), OneThird)) +
                                          pow_2(ConstantA * std::pow(SurfWindSpeed, ConstantB)));
 
                     } else if (SELECT_CASE_var1 == DOE2HcOutside) {
@@ -864,63 +863,11 @@ namespace ConvectionCoefficients {
                                  Real64 const WindDirection  // Wind (compass) direction (degrees)
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns the forced convection piece of the
-        // exterior convection coefficient.
-
-        // METHODOLOGY EMPLOYED:
-        // The forced convection calculation is based on a semi-empirical correlation
-        // developed by Sparrow, Ramsey, and Mass.
-
-        // REFERENCES:
-        //   1. Sparrow, E. M., J. W. Ramsey, and E. A. Mass.  1979.  Effect of finite
-        //   width on heat transfer and fluid flow about an inclined rectangular plate.
-        //   Journal of Heat Transfer 101:  204.
-        //   2. McClellan, T.M.  1996.  Investigation of a heat balance cooling load
-        //   procedure with a detailed study of outside heat transfer parameters.
-        //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
-        //   University of Illinois at Urbana-Champaign.
-        //   3. ASHRAE Loads Toolkit.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hf; // Surface exterior forced convective heat transfer coefficient, W/(m2-K)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // (Angle between the ground and the surface outward normal)
-        // 3=medium rough,2=rough,1=very rough)
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 WindDirectionModifier;
-
         if (Windward(CosTilt, Azimuth, WindDirection)) {
-            WindDirectionModifier = 1.0;
+            return CalcSparrowHfWindward(Roughness, Perimeter, GrossArea, SurfWindSpeed);
         } else {
-            WindDirectionModifier = 0.5;
+            return CalcSparrowHfLeeward(Roughness, Perimeter, GrossArea, SurfWindSpeed);
         }
-
-        Hf = 2.537 * WindDirectionModifier * RoughnessMultiplier(Roughness) * std::sqrt(SurfWindSpeed * Perimeter / GrossArea);
-
-        return Hf;
     }
 
     Real64 CalcHnASHRAETARPExterior(Real64 const TOutSurf, // Exterior surface temperature
@@ -9566,7 +9513,7 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+    Real64 CalcSparrowHfWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
     {
 
         // FUNCTION INFORMATION:
@@ -9592,45 +9539,10 @@ namespace ConvectionCoefficients {
         //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
         //   University of Illinois at Urbana-Champaign.
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hf;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int ErrorIndex(0);
-
-        if (FaceArea > 0.0) {
-            Hf = 2.53 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
-
-        } else {
-            if (ErrorIndex == 0) {
-                ShowSevereMessage("CalcSparrowWindward: Convection model not evaluated (bad face area)");
-                ShowContinueError("Value for effective face area = " + RoundSigDigits(FaceArea, 5));
-                ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
-                ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
-            }
-            ShowRecurringSevereErrorAtEnd("CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
-                                          ErrorIndex);
-            Hf = 9.999; // safe but noticeable
-        }
-        return Hf;
+        return 2.53 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
     }
 
-    Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+    Real64 CalcSparrowHfLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
     {
 
         // FUNCTION INFORMATION:
@@ -9656,29 +9568,37 @@ namespace ConvectionCoefficients {
         //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
         //   University of Illinois at Urbana-Champaign.
 
-        // USE STATEMENTS:
-        // na
 
-        // Return value
-        Real64 Hf;
+        return 0.5 * CalcSparrowHfWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
+    }
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+    {
         static int ErrorIndex(0);
 
         if (FaceArea > 0.0) {
-            Hf = 2.53 * 0.5 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
+            return CalcSparrowHfWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
+
+        } else {
+            if (ErrorIndex == 0) {
+                ShowSevereMessage("CalcSparrowWindward: Convection model not evaluated (bad face area)");
+                ShowContinueError("Value for effective face area = " + RoundSigDigits(FaceArea, 5));
+                ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
+                ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
+            }
+            ShowRecurringSevereErrorAtEnd("CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
+                                          ErrorIndex);
+            return 9.999; // safe but noticeable
+        }
+    }
+
+    Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+    {
+        static int ErrorIndex(0);
+
+        if (FaceArea > 0.0) {
+            return CalcSparrowHfLeeward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
         } else {
             if (ErrorIndex == 0) {
                 ShowSevereMessage("CalcSparrowLeeward: Convection model not evaluated (bad face area)");
@@ -9689,10 +9609,30 @@ namespace ConvectionCoefficients {
             ShowRecurringSevereErrorAtEnd("CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
                                           ErrorIndex);
 
-            Hf = 9.999; // safe but noticeable
+            return 9.999; // safe but noticeable
         }
-        return Hf;
     }
+
+    Real64 CalcMoWITTHn(Real64 DeltaTemp)
+    {
+        static Real64 const temp_fac(0.84);
+        return temp_fac * std::pow(std::abs(DeltaTemp), 1.0/3.0);
+    }
+
+    Real64 CalcMoWITTHfWindward(Real64 const WindAtZ)
+    {
+        static Real64 const wind_fac(3.26);
+        static Real64 const wind_exp(0.89);
+        return wind_fac * std::pow(WindAtZ, wind_exp);
+    }
+
+    Real64 CalcMoWITTHfLeeward(Real64 const WindAtZ)
+    {
+        static Real64 const wind_fac(3.55);
+        static Real64 const wind_exp(0.617);
+        return wind_fac * std::pow(WindAtZ, wind_exp);
+    }
+
 
     Real64 CalcMoWITTWindward(Real64 const DeltaTemp, Real64 const WindAtZ)
     {
@@ -9714,33 +9654,10 @@ namespace ConvectionCoefficients {
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
 
-        // USE STATEMENTS:
-        // na
+        Real64 Hn = CalcMoWITTHn(DeltaTemp);
+        Real64 Hf = CalcMoWITTHfWindward(WindAtZ);
+        return std::sqrt(pow_2(Hn) + pow_2(Hf));
 
-        // Return value
-        Real64 Hc; // total convection coefficient
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const temp_fac(pow_2(0.84));
-        static Real64 const wind_fac(pow_2(3.26));
-        static Real64 const two_thirds(2.0 / 3.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        //		Hc = std::pow( pow_2( 0.84 * std::pow( std::abs( DeltaTemp ), OneThird ) ) + pow_2( 3.26 * std::pow( WindAtZ, 0.89 ) ), 0.5 );
-        Hc = std::sqrt(temp_fac * std::pow(std::abs(DeltaTemp), two_thirds) + wind_fac * std::pow(WindAtZ, 1.78)); // Tuned
-
-        return Hc;
     }
 
     Real64 CalcMoWITTLeeward(Real64 const DeltaTemp, Real64 const WindAtZ)
@@ -9763,34 +9680,9 @@ namespace ConvectionCoefficients {
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // total convection coefficient
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const temp_fac(pow_2(0.84));
-        static Real64 const wind_fac(pow_2(3.55));
-        static Real64 const two_thirds(2.0 / 3.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        //		Hc = std::pow( pow_2( 0.84 * std::pow( std::abs( DeltaTemp ), OneThird ) ) + pow_2( 3.55 * std::pow( WindAtZ, 0.617 ) ), 0.5
-        //);
-        Hc = std::sqrt(temp_fac * std::pow(std::abs(DeltaTemp), two_thirds) + wind_fac * std::pow(WindAtZ, 1.234)); // Tuned
-
-        return Hc;
+        Real64 Hn = CalcMoWITTHn(DeltaTemp);
+        Real64 Hf = CalcMoWITTHfLeeward(WindAtZ);
+        return std::sqrt(pow_2(Hn) + pow_2(Hf));
     }
 
     Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
@@ -9814,38 +9706,12 @@ namespace ConvectionCoefficients {
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
 
-        // USE STATEMENTS:
-        // na
+        Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
 
-        // Return value
-        Real64 Hf; // forced convection coefficient
+        Real64 Hf = CalcMoWITTHfWindward(WindAtZ);
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 HcSmooth;
-        Real64 Hn;
-        Real64 DeltaTemp;
-
-        DeltaTemp = SurfaceTemp - AirTemp;
-
-        Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
-
-        HcSmooth = std::sqrt(pow_2(Hn) + pow_2(3.26 * std::pow(WindAtZ, 0.89)));
-
-        Hf = RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
-
-        return Hf;
+        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(Hf));
+        return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
     }
 
     Real64 CalcDOE2Leeward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
@@ -9869,38 +9735,12 @@ namespace ConvectionCoefficients {
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
 
-        // USE STATEMENTS:
-        // na
+        Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
+        Real64 Hf = CalcMoWITTHfLeeward(WindAtZ);
 
-        // Return value
-        Real64 Hf; // forced convection coefficient
+        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(Hf));
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 HcSmooth;
-        Real64 Hn;
-        Real64 DeltaTemp;
-
-        DeltaTemp = SurfaceTemp - AirTemp;
-
-        Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
-
-        HcSmooth = std::sqrt(pow_2(Hn) + pow_2(3.55 * std::pow(WindAtZ, 0.617)));
-
-        Hf = RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
-
-        return Hf;
+        return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
     }
 
     Real64 CalcNusseltJurges(Real64 const WindAtZ)

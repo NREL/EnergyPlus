@@ -693,9 +693,19 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum                // for messages
     );
 
+    Real64 CalcSparrowHfWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
+
+    Real64 CalcSparrowHfLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
+
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
 
     Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
+
+    Real64 CalcMoWITTHn(Real64 DeltaTemp);
+
+    Real64 CalcMoWITTHfWindward(Real64 const WindAtZ);
+
+    Real64 CalcMoWITTHfLeeward(Real64 const WindAtZ);
 
     Real64 CalcMoWITTWindward(Real64 const DeltaTemp, Real64 const WindAtZ);
 
