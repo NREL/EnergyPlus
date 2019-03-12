@@ -396,74 +396,51 @@ namespace ConvectionCoefficients {
                     }
                 }
 
-                {
-                    auto const SELECT_CASE_var(Surface(SurfNum).IntConvCoeff);
+                int algoNum;
+                bool standardAlgo;
+                if (Surface(SurfNum).IntConvCoeff <= -1) { // Set by user using one of the standard algorithms...
+                    algoNum = std::abs(Surface(SurfNum).IntConvCoeff);
+                    standardAlgo = true;
+                } else if (Surface(SurfNum).IntConvCoeff == 0)  { // Not set by user, uses Zone Setting
+                    algoNum = Zone(ZoneNum).InsideConvectionAlgo;
+                    standardAlgo = true;
+                } else {
+                    standardAlgo = false;
+                }
 
-                    if ((SELECT_CASE_var <= -1)) { // Set by user using one of the standard algorithms...
+                if (standardAlgo) {
+                    auto const SELECT_CASE_var1(algoNum);
 
-                        {
-                            auto const SELECT_CASE_var1(std::abs(Surface(SurfNum).IntConvCoeff));
-
-                            if (SELECT_CASE_var1 == ASHRAESimple) {
-                                CalcASHRAESimpleIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                                if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
-
-                            } else if (SELECT_CASE_var1 == ASHRAETARP) {
-                                if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                                    CalcASHRAEDetailedIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                } else {
-                                    CalcISO15099WindowIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                }
-
-                                // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                                if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
-
-                            } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
-
-                                ManageInsideAdaptiveConvectionAlgo(SurfNum);
-
-                            } else {
-                                ShowFatalError("Unhandled convection coefficient algorithm.");
-                            }
-                        }
-
-                    } else if (SELECT_CASE_var == 0) { // Not set by user, uses Zone Setting
-
-                        {
-                            auto const SELECT_CASE_var1(Zone(ZoneNum).InsideConvectionAlgo);
-
-                            if (SELECT_CASE_var1 == ASHRAESimple) {
-                                CalcASHRAESimpleIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                                if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
-
-                            } else if (SELECT_CASE_var1 == ASHRAETARP) {
-                                if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                                    CalcASHRAEDetailedIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                } else {
-                                    CalcISO15099WindowIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
-                                }
-                                // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                                if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
-
-                            } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
-
-                                ManageInsideAdaptiveConvectionAlgo(SurfNum);
-
-                            } else if ((SELECT_CASE_var1 == CeilingDiffuser) || (SELECT_CASE_var1 == TrombeWall)) {
-                                // Already done above and can't be at individual surface
-
-                            } else {
-                                ShowFatalError("Unhandled convection coefficient algorithm.");
-                            }
-                        }
-
-                    } else { // Interior convection has been set by the user with "value" or "schedule"
-                        HConvIn(SurfNum) = SetIntConvectionCoeff(SurfNum);
+                    if (SELECT_CASE_var1 == ASHRAESimple) {
+                        CalcASHRAESimpleIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
                         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
+
+                    } else if (SELECT_CASE_var1 == ASHRAETARP) {
+                        if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) {
+                            CalcASHRAEDetailedIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                        } else {
+                            CalcISO15099WindowIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                        }
+
+                        // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                        if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
+
+                    } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
+
+                        ManageInsideAdaptiveConvectionAlgo(SurfNum);
+
+                    } else if ((SELECT_CASE_var1 == CeilingDiffuser) || (SELECT_CASE_var1 == TrombeWall)) {
+                        // Already done above and can't be at individual surface
+
+                    } else {
+
+                        ShowFatalError("Unhandled convection coefficient algorithm.");
                     }
+                } else { // Interior convection has been set by the user with "value" or "schedule"
+                    HConvIn(SurfNum) = SetIntConvectionCoeff(SurfNum);
+                    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                    if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
                 }
 
                 if (Surface(SurfNum).EMSOverrideIntConvCoef) HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
@@ -523,11 +500,8 @@ namespace ConvectionCoefficients {
         Real64 SurfWindDir;
         Real64 TSky;
         Real64 TGround;
-        Real64 ConstantA; // = a, Constant, W/(m2K(m/s)^b)
-        Real64 ConstantB; // = b, Constant, W/(m2K^(4/3))
         Real64 Hn;        // Natural part of exterior convection
         Real64 Hf;        // Forced part of exterior convection
-        Real64 HcGlass;
         Real64 rCalcPerimeter; // approximation for Perimeter
         int BaseSurf;
         int SrdSurfsNum; // Srd surface counter
@@ -567,290 +541,177 @@ namespace ConvectionCoefficients {
         }
 
         // Check if exterior is to be set by user
-        {
-            auto const SELECT_CASE_var(Surface(SurfNum).ExtConvCoeff);
 
-            if ((SELECT_CASE_var <= -1)) { // Set by user using one of the standard algorithms...
+        int algoNum;
+        bool standardAlgo;
+        if (Surface(SurfNum).ExtConvCoeff <= -1) { // Set by user using one of the standard algorithms...
+            algoNum = std::abs(Surface(SurfNum).ExtConvCoeff);
+            standardAlgo = true;
+        } else if (Surface(SurfNum).ExtConvCoeff == 0)  { // Not set by user, uses Zone Setting
+            algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
+            standardAlgo = true;
+        } else {
+            standardAlgo = false;
+        }
 
+        if (standardAlgo) {
+
+            auto const SELECT_CASE_var1(algoNum);
+
+
+            if (SELECT_CASE_var1 == ASHRAESimple) {
+
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    auto const SELECT_CASE_var1(std::abs(Surface(SurfNum).ExtConvCoeff));
-
-                    if (SELECT_CASE_var1 == ASHRAESimple) {
-
-                        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
-                        {
-                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double windSpeed) -> double {
-                                return windSpeed;
-                            };
-                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double, double, double hfTerm, double, double) -> double {
-                                return CalcASHRAESimpExtConvectCoeff(Roughness, hfTerm);
-                            };
-                        } else {
-                            HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
-                        }
-
-                    } else if ((SELECT_CASE_var1 == ASHRAETARP) || (SELECT_CASE_var1 == BLASTHcOutside) || (SELECT_CASE_var1 == TarpHcOutside)) {
-                        //   Convection is split into forced and natural components. The total
-                        //   convective heat transfer coefficient is the sum of these components.
-                        //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
-                        //   are actually referencing the base surface because a subsurface does not initiate a completely new
-                        //   thermal boundary layer (although it may add some additional complexity that cannot be accounted for
-                        //   here).  The values for height (Z) and roughness do, however, come from the subsurface.
-                        //   BLAST algorithm has been replaced by this one since it was identical except for the standard wind
-                        //   speed measurement height which was only different because of unit conversions:  10 m vs. 30 ft (= 9.14 m).
-                        //   ASHRAE/BLAST REFERENCES:
-                        //   ?
-                        //   TARP REFERENCES:
-                        //   Walton, G. N.  1983.  Thermal Analysis Research Program Reference Manual.
-                        //   National Bureau of Standards.  NBSSIR 83-2655.
-
-                        // due to outlying calculations when perimeter is very small compared to area, use Perimeter
-                        // approximation calculation
-
-                        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
-                        {
-                            if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
-                                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
-                                    // Assume 1'x20' strip for walls.
-                                    const double length = 1.0;
-                                    const double width = 20.0;
-                                    const double area = length*width;
-                                    const double perim = 2.0 * (length + width);
-                                    // Average windward and leeward since all walls use same algorithm
-                                    double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
-                                    double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
-                                    return (windwardHf + leewardHf)/2.0;
-                                };
-                            } else {  // Slab (used for exterior grade convection)
-                                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double) -> double {
-                                    return 0.0; // CalcHfExteriorSparrow when A is really big
-                                };
-                            }
-                            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
-                                Real64 Ts = Tsurf;
-                                if (HMovInsul > 0.0) Ts = (HMovInsul * Tsurf + hfTerm * Tamb) / (HMovInsul + hfTerm);
-                                return CalcHnASHRAETARPExterior(Ts, Tamb, cosTilt) + hfTerm;
-                            };
-                        } else {
-                            if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
-                                rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
-                                Hf = CalcHfExteriorSparrow(SurfWindSpeed,
-                                                           Surface(BaseSurf).GrossArea,
-                                                           rCalcPerimeter,
-                                                           Surface(SurfNum).CosTilt,
-                                                           Surface(SurfNum).Azimuth,
-                                                           Roughness,
-                                                           SurfWindDir);
-                            } else {
-                                Hf = 0.0;
-                            }
-
-                            if (HMovInsul > 0.0) TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                            Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                            HExt = Hn + Hf;
-                        }
-
-                    } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
-                        // NOTE: Movable insulation is not taken into account here
-                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            HExt = CalcMoWITTWindward(TAir - TSurf, SurfWindSpeed);
-                        } else { // leeward
-                            HExt = CalcMoWITTLeeward(TAir - TSurf, SurfWindSpeed);
-                        }
-
-                    } else if (SELECT_CASE_var1 == DOE2HcOutside) {
-                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            Hf = CalcDOE2Windward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                        } else { // leeward
-                            Hf = CalcDOE2Leeward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                        }
-                        if (HMovInsul > 0.0) {
-                            TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                        }
-
-                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                        // Better if there was iteration for movable insulation?
-
-                        HExt = Hn + Hf;
-
-                    } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
-
-                        ManageOutsideAdaptiveConvectionAlgo(SurfNum, HExt);
-
-                    } else {
-                        ShowFatalError("InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" +
-                                       Surface(SurfNum).Name);
-                    }
-                } // choice of algorithm type
-
-                if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
-
-                if (TSurf == TSky || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
-                    HSky = 0.0;
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double windSpeed) -> double {
+                        return windSpeed;
+                    };
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double, double, double hfTerm, double, double) -> double {
+                        return CalcASHRAESimpExtConvectCoeff(Roughness, hfTerm);
+                    };
                 } else {
-                    // Compute sky radiation coefficient
-                    HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
-                           (TSurf - TSky);
+                    HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
                 }
 
-                if (TSurf == TAir || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
-                    HGround = 0.0;
-                    HAir = 0.0;
-                } else {
-                    // Compute ground radiation coefficient
-                    HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+            } else if ((SELECT_CASE_var1 == ASHRAETARP) || (SELECT_CASE_var1 == BLASTHcOutside) || (SELECT_CASE_var1 == TarpHcOutside)) {
+                //   Convection is split into forced and natural components. The total
+                //   convective heat transfer coefficient is the sum of these components.
+                //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
+                //   are actually referencing the base surface because a subsurface does not initiate a completely new
+                //   thermal boundary layer (although it may add some additional complexity that cannot be accounted for
+                //   here).  The values for height (Z) and roughness do, however, come from the subsurface.
+                //   BLAST algorithm has been replaced by this one since it was identical except for the standard wind
+                //   speed measurement height which was only different because of unit conversions:  10 m vs. 30 ft (= 9.14 m).
+                //   ASHRAE/BLAST REFERENCES:
+                //   ?
+                //   TARP REFERENCES:
+                //   Walton, G. N.  1983.  Thermal Analysis Research Program Reference Manual.
+                //   National Bureau of Standards.  NBSSIR 83-2655.
 
-                    // Compute air radiation coefficient
-                    HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
-                           (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
-                }
+                // due to outlying calculations when perimeter is very small compared to area, use Perimeter
+                // approximation calculation
 
-            } else if (SELECT_CASE_var == 0) { // Not set by user  -- uses Zone setting
-
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    auto const SELECT_CASE_var1(Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo); // Algorithm type
-
-                    if (SELECT_CASE_var1 == ASHRAESimple) {
-
-                        HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
-
-                    } else if ((SELECT_CASE_var1 == ASHRAETARP) || (SELECT_CASE_var1 == BLASTHcOutside) || (SELECT_CASE_var1 == TarpHcOutside)) {
-                        //   Convection is split into forced and natural components. The total
-                        //   convective heat transfer coefficient is the sum of these components.
-                        //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
-                        //   are actually referencing the base surface because a subsurface does not initiate a completely new
-                        //   thermal boundary layer (although it may add some additional complexity that cannot be accounted for
-                        //   here).  The values for height (Z) and roughness do, however, come from the subsurface.
-                        //   BLAST algorithm has been replaced by this one since it was identical except for the standard wind
-                        //   speed measurement height which was only different because of unit conversions:  10 m vs. 30 ft (= 9.14 m).
-                        //   ASHRAE/BLAST REFERENCES:
-                        //   ?
-                        //   TARP REFERENCES:
-                        //   Walton, G. N.  1983.  Thermal Analysis Research Program Reference Manual.
-                        //   National Bureau of Standards.  NBSSIR 83-2655.
-
-                        // due to outlying calculations when perimeter is very small compared to area, use Perimeter
-                        // approximation calculation
-
-                        if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
-                            rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
-                            Hf = CalcHfExteriorSparrow(SurfWindSpeed,
-                                                       Surface(BaseSurf).GrossArea,
-                                                       rCalcPerimeter,
-                                                       Surface(SurfNum).CosTilt,
-                                                       Surface(SurfNum).Azimuth,
-                                                       Roughness,
-                                                       SurfWindDir);
-                        } else {
-                            Hf = 0.0;
-                        }
-
-                        if (HMovInsul > 0.0) TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                        HExt = Hn + Hf;
-
-                    } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
-                        //   The MoWiTT model is based on measurements taken at the Mobile Window
-                        //   Thermal Test (MoWiTT) facility.  Appropriate for very smooth surfaces.
-                        //   REFERENCES:
-                        //   Yazdanian, M. and J.H. Klems.  1994.  Measurement of the exterior convective
-                        //   film coefficient for windows in low-rise buildings.
-                        //   ASHRAE Transactions 100(1):  1087.
-                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            ConstantA = 3.26;
-                            ConstantB = 0.89;
-                        } else { // leeward
-                            ConstantA = 3.55;
-                            ConstantB = 0.617;
-                        }
-
-                        // NOTE: Movable insulation is not taken into account here
-                        HExt = std::sqrt(pow_2(0.84 * std::pow(std::abs(TAir - TSurf), OneThird)) +
-                                         pow_2(ConstantA * std::pow(SurfWindSpeed, ConstantB)));
-
-                    } else if (SELECT_CASE_var1 == DOE2HcOutside) {
-                        //   The DOE-2 convection model is a combination of the MoWiTT and the BLAST
-                        //   convection models. However, it calculates the coefficient for very smooth
-                        //   surfaces (glass) first and then modified for other surfaces.
-                        //   REFERENCES:
-                        //   Lawrence Berkeley Laboratory.  1994.  DOE2.1E-053 source code.
-
-                        if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                            ConstantA = 3.26;
-                            ConstantB = 0.89;
-                        } else { // leeward
-                            ConstantA = 3.55;
-                            ConstantB = 0.617;
-                        }
-
-                        Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                        HcGlass = std::sqrt(pow_2(Hn) + pow_2(ConstantA * std::pow(SurfWindSpeed, ConstantB)));
-                        Hf = RoughnessMultiplier(Roughness) * (HcGlass - Hn);
-                        if (HMovInsul > 0.0) {
-                            TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                            Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                            // Better if there was iteration for movable insulation?
-                        }
-
-                        HExt = Hn + Hf;
-
-                    } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
-
-                        ManageOutsideAdaptiveConvectionAlgo(SurfNum, HExt);
-
-                    } else {
-                        ShowFatalError("InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" +
-                                       Surface(SurfNum).Name);
+                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
+                            // Assume 1'x20' strip for walls.
+                            const double length = 1.0;
+                            const double width = 20.0;
+                            const double area = length*width;
+                            const double perim = 2.0 * (length + width);
+                            // Average windward and leeward since all walls use same algorithm
+                            double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
+                            double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
+                            return (windwardHf + leewardHf)/2.0;
+                        };
+                    } else {  // Slab (used for exterior grade convection)
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double) -> double {
+                            return 0.0; // CalcHfExteriorSparrow when A is really big
+                        };
                     }
-                } // choice of algorithm type
-
-                if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
-
-                if (TSurf == TSky || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                    HSky = 0.0;
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
+                        Real64 Ts = Tsurf;
+                        if (HMovInsul > 0.0) Ts = (HMovInsul * Tsurf + hfTerm * Tamb) / (HMovInsul + hfTerm);
+                        return CalcHnASHRAETARPExterior(Ts, Tamb, cosTilt) + hfTerm;
+                    };
                 } else {
-                    // Compute sky radiation coefficient
-                    HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
-                           (TSurf - TSky);
+                    if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
+                        rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
+                        Hf = CalcHfExteriorSparrow(SurfWindSpeed,
+                                                   Surface(BaseSurf).GrossArea,
+                                                   rCalcPerimeter,
+                                                   Surface(SurfNum).CosTilt,
+                                                   Surface(SurfNum).Azimuth,
+                                                   Roughness,
+                                                   SurfWindDir);
+                    } else {
+                        Hf = 0.0;
+                    }
+
+                    if (HMovInsul > 0.0) TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
+                    Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
+                    HExt = Hn + Hf;
                 }
 
-                if (TSurf == TAir || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                    HGround = 0.0;
-                    HAir = 0.0;
-                } else {
-                    // Compute ground radiation coefficient
-                    HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
-
-                    // Compute air radiation coefficient
-                    HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
-                           (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
+            } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
+                // NOTE: Movable insulation is not taken into account here
+                if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
+                    HExt = CalcMoWITTWindward(TAir - TSurf, SurfWindSpeed);
+                } else { // leeward
+                    HExt = CalcMoWITTLeeward(TAir - TSurf, SurfWindSpeed);
                 }
 
-            } else { // Exterior convection scheme for this surface has been set by user
-
-                HExt = SetExtConvectionCoeff(SurfNum);
-
-                if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
-
-                if (TSurf == TSky || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                    HSky = 0.0;
-                } else {
-                    // Compute sky radiation coefficient
-                    HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
-                           (TSurf - TSky);
+            } else if (SELECT_CASE_var1 == DOE2HcOutside) {
+                if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
+                    Hf = CalcDOE2Windward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+                } else { // leeward
+                    Hf = CalcDOE2Leeward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+                }
+                if (HMovInsul > 0.0) {
+                    TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
                 }
 
-                if (TSurf == TAir || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                    HGround = 0.0;
-                    HAir = 0.0;
-                } else {
-                    // Compute ground radiation coefficient
-                    HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+                Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
+                // Better if there was iteration for movable insulation?
 
-                    // Compute air radiation coefficient
-                    HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
-                           (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
-                }
+                HExt = Hn + Hf;
+
+            } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
+
+                ManageOutsideAdaptiveConvectionAlgo(SurfNum, HExt);
+
+            } else {
+                ShowFatalError("InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" +
+                               Surface(SurfNum).Name);
+            }
+
+            if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+
+            if (TSurf == TSky || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
+                HSky = 0.0;
+            } else {
+                // Compute sky radiation coefficient
+                HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
+                       (TSurf - TSky);
+            }
+
+            if (TSurf == TAir || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
+                HGround = 0.0;
+                HAir = 0.0;
+            } else {
+                // Compute ground radiation coefficient
+                HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+
+                // Compute air radiation coefficient
+                HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
+                       (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
+            }
+
+        } else { // Exterior convection scheme for this surface has been set by user
+
+            HExt = SetExtConvectionCoeff(SurfNum);
+
+            if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+
+            if (TSurf == TSky || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
+                HSky = 0.0;
+            } else {
+                // Compute sky radiation coefficient
+                HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
+                       (TSurf - TSky);
+            }
+
+            if (TSurf == TAir || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
+                HGround = 0.0;
+                HAir = 0.0;
+            } else {
+                // Compute ground radiation coefficient
+                HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+
+                // Compute air radiation coefficient
+                HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
+                       (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
             }
         }
     }
@@ -9622,15 +9483,15 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMoWITTHfWindward(Real64 const WindAtZ)
     {
-        static Real64 const wind_fac(3.26);
-        static Real64 const wind_exp(0.89);
+        static Real64 const wind_fac(3.26); // = a, Constant, W/(m2K(m/s)^b)
+        static Real64 const wind_exp(0.89); // = b
         return wind_fac * std::pow(WindAtZ, wind_exp);
     }
 
     Real64 CalcMoWITTHfLeeward(Real64 const WindAtZ)
     {
-        static Real64 const wind_fac(3.55);
-        static Real64 const wind_exp(0.617);
+        static Real64 const wind_fac(3.55);  // = a, Constant, W/(m2K(m/s)^b)
+        static Real64 const wind_exp(0.617); // = b
         return wind_fac * std::pow(WindAtZ, wind_exp);
     }
 
