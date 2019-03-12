@@ -1881,7 +1881,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
-    ZoneEquipmentManager::DefaultSimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -2084,7 +2083,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
-    ZoneEquipmentManager::DefaultSimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;

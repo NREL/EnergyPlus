@@ -192,7 +192,6 @@ namespace ZoneEquipmentManager {
     }                                      // namespace
 
     Array1D<Real64> AvgData; // scratch array for storing averaged data
-    Array1D_int DefaultSimOrder;
     int NumOfTimeStepInDay; // number of zone time steps in a day
     bool GetZoneEquipmentInputFlag(true);
     bool SizeZoneEquipmentOneTimeFlag(true);
@@ -209,7 +208,6 @@ namespace ZoneEquipmentManager {
         InitZoneEquipmentOneTimeFlag = true;
         InitZoneEquipmentEnvrnFlag = true;
         AvgData.deallocate(); // scratch array for storing averaged data
-        DefaultSimOrder.deallocate();
         NumOfTimeStepInDay = 0; // number of zone time steps in a day
         GetZoneEquipmentInputFlag = true;
         PrioritySimOrder.deallocate();
@@ -329,10 +327,6 @@ namespace ZoneEquipmentManager {
         }
 
         PrioritySimOrder.allocate(MaxNumOfEquipTypes);
-        DefaultSimOrder.allocate(MaxNumOfEquipTypes);
-        for (Counter = 1; Counter <= MaxNumOfEquipTypes; ++Counter) {
-            DefaultSimOrder(Counter) = Counter;
-        }
     }
 
     void InitZoneEquipment(bool const FirstHVACIteration) // unused 1208
@@ -3967,7 +3961,7 @@ namespace ZoneEquipmentManager {
             pso.EquipType_Num = zeq.EquipType_Num(EquipTypeNum);
             pso.CoolingPriority = zeq.CoolingPriority(EquipTypeNum);
             pso.HeatingPriority = zeq.HeatingPriority(EquipTypeNum);
-            pso.EquipPtr = DefaultSimOrder(EquipTypeNum);
+            pso.EquipPtr = EquipTypeNum;
         }
         for (int EquipTypeNum = NumOfEquipTypes + 1, EquipTypeNum_end = PrioritySimOrder.u(); EquipTypeNum <= EquipTypeNum_end;
              ++EquipTypeNum) { // Reset unused upper array portion
