@@ -3859,7 +3859,22 @@ Heat transfer rate for the heat exchanger, defined as positive for \textbf{\emph
 
 \subsection{HeatExchanger:FluidToFluid}\label{heatexchangerfluidtofluid}
 
-A fluid-to-fluid heat exchanger designed to couple the supply side of one plant or condenser loop to the demand side of another plant or condenser loop. This heat exchanger is fairly general and can be configured for use in any application where any two loops need to be connected together. The only constraints are that that one side must be connected to the supply side of one loop and the other side connected to the demand side of a different loop.~ Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.~ One side is called ``Loop Supply Side'' to indicate the heat exchanger is situated on the supply side of a loop. The other side is called ``Loop Demand Side'' to indicate it is on the demand side of a loop.~ The heat exchanger is intended to act as a supply component for the loop connected to it as the ``Loop Supply Side'' and as a demand component for the loop connected to it as the ``Loop Demand Side.''~ From the point of view of the heat exchanger model itself, the Loop Demand Side fluid serves as the source/sink to supply heating/cooling to the fluid in the Loop Supply Side.~ Only hydronic ``plant'' fluids are allowed, no air-side connections are possible with this heat exchanger.
+A fluid-to-fluid heat exchanger designed to couple the supply side of one plant or condenser loop to the demand side of another plant or condenser loop.
+This heat exchanger is fairly general and can be configured for use in any application where any two loops need to be connected together.
+The only constraints are that that one side must be connected to the supply side of one loop and the other side connected to the demand side of a different loop.
+
+Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.
+One side is called \textbf{Loop Supply Side} to indicate the heat exchanger is situated on the supply side of a loop.
+The other side is called \textbf{Loop Demand Side} to indicate it is on the demand side of a loop.
+The heat exchanger is intended to act as a supply component for the loop connected to it as the ``Loop Supply Side''
+and as a demand component for the loop connected to it as the ``Loop Demand Side.''
+From the point of view of the heat exchanger model itself, the Loop Demand Side fluid serves as the source/sink to supply heating/cooling to the fluid in the Loop Supply Side.
+
+This heat exchanger can be used for a wide variety of applications including chilled water, hot water, condenser, ground source, primary-secondary systems, etc.
+Heat transfer is calculated and reported using a sign convention from chilled water applications
+where \textbf{positive heat transfer indicates energy was extracted from the Loop Supply Side and added to the Loop Demand Side.}
+
+\textbf{Note}: Only hydronic ``plant'' fluids are allowed (excepting Fluid Type "Steam"), no air-side connections are possible with this heat exchanger.
 
 \begin{figure}[hbtp] % fig 88
 \centering
@@ -3867,11 +3882,33 @@ A fluid-to-fluid heat exchanger designed to couple the supply side of one plant 
 \caption{Plant Fluid-to-Fluid Heat Exchanger \protect \label{fig:plant-fluid-to-fluid-heat-exchanger}}
 \end{figure}
 
-Various options are available for the heat exchanger model. The heat transfer between the two sides can be modeled using one of seven different models for different types of heat exchangers. Heat transfer is calculated and reported using a sign convention from chilled water applications where positive heat transfer indicates energy was extracted from the Loop Supply Side and added to the Loop Demand Side.
+\textbf{Various options are available for the heat exchanger model.}
+\begin{itemize}
+\item
+    The heat transfer between the two sides can be modeled using one of seven different models for different types of heat exchangers.
+\item
+    There are also eleven options for different ways to control the heat exchanger.
+    \begin{itemize}
+        \item
+            One general type of control is \textbf{OnOff} where the flow through the heat exchanger is either fully on or fully off.
+        \item
+            Another type of control is \textbf{Modulated} where the flow through the Loop Demand Side is controlled to try and meet a target setpoint or load on the Loop Supply Side.
+    \end{itemize}
+\end{itemize}
 
-There are eleven options for different ways to control the heat exchanger.~ One general type of control is ``OnOff'' where the flow through the heat exchanger is either fully on or fully off.~ Another type of control is ``Modulated'' where the flow through the Loop Demand Side is controlled to try and meet a target setpoint or load on the Loop Supply Side.
-
-This heat exchanger can be used for a wide variety of applications including chilled water, hot water, condenser, ground source, primary-secondary systems, etc.~ As of Version 8.0, this object replaces three separate objects that were available prior to version 8.0 of EnergyPlus.~ The former HeatExchanger:Hydronic object corresponds to a situation where the Loop Demand Side is the demand side of condenser loop, the Loop Supply Side is a the supply side of a chilled water loop, the control type is ``CoolingSetpointOnOffWithComponentOverride,'' and the remote override component is a chiller. The former HeatExchanger:WatersideEconomizer object corresponds to a situation where the Loop Demand Side is the demand side of condenser loop, the Loop Supply Side is a the supply side of a chilled water loop, and the control type is ``CoolingDifferentialOnOff.'' ~The former HeatExchanger:Plate object corresponds to a situation where the Loop Demand Side is the demand side of a condenser loop, the Loop Supply Side is the supply side of a second condenser loop, and the control type is ``UncontrolledOn.''
+As of Version 8.0, \texbf{this object replaces three separate objects that were available prior to version 8.0 of EnergyPlus}.
+\begin{itemize}
+\item
+    The former \textbf{HeatExchanger:Hydronic} object corresponds to a situation where the Loop Demand Side is the demand side of condenser loop,
+    the Loop Supply Side is a the supply side of a chilled water loop, the control type is ``CoolingSetpointOnOffWithComponentOverride'',
+    and the remote override component is a chiller.
+\item
+    The former \textbf{HeatExchanger:WatersideEconomizer} object corresponds to a situation where the Loop Demand Side is the demand side of condenser loop,
+    the Loop Supply Side is a the supply side of a chilled water loop, and the control type is ``CoolingDifferentialOnOff.''
+\item
+    The former \textbf{HeatExchanger:Plate} object corresponds to a situation where the Loop Demand Side is the demand side of a condenser loop,
+    the Loop Supply Side is the supply side of a second condenser loop, and the control type is ``UncontrolledOn.''
+\end{itemize}
 
 \subsubsection{Inputs}\label{inputs-15-002}
 

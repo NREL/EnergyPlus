@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,7 +121,6 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "OutdoorAir:Node, Test node;",
 
@@ -171,7 +170,6 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 {
     // this test checks that new actuators have the Erl variable associated with them set to Null right away, issue #5710
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
 
         "OutdoorAir:Node, Test node;",
 
@@ -539,7 +537,6 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
     // specific issue was use of "-" just after operand, e.g., IF MyVar == -X,
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "OutdoorAir:Node, Test node 1;",
         "OutdoorAir:Node, Test node 2;",
@@ -735,7 +732,6 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
     // Much easier to single step this unit test than a more complex version
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "OutdoorAir:Node, Test node 1;",
 
@@ -774,7 +770,6 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     // shows a simple way to setup sensor on a node, need to call SetupNodeVarsForReporting()
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "OutdoorAir:Node, Test node;",
 
@@ -818,7 +813,6 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
     // this tests the new initialized variable added to Erl variable value data structure, for issue #4943
     // this is also what is checked to see if an actuator has been used for issue #4404.
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
 
         "EnergyManagementSystem:GlobalVariable,",
         "TempSetpoint1;          !- Name",
@@ -855,7 +849,6 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     // this tests the new initialized variable added to Erl variable value data structure in a slightly different way
     // we call the routine EvaluateExpression and examine the new bool argument for fatal errors.
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
 
         "OutdoorAir:Node, Test node 1;",
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,13 +79,14 @@ namespace DataPlant {
         int PressureCurveIndex; // Curve: index for pressure drop calculations
         Real64 PressureEffectiveK;
         bool disableOverrideForCSBranchPumping;
+        int lastComponentSimulated;
 
         // Default Constructor
         BranchData()
             : ControlType(0), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false), ConstantSpeedBranchMassFlow(0.0), BranchLevel(0),
               FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0), IsBypass(false), PumpIndex(0), PumpSizFac(1.0),
               EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false), PressureDrop(0.0), PressureCurveType(0),
-              PressureCurveIndex(0), PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false)
+              PressureCurveIndex(0), PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
         {
         }
 

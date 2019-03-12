@@ -86,7 +86,21 @@ This alpha field contains the identifying name given to the Demand Side Connecto
 
 \paragraph{Field: Load Distribution Scheme}\label{field-load-distribution-scheme-000}
 
-This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. \textbf{Optimal} operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. \textbf{SequentialLoad} loads each piece of equipment sequentially in the order specified in the \hyperref[plantequipmentlist]{PlantEquipmentList} to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. \textbf{UniformLoad} evenly distributes the loop demand among all available components on the equipment list for a given load range. \textbf{SequentialUniformPLR} loads all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the \hyperref[plantequipmentlist]{PlantEquipmentList} until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. \textbf{UniformPLR} will load all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional:
+
+\begin{itemize}
+\item
+  \textbf{Optimal} operates each piece of equipment at its optimal part load ratio. Any remaining loop demand is distributed evenly to all of the components.
+\item
+  \textbf{SequentialLoad} loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. 
+\item
+  \textbf{UniformLoad} evenly distributes the loop demand among all available components on the equipment list for a given load range. If some components do not have the capacity to meet the uniformly distributed load, the remaining load is distributed sequentially to the other available components.
+
+\item
+  \textbf{SequentialUniformPLR} loads all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the \hyperref[plantequipmentlist]{PlantEquipmentList} until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components.
+\item
+  \textbf{UniformPLR} will load all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the \hyperref[plantequipmentlist]{PlantEquipmentList} operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+\end{itemize}
 
 Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 

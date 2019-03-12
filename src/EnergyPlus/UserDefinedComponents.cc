@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2167,6 +2167,7 @@ namespace UserDefinedComponents {
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).CompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
@@ -2274,7 +2275,8 @@ namespace UserDefinedComponents {
                                                         UserCoil(CompNum).Loop.LoopNum,
                                                         UserCoil(CompNum).Loop.LoopSideNum,
                                                         UserCoil(CompNum).Loop.BranchNum,
-                                                        UserCoil(CompNum).Loop.CompNum);
+                                                        UserCoil(CompNum).Loop.CompNum,
+                                                        errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
@@ -2383,6 +2385,7 @@ namespace UserDefinedComponents {
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,
@@ -2508,6 +2511,7 @@ namespace UserDefinedComponents {
                                                             UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).BranchNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,

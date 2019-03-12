@@ -423,7 +423,11 @@ The Component Cost Economics Summary provides the construction cost estimate sum
 
 \paragraph{Life Cycle Cost Report}\label{LifeCycleCostReport}
 
-The Life Cycle Cost Report provides the a summary of the information from the Life Cycle Cost calculations.  This report shows the costs and the timing of costs, often called “cash flows,” along with the present value in several different tables. The tabular results show the present value of all current and future costs. The key used to obtain this report is LifeCycleCostReport.
+The Life Cycle Cost Report provides a summary of the information from the Life Cycle Cost calculations.  This report shows the costs and the timing of costs, often called “cash flows,” along with the present value in several different tables. The tabular results show the present value of all current and future costs. The key used to obtain this report is LifeCycleCostReport.
+
+\paragraph{Heat Emissions Report}\label{HeatEmissionsReport}
+
+The Heat Emissions Report provides a summary of the building heat emission to the ambient air. This report shows the heat emissions from buildings by surface heat transfer, zone exhaust, zone relief, HVAC relief, HVAC heat rejection, as well as the total emissions. The key used to obtain this report is HeatEmissionsSummary.
 
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
@@ -1584,6 +1588,21 @@ The predefined monthly report options are shown below. The key name of the prede
   Zone Mechanical Ventilation Heating Load Decrease Energy (SumOrAverage)
 \item
   Zone Mechanical Ventilation Air Changes per Hour (SumOrAverage)
+\end{itemize}
+
+\paragraph{HeatEmissionsMonthly}\label{HeatEmissionsMonthly}
+
+\begin{itemize}
+\item
+  Site Total Surface Heat Emission to Air (SumOrAverage)
+\item
+  Site Total Zone Exfiltration Heat Loss (SumOrAverage)
+\item
+  Site Total Zone Exhaust Air Heat Loss (SumOrAverage)
+\item
+  Air System Relief Air Total Heat Loss Energy (SumOrAverage)
+\item
+  HVAC System Total Heat Rejection Energy (SumOrAverage)
 \end{itemize}
 
 Sample IDF Input -- Output:Table:SummaryReports

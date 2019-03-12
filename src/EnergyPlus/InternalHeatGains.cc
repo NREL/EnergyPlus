@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,7 @@
 #include <FuelCellElectricGenerator.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
+#include <HybridModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MicroCHPElectricGenerator.hh>
@@ -1419,6 +1420,7 @@ namespace InternalHeatGains {
                                         "Zone",
                                         "Sum",
                                         Lights(Loop).Name);
+
                     SetupOutputVariable("Lights Visible Radiation Heating Rate",
                                         OutputProcessor::Unit::W,
                                         Lights(Loop).VisGainRate,
@@ -3775,18 +3777,26 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
-                if (ZoneITEq(Loop).RecircFLTCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
-                    ErrorsFound = true;
+                if (!lAlphaFieldBlanks(15)) {
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    if (ZoneITEq(Loop).RecircFLTCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ZoneITEq(Loop).RecircFLTCurve = 0;
                 }
 
-                ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
-                if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
-                    ErrorsFound = true;
+                if (!lAlphaFieldBlanks(16)) {
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
                 }
 
                 // Environmental class
@@ -5603,6 +5613,7 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::ZoneLatentGain;
+        using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
         using namespace DataDaylighting;
         using DataGlobals::CompLoadReportIsReq;
         using DataRoomAirModel::IsZoneDV;
@@ -5997,6 +6008,10 @@ namespace InternalHeatGains {
             SumAllInternalRadiationGains(NZ, QL(NZ));
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
+            // Added for hybrid model
+            if (HybridModel::FlagHybridModel_PC) {
+                SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+            }
         }
 
         SumConvHTRadSys = 0.0;
@@ -6300,8 +6315,12 @@ namespace InternalHeatGains {
             } else {
                 UPSPartLoadRatio = 0.0;
             }
-            UPSPower = (CPUPower + FanPower) *
-                       max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
+            if (ZoneITEq(Loop).UPSEfficFPLRCurve != 0) {
+                UPSPower = (CPUPower + FanPower) *
+                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
+            } else {
+                UPSPower = (CPUPower + FanPower) * max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency), 0.0);
+            }
             UPSHeatGain = UPSPower * ZoneITEq(Loop).UPSLossToZoneFrac;
 
             // Calculate air outlet conditions and convective heat gain to zone
@@ -6891,6 +6910,7 @@ namespace InternalHeatGains {
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::ZoneGCGain;
         using DataHeatBalFanSys::ZoneLatentGain;
+        using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6934,6 +6954,10 @@ namespace InternalHeatGains {
             }
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
+                // Added for the hybrid model
+                if (HybridModel::FlagHybridModel_PC) {
+                    SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+                }
             }
         }
 
@@ -6984,7 +7008,6 @@ namespace InternalHeatGains {
         int DeviceNum;
 
         tmpSumConvGainRate = 0.0;
-
         if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             SumConvGainRate = 0.0;
             return;
@@ -6997,6 +7020,28 @@ namespace InternalHeatGains {
         SumConvGainRate = tmpSumConvGainRate;
     }
 
+    // For HybridModel
+    void SumAllInternalConvectionGainsExceptPeople(int const ZoneNum, Real64 &SumConvGainRateExceptPeople)
+    {
+        Real64 tmpSumConvGainRateExceptPeople;
+        int DeviceNum;
+        std::string str_people = "PEOPLE";
+        tmpSumConvGainRateExceptPeople = 0.0;
+
+        if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
+            SumConvGainRateExceptPeople = 0.0;
+            return;
+        }
+
+        for (DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
+            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectType != str_people) {
+                tmpSumConvGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).ConvectGainRate;
+            }
+        }
+
+        SumConvGainRateExceptPeople = tmpSumConvGainRateExceptPeople;
+    }
+
     void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
                                            Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
                                            Real64 &SumConvGainRate)
@@ -7004,7 +7049,7 @@ namespace InternalHeatGains {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Nov. 2011
+        //       DATE WRITTEN   Nov. 2011cl
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
@@ -7323,6 +7368,21 @@ namespace InternalHeatGains {
         SumLatentGainRate = tmpSumLatentGainRate;
     }
 
+    // Added for hybrid model -- calculate the latent gain from all sources except for people
+    void SumAllInternalLatentGainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                               Real64 &SumLatentGainRateExceptPeople)
+    {
+        if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
+            SumLatentGainRateExceptPeople = 0.0;
+            return;
+        }
+        for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
+            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+                SumLatentGainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).LatentGainRate;
+            }
+        }
+    }
+
     void SumInternalLatentGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
                                        Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
                                        Real64 &SumLatentGainRate)
@@ -7493,6 +7553,22 @@ namespace InternalHeatGains {
         }
 
         SumCO2GainRate = tmpSumCO2GainRate;
+    }
+
+    // Added for hybrid model -- function for calculating CO2 gains except people
+    void SumAllInternalCO2GainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                            Real64 &SumCO2GainRateExceptPeople)
+    {
+        if (ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
+            SumCO2GainRateExceptPeople = 0.0;
+            return;
+        }
+
+        for (int DeviceNum = 1; DeviceNum <= ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
+            if (ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+                SumCO2GainRateExceptPeople += ZoneIntGain(ZoneNum).Device(DeviceNum).CarbonDioxideGainRate;
+            }
+        }
     }
 
     void SumInternalCO2GainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for

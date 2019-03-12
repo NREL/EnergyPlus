@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -502,8 +502,12 @@ namespace DataHeatBalance {
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
     // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
-    int ZoneAirSolutionAlgo(Use3rdOrder);  // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    Real64 BuildingRotationAppendixG(0.0); // Building Rotation for Appendix G
+    int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss(0.0);    // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss(0.0);    // Building total heat emission through HVAC system heat rejection;
 
     // END SiteData
 
@@ -858,6 +862,10 @@ namespace DataHeatBalance {
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;
         BuildingRotationAppendixG = 0.0;
+        ZoneTotalExfiltrationHeatLoss = 0.0;
+        ZoneTotalExhaustHeatLoss = 0.0;
+        SysTotalHVACReliefHeatLoss = 0.0;
+        SysTotalHVACRejectHeatLoss = 0.0;
         NumOfZoneLists = 0;
         NumOfZoneGroups = 0;
         NumPeopleStatements = 0;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -776,10 +776,18 @@ namespace HeatBalanceKivaManager {
                         }
 
                         if (perimeter == 0.0) {
-                            ErrorsFound = true;
-                            ShowSevereError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
+                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
                             ShowContinueError("   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
                             ShowContinueError("   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
+                            ShowContinueError("   Simulation will continue using the distance between the two lowest points in the wall for the interface distance.");
+
+                            // sort vertices by Z-value
+                            std::vector<int> zs;
+                            for (std::size_t i = 0; i < numVs; ++i) {
+                                zs.push_back(i);
+                            }
+                            sort(zs.begin(), zs.end(), [v](int a, int b) { return v[a].z < v[b].z; });
+                            perimeter = distance(v[zs[0]], v[zs[1]]);
                         }
 
                         Real64 surfHeight = Surfaces(wl).get_average_height();

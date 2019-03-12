@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -515,7 +515,50 @@ namespace HeatBalanceAirManager {
                 SetupOutputVariable(
                     "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, ZnAirRpt(Loop).imBalance, "System", "Average", Zone(Loop).Name);
             }
+
+
+            SetupOutputVariable("Zone Exfiltration Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exfiltration Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exfiltration Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExfilLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Exhaust Air Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZnAirRpt(Loop).ExhLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(Loop).Name);
         }
+
+        SetupOutputVariable(
+            "Site Total Zone Exfiltration Heat Loss", OutputProcessor::Unit::J, ZoneTotalExfiltrationHeatLoss, "System", "Sum", "Environment");
+        SetupOutputVariable(
+            "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::J, ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
@@ -3462,7 +3505,7 @@ namespace HeatBalanceAirManager {
             if (Loop == 1)
                 gio::write(OutputFileInits, Format_721)
                     << "ZoneInfiltration"
-                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - "
+                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/Exterior Surface Area {m3/s-m2},ACH - "
                        "Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - "
                        "Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
 
@@ -3548,7 +3591,7 @@ namespace HeatBalanceAirManager {
             if (Loop == 1)
                 gio::write(OutputFileInits, Format_721)
                     << "ZoneVentilation"
-                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air "
+                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa},Fan Efficiency {},Equation A - Constant Term "
                        "Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - "
                        "Velocity Squared Term Coefficient {s2/m2},Minimum Indoor Temperature{C}/Schedule,Maximum Indoor "
@@ -3713,7 +3756,7 @@ namespace HeatBalanceAirManager {
             if (Loop == 1)
                 gio::write(OutputFileInits, Format_721)
                     << "Mixing"
-                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air "
+                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = Mixing(Loop).ZonePtr;
@@ -3778,7 +3821,7 @@ namespace HeatBalanceAirManager {
             if (Loop == 1)
                 gio::write(OutputFileInits, Format_721)
                     << "CrossMixing"
-                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air "
+                    << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = CrossMixing(Loop).ZonePtr;

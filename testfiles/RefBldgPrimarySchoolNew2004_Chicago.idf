@@ -205,7 +205,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 25
 
-  Version,9.0;
+  Version,9.1;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7188,7 +7188,7 @@
     Bath_ZN_1_FLR_1 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
-    0.3,                     !- Constant Minimum Air Flow Fraction
+    autosize,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
@@ -7628,10 +7628,14 @@
     Bath_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Bath_ZN_1_FLR_1 VAV Box, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Cafeteria_ZN_1_FLR_1 Equipment,  !- Name
@@ -7640,10 +7644,14 @@
     Cafeteria_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Cafeteria_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Computer_Class_ZN_1_FLR_1 Equipment,  !- Name
@@ -7651,7 +7659,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Computer_Class_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -7659,7 +7669,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -7667,7 +7679,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -7675,7 +7689,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -7683,7 +7699,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -7691,7 +7709,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -7699,7 +7719,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -7707,7 +7729,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -7715,7 +7739,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -7723,7 +7749,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Gym_ZN_1_FLR_1 Equipment,!- Name
@@ -7731,7 +7759,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Kitchen_ZN_1_FLR_1 Equipment,  !- Name
@@ -7740,10 +7770,14 @@
     Kitchen_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Kitchen_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Library_Media_Center_ZN_1_FLR_1 Equipment,  !- Name
@@ -7751,7 +7785,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Library_Media_Center_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_1 Equipment,  !- Name
@@ -7759,7 +7795,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lobby_ZN_1_FLR_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_1 Equipment,  !- Name
@@ -7767,7 +7805,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main_Corridor_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_1 Equipment,  !- Name
@@ -7775,7 +7815,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mech_ZN_1_FLR_1 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -7783,7 +7825,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -7791,7 +7835,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -7799,7 +7845,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -7807,7 +7855,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -7815,7 +7865,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -7823,7 +7875,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_1 Equipment,  !- Name
@@ -7831,7 +7885,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Offices_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 ! ***SIZING & CONTROLS***
 
@@ -7851,7 +7907,7 @@
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
     ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
+    0.2832,                  !- Cooling Minimum Air Flow {m3/s}
     ,                        !- Cooling Minimum Air Flow Fraction
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}

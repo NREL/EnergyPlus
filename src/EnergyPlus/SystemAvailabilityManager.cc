@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,7 @@
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -4129,9 +4129,6 @@ namespace SystemAvailabilityManager {
         using NodeInputManager::GetOnlySingleNode;
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using General::TrimSigDigits;
         using namespace DataIPShortCuts;
         using CurveManager::CurveValue;
@@ -4484,7 +4481,8 @@ namespace SystemAvailabilityManager {
                 }
             }
 
-            if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 && SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+            if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
+                AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                 ShowContinueError("The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError("The Airflow Network model is not allowed to perform. Please set the control type = NoMultizoneOrDistribution");
@@ -4492,10 +4490,10 @@ namespace SystemAvailabilityManager {
             }
 
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
-                if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError("The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+                } else if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError("Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError("The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
@@ -4882,8 +4880,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataContaminantBalance::ZoneAirCO2;
         using DataContaminantBalance::ZoneCO2SetPoint;
         using DataEnvironment::IsRain;
@@ -5015,7 +5011,7 @@ namespace SystemAvailabilityManager {
                     ACH = 0.0;
                     HybridVentModeOA = true;
                     if (!HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             HybridVentModeOA = false;
                         }
                     }

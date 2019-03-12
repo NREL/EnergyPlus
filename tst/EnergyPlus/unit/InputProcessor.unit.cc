@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -335,6 +335,40 @@ TEST_F(InputProcessorFixture, decode_encode_3)
     EXPECT_EQ(expected, encoded);
 }
 
+TEST_F(InputProcessorFixture, byte_order_mark)
+{
+    auto const idf(delimited_string(
+            {
+                    "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+            }));
+
+    auto const expected(delimited_string(
+            {
+                    "Building,",
+                    "  Bldg,",
+                    "  0.0,",
+                    "  Suburbs,",
+                    "  0.04,",
+                    "  0.4,",
+                    "  FullExterior,",
+                    "  25.0,",
+                    "  6.0;",
+                    "",
+                    "GlobalGeometryRules,",
+                    "  UpperLeftCorner,",
+                    "  Counterclockwise,",
+                    "  Relative,",
+                    "  Relative,",
+                    "  Relative;",
+                    ""
+            }));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
 TEST_F(InputProcessorFixture, parse_empty_fields)
 {
     std::string const idf(delimited_string({
@@ -372,6 +406,186 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
             }
         }
     }
+}
+
+TEST_F(InputProcessorFixture, parse_utf_8)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    试验,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                    !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    , !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;",
+    }));
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_utf_8_json)
+{
+    auto parsed = json::parse("{ \"Building\": { \"试验\": { \"temperature_convergence_tolerance_value\": 0.2000,"
+                              "\"maximum_number_of_warmup_days\": 25, \"minimum_number_of_warmup_days\": 6 } } }");
+
+    json expected = {{"Building",
+                      {{"试验",
+                        {//               {"north_axis", ""},
+                         //               {"terrain", ""},
+                         //               {"loads_convergence_tolerance_value", ""},
+                         {"temperature_convergence_tolerance_value", 0.2000},
+                         //               {"solar_distribution", ""},
+                         {"maximum_number_of_warmup_days", 25},
+                         {"minimum_number_of_warmup_days", 6}}}}}};
+    EXPECT_EQ( expected, parsed );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xED\xA0\x80\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    EXPECT_ANY_THROW(epJSON.dump(-1, ' ', false, json::error_handler_t::strict));
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::ignore);
+
+    EXPECT_EQ( expected, input_file );
+}
+
+TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
+{
+    std::string const idf(delimited_string({
+        "  Building,",
+        "    \xED\xA0\x80,  !- Name",
+        "    ,                  !- North Axis {deg}",
+        "    ,                  !- Terrain",
+        "    ,                  !- Loads Convergence Tolerance Value",
+        "    ,                  !- Temperature Convergence Tolerance Value {deltaC}",
+        "    ,                  !- Solar Distribution",
+        "    ,                  !- Maximum Number of Warmup Days",
+        "    ;",
+    }));
+
+    std::string const expected(
+      "{\"Building\":{"
+        "\"\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD\":{"
+          "\"idf_max_extensible_fields\":0,"
+          "\"idf_max_fields\":8,"
+          "\"idf_order\":1"
+        "}"
+      "},"
+      "\"GlobalGeometryRules\":{"
+        "\"\":{"
+          "\"coordinate_system\":\"Relative\","
+          "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+          "\"idf_order\":0,"
+          "\"rectangular_surface_coordinate_system\":\"Relative\","
+          "\"starting_vertex_position\":\"UpperLeftCorner\","
+          "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "}}"
+    );
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+
+    auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
+
+    EXPECT_EQ( expected, input_file );
 }
 
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
@@ -1669,7 +1883,7 @@ TEST_F(InputProcessorFixture, look_ahead)
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
@@ -1697,8 +1911,8 @@ TEST_F(InputProcessorFixture, next_token)
     EXPECT_EQ(9ul, index);
     EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
     token = next_token(test_input, index);
-    EXPECT_EQ(10ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_EQ(11ul, index);
+    EXPECT_EQ(IdfParser::Token::STRING, token);
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
@@ -2696,7 +2910,10 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-        "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2778,9 +2995,9 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
 
-    EXPECT_EQ(2, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false}), lNumericBlanks2));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1}), Numbers2));
+    EXPECT_EQ(4, NumNumbers2);
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, true, true}), lNumericBlanks2));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1, 1, 1}), Numbers2));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3561,6 +3778,93 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true}), lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
+}
+
+// https://github.com/NREL/EnergyPlus/issues/6720
+TEST_F(InputProcessorFixture, FalseDuplicates)
+{
+    std::string const idf(delimited_string({
+        "Material,",
+        "  Standard insulation_0.1,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "  Standard insulation_0.01,   !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  1.729577,                !- Conductivity {W/m-K}",
+        "  2242.585,                !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+    }));
+
+
+    ASSERT_TRUE(process_idf(idf));
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowerLevel)
+{
+
+    json root;
+    std::string obj_name = "Material";
+    std::string name1 = "Standard insulation_01";
+    json mat1 = { {"name", name1}, {"Roughness", "MediumRough"}};
+
+    EXPECT_TRUE(mat1.is_object());
+
+    // Add the first material to it
+    root[obj_name][name1] = mat1;
+
+    auto test = [=](std::string search_name) {
+        // Second material shouldn't be found!
+        // Oh Oh, this fails
+        auto it = root[obj_name].find(search_name);
+        EXPECT_TRUE( it == root[obj_name].end());
+        if (it != root[obj_name].end()) {
+            EXPECT_TRUE(false) << it.key();
+        }
+
+        // This works...
+        EXPECT_TRUE(std::find(root[obj_name].begin(), root[obj_name].end(), search_name) == root[obj_name].end());
+    };
+
+    // This all works just fine
+    test("Standard insulation");
+    test("Standard insulation_");
+    test("Standard insulation_0");
+    test("Standard insulation_0.");
+    test("Standard insulation_00");
+    test("Standard insulation_00.1");
+    test("Standard insulation_0010");
+
+    // This used to fail before fix in doj/alphanum.hpp
+    test("Standard insulation_001");
+
+}
+
+TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_001") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_010") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_0") > 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_01", "n_1") < 0);
+
+    EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
+
 }
 
 /*

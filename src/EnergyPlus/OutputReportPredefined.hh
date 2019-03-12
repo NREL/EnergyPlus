@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -107,6 +107,7 @@ namespace OutputReportPredefined {
     extern int pdchPumpFlow;
     extern int pdchPumpPower;
     extern int pdchPumpPwrPerFlow;
+    extern int pdchPumpEndUse;
     extern int pdchMotEff;
     // Cooling coil subtable
     extern int pdstCoolCoil;
@@ -972,6 +973,10 @@ namespace OutputReportPredefined {
 
     void SetPredefinedTables();
 
+
+    // Creates an entry for predefined tables when the entry
+    // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
+    // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
     void PreDefTableEntry(int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
 
     void PreDefTableEntry(int const columnIndex, std::string const &objName, std::string const &tableEntryChar);

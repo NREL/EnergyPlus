@@ -2535,6 +2535,12 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
   HVAC,Sum,AFN Zone Mixing Volume {[}m3{]}
 \item
   HVAC,Sum,AFN Zone Mixing Mass {[}kg{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,AFN Zone Exfiltration Latent Heat Transfer Rate {[}W{]}
 \end{itemize}
 
 \textbf{The following output variables are reported only when a Fan:OnOff object is used:}
@@ -3085,3 +3091,11 @@ This is the RoomAirflowNetwork node humidity ratio output in kgWater/kgDryAir.
 \paragraph{RoomAirflowNetwork Node Total Pressure {[}Pa{]}}\label{roomairflownetwork-node-total-pressure-pa}
 
 This is the RoomAirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node's relative height.
+
+\paragraph{AFN Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-heat-transfer-rate-w}
+
+\subsubsection{AFN Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-sensible-heat-transfer-rate-w}
+
+\subsubsection{AFN Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{afn-zone-exfiltration-latent-heat-transfer-rate-w}
+
+These output variables represent the heat emitted to ambient from exfiltration in Watts. The exfiltration rate is calculated by solving a mass flow balance on the zone airflow network including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. Positive values indicate the zone injects heat to the environment, while negative values indicate the building extracts heat from the environment. 

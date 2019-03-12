@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -420,10 +420,8 @@ namespace ReportSizingManager {
         Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
-        std::string DDNameFanPeak;
-        DDNameFanPeak = ""; // " test my Design Day";
-        std::string dateTimeFanPeak;
-        dateTimeFanPeak = ""; // " test 1/2 00:00:00 ";
+        std::string DDNameFanPeak;                 // Name of the design day that produced the Peak
+        std::string dateTimeFanPeak;               // A String representing the DateTime of the Peak
         Real64 DXFlowPerCapMinRatio(1.0);
         Real64 DXFlowPerCapMaxRatio(1.0);
 
@@ -529,11 +527,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).AirVolFlow) {
                                     DDNameFanPeak = "Unknown";
@@ -544,24 +558,56 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (ZoneHeatingOnlyFan) {
                                     AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                     AutosizeDes = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                     AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                     AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
@@ -569,11 +615,27 @@ namespace ReportSizingManager {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     }
                                 } else {
@@ -581,12 +643,29 @@ namespace ReportSizingManager {
                                     if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
+                                            // This block of code is entered in Test ReportSizingManager.unit.cc::ReportSizingManager_FanPeak
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     }
                                 }
@@ -597,24 +676,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
@@ -623,11 +734,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -637,11 +764,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -651,24 +794,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
@@ -677,11 +852,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -691,11 +882,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -705,24 +912,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity,
@@ -731,11 +970,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -745,11 +1000,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -759,24 +1030,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity,
@@ -785,11 +1088,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -799,11 +1118,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -813,12 +1148,28 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
@@ -826,11 +1177,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -843,12 +1210,28 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (ZoneHeatingOnlyFan) {
                                     AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else {
                                     AutosizeDes = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
@@ -856,11 +1239,27 @@ namespace ReportSizingManager {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     }
                                 }
@@ -880,12 +1279,28 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (SizingType == HeatingAirflowSizing) {
 
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else {
 
@@ -893,11 +1308,27 @@ namespace ReportSizingManager {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).AirVolFlow) {
                                         DDNameFanPeak = "Unknown";
@@ -909,24 +1340,56 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (ZoneHeatingOnlyFan) {
                                     AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                     AutosizeDes = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                     AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                     AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
@@ -934,11 +1397,27 @@ namespace ReportSizingManager {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     }
                                 } else {
@@ -947,11 +1426,27 @@ namespace ReportSizingManager {
                                         if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                         }
                                     } else if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                         if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                             FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                             DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                            dateTimeFanPeak =
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                                "/" +
+                                                General::TrimSigDigits(
+                                                    WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                                " " +
+                                                coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                         }
                                     }
                                 }
@@ -962,24 +1457,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
@@ -988,11 +1515,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -1002,11 +1545,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -1016,24 +1575,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFracOfAutosizedCoolingAirflow * ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
@@ -1042,11 +1633,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -1056,11 +1663,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -1070,24 +1693,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity,
@@ -1096,11 +1751,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -1110,11 +1781,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
@@ -1124,24 +1811,56 @@ namespace ReportSizingManager {
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneHeatingOnlyFan) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                                 AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
                                 if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                     FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                     DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                    dateTimeFanPeak =
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                        "/" +
+                                        General::TrimSigDigits(
+                                            WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                        " " +
+                                        coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
                                 AutosizeDes = max(DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity,
@@ -1150,11 +1869,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             } else {
@@ -1164,11 +1899,27 @@ namespace ReportSizingManager {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax);
                                     }
                                 } else if (AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity) {
                                     if (FinalZoneSizing(CurZoneEqNum).HeatDDNum > 0 &&
                                         FinalZoneSizing(CurZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
                                         DDNameFanPeak = WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Title;
+                                        dateTimeFanPeak =
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).Month) +
+                                            "/" +
+                                            General::TrimSigDigits(
+                                                WeatherManager::DesDayInput(FinalZoneSizing(CurZoneEqNum).HeatDDNum).DayOfMonth) +
+                                            " " +
+                                            coilSelectionReportObj->getTimeText(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtHeatMax);
                                     }
                                 }
                             }
