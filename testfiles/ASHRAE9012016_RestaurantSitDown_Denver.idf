@@ -1,120 +1,13 @@
-! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
-! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
-! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
-! the Advanced Energy Design Guide series, and building industry experts.
-! The prototypes models were developed to quantify energy saving impacts from
-! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
-! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
-! strategies can be found in the following  reports:
-! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
-! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
-! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
-! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
-!
-! BEGIN ECONOMIZER MAP
-! Economizer Name, DX COIL Name
-! PSZ-AC_1:1_OA_Controller, PSZ-AC_1:1_CoolC DXCoil
-! PSZ-AC_2:2_OA_Controller, PSZ-AC_2:2_CoolC DXCoil
-! END ECONOMIZER MAP
-!
-!
-! BEGIN EMS PROGRAM MAP
-! EMS PROGRAM, DX COIL Name
-! PSZ1_1, PSZ-AC_1:1_CoolC DXCoil
-! PSZ2_2, PSZ-AC_2:2_CoolC DXCoil
-! END EMS PROGRAM MAP
-!
-!
-! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
-! GPARM parameters as input:
-!    Case = DOE.determination2016_RestaurantSitDown_STD2016_Boise
-!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
-!    annual_run = no
-!    slab_gtp = Zone5B_nonres_R15_2ftV_RestaurantSitDown_Denver_STD2016.gtp
-!    avg_oa_tempt_ip = 49.91
-!    maxdiff_oa_tempt_ip = 42.66
-!    ext_wall_type = SteelFramedWall
-!    nonres_ext_wall_ufactor = 0.31229
-!    roof_type = WoodJoistAtticRoof
-!    nonres_roof_ufactor = 0.119238
-!    roof_solar_absorp = 0.7
-!    nonres_window = Window_U_0.40_SHGC_0.38
-!    nonres_window_east_west = Window_U_0.43_SHGC_0.26
-!    sidelighting_control = yes_AY
-!    economizer = NoEconomizer
-!    skip_economizer_control = No
-!    cc_sa_humidity = 0.007
-!    damper_sch = MinOA_MotorizedDamper_Sched
-!    exterior_lights_watts =
-!    exterior_lights_watts_a = 154.01
-!    exterior_lights_watts_b = 1459.5
-!    Dining_SZ_VAV = No
-!    Kitchen_SZ_VAV = No
-!    avg_oa_tempt = 9.95
-!    maxdiff_oa_tempt = 23.7
-!    infil = 0.00056896
-!    LPD_dining = 7.642376396
-!    LPD_kitchen = 11.40974504
-!    oa_dining = 0.003581176
-!    oa_kitchen = 0.000799956
-!    door_infil = 0.389828222
-!    door_infil_sched = VESTIBULE_DOOR_INFIL_SCH
-!    economizer_lockout = NoLockout
-!    KitExh_Reduce_10pct = Yes
-!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
-!    addendum_cd = 2016AS
-!    pv_generator = no
-!    pv_surface_area = 0
-!    STD189_overhang = no
-!    overhang_pf_ew =
-!    swh_et = 0.80512672
-!    swh_ua = 9.643286505
-!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
-!    LTG_SCH_SET = LTG_SET_STD2013
-!    freezer_power = 457.5
-!    refrigerator_power = 570
-!    HTGSETP_SCH = HTGSETP_SCH_NO_OPTIMUM
-!    CLGSETP_SCH = CLGSETP_SCH_NO_OPTIMUM
-!    HTGSETP_KITCHEN_SCH = HTGSETP_KITCHEN_SCH_NO_OPTIMUM
-!    CLGSETP_KITCHEN_SCH = CLGSETP_KITCHEN_SCH_NO_OPTIMUM
-!    swh_et_booster = 1
-!    swh_ua_booster = 1.053159296
-!    pipe_heat_loss = 947.76
-!    evap_fan_power_case1 = 21.14285714
-!    evap_fan_power_case2 = 18.85714286
-!    walkin_lighting_sch = walkin_occ_lght_sch
-!    fan_total_eff = 0.385
-!    kitchen_exh_fan_power = 914
-!    skip_EMSprogram = no
-!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
-!    loadProfile = No
-!    receptacle_ctrl_occ_reduction_frac = 0.998892143
-!    receptacle_ctrl_unocc_reduction_frac = 0.994346789
-!    CodeName = ASHRAE90.1_STD2016
-!    CZ_City_Old = Boise
-!    CZ_Label = 5B
-!    Addendum_AH = Yes
-!    LPD_Ctrl = 0.02
-!    con_swingdoor_r = 0.475963827
-!     =
-!     =
-!     =
-!     =
-! Start SimMetaData
-! RoofConstruction=Attic and Other
-! ExtWallConstruction=Steel-Framed
-! End SimMetaData
-
-  Version,9.1;
-
-!-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
+  Version,
+    9.1;                    !- Version Identifier
 
   SimulationControl,
-    Yes,                     !- Do Zone Sizing Calculation
-    Yes,                     !- Do System Sizing Calculation
-    Yes,                     !- Do Plant Sizing Calculation
-    Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    Yes,
+    Yes,
+    No,
+    Yes,
+    No,
+    No;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -4726,10 +4619,14 @@
     Dining Exhaust Fan,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Dining Direct Air,       !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction
 
   ZoneHVAC:EquipmentList,
     Kitchen Equipment,       !- Name
@@ -4738,10 +4635,14 @@
     Kitchen Exhaust Fan,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Kitchen Direct Air,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
