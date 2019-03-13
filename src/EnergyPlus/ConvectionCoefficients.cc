@@ -9401,7 +9401,7 @@ namespace ConvectionCoefficients {
         //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
         //   University of Illinois at Urbana-Champaign.
 
-        return 2.53 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
+        return 2.537 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
     }
 
     Real64 CalcSparrowHfLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
