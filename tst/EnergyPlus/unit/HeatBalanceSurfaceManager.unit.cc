@@ -721,6 +721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1259,6 +1260,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1834,6 +1836,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -2391,6 +2394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;

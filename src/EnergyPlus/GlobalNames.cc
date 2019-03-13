@@ -274,6 +274,7 @@ namespace GlobalNames {
             return;
         }
 
+        // TODO: should probably not do that either
         ErrorFound = false;
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {

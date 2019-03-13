@@ -1,3 +1,10 @@
+# Use ccache if available, has to be before "project()"
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  # Support both Unix Makefiles and Ninja
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
