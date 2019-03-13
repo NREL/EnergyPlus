@@ -585,14 +585,26 @@ namespace ConvectionCoefficients {
 
     Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const AirChangeRate); // [1/hr] air system air change rate
 
+    Real64 CalcAlamdariHammondHnUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                   Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
+    );
+
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                  int const SurfNum               // for messages
     );
 
+    Real64 CalcAlamdariHammondHnStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                               Real64 const HydraulicDiameter    // [m] characteristic size, = (4 * area) / perimeter
+    );
+
     Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                int const SurfNum               // for messages
+    );
+
+    Real64 CalcAlamdariHammondHnVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                             Real64 const Height     // [m] characteristic size, = zone height
     );
 
     Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air

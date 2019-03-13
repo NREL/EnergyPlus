@@ -595,13 +595,13 @@ namespace ConvectionCoefficients {
 
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                        // Assume 1'x20' strip for walls.
+                        const double length = 1.0;
+                        const double width = 20.0;
+                        const double area = length*width;
+                        const double perim = 2.0 * (length + width);
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
-                            // Assume 1'x20' strip for walls.
-                            const double length = 1.0;
-                            const double width = 20.0;
-                            const double area = length*width;
-                            const double perim = 2.0 * (length + width);
                             // Average windward and leeward since all walls use same algorithm
                             double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
                             double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
@@ -639,7 +639,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
                                                                                      double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
@@ -669,7 +669,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var1 == DOE2HcOutside) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
                                                                                      double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
@@ -6218,10 +6218,14 @@ namespace ConvectionCoefficients {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 Hf(0.0); // the forced, or wind driven portion of film coefficient
         static Real64 Hn(0.0); // the natural, or bouyancy driven portion of film coefficient
-        int ConstructNum;
         Real64 SurfWindSpeed;
         Real64 SurfWindDir;
         Real64 HydraulicDiameter;
+
+        // Kiva callback functions
+        Kiva::ForcedConvectionTerm HfTermFn;
+        Kiva::ConvectionAlgorithm HfFn;
+        Kiva::ConvectionAlgorithm HnFn;
 
         // first call Hn models
         {
@@ -6229,30 +6233,42 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == HcExt_None) {
                 Hn = 0.0;
+                HnFn = CONST_CONV(0.0);
             } else if (SELECT_CASE_var == HcExt_UserCurve) {
 
                 CalcUserDefinedOutsideHcModel(SurfNum, Surface(SurfNum).OutConvHnUserCurveIndex, Hn);
 
             } else if (SELECT_CASE_var == HcExt_NaturalASHRAEVerticalWall) {
                 Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+                HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                    return CalcASHRAEVerticalWall(Tsurf - Tamb);
+                };
             } else if (SELECT_CASE_var == HcExt_NaturalWaltonUnstableHorizontalOrTilt) {
                 Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                         Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                    return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+                };
             } else if (SELECT_CASE_var == HcExt_NaturalWaltonStableHorizontalOrTilt) {
                 Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                       Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                    return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+                };
             } else if (SELECT_CASE_var == HcExt_AlamdariHammondVerticalWall) {
 
                 Hn = CalcAlamdariHammondVerticalWall(
                     (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), Surface(SurfNum).OutConvFaceHeight, SurfNum);
+                HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                    return CalcAlamdariHammondHnVerticalWall(Tsurf - Tamb, Surface(SurfNum).OutConvFaceHeight);
+                };
             } else if (SELECT_CASE_var == HcExt_FohannoPolidoriVerticalWall) {
                 Hn = CalcFohannoPolidoriVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                      Surface(SurfNum).OutConvFaceHeight,
                                                      TH(1, 1, SurfNum),
                                                      -QdotConvOutRepPerArea(SurfNum),
                                                      SurfNum);
-                //  CASE (HcExt_ISO15099Windows)
-
+                // Not compatible with Kiva
             } else if (SELECT_CASE_var == HcExt_AlamdariHammondStableHorizontal) {
                 if (Surface(SurfNum).OutConvFacePerimeter > 0.0) {
                     HydraulicDiameter = 4.0 * Surface(SurfNum).OutConvFaceArea / Surface(SurfNum).OutConvFacePerimeter;
@@ -6280,45 +6296,143 @@ namespace ConvectionCoefficients {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
             }
 
+            int Roughness = Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
             if (SELECT_CASE_var == HcExt_None) {
                 Hf = 0.0;
+                HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_UserCurve) {
                 CalcUserDefinedOutsideHcModel(SurfNum, Surface(SurfNum).OutConvHfUserCurveIndex, Hf);
             } else if (SELECT_CASE_var == HcExt_SparrowWindward) {
-                ConstructNum = Surface(SurfNum).Construction;
-                Hf = CalcSparrowWindward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
+                Hf = CalcSparrowWindward(Roughness,
                                          Surface(SurfNum).OutConvFacePerimeter,
                                          Surface(SurfNum).OutConvFaceArea,
                                          SurfWindSpeed,
                                          SurfNum);
 
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
+                } else {
+                    // Assume 1'x20' strip for walls.
+                    const double length = 1.0;
+                    const double width = 20.0;
+                    const double area = length*width;
+                    const double perim = 2.0 * (length + width);
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
+                        double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
+                        return (windwardHf + leewardHf)/2.0;
+                    };
+                }
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_SparrowLeeward) {
-                ConstructNum = Surface(SurfNum).Construction;
-                Hf = CalcSparrowLeeward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
+                Hf = CalcSparrowLeeward(Roughness,
                                         Surface(SurfNum).OutConvFacePerimeter,
                                         Surface(SurfNum).OutConvFaceArea,
                                         SurfWindSpeed,
                                         SurfNum);
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
+                } else {
+                    // Assume 1'x20' strip for walls.
+                    const double length = 1.0;
+                    const double width = 20.0;
+                    const double area = length*width;
+                    const double perim = 2.0 * (length + width);
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcSparrowHfWindward(Roughness, perim, area, windSpeed);
+                        double leewardHf = CalcSparrowHfLeeward(Roughness, perim, area, windSpeed);
+                        return (windwardHf + leewardHf)/2.0;
+                    };
+                }
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
                 Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp, SurfWindSpeed);
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        return CalcMoWITTHfWindward(windSpeed);
+                    };
+                } else {
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                        double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                        return (windwardHf + leewardHf) / 2.0;
+                    };
+                }
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_MoWiTTLeeward) {
                 Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), SurfWindSpeed);
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        return CalcMoWITTHfLeeward(windSpeed);
+                    };
+                } else {
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                        double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                        return (windwardHf + leewardHf) / 2.0;
+                    };
+                }
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_DOE2Windward) {
-                ConstructNum = Surface(SurfNum).Construction;
                 Hf = CalcDOE2Windward(TH(1, 1, SurfNum),
                                       Surface(SurfNum).OutDryBulbTemp,
                                       Surface(SurfNum).CosTilt,
                                       SurfWindSpeed,
-                                      Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
+                                      Roughness);
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        return CalcMoWITTHfWindward(windSpeed);
+                    };
+                } else {
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                        double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                        return (windwardHf + leewardHf) / 2.0;
+                    };
+                }
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
-                ConstructNum = Surface(SurfNum).Construction;
                 Hf = CalcDOE2Leeward(TH(1, 1, SurfNum),
                                      Surface(SurfNum).OutDryBulbTemp,
                                      Surface(SurfNum).CosTilt,
                                      SurfWindSpeed,
-                                     Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
+                                     Roughness);
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        return CalcMoWITTHfWindward(windSpeed);
+                    };
+                } else {
+                    HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                        // Average windward and leeward since all walls use same algorithm
+                        double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                        double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                        return (windwardHf + leewardHf) / 2.0;
+                    };
+                }
+                HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double{
+                    return CalcDOE2Hf(Tsurf, Tamb, cosTilt, hfTerm, Roughness);
+                };
             } else if (SELECT_CASE_var == HcExt_NusseltJurges) {
                 Hf = CalcNusseltJurges(SurfWindSpeed);
 
@@ -6338,14 +6452,29 @@ namespace ConvectionCoefficients {
                                    Surface(SurfNum).OutConvFacePerimeter);
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
+                // Not compatible with Kiva (doesn't use local windspeed)
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
                 Hf = CalcEmmelVertical(WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
+                // Not compatible with Kiva (doesn't use local windspeed)
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
                 Hf = CalcEmmelRoof(WindSpeed, WindDir, RoofLongAxisOutwardAzimuth, SurfNum);
+                // Not compatible with Kiva (doesn't use local windspeed)
             }
         }
 
         Hc = Hf + Hn;
+
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = HfTermFn;
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double HfTerm,
+                                                                          double Roughness, double cosTilt) -> double {
+                Real64 HcExt = HfFn(Tsurf, Tamb, HfTerm, Roughness, cosTilt) + HnFn(Tsurf, Tamb, HfTerm, Roughness, cosTilt);
+                if (HcExt < AdaptiveHcOutsideLowLimit) HcExt = AdaptiveHcOutsideLowLimit;
+                return HcExt;
+            };
+            Hc = 0.0;  // Not used in Kiva
+        }
+
         if (Hc < AdaptiveHcOutsideLowLimit) Hc = AdaptiveHcOutsideLowLimit;
     }
 
@@ -7967,9 +8096,8 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                 Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                 int const SurfNum               // for messages
+    Real64 CalcAlamdariHammondHnUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                   Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     )
     {
 
@@ -7991,30 +8119,22 @@ namespace ConvectionCoefficients {
         // for buoyancy-driven convection in rooms.  Building Services Engineering
         // Research & Technology. Vol. 4, No. 3.
 
-        // USE STATEMENTS:
-        // na
 
-        // Return value
+        return std::pow(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) + (1.63 * pow_2(DeltaTemp)),
+                      OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+    }
+
+    Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                 Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                 int const SurfNum               // for messages
+    )
+    {
         Real64 Hn; // function result
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
 
         if (HydraulicDiameter > 0.0) {
-            Hn = std::pow(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) + (1.63 * pow_2(DeltaTemp)),
-                          OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+            Hn = CalcAlamdariHammondHnUnstableHorizontal(DeltaTemp, HydraulicDiameter);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
@@ -8023,16 +8143,15 @@ namespace ConvectionCoefficients {
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(
-                "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
-                ErrorIndex);
+                    "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
+                    ErrorIndex);
         }
 
         return Hn;
     }
 
-    Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                               Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                               int const SurfNum               // for messages
+    Real64 CalcAlamdariHammondHnStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                 Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     )
     {
 
@@ -8054,29 +8173,21 @@ namespace ConvectionCoefficients {
         // for buoyancy-driven convection in rooms.  Building Services Engineering
         // Research & Technology. Vol. 4, No. 3.
 
-        // USE STATEMENTS:
-        // na
+        return 0.6 * std::pow(std::abs(DeltaTemp) / pow_2(HydraulicDiameter), OneFifth);
+    }
 
-        // Return value
+    Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                               Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                               int const SurfNum               // for messages
+    )
+    {
+
         Real64 Hn; // function result, natural convection Hc value
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
 
         if (HydraulicDiameter > 0.0) {
-            Hn = 0.6 * std::pow(std::abs(DeltaTemp) / pow_2(HydraulicDiameter), OneFifth);
+            Hn = CalcAlamdariHammondHnStableHorizontal(DeltaTemp, HydraulicDiameter);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
@@ -8085,16 +8196,15 @@ namespace ConvectionCoefficients {
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(
-                "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
-                ErrorIndex);
+                    "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
+                    ErrorIndex);
         }
 
         return Hn;
     }
 
-    Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                           Real64 const Height,    // [m] characteristic size, = zone height
-                                           int const SurfNum       // for messages
+    Real64 CalcAlamdariHammondHnVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                             Real64 const Height
     )
     {
 
@@ -8116,30 +8226,22 @@ namespace ConvectionCoefficients {
         // for buoyancy-driven convection in rooms.  Building Services Engineering
         // Research & Technology. Vol. 4, No. 3.
 
-        // USE STATEMENTS:
-        // na
+        return std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + (1.23 * pow_2(DeltaTemp)),
+                          OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+    }
 
+    Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                           Real64 const Height,    // [m] characteristic size, = zone height
+                                           int const SurfNum       // for messages
+    )
+    {
         // Return value
         Real64 Hn; // function result, natural convection Hc value
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
 
         if (Height > 0.0) {
-            Hn = std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + (1.23 * pow_2(DeltaTemp)),
-                          OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+            Hn = CalcAlamdariHammondHnVerticalWall(DeltaTemp, Height);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
