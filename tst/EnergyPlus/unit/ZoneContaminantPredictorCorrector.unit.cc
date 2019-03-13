@@ -188,6 +188,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Node.allocate(5);
 
@@ -344,6 +345,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Node.allocate(5);
 
@@ -494,6 +496,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     ZoneEquipConfig(2).ZoneName = "Zone 2";
     ZoneEquipConfig(2).ActualZoneNum = 2;
@@ -505,6 +508,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 7;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     ZoneEquipConfig(3).ZoneName = "Zone 3";
     ZoneEquipConfig(3).ActualZoneNum = 3;
@@ -516,6 +520,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZoneEquipConfig(3).NumReturnNodes = 1;
     ZoneEquipConfig(3).ReturnNode.allocate(1);
     ZoneEquipConfig(3).ReturnNode(1) = 9;
+    ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
     Node.allocate(10);
 
@@ -699,6 +704,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     ZoneEquipConfig(2).ZoneName = "Zone 2";
     ZoneEquipConfig(2).ActualZoneNum = 2;
@@ -710,6 +716,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 7;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     ZoneEquipConfig(3).ZoneName = "Zone 3";
     ZoneEquipConfig(3).ActualZoneNum = 3;
@@ -721,6 +728,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZoneEquipConfig(3).NumReturnNodes = 1;
     ZoneEquipConfig(3).ReturnNode.allocate(1);
     ZoneEquipConfig(3).ReturnNode(1) = 9;
+    ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
     Node.allocate(10);
 

@@ -872,10 +872,12 @@ namespace DataZoneEquipment {
                 ZoneEquipConfig(ControlledZoneNum).ReturnNode.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
+                ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
+                ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
                 ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
 
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {

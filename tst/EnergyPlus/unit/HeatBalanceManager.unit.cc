@@ -486,6 +486,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
     ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
@@ -512,6 +513,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 8;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
     ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
@@ -533,6 +535,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+
     Node(1).MassFlowRate = 0.0; // Zone 1 zone node
     Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
     Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
@@ -544,12 +554,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    AirLoopFlow(1).MaxOutAir = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -1222,6 +1233,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataHeatBalance::TempEffBulkAir.allocate(6);
 
