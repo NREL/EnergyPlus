@@ -16,7 +16,7 @@ The Annual Building Utility Performance Summary report often called ABUPS -- (ke
 
 \begin{itemize}
 \item
-  Site and Source Energy -- Indicates the total site and source energy use. For electricity the net electricity from the utility is used for the electric contribution. The site to source conversion factors are based on those entered by the user. These are entered in the EnvironmentalImpactFactors object and FuelFactors objects.
+  Site and Source Energy -- Indicates the total site and source energy use. For electricity the net electricity from the utility is used for the electric contribution. The site to source conversion factors are based on those entered by the user. These are entered in the \hyperref[environmentalimpactfactors]{EnvironmentalImpactFactors} object and \hyperref[fuelfactors]{FuelFactors} objects.
 \item
   Building Area -- Shows the total floorspace of the building and the conditioned floorspace.
 \item
@@ -45,14 +45,14 @@ The Input Verification and Results Summary report (key: InputVerificationandResu
 \item
   Skylight-Roof Ratio table for envelope which includes the roof area and the skylight area and the ratio of the two. This includes all surfaces with a tilt of less than 60 degrees.
 \item
-  Zone Summary includes internal load summary for each zone including area, if conditioned, volume, multipliers, above ground gross wall area, underground gross wall area, window area, design lighting, design people, and design plug and process. 
+  Zone Summary includes internal load summary for each zone including area, if conditioned, volume, multipliers, above ground gross wall area, underground gross wall area, window area, design lighting, design people, and design plug and process.
 \item
   Hybrid Model: Internal Thermal Mass table is only shown when hybrid model: internal thermal mass simulation. This includes Hybrid Modeling (Y/N) for internal mass and Temperature Capacitance Multiplier values for each zone.
 \end{itemize}
 
 \paragraph{Source Energy End Use Components Summary}\label{source-energy-end-use-components-summary}
 
-The Source Energy End Use Components Summary report produces a report (key: SourceEnergyEndUseComponentsSummary) that includes three tables. These tables display source energy by fuel type that is calculated based on site to source energy factors specified by the user in the EnvironmentalImpactFactors and FuelFactors objects. The last two tables display the source energy in terms of area normalized metrics. Following is a description of each table:
+The Source Energy End Use Components Summary report produces a report (key: SourceEnergyEndUseComponentsSummary) that includes three tables. These tables display source energy by fuel type that is calculated based on site to source energy factors specified by the user in the \hyperref[environmentalimpactfactors]{EnvironmentalImpactFactors} and \hyperref[fuelfactors]{FuelFactors} objects. The last two tables display the source energy in terms of area normalized metrics. Following is a description of each table:
 
 \begin{itemize}
 \item
@@ -97,7 +97,7 @@ The Shading Summary report (key: ShadingSummary) produces a report that includes
 \item
   Sunlit Fraction which shows a list of windows and the fraction of the window that is sunlit for nine specific times of the year. The nine specific times include 9am, noon and 3pm on March 21, June 21, and December 21. These nine times were chosen to represent the range of sun angles. The simulation must include those times for the value to be included in the report.
 \item
-  Window control includes the names of all windows that have a window shading control (see WindowShadingControl) and includes the name of the control, the type of shading, the shaded construction, the kind of control, and if glare control is used.
+  Window control includes the names of all windows that have a window shading control (see \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}) and includes the name of the control, the type of shading, the shaded construction, the kind of control, and if glare control is used.
 \end{itemize}
 
 \paragraph{Lighting Summary}\label{lighting-summary}
@@ -119,13 +119,13 @@ The Equipment Summary report (key: EquipmentSummary) produces a report that incl
 
 \begin{itemize}
 \item
-  Central Plant includes details on chillers, boilers, and cooling towers including the capacity and efficiency. For Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR, IPLV at AHRI standard test conditions is reported.
+  Central Plant includes details on chillers, boilers, and cooling towers including the capacity and efficiency. For \hyperref[chillerelectriceir]{Chiller:Electric:EIR} and \hyperref[chillerelectricreformulatedeir]{Chiller:Electric:ReformulatedEIR}, IPLV at AHRI standard test conditions is reported.
 \item
   Cooling Coils includes the nominal total, sensible and latent capacities, the nominal sensible heat ratio, the nominal efficiency, nominal UA value, and nominal~ surface area for each cooling coil. These values are calculated by calling the cooling coil simulation routine with the rated inlet conditions: inlet air dry bulb temperature = 26.67C, inlet air wet bulb temperature = 19.44C, inlet chilled water temperature = 6.67C.
 \item
-  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = Coil:Cooling:DX:SingleSpeed with condenser type = AirCooled.
+  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} with condenser type = AirCooled.
 \item
-  DX Heating Coils summarizes the High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) values at AHRI standard test. Currently, these values are only reported for coil type = Coil:Heating:DX:SingleSpeed.
+  DX Heating Coils summarizes the High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 \item
   Heating Coils includes the nominal capacity and efficiency for each heating coil. The capacity is calculated by calling the heating coil simulation routine at the rated inlet conditions: inlet air dry bulb temperature = 16.6C, inlet relative humidity = 50\%, inlet hot water temperature = 82.2C.
 \item
@@ -155,7 +155,7 @@ The HVAC Sizing Summary report (key: HVACSizingSummary) produces a report that i
 
 \paragraph{Component Sizing Summary}\label{component-sizing-summary}
 
-The Component Sizing Summary report (key: ComponentSizingSummary) produces a report that includes different tables depending on the kinds of HVAC components that exist in the input file. A table is shown for each type of HVAC component that is sized. The table lists the objects of that type of component that appear in the input file and one or more parameters related to that component.~ For example, the AirTerminal:SingleDuct:VAV:Reheat component creates a table showing the maximum air flow rate from the sizing calculations and the maximum reheat water flow rate. Another example is the Fan:VariableVolume object which shows a table with both the maximum and minimum flow rates for each fan based on the results from the sizing calculations.
+The Component Sizing Summary report (key: ComponentSizingSummary) produces a report that includes different tables depending on the kinds of HVAC components that exist in the input file. A table is shown for each type of HVAC component that is sized. The table lists the objects of that type of component that appear in the input file and one or more parameters related to that component.~ For example, the \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} component creates a table showing the maximum air flow rate from the sizing calculations and the maximum reheat water flow rate. Another example is the \hyperref[fanvariablevolume]{Fan:VariableVolume} object which shows a table with both the maximum and minimum flow rates for each fan based on the results from the sizing calculations.
 
 \paragraph{Coil Sizing Details}\label{coil-sizing-details}
 
@@ -178,18 +178,18 @@ The System Summary Report (key: SystemSummary) produces a report that includes t
 
 \begin{itemize}
 \item
-  Economizer which includes the following columns for each Controller:OutdoorAir object: the high limit shutoff control, the minimum outdoor air flow, the maximum outdoor air flow, if the return air temperature has a control limit, if the return air has an enthalpy limit, the outdoor air temperature limit, and the outdoor air enthalpy limit.
+  Economizer which includes the following columns for each \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object: the high limit shutoff control, the minimum outdoor air flow, the maximum outdoor air flow, if the return air temperature has a control limit, if the return air has an enthalpy limit, the outdoor air temperature limit, and the outdoor air enthalpy limit.
 \item
-  Demand Controlled Ventilation table is for each Controller:MechanicalVentilation object and shows the name, the nominal outdoor air per person and the nominal outdoor air per zone area.
+  Demand Controlled Ventilation table is for each \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object and shows the name, the nominal outdoor air per person and the nominal outdoor air per zone area.
 \item
-  Time Not Comfortable Based on Simple ASHRAE 55-2004 table shows how many hours that the space is not comfortable for each zone under the criteria of assuming winter clothes, summer clothes or both summer and winter clothes.~ See the People object for more information about this thermal comfort calculation.
+  Time Not Comfortable Based on Simple ASHRAE 55-2004 table shows how many hours that the space is not comfortable for each zone under the criteria of assuming winter clothes, summer clothes or both summer and winter clothes.~ See the \hyperref[people]{People} object for more information about this thermal comfort calculation.
 \item
   Time Setpoint is Not Met table shows how many hours the space is more than 0.2C from the setpoint during heating and during cooling.~ The last two columns indicate those hours that the setpoint is not met while the space is occupied.
 \end{itemize}
 
 \paragraph{Adaptive Comfort Summary}\label{adaptive-comfort-summary}
 
-The Adaptive Comfort Summary report (key: AdaptiveComfortSummary) produces a report tabulating the sum of occupied hours not meeting adaptive comfort acceptability limits for each relevant People object (People objects for which adaptive comfort calculations are requested). These acceptability limits include ASHRAE Std. 55 80\%, ASHRAE Std. 55 90\%, CEN-15251 Category I, CEN-15251 Category II, and CEN-15251 Category III.
+The Adaptive Comfort Summary report (key: AdaptiveComfortSummary) produces a report tabulating the sum of occupied hours not meeting adaptive comfort acceptability limits for each relevant \hyperref[people]{People} object (\hyperref[people]{People} objects for which adaptive comfort calculations are requested). These acceptability limits include ASHRAE Std. 55 80\%, ASHRAE Std. 55 90\%, CEN-15251 Category I, CEN-15251 Category II, and CEN-15251 Category III.
 
 \paragraph{Sensible Heat Gain Summary}\label{sensible-heat-gain-summary}
 
@@ -305,7 +305,7 @@ The Opaque Surface Conduction and Other Heat Addition and Opaque Surface Conduct
 
 \paragraph{Component Load Summary}\label{component-load-summary}
 
-Three different component load summary reports can be generated: 
+Three different component load summary reports can be generated:
 
 \begin{itemize}
 \tightlist
@@ -327,7 +327,7 @@ The report has six parts:
   Estimated Cooling Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For \hyperref[people]{People} and \hyperref[lights-000]{Lights} the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist
@@ -352,7 +352,7 @@ This table shows some ratios that may be handy in evaluating the results. It con
   Estimated Heating Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For \hyperref[people]{People} and \hyperref[lights-000]{Lights} the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist
@@ -372,7 +372,7 @@ This table shows some ratios that may be handy in evaluating the results. It con
 
 The Air Loop Component Summary tables also include tables that indicate the zones included in the aggregated results for heating and cooling.
 
-If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresonding zones. 
+If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresonding zones.
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 
@@ -411,7 +411,7 @@ The LEED Summary report provides many of the simulation results required for cer
 
 \paragraph{Tariff Report}\label{TariffReport}
 
-The Tariff Report provides the results of the UtilityCost:Tariff object. The report consists of a summary table, categories, charges, ratchets, qualifies, native variables, other variables and computation. The key used to obtain this report is TariffReport.
+The Tariff Report provides the results of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. The report consists of a summary table, categories, charges, ratchets, qualifies, native variables, other variables and computation. The key used to obtain this report is TariffReport.
 
 \paragraph{Economic Result Summary}\label{EconomicResultSummary}
 
@@ -432,7 +432,7 @@ The Heat Emissions Report provides a summary of the building heat emission to th
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
 
-The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a Output:Table:Monthly can be used instead. The StandardReports.idf file in the DataSets directory includes a Output:Table:Monthly that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a discrption of the variables included.
+The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a \hyperref[outputtablemonthly]{Output:Table:Monthly} can be used instead. The StandardReports.idf file in the DataSets directory includes a \hyperref[outputtablemonthly]{Output:Table:Monthly} that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a discrption of the variables included.
 
 \paragraph{ZoneCoolingSummaryMonthly}\label{zonecoolingsummarymonthly}
 
