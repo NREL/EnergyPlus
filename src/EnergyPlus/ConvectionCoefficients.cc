@@ -635,27 +635,78 @@ namespace ConvectionCoefficients {
                 }
 
             } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
-                // NOTE: Movable insulation is not taken into account here
-                if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                    HExt = CalcMoWITTWindward(TAir - TSurf, SurfWindSpeed);
-                } else { // leeward
-                    HExt = CalcMoWITTLeeward(TAir - TSurf, SurfWindSpeed);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
+                                                                                     double windSpeed) -> double {
+                            // Average windward and leeward since all walls use same algorithm
+                            double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                            double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                            return (windwardHf + leewardHf) / 2.0;
+                        };
+                    } else {
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
+                                                                                     double windSpeed) -> double {
+                            return CalcMoWITTHfWindward(windSpeed);
+                        };
+                    }
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
+                        Real64 Hn = CalcMoWITTHn(Tsurf - Tamb);
+                        return std::sqrt(pow_2(Hn) + pow_2(hfTerm));
+                    };
+                } else {
+                    // NOTE: Movable insulation is not taken into account here
+                    if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
+                        HExt = CalcMoWITTWindward(TAir - TSurf, SurfWindSpeed);
+                    } else { // leeward
+                        HExt = CalcMoWITTLeeward(TAir - TSurf, SurfWindSpeed);
+                    }
                 }
 
             } else if (SELECT_CASE_var1 == DOE2HcOutside) {
-                if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
-                    Hf = CalcDOE2Windward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                } else { // leeward
-                    Hf = CalcDOE2Leeward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                }
-                if (HMovInsul > 0.0) {
-                    TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
-                }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    if (std::abs(Surface(SurfNum).CosTilt) < 0.98) { // Not horizontal
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
+                                                                                     double windSpeed) -> double {
+                            // Average windward and leeward since all walls use same algorithm
+                            double windwardHf = CalcMoWITTHfWindward(windSpeed);
+                            double leewardHf = CalcMoWITTHfLeeward(windSpeed);
+                            return (windwardHf + leewardHf) / 2.0;
+                        };
+                    } else {
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double,
+                                                                                     double windSpeed) -> double {
+                            return CalcMoWITTHfWindward(windSpeed);
+                        };
+                    }
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
+                        Real64 Hf = CalcDOE2Hf(Tsurf, Tamb, cosTilt, hfTerm, Roughness);
 
-                Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
-                // Better if there was iteration for movable insulation?
+                        Real64 Ts = Tsurf;
+                        if (HMovInsul > 0.0) {
+                            Ts = (HMovInsul * TSurf + Hf * Tamb) / (HMovInsul + Hf);
+                        }
 
-                HExt = Hn + Hf;
+                        Real64 Hn = CalcHnASHRAETARPExterior(Ts, Tamb, cosTilt);
+                        return Hn + Hf;
+                    };
+                } else {
+                    if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, SurfWindDir)) {
+                        Hf = CalcDOE2Windward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+                    } else { // leeward
+                        Hf = CalcDOE2Leeward(TSurf, TAir, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+                    }
+                    if (HMovInsul > 0.0) {
+                        TSurf = (HMovInsul * TSurf + Hf * TAir) / (HMovInsul + Hf);
+                    }
+
+                    Hn = CalcHnASHRAETARPExterior(TSurf, TAir, Surface(SurfNum).CosTilt);
+                    // Better if there was iteration for movable insulation?
+
+                    HExt = Hn + Hf;
+                }
 
             } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
 
@@ -666,54 +717,35 @@ namespace ConvectionCoefficients {
                                Surface(SurfNum).Name);
             }
 
-            if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
-
-            if (TSurf == TSky || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
-                HSky = 0.0;
-            } else {
-                // Compute sky radiation coefficient
-                HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
-                       (TSurf - TSky);
-            }
-
-            if (TSurf == TAir || std::abs(Surface(SurfNum).ExtConvCoeff) == ASHRAESimple) {
-                HGround = 0.0;
-                HAir = 0.0;
-            } else {
-                // Compute ground radiation coefficient
-                HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
-
-                // Compute air radiation coefficient
-                HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
-                       (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
-            }
-
         } else { // Exterior convection scheme for this surface has been set by user
 
             HExt = SetExtConvectionCoeff(SurfNum);
 
-            if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
-
-            if (TSurf == TSky || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                HSky = 0.0;
-            } else {
-                // Compute sky radiation coefficient
-                HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
-                       (TSurf - TSky);
-            }
-
-            if (TSurf == TAir || Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple) {
-                HGround = 0.0;
-                HAir = 0.0;
-            } else {
-                // Compute ground radiation coefficient
-                HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
-
-                // Compute air radiation coefficient
-                HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
-                       (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
-            }
         }
+
+        if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+
+        if (TSurf == TSky || algoNum == ASHRAESimple) {
+            HSky = 0.0;
+        } else {
+            // Compute sky radiation coefficient
+            HSky = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) /
+                   (TSurf - TSky);
+        }
+
+        if (TSurf == TAir || algoNum == ASHRAESimple) {
+            HGround = 0.0;
+            HAir = 0.0;
+        } else {
+            // Compute ground radiation coefficient
+            HGround = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+
+            // Compute air radiation coefficient
+            HAir = StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) *
+                   (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
+        }
+
+
     }
 
     Real64 CalcHfExteriorSparrow(Real64 const SurfWindSpeed, // Local wind speed at height of the heat transfer surface (m/s)
@@ -9547,9 +9579,16 @@ namespace ConvectionCoefficients {
         return std::sqrt(pow_2(Hn) + pow_2(Hf));
     }
 
+    Real64 CalcDOE2Hf(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex)
+    {
+        // This allows costly HfSmooth to be calculated independently (avoids excessive use of std::pow() in Kiva)
+        Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
+        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
+        return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
+    }
+
     Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -9567,18 +9606,13 @@ namespace ConvectionCoefficients {
         //   Yazdanian, M. and J.H. Klems.  1994.  Measurement of the exterior convective
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
-
-        Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
-
         Real64 HfSmooth = CalcMoWITTHfWindward(WindAtZ);
 
-        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
-        return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
+        return CalcDOE2Hf(SurfaceTemp, AirTemp, CosineTilt, HfSmooth, RoughnessIndex);
     }
 
     Real64 CalcDOE2Leeward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -9597,12 +9631,9 @@ namespace ConvectionCoefficients {
         //   film coefficient for windows in low-rise buildings.
         //   ASHRAE Transactions 100(1):  1087.
 
-        Real64 Hn = CalcHnASHRAETARPExterior(SurfaceTemp, AirTemp, CosineTilt);
         Real64 HfSmooth = CalcMoWITTHfLeeward(WindAtZ);
 
-        Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
-
-        return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
+        return CalcDOE2Hf(SurfaceTemp, AirTemp, CosineTilt, HfSmooth, RoughnessIndex);
     }
 
     Real64 CalcNusseltJurges(Real64 const WindAtZ)

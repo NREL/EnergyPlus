@@ -711,6 +711,8 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMoWITTLeeward(Real64 const DeltaTemp, Real64 const WindAtZ);
 
+    Real64 CalcDOE2Hf(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex);
+
     Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex);
 
     Real64 CalcDOE2Leeward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex);
