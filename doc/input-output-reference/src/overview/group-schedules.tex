@@ -8,7 +8,7 @@ Schedules are processed by the EnergyPlus Schedule Manager, stored within the Sc
 
 \subsection{Day Type}\label{day-type}
 
-A brief description of ``Day Type'' which is used in the SizingPeriod objects, RunPeriodControl:SpecialDays object, the Sizing objects and also used by reference in the Schedule:Week:Daily object (discussed later in this section).
+A brief description of ``Day Type'' which is used in the SizingPeriod objects, \hyperref[runperiodcontrolspecialdays]{RunPeriodControl:SpecialDays} object, the Sizing objects and also used by reference in the \hyperref[scheduleweekdaily]{Schedule:Week:Daily} object (discussed later in this section).
 
 Schedules work on days of the week as well as certain specially designated days. Days of the week are the normal -- Sunday, Monday, Tuesday, Wednesday, Thursday, Friday and Saturday. Special day types that can be designated are: Holiday, SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2. These day types can be used at the user's convenience to designate special scheduling (e.g.~lights, electric equipment, set point temperatures) using these days as reference.
 
@@ -99,7 +99,7 @@ This field should contain a unique (within all DaySchedules) designation for thi
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-000}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field: Hour Values (1-24)}\label{field-hour-values-1-24}
 
@@ -114,7 +114,7 @@ Schedule:Day:Hourly, Day On Peak, Fraction,
 
 \subsection{Schedule:Day:Interval}\label{scheduledayinterval}
 
-The Schedule:Day:Interval introduces a slightly different way of entering the schedule values for a day. Using the intervals, you can shorten the ``hourly'' input of the ``Schedule:Day:Hourly'' object to 2 fields. And, more importantly, you can enter an interval that represents only a portion of an hour. Schedule values are ``given'' to the simulation at the zone timestep, so there is also a possibility of ``interpolation'' from the entries used in this object to the value used in the simulation.
+The Schedule:Day:Interval introduces a slightly different way of entering the schedule values for a day. Using the intervals, you can shorten the ``hourly'' input of the ``\hyperref[scheduledayhourly]{Schedule:Day:Hourly}'' object to 2 fields. And, more importantly, you can enter an interval that represents only a portion of an hour. Schedule values are ``given'' to the simulation at the zone timestep, so there is also a possibility of ``interpolation'' from the entries used in this object to the value used in the simulation.
 
 \subsubsection{Inputs}\label{inputs-2-036}
 
@@ -124,7 +124,7 @@ This field should contain a unique (within all DaySchedules) designation for thi
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-1-000}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field: Interpolate to Timestep}\label{field-interpolate-to-timestep}
 
@@ -134,7 +134,7 @@ If ``Average'' is entered, it is used to apply values that aren't coincident wit
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 \paragraph{Field-Set: Time and Value (extensible object)}\label{field-set-time-and-value-extensible-object}
 
@@ -161,7 +161,7 @@ Schedule:Day:Interval,
 
 \subsection{Schedule:Day:List}\label{scheduledaylist}
 
-To facilitate possible matches to externally generated data intervals, this object has been included. In similar fashion to the Schedule:Day:Interval object, this object can also include ``sub-hourly'' values but must represent a complete day in its list of values.
+To facilitate possible matches to externally generated data intervals, this object has been included. In similar fashion to the \hyperref[scheduledayinterval]{Schedule:Day:Interval} object, this object can also include ``sub-hourly'' values but must represent a complete day in its list of values.
 
 \subsubsection{Inputs}\label{inputs-3-032}
 
@@ -171,7 +171,7 @@ This field should contain a unique (within all day schedules) designation for th
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-2-000}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field: Interpolate to Timestep}\label{field-interpolate-to-timestep-1}
 
@@ -181,7 +181,7 @@ If ``Average'' is entered, it is used to apply values that aren't coincident wit
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 
 \paragraph{Field: Minutes Per Item}\label{field-minutes-per-item}
@@ -275,11 +275,11 @@ The yearly schedule is used to cover the entire year using references to week sc
 
 \paragraph{Field: Name}\label{field-name-5-021}
 
-This field should contain a unique (between Schedule:Year, Schedule:Compact, and Schedule:File) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~Lights, People, Infiltration) to define the appropriate schedule values.
+This field should contain a unique (between Schedule:Year, \hyperref[schedulecompact]{Schedule:Compact}, and \hyperref[schedulefile]{Schedule:File}) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~\hyperref[lights-000]{Lights}, \hyperref[people]{People}, Infiltration) to define the appropriate schedule values.
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-3}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field Set (WeekSchedule, Start Month and Day, End Month and Day)}\label{field-set-weekschedule-start-month-and-day-end-month-and-day}
 
@@ -337,11 +337,11 @@ This object is an unusual object for description. For the data the number of fie
 
 \paragraph{Field: Name}\label{field-name-6-019}
 
-This field should contain a unique (between Schedule:Year, Schedule:Compact, and Schedule:File) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~Lights, People, Infiltration) to define the appropriate schedule values.
+This field should contain a unique (between \hyperref[scheduleyear]{Schedule:Year}, Schedule:Compact, and \hyperref[schedulefile]{Schedule:File}) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~\hyperref[lights-000]{Lights}, \hyperref[people]{People}, Infiltration) to define the appropriate schedule values.
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-4}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field-Set (Through, For, Interpolate, Until, Value)}\label{field-set-through-for-interpolate-until-value}
 
@@ -357,13 +357,13 @@ This field starts with ``For:'' and contains the applicable days (reference the 
 
 \paragraph{Field: Interpolate (optional)}\label{field-interpolate-optional}
 
-This field, if used, starts with ``Interpolate:'' and contains the word ``Average'', ``Linear'' or ``No''. If this field is not used, it should not be blank -- rather just have the following field appear in this slot. 
+This field, if used, starts with ``Interpolate:'' and contains the word ``Average'', ``Linear'' or ``No''. If this field is not used, it should not be blank -- rather just have the following field appear in this slot.
 
 If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. In earlier versions of EnergyPlus, this was the Yes option for the field.
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 
 
@@ -431,7 +431,7 @@ This field should contain a unique name designation for this schedule. It is ref
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-5}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field: Hourly Value}\label{field-hourly-value}
 
@@ -459,21 +459,21 @@ At times, data is available from a building being monitored or for factors that 
 
 The format for the data file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. The file may contain header lines that are skipped. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. Multiple schedules may be created using a single external data file or multiple external data files may be used. The first row of data must be for January 1, hour 1 (or timestep 1 for subhourly files).
 
-Schedule:File may be used along with the FuelFactors object and TDV files in the DataSets directory to compute Time Dependent Valuation based source energy as used by the California Energy Commission's Title 24 Energy Code. See Fuel Factor for more discussion on Time Dependent Valuation.
+Schedule:File may be used along with the \hyperref[fuelfactors]{FuelFactors} object and TDV files in the DataSets directory to compute Time Dependent Valuation based source energy as used by the California Energy Commission's Title 24 Energy Code. See Fuel Factor for more discussion on Time Dependent Valuation.
 
-Two optional fields: \textbf{Interpolate to Timestep} and \textbf{Minutes per Item} allow for the input of sub-hourly schedules (similar to the Schedule:Day:List object).
+Two optional fields: \textbf{Interpolate to Timestep} and \textbf{Minutes per Item} allow for the input of sub-hourly schedules (similar to the \hyperref[scheduledaylist]{Schedule:Day:List} object).
 
 \subsubsection{Inputs}\label{inputs-9-019}
 
 \paragraph{Field: Name}\label{field-name-8-018}
 
-This field should contain a unique (between Schedule:Year, Schedule:Compact, and Schedule:File) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~Lights, People, Infiltration, FuelFactors) to define the appropriate schedule values.
+This field should contain a unique (between \hyperref[scheduleyear]{Schedule:Year}, \hyperref[schedulecompact]{Schedule:Compact}, and Schedule:File) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~\hyperref[lights-000]{Lights}, \hyperref[people]{People}, Infiltration, \hyperref[fuelfactors]{FuelFactors}) to define the appropriate schedule values.
 
 \paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-6}
 
-This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
-\paragraph{Field: File Name}\label{field-file-name}
+\paragraph{Field: File Name}\label{schedulefile-field-file-name}
 
 This field contains the name of the file that contains the data for the schedule. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
@@ -578,11 +578,11 @@ The format for the data file is Comma-separated values (CSV). The CSV file refer
 
 The first row of the CSV file should be the header, and the first column of the CSV file should be the timestamp and is not imported. 
 
-With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining Schedule:File objects.
+With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining \hyperref[schedulefile]{Schedule:File} objects.
 
 \subsubsection{Inputs}\label{inputs-schedule-file-shading}
 
-\paragraph{Field: File Name}\label{field-file-name}
+\paragraph{Field: File Name}\label{schedulefileshading-field-file-name}
 
 This field contains the name of the file that contains the data for the shading schedules. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 

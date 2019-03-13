@@ -2,7 +2,7 @@
 
 \subsection{Dehumidifier:Desiccant:NoFans}\label{dehumidifierdesiccantnofans}
 
-This object models a solid desiccant dehumidifier (excluding associated fans). The process air stream is the air which is dehumidified. The regen air stream is the air which is heated to regenerate the desiccant. This object determines the process air outlet conditions, the load on the regeneration heating coil, the electric power consumption for the wheel rotor motor, and the regeneration air fan mass flow rate. All other heat exchangers are modeled as separate objects connected to the inlet and outlet nodes of the dehumidifier. The solid desiccant dehumidifier is typically used in an AirLoopHVAC:OutdoorAirSystem object, but can also be specified in any AirLoopHVAC. The regeneration heating coil can be Gas, Electric, Steam , or Hot Water coil. When hot water coil is selected as regeneration heating coil user-defined curves designed for lower temperature operation must be specified in the input field Performance Model Type along with the Nominal Regeneration Temperature input field. The default performance model type is valid for higher nominal regeneration temperature (e.g.~121C).
+This object models a solid desiccant dehumidifier (excluding associated fans). The process air stream is the air which is dehumidified. The regen air stream is the air which is heated to regenerate the desiccant. This object determines the process air outlet conditions, the load on the regeneration heating coil, the electric power consumption for the wheel rotor motor, and the regeneration air fan mass flow rate. All other heat exchangers are modeled as separate objects connected to the inlet and outlet nodes of the dehumidifier. The solid desiccant dehumidifier is typically used in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object, but can also be specified in any \hyperref[airloophvac]{AirLoopHVAC}. The regeneration heating coil can be Gas, Electric, Steam , or Hot Water coil. When hot water coil is selected as regeneration heating coil user-defined curves designed for lower temperature operation must be specified in the input field Performance Model Type along with the Nominal Regeneration Temperature input field. The default performance model type is valid for higher nominal regeneration temperature (e.g.~121C).
 
 \subsubsection{Inputs}\label{inputs-011}
 
@@ -47,14 +47,14 @@ Type of setpoint control. Options are
 
 \begin{itemize}
 \item
-  SetpointManager:SingleZone:Humidity:Maximum
+  \hyperref[setpointmanagersinglezonehumiditymaximum]{SetpointManager:SingleZone:Humidity:Maximum}
 \item
-  SetpointManager:MultiZone:MaximumHumidity:Average
+  \hyperref[setpointmanagermultizonemaximumhumidityaverage]{SetpointManager:MultiZone:MaximumHumidity:Average}
 \item
-  SetpointManager:MultiZone:Humidity:Maximum
+  \hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}
 \end{itemize}
 
-This will also require the use of a \textbf{ZoneControl:Humidistat} object. If the dehumidifer is located in the outdoor air stream, it may also be necessary to use \textbf{SetpointManager:OutdoorAirPretreat}.
+This will also require the use of a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. If the dehumidifer is located in the outdoor air stream, it may also be necessary to use \textbf{\hyperref[setpointmanageroutdoorairpretreat]{SetpointManager:OutdoorAirPretreat}}.
 
 \paragraph{Field: Leaving Maximum Humidity Ratio Setpoint}\label{field-leaving-maximum-humidity-ratio-setpoint}
 
@@ -74,17 +74,17 @@ Power input to wheel rotor motor in W. If this field is unknown, electricity con
 
 \paragraph{Field: Regeneration Coil Object Type}\label{field-regeneration-coil-object-type}
 
-Type of heating coil object for regeneration air. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Dehumidifier:Desiccant:NoFans) itself provides the ``controller'' function of modulating water flow. The valid choices are:
+Type of heating coil object for regeneration air. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Dehumidifier:Desiccant:NoFans) itself provides the ``controller'' function of modulating water flow. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Regeneration Coil Name}\label{field-regeneration-coil-name}
@@ -93,7 +93,7 @@ Name of heating coil object for regeneration air.
 
 \paragraph{Field: Regeneration Fan Object Type}\label{field-regeneration-fan-object-type}
 
-Type of fan object for regeneration air. For UserCurves performance (see below) Fan:SystemModel, Fan:VariableVolume and Fan:ConstantVolume are valid. For Default performance (see below) only Fan:SystemModel or Fan:VariableVolume are valid.
+Type of fan object for regeneration air. For UserCurves performance (see below) \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanvariablevolume]{Fan:VariableVolume} and \hyperref[fanconstantvolume]{Fan:ConstantVolume} are valid. For Default performance (see below) only \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanvariablevolume]{Fan:VariableVolume} are valid.
 
 \paragraph{Field: Regeneration Fan Name}\label{field-regeneration-fan-name}
 
@@ -330,9 +330,9 @@ Process air mass flow rate.
 
 \subsection{Dehumidifier:Desiccant:System}\label{dehumidifierdesiccantsystem}
 
-The Dehumidifier:Desiccant:System object models the dehumidification of an air stream, normally called the process air stream. A second heated air stream, called the regeneration air stream, is used to remove the collected moisture from the desiccant heat exchanger and this moisture-laden air is then usually exhausted from the building. This Dehumidifier:Desiccant:System object is similar to the Dehumidifier:Desiccant:NoFans object but has some additional modeling capabilities.
+The Dehumidifier:Desiccant:System object models the dehumidification of an air stream, normally called the process air stream. A second heated air stream, called the regeneration air stream, is used to remove the collected moisture from the desiccant heat exchanger and this moisture-laden air is then usually exhausted from the building. This Dehumidifier:Desiccant:System object is similar to the \hyperref[dehumidifierdesiccantnofans]{Dehumidifier:Desiccant:NoFans} object but has some additional modeling capabilities.
 
-The Dehumidifier:Desiccant:System object in EnergyPlus is a compound object that can be placed anywhere in an air loop (AirLoopHVAC). Common locations for this object are in an AirLoopHVAC:OutdoorAirSystem or in the main air loop (AirLoopHVAC) downstream of a cooling coil (postcooling desiccant dehumidifier). This compound object coordinates the operation of several children objects: a desiccant heat exchanger, a regeneration air fan, and an optional regeneration air heater. Gas, Electric, Steam, or Hot Water heating coils can be used for regenerator air heaters. If this dehumidifier is placed in the main air loop immediately downstream of a direct expansion (DX) cooling coil, then the dehumidifier's operation can be coordinated with the operation of the companion DX coil and it is also possible to specify that the DX system s condenser waste heat can be used to help regenerate the desiccant heat exchanger. For the case of condenser waste heat regeneration, an optional exhaust fan can also be modeled by this desiccant dehumidifier compound object to help maintain a set point temperature for air entering the regeneration side of the desiccant heat exchanger.
+The Dehumidifier:Desiccant:System object in EnergyPlus is a compound object that can be placed anywhere in an air loop (\hyperref[airloophvac]{AirLoopHVAC}). Common locations for this object are in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} or in the main air loop (\hyperref[airloophvac]{AirLoopHVAC}) downstream of a cooling coil (postcooling desiccant dehumidifier). This compound object coordinates the operation of several children objects: a desiccant heat exchanger, a regeneration air fan, and an optional regeneration air heater. Gas, Electric, Steam, or Hot Water heating coils can be used for regenerator air heaters. If this dehumidifier is placed in the main air loop immediately downstream of a direct expansion (DX) cooling coil, then the dehumidifier's operation can be coordinated with the operation of the companion DX coil and it is also possible to specify that the DX system s condenser waste heat can be used to help regenerate the desiccant heat exchanger. For the case of condenser waste heat regeneration, an optional exhaust fan can also be modeled by this desiccant dehumidifier compound object to help maintain a set point temperature for air entering the regeneration side of the desiccant heat exchanger.
 
 It is important to note that the optional exhaust air fan is modeled internal to the Dehumidifier:Desiccant:System and a separate fan object should \emph{not} be added to the input data file (idf) for this fan. On the other hand, a separate fan object \emph{is} required in the input data file for the regeneration air fan.
 
@@ -344,7 +344,7 @@ It is important to note that the optional exhaust air fan is modeled internal to
 
 A schematic of the compound object Dehumidifier:Desiccant:Systemis shown in Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} with the draw through regeneration air fan placement. Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001} shows the Dehumidifier:Desiccant:System object configured with the blow through regeneration air fan placement.
 
-NOTE: As with any air loop compound object, the Dehumidifier:Desiccant:System object itself is specified on the AirLoopHVAC Branch or in the AirLoopHVAC:OutdoorAirSystem:EquipmentList for an AirLoopHVAC:OutdoorAirSystem. The children objects (e.g., desiccant heat exchanger, regeneration air fan, and optional regeneration air heater) must be specified separately in the input data file and their inlet/outlet connections must be as shown in Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} or Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001}.
+NOTE: As with any air loop compound object, the Dehumidifier:Desiccant:System object itself is specified on the \hyperref[airloophvac]{AirLoopHVAC} Branch or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} for an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}. The children objects (e.g., desiccant heat exchanger, regeneration air fan, and optional regeneration air heater) must be specified separately in the input data file and their inlet/outlet connections must be as shown in Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} or Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001}.
 
 \begin{figure}[hbtp] % fig 142
 \centering
@@ -356,30 +356,30 @@ Currently the only heat exchanger choice for this object is HeatExchanger:Desicc
 
 \begin{itemize}
 \item
-  Dehumidifier:Desiccant:System (in an air loop (AirLoopHVAC) Branch or AirLoopHVAC:OutdoorAirSystem:EquipmentList for an AirLoopHVAC:OutdoorAirSystem)
+  Dehumidifier:Desiccant:System (in an air loop (\hyperref[airloophvac]{AirLoopHVAC}) Branch or \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} for an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem})
 \item
-  HeatExchanger:Desiccant:BalancedFlow (desiccant heat exchanger child object)
+  \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow} (desiccant heat exchanger child object)
 \item
-  HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 (desiccant heat exchanger data object)
+  \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1} (desiccant heat exchanger data object)
 \item
-  ZoneControl:Humidistat, and one of:
+  \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}, and one of:
 \item
-  SetpointManager:SingleZone:Humidity:Maximum
+  \hyperref[setpointmanagersinglezonehumiditymaximum]{SetpointManager:SingleZone:Humidity:Maximum}
 \item
-  SetpointManager:MultiZone:Humidity:Maximum
+  \hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}
 \item
-  SetpointManager:MultiZone:MaximumHumidity:Average
+  \hyperref[setpointmanagermultizonemaximumhumidityaverage]{SetpointManager:MultiZone:MaximumHumidity:Average}
 \item
-  (when in an air loop (AirLoopHVAC) Branch), and SetpointManager:OutdoorAirPretreat (when in an AirLoopHVAC:OutdoorAirSystem) to place a maximum humidity ratio set point on the sensor node, typically the process air outlet node
+  (when in an air loop (\hyperref[airloophvac]{AirLoopHVAC}) Branch), and \hyperref[setpointmanageroutdoorairpretreat]{SetpointManager:OutdoorAirPretreat} (when in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}) to place a maximum humidity ratio set point on the sensor node, typically the process air outlet node
 \item
-  Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume (regeneration air fan)
+  \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume} (regeneration air fan)
 \item
-  Coil:Heating:Electric or Coil:Heating:Fuel (optional regeneration air heater)
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric} or \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} (optional regeneration air heater)
 \item
-  Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed, or Coil:Cooling:DX:TwoStageWithHumidityControlMode (optional companion cooling coil)
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, or \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode} (optional companion cooling coil)
 \end{itemize}
 
-If the user wants to model the Dehumidifier:Desiccant:System in an AirLoopHVAC:OutdoorAirSystem, then the process air path of the dehumidifier should be located in the outdoor air stream and the regeneration air path may be placed in the relief air stream or modeled by the desiccant dehumidifier itself where the first node for the regeneration inlet air stream must be an outdoor air node. If the user wants to model the Dehumidifier:Desiccant:System in an air loop (AirLoopHVAC) Branch, then the process air path of the dehumidifier should be located in the air loop Branch object. For this case, the regeneration air stream is modeled by the desiccant dehumidifier object itself (i.e., not part of an air loop Branch statement) and the first node for the regeneration inlet air stream must be an outdoor air node (ref. Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} or Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001}).
+If the user wants to model the Dehumidifier:Desiccant:System in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, then the process air path of the dehumidifier should be located in the outdoor air stream and the regeneration air path may be placed in the relief air stream or modeled by the desiccant dehumidifier itself where the first node for the regeneration inlet air stream must be an outdoor air node. If the user wants to model the Dehumidifier:Desiccant:System in an air loop (\hyperref[airloophvac]{AirLoopHVAC}) Branch, then the process air path of the dehumidifier should be located in the air loop Branch object. For this case, the regeneration air stream is modeled by the desiccant dehumidifier object itself (i.e., not part of an air loop Branch statement) and the first node for the regeneration inlet air stream must be an outdoor air node (ref. Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} or Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001}).
 
 A description of each input field for this object is provided below:
 
@@ -395,7 +395,7 @@ The name of the schedule (ref: Schedule) that denotes whether the dehumidifier c
 
 \paragraph{Field: Desiccant Heat Exchanger Object Type}\label{field-desiccant-heat-exchanger-object-type}
 
-This alpha field contains the type of desiccant heat exchanger used with this dehumidifier. Currently, the only valid choice is HeatExchanger:Desiccant:BalancedFlow.
+This alpha field contains the type of desiccant heat exchanger used with this dehumidifier. Currently, the only valid choice is \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}.
 
 \paragraph{Field: Desiccant Heat Exchanger Name}\label{field-desiccant-heat-exchanger-name}
 
@@ -403,11 +403,11 @@ This alpha field contains the name of the desiccant heat exchanger used with thi
 
 \paragraph{Field: Sensor Node Name}\label{field-sensor-node-name-000}
 
-This alpha field specifies the name of the air loop node used to control desiccant heat exchanger operation. A set point manager must be used to place a maximum humidity ratio set point on this node (e.g., SetpointManager:SingleZone:Humidity:Maximum or SetpointManager:OutdoorAirPretreat).
+This alpha field specifies the name of the air loop node used to control desiccant heat exchanger operation. A set point manager must be used to place a maximum humidity ratio set point on this node (e.g., \hyperref[setpointmanagersinglezonehumiditymaximum]{SetpointManager:SingleZone:Humidity:Maximum} or \hyperref[setpointmanageroutdoorairpretreat]{SetpointManager:OutdoorAirPretreat}).
 
 \paragraph{Field: Regeneration Air Fan Object Type}\label{field-regeneration-air-fan-object-type}
 
-This alpha field contains the type of regeneration air fan used. Available fan types are Fan:SystemModel, Fan:OnOff and Fan:ConstantVolume.
+This alpha field contains the type of regeneration air fan used. Available fan types are \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff} and \hyperref[fanconstantvolume]{Fan:ConstantVolume}.
 
 \paragraph{Field: Regeneration Air Fan Name}\label{field-regeneration-air-fan-name}
 
@@ -419,17 +419,17 @@ This alpha field specifies the fan configuration used in the desiccant dehumidif
 
 \paragraph{Field: Regeneration Air Heater Object Type}\label{field-regeneration-air-heater-object-type}
 
-This alpha field contains the type of heating coil used to heat the regeneration air stream. This field may be left blank when no regeneration air heater is required. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Dehumidifier:Desiccant:System) itself provides the ``controller'' function of modulating water flow. For autosizing regeneration air heating coil the \emph{Design Coil Inlet Air Condition} used is the outdoor air condition if the desiccant system is on the primary air loop, or else if the desiccant system is on outdoor air system then it is the return air condition. The \emph{Design Coil Outlet Air Temperature} is the \emph{Regeneration Inlet Air Setpoint Temperature} specified in the input field below. Valid heating coil choices are:
+This alpha field contains the type of heating coil used to heat the regeneration air stream. This field may be left blank when no regeneration air heater is required. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Dehumidifier:Desiccant:System) itself provides the ``controller'' function of modulating water flow. For autosizing regeneration air heating coil the \emph{Design Coil Inlet Air Condition} used is the outdoor air condition if the desiccant system is on the primary air loop, or else if the desiccant system is on outdoor air system then it is the return air condition. The \emph{Design Coil Outlet Air Temperature} is the \emph{Regeneration Inlet Air Setpoint Temperature} specified in the input field below. Valid heating coil choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Regeneration Air Heater Name}\label{field-regeneration-air-heater-name}
@@ -442,7 +442,7 @@ This optional numeric field specifies the regeneration air inlet temperature set
 
 \paragraph{Field: Companion Cooling Coil Object Type}\label{field-companion-cooling-coil-object-type}
 
-This optional alpha field contains the type of companion cooling coil used with this desiccant dehumidifier. The only valid choices are Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed, and Coil:Cooling:DX:TwoStageWithHumidityControlMode.
+This optional alpha field contains the type of companion cooling coil used with this desiccant dehumidifier. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, and \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
 \paragraph{Field: Companion Cooling Coil Name}\label{field-companion-cooling-coil-name}
 
@@ -466,7 +466,7 @@ This optional numeric field contains the maximum power for the exhaust fan in Wa
 
 \paragraph{Field: Exhaust Fan Power Curve Name}\label{field-exhaust-fan-power-curve-name}
 
-This optional alpha field contains the name of the exhaust fan power modifier curve. This field is used only when a companion cooling coil is used and the Companion Coil Regeneration Air Heating field is set to Yes . This field must be used in conjunction with the Exhaust Fan Maximum Flow Rate and the Exhaust Fan Maximum Power input fields. If this field is blank, the exhaust fan operates (when required) at the maximum power specified in the field above. The curve object type for this Exhaust Fan Power Curve Name must be Curve:Cubic or Curve:Quadratic. The curve object (Curve:Cubic or Curve:Quadratic) defines the change in exhaust fan power as a function of the ratio of the actual exhaust air flow rate divided by the maximum flow rate.
+This optional alpha field contains the name of the exhaust fan power modifier curve. This field is used only when a companion cooling coil is used and the Companion Coil Regeneration Air Heating field is set to Yes . This field must be used in conjunction with the Exhaust Fan Maximum Flow Rate and the Exhaust Fan Maximum Power input fields. If this field is blank, the exhaust fan operates (when required) at the maximum power specified in the field above. The curve object type for this Exhaust Fan Power Curve Name must be \hyperref[curvecubic]{Curve:Cubic} or \hyperref[curvequadratic]{Curve:Quadratic}. The curve object (\hyperref[curvecubic]{Curve:Cubic} or \hyperref[curvequadratic]{Curve:Quadratic}) defines the change in exhaust fan power as a function of the ratio of the actual exhaust air flow rate divided by the maximum flow rate.
 
 Following is an example input for this object:
 

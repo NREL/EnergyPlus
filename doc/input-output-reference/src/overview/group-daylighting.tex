@@ -1,14 +1,14 @@
 \section{Group -- Daylighting}\label{group-daylighting}
 
-Daylighting can be invoked in EnergyPlus primarily by the use of the objects: \textbf{Daylighting:Controls} and \textbf{Daylighting:ReferencePoint}. Other objects related to daylighting are \textbf{Daylighting:DElight:ComplexFenestration}, \textbf{Output:IlluminanceMap}, and \textbf{OutputControl:IlluminanceMap:Style}.  These are described in the following object descriptions.
+Daylighting can be invoked in EnergyPlus primarily by the use of the objects: \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}} and \textbf{\hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}}. Other objects related to daylighting are \textbf{Daylighting:DElight:ComplexFenestration}, \textbf{\hyperref[outputilluminancemap]{Output:IlluminanceMap}}, and \textbf{\hyperref[outputcontrolilluminancemapstyle]{OutputControl:IlluminanceMap:Style}}.  These are described in the following object descriptions.
 
 \begin{callout}
-  Note that two different methodologies are used in the Daylighting:Controls object (SplitFlux and DElight) and may be intermixed in a single IDF but may not be used in the same zone.
+  Note that two different methodologies are used in the \hyperref[daylightingcontrols-000]{Daylighting:Controls} object (SplitFlux and DElight) and may be intermixed in a single IDF but may not be used in the same zone.
 \end{callout}
 
 \subsection{Daylighting:Controls}\label{daylightingcontrols-000}
 
-When this object is used, daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control. Two different methods of computing the daylighitng illuminance and subsequent lighting reduction called SplitFlux and DElight. After the object description below is are sections that describe the two methodologies in more detail. 
+When this object is used, daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control. Two different methods of computing the daylighitng illuminance and subsequent lighting reduction called SplitFlux and DElight. After the object description below is are sections that describe the two methodologies in more detail.
 
 \subsubsection{Inputs}\label{inputs-009}
 
@@ -16,7 +16,7 @@ When this object is used, daylighting illuminance levels are calculated and then
 
 The name of the Daylighting:Controls object.
 
-\paragraph{Field: Zone name}\label{field-zone-name-003}
+\paragraph{Field: Zone name}\label{daylightingcontrols-field-zone-name}
 
 The name of the zone to which the following daylighting-related input applies.
 
@@ -39,13 +39,13 @@ For Lighting Control Type set to Stepped, the electric power input and light out
 % table 18
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Example of a Stepped Lighting Control System with Three Steps \label{table:stepped-lighting-control-example}} \tabularnewline
-\toprule 
+\toprule
 Daylight illuminance & Fraction of lights that are on \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Example of a Stepped Lighting Control System with Three Steps} \tabularnewline
-\toprule 
+\toprule
 Daylight illuminance & Fraction of lights that are on \tabularnewline
 \midrule
 \endhead
@@ -91,7 +91,7 @@ May be specified if a stepped lighting control system (Lighting Control Type set
 
 \paragraph{Field: Glare Calculation Daylighting Reference Point Name}\label{field-glare calculation-daylighting-reference-point-name}
 
-The Daylighting:ReferencePoint name should be specified that is used for determining the glare. Only one reference point is used to calculate the glare. This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
+The \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} name should be specified that is used for determining the glare. Only one reference point is used to calculate the glare. This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 \paragraph{Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis}\label{field-glare-calculation-azimuth-angle-of-view-direction-clockwise-from-zone-y-axis}
 
@@ -99,7 +99,7 @@ Daylight glare from a window depends on occupant view direction. It is highest w
 
 \paragraph{Field: Maximum Allowable Discomfort Glare Index}\label{field-maximum-allowable-discomfort-glare-index}
 
-If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at Daylighting:ReferencePoint specified in the Glare Calculation Daylighting Reference Point Name field exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in WindowShadingControl for one or more windows in the zone (see WindowShadingControl). This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
+If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} specified in the Glare Calculation Daylighting Reference Point Name field exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for one or more windows in the zone (see \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}). This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 If a zone has two or more windows with glare control, the shading devices will be deployed one by one in the order in which the windows are input until the glare level at each reference point falls below Maximum Allowable Discomfort Glare Index or is as close as possible to it.
 
@@ -108,13 +108,13 @@ The following table gives recommended values of Maximum Allowable Discomfort Gla
 % table 19
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \label{table:recommended-values-discomfort-glare-index}} \tabularnewline
-\toprule 
+\toprule
 Activity or Zone Type & Maximum Allowable DGI \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI)} \tabularnewline
-\toprule 
+\toprule
 Activity or Zone Type & Maximum Allowable DGI \tabularnewline
 \midrule
 \endhead
@@ -142,19 +142,19 @@ This set of fields is used together and can be repeated an unlimited number of t
 
 \paragraph{Field: Daylighting Reference Point Name <x>}\label{field-daylighting-reference-point-name-x}
 
-The Daylighting:ReferencePoint name should be specified that is used for determining the daylighting control sensor location. 
+The \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} name should be specified that is used for determining the daylighting control sensor location.
 
 \paragraph{Field: Fraction of Zone Controlled by Reference Point <x>}\label{field-fraction-of-zone-controlled-by-reference-point-x}
 
-The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the named Daylighting:ReferencePoint. If the sum of the fractions are less than 1.0, the remaining portion is assumed to have no lighting control.
+The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the named \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}. If the sum of the fractions are less than 1.0, the remaining portion is assumed to have no lighting control.
 
 \paragraph{Field: Illuminance Setpoint at Reference Point <x>}\label{field-illuminance-setpoint-at-reference-point-x}
 
-The desired lighting level (in lux) at the named Daylighting:ReferencePoint. This is the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power. Recommended values depend on type of activity; they may be found, for example, in the Lighting Handbook of the Illuminating Engineering Society of North America. A typical value for general office work (excluding computer terminals) is 500 lux.
+The desired lighting level (in lux) at the named \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}. This is the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power. Recommended values depend on type of activity; they may be found, for example, in the Lighting Handbook of the Illuminating Engineering Society of North America. A typical value for general office work (excluding computer terminals) is 500 lux.
 
 \subsection{Daylighting:ReferencePoint}\label{daylightingreferencepoint-000}
 
-This object is referenced by Daylighting:Controls to identify the reference point coordinates for each sensor. The reference points in the zone are where horizontal daylighting illuminance will be calculated. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified coordinates. Reference points are given in coordinates specified in the GlobalGeometryRules object Daylighting Reference Point CoordinateSystem field. 
+This object is referenced by \hyperref[daylightingcontrols-000]{Daylighting:Controls} to identify the reference point coordinates for each sensor. The reference points in the zone are where horizontal daylighting illuminance will be calculated. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified coordinates. Reference points are given in coordinates specified in the \hyperref[globalgeometryrules]{GlobalGeometryRules} object Daylighting Reference Point CoordinateSystem field.
 
 When the DElight Daylighting Method is used, there may be up to a maximum of 100 reference points for each zone. Each Reference Point that is input does NOT need to be included in the control of the electric lighting system within the zone. This is determined by the fraction of the zone controlled by each Reference Point, which can be input as 0. Note when the DElight Daylighting Method is used, that the sum of all Reference Point control fractions must equal 1 to obtain correct overall results.
 
@@ -164,13 +164,13 @@ When the DElight Daylighting Method is used, there may be up to a maximum of 100
 
 The name of the Daylighting:ReferencePoint object.
 
-\paragraph{Field: Zone name}\label{field-zone-name-003}
+\paragraph{Field: Zone name}\label{daylightingreferencepoint-field-zone-name}
 
 The name of the zone in which the reference point is located.
 
 \paragraph{Fields: (X,Y,Z) Coordinate of Reference Point}\label{fields-xyz-of-reference-point}
 
-These three fields are the X, Y and Z values of the reference point in the coordinate system you specified for daylighting reference points in the GlobalGeometryRules object. Figure~\ref{fig:example-showing-location-of-daylighting} shows an example using the relative coordinate (to zone) system. Z is typically at desk height (0.8 m).
+These three fields are the X, Y and Z values of the reference point in the coordinate system you specified for daylighting reference points in the \hyperref[globalgeometryrules]{GlobalGeometryRules} object. Figure~\ref{fig:example-showing-location-of-daylighting} shows an example using the relative coordinate (to zone) system. Z is typically at desk height (0.8 m).
 
 \begin{figure}[hbtp] % fig 53
 \centering
@@ -214,11 +214,11 @@ An IDF example:
 
 \subsection{Guidelines for Daylighting Modeling Using the SplitFlux Method)}\label{guidelines-for-daylighting-modeling-splitflux-method}
 
-Following are some guidelines for preparing EnergyPlus input to model the effects of daylighting when using the SplitFlux method. Before studying these guidelines, however, you should read the description of each input field under Daylighting:Controls, Daylighting:ReferencePoint, and review the IDF example, above, and the sample daylighting input, PurchAirWithDaylighting.idf.
+Following are some guidelines for preparing EnergyPlus input to model the effects of daylighting when using the SplitFlux method. Before studying these guidelines, however, you should read the description of each input field under \hyperref[daylightingcontrols-000]{Daylighting:Controls}, \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}, and review the IDF example, above, and the sample daylighting input, PurchAirWithDaylighting.idf.
 
 \subsubsection{Use of Window Multipliers}\label{use-of-window-multipliers}
 
-If an exterior wall in a daylit zone has a number of identical windows, the windows should be entered separately rather than using a window multiplier (ref: FenestrationSurface:Detailed). Using a multiplier would give an incorrect illuminance calculation since individual windows would not be positioned correctly on the wall.
+If an exterior wall in a daylit zone has a number of identical windows, the windows should be entered separately rather than using a window multiplier (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}). Using a multiplier would give an incorrect illuminance calculation since individual windows would not be positioned correctly on the wall.
 
 \subsubsection{Use of Zone Multipliers}\label{use-of-zone-multipliers}
 
@@ -228,7 +228,7 @@ A zone multiplier should not be used on a daylit zone if the windows in the zone
 
 To correctly calculate both direct and inter-reflected daylight illuminance you should try to model a thermal zone consisting of several similar rooms separated by interior walls as a representative room with a zone multiplier (ref: Zone). An example of this is shown in Figure~\ref{fig:for-daylighting-purposes-the-thermal-zone}. Room-1 is the representative room, with a zone multiplier = 4.
 
-Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: BuildingSurface:Detailed). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
+Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
 
 \begin{figure}[hbtp] % fig 56
 \centering
@@ -260,7 +260,7 @@ The daylighting calculation accounts for the presence of exterior obstructions i
 
 \begin{itemize}
   \item
-    Fins, overhangs, trees, neighboring buildings, etc., entered with the objects Shading:Zone:Detailed, Shading:Site:Detailed, or Shading:Building:Detailed.
+    Fins, overhangs, trees, neighboring buildings, etc., entered with the objects \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed}, \hyperref[shadingsitedetailed-shadingbuildingdetailed]{Shading:Site:Detailed}, or \hyperref[shadingsitedetailed-shadingbuildingdetailed]{Shading:Building:Detailed}.
   \item
     Building surfaces like walls and roofs (in an L-shaped building, for example).
   \item
@@ -269,7 +269,7 @@ The daylighting calculation accounts for the presence of exterior obstructions i
 
 Category (1) obstructions can have an associated solar transmittance schedule (see description of the field Transmittance Schedule Name for these shading surfaces). If this schedule is not specified, the surface is opaque (has zero transmittance).
 
-The daylighting calculation takes the transmittance into account in determining, for example, how much light enters a window through a translucent awning. It is assumed that the solar and visible transmittance is the same and that the surfaces are non-diffusing, i.e., they do not change the direction of transmitted light. Ref:Daylighting:Controls.
+The daylighting calculation takes the transmittance into account in determining, for example, how much light enters a window through a translucent awning. It is assumed that the solar and visible transmittance is the same and that the surfaces are non-diffusing, i.e., they do not change the direction of transmitted light. Ref:\hyperref[daylightingcontrols-000]{Daylighting:Controls}.
 
 Category (2) and (3) surfaces are assumed to be opaque.
 
@@ -293,9 +293,9 @@ An example of an interior obstruction that is a wall in an L-shaped room is show
 
 \subsubsection{Double Façades: Daylighting through Interior Windows}\label{double-fauxe7ades-daylighting-through-interior-windows}
 
-The Daylighting:Controls method, with no additional user input,~ calculates the contribution of daylight that passes into a target zone through interior windows.\protect\hyperlink{ux5fftn1}{{[}1{]}} The origin of this daylight is exterior windows in adjacent zones that share interior windows with the target zone. This capability is aimed at daylighting through a \textbf{double façade} (also called ``double envelope'' or ``double skin.'')
+The \hyperref[daylightingcontrols-000]{Daylighting:Controls} method, with no additional user input,~ calculates the contribution of daylight that passes into a target zone through interior windows.\protect\hyperlink{ux5fftn1}{{[}1{]}} The origin of this daylight is exterior windows in adjacent zones that share interior windows with the target zone. This capability is aimed at daylighting through a \textbf{double façade} (also called ``double envelope'' or ``double skin.'')
 
-This is illustrated in Figure~\ref{fig:vertical-section-through-a-double-faade}, which shows a double-façade buffer zone, Z0, with exterior windows EW1 and EW2. Z0 shares interior windows IW1, IW2 and IW3 with daylit occupied zones ZD1, ZD2 and ZD3, respectively (``daylit'' here means the zone has an associated Daylighting:Controls object). The daylight illuminance at reference points RP1, RP2 and RP3 comes from the interior windows and has two main sources:
+This is illustrated in Figure~\ref{fig:vertical-section-through-a-double-faade}, which shows a double-façade buffer zone, Z0, with exterior windows EW1 and EW2. Z0 shares interior windows IW1, IW2 and IW3 with daylit occupied zones ZD1, ZD2 and ZD3, respectively (``daylit'' here means the zone has an associated \hyperref[daylightingcontrols-000]{Daylighting:Controls} object). The daylight illuminance at reference points RP1, RP2 and RP3 comes from the interior windows and has two main sources:
 
 \begin{itemize}
   \item
@@ -338,19 +338,19 @@ Figure~\ref{fig:configuration-in-which-daylighting-of-zone-z} shows schematicall
 
 There are two restrictions on the use of exterior-window shading devices when a daylit zone has interior windows:
 
-1)~~~If two daylit zones share an interior window, neither zone can have an exterior window whose shading device does glare control (i.e., the WindowShadingControl for the exterior window has Glare Control Is Active = Yes).
+1)~~~If two daylit zones share an interior window, neither zone can have an exterior window whose shading device does glare control (i.e., the \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the exterior window has Glare Control Is Active = Yes).
 
-2)~~~If two daylit zones share an interior window, neither zone can have an exterior window with a WindowShadingControl that has Shading Control Type = MeetDaylightIlluminanceSetpoint.
+2)~~~If two daylit zones share an interior window, neither zone can have an exterior window with a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} that has Shading Control Type = MeetDaylightIlluminanceSetpoint.
 
 \subsection{DElight Daylighting Method}\label{delight-daylighting-method}
 
-The DElight method of analyzing daylighting in buildings is very similar to that used in the SplitFlux method and uses the same Daylighting:Controls and Daylighting:ReferencePoint objects but the Daylighting Method should be set to DElight. For each point in time, DElight calculates the interior daylighting illuminance at specified reference points and then determines how much the electric lighting can be reduced while still achieving a combined daylighting and electric lighting illuminance target. The daylight illuminance level in a zone depends on many factors, including exterior light sources; location, size, and visible light transmittance of simple and complex fenestration systems; reflectance of interior surfaces; and location of calculation reference points. The subsequent reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled, and type of lighting control.
+The DElight method of analyzing daylighting in buildings is very similar to that used in the SplitFlux method and uses the same \hyperref[daylightingcontrols-000]{Daylighting:Controls} and \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} objects but the Daylighting Method should be set to DElight. For each point in time, DElight calculates the interior daylighting illuminance at specified reference points and then determines how much the electric lighting can be reduced while still achieving a combined daylighting and electric lighting illuminance target. The daylight illuminance level in a zone depends on many factors, including exterior light sources; location, size, and visible light transmittance of simple and complex fenestration systems; reflectance of interior surfaces; and location of calculation reference points. The subsequent reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled, and type of lighting control.
 
 There are two primary differences between the SplitFlux and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
 There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the SplitFlux method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles).  A second is the current lack of visual quality (e.g., glare) calculations performed by DElight. Third, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the SplitFlux method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fourth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
-Input for invoking the DElight method involves three object types: \textbf{Daylighting:Controls}, \textbf{Daylighting:ReferencePoint}, and \textbf{Daylighting:DELight:ComplexFenestration}. 
+Input for invoking the DElight method involves three object types: \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}}, \textbf{\hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}}, and \textbf{\hyperref[daylightingdelightcomplexfenestration]{Daylighting:DELight:ComplexFenestration}}.
 
 
 \subsection{Daylighting:DELight:ComplexFenestration}\label{daylightingdelightcomplexfenestration}
@@ -392,7 +392,7 @@ The name of the heat transfer surface object instance hosting this Complex Fenes
 
 \paragraph{Field: Window Name}\label{field-window-name}
 
-The name of the Window (ref: FenestrationSurface:Detailed object) instance that will be used to account for the geometry, and the solar/thermal gains/losses, of the Complex Fenestration system surface. This must be a valid name that has been associated with a Window contained in the same EnergyPlus input data file. The geometry for the Complex Fenestration is taken from the geometry input for this standard EnergyPlus subsurface, hence the term ``Doppelganger.''
+The name of the Window (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object) instance that will be used to account for the geometry, and the solar/thermal gains/losses, of the Complex Fenestration system surface. This must be a valid name that has been associated with a Window contained in the same EnergyPlus input data file. The geometry for the Complex Fenestration is taken from the geometry input for this standard EnergyPlus subsurface, hence the term ``Doppelganger.''
 
 Note that DElight only deals with the visible spectrum of light transmitted through a Complex Fenestration. To account for the solar/thermal influences of a Complex Fenestration, a geometrically coincident subsurface that will be accounted for by methods already within EnergyPlus must be defined in the input data file. This is an interim solution to the issue of accounting for solar/thermal influences that will likely change as techniques analogous to the daylighting analysis of BTDF are developed.
 
@@ -521,7 +521,7 @@ The amount by which the overhead electric lighting power in a zone is multiplied
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
-The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with Daylighting:Controls, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in Daylighting:Controls object. 
+The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with \hyperref[daylightingcontrols-000]{Daylighting:Controls}, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in \hyperref[daylightingcontrols-000]{Daylighting:Controls} object.
 
 \subsubsection{Inputs}\label{inputs-4-006}
 
@@ -531,7 +531,7 @@ The name of the map object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-2-000}
 
-Reference to a zone with Daylighting:Controls.
+Reference to a zone with \hyperref[daylightingcontrols-000]{Daylighting:Controls}.
 
 \paragraph{Field: Z Height}\label{field-z-height}
 
@@ -593,9 +593,9 @@ Note that both tab and comma separated files easily import into Excel™ or othe
 
 \subsection{Daylighting Devices}\label{daylighting-devices}
 
-Daylighting devices work in conjunction with the Daylighting:Controls object to simulate components that can improve daylighting in a zone.
+Daylighting devices work in conjunction with the \hyperref[daylightingcontrols-000]{Daylighting:Controls} object to simulate components that can improve daylighting in a zone.
 
-Daylighting devices are also tightly integrated into the zone heat balance. The thermal effects of these devices are simulated with or without the use of a Daylighting:Controls object.
+Daylighting devices are also tightly integrated into the zone heat balance. The thermal effects of these devices are simulated with or without the use of a \hyperref[daylightingcontrols-000]{Daylighting:Controls} object.
 
 There are two types of daylighting device in EnergyPlus:~ tubular daylighting devices and daylighting shelves.
 
@@ -613,11 +613,11 @@ TDDs consist of three components: a dome, a pipe, and a diffuser.
 
 In EnergyPlus each of these components corresponds to an object in the input file.
 
-The dome and diffuser are defined in the same way as windows using the FenestrationSurface:Detailed object. The \emph{Surface Type} field must be specified as TubularDaylightDome or TubularDaylightDiffuser accordingly.
+The dome and diffuser are defined in the same way as windows using the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object. The \emph{Surface Type} field must be specified as TubularDaylightDome or TubularDaylightDiffuser accordingly.
 
 The location and orientation of the dome surface affect the total amount of daylight collected.
 
-The \emph{Base Surface} of the diffuser object determines to which zone the daylighting is delivered. The location and orientation of the diffuser surface affect the amount of daylight received at the Daylighting:Controls reference points.
+The \emph{Base Surface} of the diffuser object determines to which zone the daylighting is delivered. The location and orientation of the diffuser surface affect the amount of daylight received at the \hyperref[daylightingcontrols-000]{Daylighting:Controls} reference points.
 
 Although the object definition is the same as for a window, there are several restrictions on TubularDaylightDome and TubularDaylightDiffuser objects:
 
@@ -658,11 +658,11 @@ The name of the TDD object.
 
 \paragraph{Field: Dome Name}\label{field-dome-name}
 
-Reference to a FenestrationSurface:Detailed object with \emph{Surface Type} TubularDaylightDome.
+Reference to a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object with \emph{Surface Type} TubularDaylightDome.
 
 \paragraph{Field: Diffuser Name}\label{field-diffuser-name}
 
-Reference to a FenestrationSurface:Detailed object with \emph{Surface Type} TubularDaylightDiffuser.
+Reference to a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object with \emph{Surface Type} TubularDaylightDiffuser.
 
 \paragraph{Field: Construction Name}\label{field-construction-name-001}
 
@@ -848,10 +848,10 @@ The window must be divided into two window surfaces: an upper window and a lower
 
 The inside shelf is defined as a regular heat transfer surface in the zone. However, the surface must have the \emph{Outside Boundary Condition} field set to Surface with itself as the other zone surface. Shading and thermal mass effects are taken into account.
 
-The outside shelf is defined as a Shading:Zone:Detailed object. The visible and solar absorptance of the outside material layer determines the reflectivity of the shelf.
+The outside shelf is defined as a \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object. The visible and solar absorptance of the outside material layer determines the reflectivity of the shelf.
 
 \begin{callout}
-  NOTE: Unlike a regular Shading:Zone:Detailed object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e.~toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
+  NOTE: Unlike a regular \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e.~toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
 \end{callout}
 
 The inside shelf and outside shelf are both optional. However, if neither shelf is specified, the daylighting shelf object has no effect on the simulation.
@@ -864,15 +864,15 @@ The name of the daylighting shelf object.
 
 \paragraph{Field: Window Name}\label{field-window-name-1}
 
-Reference to a FenestrationSurface:Detailed object with \emph{Surface Type} WINDOW.
+Reference to a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object with \emph{Surface Type} WINDOW.
 
 \paragraph{Field: Inside Shelf Name}\label{field-inside-shelf-name}
 
-Reference to a BuildingSurface:Detailed object. This field is optional. If used, this surface must have OTHERZONESURFACE specified for the \emph{Outside Face Environment} field and the referenced other zone surface must be itself. The number of vertices of this surface object must be 4.
+Reference to a \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} object. This field is optional. If used, this surface must have OTHERZONESURFACE specified for the \emph{Outside Face Environment} field and the referenced other zone surface must be itself. The number of vertices of this surface object must be 4.
 
 \paragraph{Field: Outside Shelf Name}\label{field-outside-shelf-name}
 
-Reference to a Shading:Zone:Detailed object. This field is optional. If used, the number of vertices of this surface object must be 4.
+Reference to a \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object. This field is optional. If used, the number of vertices of this surface object must be 4.
 
 \paragraph{Field: Outside Shelf Construction Name}\label{field-outside-shelf-construction-name}
 
@@ -1047,13 +1047,13 @@ The following table shows what input objects/fields to use to model different da
 {\scriptsize
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}>{\raggedright}p{1.5in}}
 \caption{Daylighting Modeling Options \label{table:daylighting-modeling-options}} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Daylighting Modeling Options} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File \tabularnewline
 \midrule
 \endhead
@@ -1079,7 +1079,7 @@ Find visible transmittance effect of dirt on window & WindowMaterial:Glazing/Dir
 \bottomrule
 \end{longtable}}
 
-*Used only with Daylighting:Controls with the SplitFlux Daylighting Method.
+*Used only with \hyperref[daylightingcontrols-000]{Daylighting:Controls} with the SplitFlux Daylighting Method.
 
 \begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
 
