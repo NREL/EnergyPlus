@@ -6517,8 +6517,15 @@ namespace ConvectionCoefficients {
 
         surfWindDir = Surface(SurfNum).WindDir;
 
-        if (Surface(SurfNum).Class == SurfaceClass_Roof) {
-            DeltaTemp = TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
+        if (Surface(SurfNum).Class == SurfaceClass_Roof ||
+                (Surface(SurfNum).Class == SurfaceClass_Floor && Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) // Applies to exterior grade
+           ) {
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                DeltaTemp = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T - Surface(SurfNum).OutDryBulbTemp;
+            } else {
+                DeltaTemp = TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp;
+            }
+
             if (DeltaTemp < 0.0) {
                 Surface(SurfNum).OutConvClassification = OutConvClass_RoofStable;
             } else {
