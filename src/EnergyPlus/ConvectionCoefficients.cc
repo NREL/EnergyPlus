@@ -405,6 +405,7 @@ namespace ConvectionCoefficients {
                     algoNum = Zone(ZoneNum).InsideConvectionAlgo;
                     standardAlgo = true;
                 } else {
+                    algoNum = Zone(ZoneNum).InsideConvectionAlgo;
                     standardAlgo = false;
                 }
 
@@ -551,6 +552,7 @@ namespace ConvectionCoefficients {
             algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
             standardAlgo = true;
         } else {
+            algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
             standardAlgo = false;
         }
 
