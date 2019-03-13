@@ -6271,6 +6271,15 @@ namespace ConvectionCoefficients {
         }
 
         {
+
+            if (!Surface(SurfNum).ExtWind) {
+                SurfWindSpeed = 0.0; // No wind exposure
+            } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
+                SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
+            } else {
+                SurfWindSpeed = Surface(SurfNum).WindSpeed;
+            }
+
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
             if (SELECT_CASE_var == HcExt_None) {
@@ -6279,13 +6288,6 @@ namespace ConvectionCoefficients {
                 CalcUserDefinedOutsideHcModel(SurfNum, Surface(SurfNum).OutConvHfUserCurveIndex, Hf);
             } else if (SELECT_CASE_var == HcExt_SparrowWindward) {
                 ConstructNum = Surface(SurfNum).Construction;
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcSparrowWindward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
                                          Surface(SurfNum).OutConvFacePerimeter,
                                          Surface(SurfNum).OutConvFaceArea,
@@ -6294,45 +6296,17 @@ namespace ConvectionCoefficients {
 
             } else if (SELECT_CASE_var == HcExt_SparrowLeeward) {
                 ConstructNum = Surface(SurfNum).Construction;
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcSparrowLeeward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
                                         Surface(SurfNum).OutConvFacePerimeter,
                                         Surface(SurfNum).OutConvFaceArea,
                                         SurfWindSpeed,
                                         SurfNum);
             } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp, SurfWindSpeed);
             } else if (SELECT_CASE_var == HcExt_MoWiTTLeeward) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), SurfWindSpeed);
             } else if (SELECT_CASE_var == HcExt_DOE2Windward) {
                 ConstructNum = Surface(SurfNum).Construction;
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcDOE2Windward(TH(1, 1, SurfNum),
                                       Surface(SurfNum).OutDryBulbTemp,
                                       Surface(SurfNum).CosTilt,
@@ -6340,55 +6314,20 @@ namespace ConvectionCoefficients {
                                       Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
             } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
                 ConstructNum = Surface(SurfNum).Construction;
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcDOE2Leeward(TH(1, 1, SurfNum),
                                      Surface(SurfNum).OutDryBulbTemp,
                                      Surface(SurfNum).CosTilt,
                                      SurfWindSpeed,
                                      Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
             } else if (SELECT_CASE_var == HcExt_NusseltJurges) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcNusseltJurges(SurfWindSpeed);
 
             } else if (SELECT_CASE_var == HcExt_McAdams) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcMcAdams(SurfWindSpeed);
             } else if (SELECT_CASE_var == HcExt_Mitchell) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 Hf = CalcMitchell(SurfWindSpeed, CubeRootOfOverallBuildingVolume, SurfNum);
 
             } else if (SELECT_CASE_var == HcExt_ClearRoof) {
-                if (!Surface(SurfNum).ExtWind) {
-                    SurfWindSpeed = 0.0; // No wind exposure
-                } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfaceWindow(SurfNum).ShadingFlag == ExtShadeOn) {
-                    SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-                } else {
-                    SurfWindSpeed = Surface(SurfNum).WindSpeed;
-                }
                 SurfWindDir = Surface(SurfNum).WindDir;
                 Hf = CalcClearRoof(SurfNum,
                                    TH(1, 1, SurfNum),
