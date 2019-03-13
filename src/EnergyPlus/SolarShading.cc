@@ -748,6 +748,9 @@ namespace SolarShading {
                 if (ExtShadingSchedNum) {
                     Surface(SurfNum).SchedExternalShadingFrac = true;
                     Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
+                } else {
+                    ShowWarningError(cCurrentModuleObject + ": sunlit fraction schedule not found for " + Surface(SurfNum).Name + " when using ImportedShading.");
+                    ShowContinueError("These values are set to 1.0.");
                 }
             }
         }
@@ -4496,7 +4499,7 @@ namespace SolarShading {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iHour;   // Hour index number
-        int TS;      // TimeStep Loop Countergit 
+        int TS;      // TimeStep Loop Countergit
         static bool Once(true);
 
         if (Once) InitComplexWindows();

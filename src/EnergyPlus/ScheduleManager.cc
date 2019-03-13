@@ -594,16 +594,18 @@ namespace ScheduleManager {
             rowLimitMinCount = 8760;
             ColumnSep = CharComma;
             while (read_stat == 0) { // end of file
-                {
-                    IOFlags flags;
-                    gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
+                IOFlags flags;
+                gio::read(SchdFile, fmtA, flags) >> LineIn;
+                read_stat = flags.ios();
                 ++rowCnt;
                 colCnt = 0;
                 wordStart = 0;
                 columnValue = 0.0;
                 // scan through the line and write values into 2d array
+                if (rowCnt - 1 > rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\": more than 8774 hourly values read from " + ShadingSunlitFracFileName + ".");
+                    ShowFatalError("Program terminates due to previous condition.");
+                }
                 while (true) {
                     sepPos = index(LineIn, ColumnSep);
                     ++colCnt;
@@ -640,28 +642,29 @@ namespace ScheduleManager {
                             } else if (CSVAllColumnNames.count(subString)) {
                                 ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
                                                  "\".");
-                                ShowContinueError("The first occurence of the same surface name would be used.");
+                                ShowContinueError("The first occurrence of the same surface name would be used.");
                                 errFlag = true;
                             }
                             if (!errFlag) {
                                 NumCSVAllColumnsSchedules++;
                                 Array1D<Real64> hourlyColumnValues;
                                 hourlyColumnValues.allocate(8784);
-                                CSVAllColumnNames[subString] = colCnt;
-                                CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
+                                CSVAllColumnNames[subString] = colCnt - 1;
+                                CSVAllColumnNameAndValues[colCnt - 1] = hourlyColumnValues;
                             }
                         } else {
                             columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                             if (errFlag) {
                                 ++numerrors;
                                 columnValue = 0.0;
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": found error processing column: " + std::to_string(colCnt) +
+                                                 ", row:" + std::to_string(rowCnt) + " in " + ShadingSunlitFracFileName + ".");
+                                ShowContinueError("This value is set to 0.");
                             }
-                            CSVAllColumnNameAndValues[colCnt](rowCnt - 1) = columnValue;
+                            CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
                         }
                     }
                 }
-
-                if (rowCnt == rowLimitCount) break;
             }
             gio::close(SchdFile);
 
@@ -673,17 +676,13 @@ namespace ScheduleManager {
             if (numerrors > 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +
                                  " records had errors - these values are set to 0.");
-                ShowContinueError("Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
             }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than 8760 hourly values read from file.");
+            if (rowCnt - 1 < rowLimitMinCount) {
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\": less than 8760 hourly values read from " + ShadingSunlitFracFileName + ".");
                 ShowContinueError("..Number read=" + std::to_string(rowCnt) + '.');
             }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
-                ShowContinueError(" Actual number of hourly values included=" + std::to_string(rowCnt) + ".");
-            }
-            if (rowCnt == rowLimitCount) ScheduleFileShadingLeapYear = true;
+
+            if (rowCnt - 1 == rowLimitCount) ScheduleFileShadingLeapYear = true;
         }
 
         // add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
