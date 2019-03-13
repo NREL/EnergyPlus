@@ -8,11 +8,11 @@ Zone Control objects are used to control zone conditions to a specific setpoint.
 
 \textbf{Thermostat:ThermalComfort} - The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g.~Fanger) and a user-specified thermal comfort setpoint schedule.
 
-\textbf{Thermostat:OperativeTemperature} - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
+\textbf{Thermostat:OperativeTemperature} - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} and setpoint objects.
 
-\textbf{Thermostat:TemperatureAndHumidity} - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat's cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone's traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
+\textbf{Thermostat:TemperatureAndHumidity} - This thermostat control works together with the traditional \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat's cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A \hyperref[zonecontrolthermostattemperatureandhumidity]{ZoneControl:Thermostat:TemperatureAndHumidity} object should be specified to indicate if a zone's traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} and setpoint objects.
 
-\textbf{Thermostat}:\textbf{StagedDualSetpoint} - This thermostat control works alone with ``Dual Setpoint'' type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
+\textbf{Thermostat}:\textbf{StagedDualSetpoint} - This thermostat control works alone with ``Dual Setpoint'' type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object.
 
 \subsection{ZoneControl:Thermostat}\label{zonecontrolthermostat}
 
@@ -40,7 +40,7 @@ Unique identifying name for the thermostat.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-001}
 
-Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+Name of the zone or set of zones that is being controlled. When the \hyperref[zonelist]{ZoneList} option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
 
 \paragraph{Field: Control Type Schedule Name}\label{field-control-type-schedule-name}
 
@@ -66,13 +66,13 @@ Up to four pairs of Control Object Type and Control Name may be listed to specif
 
 This field specifies the control type to be used for this zone. Available control types are:
 
-ThermostatSetpoint:SingleHeating
+\hyperref[thermostatsetpointsingleheating]{ThermostatSetpoint:SingleHeating}
 
-ThermostatSetpoint:SingleCooling
+\hyperref[thermostatsetpointsinglecooling]{ThermostatSetpoint:SingleCooling}
 
-ThermostatSetpoint:SingleHeatingOrCooling
+\hyperref[thermostatsetpointsingleheatingorcooling]{ThermostatSetpoint:SingleHeatingOrCooling}
 
-ThermostatSetpoint:DualSetpoint
+\hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint}
 
 \paragraph{Field: Control \textless{}x\textgreater{} Name}\label{field-control-x-name}
 
@@ -82,7 +82,7 @@ The corresponding control type name. The name is used in an object with the name
 
 This optional choice field provides a temperature difference between cutout temperature and setpoint. When the temperature difference is greater than 0.0, the difference is applied to both heating and cooling by possibly revising setpoints based on control types.
 
-If MAT is defined as zone air temperature at previous time step, DeltaT represents the temperature difference between cutout and setpoint and is greater than 0.0, and PredictedLoad represents predicted load calculated in the ZoneTempPredictorCorrector, following action will be taken: 
+If MAT is defined as zone air temperature at previous time step, DeltaT represents the temperature difference between cutout and setpoint and is greater than 0.0, and PredictedLoad represents predicted load calculated in the ZoneTempPredictorCorrector, following action will be taken:
 
 \begin{lstlisting}
 0 - Uncontrolled (No specification or default)
@@ -392,9 +392,9 @@ ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
 
 \subsection{ZoneControl:Thermostat:OperativeTemperature}\label{zonecontrolthermostatoperativetemperature}
 
-This object is used to modify the program's behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related setpoint objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures). 
+This object is used to modify the program's behavior for \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects. One input object is used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related setpoint objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
 
-When using this object, the setpoint temperature values (e.g. input in schedules named in ThermostatSetpoint:DualSetpoint objects) become targets for the desired operative temperatures. As of version 8.7 new options are added that allow automatically generating values for the setpoint temperature, as a function of outdoor air temperatures, using various adaptive comfort models based on ASHRAE Standard 55-2010 and CEN 15251-2007. The adaptive comfort model relates the zone operative temperature setpoint to the recent history of the outdoor air temperatures.  The adaptive comfort models only apply to cooling mode and generate a single setpoint value for each day. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems. 
+When using this object, the setpoint temperature values (e.g. input in schedules named in \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} objects) become targets for the desired operative temperatures. As of version 8.7 new options are added that allow automatically generating values for the setpoint temperature, as a function of outdoor air temperatures, using various adaptive comfort models based on ASHRAE Standard 55-2010 and CEN 15251-2007. The adaptive comfort model relates the zone operative temperature setpoint to the recent history of the outdoor air temperatures.  The adaptive comfort models only apply to cooling mode and generate a single setpoint value for each day. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems.
 
 This thermostatic operative temperature, \({T_{OP}}\) , is defined as:
 
@@ -415,13 +415,13 @@ The radiative fraction \(\gamma\) is selected by the user and can be scheduled t
 % table 28
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Radiative Fraction vs Air Velocity (Operative Temperature Control) \label{table:radiative-fraction-vs-air-velocity-operative}} \tabularnewline
-\toprule 
+\toprule
 Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Radiative Fraction vs Air Velocity (Operative Temperature Control)} \tabularnewline
-\toprule 
+\toprule
 Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \midrule
 \endhead
@@ -431,7 +431,7 @@ Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 
 When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the selected acceptability limits of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. The user can choose whether to overwrite the cooling setpoint temperature only when the adaptive setpoint is higher than the user input one for the purpose of energy saving.
 
-Reference: 
+Reference:
 \begin{itemize}
 \tightlist
 \item Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
@@ -442,7 +442,7 @@ Reference:
 
 \paragraph{Field: Thermostat Name}\label{field-thermostat-name-000}
 
-Name of ZoneControl:Thermostat object defined elsewhere in the input file whose operation is to be modified to effect control based on operative temperature. If the ZoneControl:Thermostat references a ZoneList (set of zones) then, this operative temperature thermostat will be applied to each of those zones. If only a single thermostat/zone is desired, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat name is the thermostat that referenced the set of zones.
+Name of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object defined elsewhere in the input file whose operation is to be modified to effect control based on operative temperature. If the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} references a \hyperref[zonelist]{ZoneList} (set of zones) then, this operative temperature thermostat will be applied to each of those zones. If only a single thermostat/zone is desired, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat name is the thermostat that referenced the set of zones.
 
 \paragraph{Field: Radiative Fraction Input Mode}\label{field-radiative-fraction-input-mode}
 
@@ -460,16 +460,16 @@ Note that by setting the values in this schedule separately for design days, the
 
 \paragraph{Field: Adaptive Comfort Model Type}\label{field-adaptive-comfort-mode-type}
 
-This field controls which of the seven adaptive comfort model is chosen, if any, listed as following: 
+This field controls which of the seven adaptive comfort model is chosen, if any, listed as following:
 \begin{itemize}
 \tightlist
 \item None. The adaptive comfort model is not applied and the setpoint temperatures are not adjusted from those input in the thermostat setpoints.
 \item AdaptiveASH55CentralLine. The central line of the acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveASH5580PercentUpperLine. The upper line of the 80\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
-\item AdaptiveASH5590PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint. 
+\item AdaptiveASH5590PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveCEN15251CentralLine. The central line of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveCEN15251CategoryIUpperLine. The upper line of the Category I of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
-\item AdaptiveCEN15251CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate to adjust the zone operative temperature setpoint; and 
+\item AdaptiveCEN15251CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate to adjust the zone operative temperature setpoint; and
 \item AdaptiveCEN15251CategoryIIIUpperLine. The upper line of the Category III of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate as the zone operative temperature setpoint.
 \end{itemize}
 
@@ -545,23 +545,23 @@ Operative temperature (OT) is a weighted mixture of Zone Mean Air Temperature (M
 
 \subsection{ZoneControl:Thermostat:TemperatureAndHumidity}\label{zonecontrolthermostattemperatureandhumidity}
 
-This object is used to modify the behavior of ZoneControl:Thermostat objects (control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint only) based on zone air humidity conditions. Specifically, this TemperatureAndHumidity zone control resets the ZoneControl:Thermostat s cooling setpoint temperature downward when the zone air relative humidity exceeds the Dehumidifying Relative Humidity Setpoint defined in this object. The reduced cooling setpoint temperature typically results in longer cooling coil runtimes and additional dehumidification. The rate at which the cooling setpoint temperature is reduced is dictated by the user-specified Overcool Control Ratio. The maximum reduction in cooling setpoint temperature is defined by the user-entered OverCool Range (user choice of a constant value for the entire simulation or a schedule that can define how the overcool range varies over time). For details regarding the calculations, see the EnergyPlus Engineering Reference.
+This object is used to modify the behavior of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects (control types \hyperref[thermostatsetpointsinglecooling]{ThermostatSetpoint:SingleCooling} and \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} only) based on zone air humidity conditions. Specifically, this TemperatureAndHumidity zone control resets the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} s cooling setpoint temperature downward when the zone air relative humidity exceeds the Dehumidifying Relative Humidity Setpoint defined in this object. The reduced cooling setpoint temperature typically results in longer cooling coil runtimes and additional dehumidification. The rate at which the cooling setpoint temperature is reduced is dictated by the user-specified Overcool Control Ratio. The maximum reduction in cooling setpoint temperature is defined by the user-entered OverCool Range (user choice of a constant value for the entire simulation or a schedule that can define how the overcool range varies over time). For details regarding the calculations, see the EnergyPlus Engineering Reference.
 
-Note: As described above, this ZoneControl:Thermostat:TemperatureAndHumidity control object modifies the cooling setpoint temperature of ZoneControl:Thermostat objects. The ZoneControl:Thermostat:TemperatureAndHumidity object works independently of the ZoneControl:Humidistat object; that is, it does not replace the need for, or coordinate its input fields with, ZoneControl:Humidistat objects that are required for other types of high humidity control (e.g., ZoneControl:Humidstat objects are required for ZoneHVAC:Dehumidifier:DX objects, AirLoopHVAC:Unitary* objects with CoolReheat or MultiMode dehumidification control types, etc.)
+Note: As described above, this ZoneControl:Thermostat:TemperatureAndHumidity control object modifies the cooling setpoint temperature of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects. The ZoneControl:Thermostat:TemperatureAndHumidity object works independently of the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object; that is, it does not replace the need for, or coordinate its input fields with, \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} objects that are required for other types of high humidity control (e.g., ZoneControl:Humidstat objects are required for \hyperref[zonehvacdehumidifierdx]{ZoneHVAC:Dehumidifier:DX} objects, AirLoopHVAC:Unitary* objects with CoolReheat or MultiMode dehumidification control types, etc.)
 
 \subsubsection{Inputs}\label{inputs-6-031}
 
 \paragraph{Field: Thermostat Name}\label{field-thermostat-name-1}
 
-Name of ZoneControl:Thermostat object defined elsewhere in the input file whose operation is to be modified to effect temperature control based on zone air humidity conditions. If the ZoneControl:Thermostat references a ZoneList (set of zones), then simply enter the name of the ZoneControl:Thermostat object and this TemperatureAndHumidity thermostat control will be applied to all zones in the ZoneList. If the ZoneControl:Thermostat references a ZoneList but it is desired that only a single zone within the ZoneList be controlled based on TemperatureAndHumidity control, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat Name is the name of the ZoneControl:Thermostat object.
+Name of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object defined elsewhere in the input file whose operation is to be modified to effect temperature control based on zone air humidity conditions. If the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} references a \hyperref[zonelist]{ZoneList} (set of zones), then simply enter the name of the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object and this TemperatureAndHumidity thermostat control will be applied to all zones in the \hyperref[zonelist]{ZoneList}. If the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} references a \hyperref[zonelist]{ZoneList} but it is desired that only a single zone within the \hyperref[zonelist]{ZoneList} be controlled based on TemperatureAndHumidity control, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat Name is the name of the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object.
 
 \paragraph{Field: Dehumidifying Relative Humidity Setpoint Schedule Name}\label{field-dehumidifying-relative-humidity-setpoint-schedule-name}
 
-Name of a schedule that defines the dehumidifying relative humidity setpoint, expressed as a percentage (0-100), for each timestep of the simulation. This input field is required. This input field has absolutely no relationship or influence on the Dehumidifying Relative Humidity Setpoint Schedule Name optional input field in the ZoneControl:Humidistat object.
+Name of a schedule that defines the dehumidifying relative humidity setpoint, expressed as a percentage (0-100), for each timestep of the simulation. This input field is required. This input field has absolutely no relationship or influence on the Dehumidifying Relative Humidity Setpoint Schedule Name optional input field in the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object.
 
 \paragraph{Field:Dehumidification Control Type}\label{fielddehumidification-control-type}
 
-This input field defines what type of dehumidification control is active during the simulation. Valid control types are None and Overcool. The default is Overcool if this field is left blank. Overcool resets the thermostat s cooling setpoint temperature lower based on the zone air relative humidity level. None means no overcooling (i.e., traditional zone air temperature control based on the associated ZoneControl:Thermostat object {[}Thermostat Name input field above{]} will be in effect).
+This input field defines what type of dehumidification control is active during the simulation. Valid control types are None and Overcool. The default is Overcool if this field is left blank. Overcool resets the thermostat s cooling setpoint temperature lower based on the zone air relative humidity level. None means no overcooling (i.e., traditional zone air temperature control based on the associated \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object {[}Thermostat Name input field above{]} will be in effect).
 
 \paragraph{Field: Overcool Range Input Method}\label{field-overcool-range-input-method}
 
@@ -569,17 +569,17 @@ This field controls whether the input for the overcool (temperature) range is a 
 
 \paragraph{Field: Overcool Constant Range}\label{field-overcool-constant-range}
 
-This field specifies a fixed maximum overcool temperature range for cooling setpoint temperature reduction for zone overcool dehumidification in units of deltaC. This field is used if the Overcool Range Input Method is specified as \textbf{Constant}. The Overcool dehumidification control type only works with ZoneControl:Thermostat control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint . For ThermostatSetpoint:DualSetpoint , the model will use the \textbf{smaller} of the Overcool Constant Range input value or the difference between the cooling and heating setpoint temperatures specified in the ThermostatSetpoint:DualSetpoint object. The Overcool Constant Range must be greater than or equal to zero with a maximum value of 3 °C. A value of 0.0 indicates no zone air overcooling. The default value is 1.7 °C (3 °F) if this input field is left blank.
+This field specifies a fixed maximum overcool temperature range for cooling setpoint temperature reduction for zone overcool dehumidification in units of deltaC. This field is used if the Overcool Range Input Method is specified as \textbf{Constant}. The Overcool dehumidification control type only works with \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} control types \hyperref[thermostatsetpointsinglecooling]{ThermostatSetpoint:SingleCooling} and \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} . For \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} , the model will use the \textbf{smaller} of the Overcool Constant Range input value or the difference between the cooling and heating setpoint temperatures specified in the \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} object. The Overcool Constant Range must be greater than or equal to zero with a maximum value of 3 °C. A value of 0.0 indicates no zone air overcooling. The default value is 1.7 °C (3 °F) if this input field is left blank.
 
 \paragraph{Field: Overcool Range Schedule Name}\label{field-overcool-range-schedule-name}
 
-This field contains the name of a schedule, defined elsewhere, that determines the value for the overcool range during the simulation period. This schedule should contain values from 0.0 to \textless{} = 3.0 (deltaC). When the value of this schedule is 0.0, the zone air temperature control will be based only on zone air dry-bulb temperature (i.e., no zone overcooling). This field is used by the program if the Overcool Range Input Method field is set to \textbf{Scheduled}. Overcool dehumidification control type only works with ZoneControl:Thermostat control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint . For ThermostatSetpoint:DualSetpoint , the model will use the \textbf{smaller} of the Overcool Range values specified in this schedule or the difference between the cooling and heating setpoint temperatures specified in the ThermostatSetpoint:DualSetpoint object.
+This field contains the name of a schedule, defined elsewhere, that determines the value for the overcool range during the simulation period. This schedule should contain values from 0.0 to \textless{} = 3.0 (deltaC). When the value of this schedule is 0.0, the zone air temperature control will be based only on zone air dry-bulb temperature (i.e., no zone overcooling). This field is used by the program if the Overcool Range Input Method field is set to \textbf{Scheduled}. Overcool dehumidification control type only works with \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} control types \hyperref[thermostatsetpointsinglecooling]{ThermostatSetpoint:SingleCooling} and \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} . For \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} , the model will use the \textbf{smaller} of the Overcool Range values specified in this schedule or the difference between the cooling and heating setpoint temperatures specified in the \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} object.
 
 Note that by setting the values in this schedule separately for design days, the user can control how Overcool Dehumidification Control is applied during autosizing. (Overcool dehumidification control tends to increase the cooling equipment capacities calculated during sizing.)
 
 \paragraph{Field:Overcool Control Ratio}\label{fieldovercool-control-ratio}
 
-The value of this input field is used to adjust the cooling setpoint temperature (established by the associated ZoneControl:Thermostat object) downward based on the difference between the zone air relative humidity level and the Dehumidifying Relative Humidity Setpoint. This input field is only used with Dehumidification Control Type = Overcool. Input values must be greater than or equal to 0.0 \%RH/K. The default value is 3.6 if this field is left blank.
+The value of this input field is used to adjust the cooling setpoint temperature (established by the associated \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object) downward based on the difference between the zone air relative humidity level and the Dehumidifying Relative Humidity Setpoint. This input field is only used with Dehumidification Control Type = Overcool. Input values must be greater than or equal to 0.0 \%RH/K. The default value is 3.6 if this field is left blank.
 
 An example of this object follows.
 
@@ -597,9 +597,9 @@ ZoneControl:Thermostat:TemperatureAndHumidity,
 
 \subsection{ZoneControl:Thermostat:StagedDualSetpoint}\label{zonecontrolthermostatstageddualsetpoint}
 
-The thermostatic zone control staged dual setpoint object is used to control a zone to a specified temperature based on multiple stages. The other types of ZoneControl:Thermostat objects reference a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules. This control object does not require a control type schedule and associated one or more control type objects. Instead, the object is defined as a Dual Setpoint type only and has two fields to provide heating and cooling setpoints. The object also provides two fields to specify heating and cooling throttling temperature ranges, so that predicted zone loads may be varied within the throttling ranges for both heating and cooling. The number of stages for both heating and cooling varies from 1 to 4 for the time being to match the number of speeds used in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. The number of stages may be expanded later to accommodate other objects with the number of speeds higher than 4. The object requires inputs temperature offsets for both heating and cooling based on the number of stages. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. The staged number will be assigned to the speed number for the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed system type.
+The thermostatic zone control staged dual setpoint object is used to control a zone to a specified temperature based on multiple stages. The other types of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects reference a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules. This control object does not require a control type schedule and associated one or more control type objects. Instead, the object is defined as a Dual Setpoint type only and has two fields to provide heating and cooling setpoints. The object also provides two fields to specify heating and cooling throttling temperature ranges, so that predicted zone loads may be varied within the throttling ranges for both heating and cooling. The number of stages for both heating and cooling varies from 1 to 4 for the time being to match the number of speeds used in the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. The number of stages may be expanded later to accommodate other objects with the number of speeds higher than 4. The object requires inputs temperature offsets for both heating and cooling based on the number of stages. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. The staged number will be assigned to the speed number for the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} system type.
 
-It should be pointed out that If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
+It should be pointed out that If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object.
 
 \subsubsection{Inputs}\label{inputs-7-030}
 
@@ -609,11 +609,11 @@ Unique identifying name for the staged dual-setpoint thermostat.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1-001}
 
-Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+Name of the zone or set of zones that is being controlled. When the \hyperref[zonelist]{ZoneList} option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
 
 \paragraph{Field: Number of Heating Stages}\label{field-number-of-heating-stages}
 
-This numerical field defines the number of heating stages, and must be less than or equal to the number of heating speeds defined in the associated heating coil, such as Coil:Heating:DX:MultiSpeed. The value for this input field defines the number of heating temperature offsets that must be defined for heating in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
+This numerical field defines the number of heating stages, and must be less than or equal to the number of heating speeds defined in the associated heating coil, such as \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}. The value for this input field defines the number of heating temperature offsets that must be defined for heating in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
 
 \paragraph{Field:Heating Temperature Setpoint Schedule Name}\label{fieldheating-temperature-setpoint-schedule-name}
 
@@ -625,27 +625,27 @@ This numeric field defines the heating throttling temperature range in the units
 
 \paragraph{Field: Stage 1 Heating Temperature Offset}\label{field-stage-1-heating-temperature-offset}
 
-This numeric field defines the heating temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or less than 0. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 1 offset value and greater than Stage 2 offset value, the heating stage number is 1. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 1 is specified.
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or less than 0. The heating temperature offset fields are used to determine the heating stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 1 offset value and greater than Stage 2 offset value, the heating stage number is 1. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 1 is specified.
 
 \paragraph{Field: Stage 2 Heating Temperature Offset}\label{field-stage-2-heating-temperature-offset}
 
-This numeric field defines the heating temperature offset in the units of deltaC for Stage 2. The value entered here must be less than the value at the previous field: Stage 1 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 2 offset value and greater than Stage 3 offset value, the heating stage number is 2. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 2 is specified.
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 2. The value entered here must be less than the value at the previous field: Stage 1 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 2 offset value and greater than Stage 3 offset value, the heating stage number is 2. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 2 is specified.
 
 \paragraph{Field: Stage 3 Heating Temperature Offset}\label{field-stage-3-heating-temperature-offset}
 
-This numeric field defines the heating temperature offset in the units of deltaC for Stage 3. The value entered here must be less than the value at the previous field: Stage 3 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 3 offset value and greater than Stage 4 offset value, the heating stage number is 3. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 3 is specified.
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 3. The value entered here must be less than the value at the previous field: Stage 3 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 3 offset value and greater than Stage 4 offset value, the heating stage number is 3. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 3 is specified.
 
-Note: If the stage number is not equal to the number of heating speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+Note: If the stage number is not equal to the number of heating speed in the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object, the minimum value is set to the speed number for the heat pump object.
 
 \paragraph{Field: Stage 4 Heating Temperature Offset}\label{field-stage-4-heating-temperature-offset}
 
-This numeric field defines the heating temperature offset in the units of deltaC for Stage 4. The value entered here must be less than the value at the previous field: Stage 4 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 4 offset value, the heating stage number is 4. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 4 is specified.
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 4. The value entered here must be less than the value at the previous field: Stage 4 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 4 offset value, the heating stage number is 4. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 4 is specified.
 
-Note: If the stage number is not equal to the number of heating speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+Note: If the stage number is not equal to the number of heating speed in the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object, the minimum value is set to the speed number for the heat pump object.
 
 \paragraph{Field: Number of Cooling Stages}\label{field-number-of-cooling-stages}
 
-This field defines the number of cooling stages, and must be less than or equal to the number of cooling speeds defined in the associated cooling coil, such as Coil:Cooling:DX:MultiSpeed. The value for this input field defines the number of cooling temperature offsets that must be defined for cooling in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
+This field defines the number of cooling stages, and must be less than or equal to the number of cooling speeds defined in the associated cooling coil, such as \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}. The value for this input field defines the number of cooling temperature offsets that must be defined for cooling in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
 
 \paragraph{Field:Cooling Temperature Setpoint Base Schedule Name}\label{fieldcooling-temperature-setpoint-base-schedule-name}
 
@@ -657,23 +657,23 @@ This numeric field defines the cooling throttling temperature range in the units
 
 \paragraph{Field: Stage 1 Cooling Temperature Offset}\label{field-stage-1-cooling-temperature-offset}
 
-This numeric field defines the cooling temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or greater than 0. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 1 offset value and less than Stage 2 offset value, the cooling stage number is 1. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 1 is specified.
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or greater than 0. The cooling temperature offset fields are used to determine the cooling stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 1 offset value and less than Stage 2 offset value, the cooling stage number is 1. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 1 is specified.
 
 \paragraph{Field: Stage 2 Cooling Temperature Offset}\label{field-stage-2-cooling-temperature-offset}
 
-This numeric field defines the cooling temperature offset in the units of deltaC for Stage 2. The value entered here must be greater than the value at the previous field: Stage 1 Cooling Temperature Offset. When the number of cooling stage is equal to 1, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 2 offset value and less than Stage 3 offset value, the cooling stage number is 2. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 2 is specified.
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 2. The value entered here must be greater than the value at the previous field: Stage 1 Cooling Temperature Offset. When the number of cooling stage is equal to 1, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 2 offset value and less than Stage 3 offset value, the cooling stage number is 2. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 2 is specified.
 
 \paragraph{Field: Stage 3 Cooling Temperature Offset}\label{field-stage-3-cooling-temperature-offset}
 
-This numeric field defines the cooling temperature offset in the units of deltaC for Stage 3. The value entered here must be greater than the value at the previous field: Stage 3 Cooling Temperature Offset. When the number of cooling stage is less than 3, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 3 offset value and less than Stage 4 offset value, the cooling stage number is 3. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 3 is specified.
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 3. The value entered here must be greater than the value at the previous field: Stage 3 Cooling Temperature Offset. When the number of cooling stage is less than 3, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 3 offset value and less than Stage 4 offset value, the cooling stage number is 3. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 3 is specified.
 
-Note: If the stage number is not equal to the number of cooling speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+Note: If the stage number is not equal to the number of cooling speed in the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object, the minimum value is set to the speed number for the heat pump object.
 
 \paragraph{Field: Stage 4 Cooling Temperature Offset}\label{field-stage-4-cooling-temperature-offset}
 
-This numeric field defines the cooling temperature offset in the units of deltaC for Stage 4. The value entered here must be greater than the value at the previous field: Stage 4 Cooling Temperature Offset. When the number of cooling stage is less than 4, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 4 offset value, the cooling stage number is 4. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 4 is specified.
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 4. The value entered here must be greater than the value at the previous field: Stage 4 Cooling Temperature Offset. When the number of cooling stage is less than 4, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 4 offset value, the cooling stage number is 4. When the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object is called, Speed 4 is specified.
 
-Note: If the stage number is not equal to the number of cooling speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+Note: If the stage number is not equal to the number of cooling speed in the \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed} object, the minimum value is set to the speed number for the heat pump object.
 
 An example of this statement in an IDF is:
 
@@ -702,43 +702,43 @@ ZoneControl:Thermostat:StagedDualSetpoint,
 
 The humidistat zone control object is used to control a zone to a single relative humidity setpoint schedule, or to dual humidity setpoint schedules (humidifying/ dehumidifying setpoints with deadband). The single setpoint humidistat requires single setpoint input only, and the dual-setpoint humidistat requires inputs of both humidifying and dehumidifying setpoints. The schedules consist of relative humidities, expressed as a percentage (0-100), to be used during the simulation for that zone s moisture prediction calculation. Only one humidistat control statement can be specified for each zone. For a single setpoint humidistat, if the zone relative humidity is below the control relative humidity setpoint and the equipment specified can humidify then that equipment will try and meet the zone s humidification load. The opposite is true if the zone relative humidity is above the control relative humidity setpoint and the equipment can dehumidify. For a dual setpoint humidistat, if the zone relative humidity is below the \textbf{humidifying} relative humidity setpoint and the equipment specified can humidify then that equipment will try and meet the zone s humidification load. The opposite is true if the zone relative humidity is above the \textbf{dehumidifying} relative humidity setpoint and the equipment can dehumidify.
 
-If the ZoneControl:Humidistat is used by a furnace or unitary system (Ref. Furnace and Unitary Systems) no other objects are required. The signal from the humidistat is used directly by that component. If the Zone Control:Humidistat object is used to control a Humidifier or used in conjunction with a Controller:WaterCoil object with control variable \textbf{TemperatureAndHumidityRatio} or \textbf{HumidityRatio}, the following objects are required to determine a setpoint for those components for a single setpoint humidistat:
+If the ZoneControl:Humidistat is used by a furnace or unitary system (Ref. Furnace and Unitary Systems) no other objects are required. The signal from the humidistat is used directly by that component. If the Zone Control:Humidistat object is used to control a Humidifier or used in conjunction with a \hyperref[controllerwatercoil]{Controller:WaterCoil} object with control variable \textbf{TemperatureAndHumidityRatio} or \textbf{HumidityRatio}, the following objects are required to determine a setpoint for those components for a single setpoint humidistat:
 
 \begin{itemize}
 \item
-  SetpointManager:SingleZone:Humidity:Minimum
+  \hyperref[setpointmanagersinglezonehumidityminimum]{SetpointManager:SingleZone:Humidity:Minimum}
 \item
-  SetpointManager:MultiZone:MinimumHumidity:Average
+  \hyperref[setpointmanagermultizoneminimumhumidityaverage]{SetpointManager:MultiZone:MinimumHumidity:Average}
 \item
-  SetpointManager:MultiZone:MaximumHumidity:Average
+  \hyperref[setpointmanagermultizonemaximumhumidityaverage]{SetpointManager:MultiZone:MaximumHumidity:Average}
 \item
-  SetpointManager:MultiZone:Humidity:Minimum
+  \hyperref[setpointmanagermultizonehumidityminimum]{SetpointManager:MultiZone:Humidity:Minimum}
 \item
-  SetpointManager:MultiZone:Humidity:Maximum
+  \hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}
 \item
-  SetpointManager:SingleZone:Humidity:Minimum
+  \hyperref[setpointmanagersinglezonehumidityminimum]{SetpointManager:SingleZone:Humidity:Minimum}
 \end{itemize}
 
 For a dual setpoint humidistat, both a maximum humidity setpoint manager object:
 
 \begin{itemize}
 \item
-  SetpointManager:SingleZone:Humidity:Maximum
+  \hyperref[setpointmanagersinglezonehumiditymaximum]{SetpointManager:SingleZone:Humidity:Maximum}
 \item
-  SetpointManager:MultiZone:MaximumHumidity:Average
+  \hyperref[setpointmanagermultizonemaximumhumidityaverage]{SetpointManager:MultiZone:MaximumHumidity:Average}
 \item
-  SetpointManager:MultiZone:Humidity:Maximum
+  \hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}
 \end{itemize}
 
 and a minimum humidity setpoint manager object:
 
 \begin{itemize}
 \item
-  SetpointManager:SingleZone:Humidity:Minimum
+  \hyperref[setpointmanagersinglezonehumidityminimum]{SetpointManager:SingleZone:Humidity:Minimum}
 \item
-  SetpointManager:MultiZone:MinimumHumidity:Average
+  \hyperref[setpointmanagermultizoneminimumhumidityaverage]{SetpointManager:MultiZone:MinimumHumidity:Average}
 \item
-  SetpointManager:MultiZone:Humidity:Minimum
+  \hyperref[setpointmanagermultizonehumidityminimum]{SetpointManager:MultiZone:Humidity:Minimum}
 \end{itemize}
 
 are required to determine the setpoints for the corresponding humidification and dehumidification components.
@@ -840,9 +840,9 @@ This object references a control type schedule and one or more thermal comfort c
 
 Thus, if the schedule referenced in the ZoneControl:Thermostat:ThermalComfort statement has a value of 4 for a particular hour, this indicates that during that hour ``Dual Thermal Comfort Setpoint with Deadband:Fanger'' is to be used. The specific ``Dual Thermal Comfort Setpoint with Deadband:Fanger'' control object to be used is specified in the list of control type/name pairs. Then the specific control type objects reference the thermal comfort control setpoint schedule to be used. Because only one control can be specified for each control type in a ZoneControl:Thermostat:ThermalComfort statement, there are only four pairs possible in a particular ZoneControl:Thermostat:ThermalComfort type/name list. This is because individual controls can be defined hourly, thus giving the user a full range of flexibility. Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the hourly schedule profile.
 
-The ZoneControl:Thermostat:ThermalComfort object can be used alone, or with a ZoneControl:Thermostat object. When both control objects co-exist for a specific zone and the thermal comfort control type value in the thermal comfort control type schedule is non-zero the thermal comfort object will override the value from the zone thermostat object. If the thermal comfort control is specified as Uncontrolled (thermal comfort control type value of 0) for a particular period, then control will revert to thermostat control if specified. If the thermal comfort control is specified as Uncontrolled for a particular period and thermostat control is not specified in the input, then conditions will float.
+The ZoneControl:Thermostat:ThermalComfort object can be used alone, or with a \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object. When both control objects co-exist for a specific zone and the thermal comfort control type value in the thermal comfort control type schedule is non-zero the thermal comfort object will override the value from the zone thermostat object. If the thermal comfort control is specified as Uncontrolled (thermal comfort control type value of 0) for a particular period, then control will revert to thermostat control if specified. If the thermal comfort control is specified as Uncontrolled for a particular period and thermostat control is not specified in the input, then conditions will float.
 
-This object currently allows only Fanger comfort control (Ref. Thermal Comfort in Engineering Reference). It requires one or more people objects in a specific zone. It also requires inputs of Fields \emph{Activity Level Schedule Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name} and \emph{Air Velocity Schedule Name} in the people object(s). When thermal comfort control is used in a zone, the air velocity entered in the Air Velocity Schedule (Ref. People) should be greater than or equal to 0.1 and less than or equal to 0.5 m/s. A warning message will be issued if thermal comfort control is active and the air velocity is outside this range.
+This object currently allows only Fanger comfort control (Ref. Thermal Comfort in Engineering Reference). It requires one or more people objects in a specific zone. It also requires inputs of Fields \emph{Activity Level Schedule Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name} and \emph{Air Velocity Schedule Name} in the people object(s). When thermal comfort control is used in a zone, the air velocity entered in the Air Velocity Schedule (Ref. \hyperref[people]{People}) should be greater than or equal to 0.1 and less than or equal to 0.5 m/s. A warning message will be issued if thermal comfort control is active and the air velocity is outside this range.
 
 This object reads input PMV values from a given PMV setpoint schedule to calculate a dry-bulb temperature setpoint based on the selected thermal comfort model. The dry-bulb temperature setpoint calculation uses zone air humidity ratio at the previous system timestep and surface temperatures at the previous zone timestep, along with other conditions at the current timestep (e.g., activity level, clothing level and air velocity from the PEOPLE object).
 
@@ -854,15 +854,15 @@ Unique identifying name for this thermal comfort control object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-2-000}
 
-Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+Name of the zone or set of zones that is being controlled. When the \hyperref[zonelist]{ZoneList} option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
 
 \paragraph{Field: Averaging Method}\label{field-averaging-method}
 
-This choice field specifies the method for calculating the thermal comfort dry-bulb temperature setpoint for a zone with multiple People objects defined. The available choices are: \textbf{SpecificObject}, \textbf{ObjectAverage}, and \textbf{PeopleAverage}. This field is only used when multiple people objects are defined for this zone. If this field is specified as \textbf{PeopleAverage} and the total number of people for all people objects is zero for a particular timestep, the PeopleAverage method cannot be applied and the program automatically uses the ObjectAverage method for this timestep. The default input is \textbf{PeopleAverage}.
+This choice field specifies the method for calculating the thermal comfort dry-bulb temperature setpoint for a zone with multiple \hyperref[people]{People} objects defined. The available choices are: \textbf{SpecificObject}, \textbf{ObjectAverage}, and \textbf{\hyperref[people]{People}Average}. This field is only used when multiple people objects are defined for this zone. If this field is specified as \textbf{\hyperref[people]{People}Average} and the total number of people for all people objects is zero for a particular timestep, the \hyperref[people]{People}Average method cannot be applied and the program automatically uses the ObjectAverage method for this timestep. The default input is \textbf{\hyperref[people]{People}Average}.
 
 \paragraph{Field: Object Name for Specific Object Averaging Method}\label{field-object-name-for-specific-object-averaging-method}
 
-This choice field specifies the name of the specific People object to be used for calculating comfort control when multiple People objects are defined. Only used if the Averaging Method is specified as SpecificObject.
+This choice field specifies the name of the specific \hyperref[people]{People} object to be used for calculating comfort control when multiple \hyperref[people]{People} objects are defined. Only used if the Averaging Method is specified as SpecificObject.
 
 \paragraph{Field: Minimum Dry-Bulb Temperature Setpoint}\label{field-minimum-dry-bulb-temperature-setpoint}
 
@@ -900,13 +900,13 @@ Up to four pairs of Thermal Comfort Control Type and Thermal Comfort Control Typ
 
 This field specifies the first control type name to be used for this zone. Available control types are:
 
-ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating
+\hyperref[thermostatsetpointthermalcomfortfangersingleheating]{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating}
 
-ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling
+\hyperref[thermostatsetpointthermalcomfortfangersinglecooling]{ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling}
 
-ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling
+\hyperref[thermostatsetpointthermalcomfortfangersingleheatingorcooling]{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling}
 
-ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint
+\hyperref[thermostatsetpointthermalcomfortfangerdualsetpoint]{ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint}
 
 \paragraph{Field: Thermal Comfort Control \textless{}x\textgreater{} Name}\label{field-thermal-comfort-control-x-name}
 
@@ -999,7 +999,7 @@ This output variable defined in object Zone Control:Thermostatic. The Thermal Co
 
 \subsection{Thermal Comfort Setpoints}\label{thermal-comfort-setpoints}
 
-The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a Predicted Mean Vote (PMV) setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. However, the Fanger thermal comfort output variables \lstinline!Zone Thermal Comfort Fanger Model PMV! and \lstinline!Zone Thermal Comfort Fanger Model PPD! are reported for thermal comfort uncontrolled conditions as well (e.i., free floating thermal comfort condition) just like a free floating temperature and humidity ratio.   These are indicative of the actual thermal comfort level in uncontrolled thermal comfort zone, and are outputs variables under \lstinline!People! objects.
+The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a Predicted Mean Vote (PMV) setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. However, the Fanger thermal comfort output variables \lstinline!Zone Thermal Comfort Fanger Model PMV! and \lstinline!Zone Thermal Comfort Fanger Model PPD! are reported for thermal comfort uncontrolled conditions as well (e.i., free floating thermal comfort condition) just like a free floating temperature and humidity ratio.   These are indicative of the actual thermal comfort level in uncontrolled thermal comfort zone, and are outputs variables under \hyperref[people]{\lstinline!People!} objects.
 
 \subsection{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating}\label{thermostatsetpointthermalcomfortfangersingleheating}
 
@@ -1088,26 +1088,26 @@ ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,
 
 \subsection{ZoneControl:ContaminantController}\label{zonecontrolcontaminantcontroller}
 
-The ZoneControl:ContaminantController object is used for any of the following two purposes based on the system outdoor air method specified in the Controller:MechanicalVentilation.
+The ZoneControl:ContaminantController object is used for any of the following two purposes based on the system outdoor air method specified in the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation}.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  To control a zone to a specified indoor level of contaminants. When this zone is served by an AirLoopHVAC, the other zones served by the same AirLoopHVAC will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
+  To control a zone to a specified indoor level of contaminants. When this zone is served by an \hyperref[airloophvac]{AirLoopHVAC}, the other zones served by the same \hyperref[airloophvac]{AirLoopHVAC} will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The \hyperref[airloophvac]{AirLoopHVAC} system outdoor flow rate is realized by the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The \hyperref[airloophvac]{AirLoopHVAC} system outdoor flow rate is realized by the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
 \item
-  To specify minimum or maximum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate. Carbon Dioxide Control Availability Schedule Name determines the availability of ProportionalControl .
+  To specify minimum or maximum CO2 concentration schedule name for a zone. The \hyperref[airloophvac]{AirLoopHVAC} system outdoor flow rate is realized by the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate. Carbon Dioxide Control Availability Schedule Name determines the availability of ProportionalControl .
 \end{enumerate}
 
 For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
 
-The ZoneControl:ContaminantController object is also used for any of the following two purposes based on the outdoor air method specified in the DesignSpecification:OutdoorAir.
+The ZoneControl:ContaminantController object is also used for any of the following two purposes based on the outdoor air method specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  To control a zone to a specified indoor level of contaminants. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = IndoorAirQualityProcedure, so that the required outdoor airflow rate to reach the zone air setpoint can be assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC can reach the zone air CO2 setpoint precisely.
+  To control a zone to a specified indoor level of contaminants. When this zone is served by a dedicated outdoor air system \hyperref[airloophvac]{AirLoopHVAC} through a terminal unit, some type of terminal units are able to call a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object with Outdoor Air Method = IndoorAirQualityProcedure, so that the required outdoor airflow rate to reach the zone air setpoint can be assigned to the terminal unit. The total outdoor air flow in the \hyperref[airloophvac]{AirLoopHVAC} is a sum of all terminal units. In this way, each zone served by the same \hyperref[airloophvac]{AirLoopHVAC} can reach the zone air CO2 setpoint precisely.
 \item
-  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC will receive the outdoor airflow rate based on terminal unit request. 
+  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system \hyperref[airloophvac]{AirLoopHVAC} through a terminal unit, some type of terminal units are able to call a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the \hyperref[airloophvac]{AirLoopHVAC} is a sum of all terminal units. In this way, each zone served by the same \hyperref[airloophvac]{AirLoopHVAC} will receive the outdoor airflow rate based on terminal unit request.
 
 \end{enumerate}
 
@@ -1127,15 +1127,15 @@ This field contains the name of a schedule that determines whether or not the Zo
 
 \paragraph{Field:Carbon Dioxide Setpoint Schedule Name}\label{fieldcarbon-dioxide-setpoint-schedule-name}
 
-This field contains the name of a schedule that contains the zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The setpoint values in the schedule must be between 0 and 2000 ppm. . This field is used when the field System Outdoor Air Method = IndoorAirQualityProcedure in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The setpoint values in the schedule must be between 0 and 2000 ppm. . This field is used when the field System Outdoor Air Method = IndoorAirQualityProcedure in the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object.
 
 \paragraph{Field:Minimum Carbon Dioxide Concentration Schedule Name}\label{fieldminimum-carbon-dioxide-concentration-schedule-name}
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object. This field is also used when the field Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the DesignSpecification:OutdoorAir object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object. This field is also used when the field Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object.
 
 \paragraph{Field:Maximum Carbon Dioxide Concentration Schedule Name}\label{fieldmaximum-carbon-dioxide-concentration-schedule-name}
 
-This field contains the name of a schedule that contains the maximum zone carbon dioxide concentration as a function of time and is used to calculate design CO2 concentration level in the proportional ventilation control. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the maximum zone carbon dioxide concentration as a function of time and is used to calculate design CO2 concentration level in the proportional ventilation control. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object.
 
 \paragraph{Field: Generic Contaminant Control Availability Schedule Name}\label{field-generic-contaminant-control-availability-schedule-name}
 
