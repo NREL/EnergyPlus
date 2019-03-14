@@ -394,6 +394,7 @@ namespace SetPointManager {
         NumSZOneStageHeatingSetPtMgrs = 0;   // number of singel zone one stage heating setpoint managers
         NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
         NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
+        NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
 
         DCESPMDsn_EntCondTemp = 0.0;
         DCESPMDsn_MinCondSetpt = 0.0;
@@ -446,6 +447,7 @@ namespace SetPointManager {
         SZOneStageHeatingSetPtMgr.deallocate();   // single zone 1 stage heat
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
+        SchTESSetPtMgr.deallocate();              // Array for TES Scheduled Setpoint Manager data
     }
 
     void ManageSetPoints()
