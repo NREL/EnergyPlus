@@ -1,6 +1,8 @@
 set(kiva_test_src
-  foundation.unit.cpp
-        domain_test.cpp cell_test.cpp)
+      foundation.unit.cpp
+      domain_test.cpp
+      cell_test.cpp
+   )
 
 include_directories(${kiva_BINARY_DIR}/src/libkiva/)
 
@@ -31,3 +33,5 @@ add_test(NAME unit.DomainFixture.surface_tilt COMMAND $<TARGET_FILE:kiva_tests> 
 add_test(NAME unit.DomainFixture.cell_vector COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=DomainFixture.cell_vector")
 
 add_test(NAME unit.CellFixture.cell_basics COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=CellFixture.cell_basics")
+
+add_test(NAME unit.AggregatorFixture.validation COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=AggregatorFixture.validation")

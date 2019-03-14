@@ -1,6 +1,7 @@
 /* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
+#include "fixtures/aggregator-fixture.hpp"
 #include "fixtures/bestest-fixture.hpp"
 #include "fixtures/typical-fixture.hpp"
 
@@ -13,6 +14,42 @@ std::string dbl_to_string(double dbl) {
   strs << dbl;
   std::string str = strs.str();
   return str;
+}
+
+Foundation typical_fnd() {
+  Foundation fnd;
+  fnd.reductionStrategy = Foundation::RS_AP;
+
+  Material concrete(1.95, 2400.0, 900.0);
+
+  Layer tempLayer;
+  tempLayer.thickness = 0.10;
+  tempLayer.material = concrete;
+
+  fnd.slab.interior.emissivity = 0.8;
+  fnd.slab.layers.push_back(tempLayer);
+
+  tempLayer.thickness = 0.2;
+  tempLayer.material = concrete;
+
+  fnd.wall.layers.push_back(tempLayer);
+
+  fnd.wall.heightAboveGrade = 0.1;
+  fnd.wall.depthBelowSlab = 0.2;
+  fnd.wall.interior.emissivity = 0.8;
+  fnd.wall.exterior.emissivity = 0.8;
+  fnd.wall.interior.absorptivity = 0.8;
+  fnd.wall.exterior.absorptivity = 0.8;
+
+  fnd.foundationDepth = 0.0;
+  fnd.numericalScheme = Foundation::NS_ADI;
+
+  fnd.polygon.outer().push_back(Point(-6.0, -6.0));
+  fnd.polygon.outer().push_back(Point(-6.0, 6.0));
+  fnd.polygon.outer().push_back(Point(6.0, 6.0));
+  fnd.polygon.outer().push_back(Point(6.0, -6.0));
+
+  return fnd;
 }
 
 TEST_F(GC10aFixture, GC10a) {
@@ -184,6 +221,39 @@ TEST_F(GC10aFixture, GC10a_calculateSteadyState) {
   double surface_avg = calculate();
   Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
   EXPECT_NEAR(surface_avg, 3107.57, 0.01);
+}
+
+TEST_F(AggregatorFixture, validation) {
+
+  Aggregator floor_results;
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
+
+  floor_results.add_instance(instances[0].ground.get(), 0.10);
+  floor_results.add_instance(instances[1].ground.get(), 0.75);
+
+  EXPECT_DEATH(floor_results.calc_weighted_results(),
+               "The weights of associated Kiva instances do not add to unity.");
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
+
+  EXPECT_DEATH(floor_results.add_instance(Surface::SurfaceType::ST_SLAB_PERIM,
+                                          instances[0].ground.get(), 0.25);
+               , "Inconsistent surface type added to aggregator.");
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_WALL_INT);
+
+  floor_results.add_instance(instances[0].ground.get(), 0.25);
+  floor_results.add_instance(instances[1].ground.get(), 0.75);
+
+  EXPECT_DEATH(floor_results.calc_weighted_results(),
+               "Aggregation requested for surface that is not part of foundation instance.");
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
+
+  floor_results.add_instance(instances[0].ground.get(), 0.25);
+  floor_results.add_instance(instances[1].ground.get(), 0.75);
+  floor_results.calc_weighted_results(); // Expect success
 }
 
 // Google Test main
