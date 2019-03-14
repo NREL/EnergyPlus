@@ -5197,7 +5197,7 @@ namespace HeatBalanceManager {
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
         static gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static gio::Fmt ShdFracFmt2("(f6.2,',')");
+        static gio::Fmt ShdFracFmt2("(f10.8,',')");
         static gio::Fmt fmtN("('\n')");
 
         // FLOW:
@@ -5290,23 +5290,27 @@ namespace HeatBalanceManager {
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                            << Month << DayOfMonth << iHour - 1 << 0;
-                }
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(1, iHour, SurfNum);
+                        if (TS == NumOfTimeStepInHour) {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                        } else {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                        }
                     }
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    gio::write(OutputFileShadingFrac, fmtN, flags);
+                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        gio::write(OutputFileShadingFrac, ShdFracFmt2, flags)
+                                << SunlitFrac(TS, iHour, SurfNum);
+                    }
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("YES");
+                        gio::write(OutputFileShadingFrac, "()", flags);
+                    }
                 }
             }
         }
