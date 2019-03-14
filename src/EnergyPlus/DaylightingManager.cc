@@ -6371,7 +6371,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        Array1D<Real64> SetPnt;              // Illuminance setpoint at reference points (lux)
+        static Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6381,8 +6381,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        Array1D<Real64> GLRNDX;        // Glare index at reference point
-        Array1D<Real64> GLRNEW;        // New glare index at reference point
+        static Array1D<Real64> GLRNDX; // Glare index at reference point
+        static Array1D<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
