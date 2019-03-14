@@ -173,7 +173,6 @@ namespace DaylightingManager {
     bool ReportIllumMap_firstTime(true);
     bool SQFirstTime(true);
 
-
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
     //  as the surface count increases but has some overhead such that the direct
@@ -549,10 +548,10 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum; // Zone number
-        int IHR;     // Hour of day counter
-        int IWin;    // Window counter
-        int loop;    // DO loop indices
+        int ZoneNum;     // Zone number
+        int IHR;         // Hour of day counter
+        int IWin;        // Window counter
+        int loop;        // DO loop indices
         Real64 DaylFac1; // sky daylight factor at ref pt 1
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
@@ -1132,18 +1131,17 @@ namespace DaylightingManager {
                 HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSky(
                 HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylSourceFacSun(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylSourceFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(
                 HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                0.0;
         }
 
         NRF = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
@@ -6436,9 +6434,15 @@ namespace DaylightingManager {
         //  zone/window daylighting properties.
         if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
-            tmpIllumFromWinAtRefPt.allocate(d1, 2, NREFPT);
-            tmpBackLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
-            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
+            tmpIllumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+            tmpBackLumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+
+            SetPnt.allocate(maxNumRefPtInAnyZone);
+            DaylIllum.allocate(maxNumRefPtInAnyZone);
+            GLRNDX.allocate(maxNumRefPtInAnyZone);
+            GLRNEW.allocate(maxNumRefPtInAnyZone);
+
             DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
@@ -6446,10 +6450,6 @@ namespace DaylightingManager {
         tmpSourceLumFromWinAtRefPt = 0.0;
 
         // FLOW:
-        SetPnt.allocate(NREFPT);
-        DaylIllum.allocate(maxNumRefPtInAnyZone);
-        GLRNDX.allocate(NREFPT);
-        GLRNEW.allocate(NREFPT);
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -7047,8 +7047,8 @@ namespace DaylightingManager {
                     //         (3) Initial glare too high at second ref pt.  Deploy shading if glare
                     //             at second ref pt decreases and glare at first ref pt stays below max.
                     //
-                    // The approach taken is just to count the number of reference points that fulfill the individual requirements and see if it covers
-                    // all the reference points.
+                    // The approach taken is just to count the number of reference points that fulfill the individual requirements and see if it
+                    // covers all the reference points.
                     int numRefPtOldAboveMaxNewBelowOld = 0;
                     int numRefPtOldBelowMaxNewBelowMax = 0;
                     for (IL = 1; IL <= NREFPT; ++IL) {
@@ -7414,10 +7414,10 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
         //  due to daylighting
-        int NREFPT;   // Number of daylighting reference points in a zone
+        int NREFPT;        // Number of daylighting reference points in a zone
         Real64 ZFTOT = 0.; // Fraction of zone's floor area that has daylighting controls
-        int IL;       // Reference point index
-        int LSYSTP;   // Lighting control type: 1=continuous dimming, 2=stepped,
+        int IL;            // Reference point index
+        int LSYSTP;        // Lighting control type: 1=continuous dimming, 2=stepped,
         //  3=continuous dimming then off
         Real64 ZFRAC; // Fraction of zone controlled by a reference point
         Real64 FL;    // Fraction electric lighting output required to meet setpoint
@@ -7451,7 +7451,7 @@ namespace DaylightingManager {
 
                 // Total fraction of zone that is daylit
                 ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(IL);
-                
+
                 DaylIllum(IL) = ZoneDaylight(ZoneNum).DaylIllumAtRefPt(IL);
                 if (DaylIllum(IL) >= ZoneDaylight(ZoneNum).IllumSetPoint(IL)) {
                     FL = 0.0;
