@@ -123,6 +123,7 @@ protected:
         DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
         DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
         DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 21;
+        DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
         DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;

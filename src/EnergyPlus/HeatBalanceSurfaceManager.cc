@@ -1010,6 +1010,9 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
                         computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
+                        curAzimuth = round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchOpAzimuth, surfName, curAzimuth);
                         curTilt = Surface(iSurf).Tilt;
                         PreDefTableEntry(pdchOpTilt, surfName, curTilt);
@@ -1071,6 +1074,8 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchFenVisTr, surfName, TransVisNorm, 3);
                         PreDefTableEntry(pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        curAzimuth =  round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchFenAzimuth, surfName, curAzimuth);
                         isNorth = false;
                         curTilt = Surface(iSurf).Tilt;
@@ -6135,15 +6140,15 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
-                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
             }
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6429,8 +6434,8 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
-                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobals::KelvinConv;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
                                 OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;

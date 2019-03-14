@@ -1512,8 +1512,8 @@ namespace EnergyPlus {
                     IssueSevereInputFieldError(RoutineName,
                                                ObjName_Circuit,
                                                DataIPShortCuts::cAlphaArgs(1),
-                                               DataIPShortCuts::cAlphaFieldNames(CurIndex),
-                                               DataIPShortCuts::cAlphaArgs(CurIndex),
+                                               DataIPShortCuts::cNumericFieldNames(CurIndex),
+                                               DataIPShortCuts::rNumericArgs(CurIndex),
                                                "Outer diameter must be greater than inner diameter.",
                                                ErrorsFound);
                 }
@@ -1621,10 +1621,13 @@ namespace EnergyPlus {
                 // Pipe sizing
                 thisCircuit.PipeSize.InnerDia = DataIPShortCuts::rNumericArgs(5);
                 thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(6);
+
+                // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                    // CurIndex = 5
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                            DataIPShortCuts::cAlphaArgs( CurIndex ), 'Outer diameter must be greater than inner diameter.', ErrorsFound )
+                    ShowSevereError(RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                    ShowContinueError("Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
+                            + "] must be greater than inner diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.InnerDia, 3) + "].");
+                    ErrorsFound = true;
                 }
 
                 // Read design flow rate, validated positive by IP
@@ -1698,6 +1701,7 @@ namespace EnergyPlus {
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
         }
+
 
         Circuit *Circuit::factory(std::string circuitName) {
             if (GetCircuitInputFlag) {

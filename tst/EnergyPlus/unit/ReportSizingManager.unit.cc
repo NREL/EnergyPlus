@@ -62,12 +62,12 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -813,7 +813,8 @@ TEST_F(EnergyPlusFixture, setZoneCoilInletConditions)
 
 // This tests checks that the Design Day + Peak Time is filled up for Fans
 // https://github.com/NREL/EnergyPlus/issues/6899
-TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak) {
+TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
+{
 
     // This is needed to compute time of Peak as a string
     DataGlobals::NumOfTimeStepInHour = 4;

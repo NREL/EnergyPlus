@@ -6102,8 +6102,8 @@ namespace WeatherManager {
             if (!lAlphaFieldBlanks(2)) { // Have input
                 auto result = weekDayLookUp.find(cAlphaArgs(2));
                 if (result == weekDayLookUp.end()) {
-                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(2) + " invalid (Day of Week) [" +
-                                     cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
+                    ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(2) +
+                                     " invalid (Day of Week) [" + cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
                     RunPeriodInput(Loop).startWeekDay = WeekDay::Sunday;
                 } else {
                     RunPeriodInput(Loop).startWeekDay = result->second;
@@ -6137,9 +6137,10 @@ namespace WeatherManager {
                             calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != RunPeriodInput(Loop).startWeekDay) {
-                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
-                                                 ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
-                                                 "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" +
+                                                 cAlphaArgs(2) + ") does not match the start year (" +
+                                                 std::to_string(RunPeriodInput(Loop).startYear) + "), corrected to " +
+                                                 DaysOfWeek(static_cast<int>(weekday)) + ".");
                                 RunPeriodInput(Loop).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -6169,9 +6170,10 @@ namespace WeatherManager {
                             calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != RunPeriodInput(Loop).startWeekDay) {
-                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" + cAlphaArgs(2) +
-                                                 ") does not match the start year (" + std::to_string(RunPeriodInput(Loop).startYear) +
-                                                 "), corrected to " + DaysOfWeek(static_cast<int>(weekday)) + ".");
+                                ShowWarningError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + ", start weekday (" +
+                                                 cAlphaArgs(2) + ") does not match the start year (" +
+                                                 std::to_string(RunPeriodInput(Loop).startYear) + "), corrected to " +
+                                                 DaysOfWeek(static_cast<int>(weekday)) + ".");
                                 RunPeriodInput(Loop).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -6259,7 +6261,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
                 RunPeriodInput(Loop).useHolidays = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6269,7 +6272,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
                 RunPeriodInput(Loop).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6279,7 +6283,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
                 RunPeriodInput(Loop).applyWeekendRule = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6289,7 +6294,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), "NO")) {
                 RunPeriodInput(Loop).useRain = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(6) + " invalid [" + cAlphaArgs(6) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6299,7 +6305,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
                 RunPeriodInput(Loop).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(7) + " invalid [" + cAlphaArgs(7) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6309,7 +6316,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(8), "YES")) {
                 RunPeriodInput(Loop).actualWeather = true;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodInput(Loop).title + cAlphaFieldNames(8) + " invalid [" + cAlphaArgs(8) +
+                                ']');
                 ErrorsFound = true;
             }
 
@@ -6469,7 +6477,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "NO")) {
                 RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(3) + " invalid [" + cAlphaArgs(3) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(3) + " invalid [" +
+                                cAlphaArgs(3) + ']');
                 ErrorsFound = true;
             }
 
@@ -6480,7 +6489,8 @@ namespace WeatherManager {
                 RunPeriodDesignInput(Count).useRain = false;
                 RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" +
+                                cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
@@ -6592,7 +6602,8 @@ namespace WeatherManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "NO")) {
                 RunPeriodDesignInput(Count).useDST = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" + cAlphaArgs(4) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(4) + " invalid [" +
+                                cAlphaArgs(4) + ']');
                 ErrorsFound = true;
             }
 
@@ -6603,7 +6614,8 @@ namespace WeatherManager {
                 RunPeriodDesignInput(Count).useRain = false;
                 RunPeriodDesignInput(Count).useSnow = false;
             } else {
-                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(5) + " invalid [" + cAlphaArgs(5) + ']');
+                ShowSevereError(cCurrentModuleObject + ": object=" + RunPeriodDesignInput(Count).title + ' ' + cAlphaFieldNames(5) + " invalid [" +
+                                cAlphaArgs(5) + ']');
                 ErrorsFound = true;
             }
             RunPeriodDesignInput(1).monWeekDay = 0;
@@ -9990,15 +10002,17 @@ namespace WeatherManager {
                 env.ActualWeather = true;
             } else { // std RunPeriod
                 env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-
                 if (env.StartYear == env.EndYear) {
                     // Short-circuit all the calculations, we're in a single year
-                    if (!WFAllowsLeapYears) {
-                        env.IsLeapYear = false; // explicit set
-                        LocalLeapYearAdd = 0;
-                    } else {
-                        env.IsLeapYear = true; // explicit set
-                        LocalLeapYearAdd = 1;
+                    LocalLeapYearAdd = 0;
+                    if (isLeapYear(env.StartYear)) {
+                        // If a leap year is supported by the weather file, do it.
+                        if (WFAllowsLeapYears) {
+                            env.IsLeapYear = true; // explicit set, this might be unwise
+                            LocalLeapYearAdd = 1;
+                        } else {
+                            env.IsLeapYear = false; // explicit set, this might be unwise
+                        }
                     }
                     env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
                     env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);

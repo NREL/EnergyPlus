@@ -8,22 +8,22 @@ The following is a list of life-cycle costing related objects that provide a way
 
 \begin{itemize}
 \item
-  LifeCycleCost:Parameters
+  \hyperref[lifecyclecostparameters]{LifeCycleCost:Parameters}
 \item
-  LifeCycleCost:RecurringCosts
+  \hyperref[lifecyclecostrecurringcosts]{LifeCycleCost:RecurringCosts}
 \item
-  LifeCycleCost:NonrecurringCost
+  \hyperref[lifecyclecostnonrecurringcost]{LifeCycleCost:NonrecurringCost}
 \item
-  LifeCycleCost:UsePriceEscalation
+  \hyperref[lifecyclecostusepriceescalation]{LifeCycleCost:UsePriceEscalation}
 \item
-  LifeCycleCost:UseAdjustment
+  \hyperref[lifecyclecostuseadjustment]{LifeCycleCost:UseAdjustment}
 \end{itemize}
 
-The utility costs (see UtilityCost:Tariff) and first costs (see ComponentCost:LineItem) are~ calculated by EnergyPlus are used along with other current and future costs input using the LifeCycleCost:RecurringCosts and LifeCycleCost:NonrecurringCost objects and these are combined into the present value life-cycle cost metric. The LifeCycleCost:Parameters object establishes the set of assumptions for the analysis along with LifeCycleCost:UsePriceEscalation (often from a DataSet) and LifeCycleCost:UseAdjustment.
+The utility costs (see \hyperref[utilitycosttariff]{UtilityCost:Tariff}) and first costs (see \hyperref[componentcostlineitem]{ComponentCost:LineItem}) are~ calculated by EnergyPlus are used along with other current and future costs input using the \hyperref[lifecyclecostrecurringcosts]{LifeCycleCost:RecurringCosts} and \hyperref[lifecyclecostnonrecurringcost]{LifeCycleCost:NonrecurringCost} objects and these are combined into the present value life-cycle cost metric. The \hyperref[lifecyclecostparameters]{LifeCycleCost:Parameters} object establishes the set of assumptions for the analysis along with \hyperref[lifecyclecostusepriceescalation]{LifeCycleCost:UsePriceEscalation} (often from a DataSet) and \hyperref[lifecyclecostuseadjustment]{LifeCycleCost:UseAdjustment}.
 
 It is important to understand that the comparison of different simulation results and their present values is not performed by EnergyPlus. Instead, EnergyPlus provides the present value calculations for a specific simulation combining the energy costs, first costs, and future costs and you need to make the comparison between the results of multiple simulations.
 
-The results of using the LifeCycleCost objects are included in the tabular report file when LifeCycleCostReport is specified in the Output:Table:SummaryReports object. It is also generated with any of the AllSummary options. The report appearing in the tabular report file is titled ``Life Cycle Cost Report.'' This report shows the costs and the timing of costs, often called ``cash flows,'' along with the present value in several different tables. The tabular results would show the present value of all current and future costs.
+The results of using the LifeCycleCost objects are included in the tabular report file when LifeCycleCostReport is specified in the \hyperref[outputtablesummaryreports]{Output:Table:SummaryReports} object. It is also generated with any of the AllSummary options. The report appearing in the tabular report file is titled ``Life Cycle Cost Report.'' This report shows the costs and the timing of costs, often called ``cash flows,'' along with the present value in several different tables. The tabular results would show the present value of all current and future costs.
 
 The datasets file ``LCCusePriceEscalationDataSetXXXX.idf'' includes the energy escalation factors from the NIST Handbook 135 annual supplement for the year indicated. These are necessary to use because the expected change in price for electricity and various fuels does not change at the same rate as inflation.
 

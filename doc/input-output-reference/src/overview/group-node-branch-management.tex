@@ -6,13 +6,13 @@
 
 For convenience, the NodeList object can be used to identify all the nodes for a particular use. A node list is not always required. The advantage of listing all the nodes in this manner is that input fields in other objects that ask for a node name can refer to either a single node or a list of nodes using this object. .
 
-There are other lines of input syntax that require the use of a NodeList as part of the input. These syntax items include: OutdoorAir:NodeList and the SetpointManager objects. In these two cases, the use of a NodeList statement is mandatory if there is more than one node in this particular ``list''. For example, if the outside air only has a single inlet node, then the name of that node can replace the node list name in the input syntax. As a result of this mandatory specification of node lists for certain types of input, nodes can, obviously, and may be members of more than one list.
+There are other lines of input syntax that require the use of a NodeList as part of the input. These syntax items include: \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} and the SetpointManager objects. In these two cases, the use of a NodeList statement is mandatory if there is more than one node in this particular ``list''. For example, if the outside air only has a single inlet node, then the name of that node can replace the node list name in the input syntax. As a result of this mandatory specification of node lists for certain types of input, nodes can, obviously, and may be members of more than one list.
 
 \subsubsection{Inputs}\label{inputs-027}
 
 \paragraph{Field: Name}\label{field-name-026}
 
-This alpha designation must be unique among all the Node List Names. It is used as reference in various objects (e.g.~OutdoorAir:NodeList).
+This alpha designation must be unique among all the Node List Names. It is used as reference in various objects (e.g.~\hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Node \textless{}\#\textgreater{} Name ~(up to 25 allowed)}\label{field-node-name-up-to-25-allowed}
 
@@ -310,11 +310,11 @@ It should be noted that each component also has at least two nodes associated wi
 
 \paragraph{Field: Name}\label{field-name-2-022}
 
-This alpha field is the unique, user-defined name that allows the branch to be referenced by other elements such as the PlantLoop and CondenserLoop statements.
+This alpha field is the unique, user-defined name that allows the branch to be referenced by other elements such as the \hyperref[plantloop]{PlantLoop} and \hyperref[condenserloop]{CondenserLoop} statements.
 
 \paragraph{Field: Pressure Drop Curve Name}\label{field-pressure-drop-curve-name}
 
-This is an optional field used to specify pressure drop information for this particular branch. Currently this is only available in plant/condenser fluid loops: PlantLoop and CondenserLoop. Air loops require a full airflow network, so this field is ignored if found on an air loop. The value entered for this field must match a pressure curve object also found in the input. This curve can be of the type: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Exponent, or Curve:Functional:PressureDrop. In order to then perform a pressure simulation for the loop that this branch is located on, a flag must be set in the loop object. Reference the PlantLoop and CondenserLoop field ``Pressure Simulation Type'' for allowable settings. See the Engineering Reference document for further information on pressure simulation in plant loops.
+This is an optional field used to specify pressure drop information for this particular branch. Currently this is only available in plant/condenser fluid loops: \hyperref[plantloop]{PlantLoop} and \hyperref[condenserloop]{CondenserLoop}. Air loops require a full airflow network, so this field is ignored if found on an air loop. The value entered for this field must match a pressure curve object also found in the input. This curve can be of the type: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curveexponent]{Curve:Exponent}, or \hyperref[curvefunctionalpressuredrop]{Curve:Functional:PressureDrop}. In order to then perform a pressure simulation for the loop that this branch is located on, a flag must be set in the loop object. Reference the \hyperref[plantloop]{PlantLoop} and \hyperref[condenserloop]{CondenserLoop} field ``Pressure Simulation Type'' for allowable settings. See the Engineering Reference document for further information on pressure simulation in plant loops.
 
 \paragraph{Field Set (Branch Specifications)}\label{field-set-branch-specifications}
 
@@ -402,7 +402,7 @@ This field allows the user to output the pressure drop of a particular branch on
 
 \subsection{ConnectorList}\label{connectorlist}
 
-A connector list is a collection of either one or two connection devices (Connector:Mixer or Connector:Splitter). Due to the definition of a loop in EnergyPlus, there is a maximum of one mixer and one splitter allowed for each loop segment. This limitation still allows a tremendous amount of flexibility to the user and can also still be solved within a reasonable amount of time and without a complex solver routine. The connection list simply allows the specification of the types and names of these devices. This allows the main loop statements to have the flexibility to have multiple lists that can have one or more item.
+A connector list is a collection of either one or two connection devices (\hyperref[connectormixer]{Connector:Mixer} or \hyperref[connectorsplitter]{Connector:Splitter}). Due to the definition of a loop in EnergyPlus, there is a maximum of one mixer and one splitter allowed for each loop segment. This limitation still allows a tremendous amount of flexibility to the user and can also still be solved within a reasonable amount of time and without a complex solver routine. The connection list simply allows the specification of the types and names of these devices. This allows the main loop statements to have the flexibility to have multiple lists that can have one or more item.
 
 \subsubsection{Inputs}\label{inputs-3-021}
 
@@ -412,11 +412,11 @@ This field is an identifying name that will be referenced to main loop statement
 
 \paragraph{Field-Set: Connection Object Type and Identifying Name (up to 2 allowed)}\label{field-set-connection-object-type-and-identifying-name-up-to-2-allowed}
 
-Depending on the loop, either one or two of the connectors will be specified. If this particular loop only has a single connector (either Connector:Mixer or Connector:Splitter), then only the first two items (type of connection and identifying name of connector) are included. If both a mixer and splitter are present, the additional type of connection and identifying name must be included. Note that the order that the items appear is inconsequential---either the Connector:Mixer or the Connector:Splitter may appear first. This will not affect the simulation.
+Depending on the loop, either one or two of the connectors will be specified. If this particular loop only has a single connector (either \hyperref[connectormixer]{Connector:Mixer} or \hyperref[connectorsplitter]{Connector:Splitter}), then only the first two items (type of connection and identifying name of connector) are included. If both a mixer and splitter are present, the additional type of connection and identifying name must be included. Note that the order that the items appear is inconsequential---either the \hyperref[connectormixer]{Connector:Mixer} or the \hyperref[connectorsplitter]{Connector:Splitter} may appear first. This will not affect the simulation.
 
 \paragraph{Field: Connector 1 Object Type}\label{field-connector-1-object-type}
 
-This field contains the connector type \textbf{Connector:Mixer} or \textbf{Connector:Splitter}.
+This field contains the connector type \textbf{\hyperref[connectormixer]{Connector:Mixer}} or \textbf{\hyperref[connectorsplitter]{Connector:Splitter}}.
 
 \paragraph{Field: Connector 1 Name}\label{field-connector-1-name}
 
@@ -424,7 +424,7 @@ This field is an identifying name for the connector. It will be used by other ob
 
 \paragraph{Field: Connector 2 Object Type (optional)}\label{field-connector-2-object-type-optional}
 
-This field contains the connector type \textbf{Connector:Mixer} or \textbf{Connector:Splitter}.
+This field contains the connector type \textbf{\hyperref[connectormixer]{Connector:Mixer}} or \textbf{\hyperref[connectorsplitter]{Connector:Splitter}}.
 
 \paragraph{Field: Connector 2 Name (optional)}\label{field-connector-2-name-optional}
 
@@ -745,7 +745,7 @@ This alpha field is used as an identifying field for the pipe.
 
 \paragraph{Field: Soil Material Name}\label{field-soil-material-name}
 
-This references a Material object that contains the soil properties and thickness.~ Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
+This references a \hyperref[material]{Material} object that contains the soil properties and thickness.~ Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
 
 \paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object-001}
 
@@ -766,7 +766,7 @@ Pipe:Underground,
       HTPipe Outlet Node,                 !- Outlet Node Name
       Water,                              !- Fluid Name
       SunExposed,                         !- Sun Exposure
-      0.05,                               !- Pipe Inside Diameter    
+      0.05,                               !- Pipe Inside Diameter
       20.0,                               !- Pipe Length
       Buried Pipe Soil,                   !- Soil Material
       Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
@@ -836,11 +836,11 @@ Objects in this class are used to simulate the heat transfer processes of a pipi
 
 \begin{itemize}
 \item
-  PipingSystem:Underground:Domain
+  \hyperref[pipingsystemundergrounddomain]{PipingSystem:Underground:Domain}
 \item
-  PipingSystem:Underground:PipeCircuit
+  \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit}
 \item
-  PipingSystem:Underground:PipeSegment
+  \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment}
 \end{itemize}
 
 \subsection{PipingSystem:Underground:Domain}\label{pipingsystemundergrounddomain}
@@ -965,7 +965,7 @@ The number of pipe circuit objects which will be defined in the following fields
 
 \paragraph{Field: Pipe Circuit 1 \{\ldots{} to N; extensible\}}\label{field-pipe-circuit-1-to-n-extensible}
 
-A PipingSystem:Underground:PipeCircuit to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ Any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
+A \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit} to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ Any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
 
 \subsection{PipingSystem:Underground:PipeCircuit}\label{pipingsystemundergroundpipecircuit}
 
@@ -1031,7 +1031,7 @@ This alpha field is used as an identifying field for the pipe circuit.
 
 \paragraph{Field: Pipe Segment 1 \{\ldots{} to N; extensible\}}\label{field-pipe-segment-1-to-n-extensible}
 
-~A PipingSystem:Underground:PipeSegment to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here.
+~A \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment} to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here.
 
 \subsection{PipingSystem:Underground:PipeSegment}\label{pipingsystemundergroundpipesegment}
 
@@ -1196,13 +1196,13 @@ This is the fluid heat gain or loss in the pipe segment, in Watts.
 
 \subsection{Duct}\label{duct}
 
-The Duct object is a component for air systems that is a direct analogue for Pipe:Adiabatic in the fluid loops. It is used when it is necessary (due to the HVAC system configuration) to have a branch that has no functional components. This case most often arises for a bypass branch. Since every branch must have at least one component, the Duct component is used for this situation. The duct is an adiabatic, pass-through component; all of its inlet conditions are passed through unchanged to its outlet.
+The Duct object is a component for air systems that is a direct analogue for \hyperref[pipeadiabatic]{Pipe:Adiabatic} in the fluid loops. It is used when it is necessary (due to the HVAC system configuration) to have a branch that has no functional components. This case most often arises for a bypass branch. Since every branch must have at least one component, the Duct component is used for this situation. The duct is an adiabatic, pass-through component; all of its inlet conditions are passed through unchanged to its outlet.
 
 \subsubsection{Inputs}\label{inputs-12-009}
 
 \paragraph{Field: Name}\label{field-name-12-006}
 
-This is the unique name for this component. Any reference to this component (in a BranchList, for instance) will refer to it by this name.
+This is the unique name for this component. Any reference to this component (in a \hyperref[branchlist]{BranchList}, for instance) will refer to it by this name.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-000}
 

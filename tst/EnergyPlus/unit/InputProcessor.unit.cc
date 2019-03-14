@@ -335,6 +335,40 @@ TEST_F(InputProcessorFixture, decode_encode_3)
     EXPECT_EQ(expected, encoded);
 }
 
+TEST_F(InputProcessorFixture, byte_order_mark)
+{
+    auto const idf(delimited_string(
+            {
+                    "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+            }));
+
+    auto const expected(delimited_string(
+            {
+                    "Building,",
+                    "  Bldg,",
+                    "  0.0,",
+                    "  Suburbs,",
+                    "  0.04,",
+                    "  0.4,",
+                    "  FullExterior,",
+                    "  25.0,",
+                    "  6.0;",
+                    "",
+                    "GlobalGeometryRules,",
+                    "  UpperLeftCorner,",
+                    "  Counterclockwise,",
+                    "  Relative,",
+                    "  Relative,",
+                    "  Relative;",
+                    ""
+            }));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
 TEST_F(InputProcessorFixture, parse_empty_fields)
 {
     std::string const idf(delimited_string({
