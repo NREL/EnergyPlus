@@ -538,7 +538,7 @@ where:
 
 \emph{q\(_{net,n}\)} is the net heat transfer rate for node \emph{n}.
 
-It will advantageous for the numerical solution to rearrange the nodal differential equation into the form
+It will be advantageous for the numerical solution to rearrange the nodal differential equation into the form
 
 \begin{equation}
   \frac{d{T}}{dt} = a T + b
@@ -721,7 +721,7 @@ Separating into $a$ and $b$ terms:
 
 Inversion mixing occurs when the node below is warmer than the node above. The difference in temperatures drives a difference in density that causes the nodes to mix. Usually inversion mixing occurs very rapidly.
 
-At the end of each sub timestep, the algorithm checks for temperature inversions and instantaneously mixes inverted nodes by calcualting a weighted average of the node temperatures of the inverted nodes. This is done iteratively up the tank until there are no more temperature inversions.
+At the end of each sub timestep, the algorithm checks for temperature inversions and instantaneously mixes inverted nodes by calculating a weighted average of the node temperatures of the inverted nodes. This is done iteratively up the tank until there are no more temperature inversions.
 
 \paragraph{Use and Source Effectiveness Correction}
 
