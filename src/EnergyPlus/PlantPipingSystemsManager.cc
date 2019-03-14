@@ -808,7 +808,7 @@ namespace EnergyPlus {
                 }
                 // then we can loop through and allow the factory to be called and carry on
                 for (auto &circuitNameToFind : circuitNamesToFind) {
-                    thisDomain.circuits.push_back(Circuit::factory(circuitNameToFind));
+                    thisDomain.circuits.push_back(Circuit::factory(circuitNameToFind, ErrorsFound));
                 }
 
                 // Initialize ground temperature model and get pointer reference
@@ -1702,10 +1702,8 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-
-        Circuit *Circuit::factory(std::string circuitName) {
+        Circuit *Circuit::factory(std::string circuitName, bool & errorsFound) {
             if (GetCircuitInputFlag) {
-                bool errorsFound = false;
                 ReadPipeCircuitInputs(errorsFound);
                 GetCircuitInputFlag = false;
             }
@@ -1884,7 +1882,7 @@ namespace EnergyPlus {
 
                 //******* We'll next set up the circuit ********
                 // then we can loop through and allow the factory to be called and carry on
-                thisDomain.circuits.push_back(Circuit::factory(thisTrenchName));
+                thisDomain.circuits.push_back(Circuit::factory(thisTrenchName, ErrorsFound));
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values

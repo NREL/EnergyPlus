@@ -1872,68 +1872,17 @@ TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters) {
 
     });
 
-
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // NeighborFieldCells.allocate(6);
-    // NeighborBoundaryCells.allocate(6);
+    bool ErrorsFound = false;
+    PlantPipingSystemsManager::ReadPipeCircuitInputs(ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
 
-    // Domains
-    int NumGeneralizedDomains = 1;
-    int NumHorizontalTrenches = 1;
-    int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches;
-    PlantPipingSystemsManager::PipingSystemDomains.allocate(TotalNumDomains);
-
-    // Then circuits
-    int NumPipeCircuits = 1;
-    int TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
-    PlantPipingSystemsManager::PipingSystemCircuits.allocate(TotalNumCircuits);
-
-    // Then Segments
-    // int NumPipeSegmentsInInput = 2; // Actual 'PipingSystem:Underground:PipeSegment' defined above
-    int NumPipeSegmentsInInput = EnergyPlus::inputProcessor->getNumObjectsFound(PlantPipingSystemsManager::ObjName_Segment);
-    EXPECT_EQ(NumPipeSegmentsInInput, 2);
-
-    // int NumSegmentsInHorizontalTrenches = 2; // Total of 'Number of Trenches'
-    int NumSegmentsInHorizontalTrenches = PlantPipingSystemsManager::GetNumSegmentsForHorizontalTrenches(NumHorizontalTrenches);
-    EXPECT_EQ(NumSegmentsInHorizontalTrenches, 2);
-
-    int TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
-    PlantPipingSystemsManager::PipingSystemSegments.allocate(TotalNumSegments);
-
-    {
-        bool ErrorsFound = false;
-
-        // This one is not necessary, but might as well increase code coverage
-        PlantPipingSystemsManager::ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
-        EXPECT_FALSE(ErrorsFound);
-
-        // Ok, now read the pipe circuit, and we expect the diameter mismatch to be caught
-        PlantPipingSystemsManager::ReadPipeCircuitInputs(NumPipeCircuits, ErrorsFound);
-
-        std::string error_string = delimited_string({
-             "   ** Severe  ** ReadPipeCircuitInputs:PipingSystem:Underground:PipeCircuit=\"MY PIPE CIRCUIT\", invalid Pipe Outer Diameter=\"1.200E-002\", Condition: Outer diameter must be greater than inner diameter.",
-        });
-
-        EXPECT_TRUE(ErrorsFound);
-        EXPECT_TRUE(compare_err_stream(error_string, true));
-    }
-
-
-    // Clear the error stream now, so we can only compare the Horizontal Trench stuff
-    DataGlobals::err_stream->clear();
-
-    {
-        bool ErrorsFound = false;
-        PlantPipingSystemsManager::ReadHorizontalTrenchInputs(NumGeneralizedDomains + 1, NumPipeCircuits + 1, NumPipeSegmentsInInput + 1, NumHorizontalTrenches, ErrorsFound);
-
-        std::string error_string = delimited_string({
-             "   ** Severe  ** ReadHorizontalTrenchInputs: GroundHeatExchanger:HorizontalTrench=\"GHX HORIZONTAL TRENCH\" has invalid pipe diameters.",
-             "   **   ~~~   ** Outer diameter [1.100E-002] must be greater than inner diameter [1.500E-002].",
-        });
-
-        EXPECT_TRUE(ErrorsFound);
-        EXPECT_TRUE(compare_err_stream(error_string, true));
-    }
+    std::string error_string = delimited_string({
+        R"(   ** Severe  ** ReadPipeCircuitInputs:PipingSystem:Underground:PipeCircuit="MY PIPE CIRCUIT", invalid Pipe Outer Diameter="1.200E-002", Condition: Outer diameter must be greater than inner diameter.)",
+        R"(   ** Severe  ** ReadPipeCircuitInputs: GroundHeatExchanger:HorizontalTrench="GHX HORIZONTAL TRENCH" has invalid pipe diameters.)",
+        R"(   **   ~~~   ** Outer diameter [1.100E-002] must be greater than inner diameter [1.500E-002].)",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 

@@ -645,7 +645,7 @@ namespace EnergyPlus {
                 return this->Name == a;
             }
 
-            static Circuit *factory(std::string circuit);
+            static Circuit *factory(std::string circuit, bool & errorsFound);
         };
 
         struct ZoneCoupledSurfaceData {
