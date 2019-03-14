@@ -5299,7 +5299,7 @@ namespace ZoneEquipmentManager {
             } // End of check for a return air node, which implies a return air system.
 
             // Reset current deadband flags, remaining output required, so no impact beyond zone equipment
-            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration);
+            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration, true);
         }
     }
 
