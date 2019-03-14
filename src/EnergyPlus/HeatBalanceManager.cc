@@ -5198,7 +5198,6 @@ namespace HeatBalanceManager {
         static bool ChangeSet(true); // Toggle for checking storm windows
         static gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
         static gio::Fmt ShdFracFmt2("(f10.8,',')");
-        static gio::Fmt fmtN("('\n')");
 
         // FLOW:
 
@@ -5983,7 +5982,6 @@ namespace HeatBalanceManager {
         int write_stat;
         int SurfNum;
         static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt fmtN("('\n')");
 
         OutputFileShadingFrac = GetNewUnitNumber();
         {
@@ -6010,8 +6008,8 @@ namespace HeatBalanceManager {
         }
         {
             IOFlags flags;
-            flags.ADVANCE("No");
-            gio::write(OutputFileShadingFrac, fmtN, flags);
+            flags.ADVANCE("YES");
+            gio::write(OutputFileShadingFrac, "()", flags);
         }
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
