@@ -599,17 +599,11 @@ namespace ScheduleManager {
                 gio::read(SchdFile, fmtA, flags) >> LineIn;
                 read_stat = flags.ios();
                 ++rowCnt;
+                if (rowCnt - 2 > rowLimitCount) break;
                 colCnt = 0;
                 wordStart = 0;
                 columnValue = 0.0;
                 // scan through the line and write values into 2d array
-                if (rowCnt - 2 > rowLimitCount) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\": more than " + std::to_string(rowLimitCount)
-                                    + " hourly values read from " + ShadingSunlitFracFileName + ".");
-                    ShowContinueError("Number of rows in the file should be consistent with the number of hours in the simulation year multiplied by simulation TimeStep: "
-                                      + std::to_string(NumOfTimeStepInHour) + ".");
-                    ShowFatalError("Program terminates due to previous condition.");
-                }
                 while (true) {
                     sepPos = index(LineIn, ColumnSep);
                     ++colCnt;
@@ -673,6 +667,18 @@ namespace ScheduleManager {
                 }
             }
             gio::close(SchdFile);
+
+            if (rowCnt - 2 != rowLimitCount) {
+                if (rowCnt - 2 < rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + std::to_string((rowCnt - 2)) + " data values read.");
+                }
+                else if (rowCnt - 2 > rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" too many data values read.");
+                }
+                ShowContinueError("Number of rows in the shading file must be a full year multiplied by the simulation TimeStep: " +
+                    std::to_string(rowLimitCount) + ".");
+                ShowFatalError("Program terminates due to previous condition.");
+            }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
             ScheduleFileShadingProcessed = true;
