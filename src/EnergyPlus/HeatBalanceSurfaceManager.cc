@@ -6145,15 +6145,15 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
-                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
             }
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6439,8 +6439,8 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
-                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobals::KelvinConv;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
                                 OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;

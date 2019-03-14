@@ -846,14 +846,14 @@ void Foundation::createMeshData() {
       } else if (coordinateSystem == CS_CARTESIAN) {
         reductionLength2 = ap;
       }
-    }
-
-    if (reductionStrategy == RS_RR) {
+    } else if (reductionStrategy == RS_RR) {
       twoParameters = false;
       double rrA = (perimeter - sqrt(perimeter * perimeter - 4 * PI * area)) / PI;
       double rrB = (perimeter - PI * rrA) * 0.5;
       reductionLength2 = (rrA)*0.5;
       linearAreaMultiplier = rrB;
+    } else if (reductionStrategy != RS_CUSTOM) {
+      showMessage(MSG_ERR, "Invalid two-dimensional transformation strategy.");
     }
 
     xMin = 0.0;
@@ -1069,7 +1069,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -1095,7 +1095,7 @@ void Foundation::createMeshData() {
           double &Tin = wallTopInteriorTemperature;
           double &Tout = wallTopExteriorTemperature;
           double Tdiff = (Tin - Tout);
-          std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+          std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
           double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
           for (std::size_t n = 1; n <= N; n++) {
@@ -1653,7 +1653,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -2204,7 +2204,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {

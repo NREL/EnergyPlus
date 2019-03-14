@@ -8869,7 +8869,8 @@ namespace SetPointManager {
         // Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes.allocate(1);
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes(1) = SchTESSetPtMgr(NumSchTESSetPtMgrs).CtrlNodeNum;
-        AllSetPtMgr(NumAllSetPtMgrs).Name = SchSetPtMgr(NumSchTESSetPtMgrs).Name;
+        // Give it a Name just in case it's used for error reporting
+        AllSetPtMgr(NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(NumSchTESSetPtMgrs);
         AllSetPtMgr(NumAllSetPtMgrs).SPMType = iSPMType_TESScheduled;
         AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType_Temp;
         AllSetPtMgr(NumAllSetPtMgrs).NumCtrlNodes = 1;
