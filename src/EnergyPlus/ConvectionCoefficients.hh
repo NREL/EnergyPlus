@@ -483,14 +483,14 @@ namespace ConvectionCoefficients {
                                          Real64 const SurfWindSpeed // Current wind speed, m/s
     );
 
-    Real64 ASHRAESimpleIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
+    Real64 CalcASHRAESimpleIntConvCoeff(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
 
     void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                       Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    Real64 ASHRAEDetailedIntConv(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
+    Real64 CalcASHRAEDetailedIntConvCoeff(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
 
     void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
@@ -505,7 +505,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcCeilingDiffuserACH(int const ZoneNum);
 
-    Real64 CeilingDiffuserIntConv(Real64 const Tilt, Real64 const ACH);
+    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 const Tilt, Real64 const ACH);
 
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum); // zone number for which coefficients are being calculated
 
@@ -705,25 +705,25 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum                // for messages
     );
 
-    Real64 CalcSparrowHfWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
+    Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
 
-    Real64 CalcSparrowHfLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
+    Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
 
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
 
     Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
 
-    Real64 CalcMoWITTHn(Real64 DeltaTemp);
+    Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
-    Real64 CalcMoWITTHfWindward(Real64 const WindAtZ);
+    Real64 CalcMoWITTForcedWindward(Real64 const WindAtZ);
 
-    Real64 CalcMoWITTHfLeeward(Real64 const WindAtZ);
+    Real64 CalcMoWITTForcedLeeward(Real64 const WindAtZ);
 
     Real64 CalcMoWITTWindward(Real64 const DeltaTemp, Real64 const WindAtZ);
 
     Real64 CalcMoWITTLeeward(Real64 const DeltaTemp, Real64 const WindAtZ);
 
-    Real64 CalcDOE2Hf(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex);
+    Real64 CalcDOE2Forced(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex);
 
     Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex);
 
