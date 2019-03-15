@@ -4527,12 +4527,12 @@ namespace ZoneEquipmentManager {
                     moisture.RemainingOutputReqToDehumidSP = loadRatio * moisture.UnadjRemainingOutputReqToDehumidSP;
 
                     // now store remaining load at the sequence level
-                    energy.SequencedOutputRequired(nextSystem) = energy.RemainingOutputRequired;
-                    energy.SequencedOutputRequiredToHeatingSP(nextSystem) = energy.RemainingOutputReqToHeatSP;
-                    energy.SequencedOutputRequiredToCoolingSP(nextSystem) = energy.RemainingOutputReqToCoolSP;
-                    moisture.SequencedOutputRequired(nextSystem) = moisture.RemainingOutputRequired;
-                    moisture.SequencedOutputRequiredToHumidSP(nextSystem) = moisture.RemainingOutputReqToHumidSP;
-                    moisture.SequencedOutputRequiredToDehumidSP(nextSystem) = moisture.RemainingOutputReqToDehumidSP;
+                    energy.SequencedOutputRequired(nextEquipPriorityNum) = energy.RemainingOutputRequired;
+                    energy.SequencedOutputRequiredToHeatingSP(nextEquipPriorityNum) = energy.RemainingOutputReqToHeatSP;
+                    energy.SequencedOutputRequiredToCoolingSP(nextEquipPriorityNum) = energy.RemainingOutputReqToCoolSP;
+                    moisture.SequencedOutputRequired(nextEquipPriorityNum) = moisture.RemainingOutputRequired;
+                    moisture.SequencedOutputRequiredToHumidSP(nextEquipPriorityNum) = moisture.RemainingOutputReqToHumidSP;
+                    moisture.SequencedOutputRequiredToDehumidSP(nextEquipPriorityNum) = moisture.RemainingOutputReqToDehumidSP;
                 } else {
                     // SequentialLoading, use original method for remaining output
                     energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired;
