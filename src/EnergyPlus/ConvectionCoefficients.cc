@@ -4463,6 +4463,10 @@ namespace ConvectionCoefficients {
 
             // assign the convection coefficent to the major surfaces and any subsurfaces on them
             if ((Surface(SurfNum).BaseSurf == Surf1) || (Surface(SurfNum).BaseSurf == Surf2)) {
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    ShowFatalError("Trombe wall convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                }
                 HConvIn(SurfNum) = 2.0 * HConvNet;
             }
 
@@ -4682,9 +4686,12 @@ namespace ConvectionCoefficients {
         return SetIntConvectionCoeff;
     }
 
-    void CalcISO15099WindowIntConvCoeff(int const SurfNum,               // surface number for which coefficients are being calculated
-                                        Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
-                                        Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
+    Real64 CalcISO15099WindowIntConvCoeff(Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+                                          Real64 const AirTemperature,      // Mean Air Temperature of Zone (or adjacent air temperature)
+                                          Real64 AirHumRat,       // air humidity ratio
+                                          Real64 Height,          // window cavity height [m]
+                                          Real64 TiltDeg,         // glazing tilt in degrees
+                                          Real64 sineTilt         // sine of glazing tilt
     )
     {
 
@@ -4706,8 +4713,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
-        using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -4718,34 +4723,20 @@ namespace ConvectionCoefficients {
         static Real64 const pow_11_2(0.58 * std::pow(1.0E+11, 0.2));
         static std::string const RoutineName("WindowTempsForNominalCond");
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp;       // Temperature difference between the zone air and the surface
         Real64 TmeanFilm;       // mean film temperature
         Real64 TmeanFilmKelvin; // mean film temperature for property evaluation
         Real64 rho;             // density of air [kg/m3]
         Real64 g;               // acceleration due to gravity [m/s2]
-        Real64 Height;          // window cavity height [m]
         Real64 Cp;              // specific heat of air [J/kg-K]
         Real64 lambda;          // thermal conductivity of air [W/m-K]
         Real64 mu;              // dynamic viscosity of air [kg/m-s]
         Real64 RaH;             // Rayleigh number for cavity height [ Non dim]
         Real64 RaCV;            // Rayleigh number for slanted cavity
-        Real64 TiltDeg;         // glazing tilt in degrees
-        Real64 sineTilt;        // sine of glazing tilt
         Real64 Nuint(0.0);      // Nusselt number for interior surface convection
         Real64 SurfTempKelvin;  // surface temperature in Kelvin
         Real64 AirTempKelvin;   // air temperature in Kelvin
-        Real64 AirHumRat;       // air humidity ratio
 
         SurfTempKelvin = SurfaceTemperature + 273.15;
         AirTempKelvin = AirTemperature + 273.15;
@@ -4753,19 +4744,10 @@ namespace ConvectionCoefficients {
 
         // protect against wildly out of range temperatures
         if ((AirTempKelvin < 200.0) || (AirTempKelvin > 400.0)) { // out of range
-            HConvIn(SurfNum) = LowHConvLimit;
-            return;
+            return LowHConvLimit;
         }
         if ((SurfTempKelvin < 180.0) || (SurfTempKelvin > 450.0)) { // out of range
-            HConvIn(SurfNum) = LowHConvLimit;
-            return;
-        }
-
-        // Get humidity ratio
-        if (Surface(SurfNum).Zone > 0) {
-            AirHumRat = ZoneAirHumRatAvg(Surface(SurfNum).Zone);
-        } else {
-            AirHumRat = OutHumRat;
+            return LowHConvLimit;
         }
 
         // mean film temperature
@@ -4774,16 +4756,12 @@ namespace ConvectionCoefficients {
 
         rho = PsyRhoAirFnPbTdbW(OutBaroPress, TmeanFilm, AirHumRat, RoutineName);
         g = 9.81;
-        Height = Surface(SurfNum).Height;
 
         // the following properties are probably for dry air, should maybe be remade for moist-air
         lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
         mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin;     // Table B.2 in ISO 15099
 
         Cp = PsyCpAirFnWTdb(AirHumRat, TmeanFilm);
-
-        TiltDeg = Surface(SurfNum).Tilt;
-        sineTilt = Surface(SurfNum).SinTilt;
 
         // four cases depending on tilt and DeltaTemp (heat flow direction )
         if (DeltaTemp > 0.0) TiltDeg = 180.0 - TiltDeg; // complement angle if cooling situation
@@ -4831,7 +4809,53 @@ namespace ConvectionCoefficients {
             assert(false);
         }
 
-        HConvIn(SurfNum) = Nuint * lambda / Height;
+        return Nuint * lambda / Height;
+
+    }
+
+    void CalcISO15099WindowIntConvCoeff(int const SurfNum,               // surface number for which coefficients are being calculated
+                                        Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+                                        Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
+    )
+    {
+
+        using DataEnvironment::OutHumRat;
+        using DataHeatBalFanSys::ZoneAirHumRatAvg;
+
+
+        Real64 AirHumRat;       // air humidity ratio
+
+        Real64 SurfTempKelvin = SurfaceTemperature + 273.15;
+        Real64 AirTempKelvin = AirTemperature + 273.15;
+
+        // protect against wildly out of range temperatures
+        if ((AirTempKelvin < 200.0) || (AirTempKelvin > 400.0)) { // out of range
+            HConvIn(SurfNum) = LowHConvLimit;
+            return;
+        }
+        if ((SurfTempKelvin < 180.0) || (SurfTempKelvin > 450.0)) { // out of range
+            HConvIn(SurfNum) = LowHConvLimit;
+            return;
+        }
+
+        // Get humidity ratio
+        if (Surface(SurfNum).Zone > 0) {
+            AirHumRat = ZoneAirHumRatAvg(Surface(SurfNum).Zone);
+        } else {
+            AirHumRat = OutHumRat;
+        }
+
+        Real64 Height = Surface(SurfNum).Height;
+
+        Real64 TiltDeg = Surface(SurfNum).Tilt;
+        Real64 sineTilt = Surface(SurfNum).SinTilt;
+
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+        {
+            ShowFatalError("ISO15099 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+        }
+
+        HConvIn(SurfNum) = CalcISO15099WindowIntConvCoeff(SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
 
         // EMS override point (Violates Standard 15099?  throw warning? scary.
         if (Surface(SurfNum).EMSOverrideIntConvCoef) HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
