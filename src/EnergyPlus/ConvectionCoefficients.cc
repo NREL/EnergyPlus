@@ -6168,7 +6168,7 @@ namespace ConvectionCoefficients {
                     HnFn = [=](double Tsurf, double Tamb, double HfTerm,
                                double Roughness, double CosTilt) -> double {
                         // Remove Hfterm since this is only used for the natural convection portion
-                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
+                        return SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
                     };
                 }
             } else if (SELECT_CASE_var == HcExt_NaturalASHRAEVerticalWall) {
