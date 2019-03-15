@@ -6449,6 +6449,26 @@ namespace ConvectionCoefficients {
                                    SurfWindDir,
                                    Surface(SurfNum).OutConvFaceArea,
                                    Surface(SurfNum).OutConvFacePerimeter);
+                HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                    return windSpeed;
+                };
+                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                    // Assume very large area for grade (relative to perimeter).
+                    const double area = 9999999.;
+                    const double perim = 1.;
+                    HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double{
+                        return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
+                    };
+                } else {
+                    // Assume 1'x20' strip for walls.
+                    const double length = 1.0;
+                    const double width = 20.0;
+                    const double area = length*width;
+                    const double perim = 2.0 * (length + width);
+                    HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double{
+                        return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
+                    };
+                }
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
                 // Not compatible with Kiva (doesn't use local windspeed)
@@ -10047,52 +10067,23 @@ namespace ConvectionCoefficients {
         return Hf;
     }
 
-    Real64 CalcClearRoof(int const SurfNum,
-                         Real64 const SurfTemp,
+    Real64 CalcClearRoof(Real64 const SurfTemp,
                          Real64 const AirTemp,
                          Real64 const WindAtZ,
-                         Real64 const EP_UNUSED(WindDirect), // Wind direction measured clockwise from geographhic North
                          Real64 const RoofArea,
-                         Real64 const RoofPerimeter)
+                         Real64 const RoofPerimeter,
+                         int const RoughnessIndex)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-        // Return value
-        Real64 Hc;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const g(9.81);     // gravity constant (m/s**2)
         Real64 const v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
         Real64 const k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
         Real64 const Pr(0.71);    // Prandtl number for air at ?
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp;
@@ -10104,13 +10095,8 @@ namespace ConvectionCoefficients {
         Real64 x;   // distance to roof edge toward wind direction
         Real64 eta;
         Array1D<Real64> RfARR(6);
-        Real64 Rf;
         Real64 BetaFilm;
-        static int ErrorIndex(0);
 
-        RfARR = {2.10, 1.67, 1.52, 1.13, 1.11, 1.0};
-
-        Rf = RfARR(Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness);
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 
@@ -10128,14 +10114,37 @@ namespace ConvectionCoefficients {
 
         Rex = WindAtZ * AirDensity * x / v;
 
+        Real64 Rf = RoughnessMultiplier(RoughnessIndex);
         if (Rex > 0.1) { // avoid zero and crazy small denominators
-            eta = (std::log(1.0 + GrLn / pow_2(Rex))) / (1.0 + std::log(1.0 + GrLn / pow_2(Rex)));
+            Real64 tmp = std::log(1.0 + GrLn / pow_2(Rex));
+            eta = tmp / (1.0 + tmp);
         } else {
             eta = 1.0; // forced convection gone because no wind
         }
 
+        return eta * (k / Ln) * 0.15 * std::pow(RaLn, OneThird) + (k / x) * Rf * 0.0296 * std::pow(Rex, FourFifths) * std::pow(Pr, OneThird);
+    }
+
+    Real64 CalcClearRoof(int const SurfNum,
+                         Real64 const SurfTemp,
+                         Real64 const AirTemp,
+                         Real64 const WindAtZ,
+                         Real64 const EP_UNUSED(WindDirect), // Wind direction measured clockwise from geographhic North
+                         Real64 const RoofArea,
+                         Real64 const RoofPerimeter)
+    {
+
+
+        Real64 x;   // distance to roof edge toward wind direction
+
+        static int ErrorIndex(0);
+
+        int const RoughnessIndex = Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        // find x, don't know x. avoid time consuming geometry algorithm
+        x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
+
         if (x > 0.0) {
-            Hc = eta * (k / Ln) * 0.15 * std::pow(RaLn, OneThird) + (k / x) * Rf * 0.0296 * std::pow(Rex, FourFifths) * std::pow(Pr, OneThird);
+            return CalcClearRoof(SurfTemp, AirTemp, WindAtZ, RoofArea, RoofPerimeter, RoughnessIndex);
         } else {
             if (ErrorIndex == 0) {
                 ShowSevereMessage("CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");
@@ -10145,9 +10154,8 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd(
                 "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]", ErrorIndex);
-            Hc = 9.9999; // safe but noticeable
+            return 9.9999; // safe but noticeable
         }
-        return Hc;
     }
 
 } // namespace ConvectionCoefficients
