@@ -465,11 +465,6 @@ namespace ConvectionCoefficients {
                                  Real64 const WindDirection  // Wind (compass) direction (degrees)
     );
 
-    Real64 CalcHnASHRAETARPExterior(Real64 const TOutSurf, // Exterior surface temperature
-                                    Real64 const TAir,     // Outdoor Air temperature
-                                    Real64 const CosTilt   // Cosine of the Surface Tilt Angle (Angle between the ground outward normal and
-    );
-
     bool Windward(Real64 const CosTilt,      // Cosine of the surface tilt angle
                   Real64 const Azimuth,      // or Facing, Direction the surface outward normal faces (degrees)
                   Real64 const WindDirection // Wind direction measured clockwise from geographhic North
@@ -490,7 +485,7 @@ namespace ConvectionCoefficients {
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    Real64 CalcASHRAEDetailedIntConvCoeff(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
+    Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
 
     void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
