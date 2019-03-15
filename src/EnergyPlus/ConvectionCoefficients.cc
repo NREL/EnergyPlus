@@ -5825,6 +5825,8 @@ namespace ConvectionCoefficients {
         Real64 ZoneMult; // local product of zone multiplier and zonelist multipler
 
         tmpHc = 0.0;
+
+        auto& HnFn = SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in;
         // now call appropriate function to calculate Hc
         {
             auto const SELECT_CASE_var(ConvModelEquationNum);
@@ -6248,8 +6250,8 @@ namespace ConvectionCoefficients {
 
         // Kiva callback functions
         Kiva::ForcedConvectionTerm HfTermFn;
-        Kiva::ConvectionAlgorithm HfFn;
-        Kiva::ConvectionAlgorithm HnFn;
+        Kiva::ConvectionAlgorithm HfFn(KIVA_CONST_CONV(0.0));
+        Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
         // first call Hn models
         {
@@ -6257,11 +6259,16 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == HcExt_None) {
                 Hn = 0.0;
-                HnFn = CONST_CONV(0.0);
+                HnFn = KIVA_CONST_CONV(0.0);
             } else if (SELECT_CASE_var == HcExt_UserCurve) {
-
                 CalcUserDefinedOutsideHcModel(SurfNum, Surface(SurfNum).OutConvHnUserCurveIndex, Hn);
-
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double HfTerm,
+                               double Roughness, double CosTilt) -> double {
+                        // Remove Hfterm since this is only used for the natural convection portion
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
+                    };
+                }
             } else if (SELECT_CASE_var == HcExt_NaturalASHRAEVerticalWall) {
                 Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -6326,12 +6333,14 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == HcExt_None) {
                 Hf = 0.0;
-                HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
-                HfFn = [](double, double, double HfTerm, double, double) -> double{
-                    return HfTerm;
-                };
+                HfTermFn = KIVA_HF_DEF;
+                HfFn = KIVA_CONST_CONV(0.0);
             } else if (SELECT_CASE_var == HcExt_UserCurve) {
                 CalcUserDefinedOutsideHcModel(SurfNum, Surface(SurfNum).OutConvHfUserCurveIndex, Hf);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HfTermFn = SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f;
+                    HnFn = SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out;
+                }
             } else if (SELECT_CASE_var == HcExt_SparrowWindward) {
                 Hf = CalcSparrowWindward(Roughness,
                                          Surface(SurfNum).OutConvFacePerimeter,
@@ -6340,7 +6349,7 @@ namespace ConvectionCoefficients {
                                          SurfNum);
 
                 if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
-                    HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
+                    HfTermFn = KIVA_HF_ZERO;
                 } else {
                     // Assume 1'x20' strip for walls.
                     const double length = 1.0;
@@ -6364,7 +6373,7 @@ namespace ConvectionCoefficients {
                                         SurfWindSpeed,
                                         SurfNum);
                 if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
-                    HfTermFn = [](double, double, double, double) -> double{ return 0.0;};
+                    HfTermFn = KIVA_HF_ZERO;
                 } else {
                     // Assume 1'x20' strip for walls.
                     const double length = 1.0;
@@ -7733,7 +7742,6 @@ namespace ConvectionCoefficients {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 tmpHc;
         Real64 tmpAirTemp;
         Real64 SupplyAirTemp;
         Real64 AirChangeRate;
@@ -7768,8 +7776,10 @@ namespace ConvectionCoefficients {
             }
         }
 
+        auto& UserCurve = HcInsideUserCurve(UserCurveNum);
+
         {
-            auto const SELECT_CASE_var(HcInsideUserCurve(UserCurveNum).ReferenceTempType);
+            auto const SELECT_CASE_var(UserCurve.ReferenceTempType);
 
             if (SELECT_CASE_var == RefTempMeanAirTemp) {
                 tmpAirTemp = MAT(ZoneNum);
@@ -7783,26 +7793,41 @@ namespace ConvectionCoefficients {
             }
         }
 
-        tmpHc = 0.0;
-        if (HcInsideUserCurve(UserCurveNum).HcFnTempDiffCurveNum > 0) {
-            tmpHc = CurveValue(HcInsideUserCurve(UserCurveNum).HcFnTempDiffCurveNum, std::abs(TH(2, 1, SurfNum) - tmpAirTemp));
+        Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
+        Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
+        if (UserCurve.HcFnTempDiffCurveNum > 0) {
+            HcFnTempDiff = CurveValue(UserCurve.HcFnTempDiffCurveNum, std::abs(TH(2, 1, SurfNum) - tmpAirTemp));
+            HcFnTempDiffFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                return CurveValue(UserCurve.HcFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
+            };
         }
 
-        if (HcInsideUserCurve(UserCurveNum).HcFnTempDiffDivHeightCurveNum > 0) {
-            tmpHc += CurveValue(HcInsideUserCurve(UserCurveNum).HcFnTempDiffDivHeightCurveNum,
+        if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
+            HcFnTempDiffDivHeight = CurveValue(UserCurve.HcFnTempDiffDivHeightCurveNum,
                                 (std::abs(TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
+            HcFnTempDiffDivHeightFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                return CurveValue(UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / Surface(SurfNum).IntConvZoneWallHeight);
+            };
         }
 
-        if (HcInsideUserCurve(UserCurveNum).HcFnACHCurveNum > 0) {
-            tmpHc += CurveValue(HcInsideUserCurve(UserCurveNum).HcFnACHCurveNum, AirChangeRate);
+        if (UserCurve.HcFnACHCurveNum > 0) {
+            HcFnACH = CurveValue(UserCurve.HcFnACHCurveNum, AirChangeRate);
         }
 
-        if (HcInsideUserCurve(UserCurveNum).HcFnACHDivPerimLengthCurveNum > 0) {
-            tmpHc +=
-                CurveValue(HcInsideUserCurve(UserCurveNum).HcFnACHDivPerimLengthCurveNum, (AirChangeRate / Surface(SurfNum).IntConvZonePerimLength));
+        if (UserCurve.HcFnACHDivPerimLengthCurveNum > 0) {
+            HcFnACHDivPerimLength =
+                CurveValue(UserCurve.HcFnACHDivPerimLengthCurveNum, (AirChangeRate / Surface(SurfNum).IntConvZonePerimLength));
         }
 
-        Hc = tmpHc;
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+        {
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
+                return HcFnTempDiffFn(Tsurf, Tamb, HfTerm, Roughness, CosTilt) + HcFnTempDiffDivHeightFn(Tsurf, Tamb, HfTerm, Roughness, CosTilt) + HcFnACH + HcFnACHDivPerimLength;
+            };
+            Hc = 0.0;
+        } else {
+            Hc = HcFnTempDiff + HcFnTempDiffDivHeight + HcFnACH + HcFnACHDivPerimLength;
+        }
     }
 
     void CalcUserDefinedOutsideHcModel(int const SurfNum, int const UserCurveNum, Real64 &H)
@@ -7843,13 +7868,14 @@ namespace ConvectionCoefficients {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 tmpHc;
         Real64 windVel;
         Real64 Theta;
         Real64 ThetaRad;
 
+        auto& UserCurve = HcOutsideUserCurve(UserCurveNum);
+
         {
-            auto const SELECT_CASE_var(HcOutsideUserCurve(UserCurveNum).WindSpeedType);
+            auto const SELECT_CASE_var(UserCurve.WindSpeedType);
 
             if (SELECT_CASE_var == RefWindWeatherFile) {
                 windVel = WindSpeed;
@@ -7868,23 +7894,46 @@ namespace ConvectionCoefficients {
             }
         }
 
-        tmpHc = 0.0;
-        if (HcOutsideUserCurve(UserCurveNum).HfFnWindSpeedCurveNum > 0) {
-            tmpHc = CurveValue(HcOutsideUserCurve(UserCurveNum).HfFnWindSpeedCurveNum, windVel);
+        Kiva::ForcedConvectionTerm HfFnWindSpeedFn(KIVA_HF_DEF);
+        Kiva::ConvectionAlgorithm HnFnTempDiffFn(KIVA_CONST_CONV(0.0)), HnFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
+
+        Real64 HfFnWindSpeed(0.0), HnFnTempDiff(0.0), HnFnTempDiffDivHeight(0.0);
+        if (UserCurve.HfFnWindSpeedCurveNum > 0) {
+            HfFnWindSpeed = CurveValue(UserCurve.HfFnWindSpeedCurveNum, windVel);
+            HfFnWindSpeedFn = [=](double, double, double, double windSpeed ) -> double {
+                return CurveValue(UserCurve.HfFnWindSpeedCurveNum, windSpeed);
+            };
         }
 
-        if (HcOutsideUserCurve(UserCurveNum).HnFnTempDiffCurveNum > 0) {
-            tmpHc += CurveValue(HcOutsideUserCurve(UserCurveNum).HnFnTempDiffCurveNum, std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+        if (UserCurve.HnFnTempDiffCurveNum > 0) {
+            HnFnTempDiff = CurveValue(UserCurve.HnFnTempDiffCurveNum, std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp));
+            HnFnTempDiffFn = [=](double Tsurf, double Tamb, double,
+                                 double, double) -> double {
+                return CurveValue(UserCurve.HnFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
+            };
         }
 
-        if (HcOutsideUserCurve(UserCurveNum).HnFnTempDiffDivHeightCurveNum > 0) {
+        if (UserCurve.HnFnTempDiffDivHeightCurveNum > 0) {
             if (Surface(SurfNum).OutConvFaceHeight > 0.0) {
-                tmpHc += CurveValue(HcOutsideUserCurve(UserCurveNum).HnFnTempDiffDivHeightCurveNum,
+                HnFnTempDiffDivHeight = CurveValue(UserCurve.HnFnTempDiffDivHeightCurveNum,
                                     ((std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
+                HnFnTempDiffDivHeightFn = [=](double Tsurf, double Tamb, double,
+                double, double) -> double {
+                    return CurveValue(UserCurve.HnFnTempDiffDivHeightCurveNum,
+                                      ((std::abs(Tsurf - Tamb)) / Surface(SurfNum).OutConvFaceHeight));
+                };
             }
         }
 
-        H = tmpHc;
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = HfFnWindSpeedFn;
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double HfTerm,
+                                                                           double Roughness, double CosTilt) -> double {
+                return HnFnTempDiffFn(Tsurf, Tamb, HfTerm, Roughness, CosTilt)
+                    + HnFnTempDiffDivHeightFn(Tsurf, Tamb, HfTerm, Roughness, CosTilt) + HfTerm;
+            };
+        }
+        H = HfFnWindSpeed + HnFnTempDiff + HnFnTempDiffDivHeight;
     }
 
     //** Begin catalog of Hc equation functions. **** !*************************************************
