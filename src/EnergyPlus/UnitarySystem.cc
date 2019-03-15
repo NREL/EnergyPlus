@@ -8788,10 +8788,11 @@ namespace UnitarySystems {
                 ZoneLoad = 0.0;
                 CoolingLoad = false;
                 HeatingLoad = false;
-            } else if (this->m_IterationCounter > 6) {                // attempt to lock output (air flow) if oscillations are detected
-                int OperatingMode = this->m_IterationMode[7];         // VS systems can take a few more iterations than single-speed systems
-                int OperatingModeMinusOne = this->m_IterationMode[6]; // previously tested 5th iteration, now tests 7th
-                int OperatingModeMinusTwo = this->m_IterationMode[5];
+            } else if (this->m_IterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 6)) {
+                // attempt to lock output (air flow) if oscillations are detected
+                int OperatingMode = this->m_IterationMode[m_IterationCounter]; // VS systems can take a few more iterations than single-speed systems
+                int OperatingModeMinusOne = this->m_IterationMode[m_IterationCounter - 1]; // previously tested 5th iteration, now tests 7th
+                int OperatingModeMinusTwo = this->m_IterationMode[m_IterationCounter - 2];
                 bool Oscillate = true;
                 if (OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo) Oscillate = false;
                 if (Oscillate) {

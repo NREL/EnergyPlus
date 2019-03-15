@@ -5741,7 +5741,8 @@ namespace Furnaces {
             ZoneLoad = 0.0;
             CoolingLoad = false;
             HeatingLoad = false;
-        } else if (Furnace(FurnaceNum).iterationCounter > 4) { // attempt to lock output (air flow) if oscillations are detected
+        } else if (Furnace(FurnaceNum).iterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 4)) {
+            // attempt to lock output (air flow) if oscillations are detected
             OperatingMode = Furnace(FurnaceNum).iterationMode(5);
             OperatingModeMinusOne = Furnace(FurnaceNum).iterationMode(4);
             OperatingModeMinusTwo = Furnace(FurnaceNum).iterationMode(3);
