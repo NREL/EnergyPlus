@@ -6,6 +6,11 @@
 # ADD_SIMULATION_TEST(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE GBR_London.Gatwick.037760_IWEC.epw DESIGN_DAY_ONLY)
 # This will override any attempt to run an annual simulation.  Use DESIGN_DAY_ONLY for files without annual run periods
 
+# Putting a couple files first because they are very long running and CI ends up running them while all the others are done
+# Hopefully putting them up here will get them to start sooner and better distribute CI resources over the build time
+ADD_SIMULATION_TEST(IDF_FILE HospitalLowEnergy.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterToAirWithRHControl.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneDataCenterCRAC_wApproachTemp.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 2ZoneDataCenterHVAC_wEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -315,7 +320,6 @@ ADD_SIMULATION_TEST(IDF_FILE HeatRecoveryPlantLoopAuto.idf EPW_FILE USA_IL_Chica
 ADD_SIMULATION_TEST(IDF_FILE HeatRecoverywithStorageTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HospitalBaseline.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HospitalBaselineReheatReportEMS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE HospitalLowEnergy.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialLoad.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialLoadFractions.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE House-2FurnaceAC-SequentialUniformPLR.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -533,7 +537,6 @@ ADD_SIMULATION_TEST(IDF_FILE VAVSingleDuctVarFlowBoiler.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE VSDXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterToAirWithRHControl.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VSWaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VaryingLocationAndOrientation.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VariableRefrigerantFlow_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
