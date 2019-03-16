@@ -734,7 +734,14 @@ namespace ConvectionCoefficients {
 
         }
 
-        if (Surface(SurfNum).EMSOverrideExtConvCoef) HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+        if (Surface(SurfNum).EMSOverrideExtConvCoef) {
+            HExt = Surface(SurfNum).EMSValueForExtConvCoef;
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+            {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(Surface(SurfNum).EMSValueForExtConvCoef);
+            }
+        }
 
         if (TSurf == TSky || algoNum == ASHRAESimple) {
             HSky = 0.0;
@@ -4560,15 +4567,26 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == ConvCoefValue) {
                 HExt = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideValue;
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
+                }
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserValue; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
                 HExt = GetCurrentScheduleValue(UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
                 // Need to check for validity
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
+                }
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserSchedule; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;         // reporting
             } else if (SELECT_CASE_var == ConvCoefUserCurve) {
                 CalcUserDefinedOutsideHcModel(SurfNum, UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).UserCurveIndex, HExt);
+                // Kiva convection handled in function above
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserCurve; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
@@ -4576,6 +4594,7 @@ namespace ConvectionCoefficients {
                                     UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
                                     UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
                                     HExt);
+                // Kiva convection handled in function above
                 Surface(SurfNum).OutConvHfModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
                 Surface(SurfNum).OutConvHnModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
             } else {
