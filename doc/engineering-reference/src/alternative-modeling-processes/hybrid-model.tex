@@ -240,60 +240,60 @@ People count is highly unpredictable due to the uncertain people movements and b
 
 \noindent(1). Solve people count with measured zone air temperature. \\
 \noindent The sum of internal sensible heat gains is:
-\begin{align*}
-  \Sigma{Q_{in}} &= C_z\frac {\frac{11}{6}T_{z}^{t}-3T_{z}^{t-\delta t}+\frac{3}{2}T_{z}^{t-2\delta t}-\frac{1}{3}T_{z}^{t-3\delta t}} {\delta t} \\
-  &-  [\Sigma{h_i A_i (T_{si}-T_z)} + \Sigma{ṁ_{zi}C_p(T_{zi}-T_z)} + \dot{m}_{inf}C_p(T_o - T_z) + \dot{m}_{sys}C_p(T_{sys} - T_z)] \numberthis
-\end{align*}
+\begin{align}
+  \Sigma{Q_{in}} &= C_z\frac {\frac{11}{6}T_{z}^{t}-3T_{z}^{t-\delta t}+\frac{3}{2}T_{z}^{t-2\delta t}-\frac{1}{3}T_{z}^{t-3\delta t}} {\delta t} \nonumber \\
+  &-  [\Sigma{h_i A_i (T_{si}-T_z)} + \Sigma{ṁ_{zi}C_p(T_{zi}-T_z)} + \dot{m}_{inf}C_p(T_o - T_z) + \dot{m}_{sys}C_p(T_{sys} - T_z)]
+\end{align}
 The sum of internal sensible heat gains from people is:
-\begin{align*}
-  \Sigma{Q_{people}} = \Sigma{Q_{in}} - \Sigma{Q_{others}}\numberthis
-\end{align*}
+\begin{align}
+  \Sigma{Q_{people}} = \Sigma{Q_{in}} - \Sigma{Q_{others}}
+\end{align}
 Finally, the number of people could be solved:
-\begin{align*}
-  N = \frac {\Sigma{Q_{people}}}{Q_{single}} \numberthis
-\end{align*}
-\begin{align*}
-\text{Where: }\\
-  Q_{single} &: \text{Sensible heat rate per person} ~ [W] \\
-\end{align*}
+\begin{align}
+  N = \frac {\Sigma{Q_{people}}}{Q_{single}}
+\end{align}
+Where:
+\begin{align}
+  Q_{single} &: \text{Sensible heat rate per person} ~ [W] \nonumber \\
+\end{align}
 
 \noindent (2). Solve people count with measured zone air humidity ratio. \\
 \noindent The sum of internal moisture gains is:
-\begin{align*}
-  \Sigma{kg_{mass_{sched}}} &= C_{wz}\frac {\frac{11}{6}W_{z}^{t}-3W_{z}^{t-\delta t}+\frac{3}{2}W_{z}^{t-2\delta t}-\frac{1}{3}W_{z}^{t-3\delta t}} {\delta t} \\
-  &-  [\Sigma{A_i h_i \rho_{air} (W_{si} - W_{z}^{t})} + \Sigma{ṁ_{zi} C_p (W_{zi}-W_{z}^{t})}] \numberthis
-\end{align*}
+\begin{align}
+  \Sigma{kg_{mass_{sched}}} &= C_{wz}\frac {\frac{11}{6}W_{z}^{t}-3W_{z}^{t-\delta t}+\frac{3}{2}W_{z}^{t-2\delta t}-\frac{1}{3}W_{z}^{t-3\delta t}} {\delta t} \nonumber \\
+  &-  [\Sigma{A_i h_i \rho_{air} (W_{si} - W_{z}^{t})} + \Sigma{ṁ_{zi} C_p (W_{zi}-W_{z}^{t})}]
+\end{align}
 The sum of internal moisture gains from people is:
-\begin{align*}
-  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}} \numberthis
-\end{align*}
+\begin{align}
+  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}}
+\end{align}
 Finally, the number of people could be solved:
-\begin{align*}
-  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}} \numberthis
-\end{align*}
-\begin{align*}
-\text{Where: }\\
-  kg_{mass_{single}} &: \text{Moisture dissipation rate per person} ~ [kg / s] \\
-\end{align*}
+\begin{align}
+  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}}
+\end{align}
+Where:
+\begin{align}
+  kg_{mass_{single}} &: \text{Moisture dissipation rate per person} ~ [kg / s] \nonumber \\
+\end{align}
 
 \noindent (3). Solve people count with measured zone air CO$_2$ concentration. \\
 \noindent The sum of internal CO$_2$ gains is:
-\begin{align*}
-  \Sigma{kg_{mass_{sched}}}\times 10^{6} &= C_{CO_{2}z}\frac {\frac{11}{6}C_{z}^{t}-3C_{z}^{t-\delta t}+\frac{3}{2}C_{z}^{t-2\delta t}-\frac{1}{3}C_{z}^{t-3\delta t}} {\delta t} \\
-  &-  [\Sigma{ṁ_{zi}(C_{zi}-C_z)} \dot{m}_{inf} (C_o - C_z) + \dot{m}_{sys} (C_{sys} - C_z)] \numberthis
-\end{align*}
+\begin{align}
+  \Sigma{kg_{mass_{sched}}}\times 10^{6} &= C_{CO_{2}z}\frac {\frac{11}{6}C_{z}^{t}-3C_{z}^{t-\delta t}+\frac{3}{2}C_{z}^{t-2\delta t}-\frac{1}{3}C_{z}^{t-3\delta t}} {\delta t} \nonumber \\
+  &-  [\Sigma{ṁ_{zi}(C_{zi}-C_z)} \dot{m}_{inf} (C_o - C_z) + \dot{m}_{sys} (C_{sys} - C_z)]
+\end{align}
 The sum of internal CO$_2$ gains from people is:
-\begin{align*}
-  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}} \numberthis
-\end{align*}
+\begin{align}
+  \Sigma{kg_{mass_{sched-people}}} = \Sigma{kg_{mass_{sched}}} - \Sigma{kg_{mass_{sched-others}}}
+\end{align}
 Finally, the number of people could be solved:
-\begin{align*}
-  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}} \numberthis
-\end{align*}
-\begin{align*}
-\text{Where: }\\
-  kg_{mass_{single}} &: \text{CO$_2$ generation rate per person} ~ [m^{3}/(s \cdot W)] \\
-\end{align*}
+\begin{align}
+  N = \frac {\Sigma{kg_{mass_{sched-people}}}}{kg_{mass_{single}}}
+\end{align}
+Where:
+\begin{align}
+  kg_{mass_{single}} &: \text{CO$_2$ generation rate per person} ~ [m^{3}/(s \cdot W)] \nonumber \\
+\end{align}
 
 \subsection{References}\label{references}
 
