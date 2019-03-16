@@ -82,4 +82,8 @@ void Aggregator::calc_weighted_results() {
   return;
 }
 
+std::pair<Ground *, double> Aggregator::get_instance(std::size_t index) {
+  return instances[index];
+}
+
 } // namespace Kiva

@@ -602,11 +602,11 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
                     if (Surface(SurfNum).Class == SurfaceClass_Wall) {
-                        // Assume 1'x20' strip for walls.
-                        const double length = 1.0;
-                        const double width = 20.0;
-                        const double area = length*width;
-                        const double perim = 2.0 * (length + width);
+                        auto& fnd = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                        const double length = fnd.netPerimeter;
+                        const double height = fnd.wall.heightAboveGrade;
+                        const double area = length*height;
+                        const double perim = 2.0 * (length + height);
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
                             double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
@@ -614,8 +614,11 @@ namespace ConvectionCoefficients {
                             return (windwardHf + leewardHf)/2.0;
                         };
                     } else {  // Slab (used for exterior grade convection)
-                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double) -> double {
-                            return 0.0; // CalcHfExteriorSparrow when A is really big
+                        // Assume very large area for grade (relative to perimeter).
+                        const double area = 9999999.;
+                        const double perim = 1.;
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
+                            CalcSparrowWindward(Roughness, perim, area, windSpeed);
                         };
                     }
                     SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
@@ -6229,19 +6232,26 @@ namespace ConvectionCoefficients {
                                          SurfNum);
 
                 if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
-                    HfTermFn = KIVA_HF_ZERO;
-                } else {
-                    // Assume 1'x20' strip for walls.
-                    const double length = 1.0;
-                    const double width = 20.0;
-                    const double area = length*width;
-                    const double perim = 2.0 * (length + width);
+                    // Assume very large area for grade (relative to perimeter).
+                    const double area = 9999999.;
+                    const double perim = 1.;
                     HfTermFn = [=](double, double, double, double windSpeed) -> double{
-                        // Average windward and leeward since all walls use same algorithm
-                        double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
-                        double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
-                        return (windwardHf + leewardHf)/2.0;
+                        return CalcSparrowWindward(Roughness, perim, area, windSpeed);
                     };
+                } else {
+                    if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                        auto& fnd = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                        const double length = fnd.netPerimeter;
+                        const double height = fnd.wall.heightAboveGrade;
+                        const double area = length*height;
+                        const double perim = 2.0 * (length + height);
+                        HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                            // Average windward and leeward since all walls use same algorithm
+                            double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
+                            double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
+                            return (windwardHf + leewardHf)/2.0;
+                        };
+                    }
                 }
                 HfFn = [](double, double, double HfTerm, double, double) -> double{
                     return HfTerm;
@@ -6253,19 +6263,26 @@ namespace ConvectionCoefficients {
                                         SurfWindSpeed,
                                         SurfNum);
                 if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
-                    HfTermFn = KIVA_HF_ZERO;
-                } else {
-                    // Assume 1'x20' strip for walls.
-                    const double length = 1.0;
-                    const double width = 20.0;
-                    const double area = length*width;
-                    const double perim = 2.0 * (length + width);
+                    // Assume very large area for grade (relative to perimeter).
+                    const double area = 9999999.;
+                    const double perim = 1.;
                     HfTermFn = [=](double, double, double, double windSpeed) -> double{
-                        // Average windward and leeward since all walls use same algorithm
-                        double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
-                        double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
-                        return (windwardHf + leewardHf)/2.0;
+                        return CalcSparrowLeeward(Roughness, perim, area, windSpeed);
                     };
+                } else {
+                    if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                        auto& fnd = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                        const double length = fnd.netPerimeter;
+                        const double height = fnd.wall.heightAboveGrade;
+                        const double area = length*height;
+                        const double perim = 2.0 * (length + height);
+                        HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                            // Average windward and leeward since all walls use same algorithm
+                            double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
+                            double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
+                            return (windwardHf + leewardHf)/2.0;
+                        };
+                    }
                 }
                 HfFn = [](double, double, double HfTerm, double, double) -> double{
                     return HfTerm;
@@ -6390,14 +6407,16 @@ namespace ConvectionCoefficients {
                         return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
                     };
                 } else {
-                    // Assume 1'x20' strip for walls.
-                    const double length = 1.0;
-                    const double width = 20.0;
-                    const double area = length*width;
-                    const double perim = 2.0 * (length + width);
-                    HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double{
-                        return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
-                    };
+                    if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                        auto& fnd = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                        const double length = fnd.netPerimeter;
+                        const double height = fnd.wall.heightAboveGrade;
+                        const double area = length*height;
+                        const double perim = 2.0 * (length + height);
+                        HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double{
+                            return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
+                        };
+                    }
                 }
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
