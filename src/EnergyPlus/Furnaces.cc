@@ -1056,7 +1056,7 @@ namespace Furnaces {
 
             FurnaceNum = HeatOnlyNum;
             Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           GetObjectNum,
@@ -1592,7 +1592,7 @@ namespace Furnaces {
 
             FurnaceNum = HeatCoolNum + NumHeatOnly + NumUnitaryHeatOnly;
             Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           GetObjectNum,
@@ -2779,7 +2779,7 @@ namespace Furnaces {
             HeatingCoilName = ' ';
 
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           HeatPumpNum,
@@ -3678,7 +3678,7 @@ namespace Furnaces {
             HeatingCoilName = ' ';
 
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           HeatPumpNum,
@@ -5728,12 +5728,15 @@ namespace Furnaces {
         }
         Furnace(FurnaceNum).iterationCounter += 1;
 
-        if (CoolingLoad && Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = CoolingMode;
-        } else if (HeatingLoad && Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = HeatingMode;
-        } else if (Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = NoCoolHeat;
+        // push iteration mode stack and set current mode
+        Furnace(FurnaceNum).iterationMode(3) = Furnace(FurnaceNum).iterationMode(2);
+        Furnace(FurnaceNum).iterationMode(2) = Furnace(FurnaceNum).iterationMode(1);
+        if (CoolingLoad) {
+            Furnace(FurnaceNum).iterationMode(1) = CoolingMode;
+        } else if (HeatingLoad) {
+            Furnace(FurnaceNum).iterationMode(1) = HeatingMode;
+        } else {
+            Furnace(FurnaceNum).iterationMode(1) = NoCoolHeat;
         }
 
         // IF small loads to meet or not converging, just shut down unit
@@ -5743,8 +5746,8 @@ namespace Furnaces {
             HeatingLoad = false;
         } else if (Furnace(FurnaceNum).iterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 4)) {
             // attempt to lock output (air flow) if oscillations are detected
-            OperatingMode = Furnace(FurnaceNum).iterationMode(5);
-            OperatingModeMinusOne = Furnace(FurnaceNum).iterationMode(4);
+            OperatingMode = Furnace(FurnaceNum).iterationMode(1);
+            OperatingModeMinusOne = Furnace(FurnaceNum).iterationMode(2);
             OperatingModeMinusTwo = Furnace(FurnaceNum).iterationMode(3);
             Oscillate = true;
             if (OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo) Oscillate = false;
