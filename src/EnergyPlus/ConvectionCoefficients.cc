@@ -4008,48 +4008,96 @@ namespace ConvectionCoefficients {
         if (HcIn(SurfNum) < LowHConvLimit) HcIn(SurfNum) = LowHConvLimit;
     }
 
+    Real64 CalcZoneSystemACH(int const ZoneNum)
+    {
+        // FLOW:
+        if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
+            return 0.0;
+        } else {
+            // Set local variables
+            Real64 ZoneVolume = Zone(ZoneNum).Volume;
+            Real64 ZoneVolFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
+
+            // Calculate ACH
+            return ZoneVolFlowRate / ZoneVolume * SecInHour;
+        }
+    }
+
+    Real64 CalcZoneSupplyAirTemp(int const ZoneNum)
+    {
+        using namespace DataZoneEquipment;
+
+        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        int thisZoneInletNode;
+        if (ZoneNode > 0) {
+            Real64 SumMdotTemp = 0.0;
+            Real64 SumMdot = 0.0;
+            for (int EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
+                if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
+                    thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
+                    if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
+                        SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
+                        SumMdot += Node(thisZoneInletNode).MassFlowRate;
+                    }
+                }
+            }
+            if (SumMdot > 0.0) {
+                return SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
+            } else {
+                if (thisZoneInletNode > 0) {
+                    return Node(thisZoneInletNode).Temp;
+                } else {
+                    return Node(ZoneNode).Temp;
+                }
+            }
+        } else {
+            return Node(ZoneNode).Temp;
+        }
+    }
+
+    Real64 CalcZoneSystemVolFlowRate(int const ZoneNum)
+    {
+        using DataEnvironment::OutBaroPress;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
+        using Psychrometrics::PsyWFnTdpPb;
+
+        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        if (!BeginEnvrnFlag && ZoneNode > 0) {
+            int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+            return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
+        } else {
+            return 0.0;
+        }
+    }
+
     Real64 CalcCeilingDiffuserACH(int const ZoneNum)
     {
-      // Using/Aliasing
-      using DataEnvironment::OutBaroPress;
-      using Psychrometrics::PsyRhoAirFnPbTdbW;
-      using Psychrometrics::PsyWFnTdpPb;
+        Real64 const MinFlow(0.01); // Minimum mass flow rate
+        Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
 
-      Real64 const MinFlow(0.01); // Minimum mass flow rate
-      Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
+        Real64 ACH = CalcZoneSystemACH(ZoneNum); // Air changes per hour
 
-      Real64 ACH;              // Air changes per hour
-
-      // FLOW:
-      if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
-        ACH = 0.0;
-      } else {
+          // FLOW:
         // Set local variables
         Real64 ZoneMassFlowRate;
-        Real64 ZoneVolume = Zone(ZoneNum).Volume;
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;  // Zone node as defined in system simulation
         Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        Real64 AirDensity;       // zone air density
+        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;  // Zone node as defined in system simulation
         if (!BeginEnvrnFlag && ZoneNode > 0) {
-          AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-          ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+            ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
         } else { // because these are not updated yet for new environment
-          AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, 0.0, PsyWFnTdpPb(0.0, OutBaroPress));
-          ZoneMassFlowRate = 0.0;
+            ZoneMassFlowRate = 0.0;
         }
 
         if (ZoneMassFlowRate < MinFlow) {
-          ACH = 0.0;
+            ACH = 0.0;
         } else {
-          // Calculate ACH
-          ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * SecInHour;
-          // Limit ACH to range of correlation
-          ACH = min(ACH, MaxACH);
-          ACH = max(ACH, 0.0);
+            // Calculate ACH
+            ACH = min(ACH, MaxACH);
+            ACH = max(ACH, 0.0);
         }
-      }
 
-      return ACH;
+        return ACH;
     }
 
     Real64 CalcCeilingDiffuserIntConvCoeff(Real64 Tilt, Real64 ACH)
@@ -5682,51 +5730,19 @@ namespace ConvectionCoefficients {
         //     preperation of argument values for the function calls is contained in each Case block (repeats)
         //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::QdotConvInRepPerArea;
         using DataHeatBalSurface::TH;
-        using namespace DataZoneEquipment;
-        using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using Psychrometrics::PsyWFnTdpPb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        Real64 SupplyAirTemp;
-        Real64 AirChangeRate;
-        int ZoneNum;  // zone associated with inside face of surface
-        int ZoneNode; // the system node for the zone, node index
-        int EquipNum;
-        Real64 SumMdotTemp;
-        Real64 SumMdot;
-        Real64 AirDensity;
-        Real64 AirSystemVolFlowRate;
-        int thisZoneInletNode;
-        Real64 tmpHc;
-        Real64 ZoneMult; // local product of zone multiplier and zonelist multipler
-
-        tmpHc = 0.0;
+        Real64 tmpHc = 0.0;
 
         auto& HnFn = SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in;
         // now call appropriate function to calculate Hc
         {
             auto const SELECT_CASE_var(ConvModelEquationNum);
 
+            int const ZoneNum = Surface(SurfNum).Zone;
             if (SELECT_CASE_var == HcInt_UserCurve) {
                 CalcUserDefinedInsideHcModel(SurfNum, Surface(SurfNum).IntConvHcUserCurveIndex, tmpHc);
             } else if (SELECT_CASE_var == HcInt_ASHRAEVerticalWall) {
@@ -5735,371 +5751,315 @@ namespace ConvectionCoefficients {
                         return CalcASHRAEVerticalWall(Tsurf - Tamb);
                     };
                 } else {
-                    ZoneNum = Surface(SurfNum).Zone;
                     tmpHc = CalcASHRAEVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_WaltonUnstableHorizontalOrTilt) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc =
-                    CalcWaltonUnstableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+                    };
+                } else {
+                    tmpHc =
+                            CalcWaltonUnstableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_WaltonStableHorizontalOrTilt) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc =
-                    CalcWaltonStableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+                    };
+                } else {
+                    tmpHc =
+                            CalcWaltonStableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserFloor) {
-                ZoneNum = Surface(SurfNum).Zone;
-                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
+                Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate);
-                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
-                ZoneNum = Surface(SurfNum).Zone;
-                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
+                Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
-
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
-                ZoneNum = Surface(SurfNum).Zone;
-                AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
+                Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
                 tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
-
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondStableHorizontal) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcAlamdariHammondStableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    };
+                } else {
+                    tmpHc = CalcAlamdariHammondStableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondVerticalWall) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcAlamdariHammondVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight, SurfNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight);
+                    };
+                } else {
+                    tmpHc = CalcAlamdariHammondVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight, SurfNum);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondUnstableHorizontal) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcAlamdariHammondUnstableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    };
+                } else {
+                    tmpHc = CalcAlamdariHammondUnstableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq3WallAwayFromHeat) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKhalifaEq3WallAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKhalifaEq3WallAwayFromHeat(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKhalifaEq3WallAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq4CeilingAwayFromHeat) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKhalifaEq4CeilingAwayFromHeat(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq5WallNearHeat) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKhalifaEq5WallsNearHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKhalifaEq5WallsNearHeat(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKhalifaEq5WallsNearHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq6NonHeatedWalls) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKhalifaEq6NonHeatedWalls((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKhalifaEq6NonHeatedWalls(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKhalifaEq6NonHeatedWalls((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq7Ceiling) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKhalifaEq7Ceiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKhalifaEq7Ceiling(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKhalifaEq7Ceiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedFloor) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcAwbiHattonHeatedFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcAwbiHattonHeatedFloor(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    };
+                } else {
+                    tmpHc = CalcAwbiHattonHeatedFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedWall) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcAwbiHattonHeatedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcAwbiHattonHeatedWall(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    };
+                } else {
+                    tmpHc = CalcAwbiHattonHeatedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedAssistingWall) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedAssistedWall(Tsurf - Tamb,
+                                Surface(SurfNum).IntConvZoneWallHeight,
+                                Tsurf,
+                                CalcZoneSupplyAirTemp(ZoneNum),
+                                CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                    Surface(SurfNum).IntConvZoneWallHeight,
+                                                                    TH(2, 1, SurfNum),
+                                                                    ZoneNum);
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                                Surface(SurfNum).IntConvZoneWallHeight,
-                                                                TH(2, 1, SurfNum),
-                                                                SupplyAirTemp,
-                                                                AirChangeRate,
-                                                                ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedOppossingWall) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedOpposingWall(Tsurf - Tamb,
+                                                                       Surface(SurfNum).IntConvZoneWallHeight,
+                                                                       Tsurf,
+                                                                       CalcZoneSupplyAirTemp(ZoneNum),
+                                                                       CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                    Surface(SurfNum).IntConvZoneWallHeight,
+                                                                    TH(2, 1, SurfNum),
+                                                                    ZoneNum);
                 }
-
-                tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                                Surface(SurfNum).IntConvZoneWallHeight,
-                                                                TH(2, 1, SurfNum),
-                                                                SupplyAirTemp,
-                                                                AirChangeRate,
-                                                                ZoneNum);
-
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableCeiling) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedStableCeiling(Tsurf - Tamb,
+                                                                       Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                       Tsurf,
+                                                                       CalcZoneSupplyAirTemp(ZoneNum),
+                                                                       CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                     Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                     TH(2, 1, SurfNum),
+                                                                     ZoneNum);
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                                 Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                 TH(2, 1, SurfNum),
-                                                                 SupplyAirTemp,
-                                                                 AirChangeRate,
-                                                                 ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableCeiling) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedUnstableCeiling(Tsurf - Tamb,
+                                                                        Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                        Tsurf,
+                                                                        CalcZoneSupplyAirTemp(ZoneNum),
+                                                                        CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                       Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                       TH(2, 1, SurfNum),
+                                                                       ZoneNum);
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                                   Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                   TH(2, 1, SurfNum),
-                                                                   SupplyAirTemp,
-                                                                   AirChangeRate,
-                                                                   ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableFloor) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedStableFloor(Tsurf - Tamb,
+                                                                      Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                      Tsurf,
+                                                                      CalcZoneSupplyAirTemp(ZoneNum),
+                                                                      CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedStableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                   Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                   TH(2, 1, SurfNum),
+                                                                   ZoneNum);
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedStableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                               Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                               TH(2, 1, SurfNum),
-                                                               SupplyAirTemp,
-                                                               AirChangeRate,
-                                                               ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableFloor) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0.0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
-                    SumMdotTemp = 0.0;
-                    SumMdot = 0.0;
-                    for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                        if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                            if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                                SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                                SumMdot += Node(thisZoneInletNode).MassFlowRate;
-                            }
-                        }
-                    }
-                    if (SumMdot > 0.0) {
-                        SupplyAirTemp = SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
-                    } else {
-                        if (thisZoneInletNode > 0) {
-                            SupplyAirTemp = Node(thisZoneInletNode).Temp;
-                        } else {
-                            SupplyAirTemp = Node(ZoneNode).Temp;
-                        }
-                    }
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcBeausoleilMorrisonMixedUnstableFloor(Tsurf - Tamb,
+                                                                        Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                        Tsurf,
+                                                                        CalcZoneSupplyAirTemp(ZoneNum),
+                                                                        CalcZoneSystemACH(ZoneNum));
+                    };
                 } else {
-                    AirChangeRate = 0.0;
-                    SupplyAirTemp = Node(ZoneNode).Temp;
+                    tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                     Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                     TH(2, 1, SurfNum),
+                                                                     ZoneNum);
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                                 Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                 TH(2, 1, SurfNum),
-                                                                 SupplyAirTemp,
-                                                                 AirChangeRate,
-                                                                 ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcFohannoPolidoriVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
-                                                        Surface(SurfNum).IntConvZoneWallHeight,
-                                                        TH(2, 1, SurfNum),
-                                                        -QdotConvInRepPerArea(SurfNum),
-                                                        SurfNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
+                                                               Surface(SurfNum).IntConvZoneWallHeight,
+                                                               Tsurf - KelvinConv,  // Kiva already uses Kelvin, but algorithm expects C
+                                                               -QdotConvInRepPerArea(SurfNum));
+                    };
+                } else {
+                    tmpHc = CalcFohannoPolidoriVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                            Surface(SurfNum).IntConvZoneWallHeight,
+                                                            TH(2, 1, SurfNum),
+                                                            -QdotConvInRepPerArea(SurfNum),
+                                                            SurfNum);
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KaradagChilledCeiling) {
-                ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcKaradagChilledCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
+                        return CalcKaradagChilledCeiling(Tsurf - Tamb);
+                    };
+                } else {
+                    tmpHc = CalcKaradagChilledCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_ISO15099Windows) {
-                ZoneNum = Surface(SurfNum).Zone;
                 CalcISO15099WindowIntConvCoeff(SurfNum, TH(2, 1, SurfNum), MAT(ZoneNum));
                 tmpHc = HConvIn(SurfNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWindow) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirSystemVolFlowRate = Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
-                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
-                } else {
-                    AirSystemVolFlowRate = 0.0;
-                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
-                }
-                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemVolFlowRate,
-                                                                    Surface(SurfNum).IntConvZonePerimLength,
+                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(Surface(SurfNum).IntConvZonePerimLength,
                                                                     Surface(SurfNum).IntConvWindowWallRatio,
                                                                     Surface(SurfNum).IntConvWindowLocation,
                                                                     ZoneNum);
-
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
+                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                if (ZoneNode > 0) {
+                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+                } else {
+                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                }
             } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWalls) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-                if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirSystemVolFlowRate = Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
-                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
-                } else {
-                    AirSystemVolFlowRate = 0.0;
-                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
-                }
                 tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWall(
-                    AirSystemVolFlowRate, Surface(SurfNum).IntConvZonePerimLength, Surface(SurfNum).IntConvWindowLocation, ZoneNum);
-
-            } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserFloor) {
-                ZoneNum = Surface(SurfNum).Zone;
-                ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                        Surface(SurfNum).IntConvZonePerimLength, Surface(SurfNum).IntConvWindowLocation, ZoneNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
+                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
                 if (ZoneNode > 0) {
-                    ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-                    AirSystemVolFlowRate = Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
                     Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
-                    AirSystemVolFlowRate = 0.0;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
-                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserFloor(AirSystemVolFlowRate, Surface(SurfNum).IntConvZonePerimLength, ZoneNum);
+            } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserFloor) {
+                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserFloor(Surface(SurfNum).IntConvZonePerimLength, ZoneNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                    HnFn = [=](double, double, double, double, double) -> double {
+                        return tmpHc;
+                    };
+                }
+                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                if (ZoneNode > 0) {
+                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
+                } else {
+                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                }
             }
         }
 
@@ -6193,15 +6153,19 @@ namespace ConvectionCoefficients {
                 Hn = CalcAlamdariHammondVerticalWall(
                     (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), Surface(SurfNum).OutConvFaceHeight, SurfNum);
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
-                    return CalcAlamdariHammondHnVerticalWall(Tsurf - Tamb, Surface(SurfNum).OutConvFaceHeight);
+                    return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, Surface(SurfNum).OutConvFaceHeight);
                 };
             } else if (SELECT_CASE_var == HcExt_FohannoPolidoriVerticalWall) {
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    // Not compatible with Kiva
+                    ShowFatalError("Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                }
                 Hn = CalcFohannoPolidoriVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                      Surface(SurfNum).OutConvFaceHeight,
                                                      TH(1, 1, SurfNum),
                                                      -QdotConvOutRepPerArea(SurfNum),
                                                      SurfNum);
-                // Not compatible with Kiva
             } else if (SELECT_CASE_var == HcExt_AlamdariHammondStableHorizontal) {
                 if (Surface(SurfNum).OutConvFacePerimeter > 0.0) {
                     HydraulicDiameter = 4.0 * Surface(SurfNum).OutConvFaceArea / Surface(SurfNum).OutConvFacePerimeter;
@@ -8097,7 +8061,7 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcAlamdariHammondHnUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+    Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     )
     {
@@ -8135,7 +8099,7 @@ namespace ConvectionCoefficients {
         static int ErrorIndex(0);
 
         if (HydraulicDiameter > 0.0) {
-            Hn = CalcAlamdariHammondHnUnstableHorizontal(DeltaTemp, HydraulicDiameter);
+            Hn = CalcAlamdariHammondUnstableHorizontal(DeltaTemp, HydraulicDiameter);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
@@ -8151,7 +8115,7 @@ namespace ConvectionCoefficients {
         return Hn;
     }
 
-    Real64 CalcAlamdariHammondHnStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+    Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                  Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     )
     {
@@ -8188,7 +8152,7 @@ namespace ConvectionCoefficients {
         static int ErrorIndex(0);
 
         if (HydraulicDiameter > 0.0) {
-            Hn = CalcAlamdariHammondHnStableHorizontal(DeltaTemp, HydraulicDiameter);
+            Hn = CalcAlamdariHammondStableHorizontal(DeltaTemp, HydraulicDiameter);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
@@ -8204,7 +8168,7 @@ namespace ConvectionCoefficients {
         return Hn;
     }
 
-    Real64 CalcAlamdariHammondHnVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+    Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
                                              Real64 const Height
     )
     {
@@ -8242,7 +8206,7 @@ namespace ConvectionCoefficients {
         static int ErrorIndex(0);
 
         if (Height > 0.0) {
-            Hn = CalcAlamdariHammondHnVerticalWall(DeltaTemp, Height);
+            Hn = CalcAlamdariHammondVerticalWall(DeltaTemp, Height);
         } else {
             Hn = 9.999;
             if (ErrorIndex == 0) {
@@ -8603,8 +8567,7 @@ namespace ConvectionCoefficients {
                                                    Real64 const Height,        // [m] characteristic size
                                                    Real64 const SurfTemp,      // [C] surface temperature
                                                    Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate, // [ACH] [1/hour] supply air ACH for zone
-                                                   int const ZoneNum           // index of zone for messaging
+                                                   Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8626,40 +8589,32 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // USE STATEMENTS:
-        // na
+        Real64 cofpow =
+            std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + std::pow(1.23 * pow_2(DeltaTemp), OneSixth)) +
+            pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
+                  (-0.199 + 0.190 * std::pow(AirChangeRate,
+                                             0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+        Real64 Hc = std::pow(std::abs(cofpow), OneThird);   // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+        if (cofpow < 0.0) {
+            Hc = -Hc;
+        }
+        return Hc;
 
-        // Return value
-        Real64 Hc; // function result
+    }
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 cofpow;
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const Height,        // [m] characteristic size
+                                                   Real64 const SurfTemp,      // [C] surface temperature
+                                                   int const ZoneNum           // index of zone for messaging
+    )
+    {
         static int ErrorIndex(0);
 
         if ((DeltaTemp != 0.0) && (Height != 0.0)) {
-            cofpow =
-                std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + std::pow(1.23 * pow_2(DeltaTemp), OneSixth)) +
-                pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
-                      (-0.199 + 0.190 * std::pow(AirChangeRate,
-                                                 0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
-            Hc = std::pow(std::abs(cofpow), OneThird);   // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
-            if (cofpow < 0.0) {
-                Hc = -Hc;
-            }
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedAssistedWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
-            Hc = 9.999;
             if (Height == 0.0) {
                 ShowWarningMessage("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -8677,16 +8632,15 @@ namespace ConvectionCoefficients {
                                                "difference and set to 9.999 [W/m2-K]",
                                                ErrorIndex);
             }
+            return 9.999;
         }
-        return Hc;
     }
 
     Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
                                                    Real64 const Height,        // [m] characteristic size
                                                    Real64 const SurfTemp,      // [C] surface temperature
                                                    Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate, // [ACH] [1/hour] supply air ACH for zone
-                                                   int const ZoneNum           // index of zone for messaging
+                                                   Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8708,51 +8662,47 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // function result
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 HcTmp1;
         Real64 HcTmp2;
         Real64 HcTmp3;
         Real64 cofpow;
+
+        if (Height != 0.0) {
+            cofpow = std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + std::pow(1.23 * pow_2(DeltaTemp), OneSixth)) -
+                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
+                           (-0.199 +
+                            0.190 * std::pow(AirChangeRate,
+                                             0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+            HcTmp1 =
+                    std::pow(std::abs(cofpow), OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+            if (cofpow < 0.0) {
+                HcTmp1 = -HcTmp1;
+            }
+
+            HcTmp2 = 0.8 * std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + (1.23 * pow_2(DeltaTemp)),
+                                    OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+        } else {
+            HcTmp1 = 9.999;
+            HcTmp2 = 9.999;
+        }
+        HcTmp3 = 0.8 * ((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.199 + 0.190 * std::pow(AirChangeRate, 0.8));
+
+        return max(max(HcTmp1, HcTmp2), HcTmp3);
+
+    }
+
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const Height,        // [m] characteristic size
+                                                   Real64 const SurfTemp,      // [C] surface temperature
+                                                   int const ZoneNum           // index of zone for messaging
+    )
+    {
         static int ErrorIndex(0);
         static int ErrorIndex2(0);
 
         if ((DeltaTemp != 0.0)) { // protect divide by zero
 
-            if (Height != 0.0) {
-                cofpow = std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + std::pow(1.23 * pow_2(DeltaTemp), OneSixth)) -
-                         pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
-                               (-0.199 +
-                                0.190 * std::pow(AirChangeRate,
-                                                 0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
-                HcTmp1 =
-                    std::pow(std::abs(cofpow), OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
-                if (cofpow < 0.0) {
-                    HcTmp1 = -HcTmp1;
-                }
-
-                HcTmp2 = 0.8 * std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, OneFourth)) + (1.23 * pow_2(DeltaTemp)),
-                                        OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
-            } else {
-                HcTmp1 = 9.999;
-                HcTmp2 = 9.999;
+            if (Height == 0.0) {
                 if (ErrorIndex2 == 0) {
                     ShowSevereMessage("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -8762,12 +8712,11 @@ namespace ConvectionCoefficients {
                     "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]",
                     ErrorIndex2);
             }
-            HcTmp3 = 0.8 * ((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.199 + 0.190 * std::pow(AirChangeRate, 0.8));
-
-            Hc = max(max(HcTmp1, HcTmp2), HcTmp3);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedOpposingWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
 
         } else {
-            Hc = 9.999;
             if (!WarmupFlag) {
                 if (ErrorIndex == 0) {
                     ShowSevereMessage("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
@@ -8779,17 +8728,15 @@ namespace ConvectionCoefficients {
                                               "difference and set to 9.999 [W/m2-K]",
                                               ErrorIndex);
             }
+            return 9.999;
         }
-
-        return Hc;
     }
 
     Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                   Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                   Real64 const SurfTemp,          // [C] surface temperature
                                                   Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                  Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
-                                                  int const ZoneNum               // index of zone for messaging
+                                                  Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8811,37 +8758,31 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // USE STATEMENTS:
-        // na
 
-        // Return value
-        Real64 Hc; // function result
+        Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFifth)) +
+                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
+        Real64 Hc = std::pow(std::abs(cofpow), OneThird);
+        if (cofpow < 0.0) {
+            Hc = -Hc;
+        }
+        return Hc;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
+    }
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const SurfTemp,          // [C] surface temperature
+                                                  int const ZoneNum               // index of zone for messaging
+    )
+    {
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 cofpow;
         static int ErrorIndex(0);
 
-        if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
-            cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFifth)) +
-                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
-            Hc = std::pow(std::abs(cofpow), OneThird);
-            if (cofpow < 0.0) {
-                Hc = -Hc;
-            }
+        if ((HydraulicDiameter == 0.0) || (DeltaTemp == 0.0)) {
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedStableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
-            Hc = 9.999;
             if (HydraulicDiameter == 0.0) {
                 ShowWarningMessage("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -8859,16 +8800,15 @@ namespace ConvectionCoefficients {
                                                "difference and set to 9.999 [W/m2-K]",
                                                ErrorIndex);
             }
+            return 9.999;
         }
-        return Hc;
     }
 
     Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                     Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const SurfTemp,          // [C] surface temperature
                                                     Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
-                                                    int const ZoneNum               // index of zone for messaging
+                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8890,38 +8830,30 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // USE STATEMENTS:
-        // na
+        Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) +
+                           pow_6(1.63 * std::pow(std::abs(DeltaTemp), OneThird))) +
+                 pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
+        Real64 Hc = std::pow(std::abs(cofpow), OneThird);
+        if (cofpow < 0.0) {
+            Hc = -Hc;
+        }
 
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
+        return Hc;
+    }
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 cofpow;
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const SurfTemp,          // [C] surface temperature
+                                                    int const ZoneNum               // index of zone for messaging
+    )
+    {
         static int ErrorIndex(0);
 
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
-            cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) +
-                               pow_6(1.63 * std::pow(std::abs(DeltaTemp), OneThird))) +
-                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
-            Hc = std::pow(std::abs(cofpow), OneThird);
-            if (cofpow < 0.0) {
-                Hc = -Hc;
-            }
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedUnstableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
-            Hc = 9.999;
             if (HydraulicDiameter == 0.0) {
                 ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -8939,17 +8871,15 @@ namespace ConvectionCoefficients {
                                                "difference and set to 9.999 [W/m2-K]",
                                                ErrorIndex);
             }
+            return 9.999;
         }
-
-        return Hc;
     }
 
     Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                     Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const SurfTemp,          // [C] surface temperature
                                                     Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
-                                                    int const ZoneNum               // index of zone for messaging
+                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8971,37 +8901,29 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // USE STATEMENTS:
-        // na
+        Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFifth)) +
+                 pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
+        Real64 Hc = std::pow(std::abs(cofpow), OneThird);
+        if (cofpow < 0.0) {
+            Hc = -Hc;
+        }
+        return Hc;
+    }
 
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const SurfTemp,          // [C] surface temperature
+                                                    int const ZoneNum               // index of zone for messaging
+    )
+    {
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 cofpow;
         static int ErrorIndex(0);
 
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
-            cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFifth)) +
-                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
-            Hc = std::pow(std::abs(cofpow), OneThird);
-            if (cofpow < 0.0) {
-                Hc = -Hc;
-            }
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedStableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
-            Hc = 9.999;
             if (HydraulicDiameter == 0.0) {
                 ShowWarningMessage("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -9019,16 +8941,15 @@ namespace ConvectionCoefficients {
                                                "difference and set to 9.999 [W/m2-K]",
                                                ErrorIndex);
             }
+            return 9.999;
         }
-        return Hc;
     }
 
     Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                       Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                       Real64 const SurfTemp,          // [C] surface temperature
                                                       Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                      Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
-                                                      int const ZoneNum               // index of zone for messaging
+                                                      Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -9050,38 +8971,31 @@ namespace ConvectionCoefficients {
         //  air flow modeling within dynamic whole-building simulations.
         //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-        // Using/Aliasing
+        Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) +
+                               pow_6(1.63 * std::pow(std::abs(DeltaTemp), OneThird))) +
+                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
+        Real64 Hc = std::pow(std::abs(cofpow), OneThird);
+        if (cofpow < 0.0) {
+            Hc = -Hc;
+        }
+        return Hc;
+    }
+
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 const SurfTemp,          // [C] surface temperature
+                                                      int const ZoneNum               // index of zone for messaging
+    )
+    {
         using DataGlobals::WarmupFlag;
 
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 cofpow;
         static int ErrorIndex(0);
 
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
-            cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, OneFourth)) +
-                               pow_6(1.63 * std::pow(std::abs(DeltaTemp), OneThird))) +
-                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
-            Hc = std::pow(std::abs(cofpow), OneThird);
-            if (cofpow < 0.0) {
-                Hc = -Hc;
-            }
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
+            return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
-            Hc = 9.999;
             if (HydraulicDiameter == 0.0) {
                 ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
@@ -9099,15 +9013,14 @@ namespace ConvectionCoefficients {
                                                "temperature difference and set to 9.999 [W/m2-K]",
                                                ErrorIndex);
             }
+            return 9.999;
         }
-        return Hc;
     }
 
     Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 const Height,    // [m] characteristic size, height of zone
                                            Real64 const SurfTemp,  // [C] surface temperature
-                                           Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
-                                           int const SurfNum       // for messages
+                                           Real64 const QdotConv   // [W/m2] heat flux rate for rayleigh #
     )
     {
 
@@ -9127,43 +9040,39 @@ namespace ConvectionCoefficients {
         // Fohanno, S., and G. Polidori. 2006. Modelling of natural convective heat transfer
         // at an internal surface. Energy and Buildings 38 (2006) 548 - 553
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hn; // function result, natural convection coefficient
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const g(9.81);     // gravity constant (m/s**2)
         Real64 const v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
         Real64 const k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
         Real64 const Pr(0.71);    // Prandtl number for air at ?
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static Real64 RaH(0.0);
         static Real64 BetaFilm(0.0);
-        static int ErrorIndex(0);
 
         BetaFilm = 1.0 / (KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
-        if (Height > 0.0) {
-            RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
+        RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
-            if (RaH <= 6.3e09) {
-                Hn = 1.332 * std::pow(std::abs(DeltaTemp) / Height, OneFourth);
-            } else {
-                Hn = 1.235 * std::exp(0.0467 * Height) * std::pow(std::abs(DeltaTemp), 0.316);
-            }
+        if (RaH <= 6.3e09) {
+            return 1.332 * std::pow(std::abs(DeltaTemp) / Height, OneFourth);
+        } else {
+            return 1.235 * std::exp(0.0467 * Height) * std::pow(std::abs(DeltaTemp), 0.316);
+        }
+    }
+
+    Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                           Real64 const Height,    // [m] characteristic size, height of zone
+                                           Real64 const SurfTemp,  // [C] surface temperature
+                                           Real64 const QdotConv,  // [W/m2] heat flux rate for rayleigh #
+                                           int const SurfNum       // for messages
+    )
+    {
+        static int ErrorIndex(0);
+
+        if (Height > 0.0) {
+            return CalcFohannoPolidoriVerticalWall(DeltaTemp, Height, SurfTemp, QdotConv);
         } else {
             // bad value for Height, but we have little info to identify calling culprit
-            Hn = 9.999;
             if (ErrorIndex == 0) {
                 ShowSevereMessage("CalcFohannoPolidoriVerticalWall: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective surface height is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
@@ -9171,9 +9080,8 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd(
                 "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", ErrorIndex);
+            return 9.999;
         }
-
-        return Hn;
     }
 
     Real64 CalcKaradagChilledCeiling(Real64 const DeltaTemp) // [C] temperature difference between surface and air
@@ -9224,8 +9132,7 @@ namespace ConvectionCoefficients {
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                        Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                        Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
-                                                       int const WindowLocationType,    // index for location types
-                                                       int const ZoneNum                // for messages
+                                                       int const WindowLocationType     // index for location types
     )
     {
 
@@ -9246,41 +9153,48 @@ namespace ConvectionCoefficients {
         // Goldstien, K. and A. Novoselac. 2010. Convective Heat Transfer in Rooms
         //  With Ceiling Slot Diffusers (RP-1416). HVAC&R Research Journal TBD
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int ErrorIndex(0);
-        static int ErrorIndex2(0);
-
         if (ZoneExtPerimLength > 0.0) {
             if (WindWallRatio <= 0.5) {
 
                 if (WindowLocationType == InConvWinLoc_UpperPartOfExteriorWall) {
-                    Hc = 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+                    return 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
                 } else if (WindowLocationType == InConvWinLoc_LowerPartOfExteriorWall) {
-                    Hc = 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+                    return 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
                 } else if (WindowLocationType == InConvWinLoc_LargePartOfExteriorWall) {
-                    Hc = 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
+                    return 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
                 } else if (WindowLocationType == InConvWinLoc_NotSet) {
-                    Hc = 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
+                    return 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
                 } else {
                     // shouldn'tcome
-                    Hc = 9.999;
+                    return 9.999;
+                }
+            } else {
+                return 0.103 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+            }
+        } else {
+            return 9.999;
+        }
+    }
+
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                       Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
+                                                       int const WindowLocationType,    // index for location types
+                                                       int const ZoneNum                // for messages
+    )
+    {
+
+        static int ErrorIndex(0);
+        static int ErrorIndex2(0);
+
+        Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
+
+        if (ZoneExtPerimLength > 0.0) {
+            if (WindWallRatio <= 0.5) {
+
+                if (WindowLocationType != InConvWinLoc_UpperPartOfExteriorWall &&
+                    WindowLocationType != InConvWinLoc_LowerPartOfExteriorWall &&
+                    WindowLocationType != InConvWinLoc_LargePartOfExteriorWall &&
+                    WindowLocationType != InConvWinLoc_NotSet) {
                     if (ErrorIndex == 0) {
                         ShowSevereMessage(
                             "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
@@ -9292,11 +9206,8 @@ namespace ConvectionCoefficients {
                                                   "location and set to 9.999 [W/m2-K]",
                                                   ErrorIndex);
                 }
-            } else {
-                Hc = 0.103 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
             }
         } else {
-            Hc = 9.999;
             if (ErrorIndex2 == 0) {
                 ShowSevereMessage(
                     "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (zero zone exterior perimeter length)");
@@ -9308,13 +9219,12 @@ namespace ConvectionCoefficients {
                 "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 ErrorIndex2);
         }
-        return Hc;
+        return CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemFlowRate, ZoneExtPerimLength, WindWallRatio, WindowLocationType);
     }
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                      Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                     int const WindowLocationType,    // index for location types
-                                                     int const ZoneNum                // for messages
+                                                     int const WindowLocationType     // index for location types
     )
     {
 
@@ -9335,36 +9245,36 @@ namespace ConvectionCoefficients {
         // Goldstien, K. and A. Novoselac. 2010. Convective Heat Transfer in Rooms
         //  With Ceiling Slot Diffusers (RP-1416). HVAC&R Research Journal TBD
 
-        // USE STATEMENTS:
-        // na
+        if (ZoneExtPerimLength > 0.0) {
+            if (WindowLocationType == InConvWinLoc_WindowAboveThis) {
+                return 0.063 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+            } else if (WindowLocationType == InConvWinLoc_WindowBelowThis) {
+                return 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+            } else if (WindowLocationType == InConvWinLoc_NotSet) {
+                return 0.063 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
+            } else {
+                return 9.999;
+            }
+        } else {
+            return 9.999;
+        }
+    }
 
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                     int const WindowLocationType,    // index for location types
+                                                     int const ZoneNum                // for messages
+    )
+    {
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
         static int ErrorIndex2(0);
 
+        Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
+
         if (ZoneExtPerimLength > 0.0) {
-            if (WindowLocationType == InConvWinLoc_WindowAboveThis) {
-                Hc = 0.063 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
-            } else if (WindowLocationType == InConvWinLoc_WindowBelowThis) {
-                Hc = 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
-            } else if (WindowLocationType == InConvWinLoc_NotSet) {
-                Hc = 0.063 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8); // assumption for case not covered by model
-            } else {
-                Hc = 9.999;
+            if (WindowLocationType != InConvWinLoc_WindowAboveThis &&
+                WindowLocationType != InConvWinLoc_WindowBelowThis &&
+                WindowLocationType != InConvWinLoc_NotSet) {
                 if (ErrorIndex == 0) {
                     ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
                     ShowContinueError("Value for window location = " + RoundSigDigits(WindowLocationType));
@@ -9376,7 +9286,6 @@ namespace ConvectionCoefficients {
                     ErrorIndex);
             }
         } else {
-            Hc = 9.999;
             if (ErrorIndex2 == 0) {
                 ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError("Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
@@ -9387,12 +9296,11 @@ namespace ConvectionCoefficients {
                 "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 ErrorIndex2);
         }
-        return Hc;
+        return CalcGoldsteinNovoselacCeilingDiffuserWall(AirSystemFlowRate, ZoneExtPerimLength, WindowLocationType);
     }
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
-                                                      Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                      int const ZoneNum                // for messages
+                                                      Real64 const ZoneExtPerimLength  // [m] length of zone perimeter with exterior walls
     )
     {
 
@@ -9413,29 +9321,23 @@ namespace ConvectionCoefficients {
         // Goldstien, K. and A. Novoselac. 2010. Convective Heat Transfer in Rooms
         //  With Ceiling Slot Diffusers (RP-1416). HVAC&R Research Journal TBD
 
-        // USE STATEMENTS:
-        // na
+        if (ZoneExtPerimLength > 0.0) {
+            return 0.048 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
+        } else {
+            return 9.999; // safe but noticeable
+        }
+    }
 
-        // Return value
-        Real64 Hc; // function result, total convection coefficient
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                      int const ZoneNum                // for messages
+    )
+    {
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
 
-        if (ZoneExtPerimLength > 0.0) {
-            Hc = 0.048 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
-        } else {
+        Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
+
+        if (ZoneExtPerimLength <= 0.0) {
             if (ErrorIndex == 0) {
                 ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError("Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
@@ -9445,10 +9347,8 @@ namespace ConvectionCoefficients {
             ShowRecurringSevereErrorAtEnd(
                 "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 ErrorIndex);
-
-            Hc = 9.999; // safe but noticeable
         }
-        return Hc;
+        return CalcGoldsteinNovoselacCeilingDiffuserFloor(AirSystemFlowRate, ZoneExtPerimLength);
     }
 
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
