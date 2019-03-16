@@ -60,7 +60,7 @@ This numeric field is used to describe how low a variable speed fan can be opera
 
 \paragraph{Field: Design Pressure Rise}\label{field-pressure-fansysmodel}
 
-This numeric field is the total system pressure rise experienced by the fan in Pascals at full flow rate and altitude-adjusted standard density of dry air at 20 &deg;C drybulb. This field is required.
+This numeric field is the total system pressure rise experienced by the fan in Pascals at full flow rate and altitude-adjusted standard density of dry air at 20 degrees Celsius drybulb. This field is required.
 
 \paragraph{Field: Motor Efficiency}\label{field-motor-eff-fansysmodel}
 
@@ -126,10 +126,10 @@ This numeric field is used to specify the number of different speed levels avail
 
 This input object is extensible with a set of two fields for each speed that the fan can take.  A field set is pair of values for the flow fraction and electric power fraction at each speed. The sets should be arranged in increasing order so that the flow fractions become larger in subsequent field sets.  Typically the highest speed level will match the design maximum and have fractions of 1.0.
 
-\paragraph{Field: Speed <#> Flow Fraction}\label{field-speed-flow-fraction-fansysmodel}
+\paragraph{Field: Speed <\#> Flow Fraction}\label{field-speed-flow-fraction-fansysmodel}
 This is the flow fraction for the fan speed.  This value is multiplied by the Design Maximum Air Flow Rate to obtain the flow rate when operating at this speed.
 
-\paragraph{Field: Speed <#> Electric Power Fraction}\label{field-speed-power-fraction-fansysmodel}
+\paragraph{Field: Speed <\#> Electric Power Fraction}\label{field-speed-power-fraction-fansysmodel}
 
 This field is the electric power fraction for the fan speed.  This value is multiplied by the Design Electric Power Consumption to obtain the power consumption when operating at this speed.  This field is optional if a performance curve is used in the input field Electric Power Function of Flow Fraction Curve Name.  If omitted and the performance curve is entered, the power at this speed will be determined using the curve or table.  If the power fraction is entered in this field it will be used instead of the curve or table.  This allows either overriding the curve for particular speeds or removes the necessity of creating a curve for discrete speed control.
 
