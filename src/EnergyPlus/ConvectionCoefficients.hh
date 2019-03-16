@@ -782,6 +782,8 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMcAdams(Real64 const WindAtZ);
 
+    Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale);
+
     Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum);
 
     Real64 CalcBlockenWindward(Real64 const WindAt10m,

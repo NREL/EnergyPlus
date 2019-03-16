@@ -444,7 +444,13 @@ namespace ConvectionCoefficients {
                     if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
                 }
 
-                if (Surface(SurfNum).EMSOverrideIntConvCoef) HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
+                if (Surface(SurfNum).EMSOverrideIntConvCoef) {
+                    HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
+                    if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                    {
+                        SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(Surface(SurfNum).EMSValueForIntConvCoef);
+                    }
+                }
             }
         }
     }
@@ -4607,18 +4613,26 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == ConvCoefValue) {
                 HInt = UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideValue;
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
+                }
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserValue; // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
                 HInt = GetCurrentScheduleValue(UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
                 // Need to check for validity
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
+                }
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserSchedule; // reporting
             } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-
                 CalcUserDefinedInsideHcModel(SurfNum, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).UserCurveIndex, HInt);
+                // Kiva convection handled in function above
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserCurve; // reporting
             } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-
                 EvaluateIntHcModels(SurfNum, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq, HInt);
+                // Kiva convection handled in function above
                 Surface(SurfNum).IntConvHcModelEq = UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq;
             } else {
                 assert(false);
@@ -6158,7 +6172,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == HcExt_FohannoPolidoriVerticalWall) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
-                    // Not compatible with Kiva
+                    // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
                     ShowFatalError("Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
                 Hn = CalcFohannoPolidoriVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
@@ -6334,11 +6348,28 @@ namespace ConvectionCoefficients {
                 };
             } else if (SELECT_CASE_var == HcExt_NusseltJurges) {
                 Hf = CalcNusseltJurges(SurfWindSpeed);
+                HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                    return CalcNusseltJurges(windSpeed);
+                };
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_McAdams) {
                 Hf = CalcMcAdams(SurfWindSpeed);
+                HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                    return CalcMcAdams(windSpeed);
+                };
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_Mitchell) {
                 Hf = CalcMitchell(SurfWindSpeed, CubeRootOfOverallBuildingVolume, SurfNum);
-
+                HfTermFn = [=](double, double, double, double windSpeed) -> double{
+                    return CalcMitchell(windSpeed, CubeRootOfOverallBuildingVolume);
+                };
+                HfFn = [](double, double, double HfTerm, double, double) -> double{
+                    return HfTerm;
+                };
             } else if (SELECT_CASE_var == HcExt_ClearRoof) {
                 SurfWindDir = Surface(SurfNum).WindDir;
                 Hf = CalcClearRoof(SurfNum,
@@ -6371,12 +6402,24 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
                 // Not compatible with Kiva (doesn't use local windspeed)
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    ShowFatalError("Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                }
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
                 Hf = CalcEmmelVertical(WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use local windspeed)
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    ShowFatalError("Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                }
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
                 Hf = CalcEmmelRoof(WindSpeed, WindDir, RoofLongAxisOutwardAzimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use local windspeed)
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
+                {
+                    ShowFatalError("Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                }
             }
         }
 
@@ -9672,7 +9715,7 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum)
+    Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale)
     {
 
         // FUNCTION INFORMATION:
@@ -9694,29 +9737,16 @@ namespace ConvectionCoefficients {
         // 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
         //     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
-        // USE STATEMENTS:
-        // na
+        return 8.6 * std::pow(WindAtZ, 0.6) / std::pow(LengthScale, 0.4);
+    }
 
-        // Return value
-        Real64 Hf;
+    Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum)
+    {
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static int ErrorIndex(0);
 
         if (LengthScale > 0.0) {
-            Hf = 8.6 * std::pow(WindAtZ, 0.6) / std::pow(LengthScale, 0.4);
+            return CalcMitchell(WindAtZ, LengthScale);
         } else {
             if (ErrorIndex == 0) {
                 ShowSevereMessage("CalcMitchell: Convection model not evaluated (bad length scale)");
@@ -9726,9 +9756,8 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd("CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
                                           ErrorIndex);
-            Hf = 9.999; // safe but noticeable
+            return 9.999; // safe but noticeable
         }
-        return Hf;
     }
 
     Real64 CalcBlockenWindward(Real64 const WindAt10m,
