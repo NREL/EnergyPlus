@@ -95,9 +95,9 @@ namespace HeatBalanceKivaManager {
     }
 
     KivaInstanceMap::KivaInstanceMap(
-        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum)
+        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum, KivaManager* kmPtr)
         : instance(foundation), floorSurface(floorSurface), wallSurfaces(wallSurfaces), zoneNum(zoneNum), zoneControlType(KIVAZONE_UNCONTROLLED),
-          zoneControlNum(0), floorWeight(floorWeight), constructionNum(constructionNum)
+          zoneControlNum(0), floorWeight(floorWeight), constructionNum(constructionNum), kmPtr(kmPtr)
     {
 
         for (int i = 1; i <= DataZoneControls::NumTempControlledZones; ++i) {
@@ -323,6 +323,20 @@ namespace HeatBalanceKivaManager {
         }
         bcs->slabRadiantTemp = bcs->indoorTemp;
         bcs->wallRadiantTemp = bcs->indoorTemp;
+
+        bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
+        bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
+        bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
+
+        if (wallSurfaces.size() > 0) {
+            bcs->extWallForcedTerm = kmPtr->surfaceConvMap[wallSurfaces[0]].f;
+            bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
+            bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
+        } else {
+            bcs->extWallForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
+            bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
+        }
+
     }
 
     void KivaInstanceMap::setBoundaryConditions()
@@ -370,6 +384,19 @@ namespace HeatBalanceKivaManager {
         if (Atotal > 0.0) {
             bcs->wallAbsRadiation = QAtotal / Atotal;
             bcs->wallRadiantTemp = TAtotal / Atotal + DataGlobals::KelvinConv;
+        }
+
+        bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
+        bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
+        bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
+
+        if (wallSurfaces.size() > 0) {
+            bcs->extWallForcedTerm = kmPtr->surfaceConvMap[wallSurfaces[0]].f;
+            bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
+            bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
+        } else {
+            bcs->extWallForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
+            bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         }
     }
 
@@ -956,7 +983,7 @@ namespace HeatBalanceKivaManager {
                     fnd.polygon = floorPolygon;
 
                     // point surface to associated ground intance(s)
-                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, floorWeight, constructionNum);
+                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, floorWeight, constructionNum, this);
 
                     // Floors can point to any number of foundaiton surfaces
                     floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);

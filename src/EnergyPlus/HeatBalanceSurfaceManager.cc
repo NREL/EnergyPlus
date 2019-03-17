@@ -775,11 +775,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
-        // Initialize Kiva instances
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-        }
-
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -5740,7 +5735,17 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    // Do nothing
+                    // Set Kiva exterior convection algorithms
+                    InitExteriorConvectionCoeff(SurfNum,
+                                                HMovInsul,
+                                                RoughSurf,
+                                                AbsThermSurf,
+                                                TH(1, 1, SurfNum),
+                                                HcExtSurf(SurfNum),
+                                                HSkyExtSurf(SurfNum),
+                                                HGrdExtSurf(SurfNum),
+                                                HAirExtSurf(SurfNum));
+
                 } else { // for interior or other zone surfaces
 
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
@@ -5978,6 +5983,12 @@ namespace HeatBalanceSurfaceManager {
             TempEffBulkAir = 23.0;
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
+
+            // Initialize Kiva instances ground temperatures
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                SurfaceGeometry::kivaManager.initKivaInstances();
+            }
+
         }
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag = true;
