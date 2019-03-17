@@ -83,10 +83,10 @@ TEST_F(BESTESTFixture, GC30b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
 
-  bcs.slabConvectionAlgorithm = CONST_CONV(100.);
-  bcs.intWallConvectionAlgorithm = CONST_CONV(100.);
-  bcs.extWallConvectionAlgorithm = CONST_CONV(100.);
-  bcs.gradeConvectionAlgorithm = CONST_CONV(100.);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(100.);
 
   double trnsysQ = 2533;
   double fluentQ = 2504;
@@ -104,8 +104,8 @@ TEST_F(BESTESTFixture, GC30c) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 8.0;
 
-  bcs.slabConvectionAlgorithm = CONST_CONV(7.95);
-  bcs.intWallConvectionAlgorithm = CONST_CONV(7.95);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
 
   double trnsysQ = 2137;
   double fluentQ = 2123;
@@ -123,10 +123,10 @@ TEST_F(BESTESTFixture, GC60b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
 
-  bcs.slabConvectionAlgorithm = CONST_CONV(7.95);
-  bcs.intWallConvectionAlgorithm = CONST_CONV(7.95);
-  bcs.extWallConvectionAlgorithm = CONST_CONV(100.);
-  bcs.gradeConvectionAlgorithm = CONST_CONV(100.);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(100.);
 
   double trnsysQ = 2113;
   double fluentQ = 2104;
@@ -144,10 +144,10 @@ TEST_F(BESTESTFixture, GC65b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
 
-  bcs.slabConvectionAlgorithm = CONST_CONV(7.95);
-  bcs.intWallConvectionAlgorithm = CONST_CONV(7.95);
-  bcs.extWallConvectionAlgorithm = CONST_CONV(11.95);
-  bcs.gradeConvectionAlgorithm = CONST_CONV(11.95);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(11.95);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(11.95);
 
   double trnsysQ = 1994;
   double fluentQ = 1991;

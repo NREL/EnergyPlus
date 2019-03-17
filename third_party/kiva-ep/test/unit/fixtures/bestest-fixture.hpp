@@ -54,10 +54,10 @@ protected:
     bcs.wallRadiantTemp = 303.15;
     bcs.deepGroundTemperature = 283.15;
 
-    bcs.slabConvectionAlgorithm = CONST_CONV(99999.);
-    bcs.intWallConvectionAlgorithm = CONST_CONV(99999.);
-    bcs.extWallConvectionAlgorithm = CONST_CONV(99999.);
-    bcs.gradeConvectionAlgorithm = CONST_CONV(99999.);
+    bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(99999.);
+    bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(99999.);
+    bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(99999.);
+    bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(99999.);
 
     outputMap = {Surface::ST_SLAB_CORE};
   };
