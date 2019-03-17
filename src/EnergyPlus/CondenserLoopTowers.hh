@@ -262,7 +262,9 @@ namespace CondenserLoopTowers {
         int UAModFuncWaterFlowRatioCurvePtr; // curve index for UA modifier as a function of water flow ratio
         bool SetpointIsOnOutlet;             // if true look to outlet node of tower, if flase look to overall loop setpoint
         int VSMerkelAFRErrorIter;            // error counter for regula falsi failed with max iterations, vs merkel model
+        int VSMerkelAFRErrorIterIndex;       // recurring error index for regula falsi failed with max iterations, vs merkel model
         int VSMerkelAFRErrorFail;            // error counter for regula falsi failed with limits exceeded, vs merkel model
+        int VSMerkelAFRErrorFailIndex;       // recurring error index for regula falsi failed with limits exceeded, vs merkel model
         Real64 DesInletWaterTemp;            // design tower inlet water temperature (C)
         Real64 DesOutletWaterTemp;           // design tower outlet water temperature (C)
         Real64 DesInletAirDBTemp;            // design tower inlet air dry-bulb temperature (C)
@@ -304,10 +306,11 @@ namespace CondenserLoopTowers {
               EvapLossMode(EvapLossByMoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(BlowdownByConcentration),
               ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),
               LoopSideNum(0), BranchNum(0), CompNum(0), UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0),
-              UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorFail(0), DesInletWaterTemp(0),
-              DesOutletWaterTemp(0), DesInletAirDBTemp(0), DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false),
-              FaultyCondenserSWTFlag(false), FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false),
-              FaultyTowerFoulingIndex(0), FaultyTowerFoulingFactor(1.0)
+              UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0),
+              VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
+              DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
+              FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
+              FaultyTowerFoulingFactor(1.0)
         {
         }
     };
