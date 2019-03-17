@@ -618,7 +618,7 @@ namespace ConvectionCoefficients {
                         const double area = 9999999.;
                         const double perim = 1.;
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
-                            CalcSparrowWindward(Roughness, perim, area, windSpeed);
+                            return CalcSparrowWindward(Roughness, perim, area, windSpeed);
                         };
                     }
                     SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
