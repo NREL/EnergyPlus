@@ -324,7 +324,6 @@ namespace HeatBalanceKivaManager {
         bcs->slabRadiantTemp = bcs->indoorTemp;
         bcs->wallRadiantTemp = bcs->indoorTemp;
 
-        /*
         bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
@@ -340,7 +339,6 @@ namespace HeatBalanceKivaManager {
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
             // No interior walls
         }
-         */
 
     }
 
@@ -391,7 +389,6 @@ namespace HeatBalanceKivaManager {
             bcs->wallRadiantTemp = TAtotal / Atotal + DataGlobals::KelvinConv;
         }
 
-        /*
         bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
@@ -407,7 +404,6 @@ namespace HeatBalanceKivaManager {
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
             // No interior walls
         }
-         */
     }
 
     KivaManager::Settings::Settings()
