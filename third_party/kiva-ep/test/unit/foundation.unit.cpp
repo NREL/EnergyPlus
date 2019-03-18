@@ -267,6 +267,22 @@ TEST_F(AggregatorFixture, validation) {
   floor_results.calc_weighted_results(); // Expect success
 }
 
+TEST_F(TypicalFixture, convectionCallback) {
+  double hc1 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(2.0);
+  double hc2 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+  EXPECT_NE(hc1, hc2);
+  EXPECT_EQ(2.0, hc2);
+  bcs.slabConvectionAlgorithm = [=](double Tsurf, double Tamb, double HfTerm, double roughness, double cosTilt) -> double {
+      double deltaT = Tsurf - Tamb;
+      return hc2 + deltaT*deltaT + hc1 - getDOE2ConvectionCoeff(Tsurf, Tamb, HfTerm, roughness, cosTilt);
+  };
+  double hc3 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+
+  EXPECT_NEAR(hc3, 27.0, 0.00001);
+
+}
+
 // Google Test main
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
