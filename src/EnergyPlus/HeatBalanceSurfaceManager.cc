@@ -775,11 +775,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
-        // Initialize Kiva instances (TODO: Move after convection algorithms are selected).
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-        }
-
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -6001,12 +5996,9 @@ namespace HeatBalanceSurfaceManager {
             MyEnvrnFlag = false;
 
             // Initialize Kiva instances ground temperatures
-            /*
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
                 SurfaceGeometry::kivaManager.initKivaInstances();
             }
-            */
-
         }
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag = true;
