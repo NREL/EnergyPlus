@@ -54,7 +54,8 @@ void Aggregator::calc_weighted_results() {
   double Tz, Tr;
   for (auto &instance : instances) {
     Ground *grnd = instance.first;
-    Tz = grnd->bcs.indoorTemp;
+    Tz = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallConvectiveTemp
+                                              : grnd->bcs.slabConvectiveTemp;
     Tr = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallRadiantTemp
                                               : grnd->bcs.slabRadiantTemp;
     double p = instance.second;

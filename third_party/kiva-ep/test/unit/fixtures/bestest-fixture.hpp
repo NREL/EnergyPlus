@@ -49,9 +49,7 @@ protected:
 
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;
-    bcs.indoorTemp = 303.15;
-    bcs.slabRadiantTemp = 303.15;
-    bcs.wallRadiantTemp = 303.15;
+    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp = 303.15;
     bcs.deepGroundTemperature = 283.15;
 
     bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(99999.);

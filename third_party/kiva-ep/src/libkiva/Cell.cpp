@@ -376,7 +376,7 @@ void Cell::doOutdoorTemp(const BoundaryConditions &bcs, double &A, double &bVal)
 
 void Cell::doIndoorTemp(const BoundaryConditions &bcs, double &A, double &bVal) {
   A = 1.0;
-  bVal = bcs.indoorTemp;
+  bVal = bcs.slabConvectiveTemp;
 }
 
 ExteriorAirCell::ExteriorAirCell(const std::size_t &index, const CellType cellType,
@@ -431,17 +431,17 @@ InteriorAirCell::InteriorAirCell(const std::size_t &index, const CellType cellTy
 
 void InteriorAirCell::calcCellADEUp(double /*timestep*/, const Foundation & /*foundation*/,
                                     const BoundaryConditions &bcs, double &U) {
-  U = bcs.indoorTemp;
+  U = bcs.slabConvectiveTemp;
 }
 
 void InteriorAirCell::calcCellADEDown(double /*timestep*/, const Foundation & /*foundation*/,
                                       const BoundaryConditions &bcs, double &V) {
-  V = bcs.indoorTemp;
+  V = bcs.slabConvectiveTemp;
 }
 
 double InteriorAirCell::calcCellExplicit(double /*timestep*/, const Foundation & /*foundation*/,
                                          const BoundaryConditions &bcs) {
-  return bcs.indoorTemp;
+  return bcs.slabConvectiveTemp;
 }
 
 void InteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double & /*timestep*/,
@@ -529,7 +529,7 @@ void BoundaryCell::calcCellADEUp(double /*timestep*/, const Foundation & /*found
     U = surfacePtr->temperature;
     break;
   case Surface::INTERIOR_TEMPERATURE:
-    U = bcs.indoorTemp;
+    U = bcs.slabConvectiveTemp;
     break;
   case Surface::EXTERIOR_TEMPERATURE:
     U = bcs.outdoorTemp;
@@ -556,7 +556,7 @@ void BoundaryCell::calcCellADEDown(double /*timestep*/, const Foundation & /*fou
     V = surfacePtr->temperature;
     break;
   case Surface::INTERIOR_TEMPERATURE:
-    V = bcs.indoorTemp;
+    V = bcs.slabConvectiveTemp;
     break;
   case Surface::EXTERIOR_TEMPERATURE:
     V = bcs.outdoorTemp;
@@ -581,7 +581,7 @@ double BoundaryCell::calcCellExplicit(double /*timestep*/, const Foundation & /*
   case Surface::CONSTANT_TEMPERATURE:
     return surfacePtr->temperature;
   case Surface::INTERIOR_TEMPERATURE:
-    return bcs.indoorTemp;
+    return bcs.slabConvectiveTemp;
   case Surface::EXTERIOR_TEMPERATURE:
     return bcs.outdoorTemp;
   case Surface::INTERIOR_FLUX:
@@ -744,7 +744,7 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
 }
 
 #define INTFLUX_PREFACE                                                                            \
-  double Tair = bcs.indoorTemp;                                                                    \
+  double Tair = surfacePtr->temperature;                                                           \
   double Trad = surfacePtr->radiantTemperature;                                                    \
   double cosTilt = surfacePtr->cosTilt;                                                            \
   double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfTerm,                 \
@@ -752,7 +752,7 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
   double hr = getSimpleInteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr, Trad);
 
 #define EXTFLUX_PREFACE                                                                            \
-  double Tair = bcs.outdoorTemp;                                                                   \
+  double Tair = surfacePtr->temperature;                                                           \
   double cosTilt = surfacePtr->cosTilt;                                                            \
   double Fqtr = surfacePtr->effectiveLWViewFactorQtr;                                              \
   double hc = surfacePtr->convectionAlgorithm(*told_ptr, Tair, surfacePtr->hfTerm,                 \

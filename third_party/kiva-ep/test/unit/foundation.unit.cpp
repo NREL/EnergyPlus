@@ -169,7 +169,7 @@ TEST_F(BESTESTFixture, 1D) {
 
   double area = 144; // m2
   double expectedQ = fnd.soil.conductivity / fnd.deepGroundDepth * area *
-                     (bcs.indoorTemp - bcs.deepGroundTemperature);
+                     (bcs.slabConvectiveTemp - bcs.deepGroundTemperature);
   EXPECT_NEAR(calcQ(), expectedQ, 1.0);
 }
 
