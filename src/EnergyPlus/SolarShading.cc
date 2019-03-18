@@ -743,11 +743,14 @@ namespace SolarShading {
         }
         int ExtShadingSchedNum;
         if (UseImportedSunlitFrac) {
-            for (auto surf : Surface) {
-                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(surf.Name + "_shading");
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
-                    surf.SchedExternalShadingFrac = true;
-                    surf.ExternalShadingSchInd = ExtShadingSchedNum;
+                    Surface(SurfNum).SchedExternalShadingFrac = true;
+                    Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
+                } else {
+                    ShowWarningError(cCurrentModuleObject + ": sunlit fraction schedule not found for " + Surface(SurfNum).Name + " when using ImportedShading.");
+                    ShowContinueError("These values are set to 1.0.");
                 }
             }
         }
@@ -4472,13 +4475,11 @@ namespace SolarShading {
         // BLAST/IBLAST code, original author George Walton
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DataSystemVariables::ReportExtShadingSunlitFrac;
+
         using ScheduleManager::LookUpScheduleValue;
         using WindowComplexManager::InitComplexWindows;
         using WindowComplexManager::UpdateComplexWindows;
@@ -4496,13 +4497,7 @@ namespace SolarShading {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iHour;   // Hour index number
-        int TS;      // TimeStep Loop Counter
-        int SurfNum; // Do loop counter
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static gio::Fmt ShdFracFmt2("(f6.2,',')");
-        static gio::Fmt fmtN("('\n')");
+        int TS;      // TimeStep Loop Countergit
         static bool Once(true);
 
         if (Once) InitComplexWindows();
@@ -4564,32 +4559,6 @@ namespace SolarShading {
             }     // Hour Loop
         } else {
             FigureSolarBeamAtTimestep(HourOfDay, TimeStep);
-        }
-        if (ReportExtShadingSunlitFrac) {
-            if (KindOfSim == ksRunPeriodWeather) {
-                for (iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
-                    for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * (TS - 1);
-                        }
-                        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
-                            }
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, fmtN, flags);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -4676,6 +4645,7 @@ namespace SolarShading {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
+        using DataSystemVariables::UseImportedSunlitFrac;
         using ScheduleManager::LookUpScheduleValue;
 
         // Locals
@@ -4713,7 +4683,7 @@ namespace SolarShading {
             CosIncAng(iTimeStep, iHour, SurfNum) = CTHETA(SurfNum);
         }
 
-        if (UseScheduledSunlitFrac) {
+        if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
