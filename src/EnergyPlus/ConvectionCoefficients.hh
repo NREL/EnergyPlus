@@ -534,6 +534,14 @@ namespace ConvectionCoefficients {
 
     Real64 SetIntConvectionCoeff(int const SurfNum); // Surface Number
 
+    Real64 CalcISO15099WindowIntConvCoeff(Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+                                          Real64 const AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
+                                          Real64 const AirHumRat,          // air humidity ratio
+                                          Real64 const Height,             // window cavity height [m]
+                                          Real64 TiltDeg,                  // glazing tilt in degrees
+                                          Real64 const sineTilt            // sine of glazing tilt
+    );
+
     void CalcISO15099WindowIntConvCoeff(int const SurfNum,               // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                         Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
