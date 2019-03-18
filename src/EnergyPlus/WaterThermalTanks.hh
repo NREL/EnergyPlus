@@ -768,7 +768,7 @@ namespace WaterThermalTanks {
     void CalcWaterThermalTankStratified(int const WaterThermalTankNum // Water Heater being simulated
     );
 
-	void CalcNodeMassFlows(int const WaterThermalTankNum, // Water Heater being simulated
+    void CalcNodeMassFlows(int const WaterThermalTankNum, // Water Heater being simulated
                            int const InletMode            // InletModeFixed or InletModeSeeking
     );
 
