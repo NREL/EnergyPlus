@@ -1408,8 +1408,10 @@ namespace EvaporativeFluidCoolers {
                                         "\". Low speed air flow rate must be less than the high speed air flow rate.");
                         ErrorsFound = true;
                     }
-                    if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
-                        SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA) {
+                    if ((SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
+                         SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA)) {
                         ShowSevereError(
                             "EvaporativeFluidCooler:TwoSpeed \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                             "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
