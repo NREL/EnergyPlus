@@ -46,9 +46,9 @@ double cbrt_a(double x) {
 
 double getMoWiTTForcedTerm(double cosTilt, double azimuth, double windDir, double windSpeed) {
   if (isWindward(cosTilt, azimuth, windDir)) {
-    return Memo::pow089(3.26 * windSpeed);
+    return 3.26 * Memo::pow089(windSpeed);
   } else {
-    return Memo::pow0617(3.55 * windSpeed);
+    return 3.55 * Memo::pow0617(windSpeed);
   }
 }
 
