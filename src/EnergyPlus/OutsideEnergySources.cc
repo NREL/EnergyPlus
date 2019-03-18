@@ -195,8 +195,8 @@ namespace OutsideEnergySources {
         // are initialized. Output variables are set up.
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
-        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound("DistrictHeating");
+        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound("DistrictCooling");
         NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
         if (allocated(EnergySource)) return;
@@ -205,23 +205,34 @@ namespace OutsideEnergySources {
         EnergySourceUniqueNames.reserve(static_cast<unsigned>(NumDistrictUnits));
 
         bool ErrorsFound(false); // If errors detected in input
+        int heatIndex = 0;
+        int coolIndex = 0;
 
         for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
 
-            DataIPShortCuts::cCurrentModuleObject = "DistrictHeating";
-            std::string reportVarPrefix = "District Heating ";
-            std::string nodeNames = "Hot Water Nodes";
-            int typeOf = DataPlant::TypeOf_PurchHotWater;
-            if (EnergySourceNum > NumDistrictUnitsHeat) {
+            std::string reportVarPrefix;
+            std::string nodeNames;
+            int typeOf;
+            int thisIndex;
+            if (EnergySourceNum <= NumDistrictUnitsHeat) {
+                DataIPShortCuts::cCurrentModuleObject = "DistrictHeating";
+                reportVarPrefix = "District Heating ";
+                nodeNames = "Hot Water Nodes";
+                typeOf = DataPlant::TypeOf_PurchHotWater;
+                heatIndex++;
+                thisIndex = heatIndex;
+            } else {
                 DataIPShortCuts::cCurrentModuleObject = "DistrictCooling";
                 reportVarPrefix = "District Cooling ";
                 nodeNames = "Chilled Water Nodes";
                 typeOf = DataPlant::TypeOf_PurchChilledWater;
+                coolIndex++;
+                thisIndex = coolIndex;
             }
 
             int NumAlphas = 0, NumNums = 0, IOStat = 0;
             inputProcessor->getObjectItem(
-                    DataIPShortCuts::cCurrentModuleObject, EnergySourceNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, _, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames);
+                    DataIPShortCuts::cCurrentModuleObject, thisIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, _, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
