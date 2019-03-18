@@ -160,7 +160,7 @@ PCPUDesign = PDesign * (1 - PFanFracDesign)
 PFanDesign = PDesign * PFanFracDesign
 \end{equation}
 
-For each time step,  the air inlet and outlet temperature is calculated depending on the type of air flow calculation method. Considering data centers are different from normal well-mixed zones due to the uneven air distribution, two methods are implemented to calculate the IT inlet temperature and zone return air temperature, \textbf{FlowFromSystem} and \textbf{FlowControlWithApproachTemperatures}. Specifically, the IT inlet temperature differs from AHU supply air temperature, and the IT outlet temperature differs from actual AHU return air temperature.
+For each time step,  the air inlet and outlet temperature is calculated depending on the type of air flow calculation method. Considering data centers are different from normal well-mixed zones due to the uneven air distribution, two methods are implemented to calculate the IT inlet temperature and zone return air temperature, \textbf{FlowFromSystem} and \textbf{FlowControlWithApproachTemperatures}. Specifically, the IT inlet temperature differs from AHU supply air temperature, and the actual AHU return air temperature differs from the regular return air temperature when the zone is well mixed.
 
 When using \textbf{FlowFromSystem}, the zone is assumed to be well-mixed. The air inlet temperature is calculated depending on the type of air node connection.
 
