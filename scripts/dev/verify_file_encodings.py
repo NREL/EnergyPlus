@@ -12,6 +12,7 @@ __author__ = "Julien Marrec, EffiBEM"
 __email__ = "julien@effibem.com"
 
 import os
+import sys
 import json
 import io  # For Python 2 compat
 import glob as gb
@@ -61,8 +62,17 @@ def fix_encoding(idf_path):
 
 if __name__ == '__main__':
     # Glob all .idf / .imf
-    test_files = gb.glob(os.path.join(ROOT_DIR, '**/*.i[d|m]f'),
-                         recursive=True)
+    # Glob recursive Works in python3.4 and above only...
+    if sys.version_info > (3, 4):
+        test_files = gb.glob(os.path.join(ROOT_DIR, '**/*.i[d|m]f'),
+                             recursive=True)
+    else:
+        import fnmatch
+        test_files = []
+        for root, dirnames, filenames in os.walk(ROOT_DIR):
+            for filename in fnmatch.filter(filenames, '*.i[d|m]f'):
+                test_files.append(os.path.join(root, filename))
+
     for test_file in test_files:
         success = check_file_encoding(test_file)
         if DO_FIX and not success:
