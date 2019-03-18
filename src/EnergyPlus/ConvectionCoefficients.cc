@@ -3901,8 +3901,8 @@ namespace ConvectionCoefficients {
 
             return CalcASHRAEVerticalWall(DeltaTemp);
 
-        } else if (((DeltaTemp < 0.0) && (cosTilt > 0.0)) ||
-                   ((DeltaTemp > 0.0) && (cosTilt < 0.0))) { // Enhanced Convection
+        } else if (((DeltaTemp < 0.0) && (cosTilt < 0.0)) ||
+                   ((DeltaTemp > 0.0) && (cosTilt > 0.0))) { // Enhanced Convection
 
             return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
 
