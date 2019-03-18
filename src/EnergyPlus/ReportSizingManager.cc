@@ -436,7 +436,7 @@ namespace ReportSizingManager {
         RetFanDT = 0.0;
         SupFanNum = 0;
         RetFanNum = 0;
-        FanCoolLoad = 0;
+        FanCoolLoad = 0.0;
         SizingDesValueFromParent = false;
         TotCapTempModFac = 1.0;
         CoilOutTemp = -999.0;
@@ -3155,6 +3155,8 @@ namespace ReportSizingManager {
                                     CoilInHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolHumRat +
                                                    (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
                                 }
+                                if (DataDesInletAirTemp > 0.0) CoilInTemp = DataDesInletAirTemp;
+                                if (DataDesInletAirHumRat > 0.0) CoilInHumRat = DataDesInletAirHumRat;
                             }
                             OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                             if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
@@ -3217,10 +3219,11 @@ namespace ReportSizingManager {
                             } // end switch
 
                             PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;
-                            PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
+                            PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                             CpAir = PsyCpAirFnWTdb(CoilInHumRat, CoilInTemp);
                             // adjust coil inlet/outlet temp with fan temperature rise
                             if (DataDesAccountForFanHeat) {
+                                PeakCoilLoad += FanCoolLoad;
                                 if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                     CoilInTemp += FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
                                     // include change in inlet condition in TotCapTempModFac

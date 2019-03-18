@@ -2252,6 +2252,8 @@ namespace WaterCoils {
                 if (CurSysNum == 0) bPRINT = false;
                 SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should
                                                        // always print this!)
+                // air inlet/outlet conditions should be known. Don't include fan heat in capacity calculation.
+                DataDesAccountForFanHeat = false;
                 RequestSizing(CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesWaterCoolingCoilRate = TempSize;
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
