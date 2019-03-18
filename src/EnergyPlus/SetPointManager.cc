@@ -394,6 +394,7 @@ namespace SetPointManager {
         NumSZOneStageHeatingSetPtMgrs = 0;   // number of singel zone one stage heating setpoint managers
         NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
         NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
+        NumSchTESSetPtMgrs = 0;              // number of TES Scheduled setpoint Managers
 
         DCESPMDsn_EntCondTemp = 0.0;
         DCESPMDsn_MinCondSetpt = 0.0;
@@ -446,6 +447,7 @@ namespace SetPointManager {
         SZOneStageHeatingSetPtMgr.deallocate();   // single zone 1 stage heat
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
+        SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
     }
 
     void ManageSetPoints()
@@ -8869,7 +8871,8 @@ namespace SetPointManager {
         // Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes.allocate(1);
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes(1) = SchTESSetPtMgr(NumSchTESSetPtMgrs).CtrlNodeNum;
-        AllSetPtMgr(NumAllSetPtMgrs).Name = SchSetPtMgr(NumSchTESSetPtMgrs).Name;
+        // Give it a Name just in case it's used for error reporting
+        AllSetPtMgr(NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(NumSchTESSetPtMgrs);
         AllSetPtMgr(NumAllSetPtMgrs).SPMType = iSPMType_TESScheduled;
         AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType_Temp;
         AllSetPtMgr(NumAllSetPtMgrs).NumCtrlNodes = 1;

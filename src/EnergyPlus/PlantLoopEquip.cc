@@ -230,7 +230,6 @@ namespace PlantLoopEquip {
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
         using PlantComponentTemperatureSources::SimWaterSource;
-        using PlantPipingSystemsManager::SimPipingSystemCircuit;
         using RefrigeratedCase::SimRefrigCondenser;
         using SolarCollectors::SimSolarCollector;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
@@ -292,7 +291,7 @@ namespace PlantLoopEquip {
             }
         }
 
-        // select equipment and call equiment simulation
+        // select equipment and call equipment simulation
         // PIPES
         // Pipe has no special types at the moment, so find it this way
         if (GeneralEquipType == GenEquipTypes_Pipe) {
@@ -312,7 +311,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_PipingSystemPipeCircuit) {
-                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Pipe Type=" + sim_component.TypeOf);
@@ -1048,7 +1047,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
-                SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, FirstHVACIteration, InitLoopEquip);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;

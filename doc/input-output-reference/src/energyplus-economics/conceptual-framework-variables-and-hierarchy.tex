@@ -5,13 +5,13 @@ To understand how to use the utility bill calculation portion of EnergyPlus you 
 % table 35
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Example Electric Energy Use (for Economics Calculation) \label{table:example-electric-energy-use-for-economics}} \tabularnewline
-\toprule 
+\toprule
 Month & Electric Energy Use \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Example Electric Energy Use (for Economics Calculation)} \tabularnewline
-\toprule 
+\toprule
 Month & Electric Energy Use \tabularnewline
 \midrule
 \endhead
@@ -43,7 +43,7 @@ The categories are combined in following hierarchy:
 \caption{Hierarchy for Economics Charges \protect \label{fig:hierarchy-for-economics-charges}}
 \end{figure}
 
-Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total. The total represents the total monthly charges on that tariff for the energy source used. The combining of categories together is performed automatically unless the user specifies the UtilityCost:Computation. In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5\% of the subtotal would be shown as:
+Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total. The total represents the total monthly charges on that tariff for the energy source used. The combining of categories together is performed automatically unless the user specifies the \hyperref[utilitycostcomputation]{UtilityCost:Computation}. In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5\% of the subtotal would be shown as:
 
 \begin{lstlisting}
 
@@ -56,6 +56,6 @@ UtilityCost:Charge:Simple,
     0.05;                    ! Cost Per Unit Value or Variable Name
 \end{lstlisting}
 
-As you can see, the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects do most of the ``work'' of computing the annual energy cost. The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs. If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the ``NotIncluded'' category if the result of the charge is used as an intermediate calculation and should not be included in the Total.
+As you can see, the \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} and \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} objects do most of the ``work'' of computing the annual energy cost. The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs. If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the ``NotIncluded'' category if the result of the charge is used as an intermediate calculation and should not be included in the Total.
 
-The rest of this section is divided into a reference of the objects and the fields, a set of examples, discussion of the reporting, and a description of Complex Tariff Modeling. For most tariffs, simply using a variety of UtilityCost:Charge:Simple's and UtilityCost:Charge:Block's will result in a good model but for some more complex tariffs, especially ones with complex block sizes, variables may be computed using a very simple programming language that may appear in the UtilityCost:Computation object. This will be described more in the Complex Tariff Modeling section.
+The rest of this section is divided into a reference of the objects and the fields, a set of examples, discussion of the reporting, and a description of Complex Tariff Modeling. For most tariffs, simply using a variety of \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple}'s and \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block}'s will result in a good model but for some more complex tariffs, especially ones with complex block sizes, variables may be computed using a very simple programming language that may appear in the \hyperref[utilitycostcomputation]{UtilityCost:Computation} object. This will be described more in the Complex Tariff Modeling section.
