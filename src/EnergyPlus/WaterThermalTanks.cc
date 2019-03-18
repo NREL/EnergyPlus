@@ -8309,7 +8309,7 @@ namespace WaterThermalTanks {
             }
             // More bookkeeping for reporting variables
             Eloss += Qloss * dt;
-            const Real64 Quse = Tank.UseEffectiveness * Tank.UseMassFlowRate * Cp * (Tank.UseInletTemp - Tavg[Tank.UseOutletStratNode - 1]);
+            const Real64 Quse = (Tank.UseOutletStratNode > 0) ? Tank.UseEffectiveness * Tank.UseMassFlowRate * Cp * (Tank.UseInletTemp - Tavg[Tank.UseOutletStratNode - 1]) : 0.0;
             Euse += Quse * dt;
             const Real64 Qsource = [&]{
                 if (Tank.HeatPumpNum > 0) {
@@ -8320,7 +8320,11 @@ namespace WaterThermalTanks {
                         return 0.0;
                     }
                 } else {
-                    return Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[Tank.SourceOutletStratNode - 1]);
+                    if (Tank.SourceOutletStratNode > 0) {
+                        return Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[Tank.SourceOutletStratNode - 1]);
+                    } else {
+                        return 0.0;
+                    }
                 }
             }();
             Esource += Qsource * dt;
