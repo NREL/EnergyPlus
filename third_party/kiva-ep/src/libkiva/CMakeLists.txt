@@ -124,7 +124,9 @@ configure_file (
     "${PROJECT_BINARY_DIR}/Version.hpp"
 )
 
-set(kiva_src Algorithms.cpp
+set(kiva_src Aggregator.cpp
+             Aggregator.hpp
+             Algorithms.cpp
              Algorithms.hpp
              BoundaryConditions.hpp
              Cell.cpp
@@ -142,6 +144,8 @@ set(kiva_src Algorithms.cpp
              Ground.cpp
              Ground.hpp
              GroundOutput.hpp
+             Instance.cpp
+             Instance.hpp
              Mesher.cpp
              Mesher.hpp
              Version.hpp )

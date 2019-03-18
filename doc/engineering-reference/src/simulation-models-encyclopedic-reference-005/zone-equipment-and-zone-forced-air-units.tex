@@ -1045,7 +1045,7 @@ where:
 
 \(T_{in}\) is the dry-bulb temperature of the air entering the dehumidifier (\(^{\circ}\)C)
 
-\(RH_{in}\)} is the relative of the air entering the dehumidifier (\%, 0-100).
+\(RH_{in}\) is the relative of the air entering the dehumidifier (\%, 0-100).
 
 \begin{itemize}
 \item The energy factor modifier curve is a biquadratic curve with two independent variables: dry-bulb temperature and relative humidity of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor at the specific entering air conditions at which the dehumidifier is operating (i.e., at temperature/relative humidity different from the rating point conditions). If the output of this curve is negative, then a warning message is issued and it is reset to 0.0.
@@ -1346,7 +1346,7 @@ where:
 
 \(h_{ExhaustInlet}\) is the enthalpy of the air being exhausted from the zone through the ventilator (J/kg)
 
-\(HR_{min}\)} is the enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet.
+\(HR_{min}\) is the enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet.
 
 The resulting sensible energy transfer rate is passed to the zone equipment manager and added to the zone load to be met by other heating or cooling equipment. Since the stand alone ERV is intended to reduce the outdoor air load through heat exchange and not meet that load completely, the stand alone heat exchanger must be modeled first in the list of zone equipment. This is accomplished by setting the stand alone ERV priority for cooling and heating higher than that of other zone cooling or heating equipment (reference: ZoneHVAC:EquipmentList).
 
@@ -1380,7 +1380,7 @@ where:
 
 \(h_{ExhaustInlet}\) is the enthalpy of the air being exhausted from the zone through the ventilator (J/kg)
 
-\(HR_{min}\)} is the enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet.
+\(HR_{min}\) is the enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet.
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
@@ -1488,7 +1488,7 @@ Independent variables (xk) for the model include:
  \item x2 = outside humidity ratio (g H2O/g dry air) = \({\omega_{OSA}}\)
  \item x3 = return air temperature (dry bulb) ($^{\circ}$C) = \(T_{RA}\)
  \item x4 = return air humidity ratio  (g H2O/g dry air) = \({\omega_{RA}}\)
- \item x5 = normalized supply air mass flow rate (–) = \({\dot m_{SA}/{\dot m_{SA,max}}\)
+ \item x5 = normalized supply air mass flow rate (–) = \(\dot m_{SA}/{\dot m_{SA,max}}\)
  \item x6 = outside air fraction (–) = OSAF
 \end{itemize}
 
