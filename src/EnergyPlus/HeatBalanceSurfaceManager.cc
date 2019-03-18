@@ -5748,6 +5748,9 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
+                    RoughSurf = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
                     // Set Kiva exterior convection algorithms
                     InitExteriorConvectionCoeff(SurfNum,
                                                 HMovInsul,
