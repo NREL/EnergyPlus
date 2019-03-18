@@ -51,6 +51,9 @@
 // C++ Headers
 #include <memory>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
