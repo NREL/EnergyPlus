@@ -2854,7 +2854,7 @@ namespace ReportSizingManager {
                             AutosizeDes = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                         } else if (DataDesInletAirTemp > 0.0) {
                             AutosizeDes = DataDesInletAirTemp;
-                        } else { // thereis precooling of the OA stream
+                        } else { // there is precooling of the OA stream
                             if (DataFlowUsedForSizing > 0.0) {
                                 OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
                             } else {
@@ -2881,6 +2881,7 @@ namespace ReportSizingManager {
                             if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                                 CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
                                 fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                                DataDesAccountForFanHeat = false; // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                             }
                         }
                         AutosizeDes += fanDeltaT;
@@ -2937,6 +2938,7 @@ namespace ReportSizingManager {
                             if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                                 CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
                                 fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                                DataDesAccountForFanHeat = false; // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                             }
                         }
                         AutosizeDes -= fanDeltaT;
