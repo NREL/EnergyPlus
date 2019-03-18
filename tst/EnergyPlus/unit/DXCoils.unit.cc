@@ -252,6 +252,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     DXCoilPartLoadRatio.allocate(1);
     DXCoilFanOpMode.allocate(1);
 
+    DataLoopNode::Node.allocate(1);
+    DXCoil(CoilIndex).AirOutNode = 1;
+
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
