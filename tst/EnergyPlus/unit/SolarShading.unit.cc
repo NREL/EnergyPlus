@@ -1044,6 +1044,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
     DataGlobals::HourOfDay = 9;
+    DataGlobals::DoingSizing = false;
+    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
 
     compare_err_stream(""); // just for debugging
 

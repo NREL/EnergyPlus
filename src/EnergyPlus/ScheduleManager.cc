@@ -363,14 +363,12 @@ namespace ScheduleManager {
         bool firstLine;
         bool FileIntervalInterpolated;
         int rowLimitCount;
-        int rowLimitMinCount;
         int skiprowCount;
         int curcolCount;
         int numHourlyValues;
         int numerrors;
         int ifld;
         int hrLimitCount;
-        bool ScheduleFileShadingLeapYear;
 
         if (ScheduleInputProcessed) {
             return;
@@ -590,16 +588,18 @@ namespace ScheduleManager {
 
             rowCnt = 0;
             firstLine = true;
-            rowLimitCount = 8774;
-            rowLimitMinCount = 8760;
+            if (DataEnvironment::CurrentYearIsLeapYear) {
+                rowLimitCount = 366 * 24 * NumOfTimeStepInHour;
+            } else {
+                rowLimitCount = 365 * 24 * NumOfTimeStepInHour;
+            }
             ColumnSep = CharComma;
             while (read_stat == 0) { // end of file
-                {
-                    IOFlags flags;
-                    gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
+                IOFlags flags;
+                gio::read(SchdFile, fmtA, flags) >> LineIn;
+                read_stat = flags.ios();
                 ++rowCnt;
+                if (rowCnt - 2 > rowLimitCount) break;
                 colCnt = 0;
                 wordStart = 0;
                 columnValue = 0.0;
@@ -631,56 +631,62 @@ namespace ScheduleManager {
                         }
                         break;
                     }
-                    if (rowCnt == 1) {
-                        if (subString == BlankString) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
-                            errFlag = true;
-                        } else if (CSVAllColumnNames.count(subString)) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
-                                             "\".");
-                            ShowContinueError("The first occurence of the same surface name would be used.");
-                            errFlag = true;
+                    // skip time stamp column
+                    if (colCnt > 1) {
+                        if (rowCnt == 1) {
+                            if (subString == BlankString) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+                                errFlag = true;
+                            } else if (CSVAllColumnNames.count(subString)) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
+                                                 "\".");
+                                ShowContinueError("The first occurrence of the same surface name would be used.");
+                                errFlag = true;
+                            }
+                            if (!errFlag) {
+                                NumCSVAllColumnsSchedules++;
+                                Array1D<Real64> timestepColumnValues;
+                                timestepColumnValues.allocate(rowLimitCount);
+                                // {column header: column number - 1}
+                                CSVAllColumnNames[subString] = colCnt - 1;
+                                // {column number - 1: array of numHoursInyear * timestepsInHour values}
+                                CSVAllColumnNameAndValues[colCnt - 1] = timestepColumnValues;
+                            }
+                        } else {
+                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            if (errFlag) {
+                                ++numerrors;
+                                columnValue = 0.0;
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": found error processing column: " + std::to_string(colCnt) +
+                                                 ", row:" + std::to_string(rowCnt) + " in " + ShadingSunlitFracFileName + ".");
+                                ShowContinueError("This value is set to 0.");
+                            }
+                            CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
                         }
-                        if (!errFlag) {
-                            NumCSVAllColumnsSchedules++;
-                            Array1D<Real64> hourlyColumnValues;
-                            hourlyColumnValues.allocate(8784);
-                            CSVAllColumnNames[subString] = colCnt;
-                            CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
-                        }
-                    } else {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            ++numerrors;
-                            columnValue = 0.0;
-                        }
-                        CSVAllColumnNameAndValues[colCnt](rowCnt - 1) = columnValue;
                     }
                 }
-
-                if (rowCnt == rowLimitCount) break;
             }
             gio::close(SchdFile);
 
-            ScheduleFileShadingProcessed = true;
-            ScheduleFileShadingLeapYear = false;
+            if (rowCnt - 2 != rowLimitCount) {
+                if (rowCnt - 2 < rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + std::to_string((rowCnt - 2)) + " data values read.");
+                }
+                else if (rowCnt - 2 > rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" too many data values read.");
+                }
+                ShowContinueError("Number of rows in the shading file must be a full year multiplied by the simulation TimeStep: " +
+                    std::to_string(rowLimitCount) + ".");
+                ShowFatalError("Program terminates due to previous condition.");
+            }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
+            ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +
                                  " records had errors - these values are set to 0.");
-                ShowContinueError("Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
             }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than 8760 hourly values read from file.");
-                ShowContinueError("..Number read=" + std::to_string(rowCnt) + '.');
-            }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
-                ShowContinueError(" Actual number of hourly values included=" + std::to_string(rowCnt) + ".");
-            }
-            if (rowCnt == rowLimitCount) ScheduleFileShadingLeapYear = true;
         }
 
         // add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
@@ -1879,6 +1885,7 @@ namespace ScheduleManager {
                     if (colCnt == curcolCount) {
                         columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                         if (errFlag) {
+                            std::string test = subString;
                             ++numerrors;
                             columnValue = 0.0;
                         }
@@ -1990,23 +1997,23 @@ namespace ScheduleManager {
         }
 
         std::string curName;
-        Array1D<Real64> hourlyColumnValues;
+        Array1D<Real64> timestepColumnValues;
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
-            hourlyColumnValues = CSVAllColumnNameAndValues[NameValue.second];
+            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = curName;
             Schedule(SchNum).SchType = ScheduleInput_file;
 
             iDay = 0;
-            hDay = 0;
             ifld = 0;
             while (true) {
                 // create string of which day of year
                 ++iDay;
-                ++hDay;
-                if (iDay > 366) break;
+                if (iDay > 366) {
+                    break;
+                }
                 ExtraField = RoundSigDigits(iDay);
                 // increment both since a week schedule is being defined for each day so that a day is valid
                 // no matter what the day type that is used in a design day.
@@ -2023,16 +2030,15 @@ namespace ScheduleManager {
                 DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
                 // schedule is pointing to the week schedule
                 Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
-                // MinutesPerItem == 60
 
                 for (jHour = 1; jHour <= 24; ++jHour) {
-                    ++ifld;
-                    curHrVal = hourlyColumnValues(ifld); // hourlyFileValues((hDay - 1) * 24 + jHour)
                     for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                        ++ifld;
+                        curHrVal = timestepColumnValues(ifld);
                         DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                     }
                 }
-                if (iDay == 59 && ScheduleFileShadingLeapYear) { // 28 Feb
+                if (iDay == 59 && !DataEnvironment::CurrentYearIsLeapYear) { // 28 Feb
                     // Dup 28 Feb to 29 Feb (60)
                     ++iDay;
                     Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);
