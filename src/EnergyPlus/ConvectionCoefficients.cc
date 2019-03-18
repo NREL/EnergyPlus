@@ -6407,21 +6407,21 @@ namespace ConvectionCoefficients {
                 }
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
-                // Not compatible with Kiva (doesn't use local windspeed)
+                // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
                     ShowFatalError("Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
                 Hf = CalcEmmelVertical(WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
-                // Not compatible with Kiva (doesn't use local windspeed)
+                // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
                     ShowFatalError("Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
                 Hf = CalcEmmelRoof(WindSpeed, WindDir, RoofLongAxisOutwardAzimuth, SurfNum);
-                // Not compatible with Kiva (doesn't use local windspeed)
+                // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
                 {
                     ShowFatalError("Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);

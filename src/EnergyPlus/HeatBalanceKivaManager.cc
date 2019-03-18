@@ -334,8 +334,11 @@ namespace HeatBalanceKivaManager {
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
             bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
         } else {
+            // If no wall surfaces, assume that any exposed foundation wall in Kiva uses
+            // same algorithm as exterior grade
             bcs->extWallForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
+            // No interior walls
         }
          */
 
@@ -398,8 +401,11 @@ namespace HeatBalanceKivaManager {
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
             bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
         } else {
+            // If no wall surfaces, assume that any exposed foundation wall in Kiva uses
+            // same algorithm as exterior grade
             bcs->extWallForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
+            // No interior walls
         }
          */
     }
