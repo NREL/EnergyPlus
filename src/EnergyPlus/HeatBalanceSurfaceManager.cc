@@ -2200,6 +2200,14 @@ namespace HeatBalanceSurfaceManager {
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TairLast = 20.0;
             }
 
+            // Initialize Kiva convection algorithms
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+            }
+
+
             // Initialize the flux histories
             QH(1, {2, Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
                 Construct(Surface(SurfNum).Construction).UValue * (TH(1, 1, SurfNum) - TH(2, 1, SurfNum));
