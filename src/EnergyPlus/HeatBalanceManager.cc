@@ -5172,6 +5172,7 @@ namespace HeatBalanceManager {
         using namespace SolarShading;
         using DataLoopNode::Node;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
+        using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5195,6 +5196,8 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
+        static gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
+        static gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5262,7 +5265,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac) {
+        if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile();
         }
 
@@ -5282,6 +5285,33 @@ namespace HeatBalanceManager {
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
             PerformSolarCalculations();
+        }
+
+        if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
+            for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        if (TS == NumOfTimeStepInHour) {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                        } else {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                        }
+                    }
+                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        gio::write(OutputFileShadingFrac, ShdFracFmt2, flags)
+                                << SunlitFrac(TS, iHour, SurfNum);
+                    }
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("YES");
+                        gio::write(OutputFileShadingFrac, "()", flags);
+                    }
+                }
+            }
         }
 
         // Initialize zone outdoor environmental variables
@@ -5952,7 +5982,6 @@ namespace HeatBalanceManager {
         int write_stat;
         int SurfNum;
         static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt fmtN("('\n')");
 
         OutputFileShadingFrac = GetNewUnitNumber();
         {
@@ -5965,7 +5994,6 @@ namespace HeatBalanceManager {
         if (write_stat != 0) {
             ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
         }
-        gio::write(OutputFileShadingFrac, fmtA) << "This file contains external shading fractions for all shading surfaces of all zones.";
         {
             IOFlags flags;
             flags.ADVANCE("No");
@@ -5980,8 +6008,8 @@ namespace HeatBalanceManager {
         }
         {
             IOFlags flags;
-            flags.ADVANCE("No");
-            gio::write(OutputFileShadingFrac, fmtN, flags);
+            flags.ADVANCE("YES");
+            gio::write(OutputFileShadingFrac, "()", flags);
         }
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input

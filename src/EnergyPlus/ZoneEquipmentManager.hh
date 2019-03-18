@@ -70,7 +70,6 @@ namespace ZoneEquipmentManager {
 
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D<Real64> AvgData; // scratch array for storing averaged data
-    extern Array1D_int DefaultSimOrder;
     extern int NumOfTimeStepInDay; // number of zone time steps in a day
     extern bool GetZoneEquipmentInputFlag;
     extern bool SizeZoneEquipmentOneTimeFlag;
@@ -119,7 +118,7 @@ namespace ZoneEquipmentManager {
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration);
+    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder = false);
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
 
