@@ -801,6 +801,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
     Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    DataLoopNode::Node.allocate(1);
+    Coil.AirOutNode = 1;
 
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 11012.634487601337;
