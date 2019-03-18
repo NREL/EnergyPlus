@@ -191,10 +191,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
     Basement Wall 1,         !- Name
@@ -316,10 +313,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
     Main Floor Wall 1,       !- Name
