@@ -623,7 +623,20 @@ def lookup_errors_in_source_file(source_file, found_functions):
         n_braces = lines[line_num].count('{') - lines[line_num].count('}')
         # Shouldn't happen
         if n_braces == 0:
-            print("Might want to check this...")
+            msg = ("In file {f}, line num = {n}: \n"
+                   "n_braces is zero which is unexpected.".format(f=rel_file,
+                                                                  n=line_num))
+            if IS_CI:
+                ci_msg = {'tool': 'find_byref_bool_overide',
+                          'filename': rel_file,
+                          'messagetype': 'warning',
+                          'message': msg,
+                          'line_num': line_num,
+                          }
+                print(json.dumps(ci_msg))
+            else:
+                warnings.warn(msg)
+
             while n_braces == 0:
                 n_braces = (lines[line_num].count('{') -
                             lines[line_num].count('}'))
