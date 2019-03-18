@@ -3871,7 +3871,11 @@ namespace ConvectionCoefficients {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This subroutine calculates the interior convection coefficient for a surface.
+        // This subroutine calculates the convection coefficient for a surface.
+
+        // NOTE:
+        // Because surface tilts are given with respect to the outward normal, applications for interior
+        // surfaces should use a negative cos(Tilt).
 
         // METHODOLOGY EMPLOYED:
         // The algorithm for convection coefficients is taken directly from the TARP Reference Manual.
@@ -3889,23 +3893,6 @@ namespace ConvectionCoefficients {
         //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
         // 2.  ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FLOW:
-
         Real64 DeltaTemp = Tsurf - Tamb;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Surface (Cosine Tilt)
@@ -3919,8 +3906,8 @@ namespace ConvectionCoefficients {
 
             return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
 
-        } else /*if (((DeltaTemp > 0.0) && (cosTilt > 0.0)) ||
-                   ((DeltaTemp < 0.0) && (cosTilt < 0.0)))*/ { // Reduced Convection
+        } else /*if (((DeltaTemp > 0.0) && (cosTilt < 0.0)) ||
+                   ((DeltaTemp < 0.0) && (cosTilt > 0.0)))*/ { // Reduced Convection
 
             return CalcWaltonStableHorizontalOrTilt(DeltaTemp, cosTilt);
 
@@ -3939,7 +3926,7 @@ namespace ConvectionCoefficients {
                 return CalcASHRAETARPNatural(Tsurf, Tamb, cosTilt);
             };
         } else {
-            HConvIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
+            HConvIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperature, ZoneMeanAirTemperature, -Surface(SurfNum).CosTilt);  // negative CosTilt because CosTilt is relative to exterior
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -4001,7 +3988,7 @@ namespace ConvectionCoefficients {
                     HcIn(SurfNum) = SetIntConvectionCoeff(SurfNum);
 
                 } else {
-                    HcIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperatures(SurfNum), TAirConv, Surface(SurfNum).CosTilt);
+                    HcIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperatures(SurfNum), TAirConv, -Surface(SurfNum).CosTilt);  // negative CosTilt because CosTilt is relative to exterior
                 }
 
             } else if (AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDCV) {
@@ -4014,7 +4001,7 @@ namespace ConvectionCoefficients {
                     HcIn(SurfNum) = SetIntConvectionCoeff(SurfNum);
 
                 } else {
-                    HcIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperatures(SurfNum), TAirConv, Surface(SurfNum).CosTilt);
+                    HcIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperatures(SurfNum), TAirConv, -Surface(SurfNum).CosTilt);  // negative CosTilt because CosTilt is relative to exterior
                     HcIn(SurfNum) = std::pow(std::pow(HcIn(SurfNum), 3.2) + std::pow(Hf, 3.2), 1.0 / 3.2);
                 }
             }
