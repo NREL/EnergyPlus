@@ -139,7 +139,7 @@ namespace PlantValves {
 
         }
     }
-    
+
     void TemperValveData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad,
                                               Real64 &OptLoad) {
         MaxLoad = 0.0;
