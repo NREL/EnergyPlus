@@ -1,0 +1,124 @@
+Support System Fan Object in Airflow Networks
+================
+
+**Lixing Gu**
+
+**Florida Solar Energy Center**
+
+ - Original version
+ - 3/11/19 
+
+ 
+
+## Justification for New Feature ##
+
+A new fan object model was recently added to EnergyPlus which will become the only fan object type, eliminating and simplifying the various other options, as it is capable of simulating the same physics and controls as all of the other objects. Currently, the fan is available in most parent model objects in EnergyPlus, but it is not available in airflow network simulations. Since this is supposed to be the new primary fan object, it must be also available in airflow network simulations.
+
+## E-mail and  Conference Call Conclusions ##
+
+NA
+
+## Overview ##
+
+The Fan:SystemModel object models fans of various types using a relatively simple engineering model. This fan can be used in variable air volume, constant volume, on-off cycling, two-speed, or multi-speed applications. It was designed as a replacement for Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, and FanPerformance:NightVentilation. In order to make the airflow network model accept the Fan:SystemModel object, an additional choice of fan type input and internal code revision are needed as follows.
+
+- Additional input choice
+
+A new choice key will be added in the Supply Fan Object Type field of the AirflowNetwork:Distribution:Component:Fan object as Fan:SystemModel.
+ 
+- Code revision
+
+Two modules will be revised to accommodate the new feature: AirflowNetworkBalanceManager and HVACFan.  
+ 
+
+## Approach ##
+
+The following revisions will be performed.  Any new additions will be highlighted in red.
+
+### AirflowNetworkBalanceManager
+
+GetAirflowNetworkInput
+
+The function will be modified to accept a new choice of fan type as Fan:SystemModel. Then the code will check the input choice of the Speed Control Method field in the Fan:SystemModel object. If the input is Continuous, the AFN model will consider this fan is a VAV fan. If the input is Discrete, the AFN model will consider this fan is on/off fan. the difference between on/off and constant volume fan is based the value of LoopOnOffFanPartLoadRatio.   
+
+### HAVCFan
+
+#### Assing fan part load value
+The value of OnOffFanPartLoadFraction will be assigned in the update function.
+
+#### Create two local functions to get node numbers of inlet and outlet
+Two local functions of GetFanInletNodeNum and GetFanOutletNodeNum will be created to output node numbers. The functions will be called from GetAirflowNetworkInput.
+ 
+## Testing/Validation/Data Sources ##
+
+Test will be performed to ensure the additional fan type will work properly.
+
+## Input Output Reference Documentation ##
+
+Any new additions will be highlighted in red.
+
+\subsection{AirflowNetwork:Distribution:Component:Fan}\label{airflownetworkdistributioncomponentfan}
+
+This component represents a constant volume fan in the air distribution system (AirLoopHVAC). The air flow rate and air conditions (temperature and humidity) are obtained from the associated Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume object.
+
+\subsubsection{Inputs}\label{inputs-16-001}
+
+\paragraph{Field: Fan Name}\label{field-fan-name-000}
+
+The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated Fan:ConstantVolume,~ Fan:OnOff or Fan:VariableVolume object. This name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.
+
+\paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type}
+
+This choice field defines the type of fan. The only valid choices are Fan:OnOff,~ Fan:ConstantVolume, and Fan:VariableVolume, <span style="color:red;">and Fan:SystemModel</style>, <span style="color:black;">with the default being Fan:ConstantVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume.
+
+Note: Make sure that the volumetric air flow rates for the fan, coils, and parent components (e.g., unitary system or furnace) are the same so that fan energy and air distribution system losses/gains are properly calculated.
+
+An IDF example is provided below:
+
+\begin{lstlisting}
+
+AirflowNetwork:Distribution:Component:Fan,
+      Supply Fan 1,            !- Name of Constant Volume Fan
+      Fan:ConstantVolume;  !- Supply fan type
+\end{lstlisting}
+
+## Input Description ##
+
+A new field will be added in the AirflowNetwork:Distribution:Component:Fan object to allow the AFN model accept fans defined in the Fan:SystemModel object.
+
+	AirflowNetwork:Distribution:Component:Fan,
+      \min-fields 2
+      \memo This object defines the name of the supply Air Fan used in an Air loop.
+ 	A1 , \field Fan Name
+      \required-field
+      \type object-list
+      \object-list FansCVandOnOffandVAV
+      \reference AirflowNetworkComponentNames
+      \note Enter the name of the fan in the primary air loop.
+	A2 ; \field Supply Fan Object Type
+      \type choice
+      \key Fan:OnOff
+      \key Fan:ConstantVolume
+      \key Fan:VariableVolume
+<span style="color:red;">\key Fan:SystemModel
+
+      \default Fan:ConstantVolume
+
+## Outputs Description ##
+
+insert text
+
+## Engineering Reference ##
+
+insert text
+
+## Example File and Transition Changes ##
+
+An existing example file will be modified. No transition is needed. However, idd change is required.
+
+## References ##
+
+insert text
+
+
+
