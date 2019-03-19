@@ -302,10 +302,12 @@ namespace OutsideEnergySources {
                 std::string hotOrChilled = "Hot ";
                 std::string reportVarPrefix = "District Heating ";
                 std::string heatingOrCooling = "Heating";
+                std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
                 if (EnergySource(EnergySourceNum).EnergyType == DataPlant::TypeOf_PurchChilledWater) {
                     hotOrChilled = "Chilled ";
                     reportVarPrefix = "District Cooling ";
                     heatingOrCooling = "Cooling";
+                    typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
                 }
                 SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Energy",
                                     OutputProcessor::Unit::J,
@@ -314,7 +316,7 @@ namespace OutsideEnergySources {
                                     "Sum",
                                     EnergySource(EnergySourceNum).Name,
                                     _,
-                                    DataIPShortCuts::cCurrentModuleObject,
+                                    typeName,
                                     heatingOrCooling,
                                     _,
                                     "Plant");

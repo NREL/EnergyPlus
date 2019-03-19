@@ -71,6 +71,7 @@
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <HeatPumpWaterToWaterSimple.hh>
+#include <HeatPumpWaterToWaterCOOLING.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -1134,6 +1135,7 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
                             this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
+                            this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(CompNames(CompNum));
                             if (LoopSideNum == DemandSide) {
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (LoopSideNum == SupplySide) {
