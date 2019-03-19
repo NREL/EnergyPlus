@@ -180,6 +180,7 @@
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -416,6 +417,7 @@ void EnergyPlusFixture::clear_all_states()
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
+    PlantValves::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();

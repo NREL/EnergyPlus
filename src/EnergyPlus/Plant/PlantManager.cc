@@ -74,6 +74,7 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <OutsideEnergySources.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
 #include <Plant/PlantLoopSolver.hh>
@@ -82,6 +83,7 @@
 #include <PlantLoopEquip.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <PlantUtilities.hh>
+#include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -1166,9 +1168,11 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                             this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
                             this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                            this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchChilledWater, CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                             this_comp.TypeOf_Num = TypeOf_PurchHotWater;
                             this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                            this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchHotWater, CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                             this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                             this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
@@ -1178,6 +1182,7 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                             this_comp.TypeOf_Num = TypeOf_ValveTempering;
                             this_comp.GeneralEquipType = GenEquipTypes_Valve;
+                            this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:FluidToFluid")) {
                             this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatExchanger;
