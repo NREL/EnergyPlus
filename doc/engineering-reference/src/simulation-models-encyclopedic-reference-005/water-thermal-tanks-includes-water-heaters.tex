@@ -602,19 +602,19 @@ where:
 Separating it into $a$ and $b$ terms for on-cycle losses:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - (UA_{tank} + UA_{add,n}) \\
     b_n &= (UA_{tank} + UA_{add,n}) T_{amb}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 And for off-cycle losses:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - (UA_{tank} + UA_{flue}) \\
     b_n &= (UA_{tank} + UA_{flue}) T_{amb}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 \paragraph{Conduction to Adjacent Nodes}
@@ -644,10 +644,10 @@ where:
 Separating into $a$ and $b$ terms yields:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - \left(\frac{kA_{n+1}}{L_{n+1}} + \frac{kA_{n-1}}{L_{n-1}}\right) \\
     b_n &= \left(\frac{kA_{n+1}}{L_{n+1}} T_{n+1} + \frac{kA_{n-1}}{L_{n-1}} T_{n-1}\right) T_{amb}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 \paragraph{Use- and Source-side Plant Connections}
@@ -679,19 +679,19 @@ where:
 Separating into $a$ and $b$ terms for the source side connection yields:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - \varepsilon_{src} \dot{m}_{src} c_p \\
     b_n &= \varepsilon_{src} \dot{m}_{src} c_p T_{src}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 And for the use side connection:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - \varepsilon_{use} \dot{m}_{use} c_p \\
     b_n &= \varepsilon_{use} \dot{m}_{use} c_p T_{use}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 \paragraph{Internodal Flow}
@@ -711,10 +711,10 @@ where:
 Separating into $a$ and $b$ terms:
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     a_n &= - c_p (\dot m_{n+1} + \dot m_{n-1}) \\
     b_n &= c_p (\dot m_{n+1} T_{n+1} + \dot m_{n-1} T_{n-1})
-  \end{align*}
+  \end{array}
 \end{equation}
 
 \paragraph{Inversion Mixing}
@@ -760,10 +760,10 @@ Solving the differential equation yields the following solution for the temperat
 Where $b$ is a function of the average temperature as calculated by
 
 \begin{equation}
-  \begin{align*}
+  \begin{array}{rl}
     b &= b(T_{avg}) \\
     T_{avg} &= \frac{(T_{initial} - \frac{b}{a}) (e ^ {a \Delta t} - 1)}{a \Delta t} - \frac{b}{a}
-  \end{align*}
+  \end{array}
 \end{equation}
 
 The solution is obtained by separating the $q_{net}$ terms described above into their respective $a$ and $b$ parts, solving for $T_{final}$ and $T_{avg}$, recalculating $b$ using the new average temperatures and iterating until the temperatures converge, at which point temperature inversions are resolved and controls decisions are made before moving on to the next sub timestep.
