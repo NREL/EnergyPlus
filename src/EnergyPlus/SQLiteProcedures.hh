@@ -225,6 +225,7 @@ public:
                                       Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,
+                                 int const year,
                                  int const month,
                                  int const dayOfMonth,
                                  int const hourOfDay,
