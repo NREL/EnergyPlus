@@ -5585,7 +5585,7 @@ namespace SetPointManager {
         ZoneTemp = Node(ZoneNode).Temp;
         // CR7654 IF (ZoneLoadtoHeatSP.GT.0.0) THEN
         if (ZoneMassFlow <= SmallMassFlow) {
-            this->SetPt = this->MaxSetTemp;
+            this->SetPt = this->MinSetTemp;
         } else {
             CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
             this->SetPt = ZoneTemp + ZoneLoadtoHeatSP / (CpAir * ZoneMassFlow);
@@ -5649,7 +5649,7 @@ namespace SetPointManager {
         ZoneTemp = Node(ZoneNode).Temp;
         // CR7654 IF (ZoneLoadtoCoolSP.LT.0.0) THEN
         if (ZoneMassFlow <= SmallMassFlow) {
-            this->SetPt = this->MinSetTemp;
+            this->SetPt = this->MaxSetTemp;
         } else {
             CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
             this->SetPt = ZoneTemp + ZoneLoadtoCoolSP / (CpAir * ZoneMassFlow);
