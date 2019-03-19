@@ -1082,16 +1082,12 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::initKivaInstances()
     {
-
         // initialize temperatures at the beginning of run environment
-        if (DataGlobals::BeginEnvrnFlag) {
-
-            for (auto &kv : kivaInstances) {
-                // Start with steady-state solution
-                kv.initGround(kivaWeather);
-            }
-            calcKivaSurfaceResults();
+        for (auto &kv : kivaInstances) {
+            // Start with steady-state solution
+            kv.initGround(kivaWeather);
         }
+        calcKivaSurfaceResults();
     }
 
     void KivaManager::calcKivaInstances()
