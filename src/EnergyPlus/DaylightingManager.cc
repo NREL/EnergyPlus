@@ -10055,6 +10055,7 @@ namespace DaylightingManager {
         static Array1D<Real64> XValue;
         static Array1D<Real64> YValue;
         static Array2D<Real64> IllumValue;
+        int SQYear;
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
@@ -10196,6 +10197,9 @@ namespace DaylightingManager {
                         SQFirstTime = false;
                     }
 
+                    // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
+                    // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
+                    SQYear = DataGlobals::CalendarYear;
                     SQMonth = Month;
                     SQDayOfMonth = DayOfMonth;
 
@@ -10212,7 +10216,7 @@ namespace DaylightingManager {
                     }     // Y Loop
 
                     sqlite->createSQLiteDaylightMap(
-                        MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
+                        MapNum, SQYear, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
 
                 } // WriteOutputToSQLite
             }     // end time step
