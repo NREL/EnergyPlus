@@ -535,10 +535,10 @@ void BoundaryCell::calcCellADEUp(double /*timestep*/, const Foundation & /*found
     U = bcs.outdoorTemp;
     break;
   case Surface::INTERIOR_FLUX:
-    ifCellADEUp(dim, dir, bcs, U);
+    ifCellADEUp(dim, dir, U);
     break;
   case Surface::EXTERIOR_FLUX:
-    efCellADEUp(dim, dir, bcs, U);
+    efCellADEUp(dim, dir, U);
     break;
   }
 }
@@ -562,10 +562,10 @@ void BoundaryCell::calcCellADEDown(double /*timestep*/, const Foundation & /*fou
     V = bcs.outdoorTemp;
     break;
   case Surface::INTERIOR_FLUX:
-    ifCellADEDown(dim, dir, bcs, V);
+    ifCellADEDown(dim, dir, V);
     break;
   case Surface::EXTERIOR_FLUX:
-    efCellADEDown(dim, dir, bcs, V);
+    efCellADEDown(dim, dir, V);
     break;
   }
 }
@@ -585,9 +585,9 @@ double BoundaryCell::calcCellExplicit(double /*timestep*/, const Foundation & /*
   case Surface::EXTERIOR_TEMPERATURE:
     return bcs.outdoorTemp;
   case Surface::INTERIOR_FLUX:
-    return ifCellExplicit(dim, dir, bcs);
+    return ifCellExplicit(dim, dir);
   default: // case Surface::EXTERIOR_FLUX:
-    return efCellExplicit(dim, dir, bcs);
+    return efCellExplicit(dim, dir);
   }
 }
 
@@ -612,10 +612,10 @@ void BoundaryCell::calcCellADI(std::size_t dim, const double & /*timestep*/,
     doOutdoorTemp(bcs, A, bVal);
     break;
   case Surface::INTERIOR_FLUX:
-    ifCellADI(dim, sdim, dir, bcs, A, Alt[dir], bVal);
+    ifCellADI(dim, sdim, dir, A, Alt[dir], bVal);
     break;
   case Surface::EXTERIOR_FLUX:
-    efCellADI(dim, sdim, dir, bcs, A, Alt[dir], bVal);
+    efCellADI(dim, sdim, dir, A, Alt[dir], bVal);
     break;
   }
 }
@@ -645,11 +645,11 @@ void BoundaryCell::calcCellMatrix(Foundation::NumericalScheme, const double & /*
     break;
   }
   case Surface::INTERIOR_FLUX: {
-    ifCellMatrix(dim, dir, bcs, A, Alt[dim][dir], bVal);
+    ifCellMatrix(dim, dir, A, Alt[dim][dir], bVal);
     break;
   }
   case Surface::EXTERIOR_FLUX: {
-    efCellMatrix(dim, dir, bcs, A, Alt[dim][dir], bVal);
+    efCellMatrix(dim, dir, A, Alt[dim][dir], bVal);
     break;
   }
   }
@@ -771,8 +771,7 @@ void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign, d
   }
 }
 
-void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir,
-                             const BoundaryConditions &bcs, double &A, double &Alt, double &bVal) {
+void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal) {
   INTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
@@ -788,8 +787,7 @@ void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir,
   }
 }
 
-void BoundaryCell::efCellADI(const int &dim, const int &sdim, const int &dir,
-                             const BoundaryConditions &bcs, double &A, double &Alt, double &bVal) {
+void BoundaryCell::efCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal) {
   EXTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
@@ -811,8 +809,7 @@ void BoundaryCell::zfCellMatrix(double &A, double &Alt, double &bVal) {
   bVal = 0.0;
 }
 
-void BoundaryCell::ifCellMatrix(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                                double &A, double &Alt, double &bVal) {
+void BoundaryCell::ifCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal) {
   INTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
@@ -820,8 +817,7 @@ void BoundaryCell::ifCellMatrix(const int &dim, const int &dir, const BoundaryCo
   bVal = (hc + hr) * Tair + heatGain;
 }
 
-void BoundaryCell::efCellMatrix(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                                double &A, double &Alt, double &bVal) {
+void BoundaryCell::efCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal) {
   EXTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
@@ -837,8 +833,7 @@ void BoundaryCell::zfCellADEUp(const std::size_t &dim, const std::size_t &dir, d
   }
 }
 
-void BoundaryCell::ifCellADEUp(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                               double &U) {
+void BoundaryCell::ifCellADEUp(const int &dim, const int &dir, double &U) {
   INTFLUX_PREFACE
 
   double bit;
@@ -851,8 +846,7 @@ void BoundaryCell::ifCellADEUp(const int &dim, const int &dir, const BoundaryCon
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-void BoundaryCell::efCellADEUp(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                               double &U) {
+void BoundaryCell::efCellADEUp(const int &dim, const int &dir, double &U) {
   EXTFLUX_PREFACE
 
   double bit;
@@ -873,8 +867,7 @@ void BoundaryCell::zfCellADEDown(const std::size_t &dim, const std::size_t &dir,
   }
 }
 
-void BoundaryCell::ifCellADEDown(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                                 double &V) {
+void BoundaryCell::ifCellADEDown(const int &dim, const int &dir, double &V) {
   INTFLUX_PREFACE
 
   double bit;
@@ -887,8 +880,7 @@ void BoundaryCell::ifCellADEDown(const int &dim, const int &dir, const BoundaryC
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-void BoundaryCell::efCellADEDown(const int &dim, const int &dir, const BoundaryConditions &bcs,
-                                 double &V) {
+void BoundaryCell::efCellADEDown(const int &dim, const int &dir, double &V) {
   EXTFLUX_PREFACE
 
   double bit;
@@ -906,8 +898,7 @@ double BoundaryCell::zfCellExplicit(const std::size_t &dim, const std::size_t &d
   return *(told_ptr + sign * stepsize[dim]);
 }
 
-double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &dir,
-                                    const BoundaryConditions &bcs) {
+double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &dir) {
   INTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
@@ -917,8 +908,7 @@ double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &d
          (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &dir,
-                                    const BoundaryConditions &bcs) {
+double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &dir) {
   EXTFLUX_PREFACE
 
   return (kcoeff[dim][dir] * *(told_ptr + stepsize[dim]) / dist[dim][dir] +
