@@ -70,9 +70,6 @@ namespace ConvectionCoefficients {
     extern Real64 const AdaptiveHcInsideLowLimit;  // W/m2-K
     extern Real64 const AdaptiveHcOutsideLowLimit; // W/m2-K
 
-    extern Real64 const MinFlow; // Minimum mass flow rate
-    extern Real64 const MaxACH;  // Maximum ceiling diffuser correlation limit
-
     extern Real64 const OneThird;   // 1/3 in highest precision
     extern Real64 const OneFourth;  // 1/4 in highest precision
     extern Real64 const OneFifth;   // 1/5 in highest precision
@@ -468,11 +465,6 @@ namespace ConvectionCoefficients {
                                  Real64 const WindDirection  // Wind (compass) direction (degrees)
     );
 
-    Real64 CalcHnASHRAETARPExterior(Real64 const TOutSurf, // Exterior surface temperature
-                                    Real64 const TAir,     // Outdoor Air temperature
-                                    Real64 const CosTilt   // Cosine of the Surface Tilt Angle (Angle between the ground outward normal and
-    );
-
     bool Windward(Real64 const CosTilt,      // Cosine of the surface tilt angle
                   Real64 const Azimuth,      // or Facing, Direction the surface outward normal faces (degrees)
                   Real64 const WindDirection // Wind direction measured clockwise from geographhic North
@@ -486,10 +478,14 @@ namespace ConvectionCoefficients {
                                          Real64 const SurfWindSpeed // Current wind speed, m/s
     );
 
+    Real64 CalcASHRAESimpleIntConvCoeff(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
+
     void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                       Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
+
+    Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt);
 
     void CalcASHRAEDetailedIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
@@ -501,6 +497,16 @@ namespace ConvectionCoefficients {
                                     Array1S<Real64> HcIn,                      // Interior Convection Coeff Array
                                     Optional<Array1S<Real64> const> Vhc = _    // Velocity array for forced convection coeff calculation
     );
+
+    Real64 CalcZoneSupplyAirTemp(int const ZoneNum);
+
+    Real64 CalcZoneSystemVolFlowRate(int const ZoneNum);
+
+    Real64 CalcZoneSystemACH(int const ZoneNum);
+
+    Real64 CalcCeilingDiffuserACH(int const ZoneNum);
+
+    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 const Tilt, Real64 const ACH);
 
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum); // zone number for which coefficients are being calculated
 
@@ -527,6 +533,14 @@ namespace ConvectionCoefficients {
     Real64 SetExtConvectionCoeff(int const SurfNum); // Surface Number
 
     Real64 SetIntConvectionCoeff(int const SurfNum); // Surface Number
+
+    Real64 CalcISO15099WindowIntConvCoeff(Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+                                          Real64 const AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
+                                          Real64 const AirHumRat,          // air humidity ratio
+                                          Real64 const Height,             // window cavity height [m]
+                                          Real64 TiltDeg,                  // glazing tilt in degrees
+                                          Real64 const sineTilt            // sine of glazing tilt
+    );
 
     void CalcISO15099WindowIntConvCoeff(int const SurfNum,               // surface number for which coefficients are being calculated
                                         Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
@@ -581,13 +595,25 @@ namespace ConvectionCoefficients {
     Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const AirChangeRate); // [1/hr] air system air change rate
 
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                   Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
+    );
+
+    Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                  int const SurfNum               // for messages
     );
 
     Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                               Real64 const HydraulicDiameter    // [m] characteristic size, = (4 * area) / perimeter
+    );
+
+    Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                int const SurfNum               // for messages
+    );
+
+    Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                             Real64 const Height     // [m] characteristic size, = zone height
     );
 
     Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
@@ -617,7 +643,12 @@ namespace ConvectionCoefficients {
                                                    Real64 const Height,        // [m] characteristic size
                                                    Real64 const SurfTemp,      // [C] surface temperature
                                                    Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate, // [ACH] [1/hour] supply air ACH for zone
+                                                   Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const Height,        // [m] characteristic size
+                                                   Real64 const SurfTemp,      // [C] surface temperature
                                                    int const ZoneNum           // index of zone for messaging
     );
 
@@ -625,7 +656,12 @@ namespace ConvectionCoefficients {
                                                    Real64 const Height,        // [m] characteristic size
                                                    Real64 const SurfTemp,      // [C] surface temperature
                                                    Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate, // [ACH] [1/hour] supply air ACH for zone
+                                                   Real64 const AirChangeRate // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const Height,        // [m] characteristic size
+                                                   Real64 const SurfTemp,      // [C] surface temperature
                                                    int const ZoneNum           // index of zone for messaging
     );
 
@@ -633,7 +669,12 @@ namespace ConvectionCoefficients {
                                                   Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                   Real64 const SurfTemp,          // [C] surface temperature
                                                   Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                  Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
+                                                  Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const SurfTemp,          // [C] surface temperature
                                                   int const ZoneNum               // index of zone for messaging
     );
 
@@ -641,7 +682,12 @@ namespace ConvectionCoefficients {
                                                     Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const SurfTemp,          // [C] surface temperature
                                                     Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
+                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const SurfTemp,          // [C] surface temperature
                                                     int const ZoneNum               // index of zone for messaging
     );
 
@@ -649,7 +695,12 @@ namespace ConvectionCoefficients {
                                                     Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const SurfTemp,          // [C] surface temperature
                                                     Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
+                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const SurfTemp,          // [C] surface temperature
                                                     int const ZoneNum               // index of zone for messaging
     );
 
@@ -657,8 +708,19 @@ namespace ConvectionCoefficients {
                                                       Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                       Real64 const SurfTemp,          // [C] surface temperature
                                                       Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                      Real64 const AirChangeRate,     // [ACH] [1/hour] supply air ACH for zone
+                                                      Real64 const AirChangeRate     // [ACH] [1/hour] supply air ACH for zone
+    );
+
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 const SurfTemp,          // [C] surface temperature
                                                       int const ZoneNum               // index of zone for messaging
+    );
+
+    Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                           Real64 const Height,    // [m] characteristic size, height of zone
+                                           Real64 const SurfTemp,  // [C] surface temperature
+                                           Real64 const QdotConv   // [W/m2] heat flux rate for rayleigh #
     );
 
     Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
@@ -673,28 +735,52 @@ namespace ConvectionCoefficients {
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                        Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                        Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
+                                                       int const WindowLocationType     // index for location types
+    );
+
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                       Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
                                                        int const WindowLocationType,    // index for location types
                                                        int const ZoneNum                // for messages
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                      Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                     int const WindowLocationType    // index for location types
+    );
+
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                      int const WindowLocationType,    // index for location types
                                                      int const ZoneNum                // for messages
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
-                                                      Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                      Real64 const ZoneExtPerimLength // [m] length of zone perimeter with exterior walls
+    );
+
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                       int const ZoneNum                // for messages
     );
+
+    Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
+
+    Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ);
 
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
 
     Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum);
 
+    Real64 CalcMoWITTNatural(Real64 DeltaTemp);
+
+    Real64 CalcMoWITTForcedWindward(Real64 const WindAtZ);
+
+    Real64 CalcMoWITTForcedLeeward(Real64 const WindAtZ);
+
     Real64 CalcMoWITTWindward(Real64 const DeltaTemp, Real64 const WindAtZ);
 
     Real64 CalcMoWITTLeeward(Real64 const DeltaTemp, Real64 const WindAtZ);
+
+    Real64 CalcDOE2Forced(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex);
 
     Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex);
 
@@ -703,6 +789,8 @@ namespace ConvectionCoefficients {
     Real64 CalcNusseltJurges(Real64 const WindAtZ);
 
     Real64 CalcMcAdams(Real64 const WindAtZ);
+
+    Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale);
 
     Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum);
 
@@ -720,6 +808,13 @@ namespace ConvectionCoefficients {
                          Real64 const WindDir,                // Wind direction measured clockwise from geographhic North
                          Real64 const LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                          int const SurfNum);
+
+    Real64 CalcClearRoof(Real64 const AirTemp,
+                         Real64 const WindAtZ,
+                         Real64 const WindDirect, // Wind direction measured clockwise from geographhic North
+                         Real64 const RoofArea,
+                         Real64 const RoofPerimeter,
+                         int const RoughnessIndex);
 
     Real64 CalcClearRoof(int const SurfNum,
                          Real64 const SurfTemp,

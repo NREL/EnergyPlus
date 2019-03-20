@@ -775,15 +775,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
-                !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances();
-            }
-        }
-
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -2203,6 +2194,14 @@ namespace HeatBalanceSurfaceManager {
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TairLast = 20.0;
             }
+
+            // Initialize Kiva convection algorithms
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+            }
+
 
             // Initialize the flux histories
             QH(1, {2, Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
@@ -5744,7 +5743,20 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    // Do nothing
+                    RoughSurf = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
+                    // Set Kiva exterior convection algorithms
+                    InitExteriorConvectionCoeff(SurfNum,
+                                                HMovInsul,
+                                                RoughSurf,
+                                                AbsThermSurf,
+                                                TH(1, 1, SurfNum),
+                                                HcExtSurf(SurfNum),
+                                                HSkyExtSurf(SurfNum),
+                                                HGrdExtSurf(SurfNum),
+                                                HAirExtSurf(SurfNum));
+
                 } else { // for interior or other zone surfaces
 
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
@@ -5982,6 +5994,11 @@ namespace HeatBalanceSurfaceManager {
             TempEffBulkAir = 23.0;
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
+
+            // Initialize Kiva instances ground temperatures
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                SurfaceGeometry::kivaManager.initKivaInstances();
+            }
         }
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag = true;
@@ -6130,6 +6147,15 @@ namespace HeatBalanceSurfaceManager {
             if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
                 QAdditionalHeatSourceInside(SurfNum) =
                     EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+            }
+        }
+
+        // Calculate Kiva instances
+        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+                !WarmupFlag) {
+                SurfaceGeometry::kivaManager.calcKivaInstances();
             }
         }
 

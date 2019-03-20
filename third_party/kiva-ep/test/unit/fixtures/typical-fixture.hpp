@@ -20,9 +20,7 @@ protected:
     init();
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;
-    bcs.indoorTemp = 310.15;
-    bcs.slabRadiantTemp = 310.15;
-    bcs.wallRadiantTemp = 310.15;
+    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp = 310.15;
     ground->calculate(bcs, 3600.0);
     ground->calculateSurfaceAverages();
     return ground->getSurfaceAverageValue({Surface::ST_SLAB_CORE, GroundOutput::OT_RATE});
