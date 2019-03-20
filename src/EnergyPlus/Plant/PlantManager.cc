@@ -1614,10 +1614,15 @@ namespace PlantManager {
             bool const ThisSideHasPumps = (PlantLoop(LoopNum).LoopSide(1).TotalPumps > 0);
             bool const OtherSideHasPumps = (PlantLoop(LoopNum).LoopSide(2).TotalPumps > 0);
             if ((PlantLoop(LoopNum).CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
-                ShowSevereError("Input Error: Common Pipe configurations must have pumps on both sides of loop");
-                ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
-                ShowContinueError("Make sure both demand and supply sides have a pump");
-                ErrorsFound = true;
+				ShowSevereError("Input Error: Common Pipe configurations must have pumps on both sides of loop");
+				ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+				ShowContinueError("Make sure both demand and supply sides have a pump");
+				ErrorsFound = true;
+			} else if ((PlantLoop(LoopNum).CommonPipeType == CommonPipe_No) && ThisSideHasPumps && OtherSideHasPumps) {
+				ShowSevereError("Input Error: Pumps on both loop sides must utilize a common pipe");
+				ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+				ShowContinueError("Add common pipe or remove one loop side pump");
+				ErrorsFound = true;
             } else if (!ThisSideHasPumps && !OtherSideHasPumps) {
                 ShowSevereError("SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
                 ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
