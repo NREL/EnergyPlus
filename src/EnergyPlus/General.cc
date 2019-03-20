@@ -681,10 +681,6 @@ namespace General {
         int NIte;        // number of interations
         int AltIte;      // used for Alternation choice
 
-        static gio::Fmt OpticalFormat("(i3,',',f10.6,',',f10.6)"); // Format descriptor for environ stamp
-
-        static int fileNum(0);
-
         X0 = X_0;
         X1 = X_1;
         XTemp = X0;
@@ -789,13 +785,6 @@ namespace General {
 
             } // (Cont)
 
-            if (fileNum == 0) {
-                fileNum = GetNewUnitNumber();
-            }
-            if (fileNum > 0) {
-                gio::write(fileNum, OpticalFormat) << NIte << X0 << X1;
-            }
-
         } // Cont
 
         if (Conv) {
@@ -869,10 +858,6 @@ namespace General {
         bool Cont;       // flag, if true, continue searching
         int NIte;        // number of interations
 
-        static gio::Fmt OpticalFormat("(i3,',',f10.6,',',f10.6)"); // Format descriptor for environ stamp
-
-        static int fileNum(0);
-
         X0 = X_0;
         X1 = X_1;
         XTemp = X0;
@@ -942,13 +927,6 @@ namespace General {
                 } // ( Y0 < 0 )
 
             } // (Cont)
-
-            if (fileNum == 0) {
-                fileNum = GetNewUnitNumber();
-            }
-            if (fileNum > 0) {
-                gio::write(fileNum, OpticalFormat) << NIte << X0 << X1;
-            }
 
         } // Cont
 
