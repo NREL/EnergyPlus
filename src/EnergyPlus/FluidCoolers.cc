@@ -1411,7 +1411,7 @@ namespace FluidCoolers {
             }
         }
 
-        if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized) {
+        if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized && PlantFirstSizesOkayToFinalize) {
             if (PltSizCondNum > 0) {
                 if (PlantSizData(PltSizCondNum).DesVolFlowRate >= SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint

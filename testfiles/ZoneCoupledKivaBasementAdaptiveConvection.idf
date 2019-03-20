@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !- Use '!' comments if they need to be retained when using the IDFEditor.
 !- =========== ALL OBJECTS IN CLASS: VERSION ===========
-! ZoneCoupledKivaWalkoutBasement.idf
+! ZoneCoupledKivaBasement.idf
 ! Basic File Description:
 ! This input file exemplifies the use of the Foundation outside boundary
 ! to perform the simulation of ground coupled heat transfer.
@@ -26,7 +26,7 @@
 ! Internal Mass: None
 ! People: None
 ! Lights: None
-! Windows: 3
+! Windows: None
 ! Detached Shading: None
 ! Daylight: None
 ! Natural Ventilation: None
@@ -68,6 +68,118 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
+  SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;
+
+  SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;
+
+  SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
+    Default Algorithm,       !- Name
+    FohannoPolidoriVerticalWall,  !- Simple Buoyancy Vertical Wall Equation Source
+    ,                        !- Simple Buoyancy Vertical Wall User Curve Name
+    AlamdariHammondStableHorizontal,  !- Simple Buoyancy Stable Horizontal Equation Source
+    ,                        !- Simple Buoyancy Stable Horizontal Equation User Curve Name
+    AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source
+    ,                        !- Simple Buoyancy Unstable Horizontal Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Simple Buoyancy Stable Tilted Equation Source
+    ,                        !- Simple Buoyancy Stable Tilted Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Simple Buoyancy Unstable Tilted Equation Source
+    ,                        !- Simple Buoyancy Unstable Tilted Equation User Curve Name
+    ISO15099Windows,         !- Simple Buoyancy Windows Equation Source
+    ,                        !- Simple Buoyancy Windows Equation User Curve Name
+    KhalifaEq3WallAwayFromHeat,  !- Floor Heat Ceiling Cool Vertical Wall Equation Source
+    ,                        !- Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name
+    AlamdariHammondStableHorizontal,  !- Floor Heat Ceiling Cool Stable Horizontal Equation Source
+    ,                        !- Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name
+    KhalifaEq4CeilingAwayFromHeat,  !- Floor Heat Ceiling Cool Unstable Horizontal Equation Source
+    ,                        !- Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name
+    AwbiHattonHeatedFloor,   !- Floor Heat Ceiling Cool Heated Floor Equation Source
+    ,                        !- Floor Heat Ceiling Cool Heated Floor Equation User Curve Name
+    KaradagChilledCeiling,   !- Floor Heat Ceiling Cool Chilled Ceiling Equation Source
+    ,                        !- Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Stable Tilted Equation Source
+    ,                        !- Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Unstable Tilted Equation Source
+    ,                        !- Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name
+    ISO15099Windows,         !- Floor Heat Ceiling Cool Window Equation Source
+    ,                        !- Floor Heat Ceiling Cool Window Equation User Curve Name
+    KhalifaEq6NonHeatedWalls,!- Wall Panel Heating Vertical Wall Equation Source
+    ,                        !- Wall Panel Heating Vertical Wall Equation User Curve Name
+    AwbiHattonHeatedWall,    !- Wall Panel Heating Heated Wall Equation Source
+    ,                        !- Wall Panel Heating Heated Wall Equation User Curve Name
+    AlamdariHammondStableHorizontal,  !- Wall Panel Heating Stable Horizontal Equation Source
+    ,                        !- Wall Panel Heating Stable Horizontal Equation User Curve Name
+    KhalifaEq7Ceiling,       !- Wall Panel Heating Unstable Horizontal Equation Source
+    ,                        !- Wall Panel Heating Unstable Horizontal Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Wall Panel Heating Stable Tilted Equation Source
+    ,                        !- Wall Panel Heating Stable Tilted Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Wall Panel Heating Unstable Tilted Equation Source
+    ,                        !- Wall Panel Heating Unstable Tilted Equation User Curve Name
+    ISO15099Windows,         !- Wall Panel Heating Window Equation Source
+    ,                        !- Wall Panel Heating Window Equation User Curve Name
+    FohannoPolidoriVerticalWall,  !- Convective Zone Heater Vertical Wall Equation Source
+    ,                        !- Convective Zone Heater Vertical Wall Equation User Curve Name
+    KhalifaEq5WallNearHeat,  !- Convective Zone Heater Vertical Walls Near Heater Equation Source
+    ,                        !- Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name
+    AlamdariHammondStableHorizontal,  !- Convective Zone Heater Stable Horizontal Equation Source
+    ,                        !- Convective Zone Heater Stable Horizontal Equation User Curve Name
+    KhalifaEq7Ceiling,       !- Convective Zone Heater Unstable Horizontal Equation Source
+    ,                        !- Convective Zone Heater Unstable Horizontal Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Convective Zone Heater Stable Tilted Equation Source
+    ,                        !- Convective Zone Heater Stable Tilted Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Convective Zone Heater Unstable Tilted Equation Source
+    ,                        !- Convective Zone Heater Unstable Tilted Equation User Curve Name
+    ISO15099Windows,         !- Convective Zone Heater Windows Equation Source
+    ,                        !- Convective Zone Heater Windows Equation User Curve Name
+    GoldsteinNovoselacCeilingDiffuserWalls,  !- Central Air Diffuser Wall Equation Source
+    ,                        !- Central Air Diffuser Wall Equation User Curve Name
+    FisherPedersenCeilingDiffuserCeiling,  !- Central Air Diffuser Ceiling Equation Source
+    ,                        !- Central Air Diffuser Ceiling Equation User Curve Name
+    GoldsteinNovoselacCeilingDiffuserFloor,  !- Central Air Diffuser Floor Equation Source
+    ,                        !- Central Air Diffuser Floor Equation User Curve Name
+    GoldsteinNovoselacCeilingDiffuserWindow,  !- Central Air Diffuser Window Equation Source
+    ,                        !- Central Air Diffuser Window Equation User Curve Name
+    KhalifaEq3WallAwayFromHeat,  !- Mechanical Zone Fan Circulation Vertical Wall Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name
+    AlamdariHammondStableHorizontal,  !- Mechanical Zone Fan Circulation Stable Horizontal Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name
+    KhalifaEq4CeilingAwayFromHeat,  !- Mechanical Zone Fan Circulation Unstable Horizontal Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Stable Tilted Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Unstable Tilted Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name
+    ISO15099Windows,         !- Mechanical Zone Fan Circulation Window Equation Source
+    ,                        !- Mechanical Zone Fan Circulation Window Equation User Curve Name
+    BeausoleilMorrisonMixedAssistedWall,  !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source
+    ,                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name
+    BeausoleilMorrisonMixedOpposingWall,  !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source
+    ,                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name
+    BeausoleilMorrisonMixedStableFloor,  !- Mixed Regime Stable Floor Equation Source
+    ,                        !- Mixed Regime Stable Floor Equation User Curve Name
+    BeausoleilMorrisonMixedUnstableFloor,  !- Mixed Regime Unstable Floor Equation Source
+    ,                        !- Mixed Regime Unstable Floor Equation User Curve Name
+    BeausoleilMorrisonMixedStableCeiling,  !- Mixed Regime Stable Ceiling Equation Source
+    ,                        !- Mixed Regime Stable Ceiling Equation User Curve Name
+    BeausoleilMorrisonMixedUnstableCeiling,  !- Mixed Regime Unstable Ceiling Equation Source
+    ,                        !- Mixed Regime Unstable Ceiling Equation User Curve Name
+    GoldsteinNovoselacCeilingDiffuserWindow,  !- Mixed Regime Window Equation Source
+    ;                        !- Mixed Regime Window Equation User Curve Name
+
+  SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,
+    Default algorithms,      !- Name
+    TARPWindward,            !- Wind Convection Windward Vertical Wall Equation Source
+    ,                        !- Wind Convection Windward Equation Vertical Wall User Curve Name
+    TARPLeeward,             !- Wind Convection Leeward Vertical Wall Equation Source
+    ,                        !- Wind Convection Leeward Vertical Wall Equation User Curve Name
+    ClearRoof,               !- Wind Convection Horizontal Roof Equation Source
+    ,                        !- Wind Convection Horizontal Roof User Curve Name
+    ASHRAEVerticalWall,      !- Natural Convection Vertical Wall Equation Source
+    ,                        !- Natural Convection Vertical Wall Equation User Curve Name
+    WaltonStableHorizontalOrTilt,  !- Natural Convection Stable Horizontal Equation Source
+    ,                        !- Natural Convection Stable Horizontal Equation User Curve Name
+    WaltonUnstableHorizontalOrTilt,  !- Natural Convection Unstable Horizontal Equation Source
+    ;                        !- Natural Convection Unstable Horizontal Equation User Curve Name
+
 !- =========== ALL OBJECTS IN CLASS: BUILDING ===========
 
   Building,
@@ -93,7 +205,7 @@
     Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
     39.74,                   !- Latitude {deg}
     -105.18,                 !- Longitude {deg}
-    -7.0,                    !- Time Zone {hr}
+    -7.00,                   !- Time Zone {hr}
     1829.00;                 !- Elevation {m}
 
 !- =========== ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
@@ -194,7 +306,7 @@
     autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
-    Basement North Foundation Wall,  !- Name
+    Basement Wall 1,         !- Name
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
@@ -202,44 +314,60 @@
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
+    autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,10.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,10.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,10.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Basement East Wall 1,    !- Name
+    Basement Wall 2,         !- Name
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
+    Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.000000000000,6.666666666667,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,6.666666666667,-0.775000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,10.000000000000,-0.775000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,10.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Basement West Wall 3,    !- Name
+    Basement Wall 3,         !- Name
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
+    Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000000000000,3.333333333333,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,3.333333333333,-2.325000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,0.000000000000,-2.325000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,0.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Basement Wall 4,         !- Name
+    Wall,                    !- Surface Type
+    Basement Wall Construction,  !- Construction Name
+    Basement,                !- Zone Name
+    Foundation,              !- Outside Boundary Condition
+    Basement Foundation,     !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    autocalculate,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Basement Floor,          !- Surface Name
@@ -262,10 +390,10 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.000000000000,10.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,10.000000000000,-3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Ceiling,        !- Name
@@ -278,231 +406,10 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,10.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement West Foundation Wall 1,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,10.000000000000,-0.775000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,10.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,6.666666666667,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,6.666666666667,-0.775000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement West Wall 2,    !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,6.666666666667,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,6.666666666667,-1.550000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,3.333333333333,-1.550000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,3.333333333333,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement East Foundation Wall 3,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    10.000000000000,0.000000000000,-2.325000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,3.333333333333,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,3.333333333333,-2.325000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement East Foundation Wall 2,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    10.000000000000,3.333333333333,-1.550000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,3.333333333333,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,6.666666666667,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,6.666666666667,-1.550000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement East Wall 2,    !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    10.000000000000,3.333333333333,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,3.333333333333,-1.550000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,6.666666666667,-1.550000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,6.666666666667,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement East Wall 3,    !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    10.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,0.000000000000,-2.325000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,3.333333333333,-2.325000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,3.333333333333,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement East Foundation Wall 1,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    10.000000000000,6.666666666667,-0.775000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,6.666666666667,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,10.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,10.000000000000,-0.775000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement West Foundation Wall 2,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,6.666666666667,-1.550000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,6.666666666667,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,3.333333333333,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,3.333333333333,-1.550000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement West Wall 1,    !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,10.000000000000,-0.775000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,6.666666666667,-0.775000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,6.666666666667,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement West Foundation Wall 3,  !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Foundation,              !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,3.333333333333,-2.325000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,3.333333333333,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,0.000000000000,-2.325000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  BuildingSurface:Detailed,
-    Basement South Wall,     !- Name
-    Wall,                    !- Surface Type
-    Basement Wall Construction,  !- Construction Name
-    Basement,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    Basement Foundation,     !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,0.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  FenestrationSurface:Detailed,
-    Basement South Wall Door,!- Name
-    GlassDoor,               !- Surface Type
-    Double Pane Window Construction,  !- Construction Name
-    Basement South Wall,     !- Building Surface Name
-    ,                        !- Outside Boundary Condition Object
-    ,                        !- View Factor to Ground
-    ,                        !- Frame and Divider Name
-    ,                        !- Multiplier
-    4,                       !- Number of Vertices
-    3.500000000000,0.000000000000,-1.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    3.500000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    6.500000000000,0.000000000000,-3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    6.500000000000,0.000000000000,-1.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  FenestrationSurface:Detailed,
-    Basement East Wall 2 Window,  !- Name
-    Window,                  !- Surface Type
-    Double Pane Window Construction,  !- Construction Name
-    Basement East Wall 2,    !- Building Surface Name
-    ,                        !- Outside Boundary Condition Object
-    ,                        !- View Factor to Ground
-    ,                        !- Frame and Divider Name
-    ,                        !- Multiplier
-    4,                       !- Number of Vertices
-    10.000000000000,4.083333333334,-0.362500000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,4.083333333334,-1.187500000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,5.916666666667,-1.187500000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,5.916666666666,-0.362500000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  FenestrationSurface:Detailed,
-    Basement West Wall 3 Window,  !- Name
-    Window,                  !- Surface Type
-    Double Pane Window Construction,  !- Construction Name
-    Basement West Wall 3,    !- Building Surface Name
-    ,                        !- Outside Boundary Condition Object
-    ,                        !- View Factor to Ground
-    ,                        !- Frame and Divider Name
-    ,                        !- Multiplier
-    4,                       !- Number of Vertices
-    0.000000000000,2.583333333333,-0.750000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,2.583333333333,-1.575000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,0.750000000000,-1.575000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,0.750000000000,-0.750000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
 !***********************************************************
 !****** ABOVE GROUND ZONE SPECIFICATION ********************
@@ -521,7 +428,7 @@
     autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
-    Main Floor North Wall,   !- Name
+    Main Floor Wall 1,       !- Name
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
@@ -531,13 +438,13 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.000000000000,10.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,10.000000000000,3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Main Floor South Wall,   !- Name
+    Main Floor Wall 2,       !- Name
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
@@ -547,13 +454,13 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000000000000,0.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,0.000000000000,3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Main Floor East Wall,    !- Name
+    Main Floor Wall 3,       !- Name
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
@@ -563,13 +470,13 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.000000000000,0.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    10.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,10.000000000000,3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,0.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Main Floor West Wall,    !- Name
+    Main Floor Wall 4,       !- Name
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
@@ -579,10 +486,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000000000000,10.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,10.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,0.000000000000,3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Roof,         !- Name
@@ -595,10 +502,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000000000000,10.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000000000000,0.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    10.000000000000,0.000000000000,3.100000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    10.000000000000,10.000000000000,3.100000000000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 !***********************************************************
@@ -649,16 +556,6 @@
     0.9,                     !- Thermal Absorptance
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
-
-  WindowMaterial:SimpleGlazingSystem,
-    Double Pane Window,      !- Name
-    2.716,                   !- U-Factor {W/m2-K}
-    0.763,                   !- Solar Heat Gain Coefficient
-    0.812;                   !- Visible Transmittance
-
-  Construction,
-    Double Pane Window Construction,  !- Name
-    Double Pane Window;      !- Outside Layer
 
 !***********************************************************
 !********* BASEMENT SURFACE MATERIALS/CONSTRUCTIONS ***********
@@ -744,12 +641,9 @@
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
-    Counterclockwise,        !- Vertex Entry Direction
+    CounterClockWise,        !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
-!***********************************************************
-!********************* FOUNDATION **************************
-!***********************************************************
 !***********************************************************
 !********************* FOUNDATION **************************
 !***********************************************************
