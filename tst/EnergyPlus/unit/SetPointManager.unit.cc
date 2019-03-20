@@ -1419,3 +1419,109 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     DataAirLoop::AirLoopInputsFilled = false;
 
 }
+TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
+{
+    std::string const idf_objects = delimited_string({
+        "SetpointManager:SingleZone:Heating,",
+        "  Heating Supply Air Temp Manager 1,  !- Name",
+        "  Temperature,             !- Control Variable",
+        "  -99.,                    !- Minimum Supply Air Temperature{ C }",
+        "  45.,                     !- Maximum Supply Air Temperature{ C }",
+        "  ZSF1,                    !- Control Zone Name",
+        "  ZSF1 Node,               !- Zone Node Name",
+        "  ZSF1 Inlet Node,         !- Zone Inlet Node Name",
+        "  Air Loop 1 Outlet Node;  !- Setpoint Node or NodeList Name",
+
+        "SetpointManager:SingleZone:Cooling,",
+        "  Cooling Supply Air Temp Manager 1,  !- Name",
+        "  Temperature,             !- Control Variable",
+        "  14.,                     !- Minimum Supply Air Temperature{ C }",
+        "  99.,                     !- Maximum Supply Air Temperature{ C }",
+        "  ZSF1,                    !- Control Zone Name",
+        "  ZSF1 Node,               !- Zone Node Name",
+        "  ZSF1 Inlet Node,         !- Zone Inlet Node Name",
+        "  Zone Equipment 1 Inlet Node;  !- Setpoint Node or NodeList Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    DataGlobals::NumOfZones = 1;
+
+    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone(1).Name = "ZSF1";
+    SetPointManager::GetSetPointManagerInputs();
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", DataLoopNode::NodeID);
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
+    int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", DataLoopNode::NodeID);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", DataLoopNode::NodeID);
+    int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", DataLoopNode::NodeID);
+
+    auto & zoneNode(DataLoopNode::Node(zoneNodeNum));
+    auto & inletNode(DataLoopNode::Node(inletNodeNum));
+    auto & coolSPNode(DataLoopNode::Node(coolSPNodeNum));
+    auto & heatSPNode(DataLoopNode::Node(heatSPNodeNum));
+
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    DataAirLoop::AirLoopInputsFilled = true;
+
+    SetPointManager::InitSetPointManagers();
+    EXPECT_FALSE(has_err_output(true));
+
+    // Case 1 - No load
+    inletNode.MassFlowRate = 0.1;
+    zoneNode.Temp = 20.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    SetPointManager::ManageSetPoints();
+    EXPECT_NEAR(coolSPNode.TempSetPoint, zoneNode.Temp, 0.001);
+    EXPECT_NEAR(heatSPNode.TempSetPoint, zoneNode.Temp, 0.001);
+
+    // Case 2 - Small heating load
+    inletNode.MassFlowRate = 0.1;
+    zoneNode.Temp = 20.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
+    SetPointManager::ManageSetPoints();
+    EXPECT_NEAR(coolSPNode.TempSetPoint, 20.994, 0.01);
+    EXPECT_NEAR(heatSPNode.TempSetPoint, 20.497, 0.01);
+
+    // Case 3 - Large heating load
+    inletNode.MassFlowRate = 0.1;
+    zoneNode.Temp = 20.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
+    SetPointManager::ManageSetPoints();
+    EXPECT_NEAR(coolSPNode.TempSetPoint, 99.0, 0.01);
+    EXPECT_NEAR(heatSPNode.TempSetPoint, 45.0, 0.01);
+
+    // Case 4 - Small cooling load
+    inletNode.MassFlowRate = 0.1;
+    zoneNode.Temp = 20.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
+    SetPointManager::ManageSetPoints();
+    EXPECT_NEAR(coolSPNode.TempSetPoint, 19.50, 0.01);
+    EXPECT_NEAR(heatSPNode.TempSetPoint, 19.01, 0.01);
+
+    // Case 5 - Large cooling load
+    inletNode.MassFlowRate = 0.1;
+    zoneNode.Temp = 20.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
+    SetPointManager::ManageSetPoints();
+    EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
+    EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);
+}
