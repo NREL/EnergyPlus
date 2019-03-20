@@ -347,10 +347,12 @@ namespace HeatBalanceManager {
             ManageHeatBalanceGetInputFlag = false;
         }
 
-        // Suggest new calling point here ManageEMS(emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan);
+        bool anyRan;
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(); // Initialize all heat balance related parameters
+        InitHeatBalance();                                                                // Initialize all heat balance related parameters
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -360,7 +362,6 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
-        bool anyRan;
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance();                                             // Do any heat balance related record keeping
 
@@ -698,23 +699,28 @@ namespace HeatBalanceManager {
         std::string::size_type TMP;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_721("('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
-                                   "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
-                                   "Number of Warmup Days')");
+        static ObjexxFCL::gio::Fmt Format_721(
+            "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
+            "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
+            "Number of Warmup Days')");
         static ObjexxFCL::gio::Fmt Format_720("(' Building Information',8(',',A))");
         static ObjexxFCL::gio::Fmt Format_722("('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | "
-                                   "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
+                                              "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
         static ObjexxFCL::gio::Fmt Format_723("('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | "
-                                   "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
+                                              "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
         static ObjexxFCL::gio::Fmt Format_724("('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')");
-        static ObjexxFCL::gio::Fmt Format_726("('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
+        static ObjexxFCL::gio::Fmt Format_726(
+            "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
         static ObjexxFCL::gio::Fmt Format_727("(' Zone Air Solution Algorithm, ',A)");
-        static ObjexxFCL::gio::Fmt Format_728("('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
+        static ObjexxFCL::gio::Fmt Format_728(
+            "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
         static ObjexxFCL::gio::Fmt Format_730("(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_729("('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
+        static ObjexxFCL::gio::Fmt Format_729(
+            "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
         static ObjexxFCL::gio::Fmt Format_731("(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_732("('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
-                                   "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
+        static ObjexxFCL::gio::Fmt Format_732(
+            "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
+            "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
         static ObjexxFCL::gio::Fmt Format_733("(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
         static ObjexxFCL::gio::Fmt Format_734(
             "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')");
@@ -876,9 +882,9 @@ namespace HeatBalanceManager {
         // Write Building Information to the initialization output file
         ObjexxFCL::gio::write(OutputFileInits, Format_721);
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720) << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2)
-                                                << RoundSigDigits(LoadsConvergTol, 5) << RoundSigDigits(TempConvergTol, 5) << AlphaName(3)
-                                                << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
+        ObjexxFCL::gio::write(OutputFileInits, Format_720)
+            << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2) << RoundSigDigits(LoadsConvergTol, 5)
+            << RoundSigDigits(TempConvergTol, 5) << AlphaName(3) << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -1224,7 +1230,7 @@ namespace HeatBalanceManager {
             ObjexxFCL::gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
         } else {
             ObjexxFCL::gio::write(OutputFileInits, Format_730) << "No"
-                                                    << "N/A";
+                                                               << "N/A";
         }
 
         ObjexxFCL::gio::write(OutputFileInits, Format_729);
@@ -1232,7 +1238,7 @@ namespace HeatBalanceManager {
             ObjexxFCL::gio::write(OutputFileInits, Format_731) << "Yes" << AlphaName(3);
         } else {
             ObjexxFCL::gio::write(OutputFileInits, Format_731) << "No"
-                                                    << "N/A";
+                                                               << "N/A";
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1331,9 +1337,9 @@ namespace HeatBalanceManager {
             ObjexxFCL::gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1) << AlphaName(2) << AlphaName(3);
         } else {
             ObjexxFCL::gio::write(OutputFileInits, Format_733) << "No"
-                                                    << "N/A"
-                                                    << "N/A"
-                                                    << "N/A";
+                                                               << "N/A"
+                                                               << "N/A"
+                                                               << "N/A";
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1447,11 +1453,12 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
-                                             "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
+            << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
+               "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720) << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3)
-                                                << RoundSigDigits(SiteTempGradient, 6);
+        ObjexxFCL::gio::write(OutputFileInits, Format_720)
+            << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3) << RoundSigDigits(SiteTempGradient, 6);
     }
 
     void GetMaterialData(bool &ErrorsFound) // set to true if errors found in input
@@ -3863,9 +3870,10 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
-                                                 "{w/m-K},Density {kg/m3},Specific Heat "
-                                                 "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
+                   "{w/m-K},Density {kg/m3},Specific Heat "
+                   "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
 
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
 
@@ -3874,7 +3882,8 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_702) << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_702)
+                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
                     } else {
                         ObjexxFCL::gio::write(OutputFileInits, Format_701)
                             << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4)
@@ -5021,7 +5030,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataDaylighting::ZoneDaylight;
-        using HybridModel::FlagHybridModel;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5137,15 +5145,6 @@ namespace HeatBalanceManager {
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
         SetupOutputVariable(
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
-
-        if (FlagHybridModel) {
-            SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
-                                OutputProcessor::Unit::ach,
-                                Zone(ZoneLoop).InfilOAAirChangeRateHM,
-                                "Zone",
-                                "Average",
-                                Zone(ZoneLoop).Name);
-        }
     }
 
     // End of Get Input subroutines for the HB Module
@@ -5181,6 +5180,7 @@ namespace HeatBalanceManager {
         using namespace SolarShading;
         using DataLoopNode::Node;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
+        using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5204,6 +5204,8 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
+        static ObjexxFCL::gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
+        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5271,7 +5273,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac) {
+        if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile();
         }
 
@@ -5291,6 +5293,33 @@ namespace HeatBalanceManager {
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
             PerformSolarCalculations();
+        }
+
+        if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
+            for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        if (TS == NumOfTimeStepInHour) {
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                        } else {
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
+                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                        }
+                    }
+                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
+                    }
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("YES");
+                        ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
+                    }
+                }
+            }
         }
 
         // Initialize zone outdoor environmental variables
@@ -5407,6 +5436,7 @@ namespace HeatBalanceManager {
         ZoneInfiltrationFlag.dimension(NumOfZones, false);
         ZoneReOrder = 0;
         ZoneLatentGain.dimension(NumOfZones, 0.0);
+        ZoneLatentGainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
         OAMFL.dimension(NumOfZones, 0.0);
         VAMFL.dimension(NumOfZones, 0.0);
         ZTAV.dimension(NumOfZones, 23.0);
@@ -5503,7 +5533,7 @@ namespace HeatBalanceManager {
         // Formats
         static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)");
         static ObjexxFCL::gio::Fmt Format_732("('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference "
-                                   "{deltaC},','Warmup Load Difference {W}')");
+                                              "{deltaC},','Warmup Load Difference {W}')");
 
         // FLOW:
 
@@ -5779,10 +5809,11 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_730("('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
-                                   "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
-                                   "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
-                                   "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
+        static ObjexxFCL::gio::Fmt Format_730(
+            "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
+            "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
+            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
+            "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
         static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information',10(',',A))");
 
         if (!WarmupFlag) { // Report out average/std dev
@@ -5960,7 +5991,6 @@ namespace HeatBalanceManager {
         int write_stat;
         int SurfNum;
         static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
-        static ObjexxFCL::gio::Fmt fmtN("('\n')");
 
         OutputFileShadingFrac = GetNewUnitNumber();
         {
@@ -5973,7 +6003,6 @@ namespace HeatBalanceManager {
         if (write_stat != 0) {
             ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
         }
-        ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA) << "This file contains external shading fractions for all shading surfaces of all zones.";
         {
             IOFlags flags;
             flags.ADVANCE("No");
@@ -5988,8 +6017,8 @@ namespace HeatBalanceManager {
         }
         {
             IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtN, flags);
+            flags.ADVANCE("YES");
+            ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
         }
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
@@ -6354,8 +6383,8 @@ namespace HeatBalanceManager {
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >> UValCenter(IGlSys) >>
-                        SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
+                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
+                        UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6446,8 +6475,8 @@ namespace HeatBalanceManager {
             FrameEmis = 0.0;
             {
                 IOFlags flags;
-                ObjexxFCL::gio::read(DataLine(11).substr(19), "*", flags) >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >> FrameConductance >>
-                    FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >> FrameVisAbsorp >> FrameEmis;
+                ObjexxFCL::gio::read(DataLine(11).substr(19), "*", flags) >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >>
+                    FrameConductance >> FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >> FrameVisAbsorp >> FrameEmis;
                 ReadStat = flags.ios();
             }
             if (ReadStat != 0) {

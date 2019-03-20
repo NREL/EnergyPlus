@@ -60,7 +60,6 @@ using namespace PlantPipingSystemsManager;
 TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
         "KA1,						!- Name of object",
         "1.8,						!- Soil Thermal Conductivity {W/m-K}",
@@ -81,11 +80,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    PipingSystemDomains.allocate(2);
+    domains.resize(2);
 
-    PipingSystemDomains(1).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    domains[0].groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    PipingSystemDomains(2).Farfield.groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    domains[1].groundTempModel = GetGroundTempModelAndInit("Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(PipingSystemDomains(1).Farfield.groundTempModel, PipingSystemDomains(2).Farfield.groundTempModel);
+    EXPECT_NE(domains[0].groundTempModel, domains[1].groundTempModel);
 }

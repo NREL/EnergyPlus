@@ -70,6 +70,7 @@
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
+#include <HeatPumpWaterToWaterSimple.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -79,6 +80,7 @@
 #include <Plant/PlantManager.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
+#include <PlantPipingSystemsManager.hh>
 #include <PlantUtilities.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
@@ -87,6 +89,7 @@
 #include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
 
@@ -870,6 +873,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
                             this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                             this_comp.CurOpSchemeType = NoControlOpSchemeType;
+                            this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(TypeOf_PipingSystemPipeCircuit, CompNames(CompNum));
                         } else if (has_prefixi(this_comp_type, "Pump") || has_prefixi(this_comp_type, "HeaderedPumps")) {
                             if (has_prefixi(this_comp_type, "Pump:VariableSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;
@@ -1100,6 +1104,7 @@ namespace PlantManager {
                             this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WatertoWater:EquationFit:Cooling")) {
+                            this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(TypeOf_HPWaterEFCooling, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HPWaterEFCooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
@@ -1108,6 +1113,7 @@ namespace PlantManager {
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WatertoWater:EquationFit:Heating")) {
+                            this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(TypeOf_HPWaterEFHeating, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HPWaterEFHeating;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
@@ -1125,6 +1131,24 @@ namespace PlantManager {
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
                             this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
+                            this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
+                        } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Heating")) {
+                            this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
+                            this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
+                            this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
+                        } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Cooling")) {
+                            this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
+                            this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1323,6 +1347,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
                             this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                             this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
+                            this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(TypeOf_GrndHtExchgHorizTrench, CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                             this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
                             this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
@@ -4211,6 +4236,15 @@ namespace PlantManager {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                 this_component.HowLoadServed = HowMet_PassiveCap;
+                            } else if (SELECT_CASE_var == TypeOf_HeatPumpEIRCooling || SELECT_CASE_var == TypeOf_HeatPumpEIRHeating) { // 95, 96
+                                this_component.FlowCtrl = ControlType_Active;
+                                if (LoopSideCtr == DemandSide) {
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                    this_component.HowLoadServed = HowMet_NoneDemand;
+                                } else {
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+                                    this_component.HowLoadServed = HowMet_ByNominalCap;
+                                }
                             } else {
                                 ShowSevereError("SetBranchControlTypes: Caught unexpected equipment type of number");
                             }

@@ -59,11 +59,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <ChilledCeilingPanelSimple.hh>
 #include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
 #include <DElightManagerF.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataDElight.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
@@ -775,15 +775,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
-                !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances();
-            }
-        }
-
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
 
@@ -1010,6 +1001,9 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
                         computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
+                        curAzimuth = round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchOpAzimuth, surfName, curAzimuth);
                         curTilt = Surface(iSurf).Tilt;
                         PreDefTableEntry(pdchOpTilt, surfName, curTilt);
@@ -1071,6 +1065,8 @@ namespace HeatBalanceSurfaceManager {
                         PreDefTableEntry(pdchFenVisTr, surfName, TransVisNorm, 3);
                         PreDefTableEntry(pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
                         curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        curAzimuth =  round(curAzimuth * 100.0) / 100.0;
                         PreDefTableEntry(pdchFenAzimuth, surfName, curAzimuth);
                         isNorth = false;
                         curTilt = Surface(iSurf).Tilt;
@@ -1456,6 +1452,9 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea.dimension(TotSurfaces, 0.0);
         QRadOutReport.dimension(TotSurfaces, 0.0);
 
+        QAirExtReport.dimension(TotSurfaces, 0.0);
+        QHeatEmiReport.dimension(TotSurfaces, 0.0);
+
         OpaqSurfInsFaceConduction.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceConductionFlux.dimension(TotSurfaces, 0.0);
         OpaqSurfInsFaceCondGainRep.dimension(TotSurfaces, 0.0);
@@ -1750,6 +1749,18 @@ namespace HeatBalanceSurfaceManager {
                                     "Zone",
                                     "State",
                                     Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    QAirExtReport(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Heat Emission to Air Rate",
+                                    OutputProcessor::Unit::W,
+                                    QHeatEmiReport(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
                 if (Surface(loop).Class != SurfaceClass_Window) {
                     SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate",
                                         OutputProcessor::Unit::W,
@@ -2014,6 +2025,9 @@ namespace HeatBalanceSurfaceManager {
             // CurrentModuleObject='Zone'
             SetupOutputVariable("Zone Mean Radiant Temperature", OutputProcessor::Unit::C, ZoneMRT(loop), "Zone", "State", Zone(loop).Name);
         }
+
+        SetupOutputVariable(
+            "Site Total Surface Heat Emission to Air", OutputProcessor::Unit::J, SumSurfaceHeatEmission, "Zone", "Sum", "Environment");
     }
 
     void InitThermalAndFluxHistories()
@@ -2117,6 +2131,8 @@ namespace HeatBalanceSurfaceManager {
         QRadOutReport = 0.0;
         QdotRadOutRep = 0.0;
         QdotRadOutRepPerArea = 0.0;
+        QAirExtReport = 0.0;
+        QHeatEmiReport = 0.0;
         OpaqSurfInsFaceConduction = 0.0;
         OpaqSurfInsFaceConductionFlux = 0.0;
         OpaqSurfInsFaceConductionEnergy = 0.0;
@@ -2178,6 +2194,14 @@ namespace HeatBalanceSurfaceManager {
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TairLast = 20.0;
             }
+
+            // Initialize Kiva convection algorithms
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+            }
+
 
             // Initialize the flux histories
             QH(1, {2, Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
@@ -4998,6 +5022,8 @@ namespace HeatBalanceSurfaceManager {
         int ZoneNum;
         static int TimeStepInDay(0);
 
+        SumSurfaceHeatEmission = 0.0;
+
         ZoneMRT({1, NumOfZones}) = MRT({1, NumOfZones});
 
         ReportSurfaceShading();
@@ -5101,9 +5127,10 @@ namespace HeatBalanceSurfaceManager {
                 }
 
             } // opaque heat transfer surfaces.
-
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec;
+            }
         } // loop over surfaces
-
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = ZoneOpaqSurfInsFaceCond(ZoneNum);
@@ -5716,7 +5743,20 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    // Do nothing
+                    RoughSurf = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
+                    // Set Kiva exterior convection algorithms
+                    InitExteriorConvectionCoeff(SurfNum,
+                                                HMovInsul,
+                                                RoughSurf,
+                                                AbsThermSurf,
+                                                TH(1, 1, SurfNum),
+                                                HcExtSurf(SurfNum),
+                                                HSkyExtSurf(SurfNum),
+                                                HGrdExtSurf(SurfNum),
+                                                HAirExtSurf(SurfNum));
+
                 } else { // for interior or other zone surfaces
 
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
@@ -5780,9 +5820,7 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
             }
-
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
-
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
@@ -5956,6 +5994,11 @@ namespace HeatBalanceSurfaceManager {
             TempEffBulkAir = 23.0;
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
+
+            // Initialize Kiva instances ground temperatures
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                SurfaceGeometry::kivaManager.initKivaInstances();
+            }
         }
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag = true;
@@ -6107,6 +6150,15 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
+        // Calculate Kiva instances
+        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+                !WarmupFlag) {
+                SurfaceGeometry::kivaManager.calcKivaInstances();
+            }
+        }
+
         bool const useCondFDHTalg(any_eq(HeatTransferAlgosUsed, UseCondFD));
         Converged = false;
         while (!Converged) { // Start of main inside heat balance DO loop...
@@ -6114,15 +6166,15 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
-                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
             }
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6408,8 +6460,8 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
-                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobals::KelvinConv;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
                                 OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;
@@ -6834,8 +6886,6 @@ namespace HeatBalanceSurfaceManager {
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
     {
-        using DataAirflowNetwork::AirflowNetworkControlSimple;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using General::RoundSigDigits;
 
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
@@ -6853,7 +6903,7 @@ namespace HeatBalanceSurfaceManager {
                             } else {
                                 ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
-                            if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                            if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                                 ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                                 ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
@@ -6894,7 +6944,7 @@ namespace HeatBalanceSurfaceManager {
                             } else {
                                 ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
-                            if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                            if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                                 ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                                 ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
@@ -6949,7 +6999,7 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
@@ -6975,7 +7025,7 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
-                        if (SimulateAirflowNetwork <= AirflowNetworkControlSimple) {
+                        if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                             ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
                             ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
@@ -7275,6 +7325,12 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRepPerArea(SurfNum) = QdotRadOutRep(SurfNum) / Surface(SurfNum).Area;
 
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+
+        // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
+        QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+        QHeatEmiReport(SurfNum) =
+            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {
 

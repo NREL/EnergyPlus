@@ -277,10 +277,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
 !- =========== ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========
 
@@ -467,7 +464,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Main Floor Ideal Loads Air System,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     Main Floor Ideal Loads Air System,  !- Name

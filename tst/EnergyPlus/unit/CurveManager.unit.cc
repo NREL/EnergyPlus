@@ -66,7 +66,6 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndVar_Malformed)
 
     DataIPShortCuts::lAlphaFieldBlanks = true;
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "                                                                      ",
         "  Table:TwoIndependentVariables,                                      ",
         "    AWHP_rCAP,               !- Name                                  ",
@@ -238,7 +237,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndVar_Malformed)
 TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.5;", "Table:OneIndependentVariable,", "TestTableMinMax,         !- Name", "Linear,                  !- Curve Type",
+        {"Table:OneIndependentVariable,", "TestTableMinMax,         !- Name", "Linear,                  !- Curve Type",
          "LinearInterpolationOfTable,  !- Interpolation Method", ",                        !- Minimum Value of X",
          ",                        !- Maximum Value of X", ",                        !- Minimum Table Output",
          ",                        !- Maximum Table Output", "Dimensionless,           !- Input Unit Type for X",
@@ -268,8 +267,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY)
 TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnteredMinMaxXY)
 {
 
-    std::string const idf_objects = delimited_string({"Version,8.5;",
-                                                      "Table:OneIndependentVariable,",
+    std::string const idf_objects = delimited_string({"Table:OneIndependentVariable,",
                                                       "TestTableOverwrite,      !- Name",
                                                       "Linear,                  !- Curve Type",
                                                       "EvaluateCurveToLimits,   !- Interpolation Method",
@@ -328,8 +326,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnt
 TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterMinMaxXY)
 {
 
-    std::string const idf_objects = delimited_string({"Version,8.5;",
-                                                      "Table:OneIndependentVariable,",
+    std::string const idf_objects = delimited_string({"Table:OneIndependentVariable,",
                                                       "TestTableOverwrite,      !- Name",
                                                       "Linear,                  !- Curve Type",
                                                       "LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION,   !- Interpolation Method",
@@ -620,8 +617,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
 TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMinMaxXY)
 {
 
-    std::string const idf_objects = delimited_string({"Version,8.5;",
-                                                      "Table:TwoIndependentVariables,",
+    std::string const idf_objects = delimited_string({"Table:TwoIndependentVariables,",
                                                       "TestTableMinMax,         !- Name",
                                                       "QuadraticLinear,         !- Curve Type",
                                                       "LinearInterpolationOfTable, !- Interpolation Method",
@@ -713,8 +709,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
 {
 
     std::string const idf_objects =
-        delimited_string({"Version,8.5;",
-                          "Table:TwoIndependentVariables,",
+        delimited_string({"Table:TwoIndependentVariables,",
                           "TestTableMinMax,         !- Name",
                           "QuadraticLinear,         !- Curve Type",
                           "LinearInterpolationOfTable, !- Interpolation Method",
@@ -1168,7 +1163,6 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
 TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Curve:ExponentialSkewNormal,",
         "  FanEff120CPLANormal,     !- Name",
         "  0.072613,                !- Coefficient1 C1",

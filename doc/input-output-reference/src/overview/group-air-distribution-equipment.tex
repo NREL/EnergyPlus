@@ -6,9 +6,9 @@ The systems described in the Air Distribution Units (ADU's) are shown below. A v
 
 Central system air is usually supplied to a zone through a terminal unit such as a single duct VAV reheat box. Sometimes, however, it is desirable to supply central system air directly to a zone without any zone level control or tempering. An example would be a single zone reheat system.
 
-The control zone receives supply air directly from the central system since the supply air temperature has been adjusted to control the temperature in the control zone. The slave zones then have baseboards or reheat coils to allow some temperature adjustment. The AirTerminal:SingleDuct:Uncontrolled object creates the capability of supplying central system air directly to a zone. Its input consists of the object name, an availability (on/off) schedule, and a node name. This node is both a zone inlet node and an outlet node of the AirLoopHVAC:ZoneSplitter.
+The control zone receives supply air directly from the central system since the supply air temperature has been adjusted to control the temperature in the control zone. The slave zones then have baseboards or reheat coils to allow some temperature adjustment. The AirTerminal:SingleDuct:Uncontrolled object creates the capability of supplying central system air directly to a zone. Its input consists of the object name, an availability (on/off) schedule, and a node name. This node is both a zone inlet node and an outlet node of the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}.
 
-For the objects to work correctly, it is important in any systems including Direct Air objects for the sum of the maximum zone air flow rates to be equal to the maximum central system flow rate. The zone maximum flow rates are specified in the zone terminal unit or direct air inputs. The central air system flow rate is specified in the AirLoopHVAC input and also in the air loop branch and central fan inputs.
+For the objects to work correctly, it is important in any systems including Direct Air objects for the sum of the maximum zone air flow rates to be equal to the maximum central system flow rate. The zone maximum flow rates are specified in the zone terminal unit or direct air inputs. The central air system flow rate is specified in the \hyperref[airloophvac]{AirLoopHVAC} input and also in the air loop branch and central fan inputs.
 
 \subsubsection{Inputs}\label{inputs-001}
 
@@ -22,7 +22,7 @@ The name of the schedule (ref: Schedule) that denotes whether the component can 
 
 \paragraph{Field: Zone Supply Air Node Name}\label{field-zone-supply-air-node-name}
 
-The name of the node to which the component is supplying air. This should be one of the supply air nodes for the zone the component is serving. This node should also be an outlet node of a AirLoopHVAC:ZoneSplitter component.
+The name of the node to which the component is supplying air. This should be one of the supply air nodes for the zone the component is serving. This node should also be an outlet node of a \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} component.
 
 \paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate}
 
@@ -30,7 +30,7 @@ The design maximum volume flow rate~ (m\(^{3}\)/sec) specified for the AirTermin
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
 
-This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an DesignSpecification:OutdoorAir object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the DesignSpecification:OutdoorAir object) and the number of occupants (specified in the People object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
+This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) and the number of occupants (specified in the \hyperref[people]{People} object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
 
 \paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
 
@@ -38,7 +38,7 @@ This field specifies how the outdoor air ventilation rates are calculated when b
 
 \paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name1}
 
-This optional input field is the name of a DesignSpecification:AirTerminal:Sizing object which specifies sizing adjustments to be made for this terminal unit. The terminal unit is initially sized according to the inputs in the corresponding Sizing:Zone object. Then the adjustment factors in the DesignSpecification:AirTerminal:Sizing object are applied. See DesignSpecification:AirTerminal:Sizing for more details. If left blank, then no adjustments are made.
+This optional input field is the name of a \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object which specifies sizing adjustments to be made for this terminal unit. The terminal unit is initially sized according to the inputs in the corresponding \hyperref[sizingzone]{Sizing:Zone} object. Then the adjustment factors in the \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object are applied. See \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} for more details. If left blank, then no adjustments are made.
 
 An example input follows.
 
@@ -120,13 +120,13 @@ The valid reheat component objects currently available are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name}
@@ -172,9 +172,9 @@ There are no outputs for the constant volume reheat air terminal.
 
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
-The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate. 
+The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
 
-This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the \emph{AirLoopHVAC:ZoneSplitter} or \emph{AirLoopHVAC:SupplyPlenum} component  outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: \textit{Design Specification Outdoor Air Object Name}, and \textit{Per Person Ventilation Rate Mode} are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
+This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the \emph{\hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}} or \emph{\hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}} component  outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: \textit{Design Specification Outdoor Air Object Name}, and \textit{Per Person Ventilation Rate Mode} are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
 
 \subsubsection{Inputs}\label{inputs-1-001}
 
@@ -188,7 +188,7 @@ Availability schedule name for this system. Schedule value > 0 means the system 
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name}
 
-The air inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum component.
+The air inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} or \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} component.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name}
 
@@ -200,7 +200,7 @@ The design maximum volume flow rate~ (m\(^{3}\)/sec). This field is autosizable.
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
 
-This field is used to modulate the terminal unit flow rate based on the specified outdoor air requirement. When the name of a DesignSpecification:OutdoorAir object is entered, the terminal unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled." If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on either the current or design occupancy as specified in the \textit{Per Person Ventilation Rate Mode} input field below. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested flow rate may not be fully met if the system is operating with cycling fan. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. This field is optional.
+This field is used to modulate the terminal unit flow rate based on the specified outdoor air requirement. When the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the terminal unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled." If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on either the current or design occupancy as specified in the \textit{Per Person Ventilation Rate Mode} input field below. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested flow rate may not be fully met if the system is operating with cycling fan. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. This field is optional.
 
 \paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
 
@@ -288,13 +288,13 @@ This field is used to select how the program will determine the minimum flow rat
 
 The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal.~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
 
-This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
+This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
 
-This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
+This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name}
 
@@ -306,20 +306,20 @@ The valid reheat component objects currently available are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
-If there is no reheat coil,use AirTerminal:SingleDuct:VAV:NoReheat instead of this object.
+If there is no reheat coil,use \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-1}
 
-Reheat Coil Object name being simulated with this ADU. Applicable for all coils. If there is no reheat coil,use object AirTerminal:SingleDuct:VAV:NoReheat instead of this object.
+Reheat Coil Object name being simulated with this ADU. Applicable for all coils. If there is no reheat coil,use object \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
 
 \paragraph{Field: Maximum Hot Water or Steam Flow Rate}\label{field-maximum-hot-water-or-steam-flow-rate-1}
 
@@ -361,13 +361,13 @@ The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat 
 
 \paragraph{Control Fields for Maximum Flow During Reheat:}\label{control-fields-for-maximum-flow-during-reheat}
 
-The following two fields are used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
+The following two fields are used only when Reheat Coil Object Type = \hyperref[coilheatingwater]{Coil:Heating:Water} and Damper Heating Action = ReverseWithLimits. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
 
 This limit is active only when the zone thermostat requests heating and the VAV box damper is reverse acting (i.e., ReverseWithLimits).
 
 \paragraph{Field: Maximum Flow per Zone Floor Area During Reheat}\label{field-maximum-flow-per-zone-floor-area-during-reheat}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizable and its default is autosize. If autosize is selected or the field is blank, the value is filled from the similar inputs in Sizing:Zone. If there is no sizing calculation the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizable and its default is autosize. If autosize is selected or the field is blank, the value is filled from the similar inputs in \hyperref[sizingzone]{Sizing:Zone}. If there is no sizing calculation the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Flow Fraction During Reheat}\label{field-maximum-flow-fraction-during-reheat}
 
@@ -379,7 +379,7 @@ This field specifies a maximum supply air temperature (Â°C) leaving the reheat
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name}
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref DesignSpecification:OutdoorAir).
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
 An IDF example:
 
@@ -498,7 +498,7 @@ The name of the HVAC system node that is the air outlet node of the unit. This s
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type}
 
-The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{Fan:SystemModel} or \emph{Fan:VariableVolume}.
+The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{\hyperref[fansystemmodel]{Fan:SystemModel}} or \emph{\hyperref[fanvariablevolume]{Fan:VariableVolume}}.
 
 \paragraph{Field: Fan Name}\label{field-fan-name}
 
@@ -510,13 +510,13 @@ The type of heating coil in the terminal unit. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name}
@@ -600,9 +600,9 @@ This output is the variable air volume flow fraction required to meet the zone l
 
 \subsection{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat}\label{airterminalsingleductvavheatandcoolreheat}
 
-Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: AirTerminal:SingleDuct:VAV:NoReheat). Reheat coils may be required to avoid overcooling (ref: AirTerminal:SingleDuct:VAV:Reheat).
+Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat}). Reheat coils may be required to avoid overcooling (ref: \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}).
 
-This terminal unit is slightly different from the AirTerminal:SingleDuct:VAV:Reheat terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode.~ For the Single Duct VAV Reheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required and the reheat coil output is modulated to meet the zone heating load.~ For the AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode). If additional heat is required (beyond what the terminal unit can provide with its damper fully open), then the reheat coil is modulated as needed to meet the additional heating load.
+This terminal unit is slightly different from the \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode.~ For the Single Duct VAV Reheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required and the reheat coil output is modulated to meet the zone heating load.~ For the AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode). If additional heat is required (beyond what the terminal unit can provide with its damper fully open), then the reheat coil is modulated as needed to meet the additional heating load.
 
 This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system.
 
@@ -644,20 +644,20 @@ The valid reheat component objects currently available are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
-If no reheat coil is required, use AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat instead of this object.
+If no reheat coil is required, use \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat} instead of this object.
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-2}
 
-Unique coil name being simulated with this ADU. Applicable for all coils. If there is no reheat coil, use AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat instead of this object.
+Unique coil name being simulated with this ADU. Applicable for all coils. If there is no reheat coil, use \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat} instead of this object.
 
 \paragraph{Field: Maximum Hot Water or Steam Flow Rate}\label{field-maximum-hot-water-or-steam-flow-rate-3}
 
@@ -748,15 +748,15 @@ This field is used to select how the program will determine the minimum flow rat
 
 \paragraph{Field: Constant Minimum Air Flow Fraction}\label{field-constant-minimum-air-flow-fraction-1}
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant. 
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant.
 
-This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
+This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate-1}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to FixedFlowRate.
 
-This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
+This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name-1}
 
@@ -764,7 +764,7 @@ The name of a schedule that determines the value of the minimum air flow fractio
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-1}
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref DesignSpecification:OutdoorAir).
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
 An IDF example:
 
@@ -820,11 +820,11 @@ This output is the amount of outdoor air entering the zone. This is the average 
 
 \subsection{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}\label{airterminalsingleductvavheatandcoolnoreheat}
 
-Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: AirTerminal:SingleDuct:VAV:NoReheat). Reheat coils may be required to avoid overcooling (ref: AirTerminal:SingleDuct:VAV:Reheat).
+Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat}). Reheat coils may be required to avoid overcooling (ref: \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}).
 
-This terminal unit is slightly different from the AirTerminal:SingleDuct:VAV:NoReheat terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode. For the Single Duct VAV NoReheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required. For the AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode).
+This terminal unit is slightly different from the \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode. For the Single Duct VAV NoReheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required. For the AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode).
 
-This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system..This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or ZoneHVAC:Baseboard:* objects.
+This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system..This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or ZoneHVAC:Baseboard:* objects.
 
 \begin{figure}[hbtp] % fig 105
 \centering
@@ -920,7 +920,7 @@ The name of the HVAC system node from which the unit draws its primary or supply
 
 \paragraph{Field: Secondary Air Inlet Node Name}\label{field-secondary-air-inlet-node-name}
 
-The name of the HVAC system node from which the unit draws its secondary or recirculated air. The unit can draw secondary air from its conditioned zone directly or from a return air plenum. Thus this node should be one of the zones exhaust air nodes (see \emph{Zone Air Exhaust Node} in \textbf{ZoneHVAC:EquipmentConnections}) or an induced air node outlet of a return plenum (see \emph{Induced Air Outlet Node} in \textbf{AirLoopHVAC:ReturnPlenum}).
+The name of the HVAC system node from which the unit draws its secondary or recirculated air. The unit can draw secondary air from its conditioned zone directly or from a return air plenum. Thus this node should be one of the zones exhaust air nodes (see \emph{Zone Air Exhaust Node} in \textbf{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}}) or an induced air node outlet of a return plenum (see \emph{Induced Air Outlet Node} in \textbf{\hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}}).
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name}
 
@@ -932,11 +932,11 @@ The name of the HVAC system node which is the inlet node of the unit's heating c
 
 \paragraph{Field: Zone Mixer Name}\label{field-zone-mixer-name}
 
-The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the secondary air inlet node of the PIU. The outlet node of the zone mixer should be the same as the inlet node of the PIU fan.
+The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the secondary air inlet node of the PIU. The outlet node of the zone mixer should be the same as the inlet node of the PIU fan.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run only when the Availability Schedule specified in the fan object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanconstantvolume]{Fan:ConstantVolume}. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run only when the Availability Schedule specified in the fan object is >0 or when it is overridden by an availability manager (ref. \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-3}
 
@@ -944,13 +944,13 @@ The type of coil in the PIU. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 In other words the PIU may have a hot water, gas, electric or steam reheat coil.
@@ -1033,7 +1033,7 @@ This field reports the dry air sensible heat extraction of the series PIU termin
 
 The parallel powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a variable total flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The secondary and primary air streams enter the unit in parallel. The fan sits in the secondary air stream and runs only when the primary air flow is below the Fan On Flow Fraction and the fan's availability schedule is on or it is activated by an availability manager. The primary air inlet contains a damper that can move from fully open (maximum primary air) to a minimum stop (minimum primary air).
 
-At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. The Fan On Flow Fraction field controls the fan operation; see this field description for more details. 
+At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. The Fan On Flow Fraction field controls the fan operation; see this field description for more details.
 
 The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).
 
@@ -1067,7 +1067,7 @@ The minimum volumetric air flow rate of primary air through the unit expressed a
 
 \paragraph{Field: Fan On Flow Fraction}\label{field-fan-on-flow-fraction}
 
-This is the fraction of the primary air flow at or below which the secondary fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off unless reheat is required. The fan will only operate if the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls (low flow or reheat required).
+This is the fraction of the primary air flow at or below which the secondary fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off unless reheat is required. The fan will only operate if the Availability Schedule specified in the \hyperref[fanconstantvolume]{Fan:ConstantVolume} object (see Fan Name below) is >0 or when it is overridden by an availability manager (ref. \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls (low flow or reheat required).
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name-1}
 
@@ -1075,7 +1075,7 @@ The name of the HVAC system node from which the unit draws its primary or supply
 
 \paragraph{Field: Secondary Air Inlet Node Name}\label{field-secondary-air-inlet-node-name-1}
 
-The name of the HVAC system node from which the unit draws its secondary or recirculated air. The unit can draw secondary air from its conditioned zone directly or from a return air plenum. Thus this node should be one of the zones exhaust air nodes (see \emph{Zone Air Exhaust Node} in \textbf{ZoneHVAC:EquipmentConnections}) or an induced air node outlet of a return plenum (see \emph{Induced Air Outlet Node} in \textbf{AirLoopHVAC:ReturnPlenum}).
+The name of the HVAC system node from which the unit draws its secondary or recirculated air. The unit can draw secondary air from its conditioned zone directly or from a return air plenum. Thus this node should be one of the zones exhaust air nodes (see \emph{Zone Air Exhaust Node} in \textbf{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}}) or an induced air node outlet of a return plenum (see \emph{Induced Air Outlet Node} in \textbf{\hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}}).
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-1}
 
@@ -1087,11 +1087,11 @@ The name of the HVAC system node which is the inlet node of the unit's heating c
 
 \paragraph{Field: Zone Mixer Name}\label{field-zone-mixer-name-1}
 
-The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the air outlet node of the fan. The outlet node of the zone mixer should be the same as the inlet node of the heating coil.
+The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the air outlet node of the fan. The outlet node of the zone mixer should be the same as the inlet node of the heating coil.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-2}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. The secondary fan will run only when the Availability Schedule specified in the Fan:ConstantVolume object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). See description of fan controls under Fan On Flow Fraction above.
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanconstantvolume]{Fan:ConstantVolume}. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. The secondary fan will run only when the Availability Schedule specified in the \hyperref[fanconstantvolume]{Fan:ConstantVolume} object is >0 or when it is overridden by an availability manager (ref. \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} and others). See description of fan controls under Fan On Flow Fraction above.
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-4}
 
@@ -1099,13 +1099,13 @@ The type of coil in the PIU. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 In other words the PIU may have a hot water, gas, electric or steam reheat coil.
@@ -1228,7 +1228,7 @@ The type of heating coil in the terminal unit. The choices are:
 \begin{itemize}
 \tightlist
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \end{itemize}
 
 In other words the unit may have a hot water coil only.
@@ -1261,9 +1261,9 @@ The type of cooling coil in the terminal unit. The choices are:
 
 \begin{itemize}
 \item
-  Coil:Cooling:Water
+  \hyperref[coilcoolingwater]{Coil:Cooling:Water}
 \item
-  Coil:Cooling:Water:DetailedGeometry
+  \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
 \end{itemize}
 
 In other words the unit must use only the water cooling coils.
@@ -1292,7 +1292,7 @@ The default is 0.001.
 
 \paragraph{Field: Zone Mixer Name}\label{field-zone-mixer-name-2}
 
-The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which composes part of the terminal unit. Note that some of the zone mixer's inputs will duplicate some of the terminal units's inputs. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the terminal unit; the other inlet node of the zone mixer should be the same as the cooling coil air outlet node. The outlet node of the zone mixer should be the same as the outlet node of the terminal unit.
+The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the terminal unit. Note that some of the zone mixer's inputs will duplicate some of the terminal units's inputs. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the terminal unit; the other inlet node of the zone mixer should be the same as the cooling coil air outlet node. The outlet node of the zone mixer should be the same as the outlet node of the terminal unit.
 
 An IDF example:
 
@@ -1352,13 +1352,13 @@ There are no specific outputs for the four pipe induction terminal units.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam}\label{airterminalsingleductconstantvolumefourpipebeam}
 
-The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating. Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (\textbf{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}).
+The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating. Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (\textbf{\hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}}).
 
 To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation. Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal. Therefore it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
 
 Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units.
 
-If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using \emph{VentilationRequirement} or \emph{Sensible} in the Sizing:System object (either setting can be used).
+If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the \hyperref[sizingzone]{Sizing:Zone} and \hyperref[sizingsystem]{Sizing:System} calculations. The flow rates will be somewhere between what an air terminal would size out using \emph{VentilationRequirement} or \emph{Sensible} in the \hyperref[sizingsystem]{Sizing:System} object (either setting can be used).
 
 The model includes two different types of inputs for flow rates, ``design'' and ``rated \ldots{} per-meter.'' The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers). The design values include all the individual beam units and their lengths. The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone. The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values. The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam. The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level.
 
@@ -1802,17 +1802,17 @@ This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS
 \begin{itemize}
 \setlength{\parskip}{0pt}
 \setlength{\itemsep}{0pt plus 2pt}
-\item ZoneHVAC:FourPipeFanCoil
-\item ZoneHVAC:WaterToAirHeatPump
-\item ZoneHVAC:PackagedTerminalAirConditioner
-\item ZoneHVAC:PackagedTerminalHeatPump
-\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-\item ZoneHVAC:UnitVentilator 
-\item AirLoopHVAC:UnitarySystem
+\item \hyperref[zonehvacfourpipefancoil]{ZoneHVAC:FourPipeFanCoil}
+\item \hyperref[zonehvacwatertoairheatpump]{ZoneHVAC:WaterToAirHeatPump}
+\item \hyperref[zonehvacpackagedterminalairconditioner]{ZoneHVAC:PackagedTerminalAirConditioner}
+\item \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}
+\item \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}
+\item \hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}
+\item \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}
 \end{itemize}
 
 
-The AirLoopHVAC:UnitarySystem object must be specified as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
+The \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} object must be specified as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} object type and object name input fields are left blank.
 
 \begin{figure}[hbtp] % fig 108
 \centering
@@ -1835,18 +1835,18 @@ A unique user assigned name for a particular terminal mixer unit. Any reference 
 
 \paragraph{Field: ZoneHVAC Unit Object Type}\label{field-zonehvac-unit-object-type}
 
-The type of ZoneHVAC equipment to which this terminal mixer will be connected. This is a choice input field. 
+The type of ZoneHVAC equipment to which this terminal mixer will be connected. This is a choice input field.
 Valid ZoneHVAC choices are:
 \begin{itemize}
 \setlength{\parskip}{0pt}
 \setlength{\itemsep}{0pt plus 1pt}
-\item ZoneHVAC:FourPipeFanCoil
-\item ZoneHVAC:WaterToAirHeatPump
-\item ZoneHVAC:PackagedTerminalAirConditioner
-\item ZoneHVAC:PackagedTerminalHeatPump
-\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-\item ZoneHVAC:UnitVentilator 
-\item AirLoopHVAC:UnitarySystem
+\item \hyperref[zonehvacfourpipefancoil]{ZoneHVAC:FourPipeFanCoil}
+\item \hyperref[zonehvacwatertoairheatpump]{ZoneHVAC:WaterToAirHeatPump}
+\item \hyperref[zonehvacpackagedterminalairconditioner]{ZoneHVAC:PackagedTerminalAirConditioner}
+\item \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}
+\item \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}
+\item \hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}
+\item \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}
 \end{itemize}
 
 \paragraph{Field: ZoneHVAC Unit Object Name}\label{field-zonehvac-unit-object-name}
@@ -1859,7 +1859,7 @@ The outlet air node name of the mixer. This will be an inlet air node name of th
 
 \paragraph{Field: Mixer Primary Air Inlet Node Name}\label{field-mixer-primary-air-inlet-node-name}
 
-The primary air (treated outdoor air) inlet node name of the mixer. This will be the outlet air node name of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum, providing the connection to the DOAS system.
+The primary air (treated outdoor air) inlet node name of the mixer. This will be the outlet air node name of an \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} or \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}, providing the connection to the DOAS system.
 
 \paragraph{Field: Mixer Secondary Air Inlet Node Name}\label{field-mixer-secondary-air-inlet-node-name}
 
@@ -1867,11 +1867,11 @@ The secondary air (recirculating air) inlet node name of the mixer. This will be
 
 \paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
 
-This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\ 
+This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
 
-This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an DesignSpecification:OutdoorAir object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the DesignSpecification:OutdoorAir object) and the number of occupants (specified in the People object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
+This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) and the number of occupants (specified in the \hyperref[people]{People} object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
 
 \paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
 
@@ -1888,7 +1888,7 @@ AirTerminal:SingleDuct:Mixer,
       SPACE2-1 Fan Coil Inlet,     !- Mixer Outlet Node Name
       SPACE2-1 ATM Primary Inlet,  !- Mixer Primary Air Inlet Node Name
       SPACE2-1 ATM Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-      InletSide;                   !- Mixer Connection Type   
+      InletSide;                   !- Mixer Connection Type
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -1999,7 +1999,7 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-2}
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref DesignSpecification:OutdoorAir).
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
 An IDF example:
 
@@ -2094,7 +2094,7 @@ Max total airflow rate (in m3/s) at the terminal unit outlet including both the 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-3}
 
-This field specifies the name of a DesignSpecification:OutdoorAir object.~ This field is required for this object.~ The terminal unit will modulate the Outdoor Air stream to meet this outdoor air requirement.~ If Outdoor Air Flow per Person is applied, then the outdoor air required will be based on either the current number of occupants in the zone, as for demand controlled ventilation, or the design level of occupants depending on the setting in the next field.
+This field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object.~ This field is required for this object.~ The terminal unit will modulate the Outdoor Air stream to meet this outdoor air requirement.~ If Outdoor Air Flow per Person is applied, then the outdoor air required will be based on either the current number of occupants in the zone, as for demand controlled ventilation, or the design level of occupants depending on the setting in the next field.
 
 \paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
 

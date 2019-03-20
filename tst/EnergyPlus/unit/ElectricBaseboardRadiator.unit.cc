@@ -71,7 +71,6 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     // this unit test is related to issue #5806, the input is configured to allow running get input on two electric radiative convective baseboards
     // and check that they have their zone index pointers setup
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
 
         "  Zone,",
         "    SPACE2-1,                !- Name",

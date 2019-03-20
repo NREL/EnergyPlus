@@ -231,8 +231,6 @@ namespace IntegratedHeatPump {
     {
 
         std::string const idf_objects = delimited_string({
-            "  Version,8.5;",
-
             "  CoilSystem:IntegratedHeatPump:AirSource,",
             "	ASIHP1,     !- Name of an air-source integrated heat pump",
             "	HPOutdoorWaterOutletNode, !- Name of a water node to monitor the supply water flow amount",

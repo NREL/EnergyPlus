@@ -1408,8 +1408,10 @@ namespace EvaporativeFluidCoolers {
                                         "\". Low speed air flow rate must be less than the high speed air flow rate.");
                         ErrorsFound = true;
                     }
-                    if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
-                        SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA) {
+                    if ((SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
+                         SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA)) {
                         ShowSevereError(
                             "EvaporativeFluidCooler:TwoSpeed \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                             "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
@@ -1766,7 +1768,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized &&
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized && PlantFirstSizesOkayToFinalize &&
             SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor) {
             if (PltSizCondNum > 0) {
                 if (PlantSizData(PltSizCondNum).DesVolFlowRate >= SmallWaterVolFlow) {
@@ -3281,6 +3283,8 @@ namespace EvaporativeFluidCoolers {
 
     void clear_state()
     {
+        NumSimpleEvapFluidCoolers = 0;
+        CheckEquipName.clear();
         UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
     }

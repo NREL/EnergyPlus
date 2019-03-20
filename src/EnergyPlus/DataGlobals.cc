@@ -137,6 +137,8 @@ namespace DataGlobals {
     Real64 const StefanBoltzmann(5.6697E-8);     // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 const UniversalGasConst(8314.462175); // (J/mol*K)
 
+    Real64 const convertJtoGJ(1.0E-9); // Conversion factor for J to GJ
+
     // Parameters for EMS Calling Points
     int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
     int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
@@ -156,6 +158,8 @@ namespace DataGlobals {
     int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
     int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
     int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
+    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 

@@ -58,7 +58,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -1056,7 +1056,7 @@ namespace Furnaces {
 
             FurnaceNum = HeatOnlyNum;
             Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           GetObjectNum,
@@ -1592,7 +1592,7 @@ namespace Furnaces {
 
             FurnaceNum = HeatCoolNum + NumHeatOnly + NumUnitaryHeatOnly;
             Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           GetObjectNum,
@@ -2779,7 +2779,7 @@ namespace Furnaces {
             HeatingCoilName = ' ';
 
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           HeatPumpNum,
@@ -3678,7 +3678,7 @@ namespace Furnaces {
             HeatingCoilName = ' ';
 
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
-            Furnace(FurnaceNum).iterationMode.allocate(20);
+            Furnace(FurnaceNum).iterationMode.allocate(3);
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           HeatPumpNum,
@@ -4729,8 +4729,6 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
@@ -5258,7 +5256,7 @@ namespace Furnaces {
             MassFlowRate = Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
             if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp)
                 MinHumRat = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat;
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
                                 Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -5730,12 +5728,15 @@ namespace Furnaces {
         }
         Furnace(FurnaceNum).iterationCounter += 1;
 
-        if (CoolingLoad && Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = CoolingMode;
-        } else if (HeatingLoad && Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = HeatingMode;
-        } else if (Furnace(FurnaceNum).iterationCounter <= 20) {
-            Furnace(FurnaceNum).iterationMode(Furnace(FurnaceNum).iterationCounter) = NoCoolHeat;
+        // push iteration mode stack and set current mode
+        Furnace(FurnaceNum).iterationMode(3) = Furnace(FurnaceNum).iterationMode(2);
+        Furnace(FurnaceNum).iterationMode(2) = Furnace(FurnaceNum).iterationMode(1);
+        if (CoolingLoad) {
+            Furnace(FurnaceNum).iterationMode(1) = CoolingMode;
+        } else if (HeatingLoad) {
+            Furnace(FurnaceNum).iterationMode(1) = HeatingMode;
+        } else {
+            Furnace(FurnaceNum).iterationMode(1) = NoCoolHeat;
         }
 
         // IF small loads to meet or not converging, just shut down unit
@@ -5743,9 +5744,10 @@ namespace Furnaces {
             ZoneLoad = 0.0;
             CoolingLoad = false;
             HeatingLoad = false;
-        } else if (Furnace(FurnaceNum).iterationCounter > 4) { // attempt to lock output (air flow) if oscillations are detected
-            OperatingMode = Furnace(FurnaceNum).iterationMode(5);
-            OperatingModeMinusOne = Furnace(FurnaceNum).iterationMode(4);
+        } else if (Furnace(FurnaceNum).iterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 4)) {
+            // attempt to lock output (air flow) if oscillations are detected
+            OperatingMode = Furnace(FurnaceNum).iterationMode(1);
+            OperatingModeMinusOne = Furnace(FurnaceNum).iterationMode(2);
             OperatingModeMinusTwo = Furnace(FurnaceNum).iterationMode(3);
             Oscillate = true;
             if (OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo) Oscillate = false;
@@ -5787,7 +5789,7 @@ namespace Furnaces {
         }
 
         // AirflowNetwork global variable
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
         }
     }
@@ -9468,9 +9470,6 @@ namespace Furnaces {
         // Update global variables used by AirflowNetwork module.
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9487,7 +9486,8 @@ namespace Furnaces {
         }
 
         // Set mass flow rates during on and off cylce using an OnOff fan
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
             AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = Furnace(FurnaceNum).OpMode;

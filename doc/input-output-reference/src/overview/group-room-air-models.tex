@@ -10,13 +10,13 @@ EnergyPlus offers the different types of air models listed in the table below al
 {\scriptsize
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Summary of Room Air Models \label{table:summary-of-room-air-models}} \tabularnewline
-\toprule 
+\toprule
 Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Summary of Room Air Models} \tabularnewline
-\toprule 
+\toprule
 Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
 \midrule
 \endhead
@@ -152,7 +152,7 @@ RoomAir:TemperaturePattern:ConstantGradient,
 
 \subsection{RoomAir:TemperaturePattern:TwoGradient}\label{roomairtemperaturepatterntwogradient}
 
-This object provides various controls over the value of the gradient used for determining the pattern of room air temperatures. It is similar to previous object RoomAir:TemperaturePattern:ConstantGradient object but simplifies the potentially arduous task of preparing and scheduling a large number of those objects. With this object, two different gradients are entered and user is given several options for controlling how the program will interpolate between the two bounds. The user inputs the height of the location of thermostat, return air, and exhaust air in meters rather than the temperature offset.
+This object provides various controls over the value of the gradient used for determining the pattern of room air temperatures. It is similar to previous object \hyperref[roomairtemperaturepatternconstantgradient]{RoomAir:TemperaturePattern:ConstantGradient} object but simplifies the potentially arduous task of preparing and scheduling a large number of those objects. With this object, two different gradients are entered and user is given several options for controlling how the program will interpolate between the two bounds. The user inputs the height of the location of thermostat, return air, and exhaust air in meters rather than the temperature offset.
 
 \subsubsection{Inputs}\label{inputs-3-031}
 
@@ -236,7 +236,7 @@ RoomAir:TemperaturePattern:TwoGradient,
 
 This object defines a distribution pattern for air temperatures relative to the current mean air temperature as a function of height. The height, referred to as Zeta, is non-dimensional by normalizing with the zone ceiling height. (The actual zone ceiling height can be explicitly entered in the `Zone' object but if not it is calculated by EnergyPlus from the surfaces attached to the zone.) The temperature differences are not non-dimensional and remain in units of degrees Celsius.
 
-An example of a vertical temperature pattern is shown in the figure below. The pattern itself is treated as a piecewise, linear model of air temperature as a function of height. This Zeta-DeltaTai curve, or lookup table, is then mapped to surfaces defined elsewhere in the file. The centroid of each surface and zone ceiling height are used to automatically assign Zeta values within the program. The zone named in the referencing RoomAir:TemperaturePattern:UserDefined object is used to determine which surfaces will be associated with the pattern when it is applied. A single pattern object can be reused for multiple zones and times.
+An example of a vertical temperature pattern is shown in the figure below. The pattern itself is treated as a piecewise, linear model of air temperature as a function of height. This Zeta-DeltaTai curve, or lookup table, is then mapped to surfaces defined elsewhere in the file. The centroid of each surface and zone ceiling height are used to automatically assign Zeta values within the program. The zone named in the referencing \hyperref[roomairtemperaturepatternuserdefined]{RoomAir:TemperaturePattern:UserDefined} object is used to determine which surfaces will be associated with the pattern when it is applied. A single pattern object can be reused for multiple zones and times.
 
 In addition to the vertical temperature pattern there are three other parameters included in the pattern that are important. The first two might affect how the air system conditioning the room is operated. The first describes the temperature difference between the mean air temperature and the point where the sensor of a drybulb thermostat is situated. The second describes the temperature difference between the mean and the point where system air is being extracted from the zone. This is considered important because the changes in temperature difference between supply and return can affect how an air system is controlled to meet the loads. The third parameter can affect the zone air heat balance by altering the temperature of the air leaving the zone through exhaust fans.
 
@@ -852,9 +852,9 @@ This model simulates a thermal zone using a network approach by assuming intra-z
 
 \begin{itemize}
   \item
-    RoomAirSettings:AirflowNetwork
+    \hyperref[roomairsettingsairflownetwork]{RoomAirSettings:AirflowNetwork}
   \item
-    RoomAir:Node:AirflowNetwork
+    \hyperref[roomairnodeairflownetwork]{RoomAir:Node:AirflowNetwork}
   \item
     Room\-Air\-:Node:\-Air\-flow\-Net\-work:\-Ad\-jacent\-Sur\-face\-List
   \item
@@ -867,7 +867,7 @@ This model simulates a thermal zone using a network approach by assuming intra-z
     Airflow\-Net\-work:\-Intra\-zone:\-Link\-age
 \end{itemize}
 
-The first five objects are described below. The last two objects are described in the Airflow Network Model section. This model also requires additional AirflowNetwork:* objects to form a complete network. 
+The first five objects are described below. The last two objects are described in the Airflow Network Model section. This model also requires additional AirflowNetwork:* objects to form a complete network.
 
 \subsection{RoomAirSettings:AirflowNetwork}\label{roomairsettingsairflownetwork}
 
@@ -885,18 +885,18 @@ The name of the EnergyPlus thermal zone corresponding to the RoomAir model zone.
 
 \paragraph{Field: Control Point RoomAir:Node Name}\label{field-control-point-roomairnode-name}
 
-This is the name of a RoomAir:Node:AirflowNetwork object that contains the sensor for zone HVAC controls. The conditions at this node will be used for thermostatic, humidistatic, or comfort based control decisions. The zone node defined in a Zone object is required.
+This is the name of a \hyperref[roomairnodeairflownetwork]{RoomAir:Node:AirflowNetwork} object that contains the sensor for zone HVAC controls. The conditions at this node will be used for thermostatic, humidistatic, or comfort based control decisions. The zone node defined in a Zone object is required.
 
 \paragraph{Field: RoomAir:Node:AirflowNetwork x Name}\label{field-roomairnodeairflownetwork-x-name}
 
-The name of a RoomAir:Node:AirflowNetwork object defined elsewhere. This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer.
+The name of a \hyperref[roomairnodeairflownetwork]{RoomAir:Node:AirflowNetwork} object defined elsewhere. This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer.
 
 An IDF example input is:
 
 \begin{lstlisting}
 
 RoomAirSettings:AirflowNetwork,
-  NORTH_ZONE,     !- Name 
+  NORTH_ZONE,     !- Name
   NORTH_ZONE,              !- Zone Name
   RoomAir Schedule,        !- Availability Schedule Name
   NORTH_ZONE,              !- Control Point RoomAir:Node Name
@@ -1037,7 +1037,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
   CentralUpper_HVAC,        !- Name
   ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
   NORTH_ZONE PTAC,       !- ZoneHVAC or Air Terminal Equipment Object Name 1
-  0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
+  0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1
   0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
 \end{lstlisting}
 

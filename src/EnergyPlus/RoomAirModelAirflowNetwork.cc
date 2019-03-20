@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -267,9 +267,6 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkLinkageData;
-        using DataAirflowNetwork::AirflowNetworkLinkSimu;
-        using DataAirflowNetwork::AirflowNetworkNodeSimu;
         using DataEnvironment::OutBaroPress;
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
@@ -597,17 +594,17 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetworkLinkageData(Link).NodeNums(1) == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(2);
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW2;
+                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
+                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetworkLinkageData(Link).NodeNums(2) == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(1);
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW;
+                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
+                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 
@@ -861,7 +858,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // USE STATEMENTS:
-        using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
         using DataDefineEquip::AirDistUnit;
         using DataGlobals::NumOfZones;
         using DataGlobals::SecInHour;

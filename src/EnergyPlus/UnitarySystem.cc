@@ -51,7 +51,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataGlobals.hh>
 #include <DataHVACControllers.hh>
 #include <DataHeatBalFanSys.hh>
@@ -1030,8 +1030,7 @@ namespace UnitarySystems {
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
                 this->m_IterationCounter = 0;
-                this->m_IterationMode.clear();
-                this->m_IterationMode.resize(21);
+                for (auto & val : this->m_IterationMode) { val = 0; }
 
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) > 0.0) {
@@ -2615,7 +2614,7 @@ namespace UnitarySystems {
                     thisSys.UnitarySystemType_Num = SimAirServingZones::UnitarySystemModel;
                 }
 
-                thisSys.m_IterationMode.resize(21);
+                thisSys.m_IterationMode.resize(3);
 
                 std::string loc_heatingCoilType("");
                 if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
@@ -8601,14 +8600,14 @@ namespace UnitarySystems {
 
         // Calcuate air distribution losses
         //  IF (.NOT. FirstHVACIteration .AND. AirLoopPass .EQ. 1 .AND. AirflowNetworkFanActivated) THEN
-        if (!FirstHVACIteration && DataAirflowNetwork::AirflowNetworkFanActivated) {
+        if (!FirstHVACIteration && AirflowNetwork::AirflowNetworkFanActivated) {
             Real64 DeltaMassRate = 0.0;
             int ZoneInNode = this->m_ZoneInletNode;
             Real64 MinHumRat = DataLoopNode::Node(ZoneInNode).HumRat;
             Real64 MassFlowRate = DataLoopNode::Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
             if (DataLoopNode::Node(this->AirOutNode).Temp < DataLoopNode::Node(this->NodeNumOfControlledZone).Temp)
                 MinHumRat = DataLoopNode::Node(this->AirOutNode).HumRat;
-            if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate =
                     DataLoopNode::Node(this->AirOutNode).MassFlowRate - DataLoopNode::Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -8776,22 +8775,26 @@ namespace UnitarySystems {
                 }
             }
 
-            if (CoolingLoad && this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = CoolingMode;
-            } else if (HeatingLoad && this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = HeatingMode;
-            } else if (this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = NoCoolHeat;
+            // push iteration mode stack and set current mode
+            this->m_IterationMode[2] = this->m_IterationMode[1];
+            this->m_IterationMode[1] = this->m_IterationMode[0];
+            if (CoolingLoad) {
+                this->m_IterationMode[0] = CoolingMode;
+            } else if (HeatingLoad) {
+                this->m_IterationMode[0] = HeatingMode;
+            } else {
+                this->m_IterationMode[0] = NoCoolHeat;
             }
             // IF small loads to meet or not converging, just shut down unit
             if (std::abs(ZoneLoad) < Small5WLoad) {
                 ZoneLoad = 0.0;
                 CoolingLoad = false;
                 HeatingLoad = false;
-            } else if (this->m_IterationCounter > 6) {                // attempt to lock output (air flow) if oscillations are detected
-                int OperatingMode = this->m_IterationMode[7];         // VS systems can take a few more iterations than single-speed systems
-                int OperatingModeMinusOne = this->m_IterationMode[6]; // previously tested 5th iteration, now tests 7th
-                int OperatingModeMinusTwo = this->m_IterationMode[5];
+            } else if (this->m_IterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 6)) {
+                // attempt to lock output (air flow) if oscillations are detected
+                int OperatingMode = this->m_IterationMode[0]; // VS systems can take a few more iterations than single-speed systems
+                int OperatingModeMinusOne = this->m_IterationMode[1];
+                int OperatingModeMinusTwo = this->m_IterationMode[2];
                 bool Oscillate = true;
                 if (OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo) Oscillate = false;
                 if (Oscillate) {
@@ -10213,7 +10216,7 @@ namespace UnitarySystems {
         Real64 DesOutHumRat = this->m_DesiredOutletHumRat;
         int CoilType_Num = this->m_CoolingCoilType_Num;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopDXCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
@@ -11388,7 +11391,7 @@ namespace UnitarySystems {
         this->m_CoolingCycRatio = CycRatio;
         this->m_DehumidificationMode = DehumidMode;
 
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
                 max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
@@ -11455,7 +11458,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopHeatingCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -12007,7 +12010,7 @@ namespace UnitarySystems {
         this->m_HeatingSpeedRatio = SpeedRatio;
         this->m_HeatingCycRatio = CycRatio;
 
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -12074,7 +12077,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopHeatingCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -12370,7 +12373,7 @@ namespace UnitarySystems {
         this->m_SuppHeatPartLoadFrac = PartLoadFrac;
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
-        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -12832,8 +12835,8 @@ namespace UnitarySystems {
             }
         }
 
-        if (DataAirflowNetwork::SimulateAirflowNetwork == DataAirflowNetwork::AirflowNetworkControlMultiADS ||
-            DataAirflowNetwork::SimulateAirflowNetwork == DataAirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
             DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = this->m_FanOpMode;
