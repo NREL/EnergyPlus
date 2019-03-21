@@ -5882,7 +5882,7 @@ namespace ZoneTempPredictorCorrector {
                 Zone(ZoneNum).delta_T = delta_T;
 
                 // s4 - Set ACH to 0 when delta_T <= 0.5, add max and min limits to ach
-                if (abs(delta_T) <= 0.5) {
+                if (std::abs(delta_T) <= 0.5) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (BB + CC * DD - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredTemperature) / (CpAir * delta_T);
@@ -5929,7 +5929,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Calculate multiplier
-                if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
+                if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) *
@@ -6116,7 +6116,7 @@ namespace ZoneTempPredictorCorrector {
                 CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineName);
 
-                if (abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
+                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredHumidityRatio) / delta_HR;
