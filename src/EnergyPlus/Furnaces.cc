@@ -10639,7 +10639,7 @@ namespace Furnaces {
             }
 
             if (Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
-                if (QZnReq > SmallLoad) {
+                if ((QZnReq > SmallLoad) && Furnace(FurnaceNum).HeatCoolMode == Heating) {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(BlankString,
                                Furnace(FurnaceNum).HeatingCoilIndex,
@@ -10797,7 +10797,7 @@ namespace Furnaces {
             }
 
             if (Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
-                if (QZnReq > SmallLoad) {
+                if ((QZnReq > SmallLoad) && (Furnace(FurnaceNum).HeatCoolMode == Heating)) {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(BlankString,
                                Furnace(FurnaceNum).HeatingCoilIndex,
