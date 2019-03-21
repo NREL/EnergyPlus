@@ -4074,6 +4074,7 @@ namespace VariableSpeedCoils {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
+                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
@@ -4145,6 +4146,7 @@ namespace VariableSpeedCoils {
                     }
 
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
+                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
