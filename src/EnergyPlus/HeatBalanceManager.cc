@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -347,8 +347,12 @@ namespace HeatBalanceManager {
             ManageHeatBalanceGetInputFlag = false;
         }
 
+        bool anyRan;
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
+
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
+        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -358,7 +362,6 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
-        bool anyRan;
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance();                                             // Do any heat balance related record keeping
 
@@ -5019,7 +5022,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataDaylighting::ZoneDaylight;
-        using HybridModel::FlagHybridModel;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5135,15 +5137,6 @@ namespace HeatBalanceManager {
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
         SetupOutputVariable(
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
-
-        if (FlagHybridModel) {
-            SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate",
-                                OutputProcessor::Unit::ach,
-                                Zone(ZoneLoop).InfilOAAirChangeRateHM,
-                                "Zone",
-                                "Average",
-                                Zone(ZoneLoop).Name);
-        }
     }
 
     // End of Get Input subroutines for the HB Module
@@ -5179,6 +5172,7 @@ namespace HeatBalanceManager {
         using namespace SolarShading;
         using DataLoopNode::Node;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
+        using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5202,6 +5196,8 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
+        static gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
+        static gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5250,6 +5246,11 @@ namespace HeatBalanceManager {
             }
         }
 
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
+        }
+
         if (TotStormWin > 0) {
             if (BeginDayFlag) {
                 SetStormWindowControl();
@@ -5264,7 +5265,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac) {
+        if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile();
         }
 
@@ -5284,6 +5285,33 @@ namespace HeatBalanceManager {
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
             PerformSolarCalculations();
+        }
+
+        if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
+            for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        if (TS == NumOfTimeStepInHour) {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                        } else {
+                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                        }
+                    }
+                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                        IOFlags flags;
+                        flags.ADVANCE("No");
+                        gio::write(OutputFileShadingFrac, ShdFracFmt2, flags)
+                                << SunlitFrac(TS, iHour, SurfNum);
+                    }
+                    {
+                        IOFlags flags;
+                        flags.ADVANCE("YES");
+                        gio::write(OutputFileShadingFrac, "()", flags);
+                    }
+                }
+            }
         }
 
         // Initialize zone outdoor environmental variables
@@ -5400,6 +5428,7 @@ namespace HeatBalanceManager {
         ZoneInfiltrationFlag.dimension(NumOfZones, false);
         ZoneReOrder = 0;
         ZoneLatentGain.dimension(NumOfZones, 0.0);
+        ZoneLatentGainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
         OAMFL.dimension(NumOfZones, 0.0);
         VAMFL.dimension(NumOfZones, 0.0);
         ZTAV.dimension(NumOfZones, 23.0);
@@ -5953,7 +5982,6 @@ namespace HeatBalanceManager {
         int write_stat;
         int SurfNum;
         static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt fmtN("('\n')");
 
         OutputFileShadingFrac = GetNewUnitNumber();
         {
@@ -5966,7 +5994,6 @@ namespace HeatBalanceManager {
         if (write_stat != 0) {
             ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
         }
-        gio::write(OutputFileShadingFrac, fmtA) << "This file contains external shading fractions for all shading surfaces of all zones.";
         {
             IOFlags flags;
             flags.ADVANCE("No");
@@ -5981,8 +6008,8 @@ namespace HeatBalanceManager {
         }
         {
             IOFlags flags;
-            flags.ADVANCE("No");
-            gio::write(OutputFileShadingFrac, fmtN, flags);
+            flags.ADVANCE("YES");
+            gio::write(OutputFileShadingFrac, "()", flags);
         }
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input

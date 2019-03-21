@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Building,
     Building,                !- Name
@@ -2193,7 +2193,9 @@
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone1UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2201,7 +2203,9 @@
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone2UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2209,7 +2213,9 @@
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone3UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
@@ -2217,7 +2223,9 @@
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone4UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
@@ -2225,7 +2233,9 @@
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone5UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:UnitVentilator,
     Zone1UnitVent,           !- Name

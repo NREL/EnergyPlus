@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -242,6 +242,7 @@ namespace HVACMultiSpeedHeatPump {
         int CoolIndexAvail;            // Index used to minimize the occurrence of output warnings
         int HeatCountAvail;            // Counter used to minimize the occurrence of output warnings
         int HeatIndexAvail;            // Index used to minimize the occurrence of output warnings
+        bool FirstPass;                // used to determine when first call is made
 
         // Default Constructor
         MSHeatPumpData()
@@ -262,7 +263,7 @@ namespace HVACMultiSpeedHeatPump {
               HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(0),
               SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0), HotWaterLoopSide(0), HotWaterBranchNum(0), HotWaterCompNum(0),
               HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0),
-              HeatCountAvail(0), HeatIndexAvail(0)
+              HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true)
         {
         }
     };

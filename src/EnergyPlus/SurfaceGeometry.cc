@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3269,7 +3269,13 @@ namespace SurfaceGeometry {
         for (int i = 1; i <= SurfNum; i++) {
             if (SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface && SurfaceTmp(i).ExtBoundCondName != "") {
                 ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
-                if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                // If we cannot find the referenced surface
+                if (ExtSurfNum == 0) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name +
+                                    "\" references an outside boundary surface that cannot be found:" + SurfaceTmp(i).ExtBoundCondName);
+                    ErrorsFound = true;
+                    // If vertex size mistmatch
+                } else if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name + "\", Vertex size mismatch between base surface :" +
                                     SurfaceTmp(i).Name + " and outside boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
                     ShowContinueError("The vertex sizes are " + TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and " +
@@ -6251,10 +6257,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::TotSurfaces;
+        using DataSurfaces::TotSurfLocalEnv;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6408,10 +6414,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::TotSurfaces;
+        using DataSurfaces::TotSurfLocalEnv;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6528,11 +6534,11 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
         using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
+        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -7047,14 +7053,19 @@ namespace SurfaceGeometry {
                     if (Surface(Item).HeatTransferAlgorithm <= 0) continue;
                     ExtSurfNum = Surface(Item).ExtBoundCond;
                     if (Surface(Item).HeatTransferAlgorithm != Surface(ExtSurfNum).HeatTransferAlgorithm) {
-                        ShowWarningError("An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.");
-                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is " + HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm));
-                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is " + HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm));
+                        ShowWarningError("An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in "
+                                         "both constructions should be same.");
+                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is " +
+                                          HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm));
+                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is " +
+                                          HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm));
                         if (Surface(Item).HeatTransferAlgorithm > Surface(ExtSurfNum).HeatTransferAlgorithm) {
-                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is assigned to " + HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm) + ". Simulation continues.");
+                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is assigned to " +
+                                              HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm) + ". Simulation continues.");
                             Surface(ExtSurfNum).HeatTransferAlgorithm = Surface(Item).HeatTransferAlgorithm;
                         } else {
-                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is assigned to " + HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm) + ". Simulation continues.");
+                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is assigned to " +
+                                              HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm) + ". Simulation continues.");
                             Surface(Item).HeatTransferAlgorithm = Surface(ExtSurfNum).HeatTransferAlgorithm;
                         }
                     }
@@ -7270,6 +7281,7 @@ namespace SurfaceGeometry {
                         ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                     }
                     --SurfaceTmp(SurfNum).Sides;
+                    SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                 } else {
                     if (DisplayExtraWarnings) {
                         ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7303,6 +7315,7 @@ namespace SurfaceGeometry {
                                 ShowContinueError("Dropping Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "].");
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -7323,6 +7336,7 @@ namespace SurfaceGeometry {
                                 SurfaceTmp(SurfNum).Vertex(n).z = SurfaceTmp(SurfNum).Vertex(n + 1).z;
                             }
                             --SurfaceTmp(SurfNum).Sides;
+                            SurfaceTmp(SurfNum).Vertex.redimension(SurfaceTmp(SurfNum).Sides);
                         } else {
                             if (DisplayExtraWarnings) {
                                 ShowContinueError("Cannot Drop Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) +
@@ -8187,15 +8201,15 @@ namespace SurfaceGeometry {
                         // check to make the window refenced is an exterior window
                         if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
                             ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name +
-                                            "\", invalid " + " because it is not an exterior window.");
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                            " because it is not an exterior window.");
                             ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
                         }
                         // check to make sure the window is not using equivalent layer window construction
                         if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
                             ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name +
-                                            "\", invalid " + "\".");
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                            "\".");
                             ShowContinueError(".. equivalent layer window model does not use shading control object.");
                             ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
                             ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
@@ -8203,8 +8217,8 @@ namespace SurfaceGeometry {
                         }
                     } else {
                         ErrorsFound = true;
-                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" +
-                                        SurfaceTmp(SurfNum).Name + "\" appears on more than one WindowShadingControl list.");
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" + SurfaceTmp(SurfNum).Name +
+                                        "\" appears on more than one WindowShadingControl list.");
                         ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
                                           "\" and another one.");
                     }
@@ -8212,7 +8226,6 @@ namespace SurfaceGeometry {
             }
         }
     }
-
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
@@ -8226,7 +8239,8 @@ namespace SurfaceGeometry {
                 } else {
                     // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
                     ErrorsFound = true;
-                    ShowSevereError("FinalAssociateWindowShadingControlFenestration: Fenestration surface named \"" + Surface(fenestrationIndex).Name +
+                    ShowSevereError("FinalAssociateWindowShadingControlFenestration: Fenestration surface named \"" +
+                                    Surface(fenestrationIndex).Name +
                                     "\" has WindowShadingContol index that does not match the initial index assigned.");
                     ShowContinueError("This occurs while WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
                                       "\" is being evaluated. ");

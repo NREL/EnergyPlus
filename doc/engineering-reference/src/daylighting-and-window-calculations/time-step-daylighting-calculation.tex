@@ -2,19 +2,27 @@
 
 \subsection{Overview}\label{overview-027}
 
-A daylighting calculation is performed each time step that the sun is up for each zone that has one or two daylighting reference points specified. The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file. The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then, for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and, for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step. By summation, the net illuminance and glare due to all of the windows in a zone are found. If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare. Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation to determine the electric lighting power required to meet the illuminance setpoint at each reference point.
+A daylighting calculation is performed each time step that the sun is up for each zone that has one or more daylighting reference points specified.
+The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file.
+The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then,
+for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and,
+for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step.
+By summation, the net illuminance and glare due to all of the windows in a zone are found. 
+If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare.
+Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation
+to determine the electric lighting power required to meet the illuminance setpoint at each reference point.
 
 % table 27
 \begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
 \caption{Variables in Time-Step Calculations \label{table:variables-in-time-step-calculations}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Variables in Time-Step Calculations} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endhead
 
@@ -44,7 +52,7 @@ i\(_{L}\) & Reference point index & - & IL \tabularnewline
 i\(_{S}\) & Window shade index & - & IS \tabularnewline
 I\(_{tot}\) & Total daylight illuminance at reference point & lux & DaylIllum \tabularnewline
 B\(_{tot}\), B & Total window background luminance & cd/m\(^{2}\) & BLUM \tabularnewline
-I\(_{set}\) & Illuminance setpoint & lux & ZoneDaylight\%IllumSetPoint \tabularnewline
+I\(_{set}\) & Illuminance setpoint & lux & ZoneDaylight(ZoneNum).IllumSetPoint \tabularnewline
 f\(_{L}\) & Fractional electric lighting output & - & FL \tabularnewline
 f\(_{p}\) & Fractional electric lighting input power & - & FP \tabularnewline
 N\(_{L}\) & Number of steps in a stepped control system & - & LightControlSteps \tabularnewline
@@ -69,6 +77,19 @@ Sky brightness is given by:
 \end{equation}
 
 where \emph{m} is the relative optical air mass and \(S_{norm,dir}^{ext}\) is the extraterrestrial direct normal solar irradiance.
+
+The relative optional air mass is calculated as follows:
+
+\begin{equation}
+m = \frac{1- 1\mathrm{e}{-4}\cdot h}{\frac{\sin(b) + 0.15}{(b+3.885)^{1.253}}}
+\end{equation}
+
+where $b$ is the Solar Altitude Angle, that is the angle of the sun above the horizontal (in degrees), and $h$ is the building altitude (elevation, in meters).
+
+\begin{equation}
+b = \frac{\frac{\Pi}{2} - Z}{DegToRadians}
+\end{equation}
+
 
 If \emph{$\varepsilon$} $\leq$ 1.2,
 
@@ -145,7 +166,7 @@ The horizontal illuminance from sun and sky are given by:
   \end{array}
 \end{equation}
 
-where \emph{Z} is the solar zenith angle,~ \emph{$\eta$\(_{dif}\)} is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and \emph{$\eta$\(_{dir}\)} is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990).
+where \emph{Z} is the solar zenith angle,~ \emph{$\eta$\(_{dif}\)} is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and \emph{$\eta$\(_{dir}\)} is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990), inside the DayltgLuminousEfficacy routine of the WeatherManager module.
 
 The fractions \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are given by:
 

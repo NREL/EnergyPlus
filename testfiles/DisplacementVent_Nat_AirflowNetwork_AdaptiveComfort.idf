@@ -71,7 +71,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.1;
 
   Building,
     NONE,                    !- Name
@@ -113,7 +113,7 @@
     9,                       !- End Month
     30,                      !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule

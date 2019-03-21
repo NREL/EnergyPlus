@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,9 +56,9 @@
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -1848,12 +1848,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                         MSHeatPump(MSHeatPumpNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1870,12 +1870,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1906,12 +1906,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
                                         MSHeatPump(MSHeatPumpNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1938,12 +1938,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -1974,12 +1974,12 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                         MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
@@ -2634,6 +2634,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::TrimSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -2643,6 +2644,21 @@ namespace HVACMultiSpeedHeatPump {
         int NumOfSpeedCooling; // Number of speeds for cooling
         int NumOfSpeedHeating; // Number of speeds for heating
         int i;                 // Index to speed
+
+        if (CurSysNum > 0 && CurOASysNum == 0) {
+            if (MSHeatPump(MSHeatPumpNum).FanType == DataHVACGlobals::FanType_SystemModelObject) {
+                PrimaryAirSystem(CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            } else {
+                PrimaryAirSystem(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            }
+            if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            }
+        }
 
         // FLOW
         NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
@@ -3708,9 +3724,6 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopAFNInfo;
 
         // Locals
@@ -3721,7 +3734,8 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(MSHeatPumpNum);
         }
 
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
             AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
             AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
@@ -3788,6 +3802,15 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPumpReport(MSHeatPumpNum).AuxElecCoolConsumption +=
                 MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR) * ReportingConstant;
         }
+
+        if (MSHeatPump(MSHeatPumpNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, MSHeatPump(MSHeatPumpNum).FirstPass);
+            }
+        }
+
+        // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
     }
 
     void MSHPHeatRecovery(int const MSHeatPumpNum) // Number of the current electric MSHP being simulated

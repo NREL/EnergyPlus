@@ -15,7 +15,10 @@ class ColumnNames(object):
 class CalcSoilSurfTempWorkflow(BaseEPLaunchWorkflow1):
 
     def name(self):
-        return "CalcSoilSurfTemp"
+        return "CalcSoilSurfTemp-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
+
+    def context(self):
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
 
     def description(self):
         return "Run CalcSoilSurfTemp Preprocessor"
@@ -60,6 +63,7 @@ class CalcSoilSurfTempWorkflow(BaseEPLaunchWorkflow1):
 
         csst_out = os.path.join(run_directory, 'CalcSoilSurfTemp.out')
         if os.path.exists(csst_out):
+            self.callback("Removing previous output file")
             os.remove(csst_out)
 
         if os.path.exists(out_file_path):
@@ -73,8 +77,10 @@ class CalcSoilSurfTempWorkflow(BaseEPLaunchWorkflow1):
                 )
 
         # run E+ and gather (for now fake) data
+        self.callback("Running CalcSoilSurfTemp!")
         p1 = Popen([calc_soil_surf_temp_binary, file_name], stdout=PIPE, stdin=PIPE, cwd=run_directory)
         p1.communicate(input=b'1\n1\n')
+        self.callback("CalcSoilSurfTemp Completed!")
 
         if not os.path.exists(csst_out):
             return EPLaunchWorkflowResponse1(
@@ -94,6 +100,7 @@ class CalcSoilSurfTempWorkflow(BaseEPLaunchWorkflow1):
             os.remove(csst_out)
 
         try:
+            self.callback("Processing output file...")
             with open(out_file_path, 'r') as f:
                 lines = f.readlines()
                 avg_temp = float(lines[1][40:-1])
@@ -104,12 +111,14 @@ class CalcSoilSurfTempWorkflow(BaseEPLaunchWorkflow1):
                     ColumnNames.AmplitudeSurfTemp: amp_temp,
                     ColumnNames.PhaseConstant: phase_constant
                 }
+                self.callback("   ...DONE!")
                 return EPLaunchWorkflowResponse1(
                     success=True,
                     message="Ran EnergyPlus OK for file: %s!" % file_name,
                     column_data=column_data
                 )
         except Exception:  # noqa -- there could be lots of issues here, file existence, file contents, float conversion
+            self.callback("   ...FAILED!")
             return EPLaunchWorkflowResponse1(
                 success=False,
                 message="CalcSoilSurfTemp seemed to run, but post processing failed for file: %s!" % full_file_path,

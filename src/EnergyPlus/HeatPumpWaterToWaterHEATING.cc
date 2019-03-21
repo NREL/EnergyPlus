@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -482,24 +482,24 @@ namespace HeatPumpWaterToWaterHEATING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     GSHP(GSHPNum).WWHPPlantTypeOfNum,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (!errFlag) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,

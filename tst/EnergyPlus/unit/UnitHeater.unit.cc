@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,8 +125,6 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     Real64 HWDensity(0.0);            // hot water density, kg/m3
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  Timestep,4;",
 
         "  Building,",
@@ -1048,7 +1046,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
         "    Zone2UnitHeat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  NodeList,",
         "    Zone2Inlets,             !- Name",
@@ -1136,16 +1136,22 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     InitUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(CoilNum, FirstHVACIteration); // init hot water heating coil
 
-    PltSizHeatNum =
-        PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum,
-                                           WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum, ErrorsFound);
+    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
+                                                       UnitHeat(UnitHeatNum).HCoilName,
+                                                       WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum,
+                                                       WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum,
+                                                       ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HWMaxVolFlowRate = WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate;
-    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
-    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
+    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "xxx");
+    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "xxx");
     HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
     HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
@@ -1179,8 +1185,6 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     Real64 HWCoilHeatingRate(0.0);     // hot water heating coil heating rate
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
-
         "  ScheduleTypeLimits,",
         "    Any Number;              !- Name",
 
@@ -1216,7 +1220,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
         "    Zone2UnitHeat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  NodeList,",
         "    Zone2Inlets,             !- Name",
@@ -1368,8 +1374,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_NEAR(UHHeatingRate, UnitHeat(UnitHeatNum).HeatPower, ConvTol);
     // verify the heat rate delivered by the hot water heating coil
     HWMassFlowRate = WaterCoils::WaterCoil(CoilNum).InletWaterMassFlowRate;
-    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
-                                 "UnitTest");
+    CpHW = GetSpecificHeatGlycol(
+        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
     HWCoilHeatingRate = HWMassFlowRate * CpHW * (Node(WCWaterInletNode).Temp - Node(WCWaterOutletNode).Temp);
     EXPECT_NEAR(HWCoilHeatingRate, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, ConvTol);
 }
@@ -1378,7 +1384,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
 
         "Timestep,1;",
 
@@ -1851,10 +1857,14 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
         "    Main Zone ATU,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type",
         "    UnitHeater,              !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    Main Zone ATU,           !- Name",

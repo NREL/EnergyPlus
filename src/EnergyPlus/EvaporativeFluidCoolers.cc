@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1389,12 +1389,12 @@ namespace EvaporativeFluidCoolers {
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum,
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum,
                                     SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum,
+                                    ErrorsFound,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    ErrorsFound);
+                                    _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
@@ -1408,8 +1408,10 @@ namespace EvaporativeFluidCoolers {
                                         "\". Low speed air flow rate must be less than the high speed air flow rate.");
                         ErrorsFound = true;
                     }
-                    if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
-                        SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA) {
+                    if ((SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA > 0.0) &&
+                        (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <=
+                         SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA)) {
                         ShowSevereError(
                             "EvaporativeFluidCooler:TwoSpeed \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                             "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
@@ -1766,7 +1768,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized &&
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized && PlantFirstSizesOkayToFinalize &&
             SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor) {
             if (PltSizCondNum > 0) {
                 if (PlantSizData(PltSizCondNum).DesVolFlowRate >= SmallWaterVolFlow) {
@@ -3281,6 +3283,8 @@ namespace EvaporativeFluidCoolers {
 
     void clear_state()
     {
+        NumSimpleEvapFluidCoolers = 0;
+        CheckEquipName.clear();
         UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
     }

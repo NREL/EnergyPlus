@@ -16,29 +16,30 @@ The component model is a forward model: its inputs are its inlet conditions; its
 
 The controller first decides whether the humidifier is on or off. For the humidifier to be on:
 
-*~the humidifier schedule value must be nonzero;
-
-*~the inlet air mass flow must be greater than zero;
-
-*~the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
+\begin{itemize}
+\item the humidifier schedule value must be nonzero;
+\item the inlet air mass flow must be greater than zero;
+\item the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
+\end{itemize}
 
 If the humidifier is off, the water addition rate is set to zero. If the humidifier is on, the water addition rate needed to meet the humidity setpoint is calculated.
 
 \begin{equation}
 {\dot m_a} \cdot {w_{in}} + {\dot m_{w,add,needed}} = {\dot m_a} \cdot {w_{set}}
+\label{eq:AirHumidifierControllerWaterAdditionRate}
 \end{equation}
 
-where
+where:
 
-\({\dot m_a}\) ~ = the air mass flow rate {[}kg/s{]}
+\({\dot m_a}\) is the the air mass flow rate (kg/s)
 
-\({w_{in}}\) = the inlet air humidity ratio {[}kg/kg{]}
+\({w_{in}}\) is the inlet air humidity ratio (kg/kg)
 
-\({\dot m_{w,add,needed}}\) ~ = water addition rate needed to meet the setpoint {[}kg/s{]}
+\({\dot m_{w,add,needed}}\) is the water addition rate needed to meet the setpoint (kg/s)
 
-\({w_{set}}\) = the humidity ratio setpoint {[}kg/kg{]}
+\({w_{set}}\) is the humidity ratio setpoint (kg/kg).
 
-Equation is the moisture balance equation for the component. It is solved for \({\dot m_{w,add,needed}}\) ~(the other variables are known) which is passed to the humidifier component model as its desired inlet water addition rate.
+Equation~\ref{eq:AirHumidifierControllerWaterAdditionRate} is the moisture balance equation for the component. It is solved for \({\dot m_{w,add,needed}}\) (the other variables are known) which is passed to the humidifier component model as its desired inlet water addition rate.
 
 \subsubsection{Component}\label{component}
 
@@ -48,13 +49,11 @@ The inputs to the component model are the air inlet conditions and mass flow rat
 {\dot m_{w,add,needed,{\rm{max}}}} = Min({\dot m_{w,add}},Ca{p_{nom}})
 \end{equation}
 
-where
+where \(Ca{p_{nom}}\) is the humidifier nominal capacity (kg/s), a user input.
 
-\(Ca{p_{nom}}\) ~ = the humidifier nominal capacity {[}kg/s{]}, a user input.
+If \({\dot m_{w,add,needed,{\rm{max}}}}\) is zero, the outlet conditions are set to the inlet conditions and the water addition rate is set to zero. If the humidifier is scheduled on the component power consumption is set to the standby power consumption: \({W_{hum}} = {W_{stby}}\). Otherwise \({W_{hum}}\) = 0.
 
-If \({\dot m_{w,add,needed,{\rm{max}}}}\) ~is zero, the outlet conditions are set to the inlet conditions and the water addition rate is set to zero. If the humidifier is scheduled on the component power consumption is set to the standby power consumption: \({W_{hum}} = {W_{stby}}\) . Otherwise \({W_{hum}}\) ~ = 0.
-
-If \({\dot m_{w,add,needed,{\rm{max}}}}\) ~\textgreater{} 0, then the moisture and enthalpy balance equations
+If \({\dot m_{w,add,needed,{\rm{max}}}}\) \textgreater{} 0, then the moisture and enthalpy balance equations are:
 
 \begin{equation}
 {\dot m_a} \cdot {w_{in}} + {\dot m_w} = {\dot m_a} \cdot {w_{out}}
@@ -64,57 +63,59 @@ If \({\dot m_{w,add,needed,{\rm{max}}}}\) ~\textgreater{} 0, then the moisture a
 {\dot m_a} \cdot {h_{in}} + {\dot m_w} \cdot {h_w} = {\dot m_a} \cdot {h_{out}}
 \end{equation}
 
-with \({\dot m_w}\) ~set equal to \({\dot m_{w,add,needed,{\rm{max}}}}\) ~are solved for \({w_{out}}\) ~and \({h_{out}}\) . Here
+where:
 
-\({\dot m_a}\) ~ = the air mass flow rate {[}kg/s{]}
+\({\dot m_w}\) is set equal to \({\dot m_{w,add,needed,{\rm{max}}}}\) and then the above equations are solved for \({w_{out}}\) and \({h_{out}}\)
 
-\({w_{in}}\) = the inlet air humidity ratio {[}kg/kg{]}
+\({\dot m_a}\) is the air mass flow rate (kg/s)
 
-\({\dot m_w}\) ~ = the inlet water addition rate {[}kg/s{]}
+\({w_{in}}\) is the inlet air humidity ratio (kg/kg)
 
-\({w_{out}}\) ~ = the outlet air humidity ratio {[}kg/kg{]}
+\({\dot m_w}\) is the inlet water addition rate (kg/s)
 
-\({h_{in}}\) ~ = the inlet air specific enthalpy {[}J/kg{]}
+\({w_{out}}\) is the outlet air humidity ratio (kg/kg)
 
-\({h_w}\) ~ = the steam specific enthalpy = 2676125.~ {[}J/kg{]} at 100 \(^{o}\)C
+\({h_{in}}\) is the inlet air specific enthalpy (J/kg)
 
-\({h_{out}}\) ~ = the outlet air specific enthalpy {[}J/kg{]}
+\({h_w}\) is the steam specific enthalpy = 2676125 J/kg at 100\(^{\circ}\)C
 
-The outlet temperature is obtained from
+\({h_{out}}\) is the outlet air specific enthalpy (J/kg).
+
+The outlet temperature is obtained from:
 
 \begin{equation}
 {T_{out}} = PsyHFnTdbW({h_{out}},{w_{out}})
 \end{equation}
 
-where
+where:
 
-\({T_{out}}\) ~ = outlet air temperature {[}\(^{o}\)C{]},
+\({T_{out}}\) is the outlet air temperature (\(^{\circ}\)C)
 
-\(PsyHFnTdbW({h_{out}},{w_{out}})\) ~is an EnergyPlus psychrometric function.
+\(PsyHFnTdbW\) is an EnergyPlus psychrometric function.
 
-The humidity ratio at saturation at the outlet temperature is
+The humidity ratio at saturation at the outlet temperature is:
 
 \begin{equation}
 {w_{out,sat}} = PsyWFnTdbRhPb({T_{out}},1.0,{P_{atmo}})
 \end{equation}
 
-where
+where:
 
-\({P_{atmo}}\) ~ = the barometric pressure {[}Pa{]},
+\({P_{atmo}}\) is the barometric pressure (Pa)
 
-1.0 is the relative humidity at saturation,
+\(1.0\) is the relative humidity at saturation
 
-\(PsyWFnTdbRhPb\) ~is an EnergyPlus psychrometric function.
+\(PsyWFnTdbRhPb\) is an EnergyPlus psychrometric function.
 
-IF \({w_{out}} \le {w_{out,sat}}\) ~then the outlet condition is below the saturation curve and the desired moisture addition rate can be met. \({\dot m_{w,add}}\) ~is set to \({\dot m_{w,add,needed,{\rm{max}}}}\) ~and the calculation of outlet conditions is done. But if \({w_{out}} > {w_{out,sat}}\) ~then it is assumed that this condition will be detected and the steam addition rate throttled back to bring the outlet conditions back to the saturation condition. We need to find the point where the line drawn between state 1 (inlet) and state 2 (our desired outlet) crosses the saturation curve. This will be the new outlet condition. Rather than iterate to obtain this point, we find it approximately by solving for the point where 2 lines cross: the first drawn from state 1 to state 2, the second from \({T_1}\) , \({w_{1,sat}}\) ~to \({T_2}\) , \({w_{2,sat}}\) ; where
+IF \({w_{out}} \le {w_{out,sat}}\), then the outlet condition is below the saturation curve and the desired moisture addition rate can be met. \({\dot m_{w,add}}\) is set to \({\dot m_{w,add,needed,{\rm{max}}}}\) and the calculation of outlet conditions is done. But if \({w_{out}} > {w_{out,sat}}\) then it is assumed that this condition will be detected and the steam addition rate throttled back to bring the outlet conditions back to the saturation condition. We need to find the point where the line drawn between state 1 (inlet) and state 2 (our desired outlet) crosses the saturation curve. This will be the new outlet condition. Rather than iterate to obtain this point, we find it approximately by solving for the point where 2 lines cross: the first drawn from state 1 to state 2, the second from \({T_1}\), \({w_{1,sat}}\) to \({T_2}\), \({w_{2,sat}}\); where:
 
-\({w_{1,sat}}\) ~is the inlet temperature {[}\(^{o}\)C{]},
+\({T_1}\) is the inlet temperature (\(^{\circ}\)C)
 
-\({w_{2,sat}}\) ~is the humidity ratio at saturation at temperature \({w_{1,sat}}\) ~{[}kg/kg{]},
+\({w_{2,sat}}\) is the humidity ratio at saturation at temperature \({T_1}\) (kg/kg)
 
-\({T_2}\) ~is the desired outlet temperature {[}\(^{o}\)C{]},
+\({T_2}\) is the desired outlet temperature (\(^{\circ}\)C)
 
-\({w_{2,sat}}\) ~is the humidity ratio at saturation at temperature \({T_2}\) ~{[}kg/kg{]}.
+\({w_{2,sat}}\) is the humidity ratio at saturation at temperature \({T_2}\) (kg/kg).
 
 The 2 lines are given by the equations:
 
@@ -136,7 +137,7 @@ Solving for the point (state 3) where the lines cross:
 {T_3} = {T_1} + ({w_3} - {w_1}) \cdot (({T_2} - {T_1})/({w_2} - {w_1}))
 \end{equation}
 
-This point isn't quite on the saturation curve since we made a linear approximation of the curve, but the temperature should be very close to the correct outlet temperature. We will use this temperature as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy. Thus we set \({T_{out}}\) ~ = \({T_3}\) ~and
+This point isn't quite on the saturation curve since we made a linear approximation of the curve, but the temperature should be very close to the correct outlet temperature. We will use this temperature as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy. Thus, we set \({T_{out}}\) = \({T_3}\) and:
 
 \begin{equation}
 {w_{out}} = PsyWFnTdbRhPb({T_{out}},1.0,{P_{atmo}})
@@ -146,7 +147,7 @@ This point isn't quite on the saturation curve since we made a linear approximat
 {h_{out}} = PsyHFnTdbW({T_{out}},{w_{out}})
 \end{equation}
 
-where \(PsyHFnTdbW\) ~is an EnergyPlus psychrometric function. The water addition rate is set to
+where \(PsyHFnTdbW\) is an EnergyPlus psychrometric function. The water addition rate is set to:
 
 \begin{equation}
 {\dot m_{w,add}} = {\dot m_a} \cdot ({w_{out}} - {w_{in}})
@@ -154,17 +155,17 @@ where \(PsyHFnTdbW\) ~is an EnergyPlus psychrometric function. The water additio
 
 We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve. The energy consumption of the electric and gas steam humidifiers is calculated separately.
 
-The electric steam humidifier electric consumption is given by
+The electric steam humidifier electric consumption is given by:
 
 \begin{equation}
 {W_{hum}} = ({\dot m_{w,add}}/Ca{p_{nom}}) \cdot {W_{nom}} + {W_{fan}} + {W_{stby}}
 \end{equation}
 
-where
+where:
 
-\({W_{fan}}\) ~ = nominal fan power {[}W{]}, a user input,
+\({W_{fan}}\) is the nominal fan power (W), a user input
 
-\({W_{stby}}\) ~ = standby power {[}W{]}, a user input.
+\({W_{stby}}\) is the standby power (W), a user input.
 
 The gas steam humidifier performance calculation is done for fixed and variable entering water temperature. The calculation procedure for fixed and variable entering water temperature are as follows.
 
@@ -190,7 +191,19 @@ Q_{NG} = \dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}}
 \rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}}
 \end{equation}
 
-where, EffModCurveValue = thermal efficiency modifier curve value as function of part load ratio. This curve is generated from manufacturer's part load performance data. PLR = part load ratio, (-). Q\_NG\_nom = nominal or rated gas use rate, (Watts). Q\_NG = actual gas use rate, (Watts). eta\_rated = nominal or rated thermal efficiency of gas fired steam humidifier, (-) eta\_actual = actual thermal efficiency of gas fired steam humidifier accounting for part load performance, (-).
+where:
+
+\(EffModCurveValue\) is the thermal efficiency modifier curve value as function of part load ratio. This curve is generated from manufacturer's part load performance data
+
+\(PLR\) is the part load ratio
+
+\(Q_{NG,nom}\) is the nominal or rated gas use rate, (Watts)
+
+\(Q_{NG}\) is the actual gas use rate, (Watts)
+
+\({\eta_{rated}}\) is the nominal or rated thermal efficiency of gas fired steam humidifier
+
+\({\eta_{actual}}\) is the actual thermal efficiency of gas fired steam humidifier accounting for part load performance.
 
 \subsubsection{Variable Inlet WaterTemperature:}\label{variable-inlet-watertemperature}
 
@@ -212,9 +225,9 @@ Q_{NG} = \frac{\dot{m}_w \left(h_{fg}+c_{p,w}\left(100-T_{w,inlet}\right)\right)
 Q_{NG} = \dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}}
 \end{equation}
 
-where, T\_w\_inlet = temperature of water entering the gas steam humidifier, °C. This value depends on the water source.
+where \({T_{w,inlet}}\) is the temperature of water entering the gas steam humidifier(\(^{\circ}\)C). This value depends on the water source.
 
-If the rated gas use rated input field is not autosized, then user specified thermal efficiency will be overridden with a value calculated from user specified rated gas use rate, nominal capacity (m3/s) and design conditions as follows:
+If the rated gas use rated input field is not autosized, then user specified thermal efficiency will be overridden with a value calculated from user specified rated gas use rate, nominal capacity (m\(^3\)/s) and design conditions as follows:
 
 \begin{equation}
  \eta_{rated} = \frac{\dot{V}_{cap,nom} \rho_w \PB{h_{fg}+c_{p,w}\Delta T_w}}{Q_{NG,nom}}
@@ -226,19 +239,23 @@ The gas steam humidifier requires electric power input to the blower fan and ass
 W_{aux} = W_{fan} + W_{controls}
 \end{equation}
 
-where W\_fan = nominal fan power {[}W{]}, a user input, W\_controls = control electric power {[}W{]}, a user input.
+where:
 
-The water consumption rate is, in m3/s, for electric and steam humidifier at a reference temperature of 5.05 C is given by.
+\({W_{fan}}\) is the nominal fan power (W), a user input
+
+\({W_{controls}}\) is the control electric power {(W), a user input.
+
+The water consumption rate, in m\(^3\)/s, for electric and steam humidifier at a reference temperature of 5.05\(^{\circ}\)C is given by:
 
 \begin{equation}
 {\dot V_{cons}} = {\dot m_{w,add}}/{\rho_w}
 \end{equation}
 
-where
+where:
 
-\({\dot V_{cons}}\) ~ = the water consumption rate {[}m\(^{3}\){]},
+\({\dot V_{cons}}\) is the water consumption rate (m\(^{3}\))
 
-\({\rho_w}\) ~ = water density (998.2 kg/m\(^{3}\)).
+\({\rho_w}\) is the density of water (998.2 kg/m\(^{3}\)).
 
 \subsubsection{References}\label{references-003}
 

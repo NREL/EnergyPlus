@@ -19,12 +19,14 @@ The sensible and latent air-to-air heat exchanger is typically used for exhaust 
 \caption{Operating Conditions for Defining Heat Exchanger Performance \label{table:operating-conditions-for-defining-heat}} \tabularnewline
 \toprule 
 Parameter & Conditions \tabularnewline
+ & Heating & Cooling \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Operating Conditions for Defining Heat Exchanger Performance} \tabularnewline
 \toprule 
 Parameter & Conditions \tabularnewline
+ & Heating & Cooling \tabularnewline
 \midrule
 \endhead
 Entering supply air temperature: \tabularnewline
@@ -33,12 +35,15 @@ Wet-bulb & 0.6°C (33°F) & 26°C (78°F) \tabularnewline
 Entering exhaust air temperature: \tabularnewline
 Dry-bulb & 21°C (70°F) & 24°C (75°F) \tabularnewline
 Wet-bulb & 14°C (58°F) & 17°C (63°F) \tabularnewline
+\midrule
 \multicolumn{3}{l}{Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute’s}  \tabularnewline
 \multicolumn{3}{l}{Standard 1060 (ARI 2001).} \tabularnewline
 \bottomrule
 \end{longtable}
 
 Heat exchange between the supply and exhaust air streams occurs whenever the unit is scheduled to be available (availability schedule) and supply/exhaust air flows are present. This heat exchanger object can be used in conjunction with a conventional air-side economizer (i.e., specify an appropriate economizer control type in the Controller:OutdoorAir object), whereby heat exchange is suspended whenever the air-side economizer is active (i.e., air flow is fully bypassed around a fixed-plate heat exchanger or the rotation of a rotary heat exchanger is stopped). This object is also able to suspend heat exchange for the purpose of providing free cooling operation in the absence of a conventional air-side economizer (i.e., specify MinimumFlowWithBypass in the Controller:Outside Air object). Suspension of heat exchange during economizer mode may be customized as necessary using the economizer lockout field. Note that the Economizer Type must be set to something other than NoEconomizer for this control interaction to function.
+
+\clearpage
 
 Several methods of frost control are available to warm the heat exchanger core to prevent frost formation. Available methods are preheat, exhaust only, exhaust air recirculation, and minimum exhaust temperature. Preheat frost control uses a separate heater object placed in the supply inlet air stream to keep the air temperature above the frost threshold temperature. All other frost control methods are modeled within this heat exchanger object.
 
@@ -52,63 +57,67 @@ The user must enter the sensible and latent effectiveness of the heat exchanger 
 
 To obtain the ``operating'' effectiveness of the heat exchanger at different air flow rates, the model first calculates the average volumetric air flow rate through the heat exchanger (average of the supply and exhaust air flow rates) for each simulation time step. Air flows through the heat exchanger may be unbalanced (supply greater than exhaust, or vice versa), but an unbalanced air flow ratio greater than 2:1 is not recommended~ (beyond this range a warning message is issued). The model determines the operating effectiveness of the heat exchanger by linear interpolation or extrapolation of the 100\% flow and 75\% flow effectiveness values specified in the input data file, using the average volumetric air flow rate through the heat exchanger. Extrapolation is allowed down to 50\% and up to 130\% of the nominal supply air flow rate (beyond this range a warning message is issued).
 
-\({\varepsilon_{operating,sensible}} = {\varepsilon_{sensible,75\% \,flow}} + ({\varepsilon_{sensible,100\% \,flow}} - {\varepsilon_{sensible,75\% \,flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)\) ~
+\begin{equation}
+{\varepsilon_{operating,sensible}} = {\varepsilon_{sensible,75\%flow}} + ({\varepsilon_{sensible,100\%flow}} - {\varepsilon_{sensible,75\%flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)
+\label{eq:varepsilonoperatingsensible}
+\end{equation}
 
 \begin{equation}
 {\varepsilon_{operating,latent}} = {\varepsilon_{latent,75\% \,flow}} + ({\varepsilon_{latent,100\% \,flow}} - {\varepsilon_{latent,75\% \,flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)
+\label{eq:varepsilonoperatinglatent}
 \end{equation}
 
-\emph{where}:
+where:
 
-\({\varepsilon_{operating,sensible}}\) ~ = operating sensible effectiveness of the heat exchanger
+\({\varepsilon_{operating,sensible}}\) is the operating sensible effectiveness of the heat exchanger
 
-\({\varepsilon_{operating,latent}}\) ~~~ = operating latent effectiveness of the heat exchanger
+\({\varepsilon_{operating,latent}}\) is the operating latent effectiveness of the heat exchanger
 
-\({\varepsilon_{sensible,75\% \,flow}}\) ~ = ~ sensible effectiveness at 75\% airflow condition
+\({\varepsilon_{sensible,75\% \,flow}}\) is the sensible effectiveness at 75\% airflow condition
 
-\({\varepsilon_{sensible,100\% \,flow}}\) ~ = ~ sensible effectiveness at 100\% airflow condition
+\({\varepsilon_{sensible,100\% \,flow}}\) is the sensible effectiveness at 100\% airflow condition
 
-\({\varepsilon_{latent,75\% \,flow}}\) ~ = ~ latent effectiveness at 75\% airflow condition
+\({\varepsilon_{latent,75\% \,flow}}\) is the latent effectiveness at 75\% airflow condition
 
-\({\varepsilon_{latent,100\% \,flow}}\) ~ = ~ latent effectiveness at 100\% airflow condition
+\({\varepsilon_{latent,100\% \,flow}}\) is the latent effectiveness at 100\% airflow condition
 
-\(H{X_{flowratio}}\) ~ = the ratio of the average operating volumetric air flow rate {[}(supply flow plus exhaust flow) / 2.0{]} to the nominal supply air flow rate
+\(H{X_{flowratio}}\) is the ratio of the average operating volumetric air flow rate {[}(supply flow plus exhaust flow) / 2.0{]} to the nominal supply air flow rate.
 
-If the heat exchanger's supply air inlet temperature is less than the exhaust air inlet temperature, the operating sensible and latent effectivenesses are calculated using the 75\% and 100\% heating condition values; otherwise, the 75\% and 100\% cooling effectiveness values are used in Equations and .
+If the heat exchanger's supply air inlet temperature is less than the exhaust air inlet temperature, the operating sensible and latent effectivenesses are calculated using the 75\% and 100\% heating condition values; otherwise, the 75\% and 100\% cooling effectiveness values are used in Equations~\ref{eq:varepsilonoperatingsensible} and~\ref{eq:varepsilonoperatinglatent}.
 
 The supply air conditions leaving the heat exchanger are determined using the heat exchanger operating effectiveness calculated above, the ratio of the air stream with the minimum heat capacity rate to the supply air stream heat capacity rate, and the difference in temperature or humidity ratio between the supply and exhaust inlet air:
 
 \begin{equation}
-\mathop m\limits^ \bullet  cp,\min \, = MIN(\mathop m\limits^ \bullet  cp,\sup \,,\,\mathop {\,m}\limits^ \bullet  cp,exh)
+{\dot{m} c_{p,min}} = MIN({\dot{m} c_{p,sup}},{\dot{m} c_{p,exh}})
 \end{equation}
 
 \begin{equation}
-{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{{\mathop m\limits^ \bullet  cp,\min }}{{\mathop m\limits^ \bullet  cp,\sup }}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
+{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{\dot{m} c_{p,min}}{\dot{m} c_{p,sup}}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
 \end{equation}
 
 \begin{equation}
 {\omega_{SupAirOut}} = {\omega_{SupAirIn}} + {\varepsilon_{operating,latent}}\left( {\frac{{\mathop m\limits^ \bullet  cp,\min }}{{\mathop m\limits^ \bullet  cp,\sup }}} \right)({\omega_{ExhAirIn}} - {\omega_{SupAirIn}})
 \end{equation}
 
-\emph{where}:
+where:
 
-\(\mathop m\limits^ \bullet cp,\min\) ~~~~~~~~~~ = minimum heat capacity rate (W/K)
+\({\dot{m} c_{p,min}}\) is the minimum heat capacity rate (W/K)
 
-\(\mathop m\limits^ \bullet cp,\sup\) ~~~~~~~~~~~ = heat capacity rate of the supply air stream (W/K)
+\({\dot{m} c_{p,sup}}\) is the heat capacity rate of the supply air stream (W/K)
 
-\(\mathop {\,m}\limits^ \bullet cp,exh\) ~~~~~~~~~~ = heat capacity rate of the exhaust air stream (W/K)
+\({\dot{m} c_{p,exh}}\) is the heat capacity rate of the exhaust air stream (W/K)
 
-\emph{T\(_{SupAirOut}\)} = supply air temperature leaving the heat exchanger (°C)
+\emph{T\(_{SupAirOut}\)} is the supply air temperature leaving the heat exchanger (\(^{\circ}\)C)
 
-\emph{T\(_{SupAirIn}\)} = supply air inlet temperature (°C)
+\emph{T\(_{SupAirIn}\)} is the supply air inlet temperature (\(^{\circ}\)C)
 
-\emph{T\(_{ExhAirIn}\)} = exhaust air inlet temperature (°C)
+\emph{T\(_{ExhAirIn}\)} is the exhaust air inlet temperature (\(^{\circ}\)C)
 
-\({\omega_{SupAirOut}}\) ~~~~~~~~~ = supply air humidity ratio leaving the heat exchanger (kg/kg)
+\({\omega_{SupAirOut}}\) is the supply air humidity ratio leaving the heat exchanger (kg/kg)
 
-\({\omega_{SupAirIn}}\) ~~~~~~~~~~ = supply air inlet humidity ratio (kg/kg)
+\({\omega_{SupAirIn}}\) is the supply air inlet humidity ratio (kg/kg)
 
-\({\omega_{ExhAirIn}}\) ~~~~~~~~~~ = exhaust air inlet humidity ratio (kg/kg)
+\({\omega_{ExhAirIn}}\) is the exhaust air inlet humidity ratio (kg/kg).
 
 Using the supply air outlet temperature and humidity ratio, the enthalpy of the supply air leaving the heat exchanger is calculated.
 
@@ -118,42 +127,42 @@ Using the supply air outlet temperature and humidity ratio, the enthalpy of the 
 
 where:
 
-\emph{h\(_{SupAirOut}\)} = enthalpy of the supply air leaving the heat exchanger (J/kg)
+\emph{h\(_{SupAirOut}\)} is the enthalpy of the supply air leaving the heat exchanger (J/kg)
 
-\emph{PsyHFnTdbW} = psychrometric routine calculating air enthalpy as a function of
+\emph{PsyHFnTdbW} is a psychrometric routine calculating air enthalpy as a function of temperature and humidity ratio.
 
-~~~ temperature and humidity ratio
-
-If the predicted conditions of the supply air leaving the heat exchanger exceed the saturation curve (\textgreater{}100\% RH), then the temperature and humidity ratio of the air are reset to saturated conditions ( = 100\% RH) at the enthalpy condition calculated above (\emph{h\(_{SupAirOut}\)).}
+If the predicted conditions of the supply air leaving the heat exchanger exceed the saturation curve (\textgreater{}100\% RH), then the temperature and humidity ratio of the air are reset to saturated conditions (= 100\% RH) at the enthalpy condition calculated above (\emph{h\(_{SupAirOut}\)).}
 
 Next, the sensible and total heat recovery rates of the heat exchanger are calculated:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = \left( {\mathop m\limits^ \bullet  cp,\sup } \right)({T_{SupAirIn}} - {T_{SupAirOut}})
+{\dot{Q}_{Sensible}} = \left( {\dot{m} c_{p,sup}} \right)({T_{SupAirIn}} - {T_{SupAirOut}})
+\label{eq:QSensibleHX600}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}} = {\mathop m\limits^ \bullet_{SupAir}}({h_{SupAirIn}} - {h_{SupAirOut}})
+{\dot{Q}_{Total}} = {\dot{m}_{SupAir}}({h_{SupAirIn}} - {h_{SupAirOut}})
+\label{eq:QTotalHX601}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{Sensible}}\) ~~~~~~~~~~~ = sensible heat recovery rate (W)
+\({\dot{Q}_{Sensible}}\) is the sensible heat recovery rate (W)
 
-\({\mathop Q\limits^ \bullet_{Total}}\) ~~~~~~~~~~~~~~ = total heat recovery rate (W)
+\({\dot{Q}_{Total}}\) is the total heat recovery rate (W)
 
-\emph{h\(_{SupAirIn}\)}~~~~~~~~~~~ = supply air inlet enthalpy (J/kg)
+\emph{h\(_{SupAirIn}\)} is the supply air inlet enthalpy (J/kg)
 
-\({\mathop m\limits^ \bullet_{SupAir}}\) ~~~~~~~~~~~~ = mass flow rate of the supply air stream (kg/s)
+\({\dot{m}_{SupAir}}\) is the mass flow rate of the supply air stream (kg/s).
 
 The conditions of the exhaust (secondary) air leaving the heat exchanger are then calculated:
 
 \begin{equation}
-{T_{ExhAirOut}} = {T_{ExhAirIn}}\, + \,\,\frac{{{{\mathop Q\limits^ \bullet  }_{Sensible}}}}{{\mathop m\limits^ \bullet  cp,exh}}
+{T_{ExhAirOut}} = {T_{ExhAirIn}} + \frac{\dot{Q}_{Sensible}}{\dot{m} c_{p,exh}}
 \end{equation}
 
 \begin{equation}
-{h_{ExhAirOut}} = {h_{ExhAirIn}}\, + \,\,\frac{{\mathop Q\limits^ \bullet  {\,_{Total}}}}{{{{\mathop m\limits^ \bullet  }_{_{ExhAir}}}}}
+{h_{ExhAirOut}} = {h_{ExhAirIn}} + \frac{\dot{Q}_{Total}}{\dot{m}_{ExhAir}}
 \end{equation}
 
 \begin{equation}
@@ -162,22 +171,22 @@ The conditions of the exhaust (secondary) air leaving the heat exchanger are the
 
 \emph{where}:
 
-\emph{T\(_{ExhAirOut}\)} = exhaust air temperature leaving the heat exchanger (°C)
+\emph{T\(_{ExhAirOut}\)} is the exhaust air temperature leaving the heat exchanger (\(^{\circ}\)C)
 
-\emph{h\(_{ExhAirOut}\)}~~~~~~~~~~ = exhaust air enthalpy leaving the heat exchanger (J/kg)
+\emph{h\(_{ExhAirOut}\)} is the exhaust air enthalpy leaving the heat exchanger (J/kg)
 
-\({\mathop m\limits^ \bullet_{ExhAir}}\) ~~~~~~~~~~~~ = mass flow rate of the exhaust air stream (kg/s)
+\({\dot{m}_{ExhAir}}\) is the mass flow rate of the exhaust air stream (kg/s)
 
-\({\omega_{ExhAirOut}}\) ~~~~~~~~~ = exhaust air humidity ratio leaving the heat exchanger (kg/kg)
+\({\omega_{ExhAirOut}}\) is the exhaust air humidity ratio leaving the heat exchanger (kg/kg)
 
-\emph{PsyWFnTdbH} = psychrometric routine calculating air humidity ratio as a function of temperature and enthalpy
+\emph{PsyWFnTdbH} is a psychrometric routine calculating air humidity ratio as a function of temperature and enthalpy.
 
 As was done for the supply air, calculated exhaust air conditions beyond the saturation curve are reset to saturation conditions at the calculated air enthalpy value.
 
-Once the air conditions leaving each side of the heat exchanger (supply and exhaust) are calculated, this air is blended with any bypass air that was directed around the heat exchanger core to determine the final air conditions leaving the heat exchanger unit. These outlet air conditions are used in Equations and to determine the sensible and total heat recovery rate for the overall heat exchanger unit. The latent heat recovery rate for the overall unit is then calculated as the difference between the total and sensible heat recovery rates:
+Once the air conditions leaving each side of the heat exchanger (supply and exhaust) are calculated, this air is blended with any bypass air that was directed around the heat exchanger core to determine the final air conditions leaving the heat exchanger unit. These outlet air conditions are used in Equations~\ref{eq:QSensibleHX600} and~\ref{eq:QTotalHX601} to determine the sensible and total heat recovery rate for the overall heat exchanger unit. The latent heat recovery rate for the overall unit is then calculated as the difference between the total and sensible heat recovery rates:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Latent}} = {\mathop Q\limits^ \bullet_{Total}}\,\, - \,{\mathop {\,Q}\limits^ \bullet_{Sensible}}
+{\dot{Q}_{Latent}} = {\dot{Q}_{Total}} - {\dot{Q}_{Sensible}}
 \end{equation}
 
 Heat recovery electric power is the electric consumption rate of the unit in watts. The nominal electric power rate for the heat exchanger is specified in the input data file, and can be used to model controls (transformers, relays, etc.) and/or a motor for a rotary heat exchanger. The model assumes that this electric power is consumed whenever the heat exchanger is scheduled to operate and supply/exhaust air flow rates exist. The electric power is assumed to be zero for all other times or if heat exchange is suspended to provide free cooling (economizer operation). None of this electric power is assumed to contribute thermal load to either of the heat exchanger air streams.
@@ -185,66 +194,68 @@ Heat recovery electric power is the electric consumption rate of the unit in wat
 At the end of each HVAC simulation time step, this object reports the sensible, latent and total heat recovery rates for the overall unit as calculated above. The heat recovery rates are reported separately for times when the supply air is heated and when it is cooled (Ref: HeatExchanger:AirToAir:SensibleAndLatent in the EnergyPlus Input Output Reference). The heat recovery electric power is also reported for each simulation time step. In addition to the heat recovery rates and electric power, heating/cooling energy transferred to the supply air and the electric energy consumption by the heat exchanger unit are calculated for the time step being reported as follows:
 
 \begin{equation}
-\,{Q_{SensibleCooling}} = \,\,{\mathop Q\limits^ \bullet_{SensibleCooling}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{SensibleCooling}} = {\dot{Q}_{SensibleCooling}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{Q_{LatentCooling}} = \,\,{\mathop Q\limits^ \bullet_{LatentCooling}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{LatentCooling}} = {\dot{Q}_{LatentCooling}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{Q_{TotalCooling}} = \,\,{\mathop Q\limits^ \bullet_{TotalCooling}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{TotalCooling}} = {\dot{Q}_{TotalCooling}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{Q_{SensibleHeating}} = \,\,{\mathop Q\limits^ \bullet_{SensibleHeating}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{SensibleHeating}} = {\dot{Q}_{SensibleHeating}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{Q_{LatentHeating}} = \,\,{\mathop Q\limits^ \bullet_{LatentHeating}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{LatentHeating}} = {\dot{Q}_{LatentHeating}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{Q_{TotalHeating}} = \,\,{\mathop Q\limits^ \bullet_{TotalHeating}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{Q_{TotalHeating}} = {\dot{Q}_{TotalHeating}} * TimeStepSys * 3600
 \end{equation}
 
 \begin{equation}
-\,{E_{HXUnit}} = \,\,{P_{HXUnit}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+{E_{HXUnit}} = {P_{HXUnit}} * TimeStepSys * 3600
 \end{equation}
 
-where: \(Q_{SensibleCooling}\) = output variable `Heat Exchanger Sensible Cooling Energy, J'
+where: 
 
-\(\,{\mathop Q\limits^ \bullet_{SensibleCooling}}\) ~~~~~~~~~ = output variable `Heat Exchanger Sensible Cooling Rate, W' = \({\mathop Q\limits^ \bullet_{Sensible}}\)
+\(Q_{SensibleCooling}\) is the output variable `Heat Exchanger Sensible Cooling Energy, J'
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ during times when the supply air is cooled
+\({\dot{Q}_{SensibleCooling}}\) is the output variable `Heat Exchanger Sensible Cooling Rate, W' which is equal to \({\dot{Q}_{Sensible}}\) during times when the supply air is cooled
 
-\emph{TimeStepSys} ~~~~~~~~~ = HVAC system simulation time step, hr \(Q_{LatentCooling}\) = output variable `Heat Exchanger Latent Cooling Energy, J'
+\emph{TimeStepSys} is the HVAC system simulation time step, hr
 
-\(\,{\mathop Q\limits^ \bullet_{LatentCooling}}\) ~~~~~~~~~~ = output variable `Heat Exchanger Latent Cooling Rate, W' = \({\mathop Q\limits^ \bullet_{Latent}}\)
+\(Q_{LatentCooling}\) is the output variable `Heat Exchanger Latent Cooling Energy, J'
 
-~~ during times when the supply air is dehumidified \(Q_{TotalCooling}\) = output variable `Heat Exchanger Total Cooling Energy, J'
+\({\dot{Q}_{LatentCooling}}\) is the output variable `Heat Exchanger Latent Cooling Rate, W' which is equal to \({\dot{Q}_{Latent}}\) during times when the supply air is dehumidified
 
-\(\,{\mathop Q\limits^ \bullet_{TotalCooling}}\) ~~~~~~~~~~~~ = output variable `Heat Exchanger Total Cooling Rate, W' = \({\mathop Q\limits^ \bullet_{Total}}\) during
+\(Q_{TotalCooling}\) is the output variable `Heat Exchanger Total Cooling Energy, J'
 
-~~~ times when the supply air enthalpy is reduced \(Q_{SensibleHeating}\) = output variable `Heat Exchanger Sensible Heating Energy, J'
+\({\dot{Q}_{TotalCooling}}\) is the output variable `Heat Exchanger Total Cooling Rate, W' which is equal to \({\dot{Q}_{Total}}\) during times when the supply air enthalpy is reduced
 
-\(\,{\mathop Q\limits^ \bullet_{SensibleHeating}}\) ~~~~~~~~~ = output variable `Heat Exchanger Sensible Heating Rate, W' = \({\mathop Q\limits^ \bullet_{Sensible}}\)
+\(Q_{SensibleHeating}\) is the output variable `Heat Exchanger Sensible Heating Energy, J'
 
-~~ during times when the supply air is heated \(Q_{LatentHeating}\) = output variable `Heat Exchanger Latent Heating Energy, J'
+\({\dot{Q}_{SensibleHeating}}\) is the output variable `Heat Exchanger Sensible Heating Rate, W' which is equal to \({\dot{Q}_{Sensible}}\) during times when the supply air is heated
 
-\(Q_{LatentHeating}\) = output variable `Heat Exchanger Latent Gain Energy, J'
+\(Q_{LatentHeating}\) is the output variable `Heat Exchanger Latent Heating Energy, J' and also the output variable `Heat Exchanger Latent Gain Energy, J'
 
-\(\,{\mathop Q\limits^ \bullet_{LatentHeating}}\) ~~~~~~~~~~ = output variable `Heat Exchanger Latent Gain Rate, W' = \({\mathop Q\limits^ \bullet_{Latent}}\) ~during times when the supply air is humidified \(Q_{TotalHeating}\) = output variable `Heat Exchanger Total Heating Energy, J'
+\({\dot{Q}_{LatentHeating}}\) is the output variable `Heat Exchanger Latent Gain Rate, W' which is equal to \({\dot{Q}_{Latent}}\) during times when the supply air is humidified
 
-\(\,{\mathop Q\limits^ \bullet_{TotalHeating}}\) ~~~~~~~~~~~~ = output variable `Heat Exchanger Total Heating Rate, W' = \({\mathop Q\limits^ \bullet_{Total}}\) during times when the supply air enthalpy is increased
+\(Q_{TotalHeating}\) is the output variable `Heat Exchanger Total Heating Energy, J'
 
-\(\,{E_{HXUnit}}\) ~~~~~~~~~~~~~~~~~ = output variable `Heat Exchanger Electric Energy, J'
+\({\dot{Q}_{TotalHeating}}\) is the output variable `Heat Exchanger Total Heating Rate, W' which is equal to \({\dot{Q}_{Total}}\) during times when the supply air enthalpy is increased
 
-\({P_{HXUnit}}\) ~~~~~~~~~~~~~~~~~~ = output variable `Heat Exchanger Electric Power, W'
+\({E_{HXUnit}}\) is the output variable `Heat Exchanger Electric Energy, J'
+
+\({P_{HXUnit}}\) is the output variable `Heat Exchanger Electric Power, W'.
 
 \subsubsection{Frost Control Methods}\label{frost-control-methods}
 
-In cold weather, frost can form on the heat exchanger causing a reduction in air flow and heat recovery performance. Various strategies can be employed to limit frost formation. Heat exchangers that transfer total energy (sensible plus latent) usually have a lower frost threshold temperature than sensible-only heat exchangers. Frost threshold temperatures for sensible-only heat exchangers may be -1°C to -12°C for plate and rotary heat exchangers respectively, while those for comparable total (sensible plus latent) heat exchangers may be 10°C lower. The frost threshold temperature for a specific application is dependent on the exhaust air dry-bulb temperature and relative humidity, heat exchanger type (e.g., sensible-only or total heat exchange, flat plate or rotary), and the heat exchanger effectiveness. Consult manufacturer's literature to obtain specific frost threshold temperatures for the heat exchanger being modeled.
+In cold weather, frost can form on the heat exchanger causing a reduction in air flow and heat recovery performance. Various strategies can be employed to limit frost formation. Heat exchangers that transfer total energy (sensible plus latent) usually have a lower frost threshold temperature than sensible-only heat exchangers. Frost threshold temperatures for sensible-only heat exchangers may be -1\(^{\circ}\)C to -12\(^{\circ}\)C for plate and rotary heat exchangers respectively, while those for comparable total (sensible plus latent) heat exchangers may be 10\(^{\circ}\)C lower. The frost threshold temperature for a specific application is dependent on the exhaust air dry-bulb temperature and relative humidity, heat exchanger type (e.g., sensible-only or total heat exchange, flat plate or rotary), and the heat exchanger effectiveness. Consult manufacturer's literature to obtain specific frost threshold temperatures for the heat exchanger being modeled.
 
 Four frost control strategies can be modeled for this air-to-air heat exchanger unit. Each of these four strategies is discussed in detail below.
 
@@ -264,40 +275,40 @@ The user enters a threshold temperature, an initial defrost time fraction, and a
 
 where:
 
-\({X_{DefrostTime}}\) ~ = Fractional time period for frost control \(\left( {0\,\, \le \,\,\,{X_{DefrostTime}}\,\, \le \,\,1} \right)\)
+\({X_{DefrostTime}}\) is the fractional time period for frost control \(\left( {0 \leq {X_{DefrostTime}} \leq 1} \right)\)
 
-\({X_{Initial}}\) ~~~~~~~ = Initial defrost time fraction
+\({X_{Initial}}\) is the initial defrost time fraction
 
-\({X_{RateofIncrease}}\) = Rate of defrost time fraction increase (K\(^{-1}\))
+\({X_{RateofIncrease}}\) is the rate of defrost time fraction increase (K\(^{-1}\))
 
-\({T_{Threshold}}\) ~~~~ = Threshold temperature (°C)
+\({T_{Threshold}}\) is the threshold temperature (\(^{\circ}\)C)
 
-\({T_{SupAirIn}}\) ~~~~~~ = Supply air inlet temperature (°C)
+\({T_{SupAirIn}}\) is the supply air inlet temperature (\(^{\circ}\)C).
 
 During the defrost time, supply air flow is fully bypassed around the heat exchanger core and no heat transfer takes place. For the remainder of the time period, no air is bypassed and full heat exchange is achieved. The average supply air flow bypassed around the heat exchanger core is calculated as follows:
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{SupAirBypass}}} = ({X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAir}}}
+{\dot{m}_{SupAirBypass}} = ({X_{DefrostTime}}){\dot{m}_{SupAir}}
 \end{equation}
 
-To determine the average heat transfer rates for the simulation time step, the supply air outlet conditions are first calculated as if the heat exchanger were not in defrost mode (see previous section, Model Description). The sensible and total heat transfer rates are then calculated and multiplied by the fractional time period that the heat exchanger is not in defrost mode (1-\emph{X\(_{DefrostTime}\)}).
+To determine the average heat transfer rates for the simulation time step, the supply air outlet conditions are first calculated as if the heat exchanger were not in defrost mode (see previous section, Model Description). The sensible and total heat transfer rates are then calculated and multiplied by the fractional time period that the heat exchanger is \emph{not} in defrost mode (1-\emph{X\(_{DefrostTime}\)}).
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = (1 - {X_{DefrostTime}})\left( {\mathop m\limits^ \bullet  cp,\sup } \right)({T_{SupAirIn}} - {T_{SupAirOut}})
+{\dot{Q}_{Sensible}} = (1 - {X_{DefrostTime}})\left( {\dot{m} c_{p,sup}} \right)({T_{SupAirIn}} - {T_{SupAirOut}})
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}} = (1 - {X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAir}}}({h_{SupAirIn}} - {h_{SupAirOut}})
+{\dot{Q}_{Total}} = (1 - {X_{DefrostTime}}){\dot{m}_{SupAir}}({h_{SupAirIn}} - {h_{SupAirOut}})
 \end{equation}
 
 Once the average heat transfer rates are determined, the average conditions of the supply air exiting the overall heat exchanger unit are calculated as follows:
 
 \begin{equation}
-{T_{SupAirOut}} = {T_{SupAirIn\,}}\,\,\, - \,\,\,\frac{{{{\mathop Q\limits^ \bullet  }_{Sensible}}}}{{\mathop m\limits^ \bullet  cp,\sup }}
+{T_{SupAirOut}} = {T_{SupAirIn}} - \frac{\dot{Q}_{Sensible}}{\dot{m} c_{p,sup}}
 \end{equation}
 
 \begin{equation}
-{h_{SupAirOut}} = {h_{SupAirIn}}\,\,\, - \,\,\,\frac{{{{\mathop Q\limits^ \bullet  }_{_{Total}}}}}{{{{\mathop m\limits^ \bullet  }_{_{SupAir}}}}}
+{h_{SupAirOut}} = {h_{SupAirIn}} - \frac{\dot{Q}_{Total}}{\dot{m}_{SupAir}}
 \end{equation}
 
 \begin{equation}
@@ -307,11 +318,11 @@ Once the average heat transfer rates are determined, the average conditions of t
 As described previously, if the predicted conditions of the exiting supply air exceed the saturation curve (\textgreater{}100\% RH), then the temperature and humidity ratio of the air are reset to saturated conditions ( = 100\% RH) at the enthalpy condition calculated above (\emph{h\(_{SupAirOut}\))}. If the supply air temperature is reset, the average sensible heat transfer rate is recalculated before the exhaust air outlet conditions are determined:
 
 \begin{equation}
-{T_{ExhAirOut}} = {T_{ExhAirIn}}\,\,\, + \,\,\,\frac{{{{\mathop Q\limits^ \bullet  }_{Sensible}}}}{{\mathop m\limits^ \bullet  cp,exh}}
+{T_{ExhAirOut}} = {T_{ExhAirIn}} + \frac{\dot{Q}_{Sensible}}{\dot{m} c_{p,exh}}
 \end{equation}
 
 \begin{equation}
-{h_{ExhAirOut}} = {h_{ExhAirIn}}\,\,\,\, + \,\,\,\frac{{{{\mathop Q\limits^ \bullet  }_{_{Total}}}}}{{{{\mathop m\limits^ \bullet  }_{_{ExhAir}}}}}
+{h_{ExhAirOut}} = {h_{ExhAirIn}} + \frac{\dot{Q}_{Total}}{\dot{m}_{ExhAir}}
 \end{equation}
 
 \begin{equation}
@@ -331,24 +342,24 @@ The user enters a threshold temperature, an initial defrost time fraction, and a
 The air mass flow rate of the supply air leaving the heat exchanger unit is then calculated using the defrost time fraction calculated above the mass flow rates of supply and exhaust air entering the unit.
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{SupAirOut}}} = (1 - {X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAirIn}}}\,\, + \,\,{X_{DefrostTime}}{\mathop m\limits^ \bullet_{_{ExhAirIn}}}
+{\dot{m}_{SupAirOut}} = (1 - {X_{DefrostTime}}){\dot{m}_{SupAirIn}} + {X_{DefrostTime}}{\dot{m}_{ExhAirIn}}
 \end{equation}
 
-The model assumes that no heat exchange occurs during defrost, and the average supply supply air conditions are simply a blend of the conditions when the unit is not in defrost and the exhaust air inlet conditions during defrost operation:
+The model assumes that no heat exchange occurs during defrost, and the average supply supply air conditions are simply a blend of the conditions when the unit is \emph{not} in defrost and the exhaust air inlet conditions during defrost operation:
 
 \begin{equation}
-{T_{SupAirOut}} = \,\,\frac{{(1 - {X_{DefrostTime}}){{\mathop m\limits^ \bullet  }_{_{SupAirIn}}}{T_{SupAirOut,NoDefrost\,}} + \,\,{X_{DefrostTime}}{{\mathop m\limits^ \bullet  }_{_{ExhAirIn}}}{T_{ExhAirIn\,}}}}{{{{\mathop m\limits^ \bullet  }_{_{SupAirOut}}}}}
+{T_{SupAirOut}} = \frac{{(1 - {X_{DefrostTime}}){{\dot{m}_{SupAirIn}}}{T_{SupAirOut,NoDefrost}} + {X_{DefrostTime}}{{\dot{m}_{ExhAirIn}}}{T_{ExhAirIn}}}}{{{{\dot{m}_{SupAirOut}}}}}
 \end{equation}
 
 \begin{equation}
-{\omega_{SupAirOut}} = \,\,\frac{{(1 - {X_{DefrostTime}}){{\mathop m\limits^ \bullet  }_{_{SupAirIn}}}{\omega_{SupAirOut,NoDefrost\,}} + \,\,{X_{DefrostTime}}{{\mathop m\limits^ \bullet  }_{_{ExhAirIn}}}{\omega_{ExhAirIn\,}}}}{{{{\mathop m\limits^ \bullet  }_{_{SupAirOut}}}}}
+{\omega_{SupAirOut}} = \frac{{(1 - {X_{DefrostTime}}){{\dot{m}_{SupAirIn}}}{\omega_{SupAirOut,NoDefrost}} + {X_{DefrostTime}}{{\dot{m}_{ExhAirIn}}}{\omega_{ExhAirIn}}}}{{{{\dot{m}_{SupAirOut}}}}}
 \end{equation}
 
 \begin{equation}
 {h_{SupAirOut}} = PsyHFnTdbW({T_{SupAirOut}},{\omega_{SupAirOut}})
 \end{equation}
 
-The operating effectivenesses of the heat exchanger are initially calculated according to Equations and assuming no defrost operation. Since the supply air flow across the heat exchanger core is not reduced during defrost operation, the sensible and latent effectiveness are therefore derated (for reporting purposes) in direct proportion to the fraction of time that frost control is not active.
+The operating effectivenesses of the heat exchanger are initially calculated according to Equations~\ref{eq:varepsilonoperatingsensible} and~\ref{eq:varepsilonoperatinglatent} assuming no defrost operation. Since the supply air flow across the heat exchanger core is not reduced during defrost operation, the sensible and latent effectiveness are therefore derated (for reporting purposes) in direct proportion to the fraction of time that frost control is \emph{not} active.
 
 \begin{equation}
 {\varepsilon_{operating,sensible}} = (1 - {X_{DefrostTime}}){\varepsilon_{operating,sensible}}
@@ -361,20 +372,20 @@ The operating effectivenesses of the heat exchanger are initially calculated acc
 Since the exhaust outlet air is recirculated through the supply side of the heat exchanger core, the incoming supply air and exiting exhaust air flows are stopped for the fraction of the time when frost control is active. The average air mass flow rate at the supply air inlet and the exhaust air outlet nodes are therefore reduced accordingly.
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{SupAirIn}}} = (1 - {X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAirIn}}}
+{\dot{m}_{SupAirIn}} = (1 - {X_{DefrostTime}}){\dot{m}_{SupAirIn}}
 \end{equation}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{ExhAirOut}}} = (1 - {X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{ExhAirOut}}}
+{\dot{m}_{ExhAirOut}} = (1 - {X_{DefrostTime}}){\dot{m}_{ExhAirOut}}
 \end{equation}
 
-The conditions of the exiting (outlet) exhaust air (temperature, humidity ratio and enthalpy) are reported as the values when frost control is not active (i.e., the conditions when exhaust air is actually leaving the unit).
+The conditions of the exiting (outlet) exhaust air (temperature, humidity ratio and enthalpy) are reported as the values when frost control is \emph{not} active (i.e., the conditions when exhaust air is actually leaving the unit).
 
 \subsubsection{Minimum Exhaust Temperature}\label{minimum-exhaust-temperature}
 
 With this frost control method, frost formation is avoided by continuously maintaining the temperature of the exhaust air leaving the heat exchanger core above a specified setpoint. The minimum exhaust air temperature is maintained by modulating heat exchanger rotational speed or by bypassing supply air around a plate heat exchanger. For this frost control method, the user must only enter the threshold (minimum) temperature.
 
-For the case of modulating heat exchanger rotation, the operating effectivenesses and outlet air conditions are first calculated as if the heat exchanger is not in defrost mode (see Model Description). If the resulting temperature of the exhaust air leaving the heat exchanger core is below the specified threshold temperature, then the operating effectivenesses are reduced as follows:
+For the case of modulating heat exchanger rotation, the operating effectivenesses and outlet air conditions are first calculated as if the heat exchanger is \emph{not} in defrost mode (see Model Description). If the resulting temperature of the exhaust air leaving the heat exchanger core is below the specified threshold temperature, then the operating effectivenesses are reduced as follows:
 
 \begin{equation}
 {X_{DefrostTime}} = \frac{{({T_{Threshold}} - {T_{ExhAirOut}})}}{{({T_{ExhAirIn}} - {T_{ExhAirOut}})}}
@@ -390,7 +401,7 @@ For the case of modulating heat exchanger rotation, the operating effectivenesse
 
 The supply air and exhaust air outlet conditions are then recalculated using these reduced effectiveness values. Finally the sensible, latent and total heat recovery rates are calculated along with the unit's electric power and electric consumption.
 
-The calculation procedure is slightly different for the case of a plate heat exchanger where the supply air is bypassed around the heat exchanger core. Since the volumetric air flow rate through the heat exchanger core is reduced when frost control is active, an iterative process is used to determine the operating effectiveness of the heat exchanger. The operating effectivenesses and outlet air conditions are first calculated as if the heat exchanger is not in defrost mode (see Model Description). If the resulting temperature of the exhaust air leaving the heat exchanger core is below the specified threshold temperature, then the fractional defrost time is calculated as follows:
+The calculation procedure is slightly different for the case of a plate heat exchanger where the supply air is bypassed around the heat exchanger core. Since the volumetric air flow rate through the heat exchanger core is reduced when frost control is active, an iterative process is used to determine the operating effectiveness of the heat exchanger. The operating effectivenesses and outlet air conditions are first calculated as if the heat exchanger is \emph{not} in defrost mode (see Model Description). If the resulting temperature of the exhaust air leaving the heat exchanger core is below the specified threshold temperature, then the fractional defrost time is calculated as follows:
 
 \begin{equation}
 {X_{DefrostTime}} = \frac{{({T_{Threshold}} - {T_{ExhAirOut}})}}{{({T_{ExhAirIn}} - {T_{ExhAirOut}})}}
@@ -401,25 +412,25 @@ The iteration process then begins to determine the heat exchanger effectiveness 
 \emph{Beginning of iteration process:}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{SupAirCore}}} = (1 - {X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAirIn}}}
+{\dot{m}_{SupAirCore}} = (1 - {X_{DefrostTime}}){\dot{m}_{SupAirIn}}
 \end{equation}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_{SupAirBypass}}} = ({X_{DefrostTime}}){\mathop m\limits^ \bullet_{_{SupAirIn}}}
+{\dot{m}_{SupAirBypass}} = ({X_{DefrostTime}}){\dot{m}_{SupAirIn}}
 \end{equation}
 
-The ratio of average volumetric flow rate through the heat exchanger core to heat exchanger's nominal volumetric flow rate (\emph{HX\(_{flowratio}\)}) is then determined and used to calculate the operating effectiveness of the heat exchanger using Equations and . Since the supply airflow rate through the heat exchanger core is purposely reduced to control frost formation, average volumetric airflow rates below 50\% of nominal are allowed and no warning message is issued. Supply air outlet temperature (leaving the heat exchanger core), sensible heat transfer, and exhaust air outlet temperature are then calculated using the revised heat exchanger effectiveness.
+The ratio of average volumetric flow rate through the heat exchanger core to heat exchanger's nominal volumetric flow rate (\emph{HX\(_{flowratio}\)}) is then determined and used to calculate the operating effectiveness of the heat exchanger using Equations~\ref{eq:varepsilonoperatingsensible} and~\ref{eq:varepsilonoperatinglatent}. Since the supply airflow rate through the heat exchanger core is purposely reduced to control frost formation, average volumetric airflow rates below 50\% of nominal are allowed and no warning message is issued. Supply air outlet temperature (leaving the heat exchanger core), sensible heat transfer, and exhaust air outlet temperature are then calculated using the revised heat exchanger effectiveness.
 
 \begin{equation}
-{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{{\mathop m\limits^ \bullet  cp,\min }}{{\mathop m\limits^ \bullet  cp,\sup }}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
-\end{equation}
-
-\begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = (1 - {X_{DefrostTime}})\left( {\mathop m\limits^ \bullet  cp,\sup } \right)({T_{SupAirInlet}} - {T_{SupAirOutlet}})
+{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{{\dot{m}  c_{p,min}}}{{\dot{m} c_{p,sup}}}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
 \end{equation}
 
 \begin{equation}
-{T_{ExhAirOut}} = {T_{ExhAirIn}} + \frac{{{{\mathop Q\limits^ \bullet  }_{Sensible}}}}{{\mathop m\limits^ \bullet  cp,exh}}
+{\dot{Q}_{Sensible}} = (1 - {X_{DefrostTime}})\left( {\dot{m} c_{p,sup}} \right)({T_{SupAirInlet}} - {T_{SupAirOutlet}})
+\end{equation}
+
+\begin{equation}
+{T_{ExhAirOut}} = {T_{ExhAirIn}} + \frac{\dot{Q}_{Sensible}}{\dot{m} c_{p,exh}}
 \end{equation}
 
 The error between the exhaust outlet temperature and the threshold temperature for frost control and a new defrost time fraction are subsequently calculated.
@@ -429,7 +440,7 @@ Error = {T_{ExhAirOut}} - {T_{Threshold}}
 \end{equation}
 
 \begin{equation}
-{X_{DefrostTime}} = \,{X_{DefrostTime}}\,\left( {\frac{{{T_{ExhAirIn}} - {T_{ExhAirOut}}}}{{{T_{ExhAirIn}} - {T_{Threshold}}}}} \right)
+{X_{DefrostTime}} = {X_{DefrostTime}}\,\left( {\frac{{{T_{ExhAirIn}} - {T_{ExhAirOut}}}}{{{T_{ExhAirIn}} - {T_{Threshold}}}}} \right)
 \end{equation}
 
 \emph{End of iteration process:}
@@ -476,19 +487,19 @@ The input object HeatExchanger:AirToAir:FlatPlate provides an NTU -- effectivene
 
 The inputs for the model are the design values for the primary air flow rate, primary air inlet and outlet temperature,~ secondary air flow rate, and secondary air inlet temperature. No design UAs are required: instead, the ratio (at design conditions) of the primary \emph{hA} to the secondary \emph{hA} (\emph{r\(_{hA}\)}) is input. The flow configuration is also an input (counter, parallel, or crossflow).
 
-n~An important feature of this model is that the heat exchanger total \emph{UA} is a time varying function of the primary and secondary mass flow rates and inlet temperatures.
+An important feature of this model is that the heat exchanger total \emph{UA} is a time varying function of the primary and secondary mass flow rates and inlet temperatures.
 
 \subsubsection{Model Description}\label{model-description-1-007}
 
-The design inlet / outlet conditions determine a design effectiveness \emph{eff}\(_{des}\). From the design capacity flow ratio, the flow arrangement, and \emph{eff}\(_{des,}\) the NTU -- effectiveness formulas give the \emph{NTU\(_{des}\)} and \emph{UA\(_{des}\)}.
+The design inlet / outlet conditions determine a design effectiveness \emph{eff}\(_{des}\). From the design capacity flow ratio, the flow arrangement, and \emph{eff}\(_{des}\), the NTU -- effectiveness formulas give the \emph{NTU\(_{des}\)} and \emph{UA\(_{des}\)}.
 
-The time varying calculations proceed as follows. First the \emph{UA} is determined:
+The time varying calculations proceed as follows. First, the \emph{UA} is determined:
 
 \begin{equation}
 UA = U{A_{des}}({r_{hA}} + 1)/({({\dot m_{p,des}}{T_{p,des}}/{\dot m_p}{T_p})^{.78}} + {r_{hA}}{({\dot m_{s,des}}{T_{s,des}}/{\dot m_s}{T_s})^{.78}})
 \end{equation}
 
-where \emph{des} means \emph{design}, \emph{p} means \emph{primary}, \emph{s} means \emph{secondary}, \emph{T} is air stream temperature, and \(\dot m\) is air stream mass flow rate. From the \emph{UA} and the capacity flow ratio the \emph{NTU} is determined: \(NTU = UA/{C_{\min }}\) . Then the NTU -- effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet condtions are determined.
+where \emph{des} means \emph{design}, \emph{p} means \emph{primary}, \emph{s} means \emph{secondary}, \emph{T} is air stream temperature, and \(\dot m\) is air stream mass flow rate. From the \emph{UA} and the capacity flow ratio the \emph{NTU} is determined: \(NTU = UA/{C_{\min }}\). Then the NTU -- effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet condtions are determined.
 
 \subsubsection{Economizer Operation}\label{economizer-operation-1}
 
@@ -516,23 +527,23 @@ EnergyPlus has another air-to-air heat exchanger object for modeling sensible an
 
 This heat exchanger is a simple object that performs three basic functions:
 
-1.~~~~Informs the associated performance data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1) if it should calculate heat exchange for a simulation time step, or if heat exchange is suspended for the time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger),
-
-2.~~~~Passes the process and regeneration air inlet conditions (e.g., dry-bulb temperature, humidity ratio, air mass flow rate) to the associated performance data type object, and
-
-3.~~~~Reports the total, sensible and latent cooling/heating rates and electric power based on the results from the performance data type model that is specified.
+\begin{enumerate}
+\item Informs the associated performance data type object (e.g., HeatExchanger:Desiccant:Balanc-edFlow:PerformanceDataType1) if it should calculate heat exchange for a simulation time step, or if heat exchange is suspended for the time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger),
+\item Passes the process and regeneration air inlet conditions (e.g., dry-bulb temperature, humidity ratio, air mass flow rate) to the associated performance data type object, and
+\item Reports the total, sensible and latent cooling/heating rates and electric power based on the results from the performance data type model that is specified.
+\end{enumerate}
 
 While the desiccant heat exchanger object's availability to provide heat exchange between the two air streams is determined by the user-specified availability schedule, other objects that call this heat exchanger object can also control its heat exchange during a simulation time step. Currently, this desiccant heat exchanger model can be referenced by two compound objects: CoilSystem:Cooling:DX:HeatExchangerAssisted and Dehumidifier:Desiccant:System, both of which are used to provide enhanced dehumidification over conventional systems. If this heat exchanger is referenced by a compound object, the compound object will control heat exchanger operation (i.e., tell the heat exchanger if heat exchange is needed or not for each simulation time step). Details for how the compound objects control exchanger operation are described elsewhere in this document (ref. CoilSystem:Cooling:DX:HeatExchangerAssisted and Dehumidifier:Desiccant:System).
 
-This desiccant heat exchanger object may also be specified directly in a AirLoopVHAC (air loop BranchList) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList without being referenced by a compound object. If specified directly in a AirLoopHVAC loop or AirLoopHVAC:OutdoorAirSystem:EquipmentList, then the heat exchanger can be controlled to provide heat exchange based on a maximum and/or minimum humidity setpoint placed on the process air outlet node (ref. SetpointManagers). If no humidity setpoints are provided on this node, then heat exchange will be provided whenever the heat exchanger is available to operate (via its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams. Further details regarding heat exchanger control via humidity setpoints on the process air outlet node are described in the section for the associated data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1).
+This desiccant heat exchanger object may also be specified directly in a AirLoopHVAC (air loop BranchList) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList without being referenced by a compound object. If specified directly in a AirLoopHVAC loop or AirLoopHVAC:OutdoorAirSystem:EquipmentList, then the heat exchanger can be controlled to provide heat exchange based on a maximum and/or minimum humidity setpoint placed on the process air outlet node (ref. SetpointManagers). If no humidity setpoints are provided on this node, then heat exchange will be provided whenever the heat exchanger is available to operate (via its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams. Further details regarding heat exchanger control via humidity setpoints on the process air outlet node are described in the section for the associated data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1).
 
 The balanced flow desiccant heat exchanger model first checks for three conditions to be true before calling the specified performance data type model to calculate heat exchanger performance:
 
-·~~~~~~~~Non-zero air mass flow rates on the process and regeneration inlet air nodes,
-
-·~~~~~~~~Desiccant heat exchanger is available to operate based on its availability schedule,
-
-·~~~~~~~~If a compound object is calling this desiccant heat exchanger, it is requesting that heat exchange be provided.
+\begin{itemize}
+\item Non-zero air mass flow rates on the process and regeneration inlet air nodes,
+\item Desiccant heat exchanger is available to operate based on its availability schedule,
+\item If a compound object is calling this desiccant heat exchanger, it is requesting that heat exchange be provided.
+\end{itemize}
 
 If any of these conditions is false, then heat exchange is suspended and the model simply passes the air conditions on the process and regeneration air inlet nodes to the respective outlet air nodes. In addition, the heat exchanger electric power is set to zero.
 
@@ -541,120 +552,124 @@ If all of the above conditions are true, then heat exchange is active and the sp
 After the specified performance data type model calculates the process/regeneration air outlet conditions and heat exchanger electric power, the balanced flow desiccant heat exchanger model uses that information to report overall performance. Specifically, the heat exchanger's sensible, latent and total heating and cooling rates are calculated for the process air side of the heat exchanger. Since energy must be conserved, the same heating or cooling rates apply to the regeneration air stream although they are opposite in heat transfer direction (e.g., a sensible cooling rate on the process air side of the heat exchanger would indicate an equivalent sensible heating rate on the regeneration air side).
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = \,{\mathop m\limits^ \bullet_{Proc}}C{p_{Proc,\,\,in}}\left( {{T_{Proc,\,\,out}}\, - \,{T_{Proc,\,\,in}}} \right)
+{\dot{Q}_{Sensible}} = {\dot{m}_{Proc}} {C_{p_{Proc,in}}} \left( {{T_{Proc,out}} - {T_{Proc,in}}} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}} = \,{\mathop m\limits^ \bullet_{Proc}}\left( {{h_{Proc,\,\,out}}\, - \,{h_{Proc,\,\,in}}} \right)
+{\dot{Q}_{Total}} = {\dot{m}_{Proc}}\left( {{h_{Proc,out}}\, - \,{h_{Proc,in}}} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Latent}} = \,{\mathop Q\limits^ \bullet_{Total}}\, - \,{\mathop Q\limits^ \bullet_{Sensible}}
+{\dot{Q}_{Latent}} = {\dot{Q}_{Total}} - {\dot{Q}_{Sensible}}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{Sensible}}\) ~~~~~ = sensible heat transfer rate to the process air stream (W)
+\({\dot{Q}_{Sensible}}\) is the sensible heat transfer rate to the process air stream (W)
 
-\({\mathop Q\limits^ \bullet_{Total}}\) ~~~~~~~~ = total heat transfer rate to the process air stream (W)
+\({\dot{Q}_{Total}}\) is the total heat transfer rate to the process air stream (W)
 
-\({\mathop Q\limits^ \bullet_{Latent}}\) ~~~~~~~ = latent heat transfer rate to the process air stream (W)
+\({\dot{Q}_{Latent}}\) is the latent heat transfer rate to the process air stream (W)
 
-\({\mathop m\limits^ \bullet_{Proc}}\) ~~~~~~~~ = process air mass flow rate (kg/s)
+\({\dot{m}_{Proc}}\) is the process air mass flow rate (kg/s)
 
-\(C{p_{Proc,\,\,in}}\) ~~~~ = specific heat of inlet process air (J/kg-K)
+\({C_{p_{Proc,in}}}\) is the specific heat of inlet process air (J/kg-K)
 
-\({T_{Proc,\,\,out}}\) ~~~~~ = process air outlet temperature (°C)
+\({T_{Proc,out}}\) is the process air outlet temperature (°C)
 
-\({T_{Proc,\,\,in}}\) ~~~~~~~ = process air inlet temperature (°C)
+\({T_{Proc,in}}\) is the process air inlet temperature (°C)
 
-\({h_{Proc,\,\,out}}\) ~~~~~ = process air outlet enthalpy (J/kg)
+\({h_{Proc,out}}\) is the process air outlet enthalpy (J/kg)
 
-\({h_{Proc,\,\,in}}\) ~~~~~~~ = process air inlet enthalpy (J/kg)
+\({h_{Proc,in}}\) is the process air inlet enthalpy (J/kg).
 
 To simplify the accounting of heat exchanger performance, the sensible, latent, and total heat transfer rates for the process side of the heat exchanger are stored in cooling and heating report variables. For example, if the sensible heat transfer rate is negative, the absolute value is stored in a ``cooling'' rate report variable. Conversely, if the sensible heat transfer rate is positive, the value is stored in a ``heating'' rate report variable. Similar accounting is performed for the latent and total heat transfer rate variables as follows:
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} <  = 0} \right){\mathop Q\limits^ \bullet_{SensibleCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}}} \right)
+IF \left( {{{\dot{Q}_{Sensible}}} \leq 0} \right) {\dot{Q}_{SensibleCooling}} = ABS\left( {\dot{Q}_{Sensible}} \right)
 \end{equation}
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} > 0} \right){\mathop Q\limits^ \bullet_{SensibleHeating}} = {\mathop Q\limits^ \bullet_{Sensible}}
+IF \left( {{\dot{Q}_{Sensible}} > 0} \right){\dot{Q}_{SensibleHeating}} = {\dot{Q}_{Sensible}}
 \end{equation}
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} <  = 0} \right){\mathop Q\limits^ \bullet_{LatentCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Latent}}} \right)
+IF \left( {{{\dot{Q}_{Latent}}} \leq 0} \right) {\dot{Q}_{LatentCooling}} = ABS\left( {\dot{Q}_{Latent}} \right)
 \end{equation}
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} > 0} \right){\mathop Q\limits^ \bullet_{LatentHeating}} = {\mathop Q\limits^ \bullet_{Latent}}
+IF \left( {{\dot{Q}_{Latent}} > 0} \right){\dot{Q}_{LatentHeating}} = {\dot{Q}_{Latent}}
 \end{equation}
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} <  = 0} \right){\mathop Q\limits^ \bullet_{TotalCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Total}}} \right)
+IF \left( {{{\dot{Q}_{Total}}} \leq 0} \right) {\dot{Q}_{TotalCooling}} = ABS\left( {\dot{Q}_{Total}} \right)
 \end{equation}
 
 \begin{equation}
-IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} > 0} \right){\mathop Q\limits^ \bullet_{TotalHeating}} = {\mathop Q\limits^ \bullet_{Total}}
+IF \left( {{\dot{Q}_{Total}} > 0} \right){\dot{Q}_{TotalHeating}} = {\dot{Q}_{Total}}
 \end{equation}
 
 At the end of each HVAC simulation time step, this object reports the sensible, latent and total cooling/heating energy and electric consumption for the heat exchanger as follows:
 
 \begin{equation}
-{Q_{SensibleCooling}} = {\dot Q_{SensibleCooling}}*TimeStepSys*3600.
+{Q_{SensibleCooling}} = {\dot Q_{SensibleCooling}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{Q_{LatentCooling}} = {\dot Q_{LatentCooling}}*TimeStepSys*3600.
+{Q_{LatentCooling}} = {\dot Q_{LatentCooling}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
+{Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{Q_{SensibleHeating}} = {\dot Q_{SensibleHeating}}*TimeStepSys*3600.
+{Q_{SensibleHeating}} = {\dot Q_{SensibleHeating}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{Q_{LatentHeating}} = {\dot Q_{LatentHeating}}*TimeStepSys*3600.
+{Q_{LatentHeating}} = {\dot Q_{LatentHeating}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{Q_{TotalHeating}} = {\dot Q_{TotalHeating}}*TimeStepSys*3600.
+{Q_{TotalHeating}} = {\dot Q_{TotalHeating}}*TimeStepSys*3600
 \end{equation}
 
 \begin{equation}
-{E_{HXUnit}} = {P_{HXUnit}}*TimeStepSys*3600.
+{E_{HXUnit}} = {P_{HXUnit}}*TimeStepSys*3600
 \end{equation}
 
-where: \(Q_{SensibleCooling}\) = output variable `Heat Exchanger Sensible Cooling Energy, J'
+where:
 
-\({\dot Q_{SensibleCooling}}\) ~~~~~~~~~ = output variable `Heat Exchanger Sensible Cooling Rate, W' = \({\dot Q_{Sensible}}\)
+\(Q_{SensibleCooling}\) is the output variable `Heat Exchanger Sensible Cooling Energy, J'
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ during times when the process air is cooled
+\({\dot Q_{SensibleCooling}}\) is the output variable `Heat Exchanger Sensible Cooling Rate, W' which is equal to \({\dot Q_{Sensible}}\) during times when the process air is cooled
 
-\emph{TimeStepSys} ~~~~~~~~~ = HVAC system simulation time step, hr \(Q_{LatentCooling}\) = output variable `Heat Exchanger Latent Cooling Energy, J'
+\emph{TimeStepSys} is the HVAC system simulation time step, hr
 
-\({\dot Q_{LatentCooling}}\) ~~~~~~~~~~ = output variable `Heat Exchanger Latent Cooling Rate, W' = \({\dot Q_{Latent}}\)
+\(Q_{LatentCooling}\) is the output variable `Heat Exchanger Latent Cooling Energy, J'
 
-~~ during times when the process air is dehumidified \(Q_{TotalCooling}\) = output variable `Heat Exchanger Total Cooling Energy, J'
+\({\dot Q_{LatentCooling}}\) is the output variable `Heat Exchanger Latent Cooling Rate, W' which is equal to \({\dot Q_{Latent}}\) during times when the process air is dehumidified
 
-\({\dot Q_{TotalCooling}}\) ~~~~~~~~~~~~ = output variable `Heat Exchanger Total Cooling Rate, W' = \({\dot Q_{Total}}\) during
+\(Q_{TotalCooling}\) is the output variable `Heat Exchanger Total Cooling Energy, J'
 
-~~~ times when the process air enthalpy is reduced \(Q_{SensibleHeating}\) = output variable `Heat Exchanger Sensible Heating Energy, J'
+\({\dot Q_{TotalCooling}}\) is the output variable `Heat Exchanger Total Cooling Rate, W' which is equal to \({\dot Q_{Total}}\) during times when the process air enthalpy is reduced
 
-\({\dot Q_{SensibleHeating}}\) ~~~~~~~~~ = output variable `Heat Exchanger Sensible Heating Rate, W' = \({\dot Q_{Sensible}}\)
+\(Q_{SensibleHeating}\) is the output variable `Heat Exchanger Sensible Heating Energy, J'
 
-~~ during times when the process air is heated \(Q_{LatentHeating}\) = output variable `Heat Exchanger Latent Gain Energy, J'
+\({\dot Q_{SensibleHeating}}\) is the output variable `Heat Exchanger Sensible Heating Rate, W' which is equal to \({\dot Q_{Sensible}}\) during times when the process air is heated
 
-\({\dot Q_{LatentHeating}}\) ~~~~~~~~~~ = output variable `Heat Exchanger Latent Gain Rate, W' = \({\dot Q_{Latent}}\) ~during times when the process air is humidified \(Q_{TotalHeating}\) = output variable `Heat Exchanger Total Heating Energy, J'
+\(Q_{LatentHeating}\) is the output variable `Heat Exchanger Latent Gain Energy, J'
 
-\({\dot Q_{TotalHeating}}\) ~~~~~~~~~~~~ = output variable `Heat Exchanger Total Heating Rate, W' = \({\dot Q_{Total}}\) during times when the process air enthalpy is increased
+\({\dot Q_{LatentHeating}}\) is the output variable `Heat Exchanger Latent Gain Rate, W' which is equal to \({\dot Q_{Latent}}\) during times when the process air is humidified
 
-\({E_{HXUnit}}\) ~~~~~~~~~~~~~~~~~ = output variable `Heat Exchanger Electric Energy, J'
+\(Q_{TotalHeating}\) is the output variable `Heat Exchanger Total Heating Energy, J'
 
-\({P_{HXUnit}}\) ~~~~~~~~~~~~~~~~~~ = output variable `Heat Exchanger Electric Power, W'
+\({\dot Q_{TotalHeating}}\) is the output variable `Heat Exchanger Total Heating Rate, W' which is equal to \({\dot Q_{Total}}\) during times when the process air enthalpy is increased
+
+\({E_{HXUnit}}\) is the output variable `Heat Exchanger Electric Energy, J'
+
+\({P_{HXUnit}}\) is the output variable `Heat Exchanger Electric Power, W'.
 
 \subsubsection{Economizer Operation}\label{economizer-operation-2}
 
@@ -682,17 +697,17 @@ The user is required to enter a nominal volumetric air flow rate and a nominal f
 
 where:
 
-\({A_{face}}\) ~~~~~~~~~ = heat exchanger face area (m\(^{2}\))
+\({A_{face}}\) is the heat exchanger face area (m\(^{2}\))
 
-\({V_{face,nom}}\) ~~~~~ = nominal air volume flow rate specified for the heat exchanger (m\(^{3}\)/s)
+\({V_{face,nom}}\) is the nominal air volume flow rate specified for the heat exchanger (m\(^{3}\)/s)
 
-\({\mathop v\limits^ \bullet_{face,nom}}\) ~~~~~ = nominal air face velocity specified for the heat exchanger (m/s)
+\({\dot{v}_{face,nom}}\) is the nominal air face velocity specified for the heat exchanger (m/s)
 
-\(RFV\) ~~~~~~~~ = face velocity of the regeneration (and process) air stream (m/s)
+\(RFV\) is the face velocity of the regeneration (and process) air stream (m/s)
 
-\({\mathop m\limits^ \bullet_{Reg,in}}\) ~~~~~~ = mass flow rate of the regeneration air stream (kg/s)
+\({\dot{m}_{Reg,in}}\) is the mass flow rate of the regeneration air stream (kg/s)
 
-\({\rho_{Std}}\) ~~~~~~~~~~ = density of air at standard temperature and pressure {[}dry air at 20°C{]} (m\(^{3}\)/kg)
+\({\rho_{Std}}\) is the density of air at standard temperature and pressure {[}dry air at 20\(^{\circ}\)C{]} (m\(^{3}\)/kg).
 
 The face velocity calculated each simulation time step is used in the empirical equations (see `Model Calculations' below) and should be within the minimum and maximum velocity boundaries specified for the model coefficients (see `Empirical Model Boundaries (Minimum and Maximum)` below). When the calculated air velocity exceeds one of the boundaries, a warning is issued and the velocity is reset to the appropriate boundary value before being passed to the empirical equations for calculating regeneration air outlet temperature and humidity ratio. If the user is confident in their empirical model coefficients, the minimum and maximum velocity boundaries may be expanded slightly (caution should be used here) to allow extrapolation of the empirical equations during the simulation.
 
@@ -708,17 +723,17 @@ RTO = B1 + B2*RWI + B3*RTI + B4*\left( {\frac{{RWI}}{{RTI}}} \right) + B5*PWI + 
 
 where:
 
-\(RTO\) ~ = regeneration outlet air dry-bulb temperature (°C)
+\(RTO\) is the regeneration outlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\(RWI\) ~ = regeneration inlet air humidity ratio (kg/kg)
+\(RWI\) is the regeneration inlet air humidity ratio (kg/kg)
 
-\(RTI\) ~ = regeneration inlet air dry-bulb temperature (°C)
+\(RTI\) is the regeneration inlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\(PWI\) ~ = process inlet air humidity ratio (kg/kg)
+\(PWI\) is the process inlet air humidity ratio (kg/kg)
 
-\(PTI\) ~ = process inlet air dry-bulb temperature (°C)
+\(PTI\) is the process inlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\(RFV\) ~ = regeneration (and process) face velocity (m/s)
+\(RFV\) is the regeneration (and process) face velocity (m/s).
 
 Similarly, the humidity ratio of the regeneration outlet air is defined using the same empirical equation form; however, different coefficients are used as follows:
 
@@ -726,49 +741,47 @@ Similarly, the humidity ratio of the regeneration outlet air is defined using th
 RWO = C1 + C2*RWI + C3*RTI + C4*\left( {\frac{{RWI}}{{RTI}}} \right) + C5*PWI + C6*PTI + C7*\left( {\frac{{PWI}}{{PTI}}} \right) + C8*RFV
 \end{equation}
 
-where:
-
-\(RWO\) ~ = regeneration outlet air humidity ratio (kg/kg)
+where \(RWO\) is the regeneration outlet air humidity ratio (kg/kg).
 
 If the regeneration outlet air conditions exceed the saturation curve, RTO and RWO are reset to saturated conditions (100\% RH) at the enthalpy calculated based on the original RTO and RWO values.
 
 Once the regeneration outlet air conditions are determined as described above, the dry-bulb temperature and humidity ratio differences across the regeneration side of the heat exchanger are calculated.
 
 \begin{equation}
-{T_{diff}} = \,RTO - {T_{Reg,\,\,in}}
+{T_{diff}} = RTO - {T_{Reg,in}}
 \end{equation}
 
 \begin{equation}
-{w_{diff}} = \,RWO - {w_{Reg,\,\,in}}
+{w_{diff}} = RWO - {w_{Reg,in}}
 \end{equation}
 
 where:
 
-\({T_{Reg,\,\,in}}\) ~~~~~~~~ = actual regeneration inlet air dry-bulb temperature (°C)
+\({T_{Reg,in}}\) is the actual regeneration inlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\({w_{Reg,\,\,in}}\) ~~~~~~~ = actual regeneration inlet air humidity ratio (kg/kg)
+\({w_{Reg,in}}\) is the actual regeneration inlet air humidity ratio (kg/kg)
 
-\({T_{diff}}\) ~~~~~~~~~~ = regeneration air temperature difference based on empirical model (°C)
+\({T_{diff}}\) is the regeneration air temperature difference based on empirical model (\(^{\circ}\)C)
 
-\(wdiff\) ~~~~~~~~~ = regeneration air humidity ratio difference based on empirical model (kg/kg)
+\({w_{diff}}\) is the regeneration air humidity ratio difference based on empirical model (kg/kg)
 
-The regeneration outlet air conditions described above represent the full load outlet conditions under steady-state operation. However, there are times when the heat exchanger may not operate for the entire simulation time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger for a portion of the time step). For example, the parent object calling this heat exchanger model may request that it only provide heat exchange for a portion of the time step (\emph{HXPartLoadRatio}). Another example would be if this heat exchanger is not called by a parent object but is instead placed directly in a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem and a setpoint manager is used to place a minimum and/or maximum humidity ratio setpoint on the process air outlet node. For this case the humidity setpoints, if present, are used to calculate a part-load ratio for the heat exchanger assuming the full-load process air humidity ratio difference is equivalent (but opposite in sign) to the regeneration air humidity ratio difference (\emph{w\(_{diff}\)}):
+The regeneration outlet air conditions described above represent the full load outlet conditions under steady-state operation. However, there are times when the heat exchanger may not operate for the entire simulation time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger for a portion of the time step). For example, the parent object calling this heat exchanger model may request that it only provide heat exchange for a portion of the time step (\emph{HXPartLoadRatio}). Another example would be if this heat exchanger is \emph{not} called by a parent object but is instead placed directly in a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem and a setpoint manager is used to place a minimum and/or maximum humidity ratio setpoint on the process air outlet node. For this case the humidity setpoints, if present, are used to calculate a part-load ratio for the heat exchanger assuming the full-load process air humidity ratio difference is equivalent (but opposite in sign) to the regeneration air humidity ratio difference (\emph{w\(_{diff}\)}):
 
-If $w_{diff}>0$, then Regen air humidified, process air dehumidified:
+If $w_{diff}>0$, then (Regen air humidified, process air dehumidified):
 
 \begin{equation}
-  HXPartLoadRatio = \frac{w_{Proc,in} - w_{max, setpoint}}{w_{diff}}
+  HXPartLoadRatio = \frac{w_{Proc,in} - w_{max,setpoint}}{w_{diff}}
 \end{equation}
 
-Else, if $w_{diff} <0$, then Regen air dehumidified, process air humidified:
+Else, if $w_{diff} <0$, then (Regen air dehumidified, process air humidified):
 
 \begin{equation}
-  HXPartLoadRatio = \frac{w_{Proc,in} - w_{min, setpoint}}{w_{diff}}
+  HXPartLoadRatio = \frac{w_{Proc,in} - w_{min,setpoint}}{w_{diff}}
 \end{equation}
 
 And finally, HXPartLoadRatio is constrained to be within the range 0 to 1.
 
-If this heat exchanger is not being called by a parent object and no humidity setpoints are placed on the process air outlet node, then the model assumes that the heat exchanger operates for the entire simulation time step when it is available to operate (based on its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
+If this heat exchanger is \emph{not} being called by a parent object and no humidity setpoints are placed on the process air outlet node, then the model assumes that the heat exchanger operates for the entire simulation time step when it is available to operate (based on its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
 
 EnergyPlus has an established convention for placing information on outlet air nodes. If the air flow rate is continuous but the device only operates for a portion of the simulation time step, then the average outlet conditions (temperature, humidity and enthalpy) are placed on the outlet air node. If the air flow rate cycles on and off during the simulation time step, then the full load outlet conditions are placed on the outlet air node along with the average air mass flow rate for the simulation time step. To account for these cases, this model uses the following logic:
 
@@ -792,65 +805,65 @@ Otherwise:
 
 where:
 
-\({T_{Reg,\,\,out}}\) ~~~~~~ = regeneration outlet air dry-bulb temperature (°C)
+\({T_{Reg,\,\,out}}\) is the regeneration outlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\({w_{Reg,\,\,out}}\) ~~~~~ = regeneration outlet air humidity ratio (kg/kg)
+\({w_{Reg,\,\,out}}\) is the regeneration outlet air humidity ratio (kg/kg)
 
-\(HXPartLoadRatio\) ~ = heat exchanger part-load ratio (determined by parent object calling this model, or calculated based on a minimum/maximum humidity ratio setpoints as shown above).
+\(HXPartLoadRatio\) is the heat exchanger part-load ratio (determined by parent object calling this model, or calculated based on a minimum/maximum humidity ratio setpoints as shown above).
 
 In the logic shown above, \emph{RegAirInletIsOANode} is true if the regeneration air inlet node is an outside air node. If so, the model assumes that the air flow through the regeneration side of the heat exchanger cycles on and off as required during the simulation time step. Also, the regeneration outlet air humidity ratio is limited to be between 1E-5 and 1.0.
 
 The regeneration outlet air enthalpy is then calculated using the regeneration outlet air temperature and humidity ratio.
 
 \begin{equation}
-{h_{Reg,\,\,out}} = \,PsyHFnTdbW\left( {{T_{Reg,\,\,out}}\,,\,\,{w_{Reg,\,\,out}}} \right)
+{h_{Reg,out}} = PsyHFnTdbW\left( {{T_{Reg,out}},{w_{Reg,out}}} \right)
 \end{equation}
 
 Using the regeneration outlet air conditions, the heat transfer on the regeneration side of the heat exchanger is then calculated:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible,Reg}} = \,{\mathop m\limits^ \bullet_{Reg}}C{p_{Reg,\,\,in}}\left( {{T_{Reg,\,\,out}}\, - \,{T_{Reg,\,\,in}}} \right)
+{\dot{Q}_{Sensible,Reg}} = {\dot{m}_{Reg}}{C_{p_{Reg,in}}} \left( {{T_{Reg,out}} - {T_{Reg,in}}} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total,Reg}} = \,{\mathop m\limits^ \bullet_{Reg}}\left( {{h_{Reg,\,\,out}}\, - \,{h_{Reg,\,\,in}}} \right)
+{\dot{Q}_{Total,Reg}} = {\dot{m}_{Reg}} \left( {{h_{Reg,out}} - {h_{Reg,in}}} \right)
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{Sensible,Reg}}\) ~ = sensible heat transfer rate to the regeneration air stream (W)
+\({\dot{Q}_{Sensible,Reg}}\) is the sensible heat transfer rate to the regeneration air stream (W)
 
-\({\mathop Q\limits^ \bullet_{Total,Reg}}\) ~~~~ = total heat transfer rate to the regeneration air stream (W)
+\({\dot{Q}_{Total,Reg}}\) is the total heat transfer rate to the regeneration air stream (W)
 
-\({\mathop m\limits^ \bullet_{Reg}}\) ~~~~~~~~~ = regeneration air mass flow rate (kg/s)
+\({\dot{m}_{Reg}}\) is the regeneration air mass flow rate (kg/s)
 
-\(C{p_{Reg,\,\,in}}\) ~~~~~ = specific heat of inlet regeneration air (J/kg-K)
+\({C_{p_{Reg,in}}}\) is the specific heat of inlet regeneration air (J/kg-K).
 
 Since the model assumes that total and sensible heat transfer is conserved, these heat transfer rates are then used to calculate the process air outlet conditions:
 
 \begin{equation}
-{h_{Proc, out}} = \,{h_{Proc,in}} - \left( {\frac{{{{\mathop Q\limits^ \bullet  }_{Total,Reg}}}}{{{{\mathop m\limits^ \bullet  }_{Proc}}}}} \right)
+{h_{Proc,out}} = {h_{Proc,in}} - \left( {\frac{\dot{Q}_{Total,Reg}}{\dot{m}_{Proc}}} \right)
 \end{equation}
 
 \begin{equation}
-{T_{Proc, out}} = \,{T_{Proc,in}} - \left( {\frac{{{{\mathop Q\limits^ \bullet  }_{Sensible,Reg}}}}{{{{\mathop m\limits^ \bullet  }_{Proc}}C{p_{Proc,in}}}}} \right)
+{T_{Proc,out}} = {T_{Proc,in}} - \left( {\frac{\dot{Q}_{Sensible,Reg}}{{\dot{m}_{Proc}}C_{p_{Proc,in}}}} \right)
 \end{equation}
 
 \begin{equation}
-{w_{Proc,\,\,out}} = \,PsyWFnTdbH\left( {{T_{Proc,\,\,out}}\,,\,\,{h_{Proc,\,\,out}}} \right)
+{w_{Proc,\,\,out}} = PsyWFnTdbH\left( {{T_{Proc,out}},{h_{Proc,out}}} \right)
 \end{equation}
 
 where:
 
-\({h_{Proc,\,\,out}}\) ~~~~~ = process outlet air enthalpy (J/kg)
+\({h_{Proc,\,\,out}}\) is the process outlet air enthalpy (J/kg)
 
-\({T_{Proc,\,\,out}}\) ~~~~~ = process outlet air dry-bulb temperature (°C)
+\({T_{Proc,\,\,out}}\) is the process outlet air dry-bulb temperature (\(^{\circ}\)C)
 
-\({w_{Proc,\,\,out}}\) ~~~~~ = process outlet air humidity ratio (kg/kg)
+\({w_{Proc,\,\,out}}\) is the process outlet air humidity ratio (kg/kg)
 
-\({\dot m_{Proc}}\) ~~~~~~~~ = process air mass flow rate (kg/s)
+\({\dot m_{Proc}}\) is the process air mass flow rate (kg/s)
 
-\(C{p_{Proc,in}}\) ~~~~ = specific heat of inlet process air (J/kg-K)
+\(C{p_{Proc,in}}\) is the specific heat of inlet process air (J/kg-K).
 
 Like the regeneration outlet air conditions, the process outlet air conditions are also checked for exceeding saturated conditions and, if detected, the temperature and humidity ratio are reset assuming constant enthalpy.
 
@@ -870,14 +883,14 @@ If $T_{sat}>T_{Proc,out}$, then:
 Heat recovery electric power is the electric consumption rate of the unit in watts. The nominal electric power for the heat exchanger is specified in the input data file, and can be used to model controls (transformers, relays, etc.) and/or a motor for a rotary heat exchanger. The model assumes that this electric power is consumed whenever the heat exchanger operates. The electric power is assumed to be zero for all other times. None of this electric power is assumed to contribute thermal load to either of the heat exchanger air streams. As with the thermal performance of the heat exchanger, the power used by the heat exchanger is also proportional to the heat exchanger part load ratio.
 
 \begin{equation}
-{P_{HXUnit}}\, = \,{P_{HX,\,nom}}\left( {HXPartLoadRatio} \right)
+{P_{HXUnit}} = {P_{HX,nom}}\left( {HXPartLoadRatio} \right)
 \end{equation}
 
 where:
 
-\({P_{HXUnit}}\) ~~~~~~ = output variable `Heat Exchanger Electric Power, W' reported by the HeatExchanger:Desiccant:BalancedFlow object.
+\({P_{HXUnit}}\) is the output variable `Heat Exchanger Electric Power, W' reported by the HeatExchanger:Desiccant:BalancedFlow object.
 
-\({P_{HX,\,nom}}\) ~~~~~~ = user specified `Nominal Electric Power, W'
+\({P_{HX,\,nom}}\) is the user specified `Nominal Electric Power, W'.
 
 \paragraph{Empirical Model Boundaries (Minimum and Maximum)}\label{empirical-model-boundaries-minimum-and-maximum}
 
@@ -891,9 +904,10 @@ In addition to checking the inlet air conditions, the model allows the user to s
 
 This model also assumes that the performance of the desiccant heat exchanger (i.e., the output of the empirical equations) conforms to the following two guidelines.
 
-1.~~~~The regeneration outlet air temperature (RTO) is always less than or equal to the regeneration inlet air temperature (\emph{T\(_{RegIn}\)})
-
-2.~~~~The regeneration outlet air humidity ratio (RWO) is always greater than or equal to the regeneration inlet air humidity ratio (\emph{w\(_{RegIn}\)})
+\begin{enumerate}
+\item The regeneration outlet air temperature (RTO) is always less than or equal to the regeneration inlet air temperature (\emph{T\(_{RegIn}\)})
+\item The regeneration outlet air humidity ratio (RWO) is always greater than or equal to the regeneration inlet air humidity ratio (\emph{w\(_{RegIn}\)})
+\end{enumerate}
 
 When the calculated regeneration outlet air conditions do not follow these guidelines, a warning is issued and the simulation proceeds.
 
@@ -903,9 +917,9 @@ This model (GroundHeatExchanger:System) is used to determine the borehole temper
 
 \subsubsection{Long Time-Step Response Factors}\label{long-time-step-response-factors}
 
-Eskilson(1987) originally developed \emph{g}-functions for various borehole configurations. He plotted the g-function curves for different sets of borehole spacing to borehole length ratio \(B/H\) ~typically for .05, 0.1, 0.15, 0.2, 0.3 and ∞ (∞ represents the single borehole configuration). For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the \emph{g}-function curves for 38 different configurations.
+Eskilson(1987) originally developed \emph{g}-functions for various borehole configurations. He plotted the \emph{g}-function curves for different sets of borehole spacing to borehole length ratio \(B/H\) ~typically for .05, 0.1, 0.15, 0.2, 0.3 and \(\infty\) (\(\infty\) represents the single borehole configuration). For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the \emph{g}-function curves for 38 different configurations.
 
-Figure~\ref{fig:short-time-step-g-function-curve-as-an} shows the \emph{g}-function plotted against the non-dimensional time defined as \(\ln (t/{t_s})\) , \({t_s} = {H^2}/9\alpha\) ~for various configurations of vertical boreholes with \emph{B/H} ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
+Figure~\ref{fig:short-time-step-g-function-curve-as-an} shows the \emph{g}-function plotted against the non-dimensional time defined as \(\ln (t/{t_s})\), \({t_s} = {H^2}/9\alpha\) ~for various configurations of vertical boreholes with \emph{B/H} ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
 
 \begin{figure}[hbtp] % fig 253
 \centering
@@ -918,21 +932,26 @@ The \emph{g}-functions developed by Eskilson are given only down to values of $\
 In order to generate the long time-step response factors on the fly, EnergyPlus uses the model developed by Marcotte \& Pasquier(2009) which uses a discretized line source model. The \emph{g}-functions are generated using the following equation. The boreholes are discretized into segments. The temperature response of each segment on all other segments is then used to determine response factor for that particular geometry. The model estimates surface effects by creating ``imaginary" boreholes which are mirrored about the ground surface.
 
 \begin{equation}
-g = \frac{1}{2 H_T} \sum_{i=1}^N \sum_{j=1}^N \left( \int_{u_1^i}^{u_2^i} \int_{u_1^i}^{u_2^i} \frac{\erfc\left( \frac{d(u_i, u_j)}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j)} - \frac{\erfc\left( \frac{d(u_i, u_j^{'})}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j^{'})}\right)
+g = \frac{1}{2 H_T} \sum_{i=1}^N \sum_{j=1}^N \left( \int_{u_1^i}^{u_2^i} \int_{u_1^i}^{u_2^i} \frac{erfc\left( \frac{d(u_i, u_j)}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j)} - \frac{erfc\left( \frac{d(u_i, u_j^{'})}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j^{'})}\right)
 \end{equation}
 
-where,
+where:
 
-\begin{align}
-	N &= \mbox{Number of boreholes} \\
-	H_T &= \mbox{Length of borehole} \\
-	\alpha &= \mbox{Ground thermal diffusivity} \\
-	t &= \mbox{Simulation time} \\
-	u_1 &= \mbox{Starting discretization point for borhole} \\
-	u_2 &= \mbox{Final discretization point for borehole} \\
-	d(u_i, u_j) &= \mbox{Distance between current point and point on other borehole} \\
-	d(u_i, u_j^{'}) &= \mbox{Distance between current point and point on other imaginary borehole}
-\end{align}
+\(N\) is the number of boreholes
+
+\(H_T\) is the length of borehole
+
+\(\alpha\) is the ground thermal diffusivity
+
+\(t\) is the simulation time
+
+\(u_1\) is the starting discretization point for borhole
+
+\(u_2\) is the final discretization point for borehole
+
+\(d(u_i, u_j)\) is the distance between current point and point on other borehole
+
+\(d(u_i, u_j^{'})\) is the distance between current point and point on other imaginary borehole.
 
 
 \subsubsection{Short Time-Step Response Factors}\label{short-time-step-response-factors}
@@ -961,13 +980,13 @@ Thus, the algorithm keeps track of the sub hourly loads along with their time of
 \caption{Schematic Showing the Calculation of Hourly Load from the Sub Houly Loads. \protect \label{fig:schematic-showing-the-calculation-of-hourly}}
 \end{figure}
 
-The bottom text in the boxes represents the magnitude of the sub hourly loads in W/m for each time step. The duration of the occurrence of each time-step for the each block is shown below the respective block. The first hourly load is given by the expression
+The bottom text in the boxes represents the magnitude of the sub hourly loads in W/m for each time step. The duration of the occurrence of each time-step for the each block is shown below the respective block. The first hourly load is given by the expression:
 
 \begin{equation}
 {\overline q_1} = \left[ \begin{array}{l}\left( {8.36 \times .159} \right) + \left( {6.51 \times .339} \right) + \left( {10.3 \times .107} \right)\\ + \left( {6.92 \times .162} \right) + \left( {9.03 \times .181} \right) + \left( {12 \times .05} \right)\end{array} \right] = 7.993W/m
 \end{equation}
 
-Where \({\overline q_1}\) ~ = the first hourly load in W/m
+where \({\overline q_1}\) is the first hourly load (W/m).
 
 The algorithm keeps track of enough of these past hourly loads to calculate the monthly load. As each month or user defined time passes, hourly loads over the entire month or user defined time ``blocks'' are averaged and stored in arrays for the respective monthly user defined block of time.
 
@@ -985,21 +1004,21 @@ The borehole temperature for any time step is computed by superposing the monthl
 + \sum\limits_{p = 2193}^{2193.733} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{2193.733}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
 \end{equation}
 
-Where
+where:
 
-\(\overline{\overline q}\) ~ = The average monthly loads
+\(\overline{\overline q}\) is the average monthly loads
 
-\(\overline q\) ~ = The average hourly loads
+\(\overline q\) is the average hourly loads
 
-\emph{Q} = the sub-hourly loads
+\emph{Q} is the sub-hourly loads
 
-\emph{m} = index for monthly aggregated blocks
+\emph{m} is the index for monthly aggregated blocks
 
-\emph{p} = array index for sub hourly loads
+\emph{p} is the array index for sub hourly loads
 
-\emph{t} = time
+\emph{t} is time
 
-t\(_{p}\) ~ = ~ the sub hourly time steps over the history period. (here increment is not always unity)
+t\(_{p}\) is the sub hourly time steps over the history period (here, the increment is not always unity).
 
 Superposing the temperature responses of monthly (larger) blocks over the shorter, namely the hourly and sub hourly, introduces some error in the borehole temperature calculation at the beginning of every month. Yavuzturk and Spitler suggest a method to reduce the error in borehole temperature prediction by using a minimum hourly history period during which only the short time step superposition is carried out. In our model this idea is extended to sub hourly loads as well. Thus a user specified minimum sub-hourly history period is included along with the minimum hourly history period to model the sub-hourly variations. During this period only sub-hourly and hourly superpositions are made. This guarantees that at any given time step the superposition of temperature responses involves a minimum period of short time responses, which ensures a better estimation of borehole temperature. For example, a minimum hourly history period of 96 hrs and a minimum sub hourly history period of 5 hours would result in only 2 monthly aggregation blocks (1'' and 2''). The last monthly aggregation does not occur because neither of the minimum hourly history period of 96 hours or sub-hourly history period of five hrs is met. So an hourly superposition of the load is carried out for the third month until the minimum sub-hourly history period after which sub hourly superposition is carried out. The equation becomes
 
@@ -1015,85 +1034,92 @@ Superposing the temperature responses of monthly (larger) blocks over the shorte
 + \sum\limits_{p = 2188}^{2193.733} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{2193.733}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
 \end{equation}
 
-Yavuzturk and Spitler have done a detailed analysis on the effect of minimum hourly history period. They found that a minimum hourly history period of 192 hrs for an annual simulation would reduce the running time by 90\%.~ They also found that for a 20year simulation, the computation time of the aggregated load scheme is just 1\% of the non-aggregated load scheme.
+Yavuzturk and Spitler have done a detailed analysis on the effect of minimum hourly history period. They found that a minimum hourly history period of 192 hrs for an annual simulation would reduce the running time by 90\%.~ They also found that for a 20-year simulation, the computation time of the aggregated load scheme is just 1\% of the non-aggregated load scheme.
 
 \subsubsection{Summary of Variable Short Time Step Response Factor Model}\label{summary-of-variable-short-time-step-response-factor-model}
 
 The load aggregation scheme developed in line with the above example is summarized eight steps as follows:
 
-1.~~~~Define monthly load blocks duration (mb) in hrs (generally 730 hrs) and the minimum hourly history period and minimum sub hourly history period.
-
-2.~~~~Read Borehole Geometry Parameters: number of boreholes, borehole length radius thickness of the pipe etc. Read Ground and Fluid thermal properties: Ground conductivity, volumetric specific heat capacity of the ground and heat carrier fluid. Read the short and long time-step \emph{g-}functions into arrays with their respective non-dimensionalized times.
-
-3.~~~~Start Simulation from p = 1 to nts. Here ``nts'' is the number of time steps that have occurred since the start of simulation. (Note that P in not a count of number of hour elapsed in the simulation)
-
-4.~~~~Compute the hourly loads as each hour passes. This is done by averaging the sub hourly loads during the past hour. The monthly loads are calculated by averaging the hourly loads during that month. This is done by summing the hourly loads during that monthly period and dividing the sum by 730 hours NumMonths(the number of months used in aggregation calculations) is set to the number of months of simulation (current number of aggregated load blocks)
-
-5.~~~~If the simulation time is less than the minimum sub hourly history period the borehole temperature is estimated with no aggregation. Only sub hourly loads are superposed as given by the following equation.
+\begin{enumerate}
+\item Define monthly load blocks duration (mb) in hrs (generally 730 hrs) and the minimum hourly history period and minimum sub hourly history period.
+\item Read Borehole Geometry Parameters: number of boreholes, borehole length radius thickness of the pipe etc. Read Ground and Fluid thermal properties: Ground conductivity, volumetric specific heat capacity of the ground and heat carrier fluid. Read the short and long time-step \emph{g-}functions into arrays with their respective non-dimensionalized times.
+\item Start Simulation from p = 1 to nts. Here ``nts'' is the number of time steps that have occurred since the start of simulation. (Note that P in not a count of number of hour elapsed in the simulation)
+\item Compute the hourly loads as each hour passes. This is done by averaging the sub hourly loads during the past hour. The monthly loads are calculated by averaging the hourly loads during that month. This is done by summing the hourly loads during that monthly period and dividing the sum by 730 hours NumMonths(the number of months used in aggregation calculations) is set to the number of months of simulation (current number of aggregated load blocks)
+\item If the simulation time is less than the minimum sub hourly history period the borehole temperature is estimated with no aggregation. Only sub hourly loads are superposed as given by the following equation.
+\end{enumerate}
 
 \begin{equation}
 {T_{nts}} = {T_{ground}} + \sum\limits_{p = 1}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\label{eq:Tnts605}
 \end{equation}
 
-6.~~~~. If the simulation time is less than sum of minimum hourly history and sub hourly history periods, then decomposed hourly aggregated loads are superposed using their corresponding g function until the sub hourly history required. Then the sub hourly temperature differences are found by superposing the decomposed sub hourly loads with their short time step \emph{g} functions. Average borehole temperature is found by superposing the hourly and sub hourly temperature differences with the following equation
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item If the simulation time is less than sum of minimum hourly history and sub hourly history periods, then decomposed hourly aggregated loads are superposed using their corresponding g function until the sub hourly history required. Then the sub hourly temperature differences are found by superposing the decomposed sub hourly loads with their short time step \emph{g} functions. Average borehole temperature is found by superposing the hourly and sub hourly temperature differences with the following equation
+\end{enumerate}
 
 \begin{equation}
 {T_{nts}} = \sum\limits_{n = 1}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}  + \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\label{eq:Tnts606}
 \end{equation}
 
-7.~~~~If the simulation time is greater then the sum of a monthly period, sub hourly history and the hourly history period. Then monthly load aggregation is performed. Here if the difference between the simulation time and product of a monthly block period and the current number of monthly blocks is greater than the sum of the minimum hourly history and sub hourly history periods then the average borehole temperature is found by the following equation.
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item If the simulation time is greater then the sum of a monthly period, sub hourly history and the hourly history period. Then monthly load aggregation is performed. Here if the difference between the simulation time and product of a monthly block period and the current number of monthly blocks is greater than the sum of the minimum hourly history and sub hourly history periods then the average borehole temperature is found by the following equation.
+\end{enumerate}
 
 \begin{equation}
-{T_{nts}} = {T_{ground}} + \sum\limits_{m = 1}^{calb} {\left[ {\frac{{{{\overline{\overline q} }_m} - {{\overline{\overline q} }_{m - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{mb[m - 1]}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\begin{array}{rl}
+T_{nts} =& T_{ground} + \sum\limits_{m=1}^{calb} \left[ \frac{\overline{\overline q}_m - \overline{\overline q}_{m - 1}}{2\pi \kappa_{ground}} g \left( \frac{t_{nts} - t_{mb[m - 1]}}{t_s},\frac{r_b}{H} \right) \right] \\
+ & + \sum\limits_{n = nh - [calb(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} \\
+ & + \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\end{array}
+\label{eq:Tnts607}
 \end{equation}
+
+\begin{enumerate}
+\setcounter{enumi}{7}
+\item If the difference between the simulation time and product of a monthly block period and the current number of monthly blocks is less than the sum of the minimum hourly history and sub hourly history periods, then NumMonths is set to one month less than the actual number of months of simulation completed. The average borehole temperature is calculated by superposing the long and time step temperature differences using the following equation.
+\end{enumerate}
 
 \begin{equation}
-+ \sum\limits_{n = nh - [calb(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\begin{array}{rl}
+{T_{nts}} =& {T_{ground}} + \sum\limits_{m = 1}^{calb - 1} {\left[ {\frac{{{{\overline{\overline q} }_m} - {{\overline{\overline q} }_{m - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{mb[m - 1]}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} \\
+ & + \sum\limits_{n = nh - [(calb - 1)(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} \\
+ & + \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
+\end{array}
+\label{eq:Tnts608}
 \end{equation}
 
-\textbf{\(+ \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+The following is a summary of the above eight steps:
 
-8.~~~~If the difference between the simulation time and product of a monthly block period and the current number of monthly blocks is less than the sum of the minimum hourly history and sub hourly history periods, then NumMonths is set to one month less than the actual number of months of simulation completed. The average borehole temperature is calculated by superposing the long and time step temperature differences using the following equation.
+Define Monthly block duration, minimum hourly history period and minimum sub hourly history period (\textbf{Step 1})
 
-\begin{equation}
-{T_{nts}} = {T_{ground}} + \sum\limits_{m = 1}^{calb - 1} {\left[ {\frac{{{{\overline{\overline q} }_m} - {{\overline{\overline q} }_{m - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{mb[m - 1]}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
-\end{equation}
+Read Borehole Geometry parameters, Ground and carrier fluid properties and read short and long time-step \emph{g} functions (\textbf{Step 2})
 
-\begin{equation}
-+ \sum\limits_{n = nh - [(calb - 1)(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}
-\end{equation}
-
-\textbf{\(+ \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~}
-
-Define Monthly block duration, minimum hourly history period and minimum sub hourly history period (step 1)
-
-Read Borehole Geometry parameters, Ground and carrier fluid properties and read short and long time-step \emph{g} functions. (Step 2)
-
-\textbf{~}
-
-\textbf{Do until} p = 1 to number of time-steps (nts) (Step 3)
+\textbf{Do until} p = 1 to number of time-steps (nts) (\textbf{Step 3})
 
 Compute the Ground Load for the current time step using Entering Fluid temperature (For the first time-step \emph{T}\(_{FarField}\) may be used)
 
 Compute the hourly loads as each hour and monthly loads as each month passes. Calculate the number of monthly blocks (NumMonths)(\textbf{Step 4})
 
-\textbf{If} (Current time less than minimum sub hourly history) (\textbf{Step 5})
+~~~ \textbf{If} (Current time less than minimum sub hourly history) (\textbf{Step 5})
 
-\textbf{~~~} use Equation
+~~~ ~~~~~~ \textbf{~~~} use Equation~\ref{eq:Tnts605}
 
-\textbf{Else If} (Current Simulation Time less than sum of minimum hourly history and minimum sub hourly history) (\textbf{step 6})
+~~~ \textbf{Else If} (Current Simulation Time less than sum of minimum hourly history and minimum sub hourly history) (\textbf{step 6})
 
-~~~ use Equation
+~~~ ~~~~~~ use Equation~\ref{eq:Tnts606}
 
 ~~~ \textbf{Else}
 
-\textbf{If} (Difference between current simulation~~~ time and duration of the total number months is Greater than sum of minimum hourly and sub hourly histories) (\textbf{step 7})
+~~~ ~~~~~~ \textbf{If} (Difference between current simulation~~~ time and duration of the total number months is Greater than sum of minimum hourly and sub hourly histories) (\textbf{step 7})
 
-~~~ use Equation
+~~~~~~~~~~~~~~~~~use Equation~\ref{eq:Tnts607}
 
 ~~~~~~~~~~ \textbf{Else} (\textbf{step 8})
 
-~~~~~~~~~~~~~~~~~ use Equation
+~~~~~~~~~~~~~~~~~ use Equation~\ref{eq:Tnts608}
 
 ~~~ ~~~~~~ \textbf{End if}
 
@@ -1130,7 +1156,7 @@ g_s\left(t\right) = \sum_{i = 1}^{N_{ring}} \sum_{j = 1}^{N_{ring}} \frac{R}{4\p
             \right]d\omega d\varphi
 \end{equation}}
 
-Where:
+where:
 
 \begin{equation}
 d\left(P_j,P_i\right) = \frac{d\left(P_{ii},P_j\right) + d\left(P_{io},P_j\right)}{2}
@@ -1156,7 +1182,7 @@ g_s\left(t\right) = \sum_{i = 1}^{N_{ring}} \sum_{j = 1}^{N_{ring}} \frac{R}{4\p
             \right]d\omega d\varphi
 \end{equation}
 
-Where:
+where:
 
 \begin{equation}
 d\left(P_j,P_i\right) = \frac{d\left(P_{ii},P_j\right) + d\left(P_{io},P_j\right)}{2}
@@ -1188,21 +1214,19 @@ d\left(P_{io},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi 
 
 \subsubsection{Model Simplifications for Computational Efficiency}\label{model-simplifications-for-computational-efficiency}
 
-Several simplifications were used to ensure the g-function temperature response factors are computationally efficient. The first simplification is achieved by taking advantage of symmetry. In the \protect\hyperlink{SlinkyGHX1}{Figure} below we can see that by taking advantage of symmettry the temperature response for only one quarter of the rings needs be calculated.
+Several simplifications were used to ensure the g-function temperature response factors are computationally efficient. The first simplification is achieved by taking advantage of symmetry. In the Figure~\ref{fig:slinky-first-and-second-improvements} below, we can see that by taking advantage of symmettry the temperature response for only one quarter of the rings needs be calculated.
 
-The second simplification occurs by realizing that the effect between two rings decreases exponentially as the distance between the rings increases. Near-field rings are defined as rings whose centers are within 2.5m + D distance from the center of ring i as is seen in \protect\hyperlink{SlinkyGHX1}{Figure}. Far-field rings are defined as rings whose centers are beyond 10m + D, with middle-field rings occupying the space in between the near-field and far-field rings. Near-field ring temperature response factors are determined as indicated above for horzontal or vertical slinkys. Middle-field rings are considerably simplified -- the interaction between ring is approximated as that of two point sources at their centers. Thermal effect of far-field rings are ignored.
+The second simplification occurs by realizing that the effect between two rings decreases exponentially as the distance between the rings increases. Near-field rings are defined as rings whose centers are within 2.5m + D distance from the center of ring i as is seen in Figure~\ref{fig:slinky-first-and-second-improvements}. Far-field rings are defined as rings whose centers are beyond 10m + D, with middle-field rings occupying the space in between the near-field and far-field rings. Near-field ring temperature response factors are determined as indicated above for horzontal or vertical slinkys. Middle-field rings are considerably simplified -- the interaction between ring is approximated as that of two point sources at their centers. Thermal effect of far-field rings are ignored.
 
 The third and final simplification takes advantatge of geometric similarity that ring share. Ring pairs that are geometrically similar do not require recalculation of distances or reponse factors. Thus the calculations for geometrically similar ring pairs can be reused.
 
-For more information, see \protect\hyperlink{SlinkyReferenceXiong}{Xiong et al. 2015}.
+For more information, see the Xiong et al. (2015) reference listed below.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image8001.png}
-\caption{}
+\caption{Schematic of first and second improvements to the algorithm for computational efficiency \protect \label{fig:slinky-first-and-second-improvements}}
 \end{figure}
-
-Figure: Schematic of first and second improvements to the algorithm for computational efficiency.
 
 \subsubsection{References}\label{references-3-003}
 
@@ -1218,49 +1242,49 @@ The pond model (Object: GroundHeatExchanger:Pond) is a `lumped parameter' model 
 \caption{Heat Transfer Mechanisms in a Pond (Chiasson 1999) \protect \label{fig:heat-transfer-mechanisms-in-a-pond-chiasson}}
 \end{figure}
 
-Rees(2002) implemented the model developed by Chiasson(1999) for the shallow ponds. The model is based on the assumption that thermal gradients in shallow ponds are negligible, especially during times of heat rejection. Using the lumped parameter approach, an overall energy balance for the pond may be devised as
+Rees (2002) implemented the model developed by Chiasson (1999) for the shallow ponds. The model is based on the assumption that thermal gradients in shallow ponds are negligible, especially during times of heat rejection. Using the lumped parameter approach, an overall energy balance for the pond may be devised as:
 
 \begin{equation}
 q{}_{in} - q{}_{out} = V\rho C{}_p\frac{{dT}}{{dt}}
 \end{equation}
 
-Where
+where:
 
-\(q{}_{in}\) ~~ = ~~ Heat transfer to the pond
+\(q{}_{in}\) is the heat transfer to the pond
 
-\(q{}_{out}\) ~ = ~~ Heat transfer from the pond
+\(q{}_{out}\) is the heat transfer from the pond
 
-\(V\) ~~~~ = ~~ Pond Volume
+\(V\) is the pond volume
 
-\(\rho\) ~~~~ = ~~ Density of pond water
+\(\rho\) is the density of pond water
 
-\({q_{in}}\) ~ = Heat transfer to the pond
+\({q_{in}}\) is the heat transfer to the pond
 
-\(C{}_p\) ~ = Specific heat capacity of pond water
+\(C{}_p\) is the specific heat capacity of pond water
 
-\(\frac{{dT}}{{dt}}\) ~ = rate of change of temperature of the pond water
+\(\frac{{dT}}{{dt}}\) is the  rate of change of temperature of the pond water.
 
-Rate of change in average pond temperature is given as
+The rate of change in average pond temperature is given as:
 
 \begin{equation}
 \frac{{dT}}{{dt}} = \frac{{q{}_{solar} + q{}_{thermal} + q{}_{convection} + q{}_{groundwater} + q{}_{evaporation} + q{}_{fluid}}}{{V\rho C{}_p}}
 \end{equation}
 
-Where
+where:
 
-q\(_{solar}\) = Solar radiation heat gain to the pond
+q\(_{solar}\) is the solar radiation heat gain to the pond
 
-q\(_{thermal}\) = Thermal radiation heat transfer at the pond surface.
+q\(_{thermal}\) is the thermal radiation heat transfer at the pond surface.
 
-q\(_{convection}\) = Convection heat transfer at the pond surface
+q\(_{convection}\) is the convection heat transfer at the pond surface
 
-q\(_{ground}\) = Heat transfer to/from ground to the pond
+q\(_{ground}\) is the heat transfer to/from ground to the pond
 
-q\(_{groundwater}\) = Heat transfer due to ground water inflow/outflow
+q\(_{groundwater}\) is the heat transfer due to ground water inflow/outflow
 
-q\(_{evaporation}\) = Heat transfer due to evaporation at the pond surface
+q\(_{evaporation}\) is the heat transfer due to evaporation at the pond surface
 
-q\(_{fluid}\) = Total heat transfer to/from the heat exchanging fluid flowing in all spools or~ coils in the pond
+q\(_{fluid}\) is the total heat transfer to/from the heat exchanging fluid flowing in all spools or~ coils in the pond.
 
 A heat balance is calculated at a single node that represents the pond. Heat transfer takes place by surface convection, long-wave radiation to the sky, absorption of solar energy, ground heat transfer and heat exchange with the fluid. A heat exchanger analogy is used to calculate the heat transfer between the heat transfer fluid and the pond. The differential equation defined by the heat balance is solved using a fourth order Runge-Kutta numerical integration method. The implementation along with the model equations are summarized in the figure below.
 
@@ -1278,7 +1302,7 @@ The model overall pond model consists in a number of sub-models which are enumer
 \rho ' = {\tau_a} - \tau
 \end{equation}
 
-where
+where:
 
 \(\rho '\) is the reflectance
 
@@ -1294,15 +1318,13 @@ and
 \tau  = \frac{1}{2}\left( {\frac{{1 - {r_{par}}}}{{1 + {r_{par}}}} + \frac{{1 - {r_ \bot }}}{{1 + {r_ \bot }}}} \right){e^{\frac{{ - \mu 'd}}{{\cos {\theta_r}}}}}
 \end{equation}
 
-where
+where:
 
 \(\mu '\) is the extinction coefficient for water
 
-\(d\) ~is the pond depth
+\(d\) is the pond depth
 
-\({r_{par}}\) represents the parallel component of unpolarized radiation and
-
-\({r_ \bot }\) represents the perpendicular component of unpolarized radiation which are computed by Duffie and Beckman (1991) as:
+\({r_{par}}\) represents the parallel component of unpolarized radiation and \({r_ \bot }\) represents the perpendicular component of unpolarized radiation which are computed by Duffie and Beckman (1991) as:
 
 \begin{equation}
   r_{par} = \frac{\tan ^2 \left( \theta_r - \theta \right)}{\tan ^2 \left( \theta_r + \theta \right)}
@@ -1312,19 +1334,19 @@ where
   r_{\bot} = \frac{\sin ^2 \left( \theta_r - \theta \right)}{\sin ^2 \left( \theta_r - \theta  \right)}
 \end{equation}
 
-Finally, the amount of solar radiation absorbed by the pond (\({q_{solar}}\) ) is expressed as:
+Finally, the amount of solar radiation absorbed by the pond (\({q_{solar}}\)) is expressed as:
 
 \begin{equation}
 {q_{solar}} = I\left( {1 - \rho '} \right){A_{pond}}
 \end{equation}
 
-where
+where:
 
 \(I\) is the solar radiation flux incident on the pond surface (here, the total reflectance is approximated by the beam reflectance)
 
 \({A_{pond}}\) is the area of the pond surface.
 
-The model also accepts solar radiation in the form of beam \(\left( {{I_b}} \right)\) and diffuse \(\left( {{I_d}} \right)\) ~components, in which case \(I\) is computed from:
+The model also accepts solar radiation in the form of beam \(\left( {{I_b}} \right)\) and diffuse \(\left( {{I_d}} \right)\) components, in which case \(I\) is computed from:
 
 \begin{equation}
 I = {I_b}\cos \theta  + {I_d}
@@ -1336,11 +1358,11 @@ I = {I_b}\cos \theta  + {I_d}
 q{}_{thermal} = \sigma \alpha (T{{}_{surface}^4} - T{{}_{sky}^4})
 \end{equation}
 
-Where
+where:
 
-\(\alpha\) = Thermal absorptivity
+\(\alpha\) is the thermal absorptivity
 
-\(\sigma\) = Stefan Boltzman constant
+\(\sigma\) is the Stefan Boltzman constant.
 
 \subsubsection{Convection heat transfer at the pond surface}\label{convection-heat-transfer-at-the-pond-surface}
 
@@ -1352,7 +1374,7 @@ ASHRAE simple convection coefficient model is used to obtain the convection coef
 
 \subsubsection{Heat transfer to/from ground to the pond}\label{heat-transfer-tofrom-ground-to-the-pond}
 
-Hull et al (1984) expressed the following equation for ground heat losses from any pond. The equations are also based on the assumption that, for all practical purposes, the constant temperature sink is the ground water table (Kishore and Joshi 1984)
+Hull et al (1984) expressed the following equation for ground heat losses from any pond. The equations are also based on the assumption that, for all practical purposes, the constant temperature sink is the ground water table (Kishore and Joshi 1984):
 
 \begin{equation}
 q{}_{ground} = U{}_{ground}A{}_{ground}(T{}_{groundwater} - T{}_{pond})
@@ -1362,37 +1384,37 @@ q{}_{ground} = U{}_{ground}A{}_{ground}(T{}_{groundwater} - T{}_{pond})
 U{}_{ground} = 0.999\left( {\frac{{k{}_{ground}}}{{d{}_{groundwater} - d{}_{pond}}}} \right) + 1.37\left( {\frac{{k{}_{ground}P{}_{pond}}}{{A{}_{pond}}}} \right)
 \end{equation}
 
-Where
+where:
 
-\(k{}_{ground}\) ~~~~~~~ = Thermal conductivity of the ground
+\(k{}_{ground}\) is the thermal conductivity of the ground
 
-~\(d{}_{groundwater}\) ~ = depth of water table
+\(d{}_{groundwater}\) is the depth of water table
 
-\(d{}_{pond}\) ~~~~~~~~~ = Pond depth
+\(d{}_{pond}\) is the pond depth
 
-\(P{}_{pond}\) ~~~~~~~~ = Pond perimeter
+\(P{}_{pond}\) is the pond perimeter.
 
 \subsubsection{Heat transfer due to evaporation at the pond surface}\label{heat-transfer-due-to-evaporation-at-the-pond-surface}
 
 Evaporation is calculated assuming a fixed Lewis number unlike the Chaisson model.
 
 \begin{equation}
-q{}_{evaporation} = {\left( {\frac{{\Pr }}{{Sc}}} \right)^{2/3}}\left( {\frac{{h{}_c}}{{Cp{}_{air}}}} \right)\left( {HR{}_f - HR{}_a} \right)\left( {q{}_l} \right)
+q{}_{evaporation} = {\left( {\frac{{\Pr }}{{Sc}}} \right)^{2/3}}\left( {\frac{{h{}_c}}{{C{}_{p,air}}}} \right)\left( {HR{}_f - HR{}_a} \right)\left( {q{}_l} \right)
 \end{equation}
 
-Where
+where:
 
-Pr = Prandtl number for air
+\(Pr\) is the Prandtl number for air
 
-Sc = Schmidt number for air
+\(Sc\) is the Schmidt number for air
 
-Hc = convection coefficient
+\(h_c\) is the convection coefficient
 
-HRf = humidity ratio at pond surface/film temperature
+\(HR_f\) is the humidity ratio at pond surface/film temperature
 
-HRa = humidity ratio of air
+\(HR_a\) is the humidity ratio of air
 
-ql~ = Latent heat of air
+\(q_l\) is the latent heat of air.
 
 Air properties are obtained by applying the existing the psychometric functions of EnergyPlus.
 
@@ -1402,11 +1424,11 @@ Air properties are obtained by applying the existing the psychometric functions 
 q{}_{fluid} = UA{}_{pipe}(T{}_{fluid} - T{}_{pond})N{}_{circuit}
 \end{equation}
 
-Where
+where:
 
-\(UA{}_{pipe}\) ~ = overall heat transfer coefficient expressed in terms of inside pipe area
+\(UA{}_{pipe}\) is the overall heat transfer coefficient expressed in terms of inside pipe area
 
-\(N{}_{circuit}\) = number of spools installed in the pond
+\(N{}_{circuit}\) is the number of spools installed in the pond.
 
 The fluid temperature Tfluid is computed as the average fluid temperatures of the inlet and the outlet node at a given temperature.
 
@@ -1414,15 +1436,13 @@ The fluid temperature Tfluid is computed as the average fluid temperatures of th
 U{A_{pipe}} = \frac{{2\pi {r_i}\cdot {L_{spool}}}}{{\sum {{r_t}} }}
 \end{equation}
 
-where
+where:
 
-\({r_i}\) = inner pipe radius
+\({r_i}\) is the inner pipe radius
 
-\({L_{spool}}\) l = length of one spool
+\({L_{spool}}\)  is the length of one spool
 
-\(\sum {{r_t}}\) = composite thermal resistance defined as
-
-\(\sum {{r_t}}\) = Resistance due to fluid flow in the pipe +external pipe thermal resistance +fouling factor
+\(\sum {{r_t}}\) is the composite thermal resistance defined as the resistance due to fluid flow in the pipe plus the external pipe thermal resistance plus the fouling factor.
 
 \subsubsection{References}\label{references-4-002}
 
@@ -1440,7 +1460,7 @@ Rees, S.J., J.D. Spitler and X. Xiao, X 2002.\href{http://www.hvac.okstate.edu/p
 
 This model (Object: GroundHeatExchanger:Surface) is based on the QTF formulation of heat transfer through building elements with embedded heat sources/sinks. The model uses a heat exchanger analogy to relate the inlet fluid temperature to the net heat transfer rate and consequently outlet temperature. The model is entirely passive, i.e.~it does not set any flow rates or incorporate any controls. In order to deal with the non-linear boundary conditions at the top surface due to the presence of ice/snow fluxes have to be calculated by the QTF model and temperature calculated from the surface heat balance. This requires some iteration. Note, top surface variables correspond to `outside' variables in standard CTF/QTF definition. Bottom surface variables correspond to `inside' variables.
 
-For given current surface temperatures the terms of the QTF equations can be grouped into constant terms, and those depending on the current source flux. The surface heat balance may be given by the following equation (Strand,1997)
+For given current surface temperatures the terms of the QTF equations can be grouped into constant terms, and those depending on the current source flux. The surface heat balance may be given by the following equation (Strand, 1997):
 
 \begin{equation}
 QS{}_{} = \sum\limits_{m = 1}^M {X{}_{k,m}} T{}_{i,t - m + 1} - \sum\limits_{m = 1}^M {Y{}_{k,m}} T{}_{o,t - m + 1} + \sum\limits_{m = 1}^k {F{}_m} q{}_{i,t - m} + \sum\limits_{m = 1}^M {W{}_m} {q''}{}_{source,t - m + 1}
@@ -1450,93 +1470,93 @@ QS{}_{} = \sum\limits_{m = 1}^M {X{}_{k,m}} T{}_{i,t - m + 1} - \sum\limits_{m =
 T{}_S{}_{} = \sum\limits_{m = 1}^M {X{}_{k,m}} T{}_{i,t - m + 1} - \sum\limits_{m = 1}^M {Y{}_{k,m}} T{}_{o,t - m + 1} + \sum\limits_{m = 1}^k {F{}_m} q{}_{i,t - m} + \sum\limits_{m = 1}^M {W{}_m} q''{}_{source,t - m + 1}
 \end{equation}
 
-Where
+where:
 
-T\(_{s}\)~~~ = temperature of the node where the heat source or sink is present
+T\(_{s}\) is the temperature of the node where the heat source or sink is present
 
-\(QS\) = Surface heat balance
+\(QS\) is the surface heat balance
 
-\({q''}\) = Heat flux
+\({q''_{source}}\) is the heat flux at the location of the heat source or sink
 
-T~~ = Temperature
+\(T\)is the temperature
 
-i~~~ = ~ inside of the building element
+\(i\) is the inside of the building element
 
-o~~ = outside of the building element
+\(o\) is the outside of the building element
 
-t~~~ = current time step
+\(t\) is the current time step
 
-X Y F = Conduction transfer functions
+\(X,~Y,~F,~W\) are conduction transfer functions.
 
 The surface balance equation includes terms for incident solar energy, radiation heat transfer from internal sources, linearized radiation between surfaces using the mean radiation temperature concept and convection to the surrounding air.
 
-The heat balance on the water loop is given by
+The heat balance on the water loop is given by:
 
 \begin{equation}
 q = \dot mc{}_p(T{}_{wi} - T{}_{wo})
 \end{equation}
 
-Where
+where:
 
-q = heat transferred between the water loop and the building elements.
+\(q\) is the heat transferred between the water loop and the building elements
 
-\(\dot m\) = mass flow rate of water
+\(\dot m\) is the mass flow rate of water
 
-\(T{}_{wi}\) = Inlet water temperature
+\(T{}_{wi}\) is the inlet water temperature
 
-\(T{}_{wo}\) = Outlet water temperature
+\(T{}_{wo}\) is the outlet water temperature.
 
-From the second law of thermodynamics the maximum amount of heat transfer is
+From the second law of thermodynamics the maximum amount of heat transfer is:
 
 \begin{equation}
 q{}_{\max } = (\dot mc{}_p){}_{water}(T{}_{wi} - T{}_s)
 \end{equation}
 
-Where
+where \(T_{s}\) = temperature at the source location
 
-T\(_{s}\) = temperature at the source location
-
-The effectiveness of the heat exchanger is given by
+The effectiveness of the heat exchanger is given by:
 
 \begin{equation}
 \varepsilon  = 1 - {e^{ - NTU}}
 \end{equation}
 
-Where NTU is defined by
+where NTU is defined by:
 
 \begin{equation}
 NTU = \frac{{UA}}{{(\dot mC{}_p){}_{water}}}
 \end{equation}
 
+and
+
 \begin{equation}
 UA = h\pi DL
 \end{equation}
 
-h is the convection coefficient, D is the interior tube diameter and L is the total length of the tube.
+where h is the convection coefficient, D is the interior tube diameter, and L is the total length of the tube.
 
-The Colburn equation is used to define the Nusselt number Nu
-
-\begin{equation}
-Nu = \frac{{hD}}{k} = 0.023{\mathop{\rm Re}\nolimits} {{}_D^{4/5}}{\Pr ^{1/3}}
-\end{equation}
-
-Pr is the Prandtl number, Re is the Reynolds number and k is the thermal conductivity of the fluid
+The Colburn equation is used to define the Nusselt number Nu:
 
 \begin{equation}
-{\mathop{\rm Re}\nolimits} {}_D = \frac{{4\dot m}}{{\pi \mu D}}
+Nu = \frac{{hD}}{k} = 0.023{{Re}_D^{4/5}}{Pr^{1/3}}
 \end{equation}
 
-with \(\mu\) ~being the absolute viscosity of water
+where Pr is the Prandtl number, Re is the Reynolds number and k is the thermal conductivity of the fluid.
+
+\begin{equation}
+{Re}_D = \frac{{4\dot m}}{{\pi \mu D}}
+\end{equation}
+
+where \(\mu\) is the absolute viscosity of water.
 
 \subsection{Plant Loop Fluid-to-Fluid Heat Exchanger}\label{plant-loop-fluid-to-fluid-heat-exchanger}
 
 This component (Object: HeatExchanger:FluidToFluid) is a simple hydronic heat exchanger that can be used to couple two (hydronic) plant or condenser loops.~ Sizing and nominal capacity calculations are discussed elsewhere in this document, see the section called Plant Heat Exchanger Sizing. This section first discusses the heat transfer modeling and the control issues.
 
-Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types: ~cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow maximum capacity flow mixed min), counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, \(\varepsilon\) , which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.~ The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
+Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types: ~cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow maximum capacity flow mixed min), counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, \(\varepsilon\), which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.~ The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
 
 Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.~ One side is called ``Loop Supply Side'' to indicate the heat exchanger is situated on the supply side of a loop. The other side is called ``Loop Demand Side'' to indicate it is on the demand side of a loop.~ The heat exchanger is intended to act as a supply component for the loop connected to it as the ``Loop Supply Side'' and as a demand component for the loop connected to it as the ``Loop Demand Side.''~ From the point of view of the heat exchanger component itself, the Loop Demand Side acts like a supply source/sink for the Loop Supply Side which acts like a demand to the component.
 
-The mass flow rates and specific heat capacity are multiplied together to evaluate flow thermal capacity for each side and the minimum, maximum, and capacity ratio, \({R_C}\) , are determined.
+The mass flow rates and specific heat capacity are multiplied together to evaluate flow thermal capacity for each side and the minimum, maximum, and capacity ratio, \({R_C}\), are determined.
 
 \begin{equation}
 {\left( {\dot m{c_p}} \right)_{SupLoop}} = {\dot m_{SupLoop}}*{c_p}_{SupLoop}
@@ -1618,9 +1638,9 @@ Lastly, the fluid temperatures leaving the heat exchanger are calculated using:
 
 The plant heat exchanger offers a number of control options for a wide variety of applications.~ This section documents the control decision logic. The general goal of the control is to provide appropriate conditioning of the fluid at the Loop Supply Side connection. ~The basic control action is to request the appropriate flow rates for each side of the heat exchanger.~ For all of the control modes, there is also an availability schedule that provides a level of supervisory control to determine if the heat exchange is available to run at all.~ If the device is scheduled off, then zero flow is requested for both connections. All the control modes can also use minimum and maximum temperature limits.~ If the limits are used and either of the two inlet temperatures exceeds the limit, the zero flow is requested for both connections.
 
-\textbf{UncontrolledOn.~} This control type is very simple.~ If scheduled on it requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then the full design flow rate is requested for the Loop Demand Side connection.
+\textbf{UncontrolledOn.}~ This control type is very simple.~ If scheduled on it requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then the full design flow rate is requested for the Loop Demand Side connection.
 
-\textbf{OperationSchemeModulated.~} This control type uses the plant operation schemes. Any of the various plant (or condenser) operation schemes (e.g.~PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad ). When the heat exchanger is called, the operation scheme will pass a value for the load to be met.~ If the absolute value of the load is less than a small tolerance (1 W), then zero flow is requested for both connections.~ If load is significant and negative, then the heat exchanger will attempt to provide cooling.~ If the load is significant and positive, then it will attempt to provide heating.~ The two inlet fluid temperatures are compared and if their difference exceeds the minimum temperature difference and has the correct sign for heating or cooling as needed, then the heat exchanger is turned ``on.''~ The model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then a flow rate for the Loop Demand Side is found to attempt to meet the load.~ The load value is converted to a target temperature for the fluid leaving the Loop Supply Side connection.~ The target temperature is then used with the numerical method root solver to solve for the flow rate.
+\textbf{OperationSchemeModulated.}~ This control type uses the plant operation schemes. Any of the various plant (or condenser) operation schemes (e.g.~PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad ). When the heat exchanger is called, the operation scheme will pass a value for the load to be met.~ If the absolute value of the load is less than a small tolerance (1 W), then zero flow is requested for both connections.~ If load is significant and negative, then the heat exchanger will attempt to provide cooling.~ If the load is significant and positive, then it will attempt to provide heating.~ The two inlet fluid temperatures are compared and if their difference exceeds the minimum temperature difference and has the correct sign for heating or cooling as needed, then the heat exchanger is turned ``on.''~ The model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then a flow rate for the Loop Demand Side is found to attempt to meet the load.~ The load value is converted to a target temperature for the fluid leaving the Loop Supply Side connection.~ The target temperature is then used with the numerical method root solver to solve for the flow rate.
 
 \textbf{OperationSchemeOnOff}.~ This control type uses the plant operation schemes. Any of the various plant (or condenser) operation schemes (e.g.~PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad). When the heat exchanger is called, the operation scheme will pass a value for the load to be met.~ If the absolute value of the load is less than a small tolerance (1 W), then zero flow is requested for both connections.~ If load is significant and negative, then the heat exchanger will attempt to provide cooling.~ If the load is significant and positive, then it will attempt to provide heating.~ The two inlet fluid temperatures are compared and if their difference exceeds the minimum temperature difference and has the correct sign for heating or cooling as is needed, then the heat exchanger is turned ``on.''~ The model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then the full design flow rate is requested for the Loop Demand Side connection.
 
@@ -1640,62 +1660,46 @@ The plant heat exchanger offers a number of control options for a wide variety o
 
 The heat exchanger will operate to cool the Loop Supply Side fluid when the following three conditions are all met:
 
-1)~ the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible,
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
-\setcounter{enumi}{1}
 \tightlist
-\item
-  the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible, and
+\item the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible,
+\item the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible, and
+\item the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible.
 \end{enumerate}
-
-3)~ the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible.
 
 The heat exchanger will operate to heat the Loop Supply Side fluid when the following three conditions are all met:
 
-1)~ the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible,
-
-2)~ the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible, and
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
-\setcounter{enumi}{2}
 \tightlist
-\item
-  the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible.
+\item the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible,
+\item the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible, and
+\item the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible.
 \end{enumerate}
 
-When the heat exchanger is turned ``on.''~ The model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then a flow rate for the Loop Demand Side is found to attempt to meet the setpoint.~ The setpoint temperature is then used with the numerical method root solver to solve for the flow rate.
+When the heat exchanger is turned ``on,'' the model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then a flow rate for the Loop Demand Side is found to attempt to meet the setpoint.~ The setpoint temperature is then used with the numerical method root solver to solve for the flow rate.
 
 \textbf{DualDeadbandSetpointOnOff}. This control scheme uses dual setpoints on a node. The basic idea is that the heat exchanger will condition the Loop Supply Side connection to drive its temperature into the deadband whenever its inlet temperature is outside the deadband.~ The model expects dual temperature setpoints to be placed on the setpoint, for example using the object SetpointManager:Scheduled:DualSetpoint.
 
 The heat exchanger will operate to cool the Loop Supply Side fluid when the following three conditions are all met:
 
-1)~ the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible,
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
-\setcounter{enumi}{1}
 \tightlist
-\item
-  the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible, and
+\item the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible,
+\item the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible, and
+\item the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible.
 \end{enumerate}
-
-3)~ the higher temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for cooling to be possible.
 
 The heat exchanger will operate to heat the Loop Supply Side fluid when the following three conditions are all met:
 
-1)~ the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible,
-
-2)~ the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible, and
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
-\setcounter{enumi}{2}
 \tightlist
-\item
-  the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible.
+\item the two inlet fluid temperatures are compared to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible,
+\item the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible, and
+\item the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible.
 \end{enumerate}
 
 When the heat exchanger is turned ``on,'' the model requests the full design flow rate on the Loop Supply Side connection.~ If the Loop Supply Side flow rate exceeds a small tolerance, then the full design flow rate is requested for the Loop Demand Side connection.

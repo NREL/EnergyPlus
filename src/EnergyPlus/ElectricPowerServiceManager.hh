@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -503,10 +503,11 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
         pvWatts,
     };
 
-    std::string name;        // user identifier
-    std::string typeOfName;  // equipment type
-    int compGenTypeOf_Num;   // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    int compPlantTypeOf_Num; // numeric designator for plant component, in DataPlant
+    std::string name;          // user identifier
+    std::string typeOfName;    // equipment type
+    int compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
+    std::string compPlantName; // name of plant component if heat recovery
     GeneratorType generatorType;
     int generatorIndex;              // index in generator model data struct
     Real64 maxPowerOut;              // Maximum Power Output (W)

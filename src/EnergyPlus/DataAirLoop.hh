@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <UnitarySystem.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -218,7 +219,7 @@ namespace DataAirLoop {
         Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
         Real64 ReqSupplyFrac;         // required flow (as a fraction of DesSupply) set by a manager
         Real64 MinOutAir;             // minimum outside air mass flow rate [kg/s]
-        Real64 MaxOutAir;             // maximum outside air mass flow rate [kg/s]
+        Real64 MaxOutAir;             // current maximum available outside air mass flow rate [kg/s]
         Real64 OAMinFrac;             // minimum outside air flow fraction this time step
         Real64 Previous;              // Previous mass air flow rate for this loop [kg/s]
         Real64 SupFlow;               // supply air flow rate (includes LeakFlow) [kg/s]
@@ -230,13 +231,14 @@ namespace DataAirLoop {
         Real64 ExcessZoneExhFlow;     // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
         Real64 FanPLR;                // Operating PLR of air loop fan
         Real64 OAFrac;                // fraction of outside air to mixed air mass flow rate
+        Real64 OAFlow;                // oa flow rate this time step
         bool FlowError;               // error flag for flow error message
 
         // Default Constructor
         AirLoopFlowData()
             : DesSupply(0.0), DesReturnFrac(1.0), SysToZoneDesFlowRatio(0.0), ReqSupplyFrac(1.0), MinOutAir(0.0), MaxOutAir(0.0), OAMinFrac(0.0),
               Previous(0.0), SupFlow(0.0), ZoneRetFlow(0.0), ZoneRetFlowRatio(1.0), SysRetFlow(0.0), RecircFlow(0.0), LeakFlow(0.0),
-              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), FlowError(false)
+              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), OAFlow(0.0), FlowError(false)
         {
         }
     };
@@ -258,6 +260,7 @@ namespace DataAirLoop {
         Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
+        std::vector <UnitarySystems::UnitarySys *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here

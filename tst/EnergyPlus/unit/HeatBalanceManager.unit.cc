@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,14 @@
 // EnergyPlus Headers
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataDaylighting.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataLoopNode.hh>
+#include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -66,7 +69,11 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <HeatBalanceAirManager.hh>
 #include <OutAirNodeManager.hh>
+#include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
+#include <SimulationManager.hh>
+#include <UtilityRoutines.hh>
+#include <WeatherManager.hh>
 #include <ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -126,7 +133,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowMaterial:Gap,",
         "    Gap_1_Layer,             !- Name",
         "    0.0127,                  !- Thickness {m}",
@@ -164,7 +170,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowGap:DeflectionState,",
         "    DeflectionState_813_Measured_Gap_1,  !- Name",
         "    0.0120;                  !- Deflected Thickness {m}",
@@ -252,24 +257,51 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     cAlphaArgs(2) = "ADAPTIVECONVECTIONALGORITHM"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 
     ErrorsFound = false;
-    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
-                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
+    ProcessZoneData(cCurrentModuleObject,
+                    ZoneNum,
+                    cAlphaArgs,
+                    NumAlphas,
+                    rNumericArgs,
+                    NumNumbers,
+                    lNumericFieldBlanks,
+                    lAlphaFieldBlanks,
+                    cAlphaFieldNames,
+                    cNumericFieldNames,
+                    ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneNum = 2;
     cAlphaArgs(1) = "Zone Two";      // Name
     cAlphaArgs(2) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
-                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
+    ProcessZoneData(cCurrentModuleObject,
+                    ZoneNum,
+                    cAlphaArgs,
+                    NumAlphas,
+                    rNumericArgs,
+                    NumNumbers,
+                    lNumericFieldBlanks,
+                    lAlphaFieldBlanks,
+                    cAlphaFieldNames,
+                    cNumericFieldNames,
+                    ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     ZoneNum = 2;
     cAlphaArgs(1) = "Zone Two"; // Name
     cAlphaArgs(2) = "TARP";     // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
-                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
+    ProcessZoneData(cCurrentModuleObject,
+                    ZoneNum,
+                    cAlphaArgs,
+                    NumAlphas,
+                    rNumericArgs,
+                    NumNumbers,
+                    lNumericFieldBlanks,
+                    lAlphaFieldBlanks,
+                    cAlphaFieldNames,
+                    cNumericFieldNames,
+                    ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ("Zone One", Zone(1).Name);
@@ -288,7 +320,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     //	 GLASS;        !- Layer 3
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Construction,",
         " WINDOWWBLIND, !- Name",
         " GLASS,        !- Outside Layer",
@@ -339,7 +370,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     // Test get input for ZoneAirMassFlowConservation object
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -373,8 +403,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Version,8.3;",
-                                                      "Building,",
+    std::string const idf_objects = delimited_string({"Building,",
                                                       "My Building, !- Name",
                                                       "30., !- North Axis{ deg }",
                                                       "City, !- Terrain",
@@ -457,6 +486,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
     ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
@@ -483,6 +513,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 8;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
     ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
@@ -504,6 +535,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+
     Node(1).MassFlowRate = 0.0; // Zone 1 zone node
     Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
     Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
@@ -515,12 +554,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    AirLoopFlow(1).MaxOutAir = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -539,12 +579,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string(
-        {"Version,8.3;", "Building,", "My Building, !- Name", "30., !- North Axis{ deg }", "City, !- Terrain",
-         "0.04, !- Loads Convergence Tolerance Value", "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
-         "FullExterior, !- Solar Distribution", "25, !- Maximum Number of Warmup Days", "6;                       !- Minimum Number of Warmup Days",
-         "ZoneAirMassFlowConservation,", "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance", "None, !- Infiltration Balancing Method",
-         ";                !- Infiltration Balancing Zones"});
+    std::string const idf_objects = delimited_string({"Building,",
+                                                      "My Building, !- Name",
+                                                      "30., !- North Axis{ deg }",
+                                                      "City, !- Terrain",
+                                                      "0.04, !- Loads Convergence Tolerance Value",
+                                                      "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+                                                      "FullExterior, !- Solar Distribution",
+                                                      "25, !- Maximum Number of Warmup Days",
+                                                      "6;                       !- Minimum Number of Warmup Days",
+                                                      "ZoneAirMassFlowConservation,",
+                                                      "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+                                                      "None, !- Infiltration Balancing Method",
+                                                      ";                !- Infiltration Balancing Zones"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -565,7 +612,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     // Test get output variables for ZoneAirMassFlowConservation object #5637
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -634,8 +680,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Material:RoofVegetation,",
         "    ThickSoil,               !- Name",
         "    0.5,                     !- Height of Plants {m}",
@@ -757,7 +801,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1189,6 +1233,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataHeatBalance::TempEffBulkAir.allocate(6);
 
@@ -1239,7 +1284,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1273,7 +1318,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.1;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1297,6 +1342,245 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     GetProjectControlData(ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
+{
+
+    DataIPShortCuts::lAlphaFieldBlanks = true;
+
+    std::string const idf_objects = delimited_string({
+        "Version,9.1;",
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  SizingPeriod:DesignDay,",
+        "    SunnyWinterDay,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    5.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    4.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "  Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+        "Material,",
+        "  Concrete Block,          !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  0.3805070,               !- Conductivity {W/m-K}",
+        "  608.7016,                !- Density {kg/m3}",
+        "  836.8000;                !- Specific Heat {J/kg-K}",
+        "Construction,",
+        "  WallConstruction,        !- Name",
+        "  Concrete Block;          !- Outside Layer",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS DARK STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.111,                   !- Solar Transmittance at Normal Incidence",
+        "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.128,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS LIGHT STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.9,                   !- Solar Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.9,                   !- Visible Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "Construction,",
+        "  WindowConstruction1,      !- Name",
+        "  ELECTRO GLASS LIGHT STATE;          !- Outside Layer",
+        "Construction,",
+        "  WindowConstruction2,      !- Name",
+        "  ELECTRO GLASS DARK STATE;          !- Outside Layer",
+        "FenestrationSurface:Detailed,",
+        "  FenestrationSurface,     !- Name",
+        "  Window,                  !- Surface Type",
+        "  WindowConstruction1,      !- Construction Name",
+        "  Wall,                    !- Building Surface Name",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  0.5000000,               !- View Factor to Ground",
+        "  ,                        !- Frame and Divider Name",
+        "  1.0,                     !- Multiplier",
+        "  4,                       !- Number of Vertices",
+        "  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Wall,                    !- Name",
+        "  Wall,                    !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  SunExposed,              !- Sun Exposure",
+        "  WindExposed,             !- Wind Exposure",
+        "  0.5000000,               !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Floor,                   !- Name",
+        "  Floor,                   !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  1.0,                     !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "Zone,"
+        "  Zone,                    !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  6.000000,                !- X Origin {m}",
+        "  6.000000,                !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+        "  Daylighting:Controls,",
+        "    Daylighting Control,!- Name",
+        "    Zone,          !- Zone Name",
+        "    SplitFlux,               !- Daylighting Method",
+        "    ,                        !- Availability Schedule Name",
+        "    Continuous,              !- Lighting Control Type",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "    1,                       !- Number of Stepped Control Steps",
+        "    1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "    ,                        !- Glare Calculation Daylighting Reference Point Name",
+        "    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    22,                      !- Maximum Allowable Discomfort Glare Index",
+        "    ,                        !- DElight Gridding Resolution {m2}",
+        "    Reference Point 1,  !- Daylighting Reference Point 1 Name",
+        "    1,                       !- Fraction of Zone Controlled by Reference Point 1",
+        "    500;                     !- Illuminance Setpoint at Reference Point 1 {lux}",
+        "",
+        "  Daylighting:ReferencePoint,",
+        "    Reference Point 1,  !- Name",
+        "    Zone,          !- Zone Name",
+        "    12,                      !- X-Coordinate of Reference Point {m}",
+        "    2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "    0.8;                     !- Z-Coordinate of Reference Point {m}",
+        "  ShadowCalculation,",
+        "    TimestepFrequency,       !- Calculation Method",
+        "    30,                      !- Calculation Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
+        "  EnergyManagementSystem:Actuator,",
+        "    Win1_Construct,          !- Name",
+        "    FenestrationSurface,  !- Actuated Component Unique Name",
+        "    Surface,                 !- Actuated Component Type",
+        "    Construction State;      !- Actuated Component Control Type",
+        "",
+        "  EnergyManagementSystem:ProgramCallingManager,",
+        "    Window Switcher,  !- Name",
+        "    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+        "    ZN_1_wall_south_Window_1_Control;  !- Program Name 1",
+        "",
+        "  EnergyManagementSystem:Program,",
+        "    ZN_1_wall_south_Window_1_Control,  !- Name",
+        "    IF Hour > 12,    !- Program Line 1",
+        "    Set Win1_Construct = Win_2,  !- Program Line 2",
+        "    ELSE,                    !- <none>",
+        "    SET Win1_Construct = Win_1,  !- <none>",
+        "    ENDIF;                   !- <none>",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    OutputProcessor::TimeValue.allocate(2);
+    SimulationManager::ManageSimulation();
+    DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
+    WeatherManager::Envrn = 1;
+
+    // Test 1 - Set time of day to morning - should use high transmittance window
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 11;
+    DataGlobals::CurrentTime = 11.0;
+    WeatherManager::SetCurrentWeather();
+    HeatBalanceManager::ManageHeatBalance();
+    // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
+    HeatBalanceManager::ManageHeatBalance();
+    // Find the fenestration surface
+    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
+    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
+    Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    EXPECT_GT(transSol, 0.8);
+    Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    EXPECT_GT(refPtIllum, 3000.0);
+
+    // Test 2 - Set time of day to afternoon - should use low transmittance window
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 14;
+    DataGlobals::CurrentTime = 14.0;
+    WeatherManager::SetCurrentWeather();
+    HeatBalanceManager::ManageHeatBalance();
+    // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
+    HeatBalanceManager::ManageHeatBalance();
+    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
+    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
+    transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    EXPECT_LT(transSol, 0.2);
+    refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    EXPECT_LT(refPtIllum, 1000.0);
 }
 
 } // namespace EnergyPlus

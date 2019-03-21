@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -160,7 +160,7 @@ namespace PlantCondLoopOperation {
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
-                                     Optional_bool LoadDistributionWasPerformed)
+                                     bool &LoadDistributionWasPerformed)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -353,7 +353,7 @@ namespace PlantCondLoopOperation {
                 if (this_op_scheme.EquipList(ListPtr).NumComps > 0) {
                     TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
                     DistributePlantLoad(LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
-                    if (present(LoadDistributionWasPerformed)) LoadDistributionWasPerformed = true;
+                    LoadDistributionWasPerformed = true;
                 }
             }
 
@@ -1467,10 +1467,26 @@ namespace PlantCondLoopOperation {
                         }
 
                         if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
-                            // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
-                            // detailed input that is necessary to get thermal energy storage to work from the simpler input.
+
+                            // Special case for ThermalStorage:Ice:XXXX objects which can only be dual (cf #6958)
+                            if ( ( (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
+                                   (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED") ) &&
+                                 (cAlphaArgs(CompNumA + 1) != "DUAL") ) {
+
+                                ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) +
+                                        "' in "  + CurrentModuleObject + "='" + cAlphaArgs(1) + "'.");
+                                ShowContinueError("Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3)
+                                        + " objects.");
+
+                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = DualOp;
+                            }
+
+                            // This block forces CompOpType to be either Cooling if explicitly provided, all other cases = Dual
                             CompOpType = (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum) - 1;
                             if ((CompOpType < 1) || (CompOpType > 2)) CompOpType = 2;
+
+                            // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
+                            // detailed input that is necessary to get thermal energy storage to work from the simpler input.
                             SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr,
                                                          ChargeSchedPtr,
                                                          NonChargCHWTemp,
@@ -1877,12 +1893,12 @@ namespace PlantCondLoopOperation {
                                                                     LoopSideNum,
                                                                     BranchNum,
                                                                     CompNum,
+                                                                    errFlag1,
                                                                     _,
                                                                     _,
                                                                     NumSearchResults,
                                                                     _,
-                                                                    LoopNum,
-                                                                    errFlag1);
+                                                                    LoopNum);
 
                             if (errFlag1) {
                                 ShowSevereError("InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
@@ -2227,6 +2243,7 @@ namespace PlantCondLoopOperation {
 
         // load local variables
         NumCompsOnList = this_equiplist.NumComps;
+        int numAvail = 0;
 
         // Allocate array once
         accrued_load_plr_values.reserve(NumCompsOnList);
@@ -2243,6 +2260,7 @@ namespace PlantCondLoopOperation {
             switch (LoadFlag) {
             case OptimalLoading:
                 // step 1: load all machines to optimal PLR
+                numAvail = 0;
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                     // look up topology from the equipment list
@@ -2253,6 +2271,7 @@ namespace PlantCondLoopOperation {
                     auto &this_component(this_loopside.Branch(BranchNum).Comp(CompNum));
 
                     if (!this_component.Available) continue;
+                    ++numAvail;
 
                     if (this_component.OptLoad > 0.0) {
                         ChangeInLoad = min(this_component.OptLoad, std::abs(RemLoopDemand));
@@ -2275,8 +2294,8 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 2: Evenly distribute remaining loop demand
-                if (std::abs(RemLoopDemand) > SmallLoad) {
-                    DivideLoad = std::abs(RemLoopDemand) / NumCompsOnList;
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
+                    DivideLoad = std::abs(RemLoopDemand) / numAvail;
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                         BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
@@ -2299,7 +2318,7 @@ namespace PlantCondLoopOperation {
                 }
 
                 // step 3: If RemLoopDemand is still greater than zero, look for any machine
-                if (std::abs(RemLoopDemand) > SmallLoad) {
+                if (numAvail > 0 && std::abs(RemLoopDemand) > SmallLoad) {
                     for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                         BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
@@ -2359,8 +2378,24 @@ namespace PlantCondLoopOperation {
             // UNIFORMLOAD DISTRIBUTION SCHEME
             case UniformLoading:
 
-                // step 1: distribute load equally to all machines
-                UniformLoad = std::abs(RemLoopDemand) / NumCompsOnList;
+                // step 1: distribute load equally to all available machines
+                numAvail = 0;
+                for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
+
+                    BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;
+                    CompNum = this_equiplist.Comp(CompIndex).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto &this_component(this_loopside.Branch(BranchNum).Comp(CompNum));
+
+                    if (this_component.Available) ++numAvail;
+                }
+                if (numAvail > 0) {
+                    UniformLoad = std::abs(RemLoopDemand) / numAvail;
+                }
+                else {
+                    UniformLoad = 0.0;
+                }
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
 
                     BranchNum = this_equiplist.Comp(CompIndex).BranchNumPtr;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -874,12 +874,12 @@ namespace CTElectricGenerator {
                                     CTGenerator(GeneratorNum).HRLoopSideNum,
                                     CTGenerator(GeneratorNum).HRBranchNum,
                                     CTGenerator(GeneratorNum).HRCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitCTGenerators: Program terminated due to previous condition(s).");
             }

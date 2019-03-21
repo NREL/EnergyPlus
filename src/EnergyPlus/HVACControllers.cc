@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -401,7 +401,7 @@ namespace HVACControllers {
         if (ControllerProps(ControlNum).InitFirstPass) {
             // Coil must first be sized to:
             // Initialize ControllerProps(ControlNum)%MinActuated and ControllerProps(ControlNum)%MaxActuated
-            InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+            InitController(ControlNum, IsConvergedFlag);
             ControllerProps(ControlNum).InitFirstPass = false;
         }
 
@@ -413,28 +413,32 @@ namespace HVACControllers {
         {
             auto const SELECT_CASE_var(Operation);
             if (SELECT_CASE_var == iControllerOpColdStart) {
+                // For temperature and humidity control reset humidity control override if it was set
+                if (HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride) {
+                    HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
+                    // Put the controller tolerance (offset) back to it's original value
+                    RootFinder::SetupRootFinder(RootFinders(ControlNum),
+                        iSlopeDecreasing,
+                        iMethodBrent,
+                        constant_zero,
+                        1.0e-6,
+                        ControllerProps(ControlNum).Offset);
+                }
+
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
-                ResetController(ControlNum, FirstHVACIteration, false, IsConvergedFlag);
-                //    CALL InitController(ControlNum, FirstHVACIteration, IsConvergedFlag)
+                ResetController(ControlNum, false, IsConvergedFlag);
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
-
-                // Report the current Controller
-                ReportController(ControlNum);
 
             } else if (SELECT_CASE_var == iControllerOpWarmRestart) {
                 // If a iControllerOpWarmRestart call, set the actuator inlet flows to previous solution
-                ResetController(ControlNum, FirstHVACIteration, true, IsConvergedFlag);
-                //   CALL InitController(ControlNum, FirstHVACIteration, IsConvergedFlag)
+                ResetController(ControlNum, true, IsConvergedFlag);
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
-                // Report the current Controller
-                ReportController(ControlNum);
-
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+                InitController(ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Simulate the correct Controller with the current ControlNum
@@ -452,12 +456,12 @@ namespace HVACControllers {
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
-                // Report the current Controller
-                ReportController(ControlNum);
+                CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag);
+
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+                InitController(ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Check convergence for the correct Controller with the current ControlNum
@@ -472,9 +476,6 @@ namespace HVACControllers {
                         ShowFatalError("Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
                     }
                 }
-
-                // Report the current Controller
-                ReportController(ControlNum);
 
             } else {
                 ShowFatalError("ManageControllers: Invalid Operation passed=" + TrimSigDigits(Operation) + ", Controller name=" + ControllerName);
@@ -813,7 +814,7 @@ namespace HVACControllers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void ResetController(int const ControlNum, bool const EP_UNUSED(FirstHVACIteration), bool const DoWarmRestartFlag, bool &IsConvergedFlag)
+    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -925,7 +926,6 @@ namespace HVACControllers {
     }
 
     void InitController(int const ControlNum,
-                        bool const EP_UNUSED(FirstHVACIteration), // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &IsConvergedFlag)
     {
 
@@ -935,7 +935,6 @@ namespace HVACControllers {
         //       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
         //       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
         //                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for  initializations of the Controller Components.
@@ -943,11 +942,6 @@ namespace HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -969,35 +963,14 @@ namespace HVACControllers {
         using SetPointManager::iCtrlVarType_MaxHumRat;
         using SetPointManager::iCtrlVarType_MinHumRat;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitController");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
         int SensedNode;
         int ControllerIndex;
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MySizeFlag;
         static Array1D_bool MyPlantIndexsFlag;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true ); // InitControllerOneTimeFlag
-        // static bool MySetPointCheckFlag( true ); // InitControllerSetPointCheckFlag
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Supply Air Temp Setpoint when 'TemperatureAndHumidityRatio' control is used
-        Real64 HumidityControlTempSetPoint;
-        // Difference between SA dry-bulb and dew-point temperatures
-        Real64 ApproachTemp;
-        // Desired dew point temperature setpoint for 'TemperatureAndHumidityRatio' control
-        Real64 DesiredDewPoint;
         Real64 rho; // local fluid density
 
         if (InitControllerOneTimeFlag) {
@@ -1280,54 +1253,23 @@ namespace HVACControllers {
                 }
 
             } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
-                ControllerProps(ControlNum).SensedValue = Node(SensedNode).Temp;
-                // Setpoint temp calculated once each HVAC time step to identify approach temp and whether or not humrat control is necessary
-                // WARNING: The scheme for computing the setpoint for the dual temperature and humidity ratio
-                //          control strategy breaks down whenever the sensed node temperature is modified by
-                //          a controller fired after the current one. Indeed the final sensed node temperature
-                //          is likely to have changed in the meantime if the other controller is active,
-                //          thereby invalidating the setpoint calculation for the other controller performed
-                //          earlier on the air loop.
+                if (ControllerProps(ControlNum).HumRatCtrlOverride) {
+                    // Humidity ratio control
+                    ControllerProps(ControlNum).SensedValue = Node(SensedNode).HumRat;
+                } else {
+                    // Temperature control
+                    ControllerProps(ControlNum).SensedValue = Node(SensedNode).Temp;
+                }
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
-                    // NOTE: For TEMPANDHUMRAT control the computed value ControllerProps(ControlNum)%SetPointValue
-                    //       depends on:
-                    //       - Node(SensedNode)%HumRatMax
-                    //       - Node(SensedNode)%Temp
-                    //       - Node(SensedNode)%HumRat
-                    if ((Node(SensedNode).HumRatMax > 0) && (Node(SensedNode).HumRat > Node(SensedNode).HumRatMax)) {
-                        // Setpoint can only be computed once per time step
-                        // Check if outlet air humidity ratio is greater than the set point. If so, calculate new temperature based set point.
-                        // See routine CalcSimpleController() for the sequence of operations.
-                        // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-                        ApproachTemp = Node(SensedNode).Temp - PsyTdpFnWPb(Node(SensedNode).HumRat, OutBaroPress);
-                        // Calculate the dew point temperature at the SA humidity ratio setpoint
-                        DesiredDewPoint = PsyTdpFnWPb(Node(SensedNode).HumRatMax, OutBaroPress);
-                        // Adjust the calculated dew point temperature by the approach temp. Should be within 0.3C of air temperature.
-                        HumidityControlTempSetPoint = DesiredDewPoint + min(0.3, ApproachTemp);
-                        // NOTE: The next line introduces a potential discontinuity into the residual function
-                        //       which could prevent the root finder from finding the root it if were done at each
-                        //       controller iteration. For this reason we perform the setpoint calculation only
-                        //       once at the beginning of the controller and air loop simulation.
-                        //       Use lower of temperature and humidity based set point.
-                        //       See routine CalcSimpleController() for the sequence of operations.
-                        ControllerProps(ControlNum).SetPointValue = min(
-                            Node(SensedNode).TempSetPoint,
-                            HumidityControlTempSetPoint); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
-                        // Don't allow set point temperature to be below the actuator node water temperature
-                        ControllerProps(ControlNum).SetPointValue =
-                            max(ControllerProps(ControlNum).SetPointValue, Node(ControllerProps(ControlNum).ActuatedNode).Temp);
-                        // Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
-                        // account the humidity ratio setpoint.
-                        // NOTE: Check that this does not create side-effects somewhere else in the code.
-                        Node(SensedNode).TempSetPoint = ControllerProps(ControlNum).SetPointValue;
-                        // Finally indicate thate the setpoint has been computed
-                        ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
+                    if (ControllerProps(ControlNum).HumRatCtrlOverride) {
+                        // Humidity ratio control
+                        ControllerProps(ControlNum).SetPointValue = Node(SensedNode).HumRatMax;
                     } else {
                         // Pure temperature setpoint control strategy
                         ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint;
-                        // Finally indicate thate the setpoint has been computed
-                        ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                     }
+                    // Finally indicate thate the setpoint has been computed
+                    ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                 }
 
             } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
@@ -1587,33 +1529,8 @@ namespace HVACControllers {
                 FindRootSimpleController(ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName);
 
             } else {
-
-                // We need to evaluate the sensed node temperature with the max actuated value before
-                // we can compute the actual setpoint for the dual humidity ratio / temperature strategy.
-                {
-                    auto const SELECT_CASE_var(ControllerProps(ControlNum).ControlVar);
-                    if ((SELECT_CASE_var == iTemperature) || (SELECT_CASE_var == iHumidityRatio) || (SELECT_CASE_var == iFlow)) {
-                        // Always start with min point by default for the other control strategies
-                        ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
-
-                    } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
-                        if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
-                            // Always start with max point if setpoint not yet computed. See routine InitController().
-                            ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MaxPoint.X;
-                        } else {
-                            // If setpoint already exists (i.e., HumRatMax <= 0) then try min point first as in simple
-                            // temperature control case.
-                            ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
-                        }
-
-                    } else {
-                        // Should never happen
-                        ShowSevereError("CalcSimpleController: HVAC controller failed at " + CreateHVACStepFullString());
-                        ShowContinueError(" Controller name=" + ControllerProps(ControlNum).ControllerName);
-                        ShowContinueError(" Unrecognized control variable type=" + TrimSigDigits(ControllerProps(ControlNum).ControlVar));
-                        ShowFatalError("Preceding error causes program termination.");
-                    }
-                }
+                // Always start with min point by default
+                ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).MinPoint.X;
             }
 
             // Process current iterate and compute next candidate if needed
@@ -2324,51 +2241,32 @@ namespace HVACControllers {
     //        End of Update subroutines for the Controller Module
     // *****************************************************************************
 
-    // Beginning of Reporting subroutines for the Controller Module
-    // *****************************************************************************
-
-    void ReportController(int const EP_UNUSED(ControlNum)) // unused1208
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // Still needs to report the Controller power from this component
-        // Write(*,*)=ControllerProps(ControlNum)%ControllerPower
+        {
+            auto &thisController(ControllerProps(ControlNum));
+            if (IsConvergedFlag) {
+                if (thisController.ControlVar == iTemperatureAndHumidityRatio) {
+                    // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
+                    if (!thisController.HumRatCtrlOverride) {
+                        // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
+                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-4)) {
+                            // Turn on humdity control and restart controller
+                            IsConvergedFlag = false;
+                            thisController.HumRatCtrlOverride = true;
+                            if (thisController.Action == iReverseAction) {
+                                // Cooling coil controller should always be ReverseAction, but skip this if not
+                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, 1.0e-4);
+                            }
+                            // Do a cold start reset, same as iControllerOpColdStart
+                            ResetController(ControlNum, false, IsConvergedFlag);
+                        }
+                    }
+                }
+            }
+        }
     }
-
-    //        End of Reporting subroutines for the Controller Module
-    // *****************************************************************************
 
     void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag)
     {

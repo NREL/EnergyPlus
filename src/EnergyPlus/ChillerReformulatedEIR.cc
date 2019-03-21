@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -945,12 +945,12 @@ namespace ChillerReformulatedEIR {
                                     ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                     ElecReformEIRChiller(EIRChillNum).CWBranchNum,
                                     ElecReformEIRChiller(EIRChillNum).CWCompNum,
+                                    errFlag,
                                     ElecReformEIRChiller(EIRChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     ElecReformEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ElecReformEIRChiller(EIRChillNum).CondenserType != AirCooled) {
                 ScanPlantLoopsForObject(ElecReformEIRChiller(EIRChillNum).Name,
                                         TypeOf_Chiller_ElectricReformEIR,
@@ -958,12 +958,12 @@ namespace ChillerReformulatedEIR {
                                         ElecReformEIRChiller(EIRChillNum).CDLoopSideNum,
                                         ElecReformEIRChiller(EIRChillNum).CDBranchNum,
                                         ElecReformEIRChiller(EIRChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElecReformEIRChiller(EIRChillNum).CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElecReformEIRChiller(EIRChillNum).CWLoopNum,
                                               ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElecReformEIRChiller(EIRChillNum).CDLoopNum,
@@ -978,12 +978,12 @@ namespace ChillerReformulatedEIR {
                                         ElecReformEIRChiller(EIRChillNum).HRLoopSideNum,
                                         ElecReformEIRChiller(EIRChillNum).HRBranchNum,
                                         ElecReformEIRChiller(EIRChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElecReformEIRChiller(EIRChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElecReformEIRChiller(EIRChillNum).CWLoopNum,
                                               ElecReformEIRChiller(EIRChillNum).CWLoopSideNum,
                                               ElecReformEIRChiller(EIRChillNum).HRLoopNum,

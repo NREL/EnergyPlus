@@ -72,7 +72,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 67
 
-  Version,9.0;
+  Version,9.1;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -18581,7 +18581,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr1 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     CorridorFlr2 Equipment,  !- Name
@@ -18589,7 +18591,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr2 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     CorridorFlr3 Equipment,  !- Name
@@ -18597,7 +18601,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr3 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     CorridorFlr4 Equipment,  !- Name
@@ -18605,7 +18611,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr4 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     EmployeeLoungeFlr1 Equipment,  !- Name
@@ -18613,7 +18621,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     EmployeeLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     ExerciseCenterFlr1 Equipment,  !- Name
@@ -18621,7 +18631,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ExerciseCenterFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontLoungeFlr1 Equipment,  !- Name
@@ -18629,7 +18641,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     FrontLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontOfficeFlr1 Equipment,  !- Name
@@ -18637,7 +18651,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     FrontOfficeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr1 Equipment,  !- Name
@@ -18645,7 +18661,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr2 Equipment,  !- Name
@@ -18653,7 +18671,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr3 Equipment,  !- Name
@@ -18661,7 +18681,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr4 Equipment,  !- Name
@@ -18669,7 +18691,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr1 Equipment,  !- Name
@@ -18677,7 +18701,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr2 Equipment,  !- Name
@@ -18685,7 +18711,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr3 Equipment,  !- Name
@@ -18693,7 +18721,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr4 Equipment,  !- Name
@@ -18701,7 +18731,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom101 Equipment,  !- Name
@@ -18709,7 +18741,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom101 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom102 Equipment,  !- Name
@@ -18717,7 +18751,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom102 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom103 Equipment,  !- Name
@@ -18725,7 +18761,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom103 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom104 Equipment,  !- Name
@@ -18733,7 +18771,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom104 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom105 Equipment,  !- Name
@@ -18741,7 +18781,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom105 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom201 Equipment,  !- Name
@@ -18749,7 +18791,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom201 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom202_205 Equipment,  !- Name
@@ -18757,7 +18801,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom202_205 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom206_208 Equipment,  !- Name
@@ -18765,7 +18811,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom206_208 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom209_212 Equipment,  !- Name
@@ -18773,7 +18821,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom209_212 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom213 Equipment,  !- Name
@@ -18781,7 +18831,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom213 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom214 Equipment,  !- Name
@@ -18789,7 +18841,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom214 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom215_218 Equipment,  !- Name
@@ -18797,7 +18851,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom215_218 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom219 Equipment,  !- Name
@@ -18805,7 +18861,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom219 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom220_223 Equipment,  !- Name
@@ -18813,7 +18871,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom220_223 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom224 Equipment,  !- Name
@@ -18821,7 +18881,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom224 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom301 Equipment,  !- Name
@@ -18829,7 +18891,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom301 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom302_305 Equipment,  !- Name
@@ -18837,7 +18901,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom302_305 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom306_308 Equipment,  !- Name
@@ -18845,7 +18911,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom306_308 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom309_312 Equipment,  !- Name
@@ -18853,7 +18921,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom309_312 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom313 Equipment,  !- Name
@@ -18861,7 +18931,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom313 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom314 Equipment,  !- Name
@@ -18869,7 +18941,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom314 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom315_318 Equipment,  !- Name
@@ -18877,7 +18951,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom315_318 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom319 Equipment,  !- Name
@@ -18885,7 +18961,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom319 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom320_323 Equipment,  !- Name
@@ -18893,7 +18971,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom320_323 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom324 Equipment,  !- Name
@@ -18901,7 +18981,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom324 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom401 Equipment,  !- Name
@@ -18909,7 +18991,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom401 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom402_405 Equipment,  !- Name
@@ -18917,7 +19001,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom402_405 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom406_408 Equipment,  !- Name
@@ -18925,7 +19011,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom406_408 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom409_412 Equipment,  !- Name
@@ -18933,7 +19021,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom409_412 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom413 Equipment,  !- Name
@@ -18941,7 +19031,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom413 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom414 Equipment,  !- Name
@@ -18949,7 +19041,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom414 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom415_418 Equipment,  !- Name
@@ -18957,7 +19051,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom415_418 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom419 Equipment,  !- Name
@@ -18965,7 +19061,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom419 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom420_423 Equipment,  !- Name
@@ -18973,7 +19071,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom420_423 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     GuestRoom424 Equipment,  !- Name
@@ -18981,7 +19081,9 @@
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom424 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     LaundryRoomFlr1 Equipment,  !- Name
@@ -18989,7 +19091,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LaundryRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     MechanicalRoomFlr1 Equipment,  !- Name
@@ -18997,7 +19101,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     MechanicalRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     MeetingRoomFlr1 Equipment,  !- Name
@@ -19005,7 +19111,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     MeetingRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr1 Equipment,!- Name
@@ -19013,7 +19121,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr2 Equipment,!- Name
@@ -19021,7 +19131,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr3 Equipment,!- Name
@@ -19029,7 +19141,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr4 Equipment,!- Name
@@ -19037,7 +19151,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr1 Equipment,  !- Name
@@ -19045,7 +19161,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr2 Equipment,  !- Name
@@ -19053,7 +19171,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr3 Equipment,  !- Name
@@ -19061,7 +19181,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr4 Equipment,  !- Name
@@ -19069,7 +19191,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     RestroomFlr1 Equipment,  !- Name
@@ -19077,7 +19201,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     RestroomFlr1 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
 ! ***SIZING & CONTROLS***
 

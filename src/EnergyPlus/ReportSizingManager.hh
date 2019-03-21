@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,11 +77,26 @@ namespace ReportSizingManager {
                        std::string const &CallingRoutine // name of calling rotuine for warning messages
     );
 
-    void GetCoilDesFlowT(int SysNum,         // central air system index
-                         Real64 CpAir,       // specific heat to be used in calculations [J/kgC]
-                         Real64 &DesFlow,    // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp // returned design coil exit temperature [kg/s]
+    void GetCoilDesFlowT(int SysNum,           // central air system index
+                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
+                         Real64 &DesFlow,      // returned design mass flow [kg/s]
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
     );
+
+    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
 
 } // namespace ReportSizingManager
 

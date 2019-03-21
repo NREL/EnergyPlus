@@ -12,9 +12,9 @@ This group of input objects is related to electric power serving the facility. E
   On site electric storage devices.
 \end{itemize}
 
-For facilities that own their transformer, and the utility services is metered on the high voltage side, the ElectricLoadCenter:Transformer object can be used, and may be the only input object needed.
+For facilities that own their transformer, and the utility services is metered on the high voltage side, the \hyperref[electricloadcentertransformer]{ElectricLoadCenter:Transformer} object can be used, and may be the only input object needed.
 
-All other applications involving on-site generation or storage will require at least one ElectricLoadCenter:Distribution to describe the arrangement and control of a set of electric power devices. Each of these load centers is like a subpanel connected to the main electrical panel for the facility. The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity (and does not require any input object). Each ElectricLoadCenter:Distribution input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power. The ElectricLoadCenter:Distribution object manages and calls the individual generator models that are connected to it by being listed in an ElectricLoadCenter:Generators object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc. Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a collection of predefined arrangements, called ``buss types.'' Many on site generation and storage configurations common in buildings can be modeled using just one ElectricLoadCenter:Distribution object. However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations. (Note that when using multiple ElectricLoadCenter:Distribution objects, the order of the ElectricLoadCenter:Distribution objects within the input file determines the order in which they are called to interact with the main panel.)
+All other applications involving on-site generation or storage will require at least one \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} to describe the arrangement and control of a set of electric power devices. Each of these load centers is like a subpanel connected to the main electrical panel for the facility. The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity (and does not require any input object). Each \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power. The \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object manages and calls the individual generator models that are connected to it by being listed in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc. Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a collection of predefined arrangements, called ``buss types.'' Many on site generation and storage configurations common in buildings can be modeled using just one \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object. However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations. (Note that when using multiple \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} objects, the order of the \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} objects within the input file determines the order in which they are called to interact with the main panel.)
 
 The following diagram shows some of the devices and arrangements that can be modeled using the inputs in this group.
 
@@ -40,7 +40,7 @@ This alpha field contains the schedule name (ref. Schedule objects) that contain
 
 \paragraph{Field: Transformer Usage}\label{field-transformer-usage}
 
-This field indicates one of the three supported transformer application types: PowerInFromGrid, PowerOutToGrid, and LoadCenterPowerConditioning. A PowerInFromGrid type of transformer is used to step down voltage from the electricity grid to the building. The transformer with this type of use is somewhat free standing and does not need to be referenced in any ElectricLoadCenter:Distribution object. There should be only one PowerInFromGrid transformer in the model. A PowerOutToGrid type of transformer is used to match voltage from the building to the electricity grid. This conditions power exported out of the facility and feed back into the grid. This type of transformer will only be needed if the building ever exports power and the building and grid connection have different voltages. There should be only one PowerOutToGrid transformer in the model and it will serve all the surplus electricity produced by electric load center(s). A LoadCenterPowerConditioning type of transformer is used to match voltage between an electic load center (subpanel) and the facility's main panel. Each electric load center can have its own transformer to condition power fed into the main panel. For electric load centers that also draw power from the main panel, to charge storage, the transformer is assumed to operate in both directions (at the same performance). This type of transformer should be named in an ElectricLoadCenter:Distribution object.
+This field indicates one of the three supported transformer application types: PowerInFromGrid, PowerOutToGrid, and LoadCenterPowerConditioning. A PowerInFromGrid type of transformer is used to step down voltage from the electricity grid to the building. The transformer with this type of use is somewhat free standing and does not need to be referenced in any \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object. There should be only one PowerInFromGrid transformer in the model. A PowerOutToGrid type of transformer is used to match voltage from the building to the electricity grid. This conditions power exported out of the facility and feed back into the grid. This type of transformer will only be needed if the building ever exports power and the building and grid connection have different voltages. There should be only one PowerOutToGrid transformer in the model and it will serve all the surplus electricity produced by electric load center(s). A LoadCenterPowerConditioning type of transformer is used to match voltage between an electic load center (subpanel) and the facility's main panel. Each electric load center can have its own transformer to condition power fed into the main panel. For electric load centers that also draw power from the main panel, to charge storage, the transformer is assumed to operate in both directions (at the same performance). This type of transformer should be named in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-005}
 
@@ -64,7 +64,7 @@ This field specifies the winding material used by the transformer. There are two
 
 \paragraph{Field: Full Load Temperature Rise}\label{field-full-load-temperature-rise}
 
-This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of 65 \textdegreeC. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and 150 \textdegreeC. This field accepts any value between the minimum (50 \textdegreeC) and the maximum (180 \textdegreeC). The default is 150 \textdegreeC.
+This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of \SI{65}{\celsius}. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and \SI{150}{\celsius}. This field accepts any value between the minimum (\SI{50}{\celsius}) and the maximum (\SI{180}{\celsius}). The default is \SI{150}{\celsius}.
 
 \paragraph{Field: Fraction of Eddy Current Losses}\label{field-fraction-of-eddy-current-losses}
 
@@ -92,7 +92,7 @@ This field defines the percentage of the rated capacity at which the nameplate e
 
 \paragraph{Field: Reference Temperature for Nameplate Efficiency}\label{field-reference-temperature-for-nameplate-efficiency}
 
-This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of 75 \textdegreeC for dry-type distribution transformers and it takes the value of 55 \textdegreeC for liquid-filled distribution transformers. The default is 75 \textdegreeC.
+This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of \SI{75}{\celsius} for dry-type distribution transformers and it takes the value of \SI{55}{\celsius} for liquid-filled distribution transformers. The default is \SI{75}{\celsius}.
 
 \paragraph{Field: Per Unit Load for Maximum Efficiency}\label{field-per-unit-load-for-maximum-efficiency}
 
@@ -228,11 +228,11 @@ This alpha field contains the identifying name for the electric load center.
 
 \paragraph{Field: Generator List Name}\label{field-generator-list-name}
 
-This alpha field contains the identifying name for the list of generators in the set defined in an ElectricLoadCenter:Generators object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
+This alpha field contains the identifying name for the list of generators in the set defined in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
 
 \paragraph{Field: Generator Operation Scheme Type}\label{field-generator-operation-scheme-type}
 
-This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are Baseload, DemandLimit, TrackElectrical, TrackSchedule, TrackMeter, FollowThermal, and FollowThermalLimitElectrical. The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
+This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are Baseload, DemandLimit, TrackElectrical, TrackSchedule, TrackMeter, FollowThermal, and FollowThermalLimitElectrical. The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators}). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
 
 The DemandLimit, TrackElectrical, TrackSchedule, and TrackMeter schemes will sequentially load the available generators. All demand not met by available generator capacity (or storage) will be met by purchased electrical. Therefore, if DemandLimit, TrackElectrical, TrackSchedule, or TrackMeter is utilized and the available generators are not enough to meet demand, then purchased electrical will offset the difference. If a generator is needed in the simulation for a small load and it is less than the minimum part load ratio the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be available for returning to the electric grid.
 
@@ -318,7 +318,7 @@ This alpha field is used to describe how the electric load center is configured 
 
 \paragraph{Field: Inverter Object Name}\label{field-inverter-object-name}
 
-This field is used to identify the inverter connected to this load center (if any). This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage and should contain the user-defined name of an inverter object. There are three types of inverter models available -see ElectricLoadCenter:Inverter:Simple, ElectricLoadCenter:Inverter:LookUpTable, ElectricLoadCenter:Inverter:FunctionOfPower, or ElectricLoadCenter:Inverter:PVWatts. Enter the name of one of these types of inverter objects defined elsewhere in the input file.
+This field is used to identify the inverter connected to this load center (if any). This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage and should contain the user-defined name of an inverter object. There are three types of inverter models available -see \hyperref[electricloadcenterinvertersimple]{ElectricLoadCenter:Inverter:Simple}, \hyperref[electricloadcenterinverterlookuptable]{ElectricLoadCenter:Inverter:LookUpTable}, \hyperref[electricloadcenterinverterfunctionofpower]{ElectricLoadCenter:Inverter:FunctionOfPower}, or \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. Enter the name of one of these types of inverter objects defined elsewhere in the input file.
 
 \paragraph{Field: Electrical Storage Object Name}\label{field-electrical-storage-object-name}
 
@@ -326,7 +326,7 @@ This field is used to identify the electrical storage connected to this load cen
 
 \paragraph{Field: Transformer Object Name}\label{field-transformer-object-name}
 
-This field is used to identify the transformer connected to this load center (if any). This field can be used for any electrical buss types. Enter the name of an ElectricLoadCenter:Transformer object defined elsewhere in the input file. The transformer should have use type set to LoadCenterPowerConditioning.
+This field is used to identify the transformer connected to this load center (if any). This field can be used for any electrical buss types. Enter the name of an \hyperref[electricloadcentertransformer]{ElectricLoadCenter:Transformer} object defined elsewhere in the input file. The transformer should have use type set to LoadCenterPowerConditioning.
 
 \paragraph{Field: Storage Operation Scheme}\label{field-storage-operation-scheme}
 
@@ -346,7 +346,7 @@ This field is the name of a meter to use when a custom meter is to be used. This
 
 \paragraph{Field: Storage Converter Object Name}\label{field-storage-converter-object-name}
 
-This field is the name of an ElectricLoadCenter:Storage:Converter object defined elsewhere in the input file that describes the performance when converting AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Operation Scheme is set to TrackChargeDischargeSchedules or FacilityDemandLeveling.) Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance.
+This field is the name of an \hyperref[electricloadcenterstorageconverter]{ElectricLoadCenter:Storage:Converter} object defined elsewhere in the input file that describes the performance when converting AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Operation Scheme is set to TrackChargeDischargeSchedules or FacilityDemandLeveling.) Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance.
 
 \paragraph{Field: Maximum Storage State of Charge Fraction}\label{field-maximum-storage-state-of-charge-fraction}
 
@@ -546,28 +546,28 @@ This alpha field contains the keyword for the type of generator. The available t
 
 \begin{itemize}
 \item
-  Generator:InternalCombustionEngine
+  \hyperref[generatorinternalcombustionengine]{Generator:InternalCombustionEngine}
 \item
-  Generator:CombustionTurbine
+  \hyperref[generatorcombustionturbine]{Generator:CombustionTurbine}
 \item
-  Generator:Photovoltaic
+  \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}
 \item
-  Generator:PVWatts
+  \hyperref[generatorpvwatts]{Generator:PVWatts}
 \item
-  Generator:FuelCell
+  \hyperref[generatorfuelcell]{Generator:FuelCell}
 \item
-  Generator:MicroCHP
+  \hyperref[generatormicrochp]{Generator:MicroCHP}
 \item
-  Generator:MicroTurbine
+  \hyperref[generatormicroturbine]{Generator:MicroTurbine}
 \item
-  Generator:WindTurbine
+  \hyperref[generatorwindturbine]{Generator:WindTurbine}
 \end{itemize}
 
 These keywords are the names of the input objects for the type of generator.
 
 \paragraph{Field: Generator \textless{}x\textgreater{} Rated Electric Power Output}\label{field-generator-x-rated-electric-power-output}
 
-This numeric field contains the nominal electric power output to be requested from generator 1. It is normally equal to the rated power output of the generator in Watts. This value is used only for supervisory control and generator dispatch; the actual power output for each time step is determined by the generator models. This value affects how much a generator is loaded (i.e., requested electric power output) and can also impact the operation of an electric storage unit (e.g., LoadCenter:Storage:Simple) if one is connected to the associated load distribution center (ref. ElectricLoadCenter:Distribution). Refer to Electrical Storage in the EnergyPlus Engineering Reference for more details regarding this input field and its relationship with electric storage.
+This numeric field contains the nominal electric power output to be requested from generator 1. It is normally equal to the rated power output of the generator in Watts. This value is used only for supervisory control and generator dispatch; the actual power output for each time step is determined by the generator models. This value affects how much a generator is loaded (i.e., requested electric power output) and can also impact the operation of an electric storage unit (e.g., LoadCenter:Storage:Simple) if one is connected to the associated load distribution center (ref. \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution}). Refer to Electrical Storage in the EnergyPlus Engineering Reference for more details regarding this input field and its relationship with electric storage.
 
 \paragraph{Field: Generator \textless{}x\textgreater{} Availability Schedule Name}\label{field-generator-x-availability-schedule-name}
 
@@ -676,7 +676,7 @@ This field contains the fraction of inverter thermal losses that enter the zone 
 
 \paragraph{Field: Efficiency Function of Power Curve Name}\label{field-efficiency-function-of-power-curve-name}
 
-This field contains the name of curve representing the relationship between DC power input into the inverter and the efficiency with which that power is converted to AC. The curve can be either a Curve:Linear, Curve:Quadratic, or Curve:Cubic. The curve s x value is DC power input normalized by the following field. The result of the curve should be power conversion efficiency expressed as a fraction between 0.0 and 1.0.
+This field contains the name of curve representing the relationship between DC power input into the inverter and the efficiency with which that power is converted to AC. The curve can be either a \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, or \hyperref[curvecubic]{Curve:Cubic}. The curve s x value is DC power input normalized by the following field. The result of the curve should be power conversion efficiency expressed as a fraction between 0.0 and 1.0.
 
 \paragraph{Field: Rated Maximum Continuous Input Power}\label{field-rated-maximum-continuous-input-power}
 
@@ -802,7 +802,7 @@ ElectricLoadCenter:Inverter:LookUpTable,
 
 \subsection{ElectricLoadCenter:Inverter:PVWatts}\label{electricloadcenterinverterpvwatts}
 
-The ElectricLoadCenter:Inverter:PVWatts is intended to be used in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} with one or more \hyperref[generatorpvwatts]{Generator:PVWatts} objects. It is \textbf{not} compatible with other Generator objects, such as \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}. 
+The ElectricLoadCenter:Inverter:PVWatts is intended to be used in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} with one or more \hyperref[generatorpvwatts]{Generator:PVWatts} objects. It is \textbf{not} compatible with other Generator objects, such as \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}.
 
 \subsubsection{Inputs}\label{inputs-electricloadcenterinverterpvwatts}
 
@@ -926,7 +926,7 @@ This model is for converting AC to DC for grid-supplied charging of DC storage. 
 
 \subsubsection{Field: Name}\label{field-name-5-007}
 
-This field contains a unique name for the AC to DC converter. This name will be referenced in an ElectricLoadCenter:Distribution object.
+This field contains a unique name for the AC to DC converter. This name will be referenced in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object.
 
 \subsubsection{Field: Availability Schedule Name}\label{field-availability-schedule-name-4-001}
 
@@ -1045,7 +1045,7 @@ These outputs are the power and energy consumed in standby operation when the co
 
 \subsection{ElectricLoadCenter:Storage:Simple}\label{electricloadcenterstoragesimple}
 
-This input object is used to model storage of electricity in an electric load center. This can be used to model a battery or other forms of electrical storage in a simplified manner. The type of power, AC or DC, depends on the configuration chosen as the Electrical Buss Type in the ElectricLoadCenter:Distribution object.
+This input object is used to model storage of electricity in an electric load center. This can be used to model a battery or other forms of electrical storage in a simplified manner. The type of power, AC or DC, depends on the configuration chosen as the Electrical Buss Type in the \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object.
 
 \subsubsection{Inputs}\label{inputs-6-007}
 
@@ -1217,7 +1217,7 @@ This field indicates the open circuit voltage for a fully discharged battery mod
 
 \paragraph{Field: Voltage Change Curve Name for Charging}\label{field-voltage-change-curve-name-for-charging}
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2} in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
 
 The curve has the following form:
 
@@ -1229,7 +1229,7 @@ where X is the battery charge divided by the maximum capacity at a given current
 
 \paragraph{Field: Voltage Change Curve Name for Discharging}\label{field-voltage-change-curve-name-for-discharging}
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2} in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
 
 The curve has the following form:
 
@@ -1265,7 +1265,7 @@ This field specifies the number of equally ranged cycle bins in battery life sim
 
 \paragraph{Field: Battery Cycle Life Curve Name}\label{field-battery-cycle-life-curve-name}
 
-This field specifies the name of a double exponential decay curve (ref: Curve:DoubleExponentialDecay in Performance Curves) that correlates the cycles of battery failure (C\(_{F}\)) and fractional depth of discharge (R). The curve is:
+This field specifies the name of a double exponential decay curve (ref: \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay} in Performance Curves) that correlates the cycles of battery failure (C\(_{F}\)) and fractional depth of discharge (R). The curve is:
 
 \begin{equation}
 {C_F} = {C_1} + {C_2}{e^{{C_3}R}} + {C_4}{e^{{C_5}R}}
@@ -1442,7 +1442,7 @@ This alpha field contains the optimal operating fraction of full load. This is t
 
 \paragraph{Field: Shaft Power Curve Name}\label{field-shaft-power-curve-name}
 
-This alpha field contains the name of the shaft power curve. The curve itself is specified separately using a curve object (ref: Curve:QuadLinear). The Shaft Power Curve is a quadratic equation that determines the electric output versus the fuel used. Used to calculate the electric energy output divided by the fuel energy consumption as a function of part-load ratio. The defining equation is:
+This alpha field contains the name of the shaft power curve. The curve itself is specified separately using a curve object (ref: \hyperref[curvequadlinear]{Curve:QuadLinear}). The Shaft Power Curve is a quadratic equation that determines the electric output versus the fuel used. Used to calculate the electric energy output divided by the fuel energy consumption as a function of part-load ratio. The defining equation is:
 
 \begin{equation}
 ShaftPowerToFuelRatio = {C_1} + {C_2}RL + {C_3}R{L^2}
@@ -1452,7 +1452,7 @@ where RL is the Ratio of Load to Rated Power Output.
 
 \paragraph{Field: Jacket Heat Recovery Curve Name}\label{field-jacket-heat-recovery-curve-name}
 
-This alpha field contains the name of the Recovery Jacket Heat curve. The curve itself is specified separately using a curve object (ref: Curve:QuadLinear). The Jacket Heat Recovery Curve is a quadratic equation that determines the ratio of recovery jacket heat to fuel energy. Used to calculate the recoverable jacket heat as a function of part-load ratio.
+This alpha field contains the name of the Recovery Jacket Heat curve. The curve itself is specified separately using a curve object (ref: \hyperref[curvequadlinear]{Curve:QuadLinear}). The Jacket Heat Recovery Curve is a quadratic equation that determines the ratio of recovery jacket heat to fuel energy. Used to calculate the recoverable jacket heat as a function of part-load ratio.
 
 The defining equation is:
 
@@ -1464,7 +1464,7 @@ where RL is the Ratio of Load to Rated Power Output.
 
 \paragraph{Field: Lube Heat Recovery Curve Name}\label{field-lube-heat-recovery-curve-name}
 
-This alpha field contains the name of the Recovery Lube Heat curve. The curve itself is specified separately using a curve object (ref Curve:QuadLinear). The Lube Heat Recovery Curve is a quadratic equation that determines the ratio of recovery lube heat to fuel energy. Used to calculate the recoverable lube oil heat as a function of part-load ratio. The defining equation is:
+This alpha field contains the name of the Recovery Lube Heat curve. The curve itself is specified separately using a curve object (ref \hyperref[curvequadlinear]{Curve:QuadLinear}). The Lube Heat Recovery Curve is a quadratic equation that determines the ratio of recovery lube heat to fuel energy. Used to calculate the recoverable lube oil heat as a function of part-load ratio. The defining equation is:
 
 \begin{equation}
 RecoveryLubeHeatToFuelRatio = {C_1} + {C_2}RL + {C_3}R{L^2}
@@ -1474,7 +1474,7 @@ where RL is the Ratio of Load to Rated Power Output.
 
 \paragraph{Field: Total Exhaust Energy Curve Name}\label{field-total-exhaust-energy-curve-name}
 
-This alpha field contains the name of the Total Exhaust Energy curve. The curve itself is specified separately using a curve object (ref Curve:QuadLinear object). The Total Exhaust Energy Curve is a quadratic equation that determines the ratio of total exhaust energy to fuel energy. Used to calculate the total exhaust heat as a function of part-load ratio. The defining equation is:
+This alpha field contains the name of the Total Exhaust Energy curve. The curve itself is specified separately using a curve object (ref \hyperref[curvequadlinear]{Curve:QuadLinear} object). The Total Exhaust Energy Curve is a quadratic equation that determines the ratio of total exhaust energy to fuel energy. Used to calculate the total exhaust heat as a function of part-load ratio. The defining equation is:
 
 \begin{equation}
 TotalExhaustToFuelRatio = {C_1} + {C_2}RL + {C_3}R{L^2}
@@ -1484,7 +1484,7 @@ where RL is the Ratio of Load to Rated Power Output.
 
 \paragraph{Field: Exhaust Temperature Curve Name}\label{field-exhaust-temperature-curve-name}
 
-This alpha field contains the name of the Exhaust Temperature curve. The curve itself is specified separately using a curve object (ref Curve:QuadLinear object). The Exhaust Temperature Curve is a quadratic equation that determines the absolute exhaust temperature. Used to determine the exhaust gas temperature as a function of part-load ratio. The defining equation is:
+This alpha field contains the name of the Exhaust Temperature curve. The curve itself is specified separately using a curve object (ref \hyperref[curvequadlinear]{Curve:QuadLinear} object). The Exhaust Temperature Curve is a quadratic equation that determines the absolute exhaust temperature. Used to determine the exhaust gas temperature as a function of part-load ratio. The defining equation is:
 
 \begin{equation}
 AbsoluteExhaustTemperature = {C_1} + {C_2}RL + {C_3}R{L^2}
@@ -1724,7 +1724,7 @@ If the fuel type is OtherFuel2, then OtherFuel2 is shown as the fuel type. They 
 
 \subsection{Generator:CombustionTurbine}\label{generatorcombustionturbine}
 
-EnergyPlus has two different models for combustion turbine style generators. This one stems for a model that was originally in the BLAST computer program. A newer model with a different formulation is also available -see the Generator:MicroTurbine input object. The basic combustion-turbine cycle is the Brayton Cycle or open cycle, which consists of an adiabatic compression, constant pressure heating, and adiabatic expansion. The Combustion turbine model uses the electrical load and engine generator size to compute part-load ratios (PLR). Fuel energy input and recoverable lube oil heat are then computed. Finally, the recoverable exhaust heat is calculated.
+EnergyPlus has two different models for combustion turbine style generators. This one stems for a model that was originally in the BLAST computer program. A newer model with a different formulation is also available -see the \hyperref[generatormicroturbine]{Generator:MicroTurbine} input object. The basic combustion-turbine cycle is the Brayton Cycle or open cycle, which consists of an adiabatic compression, constant pressure heating, and adiabatic expansion. The Combustion turbine model uses the electrical load and engine generator size to compute part-load ratios (PLR). Fuel energy input and recoverable lube oil heat are then computed. Finally, the recoverable exhaust heat is calculated.
 
 Combustion turbine generators use performance parameters to compute fuel energy consumption as a function of part-load and ambient (entering) air temperature. Recoverable fuel energy equipment, recoverable lube oil heat/fuel energy input equipment performance, total exhaust heat/fuel energy input equipment, exhaust gas temperature/fuel energy input equipment performance parameters are all specified with a quadratic curve fit.
 
@@ -1758,7 +1758,7 @@ This alpha field contains the optimal operating fraction of full load. This is t
 
 \paragraph{Field: Part Load Based Fuel Input Curve Name}\label{field-part-load-based-fuel-input-curve-name}
 
-Needs a Curve:Quadratic object to be specified.
+Needs a \hyperref[curvequadratic]{Curve:Quadratic} object to be specified.
 
 Fuel Input = a + b*PLR + c*PLR**2
 
@@ -1766,7 +1766,7 @@ PLR = Ratio of Generator Load to Rated Power Output. This curve is multiplied to
 
 \paragraph{Field: Temperature Based Fuel Input Curve Name}\label{field-temperature-based-fuel-input-curve-name}
 
-Needs a Curve:Quadratic object to be specified.
+Needs a \hyperref[curvequadratic]{Curve:Quadratic} object to be specified.
 
 Fuel Input = a + b*AT + c*AT**2 where: AT = Ambient Delta T
 
@@ -1990,7 +1990,7 @@ These outputs are the fuel input to the electric generator. Consumption is meter
 
 MicroTurbine generators are small combustion turbines that produce electricity on a relatively small scale (e.g., 25kW to 500kW). This model uses nominal performance at reference conditions along with several modifier curves to determine electrical power output and fuel use at non-reference conditions. Standby and ancillary power can also be taken into account. Furthermore, energy recovery from exhaust air can be used to heat water. Similar to electrical power output, thermal power (heat recovery) output is calculated using nominal performance at reference conditions with modifier curves to account for variations at non-reference conditions.
 
-The following inputs define the MicroTurbine electric generator. The ElectricLoadCenter:Generators and ElectricLoadCenter:Distribution objects are used to define the availability and control of all electric generators included in the simulation (ref. ElectricLoadCenter:Generators and ElectricLoadCenter:Distribution).
+The following inputs define the MicroTurbine electric generator. The \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} and \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} objects are used to define the availability and control of all electric generators included in the simulation (ref. \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} and \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution}).
 
 \subsubsection{Inputs}\label{inputs-9-004}
 
@@ -2016,7 +2016,7 @@ This numeric field contains the electrical efficiency of the generator at refere
 
 \paragraph{Field: Reference Combustion Air Inlet Temperature}\label{field-reference-combustion-air-inlet-temperature}
 
-This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of 15 \textdegreeC will be used.
+This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of \SI{15}{\celsius} will be used.
 
 \paragraph{Field: Reference Combustion Air Inlet Humidity Ratio}\label{field-reference-combustion-air-inlet-humidity-ratio}
 
@@ -2122,7 +2122,7 @@ As temperatures in the water loop approach this maximum temperature, the tempera
 
 \paragraph{Field: Combustion Air Inlet Node Name}\label{field-combustion-air-inlet-node-name}
 
-This alpha field specifies the name of the combustion air inlet node. If a node name is specified, this node must be an outdoor air node and must also be specified elsewhere in the input (ref: OutdoorAir:Node and OutdoorAir:NodeList). If this field is left blank, the combustion air inlet conditions are assumed to be the outdoor weather conditions used for the simulation.
+This alpha field specifies the name of the combustion air inlet node. If a node name is specified, this node must be an outdoor air node and must also be specified elsewhere in the input (ref: \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}). If this field is left blank, the combustion air inlet conditions are assumed to be the outdoor weather conditions used for the simulation.
 
 \paragraph{Field: Combustion Air Outlet Node Name}\label{field-combustion-air-outlet-node-name}
 
@@ -2394,7 +2394,7 @@ This object is used to model small-scale combined heat and power (micro CHP) ele
 
 Note that unlike other component models in EnergyPlus, this model is not normalized. Therefore, performance coefficients developed for one type and capacity of CHP device cannot be used for a device with a different capacity.
 
-This model is an empirical, curve fit model. This object describes the connections to the rest of the building model and includes a reference to another object called Generator:MicroCHP:NonNormalizedParameters that provides the operating characteristics.
+This model is an empirical, curve fit model. This object describes the connections to the rest of the building model and includes a reference to another object called \hyperref[generatormicrochpnonnormalizedparameters]{Generator:MicroCHP:NonNormalizedParameters} that provides the operating characteristics.
 
 \subsubsection{Inputs}\label{inputs-10-003}
 
@@ -2404,7 +2404,7 @@ This field contains a unique name for the residential CHP device.
 
 \paragraph{Field: Performance Parameters Name}\label{field-performance-parameters-name}
 
-This field contains the name of a Generator:MicroCHP:NonNormalizedParameters object defined elsewhere in the input.
+This field contains the name of a \hyperref[generatormicrochpnonnormalizedparameters]{Generator:MicroCHP:NonNormalizedParameters} object defined elsewhere in the input.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-7-000}
 
@@ -2428,7 +2428,7 @@ The name of an air node that receives the exhaust from the CHP unit.
 
 \paragraph{Field: Generator Fuel Supply Name}\label{field-generator-fuel-supply-name}
 
-This field contains the name of a Generator:FuelSupply object defined elsewhere in the input file.
+This field contains the name of a \hyperref[generatorfuelsupply]{Generator:FuelSupply} object defined elsewhere in the input file.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-7-000}
 
@@ -2452,7 +2452,7 @@ Generator:MicroCHP,
 
 \subsection{Generator:MicroCHP:NonNormalizedParameters}\label{generatormicrochpnonnormalizedparameters}
 
-This object is referenced by a Generator:MicroCHP object and provides the non-normalized parameters for the MicroCHP generator model.
+This object is referenced by a \hyperref[generatormicrochp]{Generator:MicroCHP} object and provides the non-normalized parameters for the MicroCHP generator model.
 
 \subsubsection{Inputs}\label{inputs-11-003}
 
@@ -2474,27 +2474,27 @@ This is the minimum flow rate of cooling water that must be available for the un
 
 \paragraph{Field: Maximum Cooling Water Temperature}\label{field-maximum-cooling-water-temperature}
 
-This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} \textdegreeC{]}.
+This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} \SI{}{\celsius}{]}.
 
 \paragraph{Field: Electrical Efficiency Curve Name}\label{field-electrical-efficiency-curve-name}
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency. The electrical efficiency, \(\eta_e\) , is a function of the cooling water mass flow rate \(\dot m_{cw}\) , the temperature of the cooling water at the inlet, \(T_{cw}\) , the steady-state net electrical power produced, \(P_{net,ss}\) .
+This is the name of \hyperref[curvetriquadratic]{Curve:Triquadratic} object that defines the steady-state net electrical efficiency. The electrical efficiency, \(\eta_e\) , is a function of the cooling water mass flow rate \(\dot m_{cw}\) , the temperature of the cooling water at the inlet, \(T_{cw}\) , the steady-state net electrical power produced, \(P_{net,ss}\) .
 
 \begin{equation}
 \eta_e = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)
 \end{equation}
 
-The associated Curve:Triquadratic object should be defined with the independent variables \({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\) corresponding to \emph{x}, \emph{y}, and \emph{z}, respectively.
+The associated \hyperref[curvetriquadratic]{Curve:Triquadratic} object should be defined with the independent variables \({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\) corresponding to \emph{x}, \emph{y}, and \emph{z}, respectively.
 
 \paragraph{Field: Thermal Efficiency Curve Name}\label{field-thermal-efficiency-curve-name}
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency. The thermal efficiency, \(\eta_q\) , is a function of the cooling water mass flow rate, \(\dot m_{cw}\) , the temperature of the cooling water at the inlet, \(T_{cw}\) , the steady-state net electrical power produced, \(P_{net,ss}\) .
+This is the name of a \hyperref[curvetriquadratic]{Curve:Triquadratic} object that defines the steady-state net thermal efficiency. The thermal efficiency, \(\eta_q\) , is a function of the cooling water mass flow rate, \(\dot m_{cw}\) , the temperature of the cooling water at the inlet, \(T_{cw}\) , the steady-state net electrical power produced, \(P_{net,ss}\) .
 
 \begin{equation}
 {\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)
 \end{equation}
 
-The associated Curve:Triquadratic object should be defined with the independent variables \({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\) corresponding to \emph{x}, \emph{y}, and \emph{z}, respectively.
+The associated \hyperref[curvetriquadratic]{Curve:Triquadratic} object should be defined with the independent variables \({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\) corresponding to \emph{x}, \emph{y}, and \emph{z}, respectively.
 
 \paragraph{Field: Cooling Water Flow Rate Mode}\label{field-cooling-water-flow-rate-mode}
 
@@ -2504,11 +2504,11 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 \paragraph{Field: Cooling Water Flow Rate Curve Name}\label{field-cooling-water-flow-rate-curve-name}
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, \({\dot m_{cw}}\) . This field is only used if the prior field is set to InternalControl. The mass flow of cooling water is a function of steady-state power, \({P_{net,ss}}\) , and the inlet temperature of the cooling water, \({T_{cw}}\) . The associated Curve:Biquadratic should be defined with the independent variables \({P_{net,ss}}\) and \({T_{cw}}\) corresponding to \emph{x} and \emph{y}, respectively.
+This field contains the name of a \hyperref[curvebiquadratic]{Curve:Biquadratic} object that defines the mass flow rate of cooling water, \({\dot m_{cw}}\) . This field is only used if the prior field is set to InternalControl. The mass flow of cooling water is a function of steady-state power, \({P_{net,ss}}\) , and the inlet temperature of the cooling water, \({T_{cw}}\) . The associated \hyperref[curvebiquadratic]{Curve:Biquadratic} should be defined with the independent variables \({P_{net,ss}}\) and \({T_{cw}}\) corresponding to \emph{x} and \emph{y}, respectively.
 
 \paragraph{Field: Air Flow Rate Curve Name}\label{field-air-flow-rate-curve-name}
 
-This is the name of a Curve:Quadratic object that defines the steady state air flow into the CHP device as a function of the mass flow rate of fuel.
+This is the name of a \hyperref[curvequadratic]{Curve:Quadratic} object that defines the steady state air flow into the CHP device as a function of the mass flow rate of fuel.
 
 \paragraph{Field: Maximum Net Electrical Power Rate of Change}\label{field-maximum-net-electrical-power-rate-of-change}
 
@@ -2556,7 +2556,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 \paragraph{Field: Nominal Engine Operating Temperature}\label{field-nominal-engine-operating-temperature}
 
-This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} \textdegreeC{]}.
+This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} \SI{}{\celsius}{]}.
 
 \paragraph{Field: Warm Up Power Coefficient}\label{field-warm-up-power-coefficient}
 
@@ -2817,39 +2817,39 @@ This field contains a unique name for the fuel cell.
 
 \paragraph{Field: Power Module Name}\label{field-power-module-name}
 
-This field contains the name of a Generator:FuelCell:PowerModule input object.
+This field contains the name of a \hyperref[generatorfuelcellpowermodule]{Generator:FuelCell:PowerModule} input object.
 
 \paragraph{Field: Air Supply Name}\label{field-air-supply-name}
 
-This field contains the name of a Generator:FuelCell:AirSupply input object.
+This field contains the name of a \hyperref[generatorfuelcellairsupply]{Generator:FuelCell:AirSupply} input object.
 
 \paragraph{Field: Fuel Supply Name}\label{field-fuel-supply-name}
 
-This field contains the name of a Generator:FuelSupply input object.
+This field contains the name of a \hyperref[generatorfuelsupply]{Generator:FuelSupply} input object.
 
 \paragraph{Field: Water Supply Name}\label{field-water-supply-name}
 
-This field contains the name of a Generator:FuelCell:WaterSupply input object.
+This field contains the name of a \hyperref[generatorfuelcellwatersupply]{Generator:FuelCell:WaterSupply} input object.
 
 \paragraph{Field: Auxiliary Heater Name}\label{field-auxiliary-heater-name}
 
-This field contains the name of a Generator:FuelCell:AuxiliaryHeater input object.
+This field contains the name of a \hyperref[generatorfuelcellauxiliaryheater]{Generator:FuelCell:AuxiliaryHeater} input object.
 
 \paragraph{Field: Heat Exchanger Name}\label{field-heat-exchanger-name-000}
 
-This field contains the name of a Generator:FuelCell:ExhaustGasToWaterHeatExchanger input object.
+This field contains the name of a \hyperref[generator-fuelcell-exhaustgastowaterheatexchanger]{Generator:FuelCell:ExhaustGasToWaterHeatExchanger} input object.
 
 \paragraph{Field: Electrical Storage Name}\label{field-electrical-storage-name}
 
-This field contains the name of a Generator:FuelCell:ElectricalStorage input object.
+This field contains the name of a \hyperref[generatorfuelcellelectricalstorage]{Generator:FuelCell:ElectricalStorage} input object.
 
 \paragraph{Field: Inverter Name}\label{field-inverter-name}
 
-This field contains the name of a Generator:FuelCell:Inverter input object.
+This field contains the name of a \hyperref[generatorfuelcellinverter]{Generator:FuelCell:Inverter} input object.
 
 \paragraph{Field: Stack Cooler Name}\label{field-stack-cooler-name}
 
-This field contains the name of a Generator:FuelCell:StackCooler input object. This is optional. The presence of a stack cooler distinguishes between SOFC and PEMFC with PEMFC operating at lower temperatures and requiring a separate subsystem to maintain stack temperatures.
+This field contains the name of a \hyperref[generatorfuelcellstackcooler]{Generator:FuelCell:StackCooler} input object. This is optional. The presence of a stack cooler distinguishes between SOFC and PEMFC with PEMFC operating at lower temperatures and requiring a separate subsystem to maintain stack temperatures.
 
 An example input data file (IDF) entry for this object is provided below:
 
@@ -3051,7 +3051,7 @@ This variable provides the results for \({\dot N_{air}}\) , the flow rate of air
 
 \paragraph{Generator Power Module Entering Air Enthalpy {[}W{]}}\label{generator-power-module-entering-air-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Blower Electric Power {[}W{]}}\label{generator-blower-electric-power-w}
 
@@ -3079,7 +3079,7 @@ This variable provides the results for \({\dot N_{fuel}}\) , which is the flow r
 
 \paragraph{Generator Power Module Entering Fuel Enthalpy {[}W{]}}\label{generator-power-module-entering-fuel-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Fuel Compressor Electric Power {[}W{]}}\label{generator-fuel-compressor-electric-power-w}
 
@@ -3115,7 +3115,7 @@ This variable provides the results for energy used by the water pump. It is also
 
 \paragraph{Generator Power Module Entering Reforming Water Enthalpy {[}W{]}}\label{generator-power-module-entering-reforming-water-enthalpy-w}
 
-This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Product Gas Temperature {[}C{]}}\label{generator-product-gas-temperature-c}
 
@@ -3123,7 +3123,7 @@ This variable provides the results for the temperature of the product gas stream
 
 \paragraph{Generator Product Gas Enthalpy {[}W{]}}\label{generator-product-gas-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to 25 \textdegreeC.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to \SI{25}{\celsius}.
 
 \paragraph{Generator Product Gas Molar Flow Rate {[}kmol/s{]}}\label{generator-product-gas-molar-flow-rate-kmols}
 
@@ -3211,7 +3211,7 @@ This is the flow of condensed water in kmol/s.
 
 \subsection{Generator:FuelCell:PowerModule}\label{generatorfuelcellpowermodule}
 
-This object is used to describe the core power module subsystem of the FC. This includes the fuel cell stack, fuel reformer, and whatever ancillary devices are included inside. If the model has multiple FC generators that are of the exact same type, then only one of these objects is needed and all the Generator:FuelCell can reference it. The model uses a number of curves to describe operating performance. Input data for specific models of FC are not yet available but will be produced by IEA Annex 42 and should be available in the future.
+This object is used to describe the core power module subsystem of the FC. This includes the fuel cell stack, fuel reformer, and whatever ancillary devices are included inside. If the model has multiple FC generators that are of the exact same type, then only one of these objects is needed and all the \hyperref[generatorfuelcell]{Generator:FuelCell} can reference it. The model uses a number of curves to describe operating performance. Input data for specific models of FC are not yet available but will be produced by IEA Annex 42 and should be available in the future.
 
 \subsubsection{Inputs}\label{inputs-13-003}
 
@@ -3225,13 +3225,13 @@ This field is used to choose between different modes of inputting the electrical
 
 \paragraph{Field: Efficiency Curve Name}\label{field-efficiency-curve-name}
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve is a function of the net DC electric power, \({P_{el}}\) (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency \({\varepsilon_{el}}\) . For the Annex42 mode the full relation for efficiency is,
+This field contains the name of a \hyperref[curvequadratic]{Curve:Quadratic} input object described elsewhere in the input file. The curve is a function of the net DC electric power, \({P_{el}}\) (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency \({\varepsilon_{el}}\) . For the Annex42 mode the full relation for efficiency is,
 
 \begin{equation}
 {\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]
 \end{equation}
 
-where the Curve:Quadratic input object named in this field serves to define the quadratic portion in the first set of brackets. For the Normalized mode the full relation for efficiency is,
+where the \hyperref[curvequadratic]{Curve:Quadratic} input object named in this field serves to define the quadratic portion in the first set of brackets. For the Normalized mode the full relation for efficiency is,
 
 \begin{equation}
 {\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot \frac{{{P_{el}}}}{{{P_{nom}}}} + {\varepsilon_2} \cdot {{\left( {\frac{{{P_{el}}}}{{{P_{nom}}}}} \right)}^2}} \right] \cdot {\varepsilon_{nom}} \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_0 {dt - {t_{threshold}},0.0))}  \cdot L} \right]
@@ -3281,7 +3281,7 @@ This field is used to describe the length of time (seconds) of the start up peri
 
 \paragraph{Field: Start Up Fuel}\label{field-start-up-fuel}
 
-This field is used to describe the amount of fuel (kmol) used during the entire start up period. The fuel is the same type as what is described in the Generator:FuelSupply object elsewhere in the input file.
+This field is used to describe the amount of fuel (kmol) used during the entire start up period. The fuel is the same type as what is described in the \hyperref[generatorfuelsupply]{Generator:FuelSupply} object elsewhere in the input file.
 
 \paragraph{Field: Start Up Electricity Consumption}\label{field-start-up-electricity-consumption}
 
@@ -3297,7 +3297,7 @@ This field is used to describe the length of time (seconds) of the shut down per
 
 \paragraph{Field: Shut Down Fuel}\label{field-shut-down-fuel}
 
-This field is used to describe the amount of fuel (kmol) used during the entire shut down period. The fuel is the same type as what is described in the Generator:FuelSupply object elsewhere in the input file.
+This field is used to describe the amount of fuel (kmol) used during the entire shut down period. The fuel is the same type as what is described in the \hyperref[generatorfuelsupply]{Generator:FuelSupply} object elsewhere in the input file.
 
 \paragraph{Field: Shut Down Electricity Consumption}\label{field-shut-down-electricity-consumption}
 
@@ -3529,7 +3529,7 @@ This field is used to define the air node where the inlet air stream is drawn fr
 
 \paragraph{Field: Blower Power Curve Name}\label{field-blower-power-curve-name}
 
-This field contains the name of a Curve:Cubic input object described elsewhere in the input file. The curve provides the power used by the air blower (W) as a cubic function of the rate of air supply (kmol/s).
+This field contains the name of a \hyperref[curvecubic]{Curve:Cubic} input object described elsewhere in the input file. The curve provides the power used by the air blower (W) as a cubic function of the rate of air supply (kmol/s).
 
 \begin{equation}
 {P_{blower - el}} = {b_0} + {b_1} \cdot {\dot N_{air}} + {b_2} \cdot \dot N_{air}^2 + {b_3} \cdot \dot N_{air}^3
@@ -3561,7 +3561,7 @@ This field is used to describe the air temperature coefficient, \({a_3}\), used 
 
 \paragraph{Field: Air Rate Function of Fuel Rate Curve Name}\label{field-air-rate-function-of-fuel-rate-curve-name}
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the fuel flow rate, \({\dot N_{fuel}}\) .
+This field contains the name of a \hyperref[curvequadratic]{Curve:Quadratic} input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the fuel flow rate, \({\dot N_{fuel}}\) .
 
  \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)
 
@@ -3675,7 +3675,7 @@ This field contains a unique name for the fuel cell water supply subsystem.
 
 \paragraph{Field: Reformer Water Flow Rate Function of Fuel Rate Curve Name}\label{field-reformer-water-flow-rate-function-of-fuel-rate-curve-name}
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve provides the rate of water flow (kmol/sec) as a function of fuel flow rate (kmol/sec).
+This field contains the name of a \hyperref[curvequadratic]{Curve:Quadratic} input object described elsewhere in the input file. The curve provides the rate of water flow (kmol/sec) as a function of fuel flow rate (kmol/sec).
 
 \begin{equation}
 {\dot N_{liq - water}} = {w_0} + {w_1} \cdot {\dot N_{fuel}} + {w_2} \cdot \dot N_{fuel}^2
@@ -3685,7 +3685,7 @@ If the unit does not use water for reforming then use a null quadratic where all
 
 \paragraph{Field: Reformer Water Pump Power Function of Fuel Rate Curve Name}\label{field-reformer-water-pump-power-function-of-fuel-rate-curve-name}
 
-This field contains the name of a Curve:Cubic input object described elsewhere in the input file. The curve provides the power used by the water pump (W) as a cubic function of the rate of water supply (kmol/s).
+This field contains the name of a \hyperref[curvecubic]{Curve:Cubic} input object described elsewhere in the input file. The curve provides the power used by the water pump (W) as a cubic function of the rate of water supply (kmol/s).
 
 \begin{equation}
 {P_{pump - el}} = {p_0} + {p_1} \cdot {\dot N_{water}} + {p_2} \cdot \dot N_{water}^2 + {p_3} \cdot \dot N_{water}^3
@@ -3699,7 +3699,7 @@ This field describes the portion of pump electrical power that is lost to the su
 
 \paragraph{Field: Water Temperature Modeling Mode}\label{field-water-temperature-modeling-mode}
 
-This field describes how the model will determine the inlet temperature of the water stream. There are four options to choose from: TemperatureFromAirNode, TemperatureFromWaterNode, TemperatureFromSchedule, and MainsWaterTemperature. For the first two options, the temperature of the water inlet is determined by the temperature at the node named in the next field. For the third option, the temperature is determined by the schedule in the last field. Using the MainsWaterTemperature option requires also defining a separate Site:WaterMainsTemperature input object elsewhere in the input file.
+This field describes how the model will determine the inlet temperature of the water stream. There are four options to choose from: TemperatureFromAirNode, TemperatureFromWaterNode, TemperatureFromSchedule, and MainsWaterTemperature. For the first two options, the temperature of the water inlet is determined by the temperature at the node named in the next field. For the third option, the temperature is determined by the schedule in the last field. Using the MainsWaterTemperature option requires also defining a separate \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} input object elsewhere in the input file.
 
 \paragraph{Field: Water Temperature Reference Node Name}\label{field-water-temperature-reference-node-name}
 
@@ -3823,7 +3823,7 @@ Generator:FuelCell:AuxiliaryHeater,
   ;                                               !- Minimum Heating Capacity in Kmol per Second
 \end{lstlisting}
 
-\subsection{Generator:FuelCell:ExhaustGasToWaterHeatExchanger}
+\subsection{Generator:FuelCell:ExhaustGasToWaterHeatExchanger}\label{generator-fuelcell-exhaustgastowaterheatexchanger}
 
 This object is used to describe the exhaust gas heat exchanger subsystem of the FC used to recovery thermal energy.
 
@@ -4079,7 +4079,7 @@ This field describes the value for inverter efficiency when using the \textbf{Co
 
 \paragraph{Field: Efficiency Function of DC Power Curve Name}\label{field-efficiency-function-of-dc-power-curve-name}
 
-This field names a Curve:Quadratic object defined elsewhere in the input file. The curve determines inverter efficiency as a function of the DC power entering the inverter as follows:
+This field names a \hyperref[curvequadratic]{Curve:Quadratic} object defined elsewhere in the input file. The curve determines inverter efficiency as a function of the DC power entering the inverter as follows:
 
 \begin{equation}
 {\eta_{PCU}} = {u_0} + {u_1} \cdot {P_{PCU - in}} + {u_2} \cdot P_{PCU - in}^2
@@ -4133,7 +4133,7 @@ This field contains the name of a temperature schedule defined elsewhere in the 
 
 \paragraph{Field: Compressor Power Function of Fuel Rate Curve Name}\label{field-compressor-power-function-of-fuel-rate-curve-name}
 
-This field contains the name of a Curve:Cubic input object described elsewhere in the input file. The curve provides the electrical power used by the fuel compressor (W) as a cubic function of the rate of fuel supply (kmol/s).
+This field contains the name of a \hyperref[curvecubic]{Curve:Cubic} input object described elsewhere in the input file. The curve provides the electrical power used by the fuel compressor (W) as a cubic function of the rate of fuel supply (kmol/s).
 
 \begin{equation}
 {P_{comp - el}} = {c_0} + {c_1} \cdot {\dot N_{fuel}} + {c_2} \cdot \dot N_{fuel}^2 + {c_3} \cdot \dot N_{fuel}^3
@@ -4161,7 +4161,7 @@ For fuel type LiquidGeneric, this field is used to enter the molecular weight of
 
 \paragraph{Field: Liquid Generic Fuel CO2 Emission Factor}\label{field-liquid-generic-fuel-co2-emission-factor}
 
-This field is not used. This part of the Annex 42 model was not implemented in EnergyPlus; see the FuelFactors object.
+This field is not used. This part of the Annex 42 model was not implemented in EnergyPlus; see the \hyperref[fuelfactors]{FuelFactors} object.
 
 \paragraph{Field: Number of Constituents in Gaseous Constituent Fuel Supply}\label{field-number-of-constituents-in-gaseous-constituent-fuel-supply}
 
@@ -4229,11 +4229,11 @@ This field is the type of PV performance model. The choices are the class names 
 
 \begin{itemize}
 \item
-  PhotovoltaicPerformance:Simple
+  \hyperref[photovoltaicperformancesimple]{PhotovoltaicPerformance:Simple}
 \item
-  PhotovoltaicPerformance:EquivalentOne-Diode
+  \hyperref[photovoltaicperformanceequivalentone-diode]{PhotovoltaicPerformance:EquivalentOne-Diode}
 \item
-  PhotovoltaicPerformance:Sandia.
+  \hyperref[photovoltaicperformancesandia]{PhotovoltaicPerformance:Sandia}.
 \end{itemize}
 
 \paragraph{Field: Module Performance Name}\label{field-module-performance-name}
@@ -4300,7 +4300,7 @@ This output variable is the resulting efficiency of the PV array .
 
 The two more detailed PV models also have the following output variables.
 
-\paragraph{Generator PV Cell Temperature {[} \textdegreeC{]}}\label{generator-pv-cell-temperature-c}
+\paragraph{Generator PV Cell Temperature {[} \SI{}{\celsius}{]}}\label{generator-pv-cell-temperature-c}
 
 This output variable represents the temperature of the solar cell used in the calculation of cell performance.
 
@@ -4762,11 +4762,11 @@ When using EpMacro with an typical installation of EnergyPlus, the above entry c
 
 \subsection{Generator:PVWatts}\label{generatorpvwatts}
 
-PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. 
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}.
 
 \subsubsection{Inputs}\label{input-description}
 
-\paragraph{Field: Name}\label{field-name}
+\paragraph{Field: Name}\label{generatorpvwatts-field-name}
 
 This field is a unique name for the PV array.
 
@@ -4856,27 +4856,27 @@ One of:
 
 The tilt angle is the angle from horizontal of the photovoltaic modules
 in the array. For a fixed array, the tilt angle is the angle from
-horizontal of the array where 0\textdegree = horizontal, and 90\textdegree = vertical. For
+horizontal of the array where \SI{0}{\degree} = horizontal, and \SI{90}{\degree} = vertical. For
 arrays with one-axis tracking, the tilt angle is the angle from
 horizontal of the tracking axis. The tilt angle does not apply to arrays
 with two-axis tracking.
 
-Default: 20\textdegree
+Default: \SI{20}{\degree}
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
 
 For a fixed array, the azimuth angle is the angle clockwise from true
 north describing the direction that the array faces. An azimuth angle of
-180\textdegree is for a south-facing array, and an azimuth angle of 0\textdegree
+\SI{180}{\degree} is for a south-facing array, and an azimuth angle of \SI{0}{\degree}
 is for a north-facing array.
 
 For an array with one-axis tracking, the azimuth angle is the angle
 clockwise from true north of the axis of rotation. The azimuth angle
 does not apply to arrays with two-axis tracking.
 
-Default: 180\textdegree
+Default: \SI{180}{\degree}
 
-\paragraph{Field: Surface Name}\label{field-surface-name}
+\paragraph{Field: Surface Name}\label{generatorpvwatts-field-surface-name}
 
 This is the name of a surface that defines the location and geometry of
 the array. Required if Array Geometry Type is \texttt{Surface}. Shading

@@ -14,41 +14,41 @@ There are several material ``types'' which may be used to describe layers within
 \item
   Material
 \item
-  Material:NoMass
+  \hyperref[materialnomass]{Material:NoMass}
 \item
-  Material:AirGap
+  \hyperref[materialairgap]{Material:AirGap}
 \item
-  Material:RoofVegetation
+  \hyperref[materialroofvegetation]{Material:RoofVegetation}
 \item
-  Material:InfraredTransparent
+  \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}
 \end{itemize}
 
-Material is the ``preferred'' type of material. This requires knowledge of many of the thermal properties of the material, but it allows EnergyPlus to take into account the thermal mass of the material and thus allows the evaluation of transient conduction effects. Material:NoMass is similar in nature but only requires the thermal resistance (R-value) rather than the thickness, thermal conductivity, density, and specific heat. Note that using a simple R-value only material forces EnergyPlus to assume steady state heat conduction through this material layer. Finally, Material:AirGap should only be used for an air gap between other layers in a construction. This type assumes that air is sufficiently lightweight to require only an R-value. In addition, since it is not exposed to any external environment, surface properties such as absorptance are not necessary. Material:RoofVegetation is used to help model ``green roofs''. Material:InfraredTransparent is used similarly to the NoMass materials. Each of these materials is described in more detail below.
+\hyperref[material]{Material} is the ``preferred'' type of material. This requires knowledge of many of the thermal properties of the material, but it allows EnergyPlus to take into account the thermal mass of the material and thus allows the evaluation of transient conduction effects. \hyperref[materialnomass]{Material:NoMass} is similar in nature but only requires the thermal resistance (R-value) rather than the thickness, thermal conductivity, density, and specific heat. Note that using a simple R-value only material forces EnergyPlus to assume steady state heat conduction through this material layer. Finally, \hyperref[materialairgap]{Material:AirGap} should only be used for an air gap between other layers in a construction. This type assumes that air is sufficiently lightweight to require only an R-value. In addition, since it is not exposed to any external environment, surface properties such as absorptance are not necessary. \hyperref[materialroofvegetation]{Material:RoofVegetation} is used to help model ``green roofs''. \hyperref[materialinfraredtransparent]{Material:InfraredTransparent} is used similarly to the NoMass materials. Each of these materials is described in more detail below.
 
 There are several material additions that can be made to the basic material properties. These additional material types are:
 
 \begin{itemize}
 \item
-  MaterialProperty:MoisturePenetrationDepth:Settings
+  \hyperref[materialpropertymoisturepenetrationdepthsettings]{MaterialProperty:MoisturePenetrationDepth:Settings}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+  \hyperref[materialpropertyheatandmoisturetransfersorptionisotherm]{MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Diffusion
+  \hyperref[materialpropertyheatandmoisturetransferdiffusion]{MaterialProperty:HeatAndMoistureTransfer:Diffusion}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Settings
+  \hyperref[materialpropertyheatandmoisturetransfersettings]{MaterialProperty:HeatAndMoistureTransfer:Settings}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Redistribution
+  \hyperref[materialpropertyheatandmoisturetransferredistribution]{MaterialProperty:HeatAndMoistureTransfer:Redistribution}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Suction
+  \hyperref[materialpropertyheatandmoisturetransfersuction]{MaterialProperty:HeatAndMoistureTransfer:Suction}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \hyperref[materialpropertyheatandmoisturetransferthermalconductivity]{MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity}
 \item
-  MaterialProperty:PhaseChange
+  \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}
 \item
-  MaterialProperty:PhaseChangeHysteresis
+  \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis}
 \end{itemize}
 
-These material property objects are used in conjunction with the basic material specification and reference back to the name of the basic material type. Without the basic material type specified the program, will give a severe error and terminate. For example, specifying the moisture materials and changing the HeatBalanceAlgorithm to a moisture simulation will allow the moisture simulation to take place.
+These material property objects are used in conjunction with the basic material specification and reference back to the name of the basic material type. Without the basic material type specified the program, will give a severe error and terminate. For example, specifying the moisture materials and changing the \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} to a moisture simulation will allow the moisture simulation to take place.
 
 \subsection{Material}\label{material}
 
@@ -74,7 +74,7 @@ This field characterizes the thickness of the material layer in meters. This sho
 
 \paragraph{Field: Conductivity}\label{field-conductivity}
 
-This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. \textbf{Modeling layers with conductivity higher than 5.0 W/(m-K) is not recommended; however, this may be appropriate for non-surfaces such as pipes and TDDs (ref. DaylightingDevice:Tubular object).}
+This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. \textbf{Modeling layers with conductivity higher than 5.0 W/(m-K) is not recommended; however, this may be appropriate for non-surfaces such as pipes and TDDs (ref. \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular} object).}
 
 \paragraph{Field: Density}\label{field-density}
 
@@ -268,7 +268,7 @@ MoisturePenetrationDepthConductionTransferFunction.
 
 \subsubsection{Inputs}\label{empd-inputs}
 
-\paragraph{Field: Name}\label{field-name}
+\paragraph{Field: Name}\label{materialpropertymoisturepenetrationdepthsettings-field-name}
 
 This field is a unique reference name that the user assigns to a
 particular material. This name can then be referred to by other input
@@ -299,7 +299,7 @@ atmospheric pressure {[}Pa{]}.
 \paragraph{Fields: Moisture equilibrium
 	constants}\label{fields-moisture-equilibrium-constants}
 
-The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, 
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d},
 define the sorption isotherm curve used for building materials under
 equilibrium conditions. They define the relationship between
 the material's moisture content and the surface air relative humidity
@@ -351,8 +351,8 @@ where
 \(\frac{du}{d\phi}\) = slope of moisture soprtion curve,
 \(a b \phi^{b-1} + c d \phi^{d-1}\)
 
-If this field is left blank or set to \texttt{autocalculate}, 
-the above equation will be used to calculate the surface layer penetration depth 
+If this field is left blank or set to \texttt{autocalculate},
+the above equation will be used to calculate the surface layer penetration depth
 assuming a $\tau_{surf}$ of 24 hours.
 To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating $d_{EMPD,surf}$, the assumed value of $\tau_{surf}$ should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
 
@@ -374,8 +374,8 @@ where each term is the same as the surface layer, except that the cycle
 period is different. This is usually on the order of weeks for the deep
 layer.
 
-If this field is left blank or set to \texttt{autocalculate}, 
-the above equation will be used to calculate the deep layer penetration depth 
+If this field is left blank or set to \texttt{autocalculate},
+the above equation will be used to calculate the deep layer penetration depth
 assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
 
 
@@ -622,7 +622,7 @@ This object also allows users to enter characteristic properties of the processe
 
 \subsubsection{Inputs}\label{materialpropertyphasechangehysteresis-inputs}
 
-The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
+The \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}Hysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
 
 \paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-name}
 
@@ -819,15 +819,15 @@ In addition to the Porosity and Initial Water content properties described here,
 
 \begin{itemize}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+  \hyperref[materialpropertyheatandmoisturetransfersorptionisotherm]{MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Suction
+  \hyperref[materialpropertyheatandmoisturetransfersuction]{MaterialProperty:HeatAndMoistureTransfer:Suction}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Redistribution
+  \hyperref[materialpropertyheatandmoisturetransferredistribution]{MaterialProperty:HeatAndMoistureTransfer:Redistribution}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:Diffusion
+  \hyperref[materialpropertyheatandmoisturetransferdiffusion]{MaterialProperty:HeatAndMoistureTransfer:Diffusion}
 \item
-  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \hyperref[materialpropertyheatandmoisturetransferthermalconductivity]{MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity}
 \end{itemize}
 
 All materials in a construction are required to have all material properties defined for HAMT to work.
@@ -868,7 +868,7 @@ The Isotherm data relates the moisture, or water content {[}kg/m3{]} of a materi
   ** Warning ** HeatAndMoistureTransfer: Large Latent Heat for Surface ROOF
 \end{lstlisting}
 
-Another potential reason for this error being generated is the use of inappropriate values for Vapor Transfer Coefficients. See the SurfaceProperties:VaporCoefficients object in the Advanced Surface Concepts group.
+Another potential reason for this error being generated is the use of inappropriate values for Vapor Transfer Coefficients. See the \hyperref[surfacepropertiesvaporcoefficients]{SurfaceProperties:VaporCoefficients} object in the Advanced Surface Concepts group.
 
 \subsubsection{Inputs}\label{inputs-8-024}
 
@@ -1152,7 +1152,7 @@ HAMT origins,FLOOR,FLOOR, 0.0000000, 0.0122726, 0.0601616, 0.1512518, 0.2766268,
 \end{lstlisting}
 
 Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
- 
+
 \begin{itemize}
 \item
   Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
@@ -1200,9 +1200,9 @@ If Optical Data Type = SpectralAverage, the values you enter for solar transmitt
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
 
-If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
-If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
+If Optical Data Type = BSDF, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object must be used to define the window construction layers. The \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
 \paragraph{Field: Window Glass Spectral Data Set Name}\label{field-window-glass-spectral-data-set-name}
 
@@ -1304,26 +1304,26 @@ In a zone with Daylighting:Detailed, translucent glazing---which is often used i
 
 \paragraph{Field: Young's modulus}\label{field-youngs-modulus}
 
-A measure of the stiffness of an elastic material.~ It is defined as the ratio of the uniaxial stress over the uniaxial strain in the range of stress in which Hooke's Law holds. It is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 7.2e10 Pa.
+A measure of the stiffness of an elastic material.~ It is defined as the ratio of the uniaxial stress over the uniaxial strain in the range of stress in which Hooke's Law holds. It is used only with complex fenestration systems defined through the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object. The default value for glass is 7.2e10 Pa.
 
 \paragraph{Field: Poisson's ratio}\label{field-poissons-ratio}
 
-The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 0.22.
+The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object. The default value for glass is 0.22.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
-  
+
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
@@ -1357,7 +1357,7 @@ MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
       0.84,  ! IR emissivity: front side
       0.84,  ! IR emissivity: back side
       0.798; ! Conductivity {W/m-K}
-      
+
 \end{lstlisting}
 
 IDF example using a SpectralAndAngle data set:
@@ -1416,7 +1416,7 @@ WindowMaterial:Glazing,
 
 \subsection{WindowMaterial:Glazing:RefractionExtinctionMethod}\label{windowmaterialglazingrefractionextinctionmethod}
 
-This is an alternative way of specifying glass properties. Index of refraction and extinction coefficient are given instead of the transmittance and reflectance values used in WindowMaterial:Glazing. However, unlike WindowMaterial:Glazing, WindowMaterial:Glazing:RefractionExtinctionMethod is restricted to cases where the front and back optical properties of the glass are the same. This means it cannot be used for glass with a coating on one side. In that case WindowMaterial:Glazing should be used. Also, unlike WindowMaterial:Glazing, WindowMaterial:Glazing:RefractionExtinctionMethod does not allow input of glass wavelength-by-wavelength (spectral) properties.
+This is an alternative way of specifying glass properties. Index of refraction and extinction coefficient are given instead of the transmittance and reflectance values used in \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}. However, unlike \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}, WindowMaterial:Glazing:RefractionExtinctionMethod is restricted to cases where the front and back optical properties of the glass are the same. This means it cannot be used for glass with a coating on one side. In that case \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} should be used. Also, unlike \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}, WindowMaterial:Glazing:RefractionExtinctionMethod does not allow input of glass wavelength-by-wavelength (spectral) properties.
 
 \subsubsection{Inputs}\label{inputs-14-015}
 
@@ -1493,7 +1493,7 @@ WindowMaterial:Glazing:RefractionExtinctionMethod,
 
 The optical properties of uncoated glass are sometimes specified by index of refraction, n, and transmittance at normal incidence, T.
 
-The following equations show how to convert from this set of values to the transmittance and reflectance values required by WindowMaterial:Glazing. These equations apply only to \underline{uncoated} glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, \(n\) and \(T\) are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the \(R\) that is solved for in the following equations.
+The following equations show how to convert from this set of values to the transmittance and reflectance values required by \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}. These equations apply only to \underline{uncoated} glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, \(n\) and \(T\) are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the \(R\) that is solved for in the following equations.
 
 Given \(n\) and \(T\), find \(R\):
 
@@ -1535,7 +1535,7 @@ R = 0.07846
 
 Thermochromic (TC) materials have active, reversible optical properties that vary with temperature. Thermochromic windows are adaptive window systems for incorporation into building envelopes. Thermochromic windows respond by absorbing sunlight and turning the sunlight energy into heat. As the thermochromic film warms it changes its light transmission level from less absorbing to more absorbing. The more sunlight it absorbs the lower the light level going through it. By using the suns own energy the window adapts based solely on the directness and amount of sunlight. Thermochromic materials will normally reduce optical transparency by absorption and/or reflection, and are specular (maintaining vision).
 
-A thermochromic window is defined with a Construction object which references a special layer defined with a WindowMaterial:GlazingGroup:Thermochromic object. The WindowMaterial:GlazingGroup:Thermochromic object further references a series of WindowMaterial:Glazing objects corresponding to each specification temperature of the TC layer.
+A thermochromic window is defined with a Construction object which references a special layer defined with a \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}Group:Thermochromic object. The \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}Group:Thermochromic object further references a series of \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} objects corresponding to each specification temperature of the TC layer.
 
 This object specifies a layer of thermochromic glass, part of a thermochromic window. An example file ThermochromicWindow.idf is included in the EnergyPlus installation.
 
@@ -1553,7 +1553,7 @@ The temperature of the TC glass layer corresponding to the optical data of the T
 
 \paragraph{Field: Window Material Glazing Name \textless{}N\textgreater{}}\label{field-window-material-glazing-name-n}
 
-The window glazing (defined with WindowMaterial:Glazing) name that provides the TC glass layer performance at the above specified temperature.
+The window glazing (defined with \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}) name that provides the TC glass layer performance at the above specified temperature.
 
 IDF Examples
 
@@ -1918,7 +1918,7 @@ WindowMaterial:Gas,AIRGAP,
     0.0125;   ! Thickness {m} 1/2 inch
 \end{lstlisting}
 
-An IDF example to be used with a WindowMaterial:Gap definition (see below)
+An IDF example to be used with a \hyperref[windowmaterialgap]{WindowMaterial:Gap} definition (see below)
 
 \begin{lstlisting}
 
@@ -1951,7 +1951,7 @@ WindowMaterial:Gas,
 
 \subsection{WindowMaterial:GasMixture}\label{windowmaterialgasmixture}
 
-This object allows you to specify the fill between the panes of a multi-pane window to be a mixture of two, three or four different gases chosen from air, argon, krypton and xenon. It can also be used if only one type of gas in the fill. In this case you can also use WindowMaterial:Gas. Note that the fractions of gas types in the mixture should add up to 1.0.
+This object allows you to specify the fill between the panes of a multi-pane window to be a mixture of two, three or four different gases chosen from air, argon, krypton and xenon. It can also be used if only one type of gas in the fill. In this case you can also use \hyperref[windowmaterialgas]{WindowMaterial:Gas}. Note that the fractions of gas types in the mixture should add up to 1.0.
 
 \subsubsection{Inputs}\label{inputs-17-009}
 
@@ -1992,7 +1992,7 @@ WindowMaterial:GasMixture,ArgonKryptonMix,
 
 \subsection{WindowMaterial:Gap}\label{windowmaterialgap}
 
-This input object is used to define the gap between two layers in a complex fenestration system, where the Construction:ComplexFenestrationState object is used. It references the gas or gas mixtures defined in the WindowMaterial:Gas and WindowMaterial:GasMixture objects. It is referenced as a layer in the Construction:ComplexFenestrationState object ;it cannot be referenced as a layer from the Construction object.
+This input object is used to define the gap between two layers in a complex fenestration system, where the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object is used. It references the gas or gas mixtures defined in the \hyperref[windowmaterialgas]{WindowMaterial:Gas} and \hyperref[windowmaterialgasmixture]{WindowMaterial:GasMixture} objects. It is referenced as a layer in the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object ;it cannot be referenced as a layer from the Construction object.
 
 \subsubsection{Inputs}\label{inputs-18-009}
 
@@ -2010,7 +2010,7 @@ The pressure (Pa) of the gas in the gap layer, used to calculate the gas propert
 
 \paragraph{Field: Deflection State}\label{field-deflection-state}
 
-This field is used when modeling the deflection of the glass layers in a window if the WindowThermalModel:Params value for ``deflection model'' is ``MeasuredDeflection''.
+This field is used when modeling the deflection of the glass layers in a window if the \hyperref[windowthermalmodelparams]{WindowThermalModel:Params} value for ``deflection model'' is ``MeasuredDeflection''.
 
 \paragraph{Field: Support Pillar}\label{field-support-pillar}
 
@@ -2018,7 +2018,7 @@ References the support pillar of the gap layer if vacuum glazing is being modele
 
 \paragraph{Field: Gas (or GasMixture)}\label{field-gas-or-gasmixture}
 
-References gas (WindowMaterial:Gas) or gas mixture (WindowMaterial:GasMixture) of the gap layer.
+References gas (\hyperref[windowmaterialgas]{WindowMaterial:Gas}) or gas mixture (\hyperref[windowmaterialgasmixture]{WindowMaterial:GasMixture}) of the gap layer.
 
 An IDF example for simple glazing:
 
@@ -2057,7 +2057,7 @@ WindowMaterial:Gap,
 
 \subsection{WindowGap:DeflectionState}\label{windowgapdeflectionstate}
 
-This input object is used to enter data describing deflection state of the gap.~ It is referenced from WindowMaterial:Gap object only and it is used only when deflection model is set to MeasuredDeflection (see WindowThermalModel:Params), otherwise it is ignored.
+This input object is used to enter data describing deflection state of the gap.~ It is referenced from \hyperref[windowmaterialgap]{WindowMaterial:Gap} object only and it is used only when deflection model is set to MeasuredDeflection (see \hyperref[windowthermalmodelparams]{WindowThermalModel:Params}), otherwise it is ignored.
 
 \subsubsection{Inputs}\label{inputs-19-006}
 
@@ -2067,9 +2067,9 @@ Unique name of the deflection state.
 
 \paragraph{Field: Deflected Thickness}\label{field-deflected-thickness}
 
-The thickness (m) of the gap in deflected state.~ It represents value of deflection at point of maximum which is usually at the center poing of glazing system.~ It is used only with tarcog algorithm set to Measured Deflection (WindowThermalModel:Params), otherwise this field will be ignored.
+The thickness (m) of the gap in deflected state.~ It represents value of deflection at point of maximum which is usually at the center poing of glazing system.~ It is used only with tarcog algorithm set to Measured Deflection (\hyperref[windowthermalmodelparams]{WindowThermalModel:Params}), otherwise this field will be ignored.
 
-An IDF example where WindowThermalModel:Params Deflection Model = MeasuredDeflection:
+An IDF example where \hyperref[windowthermalmodelparams]{WindowThermalModel:Params} Deflection Model = MeasuredDeflection:
 
 \begin{lstlisting}
 
@@ -2110,7 +2110,7 @@ Distance (m) between support pillar centers (see the Engineering reference docum
 
 The radius (m) of the support pillar (see Engineering reference document for more information).
 
-An IDF example for vacuum glazing (see Vacuum Glazing example in WindowMaterial:Gap above)
+An IDF example for vacuum glazing (see Vacuum Glazing example in \hyperref[windowmaterialgap]{WindowMaterial:Gap} above)
 
 \begin{lstlisting}
 
@@ -2126,7 +2126,7 @@ WindowGap:SupportPillar,       !- gap support pillar
 
 This input object differs from the other WindowMaterial objects in that it describes an entire glazing system rather than individual layers. This object is used when only very limited information is available on the glazing layers or when specific performance levels are being targeted. The layer by layer description offers superior method of modeling windows that should be used instead of this object when sufficient data are available. This object accesses a model that turns simple performance indices into a fuller model of the glazing system.
 
-The performance indices are U-factor and Solar Heat Gain Coefficient, and optionally Visible Transmittance. The values for these performance indices can be selected by the user to represent either glazing-only windows (with no frame) or an average window performance that includes the frame. Inside the program the model produces an equivalent window glazing layer with no frame. The properties of the modeled glazing layer are reported to the EIO file using the IDF input object syntax for the WindowMaterial:Glazing input object. This equivalent layer could be reused in subsequent models if desired, however there will be important differences in the modeled window performance because the simple glazing system model includes its own special model for angular dependence when incident beam solar is not normal to the plane of the window.
+The performance indices are U-factor and Solar Heat Gain Coefficient, and optionally Visible Transmittance. The values for these performance indices can be selected by the user to represent either glazing-only windows (with no frame) or an average window performance that includes the frame. Inside the program the model produces an equivalent window glazing layer with no frame. The properties of the modeled glazing layer are reported to the EIO file using the IDF input object syntax for the \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} input object. This equivalent layer could be reused in subsequent models if desired, however there will be important differences in the modeled window performance because the simple glazing system model includes its own special model for angular dependence when incident beam solar is not normal to the plane of the window.
 
 When this object is referenced in a Construction object, it cannot be used with other glazing or gas material layers. Shades or blinds cannot be located between the glass, but these can be used on the inside or the outside of the glazing system.~~ If the glazing system does have between-the-glass shades or blinds, then the U and SHGC values entered in this object should include the impacts of those layers. Adding window treatment layers such as shades or screens will alter the overall performance to be different than the performance levels prescribed in this object.
 
@@ -2165,7 +2165,7 @@ This object specifies the properties of window shade materials. Reflectance and 
 
 Window shades can be on the inside of the window (``interior shades''), on the outside of the window (``exterior shades''), or between glass layers (``between-glass shades''). When in place, the shade is assumed to cover all of the glazed part of the window, including dividers; it does not cover any of the window frame, if present. The plane of the shade is assumed to be parallel to the glazing.
 
-WindowMaterial:Shade can be used for diffusing materials such as drapery and translucent roller shades. For slat-type shading devices, like Venetian blinds, that have a strong angular dependence of transmission, absorption and reflection, it is better to use WindowMaterial:Blind. WindowMaterial:Screen should be used to model wire mesh insect screens where the solar and visible transmission and reflection properties vary with the angle of incidence of solar radiation.
+WindowMaterial:Shade can be used for diffusing materials such as drapery and translucent roller shades. For slat-type shading devices, like Venetian blinds, that have a strong angular dependence of transmission, absorption and reflection, it is better to use \hyperref[windowmaterialblind]{WindowMaterial:Blind}. \hyperref[windowmaterialscreen]{WindowMaterial:Screen} should be used to model wire mesh insect screens where the solar and visible transmission and reflection properties vary with the angle of incidence of solar radiation.
 
 Transmittance and reflectance values for drapery material with different color and openness of weave can be obtained from manufacturers or determined from 2001 ASHRAE Fundamentals, Chapter 30, Fig. 31.
 
@@ -2177,25 +2177,25 @@ There are two methods of assigning a shade to a window:
 
 1)~~~Define the construction of the window without the shade, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Shade.
 
-4)~~~Define a WindowShadingControl for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
+4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
 
 \paragraph{Method 2:}\label{method-2}
 
 1)~~~Define the Construction of the window without the shade, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Shade.
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Shade.
 
-5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
+5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
 
-Note that WindowShadingControl has to be used with either method, even if the shade is in place at all times. You will get an error message if you try to reference a shaded construction directly from FenestrationSurface:Detailed.
+Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the shade is in place at all times. You will get an error message if you try to reference a shaded construction directly from \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}.
 
 \paragraph{Field: Name}\label{field-name-16-009}
 
@@ -2322,31 +2322,31 @@ There are two methods of assigning a blind to a window:
 
 1)~~~Define the construction of the window without the blind, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Blind.
 
-4)~~~Define a WindowShadingControl for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
+4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
 
 \paragraph{Method 2:}\label{method-2-1}
 
 1)~~~Define the Construction of the window without the blind, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Blind.
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Blind.
 
-5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
+5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
 
-Note that WindowShadingControl has to be used with either method, even if the blind is in place at all times. You will get an error message if you try to reference a construction with a blind directly from Window objects (FenestrationSurface:Detailed or Window).
+Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the blind is in place at all times. You will get an error message if you try to reference a construction with a blind directly from Window objects (\hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} or Window).
 
-Note also that WindowShadingControl is used to determine not only when the blind is in place, but how its slat angle is controlled.
+Note also that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} is used to determine not only when the blind is in place, but how its slat angle is controlled.
 
 \paragraph{Field: Name}\label{field-name-17-007}
 
-Name of the blind. It is referenced as a layer in a window construction (ref: Construction object) or as a ``Material Name of Shading Device'' in a WindowShadingControl object.
+Name of the blind. It is referenced as a layer in a window construction (ref: Construction object) or as a ``Material Name of Shading Device'' in a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} object.
 
 \paragraph{Field: Slat Orientation}\label{field-slat-orientation}
 
@@ -2368,7 +2368,7 @@ The distance between the faces of a slat (m). See Figure~\ref{fig:a-side-view-of
 
 The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). See Figure~\ref{fig:a-side-view-of-a-window-blind-with-horizontal}.
 
-If the WindowShadingControl for the blind has Type of Slat Angle Control for Blinds = FixedSlatAngle, the slat angle is fixed at ``Slat Angle.''
+If the \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the blind has Type of Slat Angle Control for Blinds = FixedSlatAngle, the slat angle is fixed at ``Slat Angle.''
 
 If Type of Slat Angle Control for Blinds = BlockBeamSolar, the program automatically adjusts the slat angle so as just block beam solar radiation. In this case the value of ``Slat Angle'' is used only when the blind is in place and there is no beam solar radiation incident on the blind.
 
@@ -2442,11 +2442,11 @@ Back-side hemispherical emissivity of the slat. Approximately 0.9 for most mater
 
 \paragraph{Field: Blind to Glass Distance}\label{field-blind-to-glass-distance}
 
-For interior and exterior blinds, the distance from the mid-plane of the blind to the adjacent glass (m). See Figure~\ref{fig:a-side-view-of-a-window-blind-with-horizontal}. Not used for between-glass blinds. As for window shades (ref: WindowMaterial:Shade) this distance is used in calculating the natural convective air flow between glass and blind that is produced by buoyancy effects.
+For interior and exterior blinds, the distance from the mid-plane of the blind to the adjacent glass (m). See Figure~\ref{fig:a-side-view-of-a-window-blind-with-horizontal}. Not used for between-glass blinds. As for window shades (ref: \hyperref[windowmaterialshade]{WindowMaterial:Shade}) this distance is used in calculating the natural convective air flow between glass and blind that is produced by buoyancy effects.
 
 \paragraph{Opening Multipliers}\label{opening-multipliers}
 
-The following opening multipliers are defined in the same way as for window shades (see WindowMaterial:Shade, Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}). Note that, unlike window shades, there is no input for Air-Flow Permeability; this is automatically calculated by the program from slat angle, width and separation.
+The following opening multipliers are defined in the same way as for window shades (see \hyperref[windowmaterialshade]{WindowMaterial:Shade}, Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}). Note that, unlike window shades, there is no input for Air-Flow Permeability; this is automatically calculated by the program from slat angle, width and separation.
 
 \paragraph{Field: Blind Top Opening Multiplier}\label{field-blind-top-opening-multiplier}
 
@@ -2466,11 +2466,11 @@ Defined as for Material:WindowShade.
 
 \paragraph{Field: Minimum Slat Angle}\label{field-minimum-slat-angle}
 
-The minimum allowed slat angle (degrees). Used only if WindowShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle less than Minimum Slat Angle it will be reset to Minimum Slat Angle. (Note that if the Minimum Slat Angle itself is less than the minimum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that minimum.)
+The minimum allowed slat angle (degrees). Used only if \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} (for the window that incorporates this blind) varies the slat angle (i.e., the \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle less than Minimum Slat Angle it will be reset to Minimum Slat Angle. (Note that if the Minimum Slat Angle itself is less than the minimum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that minimum.)
 
 \paragraph{Field: Maximum Slat Angle}\label{field-maximum-slat-angle}
 
-The maximum allowed slat angle (degrees). Used only if WindowShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle greater than Maximum Slat Angle the slat angle will be reset to Maximum Slat Angle. (Note that if the Maximum Slat Angle itself is greater than the maximum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that maximum.)
+The maximum allowed slat angle (degrees). Used only if \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} (for the window that incorporates this blind) varies the slat angle (i.e., the \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle greater than Maximum Slat Angle the slat angle will be reset to Maximum Slat Angle. (Note that if the Maximum Slat Angle itself is greater than the maximum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that maximum.)
 
 An IDF example:
 
@@ -2516,7 +2516,7 @@ WindowMaterial:Blind,
 
 \subsection{WindowMaterial:ComplexShade}\label{windowmaterialcomplexshade}
 
-This input object is used to define shade layers used in the Construction:ComplexFenestrationState object.
+This input object is used to define shade layers used in the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object.
 
 \subsubsection{Inputs}\label{inputs-24-003}
 
@@ -2734,7 +2734,7 @@ Transmittance, reflectance, and absorptance of diffuse solar radiation are consi
 
 There is an EnergyPlus Reference Data Set for WindowMaterial:Screen that contains properties for generic window screens. Window screens of this type can only be used on the outside surface of the window (``exterior screens''). When in place, the screen is assumed to cover all of the glazed part of the window, including dividers; it does not cover any of the window frame, if present. The plane of the screen is assumed to be parallel to the glazing.
 
-WindowMaterial:Screen can be used to model wire mesh insect screens where the solar and visible transmission and reflection properties vary with the angle of incidence of solar radiation. For diffusing materials such as drapery and translucent roller shades it is better to use the WindowMaterial:Shade object. For slat-type shading devices like Venetian blinds, which have solar and visible transmission and reflection properties that strongly depend on slat angle and angle of incidence of solar radiation, it is better to use WindowMaterial:Blind.
+WindowMaterial:Screen can be used to model wire mesh insect screens where the solar and visible transmission and reflection properties vary with the angle of incidence of solar radiation. For diffusing materials such as drapery and translucent roller shades it is better to use the \hyperref[windowmaterialshade]{WindowMaterial:Shade} object. For slat-type shading devices like Venetian blinds, which have solar and visible transmission and reflection properties that strongly depend on slat angle and angle of incidence of solar radiation, it is better to use \hyperref[windowmaterialblind]{WindowMaterial:Blind}.
 
 There are two methods of assigning a screen to a window:
 
@@ -2744,25 +2744,25 @@ There are two methods of assigning a screen to a window:
 
 1)~~~Define the construction of the window without the screen, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Screen object.
 
-4)~~~Define a WindowShadingControl for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
+4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
 
 \paragraph{Method 2:}\label{method-2-2}
 
 1)~~~Define the Construction of the window without the screen, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the FenestrationSurface:Detailed for the window.
+2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
 3)~~~Define the WindowMaterial:Screen object.
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Screen.
 
-5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
+5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
 
-Note that WindowShadingControl has to be used with either method, even if the screen is in place at all times. You will get an error message if you try to reference a shaded construction directly from a FenestrationSurface:Detailed object.
+Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the screen is in place at all times. You will get an error message if you try to reference a shaded construction directly from a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object.
 
 \paragraph{Field: Name}\label{field-name-19-004}
 
@@ -2841,7 +2841,7 @@ Effective area for air flow at the right side of the screen divided the vertical
 
 Angle of resolution, in degrees, for the overall screen beam transmittance (direct and reflected) output map. The comma-separated variable file eplusscreen.csv (Ref. OutputDetailsandExamples.pdf) will contain the direct beam and reflected beam solar radiation that is transmitted through the window screen as a function of incident sun angle (0 to 90 degrees relative solar azimuth and 0 to 90 degrees relative solar altitude) in sun angle increments specified by this input field. The default value is 0, which means no transmittance map is generated. Other valid choice inputs are 1, 2, 3 and 5 degrees.
 
-An IDF example for this object, along with Construction and WindowShadingControl objects, is shown below:
+An IDF example for this object, along with Construction and \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} objects, is shown below:
 
 \begin{lstlisting}
 
@@ -2889,7 +2889,7 @@ WindowMaterial:Screen,
 
 \subsection{WindowMaterial:Shade:EquivalentLayer}\label{windowmaterialshadeequivalentlayer}
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowShadingControl. 
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \subsubsection{Inputs}\label{inputs-26-002}
 
@@ -2964,7 +2964,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support WindowShadingControl.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -3061,7 +3061,7 @@ This object specifies the properties of an Equivalent Layer window blind consist
 \end{figure}
 
 The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry (Slat width, w, slat spacing, s, slat crown, c, and slat angle, $\phi$, and long wave emittance and transmittance of the slat. Blinds can be located on the inside of the window, on the outside of the window, or between two layers of glass. The blind is assumed to cover all of the glazed part of the window.
-The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowShadingControl. 
+The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \subsubsection{Inputs}\label{inputs-28-001}
 
@@ -3194,7 +3194,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 \subsection{WindowMaterial:Screen:EquivalentLayer}\label{windowmaterialscreenequivalentlayer}
 
-This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence. The equivalent layer window screen shade model does not support WindowShadingControl.
+This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence. The equivalent layer window screen shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \begin{figure}[hbtp] % fig 23
 \centering
@@ -3270,7 +3270,7 @@ WindowMaterial:Screen:EquivalentLayer,
 
 \subsection{WindowMaterial:Glazing:EquivalentLayer}\label{windowmaterialglazingequivalentlayer}
 
-Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in. The equivalent layer window glazing model does not support WindowShadingControl.
+Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in. The equivalent layer window glazing model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \subsubsection{Inputs}\label{inputs-30-001}
 
@@ -3522,7 +3522,7 @@ WindowMaterial:Gap:EquivalentLayer,
 
 \subsection{Material:RoofVegetation}\label{materialroofvegetation}
 
-This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model has only been tested with the ConductionTransferFunction solution algorithm -- a warning will be issued for other solution algorithm choices. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
+This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model works only with the ConductionTransferFunction heat balance solution algorithm. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
 
 \subsubsection{Inputs}\label{inputs-32-000}
 
@@ -3600,13 +3600,13 @@ The field allows for user input of the initial moisture content of the soil laye
 
 \paragraph{Field: Moisture Diffusion Calculation Method}\label{field-moisture-diffusion-calculation-method}
 
-The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}.
+The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}. EnergyPlus Currently supports only the \textbf{Simple} \textit{Moisture Diffusion Calculation Method}.
 
 \textbf{Simple} is the original Ecoroof model - based on a constant diffusion of moisture through the soil.~ This model starts with the soil in two layers.~ Every time the soil properties update is called, it will look at the two soils moisture layers and asses which layer has more moisture in it. It then takes moisture from the higher moisture layer and redistributes it to the lower moisture layer at a constant rate.
 
-\textbf{Advanced} is the later Ecoroof model. If you use it, you will need to increase your number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
+\textbf{Advanced} is the later Ecoroof model. The model requires higher number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
 
-Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34.
+Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34. However, currently \textbf{Advanced} \textit{Moisture Diffusion Calculation Method} is not supported in EnergyPlus.
 
 An IDF example:
 
@@ -3628,10 +3628,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
       0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
       0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      Simple;                  !- Moisture Diffusion Calculation Method
 
 
     Material:RoofVegetation,
@@ -3650,10 +3650,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,          !- Saturation Volumetric Moisture Content of the Soil Layer
-      0.01,         !- Residual Volumetric Moisture Content of the Soil Layer
-      0.2,          !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
+      0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
+      Simple;                 !- Moisture Diffusion Calculation Method
 \end{lstlisting}
 
 And construction using the ecoroof material:
@@ -3790,7 +3790,7 @@ An alternative to using the MaterialProperty:GlazingSpectralData object is to ru
 
 \paragraph{Field: Name}\label{field-name-27-002}
 
-The name of the spectral data set. It is referenced by WindowMaterial:Glazing when Optical Data Type = Spectral.
+The name of the spectral data set. It is referenced by \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} when Optical Data Type = Spectral.
 
 \paragraph{Fields 1-4 (repeated up to 450 times)}\label{fields-1-4-repeated-up-to-450-times}
 
@@ -3902,7 +3902,7 @@ Construction, DOUBLE PANE WITH ROLL SHADE,  !- Material layer names follow:
 
 \subsection{Site:GroundTemperature:FCfactorMethod}\label{sitegroundtemperaturefcfactormethod-000}
 
-Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
+Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (\hyperref[constructioncfactorundergroundwall]{Construction:CfactorUndergroundWall}) and F-factor (\hyperref[constructionffactorgroundfloor]{Construction:FfactorGroundFloor}) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
 
 \subsubsection{Inputs}\label{inputs-35-000}
 
@@ -3920,11 +3920,11 @@ Site:GroundTemperature:FCfactorMethod,  9.5,3.5,-0.7,-1.7,-0.6,3.6,9.3,14,18.2,2
 
 Building energy code and standards like ASHRAE 90.1, 90.2 and California Title 24 require the underground wall constructions and slabs-on-grade or underground floors not to exceed certain maximum values of C-factor and F-factor, which do not specify detailed layer-by-layer materials for the constructions.
 
-A simplified approach is introduced to create equivalent constructions and model the ground heat transfer through underground walls and ground floors for the building energy code compliance calculations. The approach is to create constructions based on the user defined C or F factor with two layers: one concrete layer (0.15 m thick) with thermal mass, and one fictitious insulation layer with no thermal mass. Three new objects were created for such purpose: \textbf{Construction:CfactorUndergroundWall}, \textbf{Construction:FfactorGroundFloor}, and \textbf{Site:GroundTemperature:FCfactorMethod}. Details of the approach are described in the Engineering Reference document. The wall and floor construction objects are described in this section; the ground temperature object is described with the other ground temperature objects.
+A simplified approach is introduced to create equivalent constructions and model the ground heat transfer through underground walls and ground floors for the building energy code compliance calculations. The approach is to create constructions based on the user defined C or F factor with two layers: one concrete layer (0.15 m thick) with thermal mass, and one fictitious insulation layer with no thermal mass. Three new objects were created for such purpose: \textbf{\hyperref[constructioncfactorundergroundwall]{Construction:CfactorUndergroundWall}}, \textbf{\hyperref[constructionffactorgroundfloor]{Construction:FfactorGroundFloor}}, and \textbf{\hyperref[sitegroundtemperaturefcfactormethod]{Site:GroundTemperature:FCfactorMethod}}. Details of the approach are described in the Engineering Reference document. The wall and floor construction objects are described in this section; the ground temperature object is described with the other ground temperature objects.
 
-When a underground wall or ground floor surface (BuildingSurface:Detailed, Floor:Detailed, and Wall:Detailed) references one of the two construction objects, its field `Outside Boundary Condition' needs to be set to GroundFCfactorMethod. For simple (rectangular) wall and floor objects, the outside boundary condition is inferred from the construction type.
+When a underground wall or ground floor surface (\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[floordetailed]{Floor:Detailed}, and \hyperref[walldetailed]{Wall:Detailed}) references one of the two construction objects, its field `Outside Boundary Condition' needs to be set to GroundFCfactorMethod. For simple (rectangular) wall and floor objects, the outside boundary condition is inferred from the construction type.
 
-The Site:GroundTemperature:FCfactorMethod is described in the section for ground temperatures, the following section describes the two new construction objects.
+The \hyperref[sitegroundtemperaturefcfactormethod]{Site:GroundTemperature:FCfactorMethod} is described in the section for ground temperatures, the following section describes the two new construction objects.
 
 \subsection{Construction:CfactorUndergroundWall}\label{constructioncfactorundergroundwall}
 
@@ -4101,7 +4101,7 @@ These input objects will generally be exported directly from the WINDOW program 
 
 Multiple instances of this object are used to define the separate operating states of complex fenestration.~ For example, blinds could be deployed or redirected to create a new state, or electrochromic glazings could change transmittance.~ Each separate state defines the materials present and the overall optical performance.~ If the glazing system has only one state, then only one of these objects is needed.
 
-If there is more than one complex fenestration state, it will be controlled using the EMS actuator called ``Surface'' with the control type ``Construction State'' and the EMS input object called EnergyManagementSystem:ConstructionIndexVariable.
+If there is more than one complex fenestration state, it will be controlled using the EMS actuator called ``Surface'' with the control type ``Construction State'' and the EMS input object called \hyperref[energymanagementsystemconstructionindexvariable]{EnergyManagementSystem:ConstructionIndexVariable}.
 
 \subsubsection{Inputs}\label{inputs-39}
 
@@ -4119,7 +4119,7 @@ Only value currently implemented is ``None''. More options will be added in the 
 
 \paragraph{Field: Thermal Parameters}\label{field-thermal-parameters}
 
-This field gives the name of WindowThermalModel:Params object used to keep common data necessary for thermal simulation.
+This field gives the name of \hyperref[windowthermalmodelparams]{WindowThermalModel:Params} object used to keep common data necessary for thermal simulation.
 
 \paragraph{Field: Basis Matrix Name}\label{field-basis-matrix-name}
 
@@ -4143,7 +4143,7 @@ This field contains the name of vector object that describes the visible back re
 
 \paragraph{Field: Outside Layer \textless{}x = 1\textgreater{}}\label{field-outside-layer-x-1}
 
-Each construction must have at least one layer. The layer order is from outside to inside, with the first layer being either WindowMaterial:Glazing or WindowMaterial:ComplexShade. The next layer is a WindowMaterial:Gap layer, and the following layers then alternate between WindowMaterial:Glazing or WindowMaterial:ComplexShade and WindowMaterial:Gap. The last layer cannot be WindowMaterial:Gap.
+Each construction must have at least one layer. The layer order is from outside to inside, with the first layer being either \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} or \hyperref[windowmaterialcomplexshade]{WindowMaterial:ComplexShade}. The next layer is a \hyperref[windowmaterialgap]{WindowMaterial:Gap} layer, and the following layers then alternate between \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} or \hyperref[windowmaterialcomplexshade]{WindowMaterial:ComplexShade} and \hyperref[windowmaterialgap]{WindowMaterial:Gap}. The last layer cannot be \hyperref[windowmaterialgap]{WindowMaterial:Gap}.
 
 \paragraph{Field: Outside Layer Directional Front Absorptance Matrix Name}\label{field-outside-layer-directional-front-absorptance-matrix-name}
 
@@ -4203,7 +4203,7 @@ Construction:ComplexFenestrationState,       !- double layer example
 
 \subsection{WindowThermalModel:Params}\label{windowthermalmodelparams}
 
-This input object is used with the Construction:ComplexFenestrationState
+This input object is used with the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}
 
 \subsubsection{Inputs}\label{inputs-40}
 
@@ -4316,7 +4316,7 @@ WindowThermalModel:Params,
 
 \subsection{Matrix:TwoDimension}\label{matrixtwodimension}
 
-This is input object is only used with Construction:ComplexFenestrationState object to enter a two-dimensional matrix of values.
+This is input object is only used with \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object to enter a two-dimensional matrix of values.
 
 It is used to define the Basis Matrix for BSDF input data, and is also used to define the actual BSDF matrices data for the complete fenestration definition as well as the individual layers of the system.
 
@@ -4415,7 +4415,7 @@ Construction:WindowEquivalentLayer,
 
 \subsection{Construction:WindowDataFile}\label{constructionwindowdatafile}
 
-The WINDOW program, which does a thermal and optical analysis of a window under different design conditions, writes a data file (``Window data file'') containing a description of the window that was analyzed. The Construction:WindowDataFile object allows a window to be read in from the WINDOW data file---see ``Importing Windows from WINDOW.'' For information on adding a shading device to the window see ``WindowShadingControl.''
+The WINDOW program, which does a thermal and optical analysis of a window under different design conditions, writes a data file (``Window data file'') containing a description of the window that was analyzed. The Construction:WindowDataFile object allows a window to be read in from the WINDOW data file---see ``Importing Windows from WINDOW.'' For information on adding a shading device to the window see ``\hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.''
 
 \subsubsection{Inputs}\label{inputs-42}
 
