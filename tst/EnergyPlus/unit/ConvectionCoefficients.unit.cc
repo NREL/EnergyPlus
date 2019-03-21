@@ -82,7 +82,6 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients)
     Real64 SurfTemp;      // [C] surface temperature
     Real64 SupplyAirTemp; // [C] temperature of supply air into zone
     Real64 AirChangeRate; // [ACH] [1/hour] supply air ACH for zone
-    int ZoneNum;          // index of zone for messaging
     Real64 Hc;
 
     DeltaTemp = 1.0;
@@ -90,7 +89,6 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients)
     SurfTemp = 23.0;
     SupplyAirTemp = 35.0;
     AirChangeRate = 2.0;
-    ZoneNum = 1;
 
     Hc = CalcBeausoleilMorrisonMixedAssistedWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
     EXPECT_NEAR(-1.19516, Hc, 0.0001);
@@ -570,24 +568,45 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
 
     SurfNum = 1;
 
+    DataSurfaces::TotSurfaces = 1;
+    DataGlobals::NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
+    DataHeatBalance::Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
+    DataSurfaces::Surface( SurfNum ).Construction = 1;
+    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+    DataHeatBalance::Construct( 1 ).TypeIsWindow = false;
     DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
     DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
-    DataHeatBalance::Zone( 1 ).Volume = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
     DataLoopNode::Node( 1 ).Temp = 20.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0;
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
+        DataHeatBalSurface::TH(2, 1, surf) = 20.0;
+    }
+
+    DataHeatBalFanSys::MAT.allocate(1);
+    DataHeatBalFanSys::MAT(1) = 30.0;
+
+
+    // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
+    Real64 ACH = 1.;
+    DataHeatBalance::Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
     Hc = 0.0;
-    HcExpectedValue = 3.955;
-    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = -1;
+
+    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
@@ -596,8 +615,9 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     // Test 2: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
     Hc = 0.0;
-    HcExpectedValue = 2.234;
-    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = 1;
+
+    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
@@ -606,13 +626,52 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     // Test 3: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
     Hc = 0.0;
-    HcExpectedValue = 1.208;
-    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = 0;
+
+    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
+
+    // Case 2 - High ACH
+    ACH = 3.1;
+    DataHeatBalance::Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+
+    // Test 1: Floor Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
+    Hc = 0.0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = -1;
+
+    HcExpectedValue = 4.122;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+    // Test 2: Ceiling Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
+    Hc = 0.0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = 1;
+
+    HcExpectedValue = 9.476;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+    // Test 3: Ceiling Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
+    Hc = 0.0;
+    DataSurfaces::Surface( SurfNum ).CosTilt = 0;
+
+    HcExpectedValue = 3.212;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 }
 
 TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)

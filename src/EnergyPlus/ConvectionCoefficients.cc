@@ -375,7 +375,7 @@ namespace ConvectionCoefficients {
                 // Ceiling Diffuser and Trombe Wall only make sense at Zone Level
                 // Interior convection coeffs are first calculated here and then at surface level
                 if (SELECT_CASE_var == CeilingDiffuser) {
-                    CalcCeilingDiffuserIntConvCoeff(ZoneNum);
+                    CalcCeilingDiffuserIntConvCoeff(ZoneNum, SurfaceTemperatures);
 
                 } else if (SELECT_CASE_var == TrombeWall) {
                     CalcTrombeWallIntConvCoeff(ZoneNum, SurfaceTemperatures);
@@ -4103,7 +4103,13 @@ namespace ConvectionCoefficients {
         return ACH;
     }
 
-    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 Tilt, Real64 ACH)
+    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 const ACH,  // [1/hr] air system air change rate
+                                           Real64 const Tsurf,
+                                           Real64 const Tair,
+                                           Real64 const cosTilt,
+                                           Real64 const humRat,
+                                           Real64 const height,
+                                           bool const isWindow)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -4135,30 +4141,34 @@ namespace ConvectionCoefficients {
         // EnergyPlus code.
 
         // Set HConvIn using the proper correlation based on Surface Tilt
-        if (Tilt > 135.0) {
-            return CalcFisherPedersenCeilDiffuserFloor(ACH); // Floor correlation
-        } else if (Tilt < 45.0) {
-            return CalcFisherPedersenCeilDiffuserCeiling(ACH); // Ceiling correlation
+        static const Real64 cos45(sqrt(2.)/2.0);
+
+        if (cosTilt < -cos45) {
+            return CalcFisherPedersenCeilDiffuserFloor(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Floor correlation
+        } else if (cosTilt > cos45) {
+            return CalcFisherPedersenCeilDiffuserCeiling(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Ceiling correlation
         } else {
-            return CalcFisherPedersenCeilDiffuserWalls(ACH); // Wall correlation
+            return CalcFisherPedersenCeilDiffuserWalls(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Wall correlation
         }
     }
 
-    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum) // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, Array1S<Real64> const SurfaceTemperatures) // zone number for which coefficients are being calculated
     {
 
         Real64 ACH = CalcCeilingDiffuserACH(ZoneNum);
+
+        Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
 
         for (auto SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation)
             {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=](double, double, double, double, double) -> double {
-                    return CalcCeilingDiffuserIntConvCoeff(Surface(SurfNum).Tilt, ACH);
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                    return CalcCeilingDiffuserIntConvCoeff(ACH, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 };
             } else {
-                HConvIn(SurfNum) = CalcCeilingDiffuserIntConvCoeff(Surface(SurfNum).Tilt, ACH);
+                HConvIn(SurfNum) = CalcCeilingDiffuserIntConvCoeff(ACH, SurfaceTemperatures(SurfNum), DataHeatBalFanSys::MAT(ZoneNum), Surface(SurfNum).CosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                 if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
             }
@@ -5741,12 +5751,15 @@ namespace ConvectionCoefficients {
 
         Real64 tmpHc = 0.0;
 
+        int const ZoneNum = Surface(SurfNum).Zone;
+        Real64& Tsurface = TH(2, 1, SurfNum);
+        Real64& Tzone = MAT(ZoneNum);
+
         auto& HnFn = SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in;
         // now call appropriate function to calculate Hc
         {
             auto const SELECT_CASE_var(ConvModelEquationNum);
 
-            int const ZoneNum = Surface(SurfNum).Zone;
             if (SELECT_CASE_var == HcInt_UserCurve) {
                 CalcUserDefinedInsideHcModel(SurfNum, Surface(SurfNum).IntConvHcUserCurveIndex, tmpHc);
             } else if (SELECT_CASE_var == HcInt_ASHRAEVerticalWall) {
@@ -5755,7 +5768,7 @@ namespace ConvectionCoefficients {
                         return CalcASHRAEVerticalWall(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcASHRAEVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcASHRAEVerticalWall((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_WaltonUnstableHorizontalOrTilt) {
@@ -5765,7 +5778,7 @@ namespace ConvectionCoefficients {
                     };
                 } else {
                     tmpHc =
-                            CalcWaltonUnstableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                            CalcWaltonUnstableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_WaltonStableHorizontalOrTilt) {
@@ -5775,31 +5788,44 @@ namespace ConvectionCoefficients {
                     };
                 } else {
                     tmpHc =
-                            CalcWaltonStableHorizontalOrTilt((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+                            CalcWaltonStableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserFloor) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
-                tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate);
+                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
-                    HnFn = [=](double, double, double, double, double) -> double {
-                        return tmpHc;
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserFloor(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
                     };
+                } else {
+                    tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate, Tsurface, Tzone, Surface(SurfNum).CosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
-                tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate);
+                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HnFn = [=](double, double, double, double, double) -> double {
-                        return tmpHc;
+
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
                     };
+                } else {
+                    tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate, Tsurface, Tzone, Surface(SurfNum).CosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(ZoneNum);
-                tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate);
+                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+
+                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserWalls(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                    };
+                } else {
+                    tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate, Tsurface, Tzone, Surface(SurfNum).CosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                }
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=](double, double, double, double, double) -> double {
                         return tmpHc;
@@ -5812,7 +5838,7 @@ namespace ConvectionCoefficients {
                         return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
                     };
                 } else {
-                    tmpHc = CalcAlamdariHammondStableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                    tmpHc = CalcAlamdariHammondStableHorizontal((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondVerticalWall) {
@@ -5821,7 +5847,7 @@ namespace ConvectionCoefficients {
                         return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight);
                     };
                 } else {
-                    tmpHc = CalcAlamdariHammondVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight, SurfNum);
+                    tmpHc = CalcAlamdariHammondVerticalWall((Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, SurfNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondUnstableHorizontal) {
@@ -5830,7 +5856,7 @@ namespace ConvectionCoefficients {
                         return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
                     };
                 } else {
-                    tmpHc = CalcAlamdariHammondUnstableHorizontal((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
+                    tmpHc = CalcAlamdariHammondUnstableHorizontal((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam, SurfNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq3WallAwayFromHeat) {
@@ -5839,7 +5865,7 @@ namespace ConvectionCoefficients {
                         return CalcKhalifaEq3WallAwayFromHeat(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKhalifaEq3WallAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKhalifaEq3WallAwayFromHeat((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq4CeilingAwayFromHeat) {
@@ -5848,7 +5874,7 @@ namespace ConvectionCoefficients {
                         return CalcKhalifaEq4CeilingAwayFromHeat(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq5WallNearHeat) {
@@ -5857,7 +5883,7 @@ namespace ConvectionCoefficients {
                         return CalcKhalifaEq5WallsNearHeat(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKhalifaEq5WallsNearHeat((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKhalifaEq5WallsNearHeat((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq6NonHeatedWalls) {
@@ -5866,7 +5892,7 @@ namespace ConvectionCoefficients {
                         return CalcKhalifaEq6NonHeatedWalls(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKhalifaEq6NonHeatedWalls((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKhalifaEq6NonHeatedWalls((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KhalifaEq7Ceiling) {
@@ -5875,7 +5901,7 @@ namespace ConvectionCoefficients {
                         return CalcKhalifaEq7Ceiling(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKhalifaEq7Ceiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKhalifaEq7Ceiling((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedFloor) {
@@ -5884,7 +5910,7 @@ namespace ConvectionCoefficients {
                         return CalcAwbiHattonHeatedFloor(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
                     };
                 } else {
-                    tmpHc = CalcAwbiHattonHeatedFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    tmpHc = CalcAwbiHattonHeatedFloor((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_AwbiHattonHeatedWall) {
@@ -5893,7 +5919,7 @@ namespace ConvectionCoefficients {
                         return CalcAwbiHattonHeatedWall(Tsurf - Tamb, Surface(SurfNum).IntConvZoneHorizHydrDiam);
                     };
                 } else {
-                    tmpHc = CalcAwbiHattonHeatedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam);
+                    tmpHc = CalcAwbiHattonHeatedWall((Tsurface - Tzone), Surface(SurfNum).IntConvZoneHorizHydrDiam);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedAssistingWall) {
@@ -5906,9 +5932,9 @@ namespace ConvectionCoefficients {
                                 CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((Tsurface - Tzone),
                                                                     Surface(SurfNum).IntConvZoneWallHeight,
-                                                                    TH(2, 1, SurfNum),
+                                                                    Tsurface,
                                                                     ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -5922,9 +5948,9 @@ namespace ConvectionCoefficients {
                                                                        CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((Tsurface - Tzone),
                                                                     Surface(SurfNum).IntConvZoneWallHeight,
-                                                                    TH(2, 1, SurfNum),
+                                                                    Tsurface,
                                                                     ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -5938,9 +5964,9 @@ namespace ConvectionCoefficients {
                                                                        CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((Tsurface - Tzone),
                                                                      Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                     TH(2, 1, SurfNum),
+                                                                     Tsurface,
                                                                      ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -5954,9 +5980,9 @@ namespace ConvectionCoefficients {
                                                                         CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((Tsurface - Tzone),
                                                                        Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                       TH(2, 1, SurfNum),
+                                                                       Tsurface,
                                                                        ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -5970,9 +5996,9 @@ namespace ConvectionCoefficients {
                                                                       CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedStableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedStableFloor((Tsurface - Tzone),
                                                                    Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                   TH(2, 1, SurfNum),
+                                                                   Tsurface,
                                                                    ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -5986,9 +6012,9 @@ namespace ConvectionCoefficients {
                                                                         CalcZoneSystemACH(ZoneNum));
                     };
                 } else {
-                    tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((Tsurface - Tzone),
                                                                      Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                     TH(2, 1, SurfNum),
+                                                                     Tsurface,
                                                                      ZoneNum);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
@@ -6001,9 +6027,9 @@ namespace ConvectionCoefficients {
                                                                -QdotConvInRepPerArea(SurfNum));
                     };
                 } else {
-                    tmpHc = CalcFohannoPolidoriVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                    tmpHc = CalcFohannoPolidoriVerticalWall((Tsurface - Tzone),
                                                             Surface(SurfNum).IntConvZoneWallHeight,
-                                                            TH(2, 1, SurfNum),
+                                                            Tsurface,
                                                             -QdotConvInRepPerArea(SurfNum),
                                                             SurfNum);
                 }
@@ -6014,11 +6040,11 @@ namespace ConvectionCoefficients {
                         return CalcKaradagChilledCeiling(Tsurf - Tamb);
                     };
                 } else {
-                    tmpHc = CalcKaradagChilledCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)));
+                    tmpHc = CalcKaradagChilledCeiling((Tsurface - Tzone));
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_ISO15099Windows) {
-                CalcISO15099WindowIntConvCoeff(SurfNum, TH(2, 1, SurfNum), MAT(ZoneNum));
+                CalcISO15099WindowIntConvCoeff(SurfNum, Tsurface, Tzone);
                 tmpHc = HConvIn(SurfNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWindow) {
@@ -7984,7 +8010,13 @@ namespace ConvectionCoefficients {
         return Hn;
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 const AirChangeRate) // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 const ACH,  // [1/hr] air system air change rate
+                                               Real64 const Tsurf,
+                                               Real64 const Tair,
+                                               Real64 const cosTilt,
+                                               Real64 const humRat,
+                                               Real64 const height,
+                                               bool const isWindow)
     {
 
         // FUNCTION INFORMATION:
@@ -8002,31 +8034,27 @@ namespace ConvectionCoefficients {
         // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
         //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // function result
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-        Hc = 3.873 + 0.082 * std::pow(AirChangeRate, 0.98);
-
-        return Hc;
+        if (ACH > 3.0) {
+            return 3.873 + 0.082 * std::pow(ACH, 0.98);
+        }
+        else {
+            if (isWindow) {  // Unlikely for a floor, but okay...
+                Real64 const tilt = acos(cosTilt); // outward facing tilt
+                Real64 const sinTilt = sin(tilt);
+                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
+            } else {
+                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
+            }
+        }
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 const AirChangeRate) // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 const ACH,  // [1/hr] air system air change rate
+                                                 Real64 const Tsurf,
+                                                 Real64 const Tair,
+                                                 Real64 const cosTilt,
+                                                 Real64 const humRat,
+                                                 Real64 const height,
+                                                 bool const isWindow)
     {
 
         // FUNCTION INFORMATION:
@@ -8044,31 +8072,27 @@ namespace ConvectionCoefficients {
         // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
         //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // function result
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-        Hc = 2.234 + 4.099 * std::pow(AirChangeRate, 0.503);
-
-        return Hc;
+        if (ACH > 3.0) {
+            return 2.234 + 4.099 * std::pow(ACH, 0.503);
+        }
+        else {
+            if (isWindow) {  // Unlikely for a floor, but okay...
+                Real64 const tilt = acos(cosTilt); // outward facing tilt
+                Real64 const sinTilt = sin(tilt);
+                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
+            } else {
+                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
+            }
+        }
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const AirChangeRate) // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const ACH,  // [1/hr] air system air change rate
+                                               Real64 const Tsurf,
+                                               Real64 const Tair,
+                                               Real64 const cosTilt,
+                                               Real64 const humRat,
+                                               Real64 const height,
+                                               bool const isWindow)
     {
 
         // FUNCTION INFORMATION:
@@ -8086,28 +8110,18 @@ namespace ConvectionCoefficients {
         // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
         //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Hc; // function result
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-        Hc = 1.208 + 1.012 * std::pow(AirChangeRate, 0.604);
-
-        return Hc;
+        if (ACH > 3.0) {
+            return 1.208 + 1.012 * std::pow(ACH, 0.604);
+        }
+        else { // Revert to purely natural convection
+            if (isWindow) {  // Unlikely for a floor, but okay...
+                Real64 const tilt = acos(cosTilt); // outward facing tilt
+                Real64 const sinTilt = sin(tilt);
+                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
+            } else {
+                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
+            }
+        }
     }
 
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air

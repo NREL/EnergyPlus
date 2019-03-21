@@ -269,7 +269,7 @@ namespace DataSizing {
     Real64 DataCoilSizingAirOutHumRat(0.0);         // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingFanCoolLoad(0.0);          // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingCapFT(1.0);                // saves sizing data for use in coil object reporting
-    Real64 DataDesAccountForFanHeat(true);          // include fan heat when true
+    bool DataDesAccountForFanHeat(true);            // include fan heat when true
     Real64 DataDesInletWaterTemp(0.0);              // coil inlet water temperture used for warning messages
     Real64 DataDesInletAirHumRat(0.0);              // coil inlet air humidity ratio used for warning messages
     Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
@@ -649,6 +649,7 @@ namespace DataSizing {
         DataScalableCapSizingON = false;
         DataSysScalableFlowSizingON = false;
         DataSysScalableCapSizingON = false;
+        DataDesAccountForFanHeat = true;
 
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;
