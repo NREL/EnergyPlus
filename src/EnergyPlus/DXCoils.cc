@@ -9523,6 +9523,11 @@ namespace DXCoils {
         DXCoilFanOpMode(DXCoilNum) = FanOpMode;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp;
 
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
+
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
             CalcSecondaryDXCoils(DXCoilNum);
@@ -10181,6 +10186,12 @@ namespace DXCoils {
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp;
         DXCoilTotalCooling(DXCoilNum) = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
         DXCoilCoolInletAirWBTemp(DXCoilNum) = PsyTwbFnTdbWPb(InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
+
     }
 
     void CalcDXHeatingCoil(int const DXCoilNum,                      // the number of the DX heating coil to be simulated
@@ -10642,6 +10653,11 @@ namespace DXCoils {
         DXCoilTotalHeating(DXCoilNum) = DXCoil(DXCoilNum).TotalHeatingEnergyRate;
         DXCoilHeatInletAirDBTemp(DXCoilNum) = InletAirDryBulbTemp;
         DXCoilHeatInletAirWBTemp(DXCoilNum) = InletAirWetBulbC;
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -11147,6 +11163,11 @@ namespace DXCoils {
         DXCoilOutletTemp(DXCoilNum) = DXCoil(DXCoilNum).OutletAirTemp;
         DXCoilOutletHumRat(DXCoilNum) = DXCoil(DXCoilNum).OutletAirHumRat;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -12659,6 +12680,11 @@ namespace DXCoils {
         DXCoilFanOpMode(DXCoilNum) = FanOpMode;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
+
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
             CalcSecondaryDXCoils(DXCoilNum);
@@ -13370,6 +13396,11 @@ namespace DXCoils {
         DXCoil(DXCoilNum).MSSpeedNumHS = SpeedNumHS;
         DXCoil(DXCoilNum).MSSpeedRatio = SpeedRatio;
         DXCoil(DXCoilNum).MSCycRatio = CycRatio;
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
