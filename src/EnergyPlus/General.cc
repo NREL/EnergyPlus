@@ -1601,7 +1601,7 @@ namespace General {
         // FUNCTION PARAMETER DEFINITIONS:
         static std::string const NAN_string("NAN");
         static std::string const ZEROOOO("0.000000000000000000000000000");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1615,7 +1615,7 @@ namespace General {
 
         std::string String; // Working string
         if (RealValue != 0.0) {
-            gio::write(String, fmtLD) << RealValue;
+            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
         } else {
             String = ZEROOOO;
         }
@@ -1671,7 +1671,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1682,7 +1682,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string String; // Working string
 
-        gio::write(String, fmtLD) << IntegerValue;
+        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
     }
 
@@ -1718,7 +1718,7 @@ namespace General {
         static std::string const DigitChar("01234567890");
         static std::string const NAN_string("NAN");
         static std::string const ZEROOOO("0.000000000000000000000000000");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1732,7 +1732,7 @@ namespace General {
 
         std::string String; // Working string
         if (RealValue != 0.0) {
-            gio::write(String, fmtLD) << RealValue;
+            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
         } else {
             String = ZEROOOO;
         }
@@ -1855,7 +1855,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1866,7 +1866,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string String; // Working string
 
-        gio::write(String, fmtLD) << IntegerValue;
+        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
     }
 
@@ -2550,8 +2550,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
-        static gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
+        static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
         Real64 const FracToMin(60.0);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2582,9 +2582,9 @@ namespace General {
             ++ActualTimeHrS;
             ActualTimeMinS = 0;
         }
-        gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
+        ObjexxFCL::gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
 
-        gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
+        ObjexxFCL::gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
         if (TimeStmpE[3] == ' ') TimeStmpE[3] = '0';
         TimeStmpE[5] = ' ';
         strip(TimeStmpE);

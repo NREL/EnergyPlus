@@ -260,11 +260,11 @@ namespace HVACControllers {
         bool InitControllerSetPointCheckFlag(true);
     } // namespace
 
-    static gio::Fmt fmtLD("*");
-    static gio::Fmt fmtA("(A)");
-    static gio::Fmt fmtAA("(A,A)");
-    static gio::Fmt fmtAAA("(A,A,A)");
-    static gio::Fmt fmtAAAA("(A,A,A,A)");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtAA("(A,A)");
+    static ObjexxFCL::gio::Fmt fmtAAA("(A,A,A)");
+    static ObjexxFCL::gio::Fmt fmtAAAA("(A,A,A,A)");
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -2534,7 +2534,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(FileUnit, StatisticsFileName, flags);
+            ObjexxFCL::gio::open(FileUnit, StatisticsFileName, flags);
             if (flags.err()) goto Label100;
         }
 
@@ -2542,7 +2542,7 @@ namespace HVACControllers {
             WriteAirLoopStatistics(FileUnit, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
         }
 
-        gio::close(FileUnit);
+        ObjexxFCL::gio::close(FileUnit);
 
         return;
 
@@ -2597,11 +2597,11 @@ namespace HVACControllers {
 
         // FLOW
 
-        gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.Name << ',';
+        ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.Name << ',';
 
         // Number of calls to SimAirLoop() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.NumCalls);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.NumCalls);
 
         // Warm restart success ratio
         NumWarmRestarts = ThisAirLoopStats.NumSuccessfulWarmRestarts + ThisAirLoopStats.NumFailedWarmRestarts;
@@ -2611,22 +2611,22 @@ namespace HVACControllers {
             WarmRestartSuccessRatio = double(ThisAirLoopStats.NumSuccessfulWarmRestarts) / double(NumWarmRestarts);
         }
 
-        gio::write(FileUnit, fmtAAA) << "NumWarmRestarts" << ',' << TrimSigDigits(NumWarmRestarts);
-        gio::write(FileUnit, fmtAAA) << "NumSuccessfulWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumSuccessfulWarmRestarts);
-        gio::write(FileUnit, fmtAAA) << "NumFailedWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumFailedWarmRestarts);
-        gio::write(FileUnit, fmtAAA) << "WarmRestartSuccessRatio" << ',' << TrimSigDigits(WarmRestartSuccessRatio, 10);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumWarmRestarts" << ',' << TrimSigDigits(NumWarmRestarts);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumSuccessfulWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumSuccessfulWarmRestarts);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumFailedWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumFailedWarmRestarts);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "WarmRestartSuccessRatio" << ',' << TrimSigDigits(WarmRestartSuccessRatio, 10);
 
         // Total number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        gio::write(FileUnit, fmtAAA) << "TotSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.TotSimAirLoopComponents);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.TotSimAirLoopComponents);
         // Maximum number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        gio::write(FileUnit, fmtAAA) << "MaxSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.MaxSimAirLoopComponents);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.MaxSimAirLoopComponents);
 
         // Aggregated number of iterations needed by all controllers to simulate the specified air loop
-        gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.TotIterations);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.TotIterations);
         // Maximum number of iterations needed by controllers to simulate the specified air loop
-        gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.MaxIterations);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.MaxIterations);
 
         // Average number of iterations needed by controllers to simulate the specified air loop
         if (ThisAirLoopStats.NumCalls == 0) {
@@ -2635,12 +2635,12 @@ namespace HVACControllers {
             AvgIterations = double(ThisAirLoopStats.TotIterations) / double(ThisAirLoopStats.NumCalls);
         }
 
-        gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
 
         // Dump statistics for each controller on this air loop
         for (AirLoopControlNum = 1; AirLoopControlNum <= ThisPrimaryAirSystem.NumControllers; ++AirLoopControlNum) {
 
-            gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.ControllerName(AirLoopControlNum) << ',';
+            ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.ControllerName(AirLoopControlNum) << ',';
 
             // Aggregate iteration trackers across all operating modes
             NumCalls = 0;
@@ -2656,11 +2656,11 @@ namespace HVACControllers {
             }
 
             // Number of times this controller was simulated (should match air loop num calls)
-            gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(NumCalls);
+            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(NumCalls);
             // Aggregated number of iterations needed by this controller
-            gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(TotIterations);
+            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(TotIterations);
             // Aggregated number of iterations needed by this controller
-            gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(MaxIterations);
+            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(MaxIterations);
 
             // Average number of iterations needed by controllers to simulate the specified air loop
             if (NumCalls == 0) {
@@ -2668,22 +2668,22 @@ namespace HVACControllers {
             } else {
                 AvgIterations = double(TotIterations) / double(NumCalls);
             }
-            gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
 
             // Dump iteration trackers for each operating mode
             for (iModeNum = iFirstMode; iModeNum <= iLastMode; ++iModeNum) {
 
-                gio::write(FileUnit, fmtAA) << ControllerModeTypes(iModeNum) << ',';
+                ObjexxFCL::gio::write(FileUnit, fmtAA) << ControllerModeTypes(iModeNum) << ',';
 
                 // Number of times this controller operated in this mode
-                gio::write(FileUnit, fmtAAA) << "NumCalls" << ','
+                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ','
                                              << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
 
                 // Aggregated number of iterations needed by this controller
-                gio::write(FileUnit, fmtAAA) << "TotIterations" << ','
+                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ','
                                              << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
                 // Aggregated number of iterations needed by this controller
-                gio::write(FileUnit, fmtAAA) << "MaxIterations" << ','
+                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ','
                                              << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
 
                 // Average number of iterations needed by controllers to simulate the specified air loop
@@ -2693,7 +2693,7 @@ namespace HVACControllers {
                     AvgIterations = double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum)) /
                                     double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
                 }
-                gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
             }
         }
     }
@@ -2757,29 +2757,29 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(TraceFileUnit, TraceFileName, flags);
+            ObjexxFCL::gio::open(TraceFileUnit, TraceFileName, flags);
             if (flags.err()) goto Label100;
         }
 
         // List all controllers and their corrresponding handles into main trace file
-        gio::write(TraceFileUnit, fmtAAAA) << "Num" << ',' << "Name" << ',';
+        ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA) << "Num" << ',' << "Name" << ',';
 
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            gio::write(TraceFileUnit, fmtAAAA) << TrimSigDigits(ControllerNum) << ',' << PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum)
+            ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA) << TrimSigDigits(ControllerNum) << ',' << PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum)
                                                << ',';
             // SAME AS ControllerProps(ControllerIndex)%ControllerName BUT NOT YET AVAILABLE
         }
 
         // Skip a bunch of lines
-        gio::write(TraceFileUnit, fmtLD);
-        gio::write(TraceFileUnit, fmtLD);
-        gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
         // Write column header in main contoller trace file
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(TraceFileUnit, "(12(A,A))", flags)
+            ObjexxFCL::gio::write(TraceFileUnit, "(12(A,A))", flags)
                 << "ZoneSizingCalc" << ',' << "SysSizingCalc" << ',' << "EnvironmentNum" << ',' << "WarmupFlag" << ',' << "SysTimeStamp" << ','
                 << "SysTimeInterval" << ',' << "BeginTimeStepFlag" << ',' << "FirstTimeStepSysFlag" << ',' << "FirstHVACIteration" << ','
                 << "AirLoopPass" << ',' << "AirLoopNumCallsTot" << ',' << "AirLoopConverged" << ',';
@@ -2790,14 +2790,14 @@ namespace HVACControllers {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(TraceFileUnit, "(5(A,A,A))", flags)
+                ObjexxFCL::gio::write(TraceFileUnit, "(5(A,A,A))", flags)
                     << "Mode" << TrimSigDigits(ControllerNum) << "IterMax" << TrimSigDigits(ControllerNum) << "XRoot" << TrimSigDigits(ControllerNum)
                     << "YRoot" << TrimSigDigits(ControllerNum) << "YSetPoint" << TrimSigDigits(ControllerNum);
             }
         }
 
         // Finally goto next line
-        gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
         return;
 
@@ -2873,7 +2873,7 @@ namespace HVACControllers {
         }
 
         // Go to next line
-        gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
     }
 
     void TraceIterationStamp(
@@ -2928,7 +2928,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(TraceFileUnit, "(4(A,A),2(A,A),6(A,A))", flags)
+            ObjexxFCL::gio::write(TraceFileUnit, "(4(A,A),2(A,A),6(A,A))", flags)
                 << TrimSigDigits(LogicalToInteger(ZoneSizingCalc)) << ',' << TrimSigDigits(LogicalToInteger(SysSizingCalc)) << ','
                 << TrimSigDigits(CurEnvirNum) << ',' << TrimSigDigits(LogicalToInteger(WarmupFlag)) << ',' << CreateHVACTimeString() << ','
                 << MakeHVACTimeIntervalString() << ',' << TrimSigDigits(LogicalToInteger(BeginTimeStepFlag)) << ','
@@ -2983,7 +2983,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(TraceFileUnit, "(2(A,A),3(A,A))", flags)
+            ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A),3(A,A))", flags)
                 << TrimSigDigits(ControllerProps(ControlNum).Mode) << TrimSigDigits(ControllerProps(ControlNum).NumCalcCalls)
                 << TrimSigDigits(Node(ActuatedNode).MassFlowRate, 10) << TrimSigDigits(Node(SensedNode).Temp, 10)
                 << TrimSigDigits(Node(SensedNode).TempSetPoint, 10);
@@ -3042,7 +3042,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(TraceFileUnit, TraceFileName, flags);
+            ObjexxFCL::gio::open(TraceFileUnit, TraceFileName, flags);
             if (flags.err()) goto Label100;
         }
 
@@ -3055,7 +3055,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(TraceFileUnit, "(19(A,A))", flags) << "EnvironmentNum"
+            ObjexxFCL::gio::write(TraceFileUnit, "(19(A,A))", flags) << "EnvironmentNum"
                                                           << "WarmupFlag"
                                                           << "SysTimeStamp"
                                                           << "SysTimeInterval"
@@ -3079,7 +3079,7 @@ namespace HVACControllers {
         WriteRootFinderTraceHeader(TraceFileUnit);
 
         // Finally skip line
-        gio::write(TraceFileUnit, fmtLD);
+        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
         return;
 
@@ -3151,7 +3151,7 @@ namespace HVACControllers {
 
         // Skip a line before each new HVAC step
         if (SkipLineFlag) {
-            gio::write(TraceFileUnit, fmtLD);
+            ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
         }
 
         // Set the sensed and actuated node numbers
@@ -3162,7 +3162,7 @@ namespace HVACControllers {
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags)
+            ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags)
                 << TrimSigDigits(CurEnvirNum) << ',' << TrimSigDigits(LogicalToInteger(WarmupFlag)) << ',' << CreateHVACTimeString() << ','
                 << MakeHVACTimeIntervalString() << ',' << TrimSigDigits(AirLoopPass) << ',' << TrimSigDigits(LogicalToInteger(FirstHVACIteration))
                 << ',' << TrimSigDigits(Operation) << ',' << TrimSigDigits(ControllerProps(ControlNum).NumCalcCalls) << ',';
@@ -3178,7 +3178,7 @@ namespace HVACControllers {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags)
+                    ObjexxFCL::gio::write(TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags)
                         << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
                         << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
                         << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
@@ -3191,7 +3191,7 @@ namespace HVACControllers {
                 // Skip call to WriteRootFinderTrace()
 
                 // Finally skip line
-                gio::write(TraceFileUnit, fmtLD);
+                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // Masss flow rate
@@ -3199,7 +3199,7 @@ namespace HVACControllers {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(TraceFileUnit, "(8(A,A),2(A,A),1(A,A))", flags)
+                    ObjexxFCL::gio::write(TraceFileUnit, "(8(A,A),2(A,A),1(A,A))", flags)
                         << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
                         << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
                         << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
@@ -3213,7 +3213,7 @@ namespace HVACControllers {
                 WriteRootFinderTrace(TraceFileUnit, RootFinders(ControlNum));
 
                 // Finally skip line
-                gio::write(TraceFileUnit, fmtLD);
+                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // Masss flow rate
@@ -3221,7 +3221,7 @@ namespace HVACControllers {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(TraceFileUnit, "(3(A,A),5(A,A),2(A,A),1(A,A))", flags)
+                    ObjexxFCL::gio::write(TraceFileUnit, "(3(A,A),5(A,A),2(A,A),1(A,A))", flags)
                         << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
                         << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
                         << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
@@ -3235,10 +3235,10 @@ namespace HVACControllers {
                 // Skip call to WriteRootFinderTrace()
 
                 // Finally skip line
-                gio::write(TraceFileUnit, fmtLD);
+                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
                 // Skip an additional line to indicate end of current HVAC step
-                gio::write(TraceFileUnit, fmtLD);
+                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
 
             } else {
                 // Should never happen
