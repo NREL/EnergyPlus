@@ -56,6 +56,7 @@
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSurfaces.hh>
 #include <General.hh>
 #include <UtilityRoutines.hh>
 
@@ -211,12 +212,6 @@ namespace DataHeatBalance {
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
     int const Anisotropic(1);
-
-    // Parameters for HeatTransferAlgosUsed
-    int const UseCTF(1);
-    int const UseEMPD(2);
-    int const UseCondFD(5);
-    int const UseHAMT(6);
 
     // Parameters for ZoneAirSolutionAlgo
     int const Use3rdOrder(0);
@@ -493,9 +488,13 @@ namespace DataHeatBalance {
     int DefaultOutsideConvectionAlgo(1);         // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
     int SolarDistribution(0);                    // Solar Distribution Algorithm
     int InsideSurfIterations(0);                 // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(UseCTF); // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-    int NumberOfHeatTransferAlgosUsed(1);
-    Array1D_int HeatTransferAlgosUsed;
+    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
+   // Flags for HeatTransfer Algorithms Used
+    bool AnyCTF(false);    // CTF used
+    bool AnyEMPD(false);   // EMPD used
+    bool AnyCondFD(false); // CondFD used
+    bool AnyHAMT(false);   // HAMT used
+    bool AnyKiva(false);   // Kiva used
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
@@ -853,9 +852,7 @@ namespace DataHeatBalance {
         DefaultOutsideConvectionAlgo = 1;
         SolarDistribution = 0;
         InsideSurfIterations = 0;
-        OverallHeatTransferSolutionAlgo = UseCTF;
-        NumberOfHeatTransferAlgosUsed = 1;
-        HeatTransferAlgosUsed.deallocate();
+        OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 6;
         CondFDRelaxFactor = 1.0;

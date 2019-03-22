@@ -1679,8 +1679,6 @@ namespace SimulationManager {
         using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::HeatTransferAlgosUsed;
-        using DataHeatBalance::UseCondFD;
         using General::RoundSigDigits;
         using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
         using DataSurfaces::MaxVerticesPerSurface;
@@ -1780,7 +1778,7 @@ namespace SimulationManager {
         }
         eso_stream = nullptr;
 
-        if (any_eq(HeatTransferAlgosUsed, UseCondFD)) { // echo out relaxation factor, it may have been changed by the program
+        if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             gio::write(OutputFileInits, fmtA)
                 << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
             gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits(CondFDRelaxFactorInput, 3) +

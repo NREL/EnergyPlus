@@ -6534,10 +6534,8 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
-        using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
         using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
@@ -6633,7 +6631,7 @@ namespace SurfaceGeometry {
 
         // first initialize each heat transfer surface with the overall model type, array assignment
         for (auto &e : Surface)
-            e.HeatTransferAlgorithm = HeatTransferAlgosUsed(1);
+            e.HeatTransferAlgorithm = OverallHeatTransferSolutionAlgo;
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         CountHTAlgoObjectsSingleSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -6664,12 +6662,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
+                    AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
+                    AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
+                    AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
+                    AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundSingleSurf = true;
@@ -6678,12 +6680,6 @@ namespace SurfaceGeometry {
 
             if (!ErrorsFoundSingleSurf) {
                 Surface(Found).HeatTransferAlgorithm = tmpAlgoInput;
-
-                if (!any_eq(HeatTransferAlgosUsed, tmpAlgoInput)) { // add new algo
-                    HeatTransferAlgosUsed.redimension(++NumberOfHeatTransferAlgosUsed);
-                    HeatTransferAlgosUsed(NumberOfHeatTransferAlgosUsed) = tmpAlgoInput;
-                }
-
             } else {
                 ErrorsFound = true;
             }
@@ -6710,12 +6706,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
+                    AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
+                    AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
+                    AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
+                    AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3));
                     ErrorsFoundMultiSurf = true;
@@ -6829,11 +6829,6 @@ namespace SurfaceGeometry {
             if (!SurfacesOfType) {
                 ShowWarningError("In " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", for Multiple Surface Assignment=\"" + cAlphaArgs(2) +
                                  "\", there were no surfaces of that type found for assignment.");
-            } else {
-                if (!any_eq(HeatTransferAlgosUsed, tmpAlgoInput)) { // add new algo
-                    HeatTransferAlgosUsed.redimension(++NumberOfHeatTransferAlgosUsed);
-                    HeatTransferAlgosUsed(NumberOfHeatTransferAlgosUsed) = tmpAlgoInput;
-                }
             }
             if (ErrorsFoundMultiSurf) ErrorsFound = true;
 
@@ -6859,12 +6854,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
+                    AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
+                    AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
+                    AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
+                    AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundSurfList = true;
@@ -6883,10 +6882,6 @@ namespace SurfaceGeometry {
 
                 if (!ErrorsFoundSurfList) {
                     Surface(Found).HeatTransferAlgorithm = tmpAlgoInput;
-                    if (!any_eq(HeatTransferAlgosUsed, tmpAlgoInput)) { // add new algo
-                        HeatTransferAlgosUsed.redimension(++NumberOfHeatTransferAlgosUsed);
-                        HeatTransferAlgosUsed(NumberOfHeatTransferAlgosUsed) = tmpAlgoInput;
-                    }
                 } else {
                     ErrorsFound = true;
                 }
@@ -6913,12 +6908,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
+                    AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
+                    AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
+                    AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
+                    AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundByConstruct = true;
@@ -6935,30 +6934,21 @@ namespace SurfaceGeometry {
                 for (Item1 = 1; Item1 <= TotSurfaces; ++Item1) {
                     if (Surface(Item1).Construction == Found) {
                         Surface(Item1).HeatTransferAlgorithm = tmpAlgoInput;
-                        if (!any_eq(HeatTransferAlgosUsed, tmpAlgoInput)) { // add new algo
-                            HeatTransferAlgosUsed.redimension(++NumberOfHeatTransferAlgosUsed);
-                            HeatTransferAlgosUsed(NumberOfHeatTransferAlgosUsed) = tmpAlgoInput;
-                        }
                     }
                 }
             }
         }
 
-        // Change algorithm for Kiva foundaiton surfaces
-        bool hasKivaHeatTransferAlgo = any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva);
+        // Change algorithm for Kiva foundation surfaces
         for (auto &surf : Surface) {
             if (surf.ExtBoundCond == KivaFoundation) {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
-                if (!hasKivaHeatTransferAlgo) { // add new algo
-                    HeatTransferAlgosUsed.push_back(HeatTransferModel_Kiva);
-                    ++NumberOfHeatTransferAlgosUsed;
-                    hasKivaHeatTransferAlgo = true;
-                }
+                AnyKiva = true;
             }
         }
 
         // Setup Kiva intances
-        if (hasKivaHeatTransferAlgo) {
+        if (AnyKiva) {
             if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
         }
 
@@ -6976,24 +6966,24 @@ namespace SurfaceGeometry {
         SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
         msgneeded = false;
 
-        if (NumEMPDMat > 0 && !any_eq(HeatTransferAlgosUsed, HeatTransferModel_EMPD)) {
+        if (NumEMPDMat > 0 && !AnyEMPD) {
             ShowWarningError(
                 "The input file includes " + RoundSigDigits(NumEMPDMat) +
                 " MaterialProperty:MoisturePenetrationDepth:Settings objects but the moisture penetration depth algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (NumPCMat > 0 && !any_eq(HeatTransferAlgosUsed, HeatTransferModel_CondFD)) {
+        if (NumPCMat > 0 && !AnyCondFD) {
             ShowWarningError("The input file includes " + RoundSigDigits(NumPCMat) +
                              " MaterialProperty:PhaseChange objects but the conduction finite difference algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (NumVTCMat > 0 && !any_eq(HeatTransferAlgosUsed, HeatTransferModel_CondFD)) {
+        if (NumVTCMat > 0 && !AnyCondFD) {
             ShowWarningError(
                 "The input file includes " + RoundSigDigits(NumVTCMat) +
                 " MaterialProperty:VariableThermalConductivity objects but the conduction finite difference algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (SumHAMTMat > 0 && !any_eq(HeatTransferAlgosUsed, HeatTransferModel_HAMT)) {
+        if (SumHAMTMat > 0 && !AnyHAMT) {
             ShowWarningError("The input file includes " + RoundSigDigits(SumHAMTMat) +
                              " MaterialProperty:HeatAndMoistureTransfer:* objects but the combined heat and moisture finite difference algorithm is "
                              "not used anywhere.");
@@ -7003,12 +6993,12 @@ namespace SurfaceGeometry {
             ShowContinueError("Previous materials will be ignored due to HeatBalanceAlgorithm choice.");
         }
         msgneeded = false;
-        if (NumEMPDMat == 0 && any_eq(HeatTransferAlgosUsed, HeatTransferModel_EMPD)) {
+        if (NumEMPDMat == 0 && AnyEMPD) {
             ShowWarningError("The moisture penetration depth conduction transfer function algorithm is used but the input file includes no "
                              "MaterialProperty:MoisturePenetrationDepth:Settings objects.");
             msgneeded = true;
         }
-        if (SumHAMTMat == 0 && any_eq(HeatTransferAlgosUsed, HeatTransferModel_HAMT)) {
+        if (SumHAMTMat == 0 && AnyHAMT) {
             ShowWarningError("The combined heat and moisture finite element algorithm is used but the input file includes no "
                              "MaterialProperty:HeatAndMoistureTransfer:* objects.");
             msgneeded = true;
@@ -7023,30 +7013,40 @@ namespace SurfaceGeometry {
                                              "CombinedHeatAndMoistureFiniteElement} - Description,Inside Surface Max Temperature Limit{C}, Surface "
                                              "Convection Coefficient Lower Limit {W/m2-K}, Surface Convection Coefficient Upper Limit {W/m2-K}";
 
-        for (Item1 = 1; Item1 <= NumberOfHeatTransferAlgosUsed; ++Item1) {
-            AlgoName = "";
-            {
-                auto const SELECT_CASE_var(HeatTransferAlgosUsed(Item1));
-
-                if (SELECT_CASE_var == HeatTransferModel_CTF) {
-                    AlgoName = "CTF - ConductionTransferFunction";
-                } else if (SELECT_CASE_var == HeatTransferModel_CondFD) {
-                    AlgoName = "CondFD - ConductionFiniteDifference";
-                } else if (SELECT_CASE_var == HeatTransferModel_EMPD) {
-                    AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                } else if (SELECT_CASE_var == HeatTransferModel_HAMT) {
-                    AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                } else if (SELECT_CASE_var == HeatTransferModel_Kiva) {
-                    AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                }
-            }
-
+        int numberOfHeatTransferAlgosUsed = 0;
+        if (AnyCTF) {
+            AlgoName = "CTF - ConductionTransferFunction";
+            ++numberOfHeatTransferAlgosUsed;
+            gio::write(OutputFileInits, Format_725)
+                << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
+        }
+        if (AnyCondFD) {
+            AlgoName = "CondFD - ConductionFiniteDifference";
+            ++numberOfHeatTransferAlgosUsed;
+            gio::write(OutputFileInits, Format_725)
+                << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
+        }
+        if (AnyEMPD) {
+            AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
+            ++numberOfHeatTransferAlgosUsed;
+            gio::write(OutputFileInits, Format_725)
+                << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
+        }
+        if (AnyHAMT) {
+            AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+            ++numberOfHeatTransferAlgosUsed;
+            gio::write(OutputFileInits, Format_725)
+                << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
+        }
+        if (AnyKiva) {
+            AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
+            ++numberOfHeatTransferAlgosUsed;
             gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
 
         // Check HeatTransferAlgorithm for interior surfaces
-        if (NumberOfHeatTransferAlgosUsed > 1) {
+        if (numberOfHeatTransferAlgosUsed > 1) {
             int ExtSurfNum;
             for (Item = 1; Item <= TotSurfaces; ++Item) {
                 if (Surface(Item).ExtBoundCond > 0) {

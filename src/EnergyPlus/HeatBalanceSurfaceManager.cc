@@ -244,35 +244,14 @@ namespace HeatBalanceSurfaceManager {
         // at the time step level.  This driver manages the calls to all of
         // the other drivers and simulation algorithms.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using HeatBalanceAirManager::ManageAirHeatBalance;
         using HeatBalFiniteDiffManager::SurfaceFD;
         using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
         using ThermalComfort::ManageThermalComfort;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         int SurfNum;
         int ConstrNum;
 
-        // FLOW:
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Initializing Surfaces");
         InitSurfaceHeatBalance(); // Initialize all heat balance related parameters
 
@@ -294,11 +273,11 @@ namespace HeatBalanceSurfaceManager {
         UpdateFinalSurfaceHeatBalance();
 
         // Before we leave the Surface Manager the thermal histories need to be updated
-        if ((any_eq(HeatTransferAlgosUsed, UseCTF)) || (any_eq(HeatTransferAlgosUsed, UseEMPD))) {
+        if (AnyCTF || AnyEMPD) {
             UpdateThermalHistories(); // Update the thermal histories
         }
 
-        if (any_eq(HeatTransferAlgosUsed, UseCondFD)) {
+        if (AnyCondFD) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
@@ -571,9 +550,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (NZ = 1; NZ <= NumOfZones; ++NZ) {
-            // RJH DElight Modification Begin - Change Daylighting test to continue for Detailed AND DElight
             if (ZoneDaylight(NZ).DaylightMethod == NoDaylighting) continue;
-            // RJH DElight Modification End - Change Daylighting test to continue for Detailed AND DElight
             ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
             ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
             ZoneDaylight(NZ).ZonePowerReductionFactor = 1.0;
@@ -786,7 +763,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
-        if (any_eq(HeatTransferAlgosUsed, UseCondFD)) {
+        if (AnyCondFD) {
             InitHeatBalFiniteDiff();
         }
 
@@ -5974,7 +5951,7 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld.allocate(TotSurfaces);
             RefAirTemp.allocate(TotSurfaces);
             SurfaceEnthalpyRead.allocate(TotSurfaces);
-            if (any_eq(HeatTransferAlgosUsed, UseEMPD)) {
+            if (AnyEMPD) {
                 MinIterations = MinEMPDIterations;
             } else {
                 MinIterations = 1;
@@ -5996,7 +5973,7 @@ namespace HeatBalanceSurfaceManager {
             MyEnvrnFlag = false;
 
             // Initialize Kiva instances ground temperatures
-            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (AnyKiva) {
                 SurfaceGeometry::kivaManager.initKivaInstances();
             }
         }
@@ -6151,7 +6128,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Calculate Kiva instances
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+        if (AnyKiva) {
             if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
                  SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !WarmupFlag) {
@@ -6159,13 +6136,12 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        bool const useCondFDHTalg(any_eq(HeatTransferAlgosUsed, UseCondFD));
         Converged = false;
         while (!Converged) { // Start of main inside heat balance DO loop...
 
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
-            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (AnyKiva) {
                 for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
@@ -6173,7 +6149,7 @@ namespace HeatBalanceSurfaceManager {
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
-            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (AnyKiva) {
                 for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
@@ -6737,7 +6713,7 @@ namespace HeatBalanceSurfaceManager {
 
             } // ...end of loop to check for convergence
 
-            if (!useCondFDHTalg) {
+            if (!AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
             } else {
                 if (MaxDelTemp <= MaxAllowedDelTempCondFD) Converged = true;
@@ -6769,7 +6745,7 @@ namespace HeatBalanceSurfaceManager {
                 if (!WarmupFlag) {
                     ++ErrCount;
                     if (ErrCount < 16) {
-                        if (!useCondFDHTalg) {
+                        if (!AnyCondFD) {
                             ShowWarningError(
                                 "Inside surface heat balance did not converge with Max Temp Difference [C] =" + RoundSigDigits(MaxDelTemp, 3) +
                                 " vs Max Allowed Temp Diff [C] =" + RoundSigDigits(MaxAllowedDelTemp, 3));
@@ -6791,7 +6767,7 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of main inside heat balance DO loop (ends when Converged)
 
         // Update SumHmXXXX
-        if (useCondFDHTalg || any_eq(HeatTransferAlgosUsed, UseEMPD) || any_eq(HeatTransferAlgosUsed, UseHAMT)) {
+        if (AnyCondFD || AnyEMPD || AnyHAMT) {
             for (std::vector<int>::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate) {
                 SurfNum = HTSurfToResimulate[iHTSurfToResimulate]; // Heat transfer surfaces only
                 auto const &surface(Surface(SurfNum));

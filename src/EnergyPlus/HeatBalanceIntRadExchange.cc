@@ -146,7 +146,11 @@ namespace HeatBalanceIntRadExchange {
                                  int const SurfIterations,            // Number of iterations in calling subroutine
                                  Array1<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
-                                 std::string const &EP_UNUSED(CalledFrom))
+#ifdef EP_Count_Calls
+        std::string const &CalledFrom)
+#else
+        std::string const &EP_UNUSED(CalledFrom))
+#endif
     {
 
         // SUBROUTINE INFORMATION:
