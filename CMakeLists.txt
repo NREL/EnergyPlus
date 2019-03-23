@@ -77,11 +77,6 @@ mark_as_advanced( ENABLE_INSTALL_REMOTE )
 # we are making python a required dependency, so find it here...starting off by requiring at least 2.7
 find_package(PythonInterp 2.7 REQUIRED)
 
-# then we can add python-based tests for it
-if ( BUILD_TESTING )
-  add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
-endif()
-
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
   option( BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF )
@@ -292,7 +287,6 @@ endif()
 # some parameters are simply not needed for everyday building
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 mark_as_advanced(BUILD_SHARED_LIBS)
-mark_as_advanced(ENABLE_COVERAGE)
 mark_as_advanced(ENABLE_GTEST_DEBUG_MODE)
 mark_as_advanced(ENABLE_GTEST_SHUFFLE)
 mark_as_advanced(ENABLE_MEMORY_SANITIZER)
@@ -306,7 +300,6 @@ mark_as_advanced(KIVA_TESTING)
 mark_as_advanced(RE2_BUILD_TESTING)
 mark_as_advanced(USEPCRE)
 mark_as_advanced(CCACHE_PROGRAM)
-mark_as_advanced(CMAKE_BUILD_TYPE)
 mark_as_advanced(CMAKE_VERSION_BUILD)
 mark_as_advanced(ENABLE_REGRESSION_TESTING)
 mark_as_advanced(TEST_ANNUAL_SIMULATION)
