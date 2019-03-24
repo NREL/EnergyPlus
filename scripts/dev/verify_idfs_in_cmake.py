@@ -50,13 +50,11 @@ for fil in found_idf_files_trimmed:
 # check if any are missing in cmake
 need_to_add_to_cmake = found_idf_files_refined.difference(cmake_list_idf_files)
 if len(need_to_add_to_cmake) > 0:
-    missing_files = []
     for this_file in sorted(need_to_add_to_cmake):
-        missing_files.append({
+        print(json.dumps({
             'tool': 'verify_idfs_in_cmake',
             'filename': this_file,
             'line': 0,
             'messagetype': 'error',
             'message': 'File missing from testfiles/CMakeLists.txt'
-        })
-    print(json.dumps(missing_files))
+        }))

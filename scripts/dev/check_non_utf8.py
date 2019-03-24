@@ -11,8 +11,6 @@ current_script_dir = os.path.dirname(os.path.realpath(__file__))
 repo_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
 full_path_dirs_to_skip = [os.path.join(repo_root, d) for d in DIRS_TO_SKIP]
 
-# str.decode and str.encode function can be very useful
-files_with_non_utf8 = []
 for root, dirs, filenames in os.walk(repo_root):
     if any(root.startswith(f) for f in full_path_dirs_to_skip):
         continue
@@ -31,12 +29,10 @@ for root, dirs, filenames in os.walk(repo_root):
                     line.decode('UTF-8', 'strict')
         except (UnicodeDecodeError, UnicodeEncodeError):
             # line contains non-utf8 character
-            files_with_non_utf8.append({
+            print(json.dumps({
                 'tool': 'check_non_utf8',
                 'filename': relative_file_path,
                 'line': line_num,
                 'messagetype': 'warning',
                 'message': 'File had invalid characters/encoding issues'
-            })
-if len(files_with_non_utf8) > 0:
-    print(json.dumps(files_with_non_utf8))
+            }))
