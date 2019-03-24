@@ -1,25 +1,27 @@
+#!/usr/bin/env python
+
 import codecs
 import json
 import os
 
-DIRS_TO_SKIP = ('.git', 'build', 'builds', 'cmake-build-debug', 'cmake-build-release', 'design', 'release', 'third_party')
-FILE_PATTERNS = ('.cc', '.hh', '.tex', '.cpp', '.hpp')
+DIRS_TO_SKIP = ['.git', 'build', 'builds', 'cmake-build-debug', 'cmake-build-release', 'design', 'release', 'third_party']
+FILE_PATTERNS = ['.cc', '.hh', '.tex', '.cpp', '.hpp']
 
 current_script_dir = os.path.dirname(os.path.realpath(__file__))
 repo_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
-full_path_dirs_to_skip = tuple([os.path.join(repo_root, d) for d in DIRS_TO_SKIP])
+full_path_dirs_to_skip = [os.path.join(repo_root, d) for d in DIRS_TO_SKIP]
 
 # str.decode and str.encode function can be very useful
 files_with_non_utf8 = []
 for root, dirs, filenames in os.walk(repo_root):
-    if root.startswith(full_path_dirs_to_skip):
+    if any(root.startswith(f) for f in full_path_dirs_to_skip):
         continue
     for filename in filenames:
-        if not filename.endswith(FILE_PATTERNS):
+        if not any(filename.endswith(f) for f in FILE_PATTERNS):
             continue
         file_path = os.path.join(root, filename)
         relative_file_path = os.path.relpath(file_path, repo_root)
-        print("Trying to open file: " + relative_file_path)
+        # print("Trying to open file: " + relative_file_path)
         line_num = 0
         try:
             with codecs.open(file_path, encoding='utf-8', errors='ignore') as f_idf:
