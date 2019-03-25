@@ -27,6 +27,7 @@ compilers:
       - ./scripts/dev/check_stray_fields_in_idd.py
       - ./scripts/dev/verify_idfs_in_cmake.py
       - ./scripts/dev/check_non_utf8.py
+      - ./scripts/dev/check_pr_labels.py
 
   - name: "gcc"
     version: "7.3"
