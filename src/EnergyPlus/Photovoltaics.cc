@@ -1546,7 +1546,7 @@ namespace Photovoltaics {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for use with EnergyPlus
         //       RE-ENGINEERED  na
@@ -1601,7 +1601,7 @@ namespace Photovoltaics {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for use with EnergyPlus
         //       RE-ENGINEERED  na
@@ -1649,7 +1649,7 @@ namespace Photovoltaics {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for use with EnergyPlus
         //       RE-ENGINEERED  na
@@ -1750,7 +1750,7 @@ namespace Photovoltaics {
     {
 
         // FUNCTION INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for EnergyPlus
         //       RE-ENGINEERED
@@ -1804,7 +1804,7 @@ namespace Photovoltaics {
     {
 
         // FUNCTION INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for EnergyPlus
         //       RE-ENGINEERED
@@ -1857,7 +1857,7 @@ namespace Photovoltaics {
     {
 
         // FUNCTION INFORMATION:
-        //       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
         //       MODIFIED       D. Bradley for EnergyPlus
         //       RE-ENGINEERED
