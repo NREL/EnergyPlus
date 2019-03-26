@@ -194,11 +194,11 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
   "  No;                      !- Run Simulation for Weather File Run Periods",
 
   "RunPeriod,",
-  "  January,                        !- Name",
+  "  January,                 !- Name",
   "  1,                       !- Begin Month",
   "  1,                       !- Begin Day of Month",
   "  ,                        !- Begin Year",
-  "  1,                      !- End Month",
+  "  1,                       !- End Month",
   "  31,                      !- End Day of Month",
   "  ,                        !- End Year",
   "  Tuesday,                 !- Day of Week for Start Day",
