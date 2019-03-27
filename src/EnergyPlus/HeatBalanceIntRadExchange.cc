@@ -663,12 +663,11 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-<<<<<<< HEAD
-                gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + zoneViewFactorInformation.Name + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + zoneViewFactorInformation.Name + ',' +
                                                          RoundSigDigits(NumOfZoneSurfaces);
 
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    gio::write(OutputFileInits, "(A,',',A,$)")
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
                         << "Surface View Factor - Surface Information," + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
                                cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Class)
                         << RoundSigDigits(zoneViewFactorInformation.Area(SurfNum), 4) + ',' + RoundSigDigits(zoneViewFactorInformation.Azimuth(SurfNum), 4) + ',' +
@@ -676,22 +675,7 @@ namespace HeatBalanceIntRadExchange {
                                ',' + RoundSigDigits(Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Sides);
                     for (Vindex = 1; Vindex <= Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Sides; ++Vindex) {
                         auto &Vertex = Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Vertex(Vindex);
-                        gio::write(OutputFileInits, "(3(',',A),$)")
-=======
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + ZoneInfo(ZoneNum).Name + ',' +
-                                                         RoundSigDigits(NumOfZoneSurfaces);
-
-                for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
-                        << "Surface View Factor - Surface Information," + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                               cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Class)
-                        << RoundSigDigits(ZoneInfo(ZoneNum).Area(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Azimuth(SurfNum), 4) + ',' +
-                               RoundSigDigits(ZoneInfo(ZoneNum).Tilt(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Emissivity(SurfNum), 4) +
-                               ',' + RoundSigDigits(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides);
-                    for (Vindex = 1; Vindex <= Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides; ++Vindex) {
-                        auto &Vertex = Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Vertex(Vindex);
                         ObjexxFCL::gio::write(OutputFileInits, "(3(',',A),$)")
->>>>>>> develop
                             << RoundSigDigits(Vertex.x, 4) << RoundSigDigits(Vertex.y, 4) << RoundSigDigits(Vertex.z, 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
@@ -700,25 +684,15 @@ namespace HeatBalanceIntRadExchange {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-<<<<<<< HEAD
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
-=======
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
->>>>>>> develop
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
 
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                     RowSum = sum(SaveApproximateViewFactors(_, Findex));
-<<<<<<< HEAD
-                    gio::write(OutputFileInits, "(A,3(',',A),$)")
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
                         << "View Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name
                         << cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
-=======
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
->>>>>>> develop
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
                     }
@@ -730,94 +704,51 @@ namespace HeatBalanceIntRadExchange {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-<<<<<<< HEAD
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
-=======
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
->>>>>>> develop
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
 
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-<<<<<<< HEAD
                     RowSum = sum(zoneViewFactorInformation.F(_, Findex));
-                    gio::write(OutputFileInits, "(A,3(',',A),$)")
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
                         << "View Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name
                         << cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.F(SurfNum, Findex), 4);
-=======
-                    RowSum = sum(ZoneInfo(ZoneNum).F(_, Findex));
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).F(SurfNum, Findex), 4);
->>>>>>> develop
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.F(SurfNum, Findex), 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
 
                 if (Option1 == "IDF") {
-<<<<<<< HEAD
-                    gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
                                                                          Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
                                                                          RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
                                                                          Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
                                                                          RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ';';
-=======
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                            if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
-                            } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
->>>>>>> develop
                             }
                         }
                     }
                     ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
 
-<<<<<<< HEAD
-                    gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
                                                                          Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
                                                                          RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
                                                                          Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
                                                                          RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ';';
-=======
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                            if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
-                            } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
->>>>>>> develop
                             }
                         }
                     }
@@ -829,23 +760,13 @@ namespace HeatBalanceIntRadExchange {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Script F Factors"
                                                        << ",X Surface";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-<<<<<<< HEAD
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
-=======
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
->>>>>>> develop
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-<<<<<<< HEAD
-                    gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name;
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.ScriptF(Findex, SurfNum), 4);
-=======
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name;
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name;
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).ScriptF(Findex, SurfNum), 4);
->>>>>>> develop
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
