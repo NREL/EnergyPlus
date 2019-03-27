@@ -615,6 +615,7 @@ namespace HeatBalanceIntRadExchange {
                 zoneViewFactorInformation.ScriptF = 0.0;
                 if (DisplayAdvancedReportVariables)
                     ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + Zone(ZoneNum).Name + ",0,0,0,-1,0,0";
+                ZoneInfo.push_back(zoneViewFactorInformation);
                 continue; // Go to the next zone in the  ZoneNum DO loop
             }
 
