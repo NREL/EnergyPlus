@@ -11449,7 +11449,7 @@ namespace DXCoils {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 } else if ((Error < 0.0) && (ErrorLast > 0.0)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
-                } else if (abs(Error) > abs(ErrorLast)) {
+                } else if (std::abs(Error) > std::abs(ErrorLast)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 }
                 ErrorLast = Error;
@@ -13684,12 +13684,12 @@ namespace DXCoils {
         int index;
 
         // Formats
-        static gio::Fmt Format_890("('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
+        static ObjexxFCL::gio::Fmt Format_890("('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
                                    "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
                                    "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
                                    "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
                                    "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-        static gio::Fmt Format_891("(' VAV DX Cooling Coil Standard Rating Information, "
+        static ObjexxFCL::gio::Fmt Format_891("(' VAV DX Cooling Coil Standard Rating Information, "
                                    "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
                                    ",',A)");
 
@@ -13972,7 +13972,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            gio::write(OutputFileInits, Format_890);
+            ObjexxFCL::gio::write(OutputFileInits, Format_890);
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -14015,7 +14015,7 @@ namespace DXCoils {
         }
 
         if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            gio::write(OutputFileInits, Format_891)
+            ObjexxFCL::gio::write(OutputFileInits, Format_891)
                 << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "Fan:VariableVolume" << DXCoil(DXCoilNum).SupplyFanName
                 << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << RoundSigDigits(IEER, 2)
                 << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2) << RoundSigDigits(EER_TestPoint_SI(3), 2)
@@ -14024,7 +14024,7 @@ namespace DXCoils {
                 << RoundSigDigits(SupAirMdot_TestPoint(2), 4) << RoundSigDigits(SupAirMdot_TestPoint(3), 4)
                 << RoundSigDigits(SupAirMdot_TestPoint(4), 4);
         } else {
-            gio::write(OutputFileInits, Format_891)
+            ObjexxFCL::gio::write(OutputFileInits, Format_891)
                 << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "N/A"
                 << "N/A" << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
                 << RoundSigDigits(IEER, 2) << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2)

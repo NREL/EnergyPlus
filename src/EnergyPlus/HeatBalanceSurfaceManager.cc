@@ -349,8 +349,8 @@ namespace HeatBalanceSurfaceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -605,7 +605,7 @@ namespace HeatBalanceSurfaceManager {
                     {
                         IOFlags flags;
                         flags.ACTION("READWRITE");
-                        gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
+                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
                         iwriteStatus = flags.ios();
                     }
                     if (iwriteStatus == 0) {
@@ -625,7 +625,7 @@ namespace HeatBalanceSurfaceManager {
                     while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
                         {
                             IOFlags flags;
-                            gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
+                            ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
                             iReadStatus = flags.ios();
                         }
                         if (iReadStatus < GoodIOStatValue) {
@@ -649,7 +649,7 @@ namespace HeatBalanceSurfaceManager {
                     if (elOpened) {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     };
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
@@ -662,7 +662,7 @@ namespace HeatBalanceSurfaceManager {
                     {
                         IOFlags flags;
                         flags.ACTION("READWRITE");
-                        gio::open(iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags);
+                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags);
                         iwriteStatus = flags.ios();
                     }
                     //            IF (iwriteStatus /= 0) THEN
@@ -682,7 +682,7 @@ namespace HeatBalanceSurfaceManager {
                     while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
                         {
                             IOFlags flags;
-                            gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
+                            ObjexxFCL::gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
                             iReadStatus = flags.ios();
                         }
                         if (iReadStatus < GoodIOStatValue) {
@@ -701,7 +701,7 @@ namespace HeatBalanceSurfaceManager {
                     if (elOpened) {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     };
                 }
                 // Store the calculated total zone Power Reduction Factor due to DElight daylighting
@@ -6221,8 +6221,8 @@ namespace HeatBalanceSurfaceManager {
                                               QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                  (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                  (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                             if (construct.SourceSinkPresent) {
                                 TempSurfInTmp(SurfNum) =
                                     (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum)) *
@@ -6331,8 +6331,8 @@ namespace HeatBalanceSurfaceManager {
                                                       (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                                 Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                                 // Calculate the current inside surface temperature
-                                if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                          (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                                if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                          (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                                     if (construct.SourceSinkPresent) {
                                         TempSurfInTmp(SurfNum) =
                                             (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum) +

@@ -3081,7 +3081,7 @@ namespace EvaporativeFluidCoolers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt LowTempFmt("(' ',F6.2)");
+        static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         // minimum condenser loop temp [C]
 
@@ -3135,8 +3135,8 @@ namespace EvaporativeFluidCoolers {
         TempDifference = PlantLoop(LoopNum).MinTemp - OutletWaterTemp;
         if (TempDifference > TempAllowance && WaterMassFlowRate > 0.0) {
             ++SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorCount;
-            gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
+            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
             strip(CharErrOut);
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorCount < 2) {
                 ShowWarningError(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" +

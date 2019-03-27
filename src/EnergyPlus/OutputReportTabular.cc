@@ -540,8 +540,8 @@ namespace OutputReportTabular {
     Array1D<TOCEntriesType> TOCEntries;
     Array1D<UnitConvType> UnitConv;
 
-    static gio::Fmt fmtLD("*");
-    static gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     namespace {
         bool GatherMonthlyResultsForTimestepRunOnce(true);
@@ -1903,13 +1903,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            gio::write(OutputFileInits, fmtA) << "! <Tabular Report>,Style,Unit Conversion";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Tabular Report>,Style,Unit Conversion";
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            gio::write(OutputFileInits, "('Tabular Report,',A,',',A)") << AlphArray(1) << AlphArray(2);
+            ObjexxFCL::gio::write(OutputFileInits, "('Tabular Report,',A,',',A)") << AlphArray(1) << AlphArray(2);
         }
     }
 
@@ -5749,22 +5749,22 @@ namespace OutputReportTabular {
             }
         }
         EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-        gio::write(EchoInputFile, fmtLD) << "MonthlyInputCount=" << MonthlyInputCount;
-        gio::write(EchoInputFile, fmtLD) << "sizeMonthlyInput=" << sizeMonthlyInput;
-        gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-        gio::write(EchoInputFile, fmtLD) << "sizeMonthlyFieldSetInput=" << sizeMonthlyFieldSetInput;
-        gio::write(EchoInputFile, fmtLD) << "MonthlyTablesCount=" << MonthlyTablesCount;
-        gio::write(EchoInputFile, fmtLD) << "MonthlyColumnsCount=" << MonthlyColumnsCount;
-        gio::write(EchoInputFile, fmtLD) << "sizeReportName=" << sizeReportName;
-        gio::write(EchoInputFile, fmtLD) << "numReportName=" << numReportName;
-        gio::write(EchoInputFile, fmtLD) << "sizeSubTable=" << sizeSubTable;
-        gio::write(EchoInputFile, fmtLD) << "numSubTable=" << numSubTable;
-        gio::write(EchoInputFile, fmtLD) << "sizeColumnTag=" << sizeColumnTag;
-        gio::write(EchoInputFile, fmtLD) << "numColumnTag=" << numColumnTag;
-        gio::write(EchoInputFile, fmtLD) << "sizeTableEntry=" << sizeTableEntry;
-        gio::write(EchoInputFile, fmtLD) << "numTableEntry=" << numTableEntry;
-        gio::write(EchoInputFile, fmtLD) << "sizeCompSizeTableEntry=" << sizeCompSizeTableEntry;
-        gio::write(EchoInputFile, fmtLD) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyInputCount=" << MonthlyInputCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeMonthlyInput=" << sizeMonthlyInput;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeMonthlyFieldSetInput=" << sizeMonthlyFieldSetInput;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyTablesCount=" << MonthlyTablesCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyColumnsCount=" << MonthlyColumnsCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeReportName=" << sizeReportName;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numReportName=" << numReportName;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeSubTable=" << sizeSubTable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numSubTable=" << numSubTable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeColumnTag=" << sizeColumnTag;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numColumnTag=" << numColumnTag;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeTableEntry=" << sizeTableEntry;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numTableEntry=" << numTableEntry;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeCompSizeTableEntry=" << sizeCompSizeTableEntry;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
     }
 
     void FillWeatherPredefinedEntries()
@@ -5858,7 +5858,7 @@ namespace OutputReportTabular {
 
         {
             IOFlags flags;
-            gio::inquire(DataStringGlobals::inStatFileName, flags);
+            ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
             fileExists = flags.exists();
         }
         readStat = 0;
@@ -5876,7 +5876,7 @@ namespace OutputReportTabular {
             {
                 IOFlags flags;
                 flags.ACTION("READ");
-                gio::open(statFile, DataStringGlobals::inStatFileName, flags);
+                ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
                 readStat = flags.ios();
             }
             if (readStat != 0) {
@@ -5885,7 +5885,7 @@ namespace OutputReportTabular {
             IOFlags flags;
             while (readStat == 0) { // end of file, or error
                 lineType = lineTypeinterim;
-                gio::read(statFile, fmtA, flags) >> lineIn;
+                ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
                 readStat = flags.ios();
                 // reconcile line with different versions of stat file
                 // v7.1 added version as first line.
@@ -6423,7 +6423,7 @@ namespace OutputReportTabular {
                 if (lineType == KoppenDes1Line) lineTypeinterim = KoppenDes1Line;
                 if (lineType == KoppenLine) lineTypeinterim = KoppenLine;
             }
-            gio::close(statFile);
+            ObjexxFCL::gio::close(statFile);
         }
     }
 
@@ -8306,7 +8306,7 @@ namespace OutputReportTabular {
                 for (int jUse = 1; jUse <= 14; ++jUse) {
                     curTotal += useVal(iResource, jUse);
                 }
-                if (abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
+                if (std::abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
                     ShowWarningError(ResourceWarningMessage(columnHead(iResource)));
                 }
             }
@@ -10534,8 +10534,8 @@ namespace OutputReportTabular {
             DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
 
             if (DetailedWWR) {
-                gio::write(OutputFileDebug, fmtA) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";
-                gio::write(OutputFileDebug, fmtA) << "SurfName,Class,Area,Tilt";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "SurfName,Class,Area,Tilt";
             }
 
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
@@ -10598,7 +10598,7 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 if (DetailedWWR) {
-                                    gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Wall," + RoundSigDigits(curArea * mult, 1) + ',' +
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Wall," + RoundSigDigits(curArea * mult, 1) + ',' +
                                                                              RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
@@ -10620,7 +10620,7 @@ namespace OutputReportTabular {
                                     curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                 zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
                                 if (DetailedWWR) {
-                                    gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Window," + RoundSigDigits(curArea * mult, 1) + ',' +
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Window," + RoundSigDigits(curArea * mult, 1) + ',' +
                                                                              RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             }
@@ -10633,14 +10633,14 @@ namespace OutputReportTabular {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Roof," + RoundSigDigits(curArea * mult, 1) + ',' +
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Roof," + RoundSigDigits(curArea * mult, 1) + ',' +
                                                                              RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Skylight," + RoundSigDigits(curArea * mult, 1) +
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Skylight," + RoundSigDigits(curArea * mult, 1) +
                                                                              ',' + RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             }
@@ -10655,13 +10655,13 @@ namespace OutputReportTabular {
             TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
             TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
             if (DetailedWWR) {
-                gio::write(OutputFileDebug, fmtA) << "========================";
-                gio::write(OutputFileDebug, fmtA) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
-                gio::write(OutputFileDebug, fmtA) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
-                gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWallArea, 2) + ',' + RoundSigDigits(wallAreaN, 2) + ',' +
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "========================";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWallArea, 2) + ',' + RoundSigDigits(wallAreaN, 2) + ',' +
                                                          RoundSigDigits(wallAreaS, 2) + ',' + RoundSigDigits(wallAreaE, 2) + ',' +
                                                          RoundSigDigits(wallAreaW, 2);
-                gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWindowArea, 2) + ',' + RoundSigDigits(windowAreaN, 2) + ',' +
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWindowArea, 2) + ',' + RoundSigDigits(windowAreaN, 2) + ',' +
                                                          RoundSigDigits(windowAreaS, 2) + ',' + RoundSigDigits(windowAreaE, 2) + ',' +
                                                          RoundSigDigits(windowAreaW, 2);
             }
@@ -10791,9 +10791,9 @@ namespace OutputReportTabular {
             rowHead(3) = "Skylight-Roof Ratio [%]";
 
             if (DetailedWWR) {
-                gio::write(OutputFileDebug, fmtA) << "========================";
-                gio::write(OutputFileDebug, fmtA) << "TotalRoofArea,SkylightArea";
-                gio::write(OutputFileDebug, fmtA) << RoundSigDigits(roofArea, 2) + ',' + RoundSigDigits(skylightArea, 2);
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "========================";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "TotalRoofArea,SkylightArea";
+                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << RoundSigDigits(roofArea, 2) + ',' + RoundSigDigits(skylightArea, 2);
             }
 
             tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
@@ -11835,7 +11835,7 @@ namespace OutputReportTabular {
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             // since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-            gio::close(OutputFileInits);
+            ObjexxFCL::gio::close(OutputFileInits);
 
             std::ifstream eioFile;
             eioFile.open(DataStringGlobals::outputEioFileName);
@@ -11939,7 +11939,7 @@ namespace OutputReportTabular {
                 flags.ACTION("write");
                 flags.STATUS("UNKNOWN");
                 flags.POSITION("APPEND");
-                gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
+                ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
                 write_stat = flags.ios();
             }
             // as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
@@ -12308,9 +12308,9 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
                                                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-            gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
                                                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
@@ -12319,20 +12319,20 @@ namespace OutputReportTabular {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, "(4A)", flags)
+                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
                             << "Radiant to Convective Decay Curves for Cooling," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
                     }
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("NO");
-                            gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveCool(jTime, kSurf);
+                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveCool(jTime, kSurf);
                         }
                     }
                     {
                         IOFlags flags;
                         flags.ADVANCE("YES");
-                        gio::write(OutputFileInits, "()", flags);
+                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
                     } // put a line feed at the end of the line
                 }
 
@@ -12340,20 +12340,20 @@ namespace OutputReportTabular {
                     {
                         IOFlags flags;
                         flags.ADVANCE("NO");
-                        gio::write(OutputFileInits, "(4A)", flags)
+                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
                             << "Radiant to Convective Decay Curves for Heating," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
                     }
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("NO");
-                            gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveHeat(jTime, kSurf);
+                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveHeat(jTime, kSurf);
                         }
                     }
                     {
                         IOFlags flags;
                         flags.ADVANCE("YES");
-                        gio::write(OutputFileInits, "()", flags);
+                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
                     } // put a line feed at the end of the line
                 }
             }
@@ -15617,7 +15617,7 @@ namespace OutputReportTabular {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<gio::Fmt> formDigits({0, 9},
+        static Array1D<ObjexxFCL::gio::Fmt> formDigits({0, 9},
                                             {"(F12.0)",
                                              "(F12.1)",
                                              "(F12.2)",
@@ -15643,7 +15643,7 @@ namespace OutputReportTabular {
                                                    9.0}); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) |
                                                           // maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) |
                                                           // maxvalDigits(8) | maxvalDigits(9)
-        static gio::Fmt fmtd("(E12.6)");
+        static ObjexxFCL::gio::Fmt fmtd("(E12.6)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -15660,9 +15660,9 @@ namespace OutputReportTabular {
         if (nDigits < 0) nDigits = 0;
 
         if (std::abs(RealIn) > maxvalDigits(nDigits)) {
-            gio::write(StringOut, fmtd) << RealIn;
+            ObjexxFCL::gio::write(StringOut, fmtd) << RealIn;
         } else {
-            gio::write(StringOut, formDigits(nDigits)) << RealIn;
+            ObjexxFCL::gio::write(StringOut, formDigits(nDigits)) << RealIn;
         }
         //  WRITE(FMT=, UNIT=stringOut) RealIn
         // check if it did not fit
@@ -15688,7 +15688,7 @@ namespace OutputReportTabular {
         // Return value
         std::string StringOut;
 
-        gio::write(StringOut, fmtLD) << intIn;
+        ObjexxFCL::gio::write(StringOut, fmtLD) << intIn;
         return StringOut;
     }
 
@@ -15708,7 +15708,7 @@ namespace OutputReportTabular {
 
         {
             IOFlags flags;
-            gio::read(stringIn, fmtLD, flags) >> realValue;
+            ObjexxFCL::gio::read(stringIn, fmtLD, flags) >> realValue;
             if (flags.err()) goto Label900;
         }
         return realValue;
@@ -15737,7 +15737,7 @@ namespace OutputReportTabular {
 
         // Locals
         // ((month*100 + day)*100 + hour)*100 + minute
-        static gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
 
         int Month;  // month in integer format (1-12)
         int Day;    // day in integer format (1-31)
@@ -15779,7 +15779,7 @@ namespace OutputReportTabular {
             } else {
                 monthName = "***";
             }
-            gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
+            ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
             if (has(StringOut, "*")) {
                 StringOut = "-";
             }
