@@ -5924,7 +5924,6 @@ namespace HeatBalanceSurfaceManager {
         //  CHARACTER(len=25):: ErrMsg
         //  CHARACTER(len=5) :: TimeStmp
         static int ErrCount(0);
-        int PipeNum;  // TDD pipe object number
         int SurfNum2; // TDD:DIFFUSER object number
         Real64 Ueff;  // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 
@@ -6484,7 +6483,7 @@ namespace HeatBalanceSurfaceManager {
 
                         if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                             // Lookup up the TDD:DOME object
-                            PipeNum = FindTDDPipe(SurfNum);
+                            int PipeNum = FindTDDPipe(SurfNum);
                             SurfNum2 = TDDPipe(PipeNum).Dome;
                             Ueff = 1.0 / TDDPipe(PipeNum).Reff;
 
@@ -6521,18 +6520,6 @@ namespace HeatBalanceSurfaceManager {
                                 (Sigma_Temp_4 - (SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
                                                  QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)));
                             WinLossSWZoneToOutWinRep(SurfNum) = QS(surface.Zone) * surface.Area * Construct(surface.Construction).TransDiff;
-                            if (WinHeatGain(SurfNum) >= 0.0) {
-                                WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                                WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZoneSec;
-                            } else {
-                                WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                                WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZoneSec;
-                            }
-                            WinHeatTransferRepEnergy(SurfNum) = WinHeatGain(SurfNum) * TimeStepZoneSec;
-
-                            TDDPipe(PipeNum).HeatGain = WinHeatGainRep(SurfNum);
-                            TDDPipe(PipeNum).HeatLoss = WinHeatLossRep(SurfNum);
-
                         } else {                             // Regular window
                             if (InsideSurfIterations == 0) { // Do windows only once
                                 if (SurfaceWindow(SurfNum).StormWinFlag == 1) ConstrNum = surface.StormWinConstruction;
@@ -6607,15 +6594,6 @@ namespace HeatBalanceSurfaceManager {
                                 // Following call determines inside surface temperature of glazing, and of
                                 // frame and/or divider, if present
                                 CalcWindowHeatBalance(SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
-                                if (WinHeatGain(SurfNum) >= 0.0) {
-                                    WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                                    WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZoneSec;
-                                } else {
-                                    WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                                    WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZoneSec;
-                                }
-
-                                WinHeatTransferRepEnergy(SurfNum) = WinHeatGain(SurfNum) * TimeStepZoneSec;
 
                                 TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
                             }
@@ -6816,42 +6794,6 @@ namespace HeatBalanceSurfaceManager {
                                                                                       // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
                     SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum);
                 }
-            }
-        }
-
-        // Calculate ZoneWinHeatGain/Loss
-        if (!PartialResimulate) {
-            ZoneWinHeatGain = 0.0;
-            ZoneWinHeatGainRep = 0.0;
-            ZoneWinHeatGainRepEnergy = 0.0;
-            ZoneWinHeatLossRep = 0.0;
-            ZoneWinHeatLossRepEnergy = 0.0;
-        } else {
-            ZoneWinHeatGain(ZoneToResimulate) = 0.0;
-            ZoneWinHeatGainRep(ZoneToResimulate) = 0.0;
-            ZoneWinHeatGainRepEnergy(ZoneToResimulate) = 0.0;
-            ZoneWinHeatLossRep(ZoneToResimulate) = 0.0;
-            ZoneWinHeatLossRepEnergy(ZoneToResimulate) = 0.0;
-        }
-
-        for (std::vector<int>::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate;
-             ++iSurfToResimulate) { // Perform a heat balance on all of the relevant inside surfaces...
-            SurfNum = SurfToResimulate[iSurfToResimulate];
-            if (!Surface(SurfNum).ExtSolar) continue; // WindowManager's definition of ZoneWinHeatGain/Loss
-            if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
-            ZoneNum = Surface(SurfNum).Zone;
-            if (ZoneNum == 0) continue;
-            ZoneWinHeatGain(ZoneNum) += WinHeatGain(SurfNum);
-        }
-        for (int ZoneNum = (PartialResimulate ? ZoneToResimulate() : 1), ZoneNum_end = (PartialResimulate ? ZoneToResimulate() : NumOfZones);
-             ZoneNum <= ZoneNum_end;
-             ++ZoneNum) {
-            if (ZoneWinHeatGain(ZoneNum) >= 0.0) {
-                ZoneWinHeatGainRep(ZoneNum) = ZoneWinHeatGain(ZoneNum);
-                ZoneWinHeatGainRepEnergy(ZoneNum) = ZoneWinHeatGainRep(ZoneNum) * TimeStepZoneSec;
-            } else {
-                ZoneWinHeatLossRep(ZoneNum) = -ZoneWinHeatGain(ZoneNum);
-                ZoneWinHeatLossRepEnergy(ZoneNum) = ZoneWinHeatLossRep(ZoneNum) * TimeStepZoneSec;
             }
         }
 
