@@ -679,8 +679,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
-    HeatTransferAlgosUsed.allocate(1);
-    HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    AnyCTF = true;
     SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
