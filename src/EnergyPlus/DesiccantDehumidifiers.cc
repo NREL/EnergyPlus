@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1768,12 +1768,12 @@ namespace DesiccantDehumidifiers {
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
                                             DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
                     if (ErrorFlag) {
                         ShowFatalError("InitDesiccantDehumidifier: Program terminated for previous conditions.");
                     }
@@ -1798,12 +1798,12 @@ namespace DesiccantDehumidifiers {
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
                                             DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            ErrorFlag);
+                                            _);
 
                     if (ErrorFlag) {
                         ShowFatalError("InitDesiccantDehumidifier: Program terminated for previous conditions.");
@@ -2588,7 +2588,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
         // min vol flow per rated evaporator capacity
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3046,14 +3046,14 @@ namespace DesiccantDehumidifiers {
             VolFlowPerRatedTotQ = (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
                                   max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit));
             if (!WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
-                gio::write(VolFlowChar, fmtLD) << VolFlowPerRatedTotQ;
+                ObjexxFCL::gio::write(VolFlowChar, fmtLD) << VolFlowPerRatedTotQ;
                 ++DesicDehum(DesicDehumNum).ErrCount;
                 if (DesicDehum(DesicDehumNum).ErrCount < 2) {
                     ShowWarningError(DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
                                      "\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at " +
                                      VolFlowChar + " m3/s/W.");
                     ShowContinueErrorTimeStamp("");
-                    gio::write(MinVol, fmtLD) << MinVolFlowPerRatedTotQ;
+                    ObjexxFCL::gio::write(MinVol, fmtLD) << MinVolFlowPerRatedTotQ;
                     ShowContinueError("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [" + MinVol + ']');
                     ShowContinueError("Possible causes include inconsistent air flow rates in system components ");
                     ShowContinueError("on the regeneration side of the desiccant dehumidifier.");

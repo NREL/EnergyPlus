@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -329,6 +329,40 @@ TEST_F(InputProcessorFixture, decode_encode_3)
       "  10.0;",
       ""
     }));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
+TEST_F(InputProcessorFixture, byte_order_mark)
+{
+    auto const idf(delimited_string(
+            {
+                    "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+            }));
+
+    auto const expected(delimited_string(
+            {
+                    "Building,",
+                    "  Bldg,",
+                    "  0.0,",
+                    "  Suburbs,",
+                    "  0.04,",
+                    "  0.4,",
+                    "  FullExterior,",
+                    "  25.0,",
+                    "  6.0;",
+                    "",
+                    "GlobalGeometryRules,",
+                    "  UpperLeftCorner,",
+                    "  Counterclockwise,",
+                    "  Relative,",
+                    "  Relative,",
+                    "  Relative;",
+                    ""
+            }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -993,7 +1027,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
             }
         }
     }
-    json::parse(epJSON.dump(2));
+    auto const output = json::parse(epJSON.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1106,7 +1140,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
         }
     }
 
-    json::parse(epJSON.dump(2));
+    auto const output = json::parse(epJSON.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1474,7 +1508,7 @@ TEST_F(InputProcessorFixture, non_existent_keys)
 
     };
 
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 2ul);
@@ -1518,7 +1552,7 @@ TEST_F(InputProcessorFixture, required_fields_required_extensibles_and_missing_e
             {"maximum_number_of_warmup_days", 25},
             {"minimum_number_of_warmup_days", 6}}}}}};
 
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 4ul);
@@ -1572,7 +1606,7 @@ TEST_F(InputProcessorFixture, min_and_max_validation)
             {"daylighting_reference_point_coordinate_system", "Relative"},
             {"rectangular_surface_coordinate_system", "Relative"}}}}},
     };
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 5ul);
@@ -2876,7 +2910,10 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-        "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2958,9 +2995,9 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
 
-    EXPECT_EQ(2, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false}), lNumericBlanks2));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1}), Numbers2));
+    EXPECT_EQ(4, NumNumbers2);
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, true, true}), lNumericBlanks2));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1, 1, 1}), Numbers2));
     EXPECT_EQ(1, IOStatus);
 }
 

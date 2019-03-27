@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3271,8 +3271,8 @@ namespace CurveManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3311,12 +3311,12 @@ namespace CurveManager {
         non_adv.na_on(); // For non-advancing list-directed output
 
         // Formats
-        static gio::Fmt Format_140("('! Reading external file tabular data for ',A,' \"',A,'\"')");
-        static gio::Fmt Format_150("('! Reading tabular data for ',A,' \"',A,'\"')");
-        static gio::Fmt Format_110("('! <READING LOOKUP TABLE DATA>')");
-        static gio::Fmt Format_130("('READING LOOKUP TABLE DATA')");
-        static gio::Fmt Format_131("('END READING LOOKUP TABLE DATA')");
-        static gio::Fmt Format_160("(1X,10(I2,:,2X))");
+        static ObjexxFCL::gio::Fmt Format_140("('! Reading external file tabular data for ',A,' \"',A,'\"')");
+        static ObjexxFCL::gio::Fmt Format_150("('! Reading tabular data for ',A,' \"',A,'\"')");
+        static ObjexxFCL::gio::Fmt Format_110("('! <READING LOOKUP TABLE DATA>')");
+        static ObjexxFCL::gio::Fmt Format_130("('READING LOOKUP TABLE DATA')");
+        static ObjexxFCL::gio::Fmt Format_131("('END READING LOOKUP TABLE DATA')");
+        static ObjexxFCL::gio::Fmt Format_160("(1X,10(I2,:,2X))");
 
         // Autodesk:Uninit Initialize variables used uninitialized
         TotalDataSets = 0; // Autodesk:Uninit Force default initialization
@@ -3331,16 +3331,16 @@ namespace CurveManager {
             {
                 IOFlags flags;
                 flags.ACTION("read");
-                gio::open(FileNum, TempFullFileName, flags);
+                ObjexxFCL::gio::open(FileNum, TempFullFileName, flags);
                 if (flags.err()) goto Label999;
             }
-            gio::read(FileNum, fmtA) >> NextLine;
+            ObjexxFCL::gio::read(FileNum, fmtA) >> NextLine;
             trim(NextLine);
             endcol = len(NextLine);
             if (endcol == 0) {
                 ShowWarningError("ReadTableData: Blank line found in external file = " + FileName);
                 ShowContinueError("...Blank lines are not allowed. Will try to read next line.");
-                gio::read(FileNum, fmtA) >> NextLine;
+                ObjexxFCL::gio::read(FileNum, fmtA) >> NextLine;
                 trim(NextLine);
                 endcol = len(NextLine);
                 if (endcol == 0) {
@@ -3361,11 +3361,11 @@ namespace CurveManager {
                 }
             }
 
-            gio::rewind(FileNum);
+            ObjexxFCL::gio::rewind(FileNum);
 
             {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars;
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars;
                 ReadStat = flags.ios();
             }
             if (NumIVars > 6 || NumIVars < 1) {
@@ -3374,39 +3374,39 @@ namespace CurveManager {
                 ShowFatalError("...Only 1 to  independent variables are allowed.");
             }
 
-            gio::rewind(FileNum);
+            ObjexxFCL::gio::rewind(FileNum);
 
             if (NumIVars == 1) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars;
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars;
                 ReadStat = flags.ios();
             };
             if (NumIVars == 2) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars;
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars;
                 ReadStat = flags.ios();
             };
             if (NumIVars == 3) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
                     TableLookup(TableNum).NumX3Vars;
                 ReadStat = flags.ios();
             };
             if (NumIVars == 4) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
                     TableLookup(TableNum).NumX3Vars >> TableLookup(TableNum).NumX4Vars;
                 ReadStat = flags.ios();
             };
             if (NumIVars == 5) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
                     TableLookup(TableNum).NumX3Vars >> TableLookup(TableNum).NumX4Vars >> TableLookup(TableNum).NumX5Vars;
                 ReadStat = flags.ios();
             };
             if (NumIVars == 6) {
                 IOFlags flags;
-                gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
+                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> NumIVars >> TableLookup(TableNum).NumX1Vars >> TableLookup(TableNum).NumX2Vars >>
                     TableLookup(TableNum).NumX3Vars >> TableLookup(TableNum).NumX4Vars >> TableLookup(TableNum).NumX5Vars >>
                     TableLookup(TableNum).NumX6Vars;
                 ReadStat = flags.ios();
@@ -3418,20 +3418,20 @@ namespace CurveManager {
             // Echo table data for user verification
             if (EchoTableDataToEio) {
                 if (WriteHeaderOnce) {
-                    gio::write(OutputFileInits, Format_110);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_110);
                     WriteHeaderOnce = false;
                 }
-                gio::write(OutputFileInits, Format_130);
-                gio::write(OutputFileInits, Format_140) << CurrentModuleObject << Alphas(1);
+                ObjexxFCL::gio::write(OutputFileInits, Format_130);
+                ObjexxFCL::gio::write(OutputFileInits, Format_140) << CurrentModuleObject << Alphas(1);
             }
         } else {
             if (EchoTableDataToEio) {
                 if (WriteHeaderOnce) {
-                    gio::write(OutputFileInits, Format_110);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_110);
                     WriteHeaderOnce = false;
                 }
-                gio::write(OutputFileInits, Format_130);
-                gio::write(OutputFileInits, Format_150) << CurrentModuleObject << Alphas(1);
+                ObjexxFCL::gio::write(OutputFileInits, Format_130);
+                ObjexxFCL::gio::write(OutputFileInits, Format_150) << CurrentModuleObject << Alphas(1);
             }
             NumIVars = Numbers(17);
             if (NumIVars > 6 || NumIVars < 1) {
@@ -3452,26 +3452,26 @@ namespace CurveManager {
 
         if (EchoTableDataToEio) {
             if (NumIVars == 1) {
-                gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars;
+                ObjexxFCL::gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars;
             } else if (NumIVars == 2) {
-                gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars;
+                ObjexxFCL::gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars;
             } else if (NumIVars == 3) {
-                gio::write(CharTableData, Format_160)
+                ObjexxFCL::gio::write(CharTableData, Format_160)
                     << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars << TableLookup(TableNum).NumX3Vars;
             } else if (NumIVars == 4) {
-                gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars
+                ObjexxFCL::gio::write(CharTableData, Format_160) << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars
                                                       << TableLookup(TableNum).NumX3Vars << TableLookup(TableNum).NumX4Vars;
             } else if (NumIVars == 5) {
-                gio::write(CharTableData, Format_160)
+                ObjexxFCL::gio::write(CharTableData, Format_160)
                     << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars << TableLookup(TableNum).NumX3Vars
                     << TableLookup(TableNum).NumX4Vars << TableLookup(TableNum).NumX5Vars;
             } else if (NumIVars == 6) {
-                gio::write(CharTableData, Format_160)
+                ObjexxFCL::gio::write(CharTableData, Format_160)
                     << NumIVars << TableLookup(TableNum).NumX1Vars << TableLookup(TableNum).NumX2Vars << TableLookup(TableNum).NumX3Vars
                     << TableLookup(TableNum).NumX4Vars << TableLookup(TableNum).NumX5Vars << TableLookup(TableNum).NumX6Vars;
             }
 
-            gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
         }
 
         TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
@@ -3487,16 +3487,16 @@ namespace CurveManager {
                 {
                     IOFlags flags;
                     for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                        gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X1Var(I);
+                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X1Var(I);
                     }
                     ReadStat = flags.ios();
                 }
 
                 if (EchoTableDataToEio) {
                     for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                        gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X1Var(I);
+                        ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X1Var(I);
                     }
-                    gio::write(OutputFileInits);
+                    ObjexxFCL::gio::write(OutputFileInits);
                 }
 
                 if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3511,9 +3511,9 @@ namespace CurveManager {
 
                     if (EchoTableDataToEio) {
                         for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                            gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X1Var(I);
+                            ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X1Var(I);
                         }
-                        gio::write(OutputFileInits);
+                        ObjexxFCL::gio::write(OutputFileInits);
                     }
 
                 } else {
@@ -3539,16 +3539,16 @@ namespace CurveManager {
                     {
                         IOFlags flags;
                         for (I = 1; I <= TableLookup(TableNum).NumX2Vars; ++I) {
-                            gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X2Var(I);
+                            ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X2Var(I);
                         }
                         ReadStat = flags.ios();
                     }
 
                     if (EchoTableDataToEio) {
                         for (I = 1; I <= TableLookup(TableNum).NumX2Vars; ++I) {
-                            gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X2Var(I);
+                            ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X2Var(I);
                         }
-                        gio::write(OutputFileInits);
+                        ObjexxFCL::gio::write(OutputFileInits);
                     }
 
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3561,9 +3561,9 @@ namespace CurveManager {
 
                         if (EchoTableDataToEio) {
                             for (I = 1; I <= TableLookup(TableNum).NumX2Vars; ++I) {
-                                gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X2Var(I);
+                                ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X2Var(I);
                             }
-                            gio::write(OutputFileInits);
+                            ObjexxFCL::gio::write(OutputFileInits);
                         }
 
                     } else {
@@ -3589,16 +3589,16 @@ namespace CurveManager {
                         {
                             IOFlags flags;
                             for (I = 1; I <= TableLookup(TableNum).NumX3Vars; ++I) {
-                                gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X3Var(I);
+                                ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X3Var(I);
                             }
                             ReadStat = flags.ios();
                         }
 
                         if (EchoTableDataToEio) {
                             for (I = 1; I <= TableLookup(TableNum).NumX3Vars; ++I) {
-                                gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X3Var(I);
+                                ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X3Var(I);
                             }
-                            gio::write(OutputFileInits);
+                            ObjexxFCL::gio::write(OutputFileInits);
                         }
 
                         if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3614,9 +3614,9 @@ namespace CurveManager {
 
                             if (EchoTableDataToEio) {
                                 for (I = 1; I <= TableLookup(TableNum).NumX3Vars; ++I) {
-                                    gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X3Var(I);
+                                    ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X3Var(I);
                                 }
-                                gio::write(OutputFileInits);
+                                ObjexxFCL::gio::write(OutputFileInits);
                             }
 
                         } else {
@@ -3644,7 +3644,7 @@ namespace CurveManager {
                                 IOFlags flags;
 
                                 for (I = 1; I <= TableLookup(TableNum).NumX4Vars; ++I) {
-                                    gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X4Var(I);
+                                    ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X4Var(I);
                                 }
                                 ReadStat = flags.ios();
                             }
@@ -3652,9 +3652,9 @@ namespace CurveManager {
                             if (EchoTableDataToEio) {
                                 TableLookup(TableNum).X4Var(I);
                                 for (I = 1; I <= TableLookup(TableNum).NumX4Vars; ++I) {
-                                    gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X4Var(I);
+                                    ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X4Var(I);
                                 }
-                                gio::write(OutputFileInits);
+                                ObjexxFCL::gio::write(OutputFileInits);
                             }
 
                             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3670,9 +3670,9 @@ namespace CurveManager {
 
                                 if (EchoTableDataToEio) {
                                     for (I = 1; I <= TableLookup(TableNum).NumX4Vars; ++I) {
-                                        gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X4Var(I);
+                                        ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X4Var(I);
                                     }
-                                    gio::write(OutputFileInits);
+                                    ObjexxFCL::gio::write(OutputFileInits);
                                 }
 
                             } else {
@@ -3698,16 +3698,16 @@ namespace CurveManager {
                                 {
                                     IOFlags flags;
                                     for (I = 1; I <= TableLookup(TableNum).NumX5Vars; ++I) {
-                                        gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X5Var(I);
+                                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X5Var(I);
                                     }
                                     ReadStat = flags.ios();
                                 }
 
                                 if (EchoTableDataToEio) {
                                     for (I = 1; I <= TableLookup(TableNum).NumX5Vars; ++I) {
-                                        gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X5Var(I);
+                                        ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X5Var(I);
                                     }
-                                    gio::write(OutputFileInits);
+                                    ObjexxFCL::gio::write(OutputFileInits);
                                 }
 
                                 if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3725,9 +3725,9 @@ namespace CurveManager {
 
                                     if (EchoTableDataToEio) {
                                         for (I = 1; I <= TableLookup(TableNum).NumX5Vars; ++I) {
-                                            gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X5Var(I);
+                                            ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X5Var(I);
                                         }
-                                        gio::write(OutputFileInits);
+                                        ObjexxFCL::gio::write(OutputFileInits);
                                     }
 
                                 } else {
@@ -3752,16 +3752,16 @@ namespace CurveManager {
                                     {
                                         IOFlags flags;
                                         for (I = 1; I <= TableLookup(TableNum).NumX6Vars; ++I) {
-                                            gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X6Var(I);
+                                            ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> TableLookup(TableNum).X6Var(I);
                                         }
                                         ReadStat = flags.ios();
                                     }
 
                                     if (EchoTableDataToEio) {
                                         for (I = 1; I <= TableLookup(TableNum).NumX6Vars; ++I) {
-                                            gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X6Var(I);
+                                            ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X6Var(I);
                                         }
-                                        gio::write(OutputFileInits);
+                                        ObjexxFCL::gio::write(OutputFileInits);
                                     }
 
                                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3780,9 +3780,9 @@ namespace CurveManager {
 
                                         if (EchoTableDataToEio) {
                                             for (I = 1; I <= TableLookup(TableNum).NumX6Vars; ++I) {
-                                                gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X6Var(I);
+                                                ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv) << TableLookup(TableNum).X6Var(I);
                                             }
-                                            gio::write(OutputFileInits);
+                                            ObjexxFCL::gio::write(OutputFileInits);
                                         }
 
                                     } else {
@@ -3857,13 +3857,13 @@ namespace CurveManager {
 
                     {
                         IOFlags flags;
-                        gio::read(FileNum, fmtLD, flags) >> Var3;
+                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> Var3;
                         ReadStat = flags.ios();
                     }
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
 
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3873,8 +3873,8 @@ namespace CurveManager {
                     ++NumbersOffset;
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
                 }
             } else if (NumIVars == 4) {
@@ -3882,13 +3882,13 @@ namespace CurveManager {
 
                     {
                         IOFlags flags;
-                        gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4;
+                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4;
                         ReadStat = flags.ios();
                     }
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
 
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3899,8 +3899,8 @@ namespace CurveManager {
                     NumbersOffset += 2;
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
                 }
             } else if (NumIVars == 5) {
@@ -3908,13 +3908,13 @@ namespace CurveManager {
 
                     {
                         IOFlags flags;
-                        gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4 >> Var5;
+                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4 >> Var5;
                         ReadStat = flags.ios();
                     }
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
 
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3926,8 +3926,8 @@ namespace CurveManager {
                     NumbersOffset += 3;
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
                 }
             } else if (NumIVars == 6) {
@@ -3935,13 +3935,13 @@ namespace CurveManager {
 
                     {
                         IOFlags flags;
-                        gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4 >> Var5 >> Var6;
+                        ObjexxFCL::gio::read(FileNum, fmtLD, flags) >> Var3 >> Var4 >> Var5 >> Var6;
                         ReadStat = flags.ios();
                     }
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
 
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -3954,8 +3954,8 @@ namespace CurveManager {
                     NumbersOffset += 4;
 
                     if (EchoTableDataToEio) {
-                        gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
-                        gio::write(OutputFileInits, fmtA) << trim(CharTableData);
+                        ObjexxFCL::gio::write(CharTableData, fmtLD) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << trim(CharTableData);
                     }
                 }
             }
@@ -4093,7 +4093,7 @@ namespace CurveManager {
                             {
                                 IOFlags flags;
                                 for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                                    gio::read(FileNum, fmtLD, flags) >>
+                                    ObjexxFCL::gio::read(FileNum, fmtLD, flags) >>
                                         TableLookup(TableNum).TableLookupZData(Var6Index, Var5Index, Var4Index, Var3Index, J, I);
                                 }
                                 ReadStat = flags.ios();
@@ -4118,7 +4118,7 @@ namespace CurveManager {
                             {
                                 IOFlags flags;
                                 for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                                    gio::read(FileNum, fmtLD, flags) >>
+                                    ObjexxFCL::gio::read(FileNum, fmtLD, flags) >>
                                         TableLookup(TableNum).TableLookupZData(Var6Index, Var5Index, Var4Index, Var3Index, J, I);
                                 }
                                 ReadStat = flags.ios();
@@ -4146,7 +4146,7 @@ namespace CurveManager {
                             {
                                 IOFlags flags;
                                 for (I = TableLookup(TableNum).NumX1Vars; I >= 1; --I) {
-                                    gio::read(FileNum, fmtLD, flags) >>
+                                    ObjexxFCL::gio::read(FileNum, fmtLD, flags) >>
                                         TableLookup(TableNum).TableLookupZData(Var6Index, Var5Index, Var4Index, Var3Index, J, I);
                                 }
                                 ReadStat = flags.ios();
@@ -4170,7 +4170,7 @@ namespace CurveManager {
                             {
                                 IOFlags flags;
                                 for (I = TableLookup(TableNum).NumX1Vars; I >= 1; --I) {
-                                    gio::read(FileNum, fmtLD, flags) >>
+                                    ObjexxFCL::gio::read(FileNum, fmtLD, flags) >>
                                         TableLookup(TableNum).TableLookupZData(Var6Index, Var5Index, Var4Index, Var3Index, J, I);
                                 }
                                 ReadStat = flags.ios();
@@ -4194,10 +4194,10 @@ namespace CurveManager {
                 // write data to eio file in ascending order
                 if (EchoTableDataToEio) {
                     for (I = 1; I <= TableLookup(TableNum).NumX1Vars; ++I) {
-                        gio::write(OutputFileInits, fmtLD, non_adv)
+                        ObjexxFCL::gio::write(OutputFileInits, fmtLD, non_adv)
                             << TableLookup(TableNum).TableLookupZData(Var6Index, Var5Index, Var4Index, Var3Index, J, I);
                     }
-                    gio::write(OutputFileInits);
+                    ObjexxFCL::gio::write(OutputFileInits);
                 }
 
                 // normalize the data according to the user entered normal point
@@ -4210,12 +4210,12 @@ namespace CurveManager {
         }
 
         if (EchoTableDataToEio) {
-            gio::write(OutputFileInits, Format_131);
+            ObjexxFCL::gio::write(OutputFileInits, Format_131);
         }
 
     Label1000:;
         EOFonFile = true;
-        if (ReadFromFile) gio::close(FileNum);
+        if (ReadFromFile) ObjexxFCL::gio::close(FileNum);
 
         if (TotalDataSets < DataSetCount) {
             ShowSevereError("GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve(CurveNum).Name + "\"");
@@ -5240,31 +5240,31 @@ namespace CurveManager {
         bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 
         // Formats
-        static gio::Fmt Format_110("('! <CREATING NEW CURVE OBJECT>')");
-        static gio::Fmt Format_130("('CREATING NEW CURVE OBJECT')");
-        static gio::Fmt Format_140("('! Input as ',A,' \"',A,'\"')");
-        static gio::Fmt Format_150("('! RSquared       = ',A)");
-        static gio::Fmt Format_160("('! Standard Error = ',A)");
-        static gio::Fmt Format_170("('! Sample Size    = ',A)");
-        static gio::Fmt Format_180("('Curve:',A,',')");
-        static gio::Fmt Format_190("('FromTable_',A,',  !- Name')");
-        static gio::Fmt Format_200("('  ',A,',  !- Coefficient1 Constant')");
-        static gio::Fmt Format_210("('  ',A,',  !- Coefficient2 x')");
-        static gio::Fmt Format_300("('  ',A,',  !- Minimum Value of x')");
-        static gio::Fmt Format_310("('  ',A,',  !- Maximum Value of x')");
-        static gio::Fmt Format_340("('  ',A,',  !- Minimum Curve Output')");
-        static gio::Fmt Format_350("('  ',A,';  !- Maximum Curve Output')");
-        static gio::Fmt Format_360("('END CREATING NEW CURVE OBJECT')");
-        static gio::Fmt Format_220("('  ',A,',  !- Coefficient3 x**2')");
-        static gio::Fmt Format_230("('  ',A,',  !- !- Coefficient4 x**3')");
-        static gio::Fmt Format_240("('  ',A,',  !- Coefficient4 y')");
-        static gio::Fmt Format_250("('  ',A,',  !- !- Coefficient5 x**4')");
-        static gio::Fmt Format_260("('  ',A,',  !- Coefficient5 y**2')");
-        static gio::Fmt Format_270("('  ',A,',  !- Coefficient5 xy')");
-        static gio::Fmt Format_280("('  ',A,',  !- Coefficient6 x*y')");
-        static gio::Fmt Format_290("('  ',A,',  !- Coefficient6 x**2y')");
-        static gio::Fmt Format_320("('  ',A,',  !- Minimum Value of y')");
-        static gio::Fmt Format_330("('  ',A,',  !- Maximum Value of y')");
+        static ObjexxFCL::gio::Fmt Format_110("('! <CREATING NEW CURVE OBJECT>')");
+        static ObjexxFCL::gio::Fmt Format_130("('CREATING NEW CURVE OBJECT')");
+        static ObjexxFCL::gio::Fmt Format_140("('! Input as ',A,' \"',A,'\"')");
+        static ObjexxFCL::gio::Fmt Format_150("('! RSquared       = ',A)");
+        static ObjexxFCL::gio::Fmt Format_160("('! Standard Error = ',A)");
+        static ObjexxFCL::gio::Fmt Format_170("('! Sample Size    = ',A)");
+        static ObjexxFCL::gio::Fmt Format_180("('Curve:',A,',')");
+        static ObjexxFCL::gio::Fmt Format_190("('FromTable_',A,',  !- Name')");
+        static ObjexxFCL::gio::Fmt Format_200("('  ',A,',  !- Coefficient1 Constant')");
+        static ObjexxFCL::gio::Fmt Format_210("('  ',A,',  !- Coefficient2 x')");
+        static ObjexxFCL::gio::Fmt Format_300("('  ',A,',  !- Minimum Value of x')");
+        static ObjexxFCL::gio::Fmt Format_310("('  ',A,',  !- Maximum Value of x')");
+        static ObjexxFCL::gio::Fmt Format_340("('  ',A,',  !- Minimum Curve Output')");
+        static ObjexxFCL::gio::Fmt Format_350("('  ',A,';  !- Maximum Curve Output')");
+        static ObjexxFCL::gio::Fmt Format_360("('END CREATING NEW CURVE OBJECT')");
+        static ObjexxFCL::gio::Fmt Format_220("('  ',A,',  !- Coefficient3 x**2')");
+        static ObjexxFCL::gio::Fmt Format_230("('  ',A,',  !- !- Coefficient4 x**3')");
+        static ObjexxFCL::gio::Fmt Format_240("('  ',A,',  !- Coefficient4 y')");
+        static ObjexxFCL::gio::Fmt Format_250("('  ',A,',  !- !- Coefficient5 x**4')");
+        static ObjexxFCL::gio::Fmt Format_260("('  ',A,',  !- Coefficient5 y**2')");
+        static ObjexxFCL::gio::Fmt Format_270("('  ',A,',  !- Coefficient5 xy')");
+        static ObjexxFCL::gio::Fmt Format_280("('  ',A,',  !- Coefficient6 x*y')");
+        static ObjexxFCL::gio::Fmt Format_290("('  ',A,',  !- Coefficient6 x**2y')");
+        static ObjexxFCL::gio::Fmt Format_320("('  ',A,',  !- Minimum Value of y')");
+        static ObjexxFCL::gio::Fmt Format_330("('  ',A,',  !- Maximum Value of y')");
 
         EchoTableDataToEio = DisplayAdvancedReportVariables;
 
@@ -5617,23 +5617,23 @@ namespace CurveManager {
         // echo new curve object to eio file
         if (EchoTableDataToEio) {
             if (WriteHeaderOnce) {
-                gio::write(OutputFileInits, Format_110);
+                ObjexxFCL::gio::write(OutputFileInits, Format_110);
                 WriteHeaderOnce = false;
             }
 
-            gio::write(OutputFileInits, Format_130);
-            gio::write(OutputFileInits, Format_140) << TableType << CurveName;
-            gio::write(OutputFileInits, Format_150) << RoundSigDigits(RSquared, 10);
-            gio::write(OutputFileInits, Format_160) << RoundSigDigits(StandardError, 10);
-            gio::write(OutputFileInits, Format_170) << TrimSigDigits(N);
-            gio::write(OutputFileInits, Format_180) << StrCurve;
-            gio::write(OutputFileInits, Format_190) << CurveName;
-            gio::write(OutputFileInits, Format_200) << RoundSigDigits(Results(1), 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_130);
+            ObjexxFCL::gio::write(OutputFileInits, Format_140) << TableType << CurveName;
+            ObjexxFCL::gio::write(OutputFileInits, Format_150) << RoundSigDigits(RSquared, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_160) << RoundSigDigits(StandardError, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_170) << TrimSigDigits(N);
+            ObjexxFCL::gio::write(OutputFileInits, Format_180) << StrCurve;
+            ObjexxFCL::gio::write(OutputFileInits, Format_190) << CurveName;
+            ObjexxFCL::gio::write(OutputFileInits, Format_200) << RoundSigDigits(Results(1), 10);
             {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic) ||
                     (SELECT_CASE_var == BiQuadratic) || (SELECT_CASE_var == QuadraticLinear)) {
-                    gio::write(OutputFileInits, Format_210) << RoundSigDigits(Results(2), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_210) << RoundSigDigits(Results(2), 10);
                 } else {
                 }
             }
@@ -5641,53 +5641,53 @@ namespace CurveManager {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if ((SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic) ||
                     (SELECT_CASE_var == BiQuadratic) || (SELECT_CASE_var == QuadraticLinear)) {
-                    gio::write(OutputFileInits, Format_220) << RoundSigDigits(Results(3), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_220) << RoundSigDigits(Results(3), 10);
                 } else {
                 }
             }
             {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if ((SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic)) {
-                    gio::write(OutputFileInits, Format_230) << RoundSigDigits(Results(4), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_230) << RoundSigDigits(Results(4), 10);
                 } else if ((SELECT_CASE_var == BiQuadratic) || (SELECT_CASE_var == QuadraticLinear)) {
-                    gio::write(OutputFileInits, Format_240) << RoundSigDigits(Results(4), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_240) << RoundSigDigits(Results(4), 10);
                 } else {
                 }
             }
             {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if (SELECT_CASE_var == Quartic) {
-                    gio::write(OutputFileInits, Format_250) << RoundSigDigits(Results(5), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_250) << RoundSigDigits(Results(5), 10);
                 } else if (SELECT_CASE_var == BiQuadratic) {
-                    gio::write(OutputFileInits, Format_260) << RoundSigDigits(Results(5), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_260) << RoundSigDigits(Results(5), 10);
                 } else if (SELECT_CASE_var == QuadraticLinear) {
-                    gio::write(OutputFileInits, Format_270) << RoundSigDigits(Results(5), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_270) << RoundSigDigits(Results(5), 10);
                 } else {
                 }
             }
             {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if (SELECT_CASE_var == BiQuadratic) {
-                    gio::write(OutputFileInits, Format_280) << RoundSigDigits(Results(6), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_280) << RoundSigDigits(Results(6), 10);
                 } else if (SELECT_CASE_var == QuadraticLinear) {
-                    gio::write(OutputFileInits, Format_290) << RoundSigDigits(Results(6), 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_290) << RoundSigDigits(Results(6), 10);
                 } else {
                 }
             }
-            gio::write(OutputFileInits, Format_300) << RoundSigDigits(MinX, 10);
-            gio::write(OutputFileInits, Format_310) << RoundSigDigits(MaxX, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_300) << RoundSigDigits(MinX, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_310) << RoundSigDigits(MaxX, 10);
             {
                 auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
                 if (SELECT_CASE_var == Quartic) {
                 } else if ((SELECT_CASE_var == BiQuadratic) || (SELECT_CASE_var == QuadraticLinear)) {
-                    gio::write(OutputFileInits, Format_320) << RoundSigDigits(MinX2, 10);
-                    gio::write(OutputFileInits, Format_330) << RoundSigDigits(MaxX2, 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_320) << RoundSigDigits(MinX2, 10);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_330) << RoundSigDigits(MaxX2, 10);
                 } else {
                 }
             }
-            gio::write(OutputFileInits, Format_340) << RoundSigDigits(MinY, 10);
-            gio::write(OutputFileInits, Format_350) << RoundSigDigits(MaxY, 10);
-            gio::write(OutputFileInits, Format_360);
+            ObjexxFCL::gio::write(OutputFileInits, Format_340) << RoundSigDigits(MinY, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_350) << RoundSigDigits(MaxY, 10);
+            ObjexxFCL::gio::write(OutputFileInits, Format_360);
         }
 
         // save results in performance curve structure

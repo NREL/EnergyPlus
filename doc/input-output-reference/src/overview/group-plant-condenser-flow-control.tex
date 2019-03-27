@@ -4,7 +4,7 @@ The connector list described earlier determines how the branches of a particular
 
 \subsection{Connector:Splitter, Connector:Mixer}\label{connectorsplitter-connectormixer}
 
-The format of both the \textbf{Connector:Splitter} and \textbf{Connector:Mixer} statements is similar. Both begin with an identifying name followed by the branch name of the ``single side'' of the component. In the case of the splitter, this is the inlet since the inlet stream is broken into several outlet streams. In the case of the mixer, this is the outlet since several streams are mixed together to form a single outlet. The remaining list of up to 50 names is simply the branch names of the outlet legs in the case of the splitter and inlet legs in the case of the mixer. No control logic is assume in these components---a determination of how much air to split in which direction using the splitter must be defined by other components.
+The format of both the \textbf{\hyperref[connectorsplitter]{Connector:Splitter}} and \textbf{\hyperref[connectormixer]{Connector:Mixer}} statements is similar. Both begin with an identifying name followed by the branch name of the ``single side'' of the component. In the case of the splitter, this is the inlet since the inlet stream is broken into several outlet streams. In the case of the mixer, this is the outlet since several streams are mixed together to form a single outlet. The remaining list of up to 50 names is simply the branch names of the outlet legs in the case of the splitter and inlet legs in the case of the mixer. No control logic is assume in these components---a determination of how much air to split in which direction using the splitter must be defined by other components.
 
 \subsection{Connector:Splitter}\label{connectorsplitter}
 
@@ -70,7 +70,7 @@ The TemperingValve object models a temperature-controlled diversion valve. It mo
 \caption{Tempering Valve Schematic \protect \label{fig:tempering-valve-schematic}}
 \end{figure}
 
-The TemperingValve is an \textbf{Active} component and the other path should have only \textbf{Passive} components. Only two paths in the splitter/mixer can be used; bypasses are not allowed. No other Connector:Splitter and Connector:Mixer pair can be used on the supply side of the plant loop.
+The TemperingValve is an \textbf{Active} component and the other path should have only \textbf{Passive} components. Only two paths in the splitter/mixer can be used; bypasses are not allowed. No other \hyperref[connectorsplitter]{Connector:Splitter} and \hyperref[connectormixer]{Connector:Mixer} pair can be used on the supply side of the plant loop.
 
 \subsubsection{Inputs}\label{inputs-2-029}
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2904,7 +2904,7 @@ namespace BranchInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2959,12 +2959,12 @@ namespace BranchInputManager {
         Array1D<BranchUniqueNodes> BranchNodes;
 
         // Formats
-        static gio::Fmt Format_700("('! <#Branch Lists>,<Number of Branch Lists>')");
-        static gio::Fmt Format_701("(A)");
-        static gio::Fmt Format_702("('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')");
-        static gio::Fmt Format_704(
+        static ObjexxFCL::gio::Fmt Format_700("('! <#Branch Lists>,<Number of Branch Lists>')");
+        static ObjexxFCL::gio::Fmt Format_701("(A)");
+        static ObjexxFCL::gio::Fmt Format_702("('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')");
+        static ObjexxFCL::gio::Fmt Format_704(
             "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')");
-        static gio::Fmt Format_706("('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')");
+        static ObjexxFCL::gio::Fmt Format_706("('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')");
 
         BranchReported.dimension(NumOfBranches, false);
 
@@ -2974,18 +2974,18 @@ namespace BranchInputManager {
 
         BranchNodes.allocate(NumOfBranches);
 
-        gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        gio::write(OutputFileBNDetails, Format_700);
-        gio::write(ChrOut, fmtLD) << NumOfBranchLists;
-        gio::write(OutputFileBNDetails, Format_701) << " #Branch Lists," + stripped(ChrOut);
-        gio::write(OutputFileBNDetails, Format_702);
-        gio::write(OutputFileBNDetails, Format_704);
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfBranchLists;
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Branch Lists," + stripped(ChrOut);
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_704);
 
         for (BCount = 1; BCount <= NumOfBranchLists; ++BCount) {
 
-            gio::write(ChrOut, fmtLD) << BCount;
-            gio::write(ChrOut1, fmtLD) << BranchList(BCount).NumOfBranchNames;
-            gio::write(OutputFileBNDetails, Format_701) << " Branch List," + stripped(ChrOut) + ',' + BranchList(BCount).Name + ',' +
+            ObjexxFCL::gio::write(ChrOut, fmtLD) << BCount;
+            ObjexxFCL::gio::write(ChrOut1, fmtLD) << BranchList(BCount).NumOfBranchNames;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Branch List," + stripped(ChrOut) + ',' + BranchList(BCount).Name + ',' +
                                                                BranchList(BCount).LoopName + ',' + BranchList(BCount).LoopType + ',' +
                                                                stripped(ChrOut1);
 
@@ -3020,7 +3020,7 @@ namespace BranchInputManager {
 
                 Found = FoundBranches(Count);
                 if (Found == 0) {
-                    gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + BranchList(BCount).BranchNames(Count) +
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + BranchList(BCount).BranchNames(Count) +
                                                                        "(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**";
                     continue;
                 }
@@ -3094,7 +3094,7 @@ namespace BranchInputManager {
                     BranchLoopName = Branch(Found).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + Branch(Found).Name + ',' + BranchLoopName + ',' +
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + Branch(Found).Name + ',' + BranchLoopName + ',' +
                                                                    BranchLoopType + ',' + BranchInletNodeName + ',' + BranchOutletNodeName;
             }
             if (MixedFluidTypesOnBranchList) {
@@ -3171,10 +3171,10 @@ namespace BranchInputManager {
             ++BCount;
         }
         if (BCount > 0) {
-            gio::write(OutputFileBNDetails, Format_706);
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_706);
             ChrOut = RoundSigDigits(BCount);
             //    WRITE(ChrOut,*) BCount
-            gio::write(OutputFileBNDetails, Format_701) << " #Orphaned Branches," + ChrOut;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Orphaned Branches," + ChrOut;
             ShowWarningError("There are orphaned Branches in input. See .bnd file for details.");
 
             BCount = 0;
@@ -3215,7 +3215,7 @@ namespace BranchInputManager {
                     BranchLoopName = Branch(Count).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                gio::write(OutputFileBNDetails, Format_701) << " Branch," + ChrOut + ',' + Branch(Count).Name + ',' + BranchLoopName + ',' +
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Branch," + ChrOut + ',' + Branch(Count).Name + ',' + BranchLoopName + ',' +
                                                                    BranchLoopType + ',' + BranchInletNodeName + ',' + BranchOutletNodeName;
             }
         }

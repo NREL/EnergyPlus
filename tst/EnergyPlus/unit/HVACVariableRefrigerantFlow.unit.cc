@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,8 +131,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     int VRFCond(1);            // index to VRF condenser
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,                         ",
         " VRF Heat Pump,           !- Name                                                          ",
         " ,                        !- Availability Schedule Name                                    ",
@@ -2143,7 +2141,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     std::string const idf_objects =
         delimited_string({" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
                           " 	 TU1 VRF DX Cooling Coil, !- Name							   ",
-                          " 	 VRFAvailSched,           !- Availability Schedule Name		   ",
+                          " 	 ,                        !- Availability Schedule Name		   ",
                           " 	 TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node		   ",
                           " 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
                           " 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
@@ -2473,8 +2471,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3195,8 +3191,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     int VRFTUNum(1);         // index to VRF terminal unit
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3821,7 +3815,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     Real64 CondVolFlowRate(0.0);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
         " ",
         "AirConditioner:VariableRefrigerantFlow,",
@@ -4777,8 +4770,6 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,8.4;",
 
         "  ScheduleTypeLimits,",
         "    Fraction,                !- Name",

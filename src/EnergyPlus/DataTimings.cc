@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -295,29 +295,29 @@ namespace DataTimings {
                 {
                     auto const SELECT_CASE_var(wprint);
                     if (SELECT_CASE_var == "PRINT_TIME0") {
-                        gio::write("(a80,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a80,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME1") {
-                        gio::write("(a70,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a70,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME2") {
-                        gio::write("(a60,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a60,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME2i") {
-                        gio::write("(a56,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        ObjexxFCL::gio::write("(a56,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
                     } else if (SELECT_CASE_var == "PRINT_TIME3") {
-                        gio::write("(a50,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a50,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME3i") {
-                        gio::write("(a46,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        ObjexxFCL::gio::write("(a46,i4,f10.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
                     } else if (SELECT_CASE_var == "PRINT_TIME4") {
-                        gio::write("(a40,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a40,f10.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIMEX") {
-                        gio::write("(a100,f16.6)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a100,f16.6)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINTES") {
-                        gio::write("(a80,es22.15)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a80,es22.15)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME_AF") {
-                        gio::write("(a55,10x,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
+                        ObjexxFCL::gio::write("(a55,10x,f16.4)") << ctimingElementstring << stoptime - Timing(found).rstartTime;
                     } else if (SELECT_CASE_var == "PRINT_TIME_AIF") {
-                        gio::write("(a55,i10,f16.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
+                        ObjexxFCL::gio::write("(a55,i10,f16.4)") << ctimingElementstring << Timing(found).calls << Timing(found).currentTimeSum;
                     } else {
-                        gio::write("*") << ctimingElementstring << Timing(found).currentTimeSum;
+                        ObjexxFCL::gio::write("*") << ctimingElementstring << Timing(found).currentTimeSum;
                     }
                 }
             }
@@ -361,7 +361,7 @@ namespace DataTimings {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -378,19 +378,19 @@ namespace DataTimings {
         int loop;
         int EchoInputFile;
         EchoInputFile = FindUnitNumber(outputAuditFile);
-        gio::write(EchoInputFile, fmtA) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
+        ObjexxFCL::gio::write(EchoInputFile, fmtA) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
         for (loop = 1; loop <= NumTimingElements; ++loop) {
             if (Timing(loop).calls > 0) {
-                gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
+                ObjexxFCL::gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
                                                        RoundSigDigits(Timing(loop).currentTimeSum, 3) + tabchar +
                                                        RoundSigDigits(Timing(loop).currentTimeSum / double(Timing(loop).calls), 3);
             } else {
-                gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
+                ObjexxFCL::gio::write(EchoInputFile, fmtA) << Timing(loop).Element + tabchar + RoundSigDigits(Timing(loop).calls) + tabchar +
                                                        RoundSigDigits(Timing(loop).currentTimeSum, 3) + tabchar + RoundSigDigits(-999.0, 3);
             }
         }
-        gio::write(EchoInputFile, fmtA) << "Time from CPU_Time" + tabchar + RoundSigDigits(TimeUsed_CPUTime, 3);
+        ObjexxFCL::gio::write(EchoInputFile, fmtA) << "Time from CPU_Time" + tabchar + RoundSigDigits(TimeUsed_CPUTime, 3);
 #endif
     }
 

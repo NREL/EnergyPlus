@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,7 +70,6 @@ namespace ZoneEquipmentManager {
 
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D<Real64> AvgData; // scratch array for storing averaged data
-    extern Array1D_int DefaultSimOrder;
     extern int NumOfTimeStepInDay; // number of zone time steps in a day
     extern bool GetZoneEquipmentInputFlag;
     extern bool SizeZoneEquipmentOneTimeFlag;
@@ -119,7 +118,7 @@ namespace ZoneEquipmentManager {
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration);
+    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder = false);
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
 
@@ -129,7 +128,7 @@ namespace ZoneEquipmentManager {
                                     Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
     );
 
-    void CalcZoneMassBalance();
+    void CalcZoneMassBalance(bool const FirstHVACIteration);
 
     void CalcZoneReturnFlows(int const ZoneNum,
                              Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate

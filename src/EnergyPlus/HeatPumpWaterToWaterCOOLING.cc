@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -299,19 +299,19 @@ namespace HeatPumpWaterToWaterCOOLING {
 
             GSHP(GSHPNum).LoadSideUACoeff = NumArray(8);
             if (NumArray(9) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Load Side Heat Transfer Coefficient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).SourceSideUACoeff = NumArray(9);
             if (NumArray(8) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Source Side Heat Transfer Coefficient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).CompPistonDisp = NumArray(10);
             if (NumArray(10) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(ModuleCompName + ":Compressor Piston displacement/Stroke = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -513,24 +513,24 @@ namespace HeatPumpWaterToWaterCOOLING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     GSHP(GSHPNum).WWHPPlantTypeOfNum,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             if (!errFlag) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
@@ -590,24 +590,24 @@ namespace HeatPumpWaterToWaterCOOLING {
                                     GSHP(GSHPNum).SourceLoopSideNum,
                                     GSHP(GSHPNum).SourceBranchNum,
                                     GSHP(GSHPNum).SourceCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
                                     TypeOf_HPWaterPECooling,
                                     GSHP(GSHPNum).LoadLoopNum,
                                     GSHP(GSHPNum).LoadLoopSideNum,
                                     GSHP(GSHPNum).LoadBranchNum,
                                     GSHP(GSHPNum).LoadCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGshp: Program terminated due to previous condition(s).");
             }
@@ -723,7 +723,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1066,19 +1066,19 @@ namespace HeatPumpWaterToWaterCOOLING {
                     ShowWarningError("HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + GSHP(GSHPNum).Name);
-                    gio::write(ErrString, fmtLD) << std::abs(100.0 * (QSource - initialQSource) / (initialQSource + SmallNum));
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (QSource - initialQSource) / (initialQSource + SmallNum));
                     ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QLoad;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QLoad;
                     ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QSource;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QSource;
                     ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
                     ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
                     ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
                     ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
                     ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
                 }
                 goto LOOPSourceEnth_exit;

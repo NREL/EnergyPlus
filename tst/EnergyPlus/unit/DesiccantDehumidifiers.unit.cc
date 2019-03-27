@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,7 +103,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     Real64 RegCoilCapacity(0.0);
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.4;",
 
         "  Building,",
         "    Building,                !- Name",
@@ -2866,8 +2865,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,8.4;",
-
         "  Timestep,6;",
 
         "  Building,",
@@ -4047,8 +4044,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     Real64 RegCoilCapacity(0.0);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,8.4;",
 
         "  Timestep,6;",
 
@@ -5476,7 +5471,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Timestep,6;",
 

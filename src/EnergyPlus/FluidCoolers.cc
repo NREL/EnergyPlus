@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1031,12 +1031,12 @@ namespace FluidCoolers {
                                     SimpleFluidCooler(FluidCoolerNum).LoopSideNum,
                                     SimpleFluidCooler(FluidCoolerNum).BranchNum,
                                     SimpleFluidCooler(FluidCoolerNum).CompNum,
+                                    ErrorsFound,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    ErrorsFound);
+                                    _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitFluidCooler: Program terminated due to previous condition(s).");
@@ -1411,7 +1411,7 @@ namespace FluidCoolers {
             }
         }
 
-        if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized) {
+        if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized && PlantFirstSizesOkayToFinalize) {
             if (PltSizCondNum > 0) {
                 if (PlantSizData(PltSizCondNum).DesVolFlowRate >= SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
@@ -2318,7 +2318,7 @@ namespace FluidCoolers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt LowTempFmt("(' ',F6.2)");
+        static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2366,8 +2366,8 @@ namespace FluidCoolers {
         LoopMinTemp = PlantLoop(LoopNum).MinTemp;
         if (OutletWaterTemp < LoopMinTemp && WaterMassFlowRate > 0.0) {
             ++SimpleFluidCooler(FluidCoolerNum).OutletWaterTempErrorCount;
-            gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
+            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
             strip(CharErrOut);
             if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTempErrorCount < 2) {
                 ShowWarningError(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\"");

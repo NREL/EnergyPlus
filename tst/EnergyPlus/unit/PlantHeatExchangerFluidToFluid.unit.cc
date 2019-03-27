@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,8 +80,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     // to 20.
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
-
         "Building,",
         "Plant Load Profile Example,  !- Name",
         "    0.0,                     !- North Axis {deg}",
@@ -1173,8 +1171,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     // still heats up to 20.
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
-
         "Building,",
         "Plant Load Profile Example,  !- Name",
         "    0.0,                     !- North Axis {deg}",

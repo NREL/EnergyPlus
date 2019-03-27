@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1279,14 +1279,14 @@ namespace HybridEvapCoolingModel {
         PartRuntimeFraction = PLVentRatio;
 
         if (SensibleRoomORZone > 0) {
-            PLSensibleCoolingRatio = abs(RequestedCoolingLoad) / abs(SensibleRoomORZone);
+            PLSensibleCoolingRatio = std::abs(RequestedCoolingLoad) / std::abs(SensibleRoomORZone);
         }
         if (PLSensibleCoolingRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLSensibleCoolingRatio;
         }
 
         if (SensibleRoomORZone < 0) {
-            PLSensibleHeatingRatio = abs(RequestedHeatingLoad) / abs(SensibleRoomORZone);
+            PLSensibleHeatingRatio = std::abs(RequestedHeatingLoad) / std::abs(SensibleRoomORZone);
         }
 
         if (PLSensibleHeatingRatio > PartRuntimeFraction) {
@@ -1294,7 +1294,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedDehumidificationLoad > 0) {
-            PLDehumidRatio = abs(RequestedDehumidificationLoad) / abs(LatentRoomORZone);
+            PLDehumidRatio = std::abs(RequestedDehumidificationLoad) / std::abs(LatentRoomORZone);
         }
 
         if (PLDehumidRatio > PartRuntimeFraction) {
@@ -1302,7 +1302,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedMoistureLoad > 0) {
-            PLHumidRatio = abs(RequestedMoistureLoad) / abs(LatentRoomORZone);
+            PLHumidRatio = std::abs(RequestedMoistureLoad) / std::abs(LatentRoomORZone);
         }
         if (PLHumidRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLHumidRatio;

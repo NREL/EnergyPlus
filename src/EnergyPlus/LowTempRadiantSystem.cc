@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1676,7 +1676,7 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
         static std::string const RoutineName("InitLowTempRadiantSystem");
-        static gio::Fmt fmtF102("(F10.2)");
+        static ObjexxFCL::gio::Fmt fmtF102("(F10.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
@@ -1758,15 +1758,15 @@ namespace LowTempRadiantSystem {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                          "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                          "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                     } else if (CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowSevereError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                         "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                         InitErrorsFound = true;
@@ -1793,12 +1793,12 @@ namespace LowTempRadiantSystem {
                                             HydrRadSys(RadSysNum).HWLoopSide,
                                             HydrRadSys(RadSysNum).HWBranchNum,
                                             HydrRadSys(RadSysNum).HWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1810,12 +1810,12 @@ namespace LowTempRadiantSystem {
                                             HydrRadSys(RadSysNum).CWLoopSide,
                                             HydrRadSys(RadSysNum).CWBranchNum,
                                             HydrRadSys(RadSysNum).CWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1836,12 +1836,12 @@ namespace LowTempRadiantSystem {
                                             CFloRadSys(RadSysNum).HWLoopSide,
                                             CFloRadSys(RadSysNum).HWBranchNum,
                                             CFloRadSys(RadSysNum).HWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             CFloRadSys(RadSysNum).HotWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
@@ -1853,12 +1853,12 @@ namespace LowTempRadiantSystem {
                                             CFloRadSys(RadSysNum).CWLoopSide,
                                             CFloRadSys(RadSysNum).CWBranchNum,
                                             CFloRadSys(RadSysNum).CWCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             CFloRadSys(RadSysNum).ColdWaterInNode,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
