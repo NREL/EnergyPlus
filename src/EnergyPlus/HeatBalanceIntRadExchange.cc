@@ -767,7 +767,7 @@ namespace HeatBalanceIntRadExchange {
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                     ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name;
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).ScriptF(Findex, SurfNum), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.ScriptF(Findex, SurfNum), 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
