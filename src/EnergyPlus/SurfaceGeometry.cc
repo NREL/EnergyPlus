@@ -7023,25 +7023,25 @@ namespace SurfaceGeometry {
         if (AnyCondFD) {
             AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            gio::write(OutputFileInits, Format_725)
+            ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (AnyEMPD) {
             AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
-            gio::write(OutputFileInits, Format_725)
+            ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (AnyHAMT) {
             AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
-            gio::write(OutputFileInits, Format_725)
+            ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (AnyKiva) {
             AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            gio::write(OutputFileInits, Format_725)
+            ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
 
