@@ -2178,6 +2178,18 @@ namespace DataHeatBalance {
         {
         }
     };
+    struct HeatReclaimHPCoilData
+    {
+        // Members
+        std::string Name;       // Name of WAHP Coil
+        std::string SourceType; // SourceType for WAHP Coil
+        Real64 AvailCapacity;   // Total available heat reclaim capacity
+
+        // Default Constructor
+        HeatReclaimHPCoilData() : AvailCapacity(0.0)
+        {
+        }
+    };
 
     struct AirReportVars
     {
@@ -2616,6 +2628,7 @@ namespace DataHeatBalance {
     extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;
