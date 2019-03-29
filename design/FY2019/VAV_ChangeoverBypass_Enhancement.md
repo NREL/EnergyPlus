@@ -9,8 +9,8 @@ Enhancement: VAV Changeover Bypass
 
 The existing AirloopHVAC:UnitaryHeatCool:VAVChangeoverBypass model, a constant volume flow system, uses a bypass duct to short-circuit excess supply air back to the inlet of the unit. The following figure from the Engineering Reference illustrates the use and location of the bypass duct. 
 
-<center>![Figure 1](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-Mods/doc/engineering-reference/media/image5053.png)</center>
-<center>Figure 1. Schematic of Changeover Bypass VAV Unitary System with Blow Through Fan</center>
+Figure 1: ![Figure 1](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-Mods/doc/engineering-reference/media/image5053.png)
+ Schematic of Changeover Bypass VAV Unitary System with Blow Through Fan
 
 With this configuration the treated supply air that bypasses the zones mixes with the return air prior to entering the outdoor air mixer. At the higher bypass fractions this can lead to unreasonably low or high air temperatures entering the OA mixing box. When the AirloopHVAC:OutdoorAirSystem is used external to this model (upstream of the Air Inlet Node in the previous figure), mixing the bypass air in this fashion (i.e., after the external OA Mixer) leads to unexpected economizer operation since the true mixed air temperature entering the external OA Mixer would be different had the bypass air been mixed prior to the external OA Mixer.
 
@@ -40,8 +40,8 @@ Tiejun Wu at Carrier was the first to notice this problem and last year offered 
 
 The solution to the above mentioned problem is to move the internal bypass duct away from the model and mix the bypass air using an AirloopHVAC:ReturnPlenum or AirloopHVAC:ZoneMixer (if a plenum is not used). Figure 2 represents the proposed enhancement to the Changeover Bypass model. The bypass duct leaves the system at the Bypass Duct Splitter Node and connects to existing air loop mixing objects.
 
-<center>![Figure 2](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-Mods/doc/engineering-reference/media/ChangeoverBypassVAV_ReturnPlenumOrMixer.png)</center>
-<center>Figure 2. Proposed changes to Changeover Bypass VAV Unitary System Model</center>
+Figure 2: ![Figure 2](https://github.com/NREL/EnergyPlus/tree/New-Feature-CBVAV-Mods/doc/engineering-reference/media/ChangeoverBypassVAV_ReturnPlenumOrMixer.PNG)
+ Proposed changes to Changeover Bypass VAV Unitary System Model
 
 
 ###Proposed Enhancement Summary:
