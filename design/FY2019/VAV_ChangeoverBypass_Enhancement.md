@@ -40,7 +40,7 @@ Tiejun Wu at Carrier was the first to notice this problem and last year offered 
 
 The solution to the above mentioned problem is to move the internal bypass duct away from the model and mix the bypass air using an AirloopHVAC:ReturnPlenum or AirloopHVAC:ZoneMixer (if a plenum is not used). Figure 2 represents the proposed enhancement to the Changeover Bypass model. The bypass duct leaves the system at the Bypass Duct Splitter Node and connects to existing air loop mixing objects.
 
-<center>![Figure 2](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-Mods/design/FY2019/ChangeoverBypassVAV_ReturnPlenumOrMixer.png)</center>
+<center>![Figure 2](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-Mods/doc/engineering-reference/media/ChangeoverBypassVAV_ReturnPlenumOrMixer.png)</center>
 <center>Figure 2. Proposed changes to Changeover Bypass VAV Unitary System Model</center>
 
 
