@@ -175,6 +175,8 @@ namespace HVACVariableRefrigerantFlow {
         cValidFuelTypes(NumValidFuelTypes,
                         {"Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
 
+    static std::string const fluidNameSteam("STEAM");
+
     // VRF Algorithm Type
     int const AlgorithmTypeSysCurve(1);   // VRF model based on system curve
     int const AlgorithmTypeFluidTCtrl(2); // VRF model based on physics, appreciable for Fluid Temperature Control
@@ -1405,25 +1407,29 @@ namespace HVACVariableRefrigerantFlow {
         int NumParams;
         int MaxAlphas;
         int MaxNumbers;
-        std::string FanType;           // Type of supply air fan
-        std::string FanName;           // Supply air fan name
-        std::string OAMixerType;       // Type of OA mixer
-        std::string DXCoolingCoilType; // Type of VRF DX cooling coil
-        std::string DXHeatingCoilType; // Type of VRF DX heating coil
-        Real64 FanVolFlowRate;         // Fan Max Flow Rate from Fan object (for comparisons to validity)
-        int FanInletNodeNum;           // Used in TU configuration setup
-        int FanOutletNodeNum;          // Used in TU configuration setup
-        Array1D_int OANodeNums(4);     // Node numbers of OA mixer (OA, EA, RA, MA)
-        int CCoilInletNodeNum;         // Used in TU configuration setup
-        int CCoilOutletNodeNum;        // Used in TU configuration setup
-        int HCoilInletNodeNum;         // Used in TU configuration setup
-        int HCoilOutletNodeNum;        // Used in TU configuration setup
-        int ZoneTerminalUnitListNum;   // Used to find connection between VRFTU, TUList and VRF condenser
-        int NumCond;                   // loop counter
-        int NumList;                   // loop counter
-        bool ZoneNodeNotFound;         // used in error checking
-        int CtrlZone;                  // index to loop counter
-        int NodeNum;                   // index to loop counter
+        std::string FanType;             // Type of supply air fan
+        std::string FanName;             // Supply air fan name
+        std::string OAMixerType;         // Type of OA mixer
+        std::string DXCoolingCoilType;   // Type of VRF DX cooling coil
+        std::string DXHeatingCoilType;   // Type of VRF DX heating coil
+        std::string SuppHeatingCoilType; // Type of VRF supplemental heating coil
+        std::string SuppHeatingCoilName; // Name of VRF supplemental heating coil
+        Real64 FanVolFlowRate;           // Fan Max Flow Rate from Fan object (for comparisons to validity)
+        int FanInletNodeNum;             // Used in TU configuration setup
+        int FanOutletNodeNum;            // Used in TU configuration setup
+        Array1D_int OANodeNums(4);       // Node numbers of OA mixer (OA, EA, RA, MA)
+        int CCoilInletNodeNum;           // Used in TU configuration setup
+        int CCoilOutletNodeNum;          // Used in TU configuration setup
+        int HCoilInletNodeNum;           // Used in TU configuration setup
+        int HCoilOutletNodeNum;          // Used in TU configuration setup
+        int SuppHeatCoilAirInletNode;    // supplemental heating coil air inlet node
+        int SuppHeatCoilAirOutletNode;   // supplemental heating coil air outlet node
+        int ZoneTerminalUnitListNum;     // Used to find connection between VRFTU, TUList and VRF condenser
+        int NumCond;                     // loop counter
+        int NumList;                     // loop counter
+        bool ZoneNodeNotFound;           // used in error checking
+        int CtrlZone;                    // index to loop counter
+        int NodeNum;                     // index to loop counter
         // Followings for VRF FluidTCtrl Only
         int NumCompSpd;     // XP_loop counter
         int NumOfCompSpd;   // XP_ number of compressor speed inputs
@@ -3944,6 +3950,177 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
+            // supplemental heating coil
+            if (!lAlphaFieldBlanks(17) && !lAlphaFieldBlanks(18)) {
+
+                SuppHeatingCoilType = cAlphaArgs(17);
+                SuppHeatingCoilName = cAlphaArgs(18);
+
+                VRFTU(VRFTUNum).SuppHeatCoilName = SuppHeatingCoilName;
+
+                errFlag = false;
+                if (UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Water")) {
+                    VRFTU(VRFTUNum).SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                } else if (UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Steam")) {
+                    VRFTU(VRFTUNum).SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+                } else if (UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Fuel") ||
+                           UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Electric")) {
+                    VRFTU(VRFTUNum).SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
+                }
+
+                VRFTU(VRFTUNum).SuppHeatCoilType = SuppHeatingCoilType;
+                VRFTU(VRFTUNum).SuppHeatingCoilPresent = true;
+
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
+                    VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) {
+                    errFlag = false;
+                    VRFTU(VRFTUNum).SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                        ErrorsFound = true;
+                    } else {
+                        ValidateComponent(SuppHeatingCoilType, SuppHeatingCoilName, IsNotOK, cCurrentModuleObject);
+                        if (IsNotOK) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        } else { // mine data from supplemental heating coil
+                            // Get the supplemental heating coil index
+                            VRFTU(VRFTUNum).SuppHeatCoilIndex = HeatingCoils::GetHeatingCoilIndex(SuppHeatingCoilType, SuppHeatingCoilName, IsNotOK);
+                            if (IsNotOK) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                                ErrorsFound = true;
+                            }
+                            // Get the design supplemental heating capacity
+                            errFlag = false;
+                            VRFTU(VRFTUNum).DesignSuppHeatingCapacity =
+                                HeatingCoils::GetCoilCapacity(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
+                            if (VRFTU(VRFTUNum).DesignSuppHeatingCapacity == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
+                            if (errFlag) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                                ErrorsFound = true;
+                            }
+                            // Get the supplemental heating Coil air inlet node
+                            errFlag = false;
+                            SuppHeatCoilAirInletNode = HeatingCoils::GetCoilInletNode(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
+                            if (errFlag) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                                ErrorsFound = true;
+                            }
+                            // Get the supplemental heating Coil air outlet node
+                            errFlag = false;
+                            SuppHeatCoilAirOutletNode = HeatingCoils::GetCoilOutletNode(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
+                            if (errFlag) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                                ErrorsFound = true;
+                            }
+                        } // IF (IsNotOK) THEN
+                    }
+
+                    VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
+                    VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
+
+                } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+
+                    ValidateComponent(SuppHeatingCoilType, SuppHeatingCoilName, IsNotOK, cCurrentModuleObject);
+                    if (IsNotOK) {
+                        ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                        ErrorsFound = true;
+                    } else { // mine data from heating coil object
+
+                        // Get the supplemental heating coil water Inlet or control node number
+                        errFlag = false;
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode =
+                            WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating coil hot water max volume flow rate
+                        errFlag = false;
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
+                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating Coil air inlet Node
+                        errFlag = false;
+                        SuppHeatCoilAirInletNode = WaterCoils::GetCoilInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating coil air outlet Node
+                        errFlag = false;
+                        SuppHeatCoilAirOutletNode = WaterCoils::GetCoilOutletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                    }
+
+                } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+
+                    ValidateComponent(SuppHeatingCoilType, SuppHeatingCoilName, IsNotOK, cCurrentModuleObject);
+                    if (IsNotOK) {
+                        ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                        ErrorsFound = true;
+                    } else { // mine data from supplemental heating coil object
+                        errFlag = false;
+                        VRFTU(VRFTUNum).SuppHeatCoilIndex = SteamCoils::GetSteamCoilIndex("COIL:HEATING:STEAM", SuppHeatingCoilName, errFlag);
+                        if (VRFTU(VRFTUNum).SuppHeatCoilIndex == 0) {
+                            ShowSevereError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating Coil steam inlet node number
+                        errFlag = false;
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode =
+                            SteamCoils::GetCoilSteamInletNode("Coil:Heating:Steam", SuppHeatingCoilName, errFlag);
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating coil steam max volume flow rate
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, errFlag);
+                        if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
+                        if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
+                            int SteamIndex = 0; // fluid type index of 0 is passed if steam
+                            Real64 TempSteamIn = 100.0;
+                            Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
+                                SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                        }
+                        // Get the supplemental heating coil air inlet node
+                        errFlag = false;
+                        SuppHeatCoilAirInletNode = SteamCoils::GetCoilAirInletNode(VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatingCoilName, errFlag);
+                        VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                        // Get the supplemental heating coil air outlet node
+                        errFlag = false;
+                        SuppHeatCoilAirOutletNode = SteamCoils::GetCoilAirOutletNode(VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatingCoilName, errFlag);
+                        VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
+                        if (errFlag) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
+            // set supplemental heating coil operation temperature limits
+            if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+                // Set maximum supply air temperature for supplemental heating coil
+                VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = rNumericArgs(11);
+                // set maximum outdoor dry-bulb temperature for supplemental heating coil operation
+                VRFTU(VRFTUNum).MaxOATSuppHeatingCoil = rNumericArgs(12);
+            }
+
             // Add TU to component sets array
             SetUpCompSets(cCurrentModuleObject,
                           VRFTU(VRFTUNum).Name,
@@ -4045,6 +4222,15 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
+            // Add supplemental heating coil to component sets array
+            if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+                SetUpCompSets(cCurrentModuleObject,
+                              VRFTU(VRFTUNum).Name,
+                              cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
+                              SuppHeatingCoilName,
+                              NodeID(SuppHeatCoilAirInletNode),
+                              NodeID(SuppHeatCoilAirOutletNode));
+            }
             // Set up component set for OA mixer - use OA node and Mixed air node
             if (VRFTU(VRFTUNum).OAMixerUsed)
                 SetUpCompSets(cCurrentModuleObject,
@@ -4228,12 +4414,23 @@ namespace HVACVariableRefrigerantFlow {
                         ErrorsFound = true;
                     }
                 }
-                if (FanOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-                    ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
-                    ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
-                    ShowContinueError("... Fan outlet node = " + NodeID(FanOutletNodeNum));
-                    ShowContinueError("... Terminal unit air outlet node = " + NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-                    ErrorsFound = true;
+                if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+                    if (SuppHeatCoilAirOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
+                                        "\" Supplemental heating coil air outlet node name must be the same");
+                        ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
+                        ShowContinueError("... Supplemental heating coil air outlet node = " + NodeID(SuppHeatCoilAirOutletNode));
+                        ShowContinueError("... Terminal unit air outlet node = " + NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    if (FanOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
+                        ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
+                        ShowContinueError("... Fan outlet node = " + NodeID(FanOutletNodeNum));
+                        ShowContinueError("... Terminal unit air outlet node = " + NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ErrorsFound = true;
+                    }
                 }
             }
             if (VRFTU(VRFTUNum).CoolingCoilPresent && VRFTU(VRFTUNum).HeatingCoilPresent) {
@@ -4860,28 +5057,32 @@ namespace HVACVariableRefrigerantFlow {
         static std::string const RoutineName("InitVRF");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InNode;                       // TU inlet node
-        int OutNode;                      // TU outlet node
-        int OutsideAirNode;               // TU mixer outside air inlet node
-        int NumTULoop;                    // loop counter, number of TU's in list
-        int ELLoop;                       // loop counter, number of zone equipment lists
-        int ListLoop;                     // loop counter, number of equipment is each list
-        int VRFCond;                      // index to VRF condenser
-        int TUIndex;                      // index to TU
-        int TUListNum;                    // index to VRF AC system terminal unit list
-        int TUListIndex;                  // pointer to TU list for this VRF system
-        int IndexToTUInTUList;            // index to TU in TerminalUnilList
-        Real64 RhoAir;                    // air density at InNode
-        static Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
-        static Real64 TimeStepSysLast;    // system time step on last time step
-        Real64 TempOutput;                // Sensible output of TU
-        Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
-        Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
-        bool EnableSystem;                // use to turn on secondary operating mode if OA temp limits exceeded
-        Real64 rho;                       // density of water (kg/m3)
-        Real64 OutsideDryBulbTemp;        // Outdoor air temperature at external node height
-
+        int InNode;                                  // TU inlet node
+        int OutNode;                                 // TU outlet node
+        int OutsideAirNode;                          // TU mixer outside air inlet node
+        int NumTULoop;                               // loop counter, number of TU's in list
+        int ELLoop;                                  // loop counter, number of zone equipment lists
+        int ListLoop;                                // loop counter, number of equipment is each list
+        int VRFCond;                                 // index to VRF condenser
+        int TUIndex;                                 // index to TU
+        int TUListNum;                               // index to VRF AC system terminal unit list
+        int TUListIndex;                             // pointer to TU list for this VRF system
+        int IndexToTUInTUList;                       // index to TU in TerminalUnilList
+        Real64 RhoAir;                               // air density at InNode
+        static Real64 CurrentEndTime;                // end time of current time step
+        static Real64 CurrentEndTimeLast;            // end time of last time step
+        static Real64 TimeStepSysLast;               // system time step on last time step
+        Real64 TempOutput;                           // Sensible output of TU
+        Real64 LoadToCoolingSP;                      // thermostat load to cooling setpoint (W)
+        Real64 LoadToHeatingSP;                      // thermostat load to heating setpoint (W)
+        bool EnableSystem;                           // use to turn on secondary operating mode if OA temp limits exceeded
+        bool ErrorsFound;                            // flag returned from mining call
+        Real64 rho;                                  // density of water (kg/m3)
+        Real64 OutsideDryBulbTemp;                   // Outdoor air temperature at external node height
+        static Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
+        bool errFlag;                                // local error flag
+        Real64 SuppHeatCoilLoad;                     // additional heating required by supplemental heater (W)
+        Real64 SuppHeatCoilCapacity;                 // supplemental heating coil size (W)
         // FLOW:
 
         // ALLOCATE and Initialize subroutine variables
@@ -4920,6 +5121,9 @@ namespace HVACVariableRefrigerantFlow {
             MyOneTimeFlag = false;
             MyVRFCondFlag = true;
 
+            MySuppCoilPlantScanFlag.allocate(NumVRFTU);
+            MySuppCoilPlantScanFlag = true;
+
         } // IF (MyOneTimeFlag) THEN
 
         // identify VRF condenser connected to this TU
@@ -4929,6 +5133,9 @@ namespace HVACVariableRefrigerantFlow {
         OutNode = VRFTU(VRFTUNum).VRFTUOutletNodeNum;
         OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum;
         IndexToTUInTUList = VRFTU(VRFTUNum).IndexToTUInTUList;
+
+        SuppHeatCoilCapacity = 0.0;
+        SuppHeatCoilLoad = 0.0;
 
         // set condenser inlet temp, used as surrogate for OAT (used to check limits of operation)
         if (VRF(VRFCond).CondenserType == WaterCooled) {
@@ -4948,6 +5155,84 @@ namespace HVACVariableRefrigerantFlow {
                 MyZoneEqFlag(VRFTUNum) = false;
             }
             VRFTU(VRFTUNum).AvailStatus = ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
+        }
+
+        if (MySuppCoilPlantScanFlag(VRFTUNum) && allocated(PlantLoop)) {
+            if ((VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
+                (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
+
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                    // hot water supplemental heating coil
+                    errFlag = false;
+                    PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                            TypeOf_CoilWaterSimpleHeating,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilCompNum,
+                                                            errFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _);
+
+                    WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
+                                               VRFTU(VRFTUNum).SuppHeatCoilName,
+                                               VRFTU(VRFTUNum).MaxHeatAirVolFlow,
+                                               errFlag);
+
+                    if (errFlag) {
+                        ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
+                    }
+                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
+                        WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+
+                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
+                        rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                               RoutineName);
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
+                    }
+                } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                    // steam supplemental heating coil
+                    errFlag = false;
+                    PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                            TypeOf_CoilSteamAirHeating,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilCompNum,
+                                                            errFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _);
+                    if (errFlag) {
+                        ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
+                    }
+                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
+                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
+                        int SteamIndex = 0; // fluid type index of 0 is passed if steam
+                        Real64 TempSteamIn = 100.0;
+                        Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * SteamDensity;
+                    }
+                }
+                // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
+                VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                                                                  .LoopSide(VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
+                                                                  .Branch(VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
+                                                                  .Comp(VRFTU(VRFTUNum).SuppHeatCoilCompNum)
+                                                                  .NodeNumOut;
+                MySuppCoilPlantScanFlag(VRFTUNum) = false;
+            } else { // pthp not connected to plant
+                MySuppCoilPlantScanFlag(VRFTUNum) = false;
+            }
+        } else if (MySuppCoilPlantScanFlag(VRFTUNum) && !AnyPlantInModel) {
+            MySuppCoilPlantScanFlag(VRFTUNum) = false;
         }
 
         // If all VRF Terminal Units on this VRF AC System have been simulated, reset the IsSimulated flag
@@ -5063,12 +5348,113 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFCond).HRModeChange = false;
             MyVRFCondFlag(VRFCond) = false;
             //    END IF
+
+            if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
+                        WaterCoils::SimulateWaterCoilComponents(
+                            VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex);
+                        // design hot water volume flow rate
+                        Real64 CoilMaxVolFlowRate =
+                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
+                            rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                                   RoutineName);
+                            VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
+                        }
+                    }
+                }
+
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
+                        SteamCoils::SimulateSteamCoilComponents(
+                            VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, 1.0);
+                        // design steam volume flow rate
+                        Real64 CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
+                            int SteamIndex = 0; // fluid type index of 0 is passed if steam
+                            Real64 TempSteamIn = 100.0;
+                            Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * SteamDensity;
+                        }
+                    }
+                }
+                // init water/steam coils min and max flow rates
+                InitComponentNodes(0.0,
+                                   VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow,
+                                   VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
+                                   VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
+                                   VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                   VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                   VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                   VRFTU(VRFTUNum).SuppHeatCoilCompNum);
+            }
         } // IF (BeginEnvrnFlag .and. MyEnvrnFlag(VRFTUNum)) THEN
 
         // reset environment flag for next environment
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag(VRFTUNum) = true;
             MyVRFCondFlag(VRFCond) = true;
+        }
+
+        // get operating capacity of water and steam coil
+        if (FirstHVACIteration) {
+            if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                    //     set hot water full flow rate for sizing
+                    Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow;
+                    PlantUtilities::SetComponentFlowRate(mdot,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilCompNum);
+
+                    //     simulate water coil to find operating capacity
+                    WaterCoils::SimulateWaterCoilComponents(
+                        VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatCoilCapacity);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = SuppHeatCoilCapacity;
+                } // from iF VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater
+                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                    //     set hot water full flow rate for sizing
+                    Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow;
+                    PlantUtilities::SetComponentFlowRate(mdot,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                         VRFTU(VRFTUNum).SuppHeatCoilCompNum);
+
+                    //     simulate water coil to find operating capacity
+                    WaterCoils::SimulateWaterCoilComponents(
+                        VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatCoilCapacity);
+
+                    //     simulate steam coil to find operating capacity
+                    SteamCoils::SimulateSteamCoilComponents(VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                            FirstHVACIteration,
+                                                            VRFTU(VRFTUNum).SuppHeatCoilIndex,
+                                                            1.0,
+                                                            ErrorsFound); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
+                    SuppHeatCoilCapacity = SteamCoils::GetCoilCapacity("Coil:Heating:Steam", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = SuppHeatCoilCapacity;
+                } // from if VRFTU( VRFTUNum ).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam
+            }
+        }
+        // initialize water/steam coil inlet flow rate to zero
+        if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
+            Real64 mdot = 0.0;
+            PlantUtilities::SetComponentFlowRate(mdot,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                 VRFTU(VRFTUNum).SuppHeatCoilCompNum);
         }
 
         // one-time checks of flow rate vs fan flow rate
@@ -5473,7 +5859,7 @@ namespace HVACVariableRefrigerantFlow {
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
             } else {
                 // Algorithm Type: VRF model based on system curve
-                CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
             }
 
             // If the Terminal Unit has a net cooling capacity (TempOutput < 0) and
@@ -5506,7 +5892,7 @@ namespace HVACVariableRefrigerantFlow {
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
-                                CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             }
 
                             // if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
@@ -5554,7 +5940,7 @@ namespace HVACVariableRefrigerantFlow {
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
-                                CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             }
 
                             // if zone temp will overshoot, pass the LoadToCoolingSP as the load to meet
@@ -5586,7 +5972,7 @@ namespace HVACVariableRefrigerantFlow {
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
-                                CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             }
 
                             // if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
@@ -5632,7 +6018,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                         } else {
                             // Algorithm Type: VRF model based on system curve
-                            CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         }
 
                         // if zone temp will overshoot, pass the LoadToCoolingSP as the load to meet
@@ -5669,7 +6055,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                         } else {
                             // Algorithm Type: VRF model based on system curve
-                            CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         }
 
                         // if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
@@ -5998,9 +6384,10 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingCapacity )
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-                                   "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-                                   "Correction Factor')");
+        static ObjexxFCL::gio::Fmt Format_990(
+            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
+            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
+            "Correction Factor')");
         static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
@@ -6482,6 +6869,78 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
+        IsAutoSize = false;
+        if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil == AutoSize) {
+            IsAutoSize = true;
+        }
+        if (CurZoneEqNum > 0) {
+            bool SizingDesRunThisZone;
+            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+            std::string cZoneHVAC_TU_VRF = cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num);
+            std::string ZoneHVAC_TU_VRF_Name = VRFTU(VRFTUNum).Name;
+
+            if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
+                if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil > 0.0) {
+                    ReportSizingOutput(cZoneHVAC_TU_VRF,
+                                       ZoneHVAC_TU_VRF_Name,
+                                       "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                       VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil);
+                }
+            } else {
+                CheckZoneSizing(cZoneHVAC_TU_VRF, ZoneHVAC_TU_VRF_Name);
+                Real64 MaxSATSuppHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
+                if (IsAutoSize) {
+                    VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = MaxSATSuppHeatDes;
+                    ReportSizingOutput(cZoneHVAC_TU_VRF,
+                                       ZoneHVAC_TU_VRF_Name,
+                                       "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                       MaxSATSuppHeatDes);
+                } else {
+                    if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil > 0.0 && MaxSATSuppHeatDes > 0.0 && SizingDesRunThisZone) {
+                        Real64 MaxSATSuppHeatUser = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
+                        ReportSizingOutput(cZoneHVAC_TU_VRF,
+                                           ZoneHVAC_TU_VRF_Name,
+                                           "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                           MaxSATSuppHeatDes,
+                                           "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                           MaxSATSuppHeatUser);
+                        if (DisplayExtraWarnings) {
+                            if (std::abs(MaxSATSuppHeatDes - MaxSATSuppHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
+                                ShowMessage("SizePTUnit: Potential issue with equipment sizing for " + cZoneHVAC_TU_VRF + ' ' + ZoneHVAC_TU_VRF_Name);
+                                ShowContinueError("User-Specified Maximum Supply Air Temperature from Supplemental Heater of " +
+                                                  RoundSigDigits(MaxSATSuppHeatUser, 2) + " [C]");
+                                ShowContinueError("differs from Design Size Maximum Supply Air Temperature from Supplemental Heater of " +
+                                                  RoundSigDigits(MaxSATSuppHeatDes, 2) + " [C]");
+                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+            bool ErrorsFound = false;
+            WaterCoils::SetCoilDesFlow(
+                VRFTU(VRFTUNum).SuppHeatCoilType, VRFTU(VRFTUNum).SuppHeatCoilName, VRFTU(VRFTUNum).MaxHeatAirVolFlow, ErrorsFound);
+        }
+
+        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+            CompType = VRFTU(VRFTUNum).SuppHeatCoilType;
+            CompName = VRFTU(VRFTUNum).SuppHeatCoilName;
+            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            PrintFlag = false;
+            TempSize = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
+            SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
+            if (TempSize == DataSizing::AutoSize) {
+                IsAutoSize = true;
+                ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
+            }
+            // DataSizing::SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+        }
+
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
             ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = VRFTU(VRFTUNum).MaxCoolAirVolFlow;
@@ -6503,13 +6962,15 @@ namespace HVACVariableRefrigerantFlow {
                 ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;
             }
 
+            Real64 SuppHeatCoilLoad = 0.0;
+
             // simulate the TU to size the coils
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat);
             } else {
                 // Algorithm Type: VRF model based on system curve
-                CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat);
+                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
             }
 
             //    ZoneEqDXCoil = .FALSE.
@@ -7012,6 +7473,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadRatio(1.0);
+        Real64 SuppHeatCoilLoad(0.0); // supplemental heating coil load (W)
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
@@ -7020,8 +7482,9 @@ namespace HVACVariableRefrigerantFlow {
             // CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
         } else {
             // Algorithm Type: VRF model based on system curve
-            ControlVRF(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio);
-            CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided);
+            ControlVRF(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
+            VRFTU(VRFTUNum).CalcVRF(
+                VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
         }
 
         VRFTU(VRFTUNum).TerminalUnitSensibleRate = SysOutputProvided;
@@ -7032,7 +7495,8 @@ namespace HVACVariableRefrigerantFlow {
                     Real64 const QZnReq,           // Index to zone number
                     bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                     Real64 &PartLoadRatio,         // unit part load ratio
-                    Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                    Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                    Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
     )
     {
 
@@ -7079,7 +7543,10 @@ namespace HVACVariableRefrigerantFlow {
         bool VRFHeatingMode;
         bool HRCoolingMode;
         bool HRHeatingMode;
+        Real64 SuppHeatCoilPLR; // supplemental heating part-load ratio
+        Real64 LoadToHeatingSP; // load to heating setpoint of a zone
 
+        SuppHeatCoilPLR = 0.0;
         PartLoadRatio = 0.0;
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
@@ -7114,7 +7581,7 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
-            CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio);
+            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         }
 
         if (VRFCoolingMode && HRHeatingMode) {
@@ -7150,8 +7617,27 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
-            CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
+            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         }
+
+        // set supplemental heating coil calculation if the condition requires
+        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
+            LoadToHeatingSP = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP;
+            if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
+                SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                VRFTU(VRFTUNum).SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                if (VRFTU(VRFTUNum).DesignSuppHeatingCapacity > 0.0) {
+                    VRFTU(VRFTUNum).SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / VRFTU(VRFTUNum).DesignSuppHeatingCapacity);
+                }
+            } else {
+                SuppHeatCoilLoad = 0.0;
+                VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
+            }
+        } else {
+            SuppHeatCoilLoad = 0.0;
+            VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
+        }
+
         PartLoadRatio = 0.0;
 
         if ((VRFCoolingMode && !VRF(VRFCond).HeatRecoveryUsed) || (VRF(VRFCond).HeatRecoveryUsed && HRCoolingMode)) {
@@ -7180,6 +7666,8 @@ namespace HVACVariableRefrigerantFlow {
 
         if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
 
+            // if ((QZnReq > 0.0 && QZnReq < FullOutput) || (QZnReq < 0.0 && QZnReq > FullOutput)) {
+
             Par(1) = VRFTUNum;
             Par(2) = 0.0;
             Par(4) = 0.0;
@@ -7204,7 +7692,7 @@ namespace HVACVariableRefrigerantFlow {
                         VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        CalcVRF(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
+                        VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     if (VRFHeatingMode && TempOutput > QZnReq) ContinueIter = false;
@@ -7221,7 +7709,7 @@ namespace HVACVariableRefrigerantFlow {
                         VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        CalcVRF(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio);
+                        VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
@@ -7242,7 +7730,7 @@ namespace HVACVariableRefrigerantFlow {
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
-                                CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             }
 
                             ShowContinueError(" Load requested = " + TrimSigDigits(QZnReq, 5) + ", Load delivered = " + TrimSigDigits(TempOutput, 5));
@@ -7300,12 +7788,13 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void CalcVRF(int const VRFTUNum,                // Unit index in VRF terminal unit array
-                 bool const FirstHVACIteration,     // flag for 1st HVAC iteration in the time step
-                 Real64 const PartLoadRatio,        // compressor part load fraction
-                 Real64 &LoadMet,                   // load met by unit (W)
-                 Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
-                 Optional<Real64> LatOutputProvided // delivered latent capacity (W)
+    void VRFTerminalUnitEquipment::CalcVRF(int const VRFTUNum,                // Unit index in VRF terminal unit array
+                                           bool const FirstHVACIteration,     // flag for 1st HVAC iteration in the time step
+                                           Real64 const PartLoadRatio,        // compressor part load fraction
+                                           Real64 &LoadMet,                   // load met by unit (W)
+                                           Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
+                                           Real64 &SuppHeatCoilLoad,          // supplemental heating coil load (W)
+                                           Optional<Real64> LatOutputProvided // delivered latent capacity (W)
     )
     {
 
@@ -7347,43 +7836,42 @@ namespace HVACVariableRefrigerantFlow {
         int ZoneNode;               // Zone node of VRFTU is serving
         // FLOW
 
-        VRFCond = VRFTU(VRFTUNum).VRFSysNum;
+        VRFCond = this->VRFSysNum;
         TUListIndex = VRF(VRFCond).ZoneTUListPtr;
-        IndexToTUInTUList = VRFTU(VRFTUNum).IndexToTUInTUList;
-        VRFTUOutletNodeNum = VRFTU(VRFTUNum).VRFTUOutletNodeNum;
-        VRFTUInletNodeNum = VRFTU(VRFTUNum).VRFTUInletNodeNum;
-        OpMode = VRFTU(VRFTUNum).OpMode;
-        ZoneNode = ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).ZoneNode;
+        IndexToTUInTUList = this->IndexToTUInTUList;
+        VRFTUOutletNodeNum = this->VRFTUOutletNodeNum;
+        VRFTUInletNodeNum = this->VRFTUInletNodeNum;
+        OpMode = this->OpMode;
+        ZoneNode = ZoneEquipConfig(this->ZoneNum).ZoneNode;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
 
         AirMassFlow = Node(VRFTUInletNodeNum).MassFlowRate;
-        if (VRFTU(VRFTUNum).ATMixerExists) {
+        if (this->ATMixerExists) {
             // There is an air terminal mixer
-            ATMixOutNode = VRFTU(VRFTUNum).ATMixerOutNode;
-            if (VRFTU(VRFTUNum).ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+            ATMixOutNode = this->ATMixerOutNode;
+            if (this->ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                 // set the primary air inlet mass flow rate
-                Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate =
-                    min(Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(VRFTUInletNodeNum).MassFlowRate);
+                Node(this->ATMixerPriNode).MassFlowRate = min(Node(this->ATMixerPriNode).MassFlowRateMaxAvail, Node(VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
                 // been set above (it is the "inlet" node flow rate)
-                SimATMixer(VRFTU(VRFTUNum).ATMixerName, FirstHVACIteration, VRFTU(VRFTUNum).ATMixerIndex);
+                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             }
         } else {
             // ATMixOutNode = 0;
-            if (VRFTU(VRFTUNum).OAMixerUsed) SimOAMixer(VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, VRFTU(VRFTUNum).OAMixerIndex);
+            if (this->OAMixerUsed) SimOAMixer(this->OAMixerName, FirstHVACIteration, this->OAMixerIndex);
         }
         // if blow through, simulate fan then coils
-        if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
-            if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+        if (this->FanPlace == BlowThru) {
+            if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (OnOffAirFlowRatio > 0.0) {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[this->FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             } else {
-                Fans::SimulateFanComponents("", FirstHVACIteration, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents("", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             }
         }
 
@@ -7394,15 +7882,15 @@ namespace HVACVariableRefrigerantFlow {
                 SimDXCoil("",
                           On,
                           FirstHVACIteration,
-                          VRFTU(VRFTUNum).CoolCoilIndex,
+                          this->CoolCoilIndex,
                           OpMode,
                           PartLoadRatio,
                           OnOffAirFlowRatio,
                           _,
                           MaxCoolingCapacity(VRFCond),
-                          VRF(VRFTU(VRFTUNum).VRFSysNum).VRFCondCyclingRatio);
+                          VRF(this->VRFSysNum).VRFCondCyclingRatio);
             } else { // cooling coil is off
-                SimDXCoil("", Off, FirstHVACIteration, VRFTU(VRFTUNum).CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+                SimDXCoil("", Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
             }
             LoopDXCoolCoilRTF = LoopDXCoilRTF;
         } else {
@@ -7413,17 +7901,9 @@ namespace HVACVariableRefrigerantFlow {
             // above condition for heat pump mode, below condition for heat recovery mode
             if ((!VRF(VRFCond).HeatRecoveryUsed && HeatingLoad(VRFCond)) ||
                 (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
-                SimDXCoil("",
-                          Off,
-                          FirstHVACIteration,
-                          VRFTU(VRFTUNum).HeatCoilIndex,
-                          OpMode,
-                          PartLoadRatio,
-                          OnOffAirFlowRatio,
-                          _,
-                          MaxHeatingCapacity(VRFCond));
+                SimDXCoil("", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity(VRFCond));
             } else {
-                SimDXCoil("", Off, FirstHVACIteration, VRFTU(VRFTUNum).HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+                SimDXCoil("", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
             }
             LoopDXHeatCoilRTF = LoopDXCoilRTF;
         } else {
@@ -7431,16 +7911,29 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // if draw through, simulate coils then fan
-        if (VRFTU(VRFTUNum).FanPlace == DrawThru) {
-            if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+        if (this->FanPlace == DrawThru) {
+            if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (OnOffAirFlowRatio > 0.0) {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[this->FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
             } else {
-                Fans::SimulateFanComponents("", FirstHVACIteration, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents("", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+            }
+        }
+
+        // run supplemental heating coil
+        Real64 SuppPLR = this->SuppHeatPartLoadRatio;
+        if (this->SuppHeatingCoilPresent) {
+            this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
+            if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
+                // adjust the heating load to maximum allowed
+                Real64 MaxHeatCoilLoad =
+                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
+                SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
         }
 
@@ -7756,6 +8249,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 QZnReqTemp;        // denominator representing zone load (W)
         Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
         Real64 ActualOutput;      // delivered capacity of VRF terminal unit
+        Real64 SuppHeatCoilLoad;  // supplemetal heating coil load (W)
 
         VRFTUNum = int(Par(1));
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
@@ -7765,13 +8259,14 @@ namespace HVACVariableRefrigerantFlow {
         QZnReqTemp = QZnReq;
         if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
         OnOffAirFlowRatio = Par(6);
+        SuppHeatCoilLoad = 0.0;
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
-            CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio);
+            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         }
 
         PLRResidual = (ActualOutput - QZnReq) / QZnReqTemp;
@@ -7919,16 +8414,17 @@ namespace HVACVariableRefrigerantFlow {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ZoneDeltaT;      // zone temperature difference from setpoint
-        Real64 SPTempHi;        // thermostat setpoint high
-        Real64 SPTempLo;        // thermostat setpoint low
-        int NumTU;              // loop counter, number of TU's in list
-        int TUIndex;            // index to TU
-        int ThisZoneNum;        // index to zone number where TU is located
-        Real64 ZoneLoad;        // current zone load (W)
-        Real64 LoadToCoolingSP; // thermostat load to cooling setpoint (W)
-        Real64 LoadToHeatingSP; // thermostat load to heating setpoint (W)
-        Real64 TempOutput;      // terminal unit output [W]
+        Real64 ZoneDeltaT;       // zone temperature difference from setpoint
+        Real64 SPTempHi;         // thermostat setpoint high
+        Real64 SPTempLo;         // thermostat setpoint low
+        int NumTU;               // loop counter, number of TU's in list
+        int TUIndex;             // index to TU
+        int ThisZoneNum;         // index to zone number where TU is located
+        Real64 ZoneLoad;         // current zone load (W)
+        Real64 LoadToCoolingSP;  // thermostat load to cooling setpoint (W)
+        Real64 LoadToHeatingSP;  // thermostat load to heating setpoint (W)
+        Real64 TempOutput;       // terminal unit output [W]
+        Real64 SuppHeatCoilLoad; // supplemental heating coil load
 
         MaxDeltaT = 0.0;
         MinDeltaT = 0.0;
@@ -7936,6 +8432,7 @@ namespace HVACVariableRefrigerantFlow {
         SumCoolingLoads = 0.0;
         NumHeatingLoads = 0;
         SumHeatingLoads = 0.0;
+        SuppHeatCoilLoad = 0.0;
 
         NumCoolingLoads(VRFCond) = 0;
         NumHeatingLoads(VRFCond) = 0;
@@ -8020,7 +8517,7 @@ namespace HVACVariableRefrigerantFlow {
                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                        VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     LoadToCoolingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToCoolingSP;
@@ -8048,7 +8545,7 @@ namespace HVACVariableRefrigerantFlow {
                                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
-                                        CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                        VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                     }
 
                                     if (TempOutput < LoadToHeatingSP) {
@@ -8092,7 +8589,7 @@ namespace HVACVariableRefrigerantFlow {
                                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
-                                        CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                        VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                     }
 
                                     if (TempOutput > LoadToCoolingSP) {
@@ -8189,7 +8686,8 @@ namespace HVACVariableRefrigerantFlow {
                             .CalcVRF_FluidTCtrl(VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        CalcVRF(VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                        VRFTU(VRF(VRFCond).MasterZoneTUIndex)
+                            .CalcVRF(VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     LoadToCoolingSP = ZoneSysEnergyDemand(VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP;
@@ -12016,8 +12514,8 @@ namespace HVACVariableRefrigerantFlow {
                         T_suction = GetSatTemperatureRefrig(
                             this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                        if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
-                            (NumIteTe < MaxNumIteTe)) {
+                        if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) &&
+                            (Pipe_Te_assumed > SmallLoadTe) && (NumIteTe < MaxNumIteTe)) {
                             Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
                             NumIteTe = NumIteTe + 1;
                             goto Label11;
@@ -13050,6 +13548,165 @@ namespace HVACVariableRefrigerantFlow {
             Pipe_Q = 0;
             Pipe_h_comp_out = Pipe_h_IU_in;
         }
+    }
+
+    void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(int const VRFTUNum,            // index of vrf terminal unit
+                                                          bool const FirstHVACIteration, // True when first HVAC iteration
+                                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
+                                                          Real64 &SuppCoilLoad           // supp heating coil load max (W)
+    )
+    {
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manages VRF terminal unit supplemental heaters simulation.
+
+        // Locals
+        // subroutine parameter definitions:
+        int const MaxIte(500);   // Maximum number of iterations for solver
+        Real64 const Acc(1.e-3); // Accuracy of solver result
+
+        // local variable declaration:
+        std::vector<Real64> Par; // Parameter array passed to solver
+        int SolFla;              // Flag of solver, num iterations if >0, else error index
+        Real64 SuppHeatCoilLoad; // load passed to supplemental heating coil (W)
+        Real64 QActual;          // actual coil output (W)
+        Real64 PartLoadFrac;     // temporary PLR variable
+
+        Par.resize(4);
+        QActual = 0.0;
+        SuppHeatCoilLoad = 0.0;
+
+        // simulate gas, electric, hot water, and steam heating coils
+        if (DataEnvironment::OutDryBulbTemp <= this->MaxOATSuppHeatingCoil) {
+            SuppHeatCoilLoad = SuppCoilLoad;
+        } else {
+            SuppHeatCoilLoad = 0.0;
+        }
+
+        {
+            auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
+
+            if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
+                HeatingCoils::SimulateHeatingCoilComponents(
+                    this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, _, true, this->OpMode, PartLoadRatio);
+
+            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
+                if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
+                    //     see if HW coil has enough capacity to meet the load
+                    Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
+                    DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                    //     simulate hot water coil to find the full flow operating capacity
+                    WaterCoils::SimulateWaterCoilComponents(
+                        this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
+                    if (QActual > SuppHeatCoilLoad) {
+                        Par[1] = double(VRFTUNum);
+                        if (FirstHVACIteration) {
+                            Par[2] = 1.0;
+                        } else {
+                            Par[2] = 0.0;
+                        }
+                        Par[3] = SuppHeatCoilLoad;
+
+                        General::SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                        this->SuppHeatPartLoadRatio = PartLoadFrac;
+                    } else {
+                        this->SuppHeatPartLoadRatio = 1.0;
+                        SuppHeatCoilLoad = QActual;
+                    }
+                } else {
+                    this->SuppHeatPartLoadRatio = 0.0;
+                    Real64 mdot = 0.0;
+                    SuppHeatCoilLoad = 0.0;
+                    PlantUtilities::SetComponentFlowRate(mdot,
+                                                         this->SuppHeatCoilFluidInletNode,
+                                                         this->SuppHeatCoilFluidOutletNode,
+                                                         this->SuppHeatCoilLoopNum,
+                                                         this->SuppHeatCoilLoopSide,
+                                                         this->SuppHeatCoilBranchNum,
+                                                         this->SuppHeatCoilCompNum);
+                }
+                //     simulate water heating coil
+                WaterCoils::SimulateWaterCoilComponents(
+                    this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
+
+            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
+                //     simulate steam heating coil
+                Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
+                DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                SteamCoils::SimulateSteamCoilComponents(
+                    this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
+                SuppHeatCoilLoad = QActual;
+            }
+            SuppCoilLoad = SuppHeatCoilLoad;
+        }
+    }
+
+    Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(Real64 const PartLoadFrac,     // water heating coil part-load ratio
+                                                                 std::vector<Real64> const &Par // par(1) = index to current VRF terminal unit
+    )
+    {
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates supplemental hot water heating coils load fraction residual [(QActual - Load)/Load]
+        // hot water Coil output depends on the part load ratio which is being varied to drive the load
+        // fraction residual to zero.
+
+        // METHODOLOGY EMPLOYED:
+        // runs Coil:Heating:Water component object to get the actual heating load deleivered [W] at a
+        // given part load ratio and calculates the residual as defined above
+
+        // Return value
+        Real64 Residuum; // Residual to be minimized to zero
+
+        // local variables declaration:
+        int VRFTUNum = int(Par[1]);       // index to current terminal unit simulated
+        bool FirstHVACIteration = Par[2]; // 0 flag if it first HVAC iteration, or else 1
+        Real64 SuppHeatCoilLoad = Par[3]; // supplemental heating coil load to be met [W]
+        Real64 QActual = 0.0;             // actual heating load deleivered [W]
+
+        // Real64 mdot = min(DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
+        //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
+
+        Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
+        DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+        WaterCoils::SimulateWaterCoilComponents(
+            VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, QActual, VRFTU(VRFTUNum).OpMode, PartLoadFrac);
+
+        if (std::abs(SuppHeatCoilLoad) == 0.0) {
+            Residuum = (QActual - SuppHeatCoilLoad) / 100.0;
+        } else {
+            Residuum = (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
+        }
+
+        return Residuum;
+    }
+
+    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
+        Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet node
+        Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet node
+        Real64 const HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
+    )
+    {
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates supplemental heating coils maximum heating capacity allowed based on the maximum
+        // supply air temperature limit specified.
+
+        // METHODOLOGY EMPLOYED:
+        // (uses supply air mass flow rate * average specific heat of supply air * supply air temperature difference across the heating coil) [W]
+
+        // Return value
+        Real64 HeatCoilCapacityMax; // heating coil maximum capacity that can be deleivered at current time [W]
+
+        Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
+        Real64 CpAirIn =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
+        Real64 CpAirOut =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
+        Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+        Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
+        HeatCoilCapacityMax = MDotAir * (0.5 * (CpAirIn + CpAirOut)) * HCDeltaT;
+
+        return HeatCoilCapacityMax;
     }
 
     // Clears the global data in HVACVariableRefrigerantFlow.
