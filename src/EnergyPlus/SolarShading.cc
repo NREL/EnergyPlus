@@ -58,6 +58,9 @@
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
+// Penumbra Headers
+#include <penumbra/penumbra.h>
+
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
 #include <DataDaylighting.hh>
