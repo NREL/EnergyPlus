@@ -97,6 +97,8 @@ namespace HVACDXSystem {
     // Make this type allocatable
     extern Array1D_bool CheckEquipName;
 
+    extern Real64 timecount;
+
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
 
@@ -190,6 +192,7 @@ namespace HVACDXSystem {
         Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
         bool VSCoilFanInfoSet; // flag to indicate if Coil System has set fan info in VS DX coil model
+        bool DirectSolution;           // Direct solution choice: Yes ot No
 
         // Default Constructor
         DXCoolingConditions()
@@ -205,7 +208,8 @@ namespace HVACDXSystem {
               MSpdCycSensPLRIterIndex(0), MSpdLatPLRIter(0), MSpdLatPLRIterIndex(0), MSpdCycLatPLRIter(0), MSpdCycLatPLRIterIndex(0),
               MModeSensPLRIter(0), MModeSensPLRIterIndex(0), MModeLatPLRIter(0), MModeLatPLRIterIndex(0), MModeLatPLRIter2(0),
               MModeLatPLRIterIndex2(0), OAUnitSetTemp(0.0), ISHundredPercentDOASDXCoil(false), DesignMinOutletTemp(0.0), FrostControlStatus(0),
-              SpeedNum(0), TESOpMode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), VSCoilFanInfoSet(false)
+              SpeedNum(0), TESOpMode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), VSCoilFanInfoSet(false),
+              DirectSolution(false)
 
         {
         }

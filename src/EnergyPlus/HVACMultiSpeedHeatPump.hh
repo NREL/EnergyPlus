@@ -110,6 +110,8 @@ namespace HVACMultiSpeedHeatPump {
     extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
     extern Array1D_bool CheckEquipName;
 
+    extern Real64 timecount;
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Types
@@ -243,6 +245,8 @@ namespace HVACMultiSpeedHeatPump {
         int HeatCountAvail;            // Counter used to minimize the occurrence of output warnings
         int HeatIndexAvail;            // Index used to minimize the occurrence of output warnings
         bool FirstPass;                // used to determine when first call is made
+        Array1D<Real64> FullOutput;    // Full output for different speed
+        bool DirectSolution;           // Direct solution choice: Yes ot No
 
         // Default Constructor
         MSHeatPumpData()
@@ -263,7 +267,7 @@ namespace HVACMultiSpeedHeatPump {
               HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(0),
               SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0), HotWaterLoopSide(0), HotWaterBranchNum(0), HotWaterCompNum(0),
               HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0),
-              HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true)
+              HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), DirectSolution( false )
         {
         }
     };

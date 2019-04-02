@@ -383,6 +383,8 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
+    double mysecond();
+
 } // namespace General
 
 } // namespace EnergyPlus

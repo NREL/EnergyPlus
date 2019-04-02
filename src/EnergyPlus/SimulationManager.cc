@@ -103,9 +103,12 @@ extern "C" {
 #include <ExternalInterface.hh>
 #include <FaultsManager.hh>
 #include <FluidProperties.hh>
+#include <Furnaces.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACControllers.hh>
+#include <HVACDXSystem.hh>
+#include <HVACMultiSpeedHeatPump.hh>
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <HeatBalanceAirManager.hh>
@@ -290,6 +293,7 @@ namespace SimulationManager {
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
         using WeatherManager::CheckIfAnyUnderwaterBoundaries;
+        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -677,6 +681,13 @@ namespace SimulationManager {
             sqlite->sqliteCommit();      // final transactions
             sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
         }
+
+        std::string timeout1 = RoundSigDigits(HVACDXSystem::timecount, 3);
+        std::string timeout2 = RoundSigDigits(HVACMultiSpeedHeatPump::timecount, 3);
+        std::string timeout3 = RoundSigDigits(Furnaces::timecount, 3);
+        DisplayString(timeout1);
+        DisplayString(timeout2);
+        DisplayString(timeout3);
 
         if (ErrorsFound) {
             ShowFatalError("Error condition occurred.  Previous Severe Errors cause termination.");

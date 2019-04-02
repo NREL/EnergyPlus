@@ -110,6 +110,8 @@ namespace Furnaces {
     extern std::string CurrentModuleObject; // Object type for getting and error messages
     // ending varibles for variable speed water source heat pump
 
+    extern Real64 timecount;
+
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
 
@@ -284,6 +286,7 @@ namespace Furnaces {
         int iterationCounter;       // track time step iterations
         Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
         bool FirstPass;             // used to determine when first call is made
+        bool DirectSolution;           // Direct solution choice: Yes ot No
 
         // Default Constructor
         FurnaceEquipConditions()
@@ -315,7 +318,7 @@ namespace Furnaces {
               IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(MaxSpedLevels, 0.0),
               HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0), CoolMassFlowRate(MaxSpedLevels, 0.0),
               MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
-              ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
+              ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true), DirectSolution(false)
         {
         }
     };

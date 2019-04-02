@@ -51,6 +51,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <BranchInputManager.hh>
@@ -235,6 +236,7 @@ namespace Furnaces {
     Real64 SaveCompressorPLR(0.0);   // holds compressor PLR from active DX coil
     std::string CurrentModuleObject; // Object type for getting and error messages
     // ending varibles for variable speed water source heat pump
+    Real64 timecount(0.0);
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -2391,6 +2393,20 @@ namespace Furnaces {
                 } // IF (Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
             } // IF(.NOT. lAlphaBlanks(15))THEN
+
+              // Read solution method
+            if (NumAlphas == 17) {
+                if (UtilityRoutines::SameString(Alphas(17), "Yes")) {
+                    Furnace(FurnaceNum).DirectSolution = true;
+                } else if (UtilityRoutines::SameString(Alphas(17), "No")) {
+                    Furnace(FurnaceNum).DirectSolution = false;
+                } else {
+                    ShowSevereError(CurrentModuleObject + "Invalid choice of Direct Solution = " + Alphas(17) + "in " +
+                        cAlphaFields(17));
+                    ShowContinueError("Valid choices are Yes or No.");
+                    ErrorsFound = true;
+                }
+            }
 
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
 
@@ -6359,6 +6375,8 @@ namespace Furnaces {
         using namespace ScheduleManager;
         using DataHeatBalFanSys::MAT;
         using General::TrimSigDigits;
+        using General::mysecond;
+        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6646,6 +6664,8 @@ namespace Furnaces {
         using DXCoils::DXCoilPartLoadRatio;
         using General::SolveRoot;
         using General::TrimSigDigits;
+        using General::mysecond;
+        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7128,6 +7148,55 @@ namespace Furnaces {
 
                             // Calculate the part load ratio through iteration
                             HeatErrorToler = Furnace(FurnaceNum).HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
+                            double ts = mysecond();
+                            Real64 SensibleOutput = 0.0;
+                            Real64 LatentOutput = 0.0;
+//                            int NewOutput = GetNewUnitNumber();
+//                            static gio::Fmt fmtA("(A)");
+//                            gio::open(NewOutput, "Data2.dat");
+//
+//                            for (int ii = 0; ii <= 100; ii++) {
+//                                PartLoadRatio = ii * 0.01;
+//                                CalcFurnaceOutput(FurnaceNum,
+//                                    FirstHVACIteration,
+//                                    OpMode,
+//                                    CompOp,
+//                                    0.0,
+//                                    PartLoadRatio,
+////                                    0.0,
+//                                    HeatCoilLoad * PartLoadRatio,
+//                                    0.0,
+//                                    SensibleOutput,
+//                                    LatentOutput,
+//                                    OnOffAirFlowRatio,
+//                                    false);
+//
+//                                std::string StringOut = RoundSigDigits(PartLoadRatio, 2) + ",  " + RoundSigDigits(SensibleOutput, 2);
+//                                gio::write(NewOutput, fmtA) << StringOut;
+//                            }
+//                            gio::close(NewOutput);
+
+                            //PartLoadRatio = (SystemSensibleLoad - NoHeatOutput) / (FullSensibleOutput - NoHeatOutput);
+                            //auto const HeatingCoilType_Num(Furnace(FurnaceNum).HeatingCoilType_Num);
+                            //if (HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel || HeatingCoilType_Num == Coil_HeatingElectric ||
+                            //    HeatingCoilType_Num == Coil_HeatingWater || HeatingCoilType_Num == Coil_HeatingSteam) {
+                            //    HeatCoilLoad = Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadRatio;
+                            //} else {
+                            //    HeatCoilLoad = 0.0;
+                            //}
+
+                            //CalcFurnaceOutput(FurnaceNum,
+                            //               FirstHVACIteration,
+                            //               OpMode,
+                            //               CompOp,
+                            //               0.0,
+                            //               PartLoadRatio,
+                            //               HeatCoilLoad,
+                            //               0.0,
+                            //               SensibleOutput,
+                            //               LatentOutput,
+                            //               OnOffAirFlowRatio,
+                            //               false);
 
                             SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Par(1) = double(FurnaceNum);
@@ -7251,6 +7320,8 @@ namespace Furnaces {
                                     SystemSensibleLoad,
                                     SystemSensibleLoad);
                             }
+                            double timer = mysecond() - ts;
+                            timecount += timer;
                         }
 
                     } else { // ELSE from IF(FullSensibleOutput.GT.NoSensibleOutput)THEN above
@@ -7394,83 +7465,104 @@ namespace Furnaces {
                             //           ELSE load is between NoCoolOutput and FullSensibleOuput, find PLR required to meet load
                         } else {
 
-                            // Calculate the sensible part load ratio through iteration
-                            CoolErrorToler = Furnace(FurnaceNum).CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
-                            SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                            Par(1) = double(FurnaceNum);
-                            Par(2) = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                            if (FirstHVACIteration) Par(2) = 1.0;
-                            Par(3) = double(OpMode);
-                            Par(4) = double(CompOp);
-                            Par(5) = CoolCoilLoad;
-                            Par(6) = 1.0;               // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                            Par(7) = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                            Par(8) = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                            if (HXUnitOn) {
-                                Par(9) = 1.0;
+                            double ts = mysecond();
+                            Real64 SensibleOutput = 0.0;
+                            Real64 LatentOutput = 0.0;
+                            if (Furnace(FurnaceNum).DirectSolution) {
+                                PartLoadRatio = (CoolCoilLoad - NoCoolOutput) / (FullSensibleOutput - NoCoolOutput);
+                                CalcFurnaceOutput(FurnaceNum,
+                                    FirstHVACIteration,
+                                    OpMode,
+                                    CompOp,
+                                    PartLoadRatio,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    SensibleOutput,
+                                    LatentOutput,
+                                    OnOffAirFlowRatio,
+                                    false);
                             } else {
-                                Par(9) = 0.0;
-                            }
-                            //             Par(10) is the heating coil PLR, set this value to 0 for sensible PLR calculations.
-                            Par(10) = 0.0;
-                            //             CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            SolveRoot(CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
-                            //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
-                            OnOffAirFlowRatio = OnOffAirFlowRatioSave;
-                            if (SolFlag < 0) {
-                                if (SolFlag == -1) {
-                                    CalcFurnaceOutput(FurnaceNum,
-                                                      FirstHVACIteration,
-                                                      OpMode,
-                                                      CompOp,
-                                                      PartLoadRatio,
-                                                      0.0,
-                                                      0.0,
-                                                      0.0,
-                                                      TempCoolOutput,
-                                                      TempLatentOutput,
-                                                      OnOffAirFlowRatio,
-                                                      HXUnitOn);
-                                    if (!WarmupFlag) {
-                                        if (std::abs(CoolCoilLoad - TempCoolOutput) > SmallLoad) {
-                                            if (Furnace(FurnaceNum).SensibleMaxIterIndex == 0) {
-                                                ShowWarningMessage("Cooling coil control failed to converge for " +
-                                                                   cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' +
-                                                                   Furnace(FurnaceNum).Name);
-                                                ShowContinueError(
-                                                    "  Iteration limit exceeded in calculating DX cooling coil sensible part-load ratio.");
-                                                ShowContinueErrorTimeStamp(
-                                                    "Sensible load to be met by DX coil = " + TrimSigDigits(CoolCoilLoad, 2) +
-                                                    " (watts), sensible output of DX coil = " + TrimSigDigits(TempCoolOutput, 2) +
-                                                    " (watts), and the simulation continues.");
+                                // Calculate the sensible part load ratio through iteration
+                                CoolErrorToler = Furnace(FurnaceNum).CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
+                                SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
+                                Par(1) = double(FurnaceNum);
+                                Par(2) = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
+                                if (FirstHVACIteration) Par(2) = 1.0;
+                                Par(3) = double(OpMode);
+                                Par(4) = double(CompOp);
+                                Par(5) = CoolCoilLoad;
+                                Par(6) = 1.0;               // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
+                                Par(7) = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
+                                Par(8) = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
+                                if (HXUnitOn) {
+                                    Par(9) = 1.0;
+                                } else {
+                                    Par(9) = 0.0;
+                                }
+                                //             Par(10) is the heating coil PLR, set this value to 0 for sensible PLR calculations.
+                                Par(10) = 0.0;
+                                //             CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
+                                SolveRoot(CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                                //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
+                                OnOffAirFlowRatio = OnOffAirFlowRatioSave;
+                                if (SolFlag < 0) {
+                                    if (SolFlag == -1) {
+                                        CalcFurnaceOutput(FurnaceNum,
+                                                          FirstHVACIteration,
+                                                          OpMode,
+                                                          CompOp,
+                                                          PartLoadRatio,
+                                                          0.0,
+                                                          0.0,
+                                                          0.0,
+                                                          TempCoolOutput,
+                                                          TempLatentOutput,
+                                                          OnOffAirFlowRatio,
+                                                          HXUnitOn);
+                                        if (!WarmupFlag) {
+                                            if (std::abs(CoolCoilLoad - TempCoolOutput) > SmallLoad) {
+                                                if (Furnace(FurnaceNum).SensibleMaxIterIndex == 0) {
+                                                    ShowWarningMessage("Cooling coil control failed to converge for " +
+                                                                       cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' +
+                                                                       Furnace(FurnaceNum).Name);
+                                                    ShowContinueError(
+                                                        "  Iteration limit exceeded in calculating DX cooling coil sensible part-load ratio.");
+                                                    ShowContinueErrorTimeStamp(
+                                                        "Sensible load to be met by DX coil = " + TrimSigDigits(CoolCoilLoad, 2) +
+                                                        " (watts), sensible output of DX coil = " + TrimSigDigits(TempCoolOutput, 2) +
+                                                        " (watts), and the simulation continues.");
+                                                }
+                                                ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
+                                                                                   Furnace(FurnaceNum).Name +
+                                                                                   "\" - Iteration limit exceeded in calculating sensible cooling "
+                                                                                   "part-load ratio error continues. Sensible load statistics:",
+                                                                               Furnace(FurnaceNum).SensibleMaxIterIndex,
+                                                                               CoolCoilLoad,
+                                                                               CoolCoilLoad);
                                             }
-                                            ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                                                               Furnace(FurnaceNum).Name +
-                                                                               "\" - Iteration limit exceeded in calculating sensible cooling "
-                                                                               "part-load ratio error continues. Sensible load statistics:",
-                                                                           Furnace(FurnaceNum).SensibleMaxIterIndex,
-                                                                           CoolCoilLoad,
-                                                                           CoolCoilLoad);
                                         }
-                                    }
-                                } else if (SolFlag == -2) {
-                                    if (!WarmupFlag) {
-                                        if (Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex == 0) {
-                                            ShowWarningMessage("Cooling coil control failed for " +
-                                                               cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' + Furnace(FurnaceNum).Name);
-                                            ShowContinueError("  Cooling sensible part-load ratio determined to be outside the range of 0-1.");
-                                            ShowContinueErrorTimeStamp("  Cooling sensible load = " + TrimSigDigits(CoolCoilLoad, 2));
+                                    } else if (SolFlag == -2) {
+                                        if (!WarmupFlag) {
+                                            if (Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex == 0) {
+                                                ShowWarningMessage("Cooling coil control failed for " +
+                                                                   cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' + Furnace(FurnaceNum).Name);
+                                                ShowContinueError("  Cooling sensible part-load ratio determined to be outside the range of 0-1.");
+                                                ShowContinueErrorTimeStamp("  Cooling sensible load = " + TrimSigDigits(CoolCoilLoad, 2));
+                                            }
+                                            ShowRecurringWarningErrorAtEnd(
+                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                                                    "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
+                                                    "statistics:",
+                                                Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex,
+                                                CoolCoilLoad,
+                                                CoolCoilLoad);
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
-                                            cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
-                                                "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
-                                                "statistics:",
-                                            Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex,
-                                            CoolCoilLoad,
-                                            CoolCoilLoad);
                                     }
                                 }
                             }
+                            double timer = mysecond() - ts;
+                            timecount += timer;
                         }
 
                     } else {
@@ -10128,6 +10220,7 @@ namespace Furnaces {
         using IntegratedHeatPump::IHPOperationMode;
         using IntegratedHeatPump::IntegratedHeatPumps;
         using Psychrometrics::PsyCpAirFnWTdb;
+        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
