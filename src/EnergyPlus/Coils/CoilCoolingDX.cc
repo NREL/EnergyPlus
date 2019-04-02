@@ -168,6 +168,14 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     auto &myPerformance = this->performance;
     myPerformance.simulate(evapInletNode, evapOutletNode, mode, PLR, speedNum, speedRatio, fanOpMode);
 
+    evapOutletNode.MassFlowRate = evapInletNode.MassFlowRate;                 // pass through
+    evapOutletNode.Press = evapInletNode.Press;                               // pass through
+    evapOutletNode.Quality = evapInletNode.Quality;                           // pass through
+    evapOutletNode.MassFlowRateMax = evapInletNode.MassFlowRateMax;           // pass through
+    evapOutletNode.MassFlowRateMin = evapInletNode.MassFlowRateMin;           // pass through
+    evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMaxAvail; // pass through
+    evapOutletNode.MassFlowRateMinAvail = evapInletNode.MassFlowRateMinAvail; // pass through
+
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     // update report variables
