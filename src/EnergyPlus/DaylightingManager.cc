@@ -5848,7 +5848,9 @@ namespace DaylightingManager {
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
             GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -5923,7 +5925,9 @@ namespace DaylightingManager {
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
                 // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
                 // below, which is (0.2936)**0.6
                 GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -6528,7 +6532,8 @@ namespace DaylightingManager {
                                                WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylSourceFacSun(PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(PreviousHour, 1, IL, loop)));
 
-                    if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                         // ===Shaded window or window with diffusing glass===
                         if (!SurfaceWindow(IWin).MovableSlats) {
@@ -6699,7 +6704,7 @@ namespace DaylightingManager {
                 HorIllSkyFac = HISKF / ((1 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
-                    if (IS == 2 && SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing) break;
+                    if (IS == 2 && (SurfaceWindow(IWin).WindowModelType == WindowBSDFModel) || (SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing)) break;
 
                     ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) =
                         DFSUHR(IS) * HISUNF +
@@ -6750,7 +6755,9 @@ namespace DaylightingManager {
             //   the window is initialized at clear state: IS = 1
             //  For other windows with glare control, the shading flag is initialized at >10, to be determined
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
 
             for (IL = 1; IL <= NREFPT; ++IL) {
                 DaylIllum(IL) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
@@ -6793,7 +6800,9 @@ namespace DaylightingManager {
 
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
                     if (Surface(IWin).HasShadeControl) {
                         if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
                             WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
@@ -9710,7 +9719,8 @@ namespace DaylightingManager {
                                                                          IllumMapCalc(MapNum).DaylSourceFacSunDisk(PreviousHour, 1, ILB, loop)));
                         }
 
-                        if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                        if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                            (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                             //                                 ===Shaded window===
                             if (!SurfaceWindow(IWin).MovableSlats) {
@@ -9919,7 +9929,9 @@ namespace DaylightingManager {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
 
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
 
                 // CR 8057. 3/17/2010.
                 // Switchable windows may be in partially switched state rather than fully dark state
@@ -9955,7 +9967,9 @@ namespace DaylightingManager {
                 for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                     IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
 
                     // CR 8057. 3/17/2010
                     VTMULT = 1.0;
