@@ -1,0 +1,551 @@
+\subsection{Coil:Cooling:DX}\label{coilcoolingdx}
+
+This coil input structure is meant to supplant the coil objects from previous EnergyPlus versions (Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, etc.). This coil input structure uses a combination of four objects to fully define the performance of the coil under a range of operating conditions.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+ Coil:Cooling:DX - Defines where the coil's evaporator and condenser sections are connected to the HVAC system through node connections to air loops or zones (if condenser section rejects heat to a zone), as well as the coil's availability.
+\item
+ Coil:Cooling:DX:CurveFit:Performance - Defines how the coil operates over a range of operating conditions.
+\item
+ Coil:Cooling:DX:CurveFit:OperatingMode - Defines the rated coil characteristics (capacity, evaporator section air flow rate, etc.) and capacity control method for a given operating mode. Operating modes are generally used to describe humidity control strategies for DX cooling coil arrangements that enable enhanced dehumidification.
+\item
+ Coil:Cooling:DX:CurveFit:Speed - Defines DX cooling coil performance for a specific speed within a single operating mode.
+
+\end{enumerate}
+
+Figure~\ref{fig:diagram-of-coil-object-references} below represents the hierarchy how these four input objects reference each other. Arrows pointing from one object to another represents where one object has an input field that references the name of a different object. For example, an input field of the Coil:Cooling:DX object references the name of a Coil:Cooling:DX:CurveFit:Performance object. For this coil input structure, one Coil:Cooling:DX object can only reference one Coil:Cooling:DX:CurveFit:Performance object. However, one Coil:Cooling:DX:CurveFit:Performance object can reference multiple Coil:Cooling:DX:CurveFit:OperatingMode objects, and each Coil:Cooling:DX:CurveFit:OperatingMode object can reference multiple Coil:Cooling:DX:CurveFit:Speed objects. In the image below, the cooling coil has one single-speed operating mode and a second two-speed operating mode.
+
+\begin{figure}[hbtp] % fig 176
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/cooling-coil-hierarchy.png}
+\caption{Hierarchy of references between cooling coil objects \protect \label{fig:diagram-of-coil-object-references}}
+\end{figure}
+
+\subsubsection{Inputs}\label{inputs-01}
+
+\paragraph{Field: Name}\label{field-name-01}
+
+A unique user-assigned name for an instance of a cooling coil. Any reference to this cooling coil by another object will use this name.
+
+\paragraph{Field: Evaporator Inlet Node Name}\label{field-evaporator-inlet-node-name-021}
+
+The name of the HVAC system node from which the evaporator of the DX cooling coil draws its inlet air.
+
+\paragraph{Field: Evaporator Outlet Node Name}\label{field-evaporator-outlet-node-name-021}
+
+The name of the HVAC system node to which the evaporator of the DX cooling coil sends its outlet air.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-001}
+
+The name of the schedule (ref: Schedule) that denotes whether the DX cooling coil can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during a given time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Condenser Zone Name}\label{field-condenser-zone-name-6-001}
+
+The name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modelled as internal sensible heat gain of the zone.
+
+\paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-6-001}
+
+The name of the HVAC system node from which the condenser of the DX cooling coil draws its inlet air.
+
+\paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-6-001}
+
+The name of the HVAC system node to which the condenser of the DX cooling coil sends its outlet air.
+
+\paragraph{Field: Performance Object Name}\label{field-performance-object-name-6-001}
+
+The name of the Coil:Cooling:DX:CurveFit:Performance object that defines this coil's performance specifications.
+
+\paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name-2}
+
+This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of a WaterUse:Storage object defined elsewhere and the condensate will then be collected in that tank.
+
+\paragraph{Field: Evaporative Condenser Supply Water Storage Tank Name}\label{field-evaporative-condenser-supply-water-storage-tank-name-000}
+
+This field is optional. It is used to describe where the coil obtains water used for evaporative cooling of its condenser. If blank or omitted, then the unit will obtain water directly from the mains. If the name of a WaterUse:Storage object is used here, then the unit will obtain its water from that tank. If a tank is specified, the unit will attempt to obtain all the water it uses from the tank. However if the tank cannot provide all the water the condenser needs, then the unit will still operate and obtain the rest of the water it needs from the mains (referred to as StarvedWater).
+
+\subsection{Coil:Cooling:DX:CurveFit:Performance}\label{coilcoolingdxcurvefitperformance}
+
+This object defines basic unit control and other characteristics for one Coil:Cooling:DX object. For that Coil:Cooling:DX object, it also references one or more operating modes, which are defined using the Coil:Cooling:DX:CurveFit:OperatingMode object.
+
+\subsubsection{Inputs}\label{inputs-02}
+
+\paragraph{Field: Name}\label{field-name-02}
+
+A unique user-assigned name for an instance of a cooling coil performance specification. Any reference to this cooling coil  performance specification by a cooling coil object will use this name.
+
+\paragraph{Field: Crankcase Heater Capacity}\label{field-crankcase-heater-capacity}
+
+This numeric field defines the crankcase heater capacity in Watts. When the outdoor air dry-bulb temperature is below the value specified in the input field Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation (described below), the crankcase heater is enabled during the time that the compressor is not running. If this cooling coil is used as part of an air-to-air heat pump (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir or PackageTerminal: HeatPump:AirToAir), the crankcase heater defined for this DX cooling coil is ignored and the crankcase heater power defined for the DX heating coil (Ref. Coil:Heating:DX:SingleSpeed) is enabled during the time that the compressor is not running for either heating or cooling. The value for this input field must be greater than or equal to 0, and the default value is 0. To simulate a DX cooling coil without a crankcase heater, enter a value of 0.
+
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the default value is -25 °C (-13 °F).
+
+\paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation}
+
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C (32 °F), and the default value is 10 °C (50 °F).
+
+\paragraph{Field: Unit Internal Static Air Pressure}\label{field-unit-internal-static-air-pressure}
+
+If this coil is used with a Fan:VariableVolume to model a packaged variable-air-volume unit, then ratings for standard rated net capacity, EER, and IEER will be calculated per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2. This field is to specify the internal static air pressure, in units of Pascals, associated with the unit's supply air flow for rating purposes. This field does not affect the performance during operation. This field is optional. If this field is used, then the internal static air pressure is used with the associated fan characteristics when calculating standard rated net capacity, EER, and IEER. If this field is not used, then the standard ratings are still performed but use a default for specific fan power of 773.3 (W/(m\(^{3}\)/s)). The air pressure drop/rise input here should be internal in the sense that it is for the entire package of unitary equipment as it would be tested in a laboratory (including other non-cooling sections inside the package for filters, dampers, and/or heating coils) but none of the external pressure drop for distributing supply air throughout the building. This is different from the input field called Pressure Rise in the fan object which includes both the external static pressure and the internal static pressure. The results of standard rating calculations are reported to the EIO file and to predefined output tables called DX Cooling Coils and VAV DX Cooling Standard Rating Details.
+
+\paragraph{Field: Method for Switching Operating Modes}\label{field-method-for-switching-operating-modes}
+
+This choice field defines the approach to set when coil operating modes should change. Valid choices for this input field are \textbf{HumidityControl} or \textbf{Scheduled}. The default for this field is \textbf{HumidityControl}.
+
+If the DX unit can switch operating modes to increase dehumidification based on a humidistat signal, then set this to \textbf{HumidityControl}. This field just specifies the availability of enhanced dehumidification. Actual control of the operating mode is handled by the coil's parent component.
+
+\paragraph{Field: Operating Mode Number Schedule Name}\label{field-operation-mode-number-schedule-name}
+
+This field is used (and required) if the operating mode control method is set to \textbf{Scheduled} in the previous input field. The control schedule consists of a series of integer values that indicate what mode the coil should operate in for a given time period. This input is useful for EMS control of operating mode. The integer values in this control schedule should correlate with the operating mode numbers defined in the last input field(s) of this object.
+
+\paragraph{Field: Evaporative Condenser Basin Heater Capacity}\label{field-evaporative-condenser-basin-heater-capacity-000}
+
+This numeric field contains the capacity of the coil's electric evaporative cooler basin heater in Watts per degree Kelvin. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. This field is used in conjunction with the Evaporative Condenser Basin Heater Setpoint Temperature and Evaporative Condenser Basin Heater Operating Schedule Name described in the following fields. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
+
+\paragraph{Field: Evaporative Condenser Basin Heater Setpoint Temperature}\label{field-evaporative-condenser-basin-heater-setpoint-temperature-000}
+
+This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the DX coil is off. This set point temperature must be greater than or equal to 2 ˚C (35.6 °F), and the default value is 2 ˚C (35.6 °F) if this field is left blank.
+
+\paragraph{Field: Evaporative Condenser Basin Heater Operating Schedule Name}\label{field-evaporative-condenser-basin-heater-operating-schedule-name-000}
+
+This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the DX coil is off.
+
+\paragraph{Field: Compressor Fuel Type}\label{field-compressor-fuel-type-000}
+
+This alpha field determines the type of fuel that this cooling coil's compressor uses. This field has nine choices: \textbf{Electricity}, \textbf{NaturalGas}, \textbf{Propane}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2}, \textbf{OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{Electricity}.
+
+\paragraph{Field: Operating Mode \textless{}x\textgreater{} Name}\label{field-operating-mode-x-name}
+
+For operating mode \textless{}x\textgreater{}, the name of the corresponding Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode 1 is always used as the base design operating mode. Each coil may have up to 10 operating modes defined, and each operating mode may have one or more speeds.
+
+If \textit{Method for Switching Operating Modes} is set to \textbf{HumidityControl}, then the operating modes should be listed in order from least dehumidification capacity to most dehumidification capacity. If \textit{Method for Switching Operating Modes} is set to \textbf{Scheduled}, then the operating mode numbers should align with the control schedule referenced in \textit{Operating Mode Number Schedule Name}.
+
+\subsection{Coil:Cooling:DX:CurveFit:OperatingMode}\label{coilcoolingdxcurvefitoperatingmode}
+
+This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Operating mode 1 is always the base design operating mode. Additional modes may be optional enhanced dehumidification states such as subcool reheat. The operating mode also defines the condenser type. Each performance specification can reference a maximum of 10 operating modes.
+
+\subsubsection{Inputs}\label{inputs-03}
+
+\paragraph{Field: Name}\label{field-name-03}
+
+A unique user-assigned name for an instance of a cooling coil operating mode. Any reference to this cooling coil operating mode by a cooling coil performance specification will use this name.
+
+\paragraph{Field: Rated Gross Total Cooling Capacity}\label{field-rated-gross-total-cooling-capacity-1}
+
+The total, full load gross cooling capacity (sensible plus latent) in Watts of the DX coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb\protect\hyperlink{ux5fftn1}{{[}1{]}} (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). Capacity should be gross (i.e., the effect of supply air fan heat is NOT accounted for). When used in a heat pump, the gross rated total cooling capacity should be within 20\% of the gross rated heating capacity, otherwise a warning message is issued.
+
+\paragraph{Field: Rated Evaporator Air Flow Rate}\label{field-rated-evaporator-air-flow-rate-2}
+
+The air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil evaporator section at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per Watt of gross rated total cooling capacity (300 to 450 cfm/ton). For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb (95 °F drybulb/75 °F wetbulb), and the rated air volume flow rate defined here.
+
+\paragraph{Field: Rated Condenser Air Flow Rate}\label{field-rated-condenser-air-flow-rate-2}
+
+The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = \textbf{AirCooled}.
+
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate}
+
+The maximum on-off cycling rate for the compressor (cycles per hour), which occurs at 50\% run time fraction. Suggested value is 3; zero value means latent degradation model is disabled. The default value for this field is zero. The supply air fan operating mode must be continuous (i.e., the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects (e.g., AirloopHVAC:UnitaryHeatCool); and this field, the previous two fields and the next field must have positive values in order to model latent capacity degradation.
+
+\paragraph{Field: Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity}\label{field-ratio-of-initial-moisture-evaporation-rate-and-steady-state-latent-capacity}
+
+Ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero. The supply air fan operating mode must be continuous (i.e., the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects (e.g., AirloopHVAC:UnitaryHeatCool); and this field, the previous field and the next two fields must have positive values in order to model latent capacity degradation.
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-latent-capacity-time-constant}
+
+Time constant (in seconds) for the cooling coil's latent capacity to reach steady state after startup. Suggested value is 45: supply air fan operating mode must be continuous. That is, the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects (e.g., AirloopHVAC:UnitaryHeatCool).
+
+\paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin}
+
+The nominal time (in seconds) after startup for condensate to begin leaving the coil's condensate drain line at the coil's rated airflow and temperature conditions, starting with a dry coil. Nominal time is equal to the ratio of the energy of the coil's maximum condensate holding capacity (J) to the coil's steady-state latent capacity (W). Suggested value is 1000; zero value means the latent degradation model is disabled. The default value for this field is zero. The supply air fan operating mode must be continuous (i.e., the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects (e.g., AirloopHVAC:UnitaryHeatCool), and this field as well as the previous three input fields for this object must have positive values in order to model latent capacity degradation.
+
+\paragraph{Field: Apply Latent Degradation to Speeds Greater than 1}\label{field-apply-latent-degradation-to-speeds-greater-than-1}
+
+This field determines whether latent capacity degradation is applied when the coil is operating at speeds greater than speed 1. The allowed choices are \textbf{Yes} or \textbf{No}, with the default being \textbf{No} if this field is left blank. Other input fields in this object allow the user to specify latent capacity degradation at each speed.
+
+The latent capacity degradation model only applies when the ContinuousFanWithCyclingCompressor supply air fan operating mode is specified, to account for moisture evaporation from the wet cooling coil when the compressor cycles off but the supply air fan continues to operate. For the case of a single multi-speed compressor, latent capacity degradation may only be significant when the compressor cycles between speed 1 and off, but the losses may be extremely small when the compressor operates between speed 1 and speed 2 (or between speeds 2 and 3, etc.). In this case, the user may chose to specify \textbf{No} for this input field to neglect latent capacity degradation impacts at higher operating speeds. If latent capacity degradation is thought to be significant (e.g., interwined or row-split cooling coil with multiple compressors feeding individual refrigerant circuits), then the user may chose to specify \textbf{Yes} and the latent capacity degradation model will be applied for speeds 2 through 10 as appropriate. The selection for this input field does not affect latent capacity degradation between speed 1 and off.
+
+\paragraph{Field: Condenser Type}\label{field-condenser-type-3}
+
+The type of condenser used by the DX cooling coil. Valid choices for this input field are \textbf{AirCooled} or \textbf{EvaporativelyCooled}. The default for this field is \textbf{AirCooled}.
+
+\paragraph{Field: Nominal Evaporative Condenser Pump Power}\label{field-nominal-evaporative-condenser-pump-power-1}
+
+The rated power of the evaporative condenser water pump in Watts. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The default value for this input field is zero, but it is autosizable (equivalent to 0.004266 W per watt {[}15 W/ton{]} of rated total cooling capacity). This field is not used when Condenser Type = \textbf{AirCooled}.
+
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
+
+This field determines how the cooling coil capacity is to be controlled. Options are \textbf{Staged}, \textbf{VariableSpeed}, and \textbf{MultiSpeed}. The default is \textbf{MultiSpeed}.
+
+\paragraph{Field: Nominal Speed Number}\label{field-nominal-speed-number}
+
+This numeric field specifies the speed number which corresponds to the rated capacity and air flow rates specified in this object. This value must be lower than or equal to the highest speed number defined below. If blank, defaults to the highest speed number used.
+
+\paragraph{Field: Speed \textless{}x\textgreater{} Name}\label{field-speed-x-name}
+
+For speed \textless{}x\textgreater{}, the name of the corresponding Coil:Cooling:DX:CurveFit:Speed object. Speed 1 is always used as the lowest speed. Speeds should be listed in ascending order from lowest capacity to highest capacity. Each coil operating mode may have up to 10 speeds defined.
+
+\subsection{Coil:Cooling:DX:CurveFit:Speed}\label{coilcoolingdxcurvefitspeed}
+
+This object defines DX cooling coil performance for a specific speed within a single operating mode. A speed can be used for a combination of air flow rates and capacities different than the rated air flow rates and capacities defined in Coil:Cooling:DX:CurveFit:OperatingMode. Each operating mode can reference a maximum of 10 speeds.
+
+\subsubsection{Inputs}\label{inputs-04}
+
+\paragraph{Field: Name}\label{field-name-04}
+
+A unique user-assigned name for an instance of a cooling coil operating mode's speed. Any reference to a specific speed by a cooling coil operating mode will use this name.
+
+\paragraph{Field: Gross Total Cooling Capacity Fraction}\label{field-gross-total-cooling-capacity-fraction}
+
+This is the ratio of capacity at a specific speed to the operating mode's \textit{Rated Gross Total Cooling Capacity}. This field should be 1.0 for the \textit{Nominal Speed Number} specified in the Coil:Cooling:DX:CurveFit:OperatingMode object.
+
+\paragraph{Field: Evaporator Air Flow Rate Fraction}\label{field-evaporator-air-flow-rate-fraction}
+
+This is the ratio of evaporator air flow rate at a specific speed to the operating mode's \textit{Rated Evaporator Air Flow Rate}. This field should be 1.0 for the \textit{Nominal Speed Number} specified in the Coil:Cooling:DX:CurveFit:OperatingMode object.
+
+\paragraph{Field: Condenser Air Flow Rate Fraction}\label{field-condenser-air-flow-rate-fraction}
+
+This is the ratio of condenser air flow at a specific speed to the operating mode's \textit{Rated Condenser Air Flow Rate}. This field should be 1.0 for the \textit{Nominal Speed Number} specified in the Coil:Cooling:DX:CurveFit:OperatingMode object.
+
+\paragraph{Field: Gross Sensible Heat Ratio}\label{field-gross-sensible-heat-ratio}
+
+This numeric field defines the gross sensible heat ratio (sensible capacity divided by total cooling capacity) of the DX cooling coil at rated conditions for a specific speed. Both the sensible and total cooling capacities used should be gross (i.e., the effect of supply air fan heat is NOT accounted for).
+
+\paragraph{Field: Gross Cooling COP}\label{field-gross-rated-cooling-cop}
+
+The coefficient of performance is the ratio of the gross total cooling capacity in Watts to electrical power input in Watts of the DX cooling coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/ 23.9 °C wetbulb (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). The input power includes electric power for the compressor(s) and condenser fan(s) but does not include the power consumption of the supply air fan. The gross COP should NOT account for the supply air fan. If this input field is left blank, the default value is 3.0.
+
+\paragraph{Field: Active Fraction of Coil Face Area}\label{field-active-fraction-of-coil-face-area}
+
+Defines the fraction of the cooling coil face which is actively cooled at a specific speed. Value varies between 0.0 and 1.0. For non-split-face coils, this should be 1.0.
+
+\paragraph{Field: Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
+
+\paragraph{Field: Evaporative Condenser Pump Power Fraction}\label{field-evaporative-condenser-pump-power-fraction}
+
+The ratio of evaporative condenser pump power at a specific speed to the operating mode's \textit{Nominal Evaporative Condenser Pump Power}. This field is not used when Condenser Type = \textbf{AirCooled}.
+
+\paragraph{Field: Evaporative Condenser Effectiveness}\label{field-evaporative-condenser-effectiveness}
+
+The effectiveness of the evaporative condenser at a specific speed, which is used to determine the temperature of the air entering the outdoor condenser coil as follows:
+
+\begin{equation}
+Tcond,inlet = \,\left( {Twb,o} \right)\,\, + \,\,\left( {1 - EvapCondEffectivenes} \right)\left( {Tdb,o\,\, - Twb,o} \right)
+\end{equation}
+
+where
+
+\emph{T\(_{cond,inlet}\)} = the temperature of the air entering the condenser coil (C)
+
+\emph{T\(_{wb,o}\)} = the wet-bulb temperature of the outdoor air (C)
+
+\emph{T\(_{db,o}\)} = the dry-bulb temperature of the outdoor air (C)
+
+The resulting condenser inlet air temperature is used by the Total Cooling Capacity Modifier Function of Temperature Curve and the Energy Input Ratio Modifier Function of Temperature Curve. The default value for this field is 0.9, although valid entries can range from 0.0 to 1.0. This field is not used when Condenser Type = \textbf{AirCooled}.
+
+If the user wants to model an air-cooled condenser, they should simply specify \textbf{AirCooled} in the field \textit{Condenser Type}. In this case, the Total Cooling Capacity Modifier Function of Temperature Curve and the Energy Input Ratio Modifier Function of Temperature Curve input fields for this object should reference performance curves that are a function of outdoor dry-bulb temperature.
+
+If the user wishes to model an evaporative-cooled condenser AND they have performance curves that are a function of the wet-bulb temperature of air entering the condenser coil, then the user should specify Condenser Type = \textbf{EvaporativelyCooled} and the evaporative condenser effectiveness value should be entered as 1.0. In this case, the Total Cooling Capacity Modifier Function of Temperature Curve and the Energy Input Ratio Modifier Function of Temperature Curve input fields for this object should reference performance curves that are a function of the wet-bulb temperature of air entering the condenser coil.
+
+If the user wishes to model an air-cooled condenser that has evaporative media placed in front of it to cool the air entering the condenser coil, then the user should specify Condenser Type = \textbf{EvaporativelyCooled}. The user must also enter the appropriate evaporative effectiveness for the media. In this case, the Total Cooling Capacity Modifier Function of Temperature Curve and the Energy Input Ratio Modifier Function of Temperature Curve input fields for this object should reference performance curves that are a function of outdoor dry-bulb temperature. Be aware that the evaporative media will significantly reduce the dry-bulb temperature of the air entering the condenser coil, so the Total Cooling Capacity and EIR Modifier Function of Air Flow Fraction Curves must be valid for the expected range of dry-bulb temperatures that will be entering the condenser coil.
+
+\paragraph{Field: Total Cooling Capacity Modifier Function of Temperature Curve Name}\label{field-total-cooling-capacity-function-of-temperature-curve-name}
+
+The name of a bivariate (e.g. biquadratic) or univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the gross total cooling capacity for a specific speed as a function of the wet-bulb temperature of the air entering the evaporator section, and the dry-bulb temperature of the air entering the condenser section (wet-bulb temperature if modeling an evaporative-cooled condenser). If a univariate curve or table is specified, then the independent variable is the entering condenser temperature. The curve is normalized to 1 at 19.44 °C (67 °F) indoor wet-bulb temperature and 35 °C (95 °F) outdoor dry-bulb temperature. The output of this curve is multiplied by the operating mode's \textit{Rated Gross Total Cooling Capacity} to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). The curve is normalized to have the value of 1.0 at the rating point.
+
+\paragraph{Field: Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name}\label{field-total-cooling-capacity-function-of-air-flow-fraction-curve-name}
+
+The name of a univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the gross total cooling capacity for a specific speed as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate for a specific speed (i.e., fraction of full load flow). The output of this curve is multiplied by the operating mode's \textit{Rated Gross Total Cooling Capacity} and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity for a specific speed at the specific temperature and air flow conditions at which the coil is operating. The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate for Speed \textless{}x\textgreater{}.
+
+\paragraph{Field: Energy Input Ratio Modifier Function of Temperature Curve Name}\label{field-energy-input-ratio-function-of-temperature-curve-name}
+
+The name of a bivariate (e.g. biquadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the energy input ratio (EIR) for a specific speed as a function of the wetbulb temperature of the air entering the evaporator section and the drybulb temperature of the air entering the condenser section (wetbulb temperature if modeling an evaporative-cooled condenser). The curve is normalized to 1 at 19.44 °C (67 °F) indoor wet-bulb temperature and 35 °C (95 °F) outdoor dry-bulb temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR for a specific speed (inverse of rated COP for a specific speed) to give the EIR for a specific speed at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures).
+
+\paragraph{Field: Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name}\label{field-energy-input-ratio-function-of-air-flow-fraction-curve-name}
+
+The name of a univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the energy input ratio (EIR) for a specific speed as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate for a specific speed (i.e., fraction of full load flow). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR and the EIR modifier curve (function of temperature) to give the EIR for a specific speed at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate for a specific speed.
+
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name}
+
+The name of a univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity for a specific speed). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep for a specific speed. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+
+The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 \textless{} = PLR \textless{} 1), the following rules apply:
+
+\begin{lstlisting}
+       PLF > = 0.7     and     PLF > = PLR
+\end{lstlisting}
+
+If PLF \textless{} 0.7 a warning message is issued, the program resets the PLF value to 0.7, and the simulation proceeds. The runtime fraction of the coil is defined as PLR/PLF. If PLF \textless{} PLR, then a warning message is issued and the runtime fraction of the coil is limited to 1.0.
+
+A typical part load fraction correlation for a conventional DX cooling coil (a specific speed) would be:
+
+\begin{lstlisting}
+       PLF = 0.85 + 0.15(PLR)
+\end{lstlisting}
+
+If the user wishes to model no efficiency degradation due to compressor cycling, the part load fraction correlation should be defined as follows:
+
+\begin{lstlisting}
+       PLF = 1.0 + 0.0(PLR)
+\end{lstlisting}
+
+\paragraph{Field: Rated Waste Heat Fraction of Power Input}\label{field-rated-waste-heat-fraction-of-power-input}
+
+The fraction of energy input to the cooling coil that is available as recoverable waste heat at full load and rated conditions for a specific speed.
+
+\paragraph{Field: Waste Heat Modifier Function of Temperature Curve Name}\label{field-waste-heat-function-of-temperature-curve-name}
+
+The name of a bivariate (e.g. biquadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at a specific speed. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issued and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued.
+
+\paragraph{Field: Sensible Heat Ratio Modifier Function of Temperature Curve Name}\label{field-sensible-heat-ratio-modifier-function-of-temperature-curve-name}
+
+The name of a bivariate (e.g. biquadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the sensible heat ratio (SHR) as a function of DX cooling coil entering air wet-bulb and dry-bulb temperatures. The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of flow fraction) to give the SHR at the specific coil entering air temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 at the rated condition. This input field is optional. If this input is not blank then the \textit{Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name} must also be entered. If left blank, SHR is calculated using the apparatus dew point method based on total capacity and coil bypass factor.
+
+
+\paragraph{Field: Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
+
+The name of a univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the sensible heat ratio (SHR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of temperature) to give the SHR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This input field is optional. If this input is not blank then the \textit{Sensible Heat Ratio Modifier Function of Temperature Curve Name} must also be entered. If left blank, SHR is calculated using the apparatus dew point method based on total capacity and coil bypass factor.
+
+Following is an example input for a single-speed air-cooled cooling DX coil.
+
+\begin{lstlisting}
+
+Coil:Cooling:DX,
+  Single Speed Cooling Coil,     !- Name
+  Cooling Coil Air Inlet Node, !- Evaporator Inlet Node Name
+  Cooling Coil Air Outlet Node, !- Evaporator Outlet Node Name
+  FanAndCoilAvailSched,   !- Availability Schedule Name
+  , !- Condenser Zone Name
+  Outdoor Condenser Air Inlet Node, !- Condenser Inlet Node Name
+  Outdoor Condenser Air Outlet Node, !- Condenser Outlet Node Name
+  Single Speed Cooling Coil Performance, !- Performance Object Name
+  , !- Condensate Collection Water Storage Tank Name
+  ; !- Evaporative Condenser Supply Water Storage Tank Name
+
+Coil:Cooling:DX:CurveFit:Performance,
+  Single Speed Cooling Coil Performance, !- Name
+  0.0, !- Crankcase Heater Capacity {W}
+  -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  500.0, !- Unit Internal Static Air Pressure {Pa}
+  HumidityControl, !- Method for Switching Operating Modes
+  , !- Operating Mode Number Schedule Name
+  , !- Evaporative Condenser Basin Heater Capacity {W}
+  , !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+  , !- Evaporative Condenser Basin Heater Operating Schedule Name
+  Electricity, !- Compressor Fuel Type
+  Single Speed Cooling Coil Operating Mode; !- Operating Mode 1 Name
+
+Coil:Cooling:DX:CurveFit:OperatingMode,
+  Single Speed Cooling Coil Operating Mode, !-  Name
+  Autosize, !- Rated Gross Total Cooling Capacity {W}
+  Autosize, !- Rated Evaporator Air Flow Rate {m3/s}
+  , !- Rated Condenser Air Flow Rate {m3/s}
+  0.0, !- Maximum Cycling Rate {cycles/hr}
+  0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  0.0, !- Latent Capacity Time Constant {s}
+  0.0, !- Nominal Time for Condensate Removal to Begin {s}
+  No, !- Apply Latent Degradation to Speeds Greater than 1
+  AirCooled, !- Condenser Type
+  , !- Nominal Evaporative Condenser Pump Power {W}
+  Multispeed, !- Capacity Control Method
+  1, !- Nominal Speed Number
+  Single Speed Cooling Coil Speed 1; !- Speed 1 Name
+
+Coil:Cooling:DX:CurveFit:Speed,
+  Single Speed Cooling Coil Speed 1, !- Name
+  1.0, !- Gross Total Cooling Capacity Fraction
+  1.0, !- Evaporator Air Flow Rate Fraction
+  1.0, !- Condenser Air Flow Rate Fraction
+  Autosize, !- Gross Sensible Heat Ratio
+  3.0, !- Gross Cooling COP
+  1.0, !- Active Fraction of Coil Face Area
+  773.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  1.0, !- Evaporative Condenser Pump Power Fraction
+  0.9, !- Evaporative Condenser Effectiveness
+  Single Speed Cool Cap fTemp, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Single Speed Cool Cap fFlow, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool EIR fTemp, !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Single Speed Cool EIR fFlow, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool fPLR, !- Part Load Fraction Correlation Curve Name
+  0.2, !- Rated Waste Heat Fraction of Power Input
+  Single Speed Waste Heat fTemp; !- Waste Heat Function of Temperature Curve Name
+
+\end{lstlisting}
+
+Following is an example input for a three-speed evaporatively-cooled cooling DX coil.
+
+\begin{lstlisting}
+
+Coil:Cooling:DX,
+  Three Speed Cooling Coil,     !- Name
+  Cooling Coil Air Inlet Node, !- Evaporator Inlet Node Name
+  Cooling Coil Air Outlet Node, !- Evaporator Outlet Node Name
+  FanAndCoilAvailSched,   !- Availability Schedule Name
+  , !- Condenser Zone Name
+  Outdoor Condenser Air Inlet Node, !- Condenser Inlet Node Name
+  Outdoor Condenser Air Outlet Node, !- Condenser Outlet Node Name
+  Three Speed Cooling Coil Performance, !- Performance Object Name
+  , !- Condensate Collection Water Storage Tank Name
+  ; !- Evaporative Condenser Supply Water Storage Tank Name
+
+Coil:Cooling:DX:CurveFit:Performance,
+  Three Speed Cooling Coil Performance, !- Name
+  0.0, !- Crankcase Heater Capacity {W}
+  -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  500.0, !- Unit Internal Static Air Pressure {Pa}
+  HumidityControl, !- Method for Switching Operating Modes
+  , !- Operating Mode Number Schedule Name
+  0.0, !- Evaporative Condenser Basin Heater Capacity {W}
+  2.0, !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+  FanAndCoilAvailSched, !- Evaporative Condenser Basin Heater Operating Schedule Name
+  Electricity, !- Compressor Fuel Type
+  Three Speed Cooling Coil Operating Mode; !- Operating Mode 1 Name
+
+Coil:Cooling:DX:CurveFit:OperatingMode,
+  Three Speed Cooling Coil Operating Mode, !-  Name
+  Autosize, !- Rated Gross Total Cooling Capacity {W}
+  Autosize, !- Rated Evaporator Air Flow Rate {m3/s}
+  Autosize, !- Rated Condenser Air Flow Rate {m3/s}
+  0.0, !- Maximum Cycling Rate {cycles/hr}
+  0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  0.0, !- Latent Capacity Time Constant {s}
+  0.0, !- Nominal Time for Condensate Removal to Begin {s}
+  No, !- Apply Latent Degradation to Speeds Greater than 1
+  EvaporativelyCooled, !- Condenser Type
+  0.0, !- Nominal Evaporative Condenser Pump Power {W}
+  Multispeed, !- Capacity Control Method
+  3, !- Nominal Speed Number
+  Three Speed Cooling Coil Speed 1, !- Speed 1 Name
+  Three Speed Cooling Coil Speed 2, !- Speed 2 Name
+  Three Speed Cooling Coil Speed 3; !- Speed 3 Name
+
+Coil:Cooling:DX:CurveFit:Speed,
+  Three Speed Cooling Coil Speed 1, !- Name
+  0.4, !- Gross Total Cooling Capacity Fraction
+  0.4, !- Evaporator Air Flow Rate Fraction
+  0.4, !- Condenser Air Flow Rate Fraction
+  Autosize, !- Gross Sensible Heat Ratio
+  4.5, !- Gross Cooling COP
+  1.0, !- Active Fraction of Coil Face Area
+  453.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  0.4, !- Evaporative Condenser Pump Power Fraction
+  0.9, !- Evaporative Condenser Effectiveness
+  Three Speed Cool Cap fTemp Spd 1, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Three Speed Cool Cap fFlow Spd 1, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool EIR fTemp Spd 1, !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Three Speed Cool EIR fFlow Spd 1, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool fPLR Spd 1, !- Part Load Fraction Correlation Curve Name
+  0.2, !- Rated Waste Heat Fraction of Power Input
+  Three Speed Waste Heat fTemp Spd 1, !- Waste Heat Function of Temperature Curve Name
+  Three Speed SHR fTemp Spd 1, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  Three Speed SHR fFlow Spd 1; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+Coil:Cooling:DX:CurveFit:Speed,
+  Three Speed Cooling Coil Speed 2, !- Name
+  0.7, !- Gross Total Cooling Capacity Fraction
+  0.7, !- Evaporator Air Flow Rate Fraction
+  0.7, !- Condenser Air Flow Rate Fraction
+  Autosize, !- Gross Sensible Heat Ratio
+  3.5, !- Gross Cooling COP
+  1.0, !- Active Fraction of Coil Face Area
+  613.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  0.7, !- Evaporative Condenser Pump Power Fraction
+  0.9, !- Evaporative Condenser Effectiveness
+  Three Speed Cool Cap fTemp Spd 2, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Three Speed Cool Cap fFlow Spd 2, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool EIR fTemp Spd 2, !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Three Speed Cool EIR fFlow Spd 2, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool fPLR Spd 2, !- Part Load Fraction Correlation Curve Name
+  0.2, !- Rated Waste Heat Fraction of Power Input
+  Three Speed Waste Heat fTemp Spd 2, !- Waste Heat Function of Temperature Curve Name
+  Three Speed SHR fTemp Spd 2, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  Three Speed SHR fFlow Spd 2; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+Coil:Cooling:DX:CurveFit:Speed,
+  Three Speed Cooling Coil Speed 3, !- Name
+  1.0, !- Gross Total Cooling Capacity Fraction
+  1.0, !- Evaporator Air Flow Rate Fraction
+  1.0, !- Condenser Air Flow Rate Fraction
+  Autosize, !- Gross Sensible Heat Ratio
+  3.0, !- Gross Cooling COP
+  1.0, !- Active Fraction of Coil Face Area
+  773.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  1.0, !- Evaporative Condenser Pump Power Fraction
+  0.9, !- Evaporative Condenser Effectiveness
+  Three Speed Cool Cap fTemp Spd 3, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Three Speed Cool Cap fFlow Spd 3, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool EIR fTemp Spd 3, !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Three Speed Cool EIR fFlow Spd 3, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Three Speed Cool fPLR Spd 3, !- Part Load Fraction Correlation Curve Name
+  0.2, !- Rated Waste Heat Fraction of Power Input
+  Three Speed Waste Heat fTemp Spd 3, !- Waste Heat Function of Temperature Curve Name
+  Three Speed SHR fTemp Spd 3, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-01}
+
+Following are the list of possible output variables from this coil model:
+
+\begin{itemize}
+\item
+  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Electric Power{[}W{]}
+\item
+  HVAC,Sum,Cooling Coil Electric Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Runtime Fraction {[]}
+\end{itemize}
+
+\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}\label{cooling-coil-total-cooling-rate-w}
+
+This field is the total (sensible and latent) cooling rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{Cooling Coil Total Cooling Energy {[}J{]}}\label{cooling-coil-total-cooling-energy-j}
+
+This is the total (sensible plus latent) cooling output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}\label{cooling-coil-sensible-cooling-rate-w}
+
+This output is the moist air sensible cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{Cooling Coil Sensible Cooling Energy {[}J{]}}\label{cooling-coil-sensible-cooling-energy-j}
+
+This is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{Cooling Coil Latent Cooling Rate {[}W{]}}\label{cooling-coil-latent-cooling-rate-w-2}
+
+This is the latent cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{Cooling Coil Latent Cooling Energy {[}J{]}}\label{cooling-coil-latent-cooling-energy-j}
+
+This is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+\paragraph{Cooling Coil Electric Power {[}W{]}}\label{cooling-coil-electric-power-w}
+
+This output is the electricity consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Electric Energy {[}J{]}}\label{cooling-coil-electric-energy-j}
+
+This is the electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction}
+
+This is the runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported.
