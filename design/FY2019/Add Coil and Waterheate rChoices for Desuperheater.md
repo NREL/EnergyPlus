@@ -1,4 +1,4 @@
-# Desuperheater object capability improvement
+# Add More Coil/WaterHeater Choices for Coil:WaterHeating:Desuperheater
 
 
 **Yueyue Zhou**
