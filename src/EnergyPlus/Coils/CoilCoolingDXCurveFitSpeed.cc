@@ -180,8 +180,7 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
-Psychrometrics::PsychState
-CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletState, Real64 &PLR, int &fanOpMode)
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode)
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -195,13 +194,13 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
     }
 
     if ((PLR == 0.0) || (AirMassFlow == 0.0)) {
-        outletState.tdb = inletState.tdb;
-        outletState.w = inletState.w;
-        outletState.h = inletState.h;
-        outletState.p = inletState.p;
+        outletNode.Temp = inletNode.Temp;
+        outletNode.HumRat = inletNode.HumRat;
+        outletNode.Enthalpy = inletNode.Enthalpy;
+        outletNode.Press = inletNode.Press;
         FullLoadPower = 0.0;
         RTF = 0.0;
-        return outletState;
+        return;
     }
 
     Real64 TotCap = 0.0;
@@ -223,8 +222,8 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
         CBF = 0.0;
     }
 
-    Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletState.tdb, inletState.w, ambPressure);
-    Real64 inletw = inletState.w;
+    Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletNode.Temp, inletNode.HumRat, ambPressure);
+    Real64 inletw = inletNode.HumRat;
 
     int Counter = 0;              // iteration counter for dry coil condition
     int const MaxIter(30);        // iteration limit
@@ -250,16 +249,16 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
 
         SHR = 0.0;
         if (indexSHRFT > 0) {
-            SHR = DXCoils::CalcSHRUserDefinedCurves(inletState.tdb, inletWetBulb, AirFF, indexSHRFT, indexSHRFFF, RatedSHR);
+            SHR = DXCoils::CalcSHRUserDefinedCurves(inletNode.Temp, inletWetBulb, AirFF, indexSHRFT, indexSHRFFF, RatedSHR);
             break;
         } else {
             // Calculate apparatus dew point conditions using TotCap and CBF
-            Real64 hADP = inletState.h - hDelta / (1.0 - CBF);
+            Real64 hADP = inletNode.Enthalpy - hDelta / (1.0 - CBF);
             Real64 tADP = Psychrometrics::PsyTsatFnHPb(hADP, ambPressure, RoutineName);
             Real64 wADP = Psychrometrics::PsyWFnTdbH(tADP, hADP, RoutineName);
-            Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(inletState.tdb, wADP);
-            if ((inletState.h - hADP) > 1.e-10) {
-                SHR = min((hTinwADP - hADP) / (inletState.h - hADP), 1.0);
+            Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(inletNode.Temp, wADP);
+            if ((inletNode.Enthalpy - hADP) > 1.e-10) {
+                SHR = min((hTinwADP - hADP) / (inletNode.Enthalpy - hADP), 1.0);
             } else {
                 SHR = 1.0;
             }
@@ -271,7 +270,7 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
                 // capacity at the dry-out point to determine exiting conditions from coil. This is required
                 // since the TotCapTempModFac doesn't work properly with dry-coil conditions.
                 inletw = RF * wADP + (1.0 - RF) * inletw;
-                inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletState.tdb, inletw, ambPressure);
+                inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletNode.Temp, inletw, ambPressure);
                 ++Counter;
                 if (std::abs(werror) > Tolerance) continue; // Recalculate with modified inlet conditions
                 break;
@@ -300,12 +299,11 @@ CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(Psychrometrics::PsychState &inletSta
     RTF = PLR / PLF;
     FullLoadPower = TotCap * EIR;
 
-    outletState.h = inletState.h - hDelta;
-    Real64 hTinwout = inletState.h - ((1.0 - SHR) * hDelta);
-    outletState.w = Psychrometrics::PsyWFnTdbH(inletState.tdb, hTinwout);
+    outletState.h = inletNode.Enthalpy - hDelta;
+    Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);
+    outletState.w = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout);
     outletState.tdb = Psychrometrics::PsyTdbFnHW(outletState.h, outletState.w);
 
-    return outletState;
 }
 
 Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &in)

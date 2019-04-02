@@ -5,6 +5,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
+#include "DataLoopNode.hh"
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -154,11 +155,18 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 
 	Psychrometrics::PsychState inletState;
 
+    DataLoopNode::NodeData inletNode;
+    inletNode.Temp = 20.0;
+    inletNode.HumRat = 0.008;
+    //node.twb = 14.43;
+    inletNode.Enthalpy = 40000.0;
+    DataLoopNode::NodeData outletNode;
+
 	thisSpeed.PLR = 1.0;
 	thisSpeed.speedRatio = 1.0;
 	inletState.tdb = 20.0;
 	inletState.w = 0.008;
-	inletState.twb = 14.43;
+	inletState.twb = 1443.0;
 	inletState.h = 40000.0;
 	thisSpeed.CondInletTemp = 35.0;
 	thisSpeed.ambPressure = 101325.0;
@@ -171,11 +179,11 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.AirMassFlow = 1.0;
 	int fanOpMode = 0;
 
-	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, thisSpeed.PLR, fanOpMode );
+	thisSpeed.CalcSpeedOutput(inletNode, outletNode, thisSpeed.PLR, fanOpMode );
 
-	EXPECT_NEAR( outletConditions.tdb, 17.057, 0.001 );
-	EXPECT_NEAR( outletConditions.w, 0.0078, 0.0001 );
-	EXPECT_NEAR( outletConditions.h, 37000.0, 0.1 );
+	EXPECT_NEAR( outletNode.Temp, 17.057, 0.001 );
+	EXPECT_NEAR( outletNode.HumRat, 0.0078, 0.0001 );
+	EXPECT_NEAR( outletNode.Enthalpy, 37000.0, 0.1 );
 	EXPECT_NEAR( thisSpeed.FullLoadPower, 900.0, 0.1 );
 	EXPECT_NEAR( thisSpeed.RTF, 1.0, 0.01 );
 

@@ -128,25 +128,25 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     this->ratedCondAirFlowRate = TempSize;
 }
 
-Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
-    Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
+    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
 
 	// Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
     thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
-    thisspeed.ambPressure = inletState.p;
-    thisspeed.AirMassFlow = inletState.massFlowRate;
+    thisspeed.ambPressure = inletNode.Press;
+    thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
         if (PLR > 0.0) {
-            thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
+            thisspeed.AirMassFlow = inletNode.MassFlowRate / PLR;
         } else {
             thisspeed.AirMassFlow = 0.0;
         }
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
-        thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
+        thisspeed.AirFF = inletNode.MassFlowRate / thisspeed.RatedAirMassFlowRate;
     } else {
         thisspeed.AirFF = 0.0;
     }
@@ -157,18 +157,18 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
         plr1 = speedRatio;
     }
 
-    auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, plr1, fanOpMode);
+    thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode);
 
     Psychrometrics::PsychState finalOutletConditions;
 
+    Real64 outSpeed1HumRat = outletNode.HumRat;
+    Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
+
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
-        finalOutletConditions.w = outSpeed1.w * PLR + (1.0 - PLR) * inletState.w;
-        finalOutletConditions.h = outSpeed1.h * PLR + (1.0 - PLR) * inletState.h;
-    } else {
-        finalOutletConditions.w = outSpeed1.w;
-        finalOutletConditions.h = outSpeed1.h;
+        outletNode.HumRat = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
+        outletNode.Enthalpy = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
     }
-    finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(finalOutletConditions.h, finalOutletConditions.w);
+    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
     OpModeRTF = thisspeed.RTF;
     OpModePower = thisspeed.FullLoadPower * thisspeed.RTF;
@@ -178,13 +178,11 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto &lowerspeed(this->speeds[max(speedNum - 2,0)]);
 
-        auto out = lowerspeed.CalcSpeedOutput(inletState, PLR, fanOpMode);
+        lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode); // out
 
-        finalOutletConditions.w = outSpeed1.w * speedRatio + (1.0 - speedRatio) * out.w;
-        finalOutletConditions.h = outSpeed1.h * speedRatio + (1.0 - speedRatio) * out.h;
-        finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(finalOutletConditions.h, finalOutletConditions.w);
+        outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
+        outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
+        finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
         OpModePower = OpModePower + lowerspeed.FullLoadPower;
     }
-
-    return finalOutletConditions;
 }

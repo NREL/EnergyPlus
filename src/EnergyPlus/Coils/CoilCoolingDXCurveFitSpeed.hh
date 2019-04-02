@@ -6,6 +6,7 @@
 
 #include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -105,7 +106,7 @@ public:
     Real64 RatedOutdoorAirTemp;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState &inletState, Real64 &PLR, int &fanOpMode);
+    void CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
     void sizeSpeedMode();
     bool mySizeFlag;
 

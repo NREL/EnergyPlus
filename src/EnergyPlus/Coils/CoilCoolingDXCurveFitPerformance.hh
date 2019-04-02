@@ -8,6 +8,7 @@
 
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/PsychStruct.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -36,8 +37,13 @@ class CoilCoolingDXCurveFitPerformance
 
 public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-    Psychrometrics::PsychState
-    simulate(Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void simulate(DataLoopNode::NodeData &inletNode,
+                  DataLoopNode::NodeData &outletNode,
+                  int &mode,
+                  Real64 &PLR,
+                  int &speedNum,
+                  Real64 &speedRatio,
+                  int &fanOpMode);
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
