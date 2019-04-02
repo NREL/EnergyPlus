@@ -6704,7 +6704,8 @@ namespace DaylightingManager {
                 HorIllSkyFac = HISKF / ((1 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
-                    if (IS == 2 && (SurfaceWindow(IWin).WindowModelType == WindowBSDFModel) || (SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing)) break;
+                    if (IS == 2 && (SurfaceWindow(IWin).WindowModelType == WindowBSDFModel)) break;
+                    if (IS == 2 && SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing) break;
 
                     ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) =
                         DFSUHR(IS) * HISUNF +
