@@ -498,6 +498,9 @@ namespace DataSurfaces {
     Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    std::vector<int> AllHTSurfaceList;       // List of all heat transfer surfaces (built once)
+    std::vector<int> ZoneHTSurfToResimulate; // List of HT surfaces related to a given zone (rebuilt frequently)
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Object Data
@@ -1147,6 +1150,8 @@ namespace DataSurfaces {
         WinShadingAbsorbedSolarEnergy.deallocate();
         WinGapConvHtFlowRepEnergy.deallocate();
         WinHeatTransferRepEnergy.deallocate();
+        AllHTSurfaceList.clear();
+        ZoneHTSurfToResimulate.clear();
         Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();

@@ -477,6 +477,9 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    extern std::vector<int> AllHTSurfaceList;       // List of all heat transfer surfaces (built once)
+    extern std::vector<int> ZoneHTSurfToResimulate; // List of HT surfaces related to a given zone (rebuilt frequently)
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Types

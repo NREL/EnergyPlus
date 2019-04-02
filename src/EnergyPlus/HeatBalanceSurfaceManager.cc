@@ -5803,8 +5803,65 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
+        // Reset window-related values and pass correct list of surfaces to CalcHeatBalanceInsideSurf2
+        bool const PartialResimulate(present(ZoneToResimulate));
 
-        // SUBROUTINE INFORMATION:
+        if (!PartialResimulate) {
+            // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
+            // CalcWindowHeatBalance is called, then, multiple times and these need to be initialized before each call to
+            // CalcWindowHeatBalance.
+            WinHeatGain = 0.0;
+            WinHeatTransfer = 0.0;
+            WinHeatGainRep = 0.0;
+            WinHeatLossRep = 0.0;
+            WinGainConvGlazToZoneRep = 0.0;
+            WinGainIRGlazToZoneRep = 0.0;
+            WinLossSWZoneToOutWinRep = 0.0;
+            WinGainFrameDividerToZoneRep = 0.0;
+            WinGainConvGlazShadGapToZoneRep = 0.0;
+            WinGainConvShadeToZoneRep = 0.0;
+            OtherConvGainInsideFaceToZoneRep = 0.0;
+            WinGainIRShadeToZoneRep = 0.0;
+            for (auto &window : SurfaceWindow) {
+                window.FrameQRadOutAbs = 0.0;
+                window.FrameQRadInAbs = 0.0;
+                window.DividerQRadOutAbs = 0.0;
+                window.DividerQRadInAbs = 0.0;
+            }
+            CalcHeatBalanceInsideSurf2(AllHTSurfaceList);
+        } else {
+            // Build surface list for zone to resimulate - includes adjacent interzone surfaces
+            ZoneHTSurfToResimulate.clear();
+            for (int surfNum = 1; surfNum <= TotSurfaces; ++surfNum) {
+                if (!Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                int zoneNum = Surface(surfNum).Zone;
+                if ((zoneNum == ZoneToResimulate) || (AdjacentZoneToSurface(surfNum) == ZoneToResimulate)) { // Surface relevant
+                    ZoneHTSurfToResimulate.push_back(surfNum);
+                }
+                WinHeatGain(surfNum) = 0.0;
+                WinHeatTransfer(surfNum) = 0.0;
+                WinHeatGainRep(surfNum) = 0.0;
+                WinHeatLossRep(surfNum) = 0.0;
+                WinGainConvGlazToZoneRep(surfNum) = 0.0;
+                WinGainIRGlazToZoneRep(surfNum) = 0.0;
+                WinLossSWZoneToOutWinRep(surfNum) = 0.0;
+                WinGainFrameDividerToZoneRep(surfNum) = 0.0;
+                WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
+                WinGainConvShadeToZoneRep(surfNum) = 0.0;
+                OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
+                WinGainIRShadeToZoneRep(surfNum) = 0.0;
+                SurfaceWindow(surfNum).FrameQRadOutAbs = 0.0;
+                SurfaceWindow(surfNum).FrameQRadInAbs = 0.0;
+                SurfaceWindow(surfNum).DividerQRadOutAbs = 0.0;
+                SurfaceWindow(surfNum).DividerQRadInAbs = 0.0;
+            }
+            CalcHeatBalanceInsideSurf2(ZoneHTSurfToResimulate, ZoneToResimulate);
+        }
+    }
+
+    void CalcHeatBalanceInsideSurf2(std::vector<int> &HTSurfToResimulate, Optional_int_const ZoneToResimulate)
+    {
+            // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   December 1979
         //       MODIFIED       Jun 1990 (RDT for new CTF arrays)
@@ -5980,7 +6037,6 @@ namespace HeatBalanceSurfaceManager {
             MyEnvrnFlag = true;
         }
 
-        bool const PartialResimulate(present(ZoneToResimulate));
         SurfaceEnthalpyRead = false;
         if (ZnAirRpt.allocated()) {
             for (auto &zar : ZnAirRpt) {
@@ -5989,52 +6045,13 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        // Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
-        std::vector<int> SurfToResimulate;
-        std::vector<int> HTSurfToResimulate; // Heat transfer surfaces
-        if (!PartialResimulate) {            // Avoid resizing
-            SurfToResimulate.reserve(TotSurfaces);
-            HTSurfToResimulate.reserve(TotSurfaces);
-        }
-
         // determine reference air temperatures
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
 
-            if (PartialResimulate) {
-                if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) { // Surface not relevant
-                    continue; // skip surfaces that are not associated with this zone
-                } else {      // Surface is relevant for ZoneToResimulate
-                    SurfToResimulate.push_back(SurfNum);
-                    if (Surface(SurfNum).HeatTransSurf) HTSurfToResimulate.push_back(SurfNum); // Skip non-heat transfer surfaces
-                }
-            } else {
-                SurfToResimulate.push_back(SurfNum);
-                if (Surface(SurfNum).HeatTransSurf) HTSurfToResimulate.push_back(SurfNum); // Skip non-heat transfer surfaces
-            }
-
             // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
             if ((ZoneNum == 0) || !Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue;   // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-
-            if (PartialResimulate) {
-                WinHeatGain(SurfNum) = 0.0;
-                WinHeatTransfer(SurfNum) = 0.0;
-                WinHeatGainRep(SurfNum) = 0.0;
-                WinHeatLossRep(SurfNum) = 0.0;
-                WinGainConvGlazToZoneRep(SurfNum) = 0.0;
-                WinGainIRGlazToZoneRep(SurfNum) = 0.0;
-                WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
-                WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-                WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
-                WinGainConvShadeToZoneRep(SurfNum) = 0.0;
-                OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
-                WinGainIRShadeToZoneRep(SurfNum) = 0.0;
-                SurfaceWindow(SurfNum).FrameQRadOutAbs = 0.0;
-                SurfaceWindow(SurfNum).FrameQRadInAbs = 0.0;
-                SurfaceWindow(SurfNum).DividerQRadOutAbs = 0.0;
-                SurfaceWindow(SurfNum).DividerQRadInAbs = 0.0;
-            }
 
             {
                 auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
@@ -6075,34 +6092,9 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
         }
-        auto const nSurfToResimulate(SurfToResimulate.size());
         auto const nHTSurfToResimulate(HTSurfToResimulate.size());
 
         InsideSurfIterations = 0;
-        // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
-        // CalcWindowHeatBalance is called, then, multiple times and these need to be initialized before each call to
-        // CalcWindowHeatBalance.
-        if (!PartialResimulate) {
-            WinHeatGain = 0.0;
-            WinHeatTransfer = 0.0;
-            WinHeatGainRep = 0.0;
-            WinHeatLossRep = 0.0;
-            WinGainConvGlazToZoneRep = 0.0;
-            WinGainIRGlazToZoneRep = 0.0;
-            WinLossSWZoneToOutWinRep = 0.0;
-            WinGainFrameDividerToZoneRep = 0.0;
-            WinGainConvGlazShadGapToZoneRep = 0.0;
-            WinGainConvShadeToZoneRep = 0.0;
-            OtherConvGainInsideFaceToZoneRep = 0.0;
-            WinGainIRShadeToZoneRep = 0.0;
-            for (auto &window : SurfaceWindow) {
-                window.FrameQRadOutAbs = 0.0;
-                window.FrameQRadInAbs = 0.0;
-                window.DividerQRadOutAbs = 0.0;
-                window.DividerQRadInAbs = 0.0;
-            }
-        }
-
         // Tuned Precompute whether CTF temperature limits will be needed //? Can we do this just once in the FirstTime block to save a little more
         // time (with static array)
         Array1D_bool zone_has_mixed_HT_models(NumOfZones, false);
@@ -6656,8 +6648,8 @@ namespace HeatBalanceSurfaceManager {
             // inside surface heat balance for the other side.
             assert(TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
             auto const l211(TH.index(2, 1, 1) - 1);
-            for (std::vector<int>::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate; ++iSurfToResimulate) {
-                SurfNum = SurfToResimulate[iSurfToResimulate];
+            for (std::vector<int>::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate) {
+                SurfNum = HTSurfToResimulate[iHTSurfToResimulate];
                 // Interzones must have an exterior boundary condition greater than zero
                 // (meaning that the other side is a surface) and the surface number must
                 // not be the surface itself (which is just a simple partition)

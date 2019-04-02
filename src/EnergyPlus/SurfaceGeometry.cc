@@ -383,9 +383,10 @@ namespace SurfaceGeometry {
             ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Surface,Class,Area,Tilt";
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows and build sim list
 
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip shadowing (sub)surfaces
+            AllHTSurfaceList.push_back(SurfNum); // Build heat transfer surface list
             ZoneNum = Surface(SurfNum).Zone;
             Zone(ZoneNum).TotalSurfArea += Surface(SurfNum).Area;
             if (Construct(Surface(SurfNum).Construction).TypeIsWindow) {

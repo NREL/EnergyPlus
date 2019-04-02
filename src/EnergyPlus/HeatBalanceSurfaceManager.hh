@@ -155,6 +155,8 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
+    void CalcHeatBalanceInsideSurf2(std::vector<int> &HTSurfToResimulate, Optional_int_const ZoneToResimulate = _);
+
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 
     void CalcOutsideSurfTemp(int const SurfNum,      // Surface number DO loop counter
