@@ -26,7 +26,7 @@ EnergyPlus would be modified to add more enumarations in Coil:WaterHeating:Desup
 
 EnergyPlus already handles HVAC/water heating hybrid systems for several coil types. The workflow is straight-forward to add the same structure as those systems. The steps to new enumarations are given below.
 
-1. IDD file modification: **Coil:WaterHeating:Desuperheater** A7 add **WaterHeater:Stratified** ; **Coil:WaterHeating:Desuperheater** A9 add **Coil:Cooling:WaterToAirHeatPump:EquationFit**, 
+1. IDD file modification: **Coil:WaterHeating:Desuperheater** A7 add **WaterHeater:Stratified** ; A9 add **Coil:Cooling:WaterToAirHeatPump:EquationFit**, 
 **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation**, **Coil:Cooling:DX:MultiSpeed** , etc. 
 
 2. Available reclaimed heat data passing: The available waste heat, heat source name and type data is spread across three namespaces (DataHeatBalance, WaterThermalTank, and the corresponding 
