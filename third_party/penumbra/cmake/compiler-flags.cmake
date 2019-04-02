@@ -35,18 +35,13 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("/GS-") # Disable buffer overrun checks for performance in release mode
-    ADD_CXX_RELEASE_DEFINITIONS("/MT")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("/Ob0") # Disable inlining
     ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
-    ADD_CXX_DEBUG_DEFINITIONS("/MTd")
     ADD_CXX_DEBUG_DEFINITIONS("/Zi")
-    SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") # g++/Clang
-    message("-- Building penumbra with ${CMAKE_CXX_COMPILER_ID}")
     if(CMAKE_HOST_UNIX)
       if(NOT APPLE)
         set(LINKER_FLAGS "${LINKER_FLAGS} -pthread")
@@ -73,7 +68,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleC
     endif()
 
     if (UNIX)
-      ADD_CXX_DEFINITIONS("-fPIC") # Faster compiler processing
+      ADD_CXX_DEFINITIONS("-fPIC")
     endif()
 
     # ADDITIONAL GCC-SPECIFIC FLAGS
