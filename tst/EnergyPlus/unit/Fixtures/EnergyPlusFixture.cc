@@ -74,7 +74,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -173,6 +173,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
@@ -212,6 +213,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -275,19 +277,19 @@ void EnergyPlusFixture::TearDown()
     {
         IOFlags flags;
         flags.DISPOSE("DELETE");
-        gio::close(OutputProcessor::OutputFileMeterDetails, flags);
-        gio::close(DataGlobals::OutputFileStandard, flags);
-        gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
-        gio::close(DataGlobals::OutputStandardError, flags);
-        gio::close(DataGlobals::OutputFileInits, flags);
-        gio::close(DataGlobals::OutputFileDebug, flags);
-        gio::close(DataGlobals::OutputFileZoneSizing, flags);
-        gio::close(DataGlobals::OutputFileSysSizing, flags);
-        gio::close(DataGlobals::OutputFileMeters, flags);
-        gio::close(DataGlobals::OutputFileBNDetails, flags);
-        gio::close(DataGlobals::OutputFileZonePulse, flags);
-        gio::close(DataGlobals::OutputDElightIn, flags);
-        gio::close(DataGlobals::OutputFileShadingFrac, flags);
+        ObjexxFCL::gio::close(OutputProcessor::OutputFileMeterDetails, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
+        ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileInits, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
     }
 }
 
@@ -309,7 +311,7 @@ void EnergyPlusFixture::clear_all_states()
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CurveManager::clear_state();
-    DataAirflowNetwork::clear_state();
+    AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -369,7 +371,7 @@ void EnergyPlusFixture::clear_all_states()
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::clear_state();
+    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
@@ -404,8 +406,9 @@ void EnergyPlusFixture::clear_all_states()
     PackagedTerminalHeatPump::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
-    PlantCondLoopOperation::clear_state();
+    PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
+    PlantCondLoopOperation::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();
@@ -445,6 +448,7 @@ void EnergyPlusFixture::clear_all_states()
     WaterCoils::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
+    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();

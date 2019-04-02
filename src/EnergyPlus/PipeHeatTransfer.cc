@@ -890,7 +890,7 @@ namespace PipeHeatTransfer {
         if (this->OneTimeInit) {
             errFlag = false;
             ScanPlantLoopsForObject(
-                this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag);
+                this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");
             }
@@ -1469,7 +1469,7 @@ namespace PipeHeatTransfer {
         }
     IterationLoop_exit:;
 
-        gio::close(112);
+        ObjexxFCL::gio::close(112);
     }
 
     //==============================================================================

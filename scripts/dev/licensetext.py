@@ -1,6 +1,8 @@
 import datetime
+import fnmatch
 import json
 import glob
+import os
 #
 # The previous year that is in the license. It should be a string
 #
@@ -194,10 +196,14 @@ class CodeChecker(Visitor):
     def __init__(self):
         Visitor.__init__(self)
     def files(self, path):
-        srcs = glob.glob(path+'*.cc')
-        hdrs = glob.glob(path+'*.hh')
-        hdrs.extend(glob.glob(path+'*.h'))
-        return srcs+hdrs
+        extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
+        results = []
+        for ext in extensions:
+            results.extend(glob.glob(path+'*.'+ext))
+            for root, _, filenames in os.walk(path):
+                for filename in fnmatch.filter(filenames, '*.'+ext):
+                    results.append(os.path.join(root, filename))
+        return results
 
 class Checker(CodeChecker):
     def __init__(self, boilerplate, toolname='unspecified', message=error):

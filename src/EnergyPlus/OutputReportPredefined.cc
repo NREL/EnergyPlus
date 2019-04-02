@@ -116,6 +116,7 @@ namespace OutputReportPredefined {
     int pdchPumpFlow;
     int pdchPumpPower;
     int pdchPumpPwrPerFlow;
+    int pdchPumpEndUse;
     int pdchMotEff;
     // Cooling coil subtable
     int pdstCoolCoil;
@@ -932,6 +933,7 @@ namespace OutputReportPredefined {
         pdchPumpFlow = 0;
         pdchPumpPower = 0;
         pdchPumpPwrPerFlow = 0;
+        pdchPumpEndUse = 0;
         pdchMotEff = 0;
         pdstCoolCoil = 0;
         pdchCoolCoilType = 0;
@@ -1782,6 +1784,8 @@ namespace OutputReportPredefined {
         pdchMechType = newPreDefColumn(pdstMech, "Type");
         pdchMechNomCap = newPreDefColumn(pdstMech, "Nominal Capacity [W]");
         pdchMechNomEff = newPreDefColumn(pdstMech, "Nominal Efficiency [W/W]");
+        // Note: We don't want any of these to convert.
+        // The Btu/W-h isn't going to convert anyways, and the W/W will convert to W/W since it has "SI" in the string as a hint
         pdchMechIPLVSI = newPreDefColumn(pdstMech, "IPLV in SI Units [W/W]");
         pdchMechIPLVIP = newPreDefColumn(pdstMech, "IPLV in IP Units [Btu/W-h]");
 
@@ -1886,6 +1890,7 @@ namespace OutputReportPredefined {
         pdchPumpPower = newPreDefColumn(pdstPump, "Electric Power [W]");
         pdchPumpPwrPerFlow = newPreDefColumn(pdstPump, "Power Per Water Flow Rate [W-s/m3]");
         pdchMotEff = newPreDefColumn(pdstPump, "Motor Efficiency [W/W]");
+        pdchPumpEndUse = newPreDefColumn(pdstPump, "End Use Subcategory");
 
         pdstSWH = newPreDefSubTable(pdrEquip, "Service Water Heating");
         pdchSWHType = newPreDefColumn(pdstSWH, "Type");
@@ -2621,7 +2626,7 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtI1("(I1)");
+        static ObjexxFCL::gio::Fmt fmtI1("(I1)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2648,7 +2653,7 @@ namespace OutputReportPredefined {
             sigDigitCount = 2;
         }
         // convert the integer to a string for the number of digits
-        gio::write(digitString, fmtI1) << sigDigitCount;
+        ObjexxFCL::gio::write(digitString, fmtI1) << sigDigitCount;
         // build up the format string
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
             formatConvert = "(F12." + digitString + ')';
@@ -2657,7 +2662,7 @@ namespace OutputReportPredefined {
         }
         {
             IOFlags flags;
-            gio::write(stringEntry, formatConvert, flags) << tableEntryReal;
+            ObjexxFCL::gio::write(stringEntry, formatConvert, flags) << tableEntryReal;
             IOS = flags.ios();
         }
         if (IOS != 0) stringEntry = "  Too Big";
@@ -2733,7 +2738,7 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2746,7 +2751,7 @@ namespace OutputReportPredefined {
 
         incrementTableEntry();
         // convert the integer to a string
-        gio::write(stringEntry, fmtLD) << tableEntryInt;
+        ObjexxFCL::gio::write(stringEntry, fmtLD) << tableEntryInt;
         tableEntry(numTableEntry).charEntry = stringEntry;
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;

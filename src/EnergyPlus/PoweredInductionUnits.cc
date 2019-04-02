@@ -808,12 +808,12 @@ namespace PoweredInductionUnits {
                                         PIU(PIUNum).HWLoopSide,
                                         PIU(PIUNum).HWBranchNum,
                                         PIU(PIUNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitPIU: Program terminated due to previous condition(s).");
                 }
@@ -1461,7 +1461,7 @@ namespace PoweredInductionUnits {
             TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = PIU(PIUNum).MinPriAirFlowFrac;
             TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = PIU(PIUNum).MaxVolHotWaterFlow;
             TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = PIU(PIUNum).MaxVolHotSteamFlow;
-            TermUnitSizing(CurZoneEqNum).DesHeatingLoad = DesCoilLoad; // coil report
+            TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
             TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir = PIU(PIUNum).InducesPlenumAir;
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
                 SetCoilDesFlow(PIU(PIUNum).HCoilType, PIU(PIUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);

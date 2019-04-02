@@ -191,8 +191,8 @@ namespace ScheduleManager {
     Array1D<ScheduleData> Schedule; // Schedule Storage
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
 
-    static gio::Fmt fmtLD("*");
-    static gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -363,14 +363,12 @@ namespace ScheduleManager {
         bool firstLine;
         bool FileIntervalInterpolated;
         int rowLimitCount;
-        int rowLimitMinCount;
         int skiprowCount;
         int curcolCount;
         int numHourlyValues;
         int numerrors;
         int ifld;
         int hrLimitCount;
-        bool ScheduleFileShadingLeapYear;
 
         if (ScheduleInputProcessed) {
             return;
@@ -558,7 +556,7 @@ namespace ScheduleManager {
                 {
                     IOFlags flags;
                     flags.ACTION("read");
-                    gio::open(SchdFile, TempFullFileName, flags);
+                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
                     read_stat = flags.ios();
                 }
                 if (read_stat != 0) {
@@ -569,19 +567,19 @@ namespace ScheduleManager {
                 // check for stripping
                 {
                     IOFlags flags;
-                    gio::read(SchdFile, fmtA, flags) >> LineIn;
+                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
                     read_stat = flags.ios();
                 }
                 endLine = len(LineIn);
                 if (endLine > 0) {
                     if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        gio::close(SchdFile);
+                        ObjexxFCL::gio::close(SchdFile);
                         ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
                         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError("Program terminates due to previous condition.");
                     }
                 }
-                gio::backspace(SchdFile);
+                ObjexxFCL::gio::backspace(SchdFile);
             }
 
             numerrors = 0;
@@ -590,16 +588,18 @@ namespace ScheduleManager {
 
             rowCnt = 0;
             firstLine = true;
-            rowLimitCount = 8774;
-            rowLimitMinCount = 8760;
+            if (DataEnvironment::CurrentYearIsLeapYear) {
+                rowLimitCount = 366 * 24 * NumOfTimeStepInHour;
+            } else {
+                rowLimitCount = 365 * 24 * NumOfTimeStepInHour;
+            }
             ColumnSep = CharComma;
             while (read_stat == 0) { // end of file
-                {
-                    IOFlags flags;
-                    gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
+                IOFlags flags;
+                ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
+                read_stat = flags.ios();
                 ++rowCnt;
+                if (rowCnt - 2 > rowLimitCount) break;
                 colCnt = 0;
                 wordStart = 0;
                 columnValue = 0.0;
@@ -631,56 +631,62 @@ namespace ScheduleManager {
                         }
                         break;
                     }
-                    if (rowCnt == 1) {
-                        if (subString == BlankString) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
-                            errFlag = true;
-                        } else if (CSVAllColumnNames.count(subString)) {
-                            ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
-                                             "\".");
-                            ShowContinueError("The first occurence of the same surface name would be used.");
-                            errFlag = true;
+                    // skip time stamp column
+                    if (colCnt > 1) {
+                        if (rowCnt == 1) {
+                            if (subString == BlankString) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+                                errFlag = true;
+                            } else if (CSVAllColumnNames.count(subString)) {
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
+                                                 "\".");
+                                ShowContinueError("The first occurrence of the same surface name would be used.");
+                                errFlag = true;
+                            }
+                            if (!errFlag) {
+                                NumCSVAllColumnsSchedules++;
+                                Array1D<Real64> timestepColumnValues;
+                                timestepColumnValues.allocate(rowLimitCount);
+                                // {column header: column number - 1}
+                                CSVAllColumnNames[subString] = colCnt - 1;
+                                // {column number - 1: array of numHoursInyear * timestepsInHour values}
+                                CSVAllColumnNameAndValues[colCnt - 1] = timestepColumnValues;
+                            }
+                        } else {
+                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            if (errFlag) {
+                                ++numerrors;
+                                columnValue = 0.0;
+                                ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\": found error processing column: " + std::to_string(colCnt) +
+                                                 ", row:" + std::to_string(rowCnt) + " in " + ShadingSunlitFracFileName + ".");
+                                ShowContinueError("This value is set to 0.");
+                            }
+                            CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
                         }
-                        if (!errFlag) {
-                            NumCSVAllColumnsSchedules++;
-                            Array1D<Real64> hourlyColumnValues;
-                            hourlyColumnValues.allocate(8784);
-                            CSVAllColumnNames[subString] = colCnt;
-                            CSVAllColumnNameAndValues[colCnt] = hourlyColumnValues;
-                        }
-                    } else {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            ++numerrors;
-                            columnValue = 0.0;
-                        }
-                        CSVAllColumnNameAndValues[colCnt](rowCnt - 1) = columnValue;
                     }
                 }
-
-                if (rowCnt == rowLimitCount) break;
             }
-            gio::close(SchdFile);
+            ObjexxFCL::gio::close(SchdFile);
 
-            ScheduleFileShadingProcessed = true;
-            ScheduleFileShadingLeapYear = false;
+            if (rowCnt - 2 != rowLimitCount) {
+                if (rowCnt - 2 < rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + std::to_string((rowCnt - 2)) + " data values read.");
+                }
+                else if (rowCnt - 2 > rowLimitCount) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" too many data values read.");
+                }
+                ShowContinueError("Number of rows in the shading file must be a full year multiplied by the simulation TimeStep: " +
+                    std::to_string(rowLimitCount) + ".");
+                ShowFatalError("Program terminates due to previous condition.");
+            }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
+            ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +
                                  " records had errors - these values are set to 0.");
-                ShowContinueError("Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
             }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than 8760 hourly values read from file.");
-                ShowContinueError("..Number read=" + std::to_string(rowCnt) + '.');
-            }
-            if (rowCnt < rowLimitMinCount) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
-                ShowContinueError(" Actual number of hourly values included=" + std::to_string(rowCnt) + ".");
-            }
-            if (rowCnt == rowLimitCount) ScheduleFileShadingLeapYear = true;
         }
 
         // add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
@@ -726,7 +732,7 @@ namespace ScheduleManager {
         Schedule(0).WeekSchedulePointer = 0;
 
         UnitNumber = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-        gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Start";
+        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Start";
 
         //!! Get Schedule Types
 
@@ -1402,7 +1408,7 @@ namespace ScheduleManager {
                 }
                 ++WkCount;
                 ++AddWeekSch;
-                gio::write(ExtraField, fmtLD) << WkCount;
+                ObjexxFCL::gio::write(ExtraField, fmtLD) << WkCount;
                 strip(ExtraField);
                 WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
                 WeekSchedule(AddWeekSch).Used = true;
@@ -1420,7 +1426,7 @@ namespace ScheduleManager {
                     if (has_prefix(Alphas(NumField), "FOR")) {
                         ++DyCount;
                         ++AddDaySch;
-                        gio::write(ExtraField, fmtLD) << DyCount;
+                        ObjexxFCL::gio::write(ExtraField, fmtLD) << DyCount;
                         strip(ExtraField);
                         DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
                         DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
@@ -1787,7 +1793,7 @@ namespace ScheduleManager {
                 {
                     IOFlags flags;
                     flags.ACTION("read");
-                    gio::open(SchdFile, TempFullFileName, flags);
+                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
                     read_stat = flags.ios();
                 }
                 if (read_stat != 0) {
@@ -1799,20 +1805,20 @@ namespace ScheduleManager {
                 // check for stripping
                 {
                     IOFlags flags;
-                    gio::read(SchdFile, fmtA, flags) >> LineIn;
+                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
                     read_stat = flags.ios();
                 }
                 endLine = len(LineIn);
                 if (endLine > 0) {
                     if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        gio::close(SchdFile);
+                        ObjexxFCL::gio::close(SchdFile);
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                         " appears to be a Unicode or binary file.");
                         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError("Program terminates due to previous condition.");
                     }
                 }
-                gio::backspace(SchdFile);
+                ObjexxFCL::gio::backspace(SchdFile);
 
                 // skip lines if any need to be skipped.
                 numerrors = 0;
@@ -1822,7 +1828,7 @@ namespace ScheduleManager {
                     while (read_stat == 0) { // end of file
                         {
                             IOFlags flags;
-                            gio::read(SchdFile, fmtA, flags) >> LineIn;
+                            ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
                             read_stat = flags.ios();
                         }
                         ++rowCnt;
@@ -1839,7 +1845,7 @@ namespace ScheduleManager {
                 while (read_stat == 0) { // end of file
                     {
                         IOFlags flags;
-                        gio::read(SchdFile, fmtA, flags) >> LineIn;
+                        ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
                         read_stat = flags.ios();
                     }
                     ++rowCnt;
@@ -1879,6 +1885,7 @@ namespace ScheduleManager {
                     if (colCnt == curcolCount) {
                         columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                         if (errFlag) {
+                            std::string test = subString;
                             ++numerrors;
                             columnValue = 0.0;
                         }
@@ -1888,7 +1895,7 @@ namespace ScheduleManager {
                     hourlyFileValues(rowCnt) = columnValue;
                     if (rowCnt == rowLimitCount) break;
                 }
-                gio::close(SchdFile);
+                ObjexxFCL::gio::close(SchdFile);
 
                 // schedule values have been filled into the hourlyFileValues array.
 
@@ -1990,23 +1997,23 @@ namespace ScheduleManager {
         }
 
         std::string curName;
-        Array1D<Real64> hourlyColumnValues;
+        Array1D<Real64> timestepColumnValues;
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
-            hourlyColumnValues = CSVAllColumnNameAndValues[NameValue.second];
+            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = curName;
             Schedule(SchNum).SchType = ScheduleInput_file;
 
             iDay = 0;
-            hDay = 0;
             ifld = 0;
             while (true) {
                 // create string of which day of year
                 ++iDay;
-                ++hDay;
-                if (iDay > 366) break;
+                if (iDay > 366) {
+                    break;
+                }
                 ExtraField = RoundSigDigits(iDay);
                 // increment both since a week schedule is being defined for each day so that a day is valid
                 // no matter what the day type that is used in a design day.
@@ -2023,16 +2030,15 @@ namespace ScheduleManager {
                 DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
                 // schedule is pointing to the week schedule
                 Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
-                // MinutesPerItem == 60
 
                 for (jHour = 1; jHour <= 24; ++jHour) {
-                    ++ifld;
-                    curHrVal = hourlyColumnValues(ifld); // hourlyFileValues((hDay - 1) * 24 + jHour)
                     for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                        ++ifld;
+                        curHrVal = timestepColumnValues(ifld);
                         DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                     }
                 }
-                if (iDay == 59 && ScheduleFileShadingLeapYear) { // 28 Feb
+                if (iDay == 59 && !DataEnvironment::CurrentYearIsLeapYear) { // 28 Feb
                     // Dup 28 Feb to 29 Feb (60)
                     ++iDay;
                     Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);
@@ -2344,7 +2350,7 @@ namespace ScheduleManager {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Complete";
+        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Complete";
     }
 
     void ReportScheduleDetails(int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
@@ -2376,15 +2382,15 @@ namespace ScheduleManager {
         static Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
         static Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                                       "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
-        static gio::Fmt SchTFmt0("('! Schedule Details Report=',A,' =====================')");
-        static gio::Fmt SchTFmt("('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')");
-        static gio::Fmt SchSFmt("('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')");
-        static gio::Fmt SchTFmtdata("('ScheduleTypeLimits',5(',',A))");
-        static gio::Fmt SchWFmtdata("('Schedule:Week:Daily',',',A,$)");
-        static gio::Fmt CMinFmt("(I2.2)");
-        static gio::Fmt ThruFmt("(',Through ',A,1X,I2.2,',',A)");
-        static gio::Fmt SchDFmt0("('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)");
-        static gio::Fmt SchDFmtdata0("('DaySchedule,',A,',',A,',',A,',',A,$)");
+        static ObjexxFCL::gio::Fmt SchTFmt0("('! Schedule Details Report=',A,' =====================')");
+        static ObjexxFCL::gio::Fmt SchTFmt("('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')");
+        static ObjexxFCL::gio::Fmt SchSFmt("('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')");
+        static ObjexxFCL::gio::Fmt SchTFmtdata("('ScheduleTypeLimits',5(',',A))");
+        static ObjexxFCL::gio::Fmt SchWFmtdata("('Schedule:Week:Daily',',',A,$)");
+        static ObjexxFCL::gio::Fmt CMinFmt("(I2.2)");
+        static ObjexxFCL::gio::Fmt ThruFmt("(',Through ',A,1X,I2.2,',',A)");
+        static ObjexxFCL::gio::Fmt SchDFmt0("('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)");
+        static ObjexxFCL::gio::Fmt SchDFmtdata0("('DaySchedule,',A,',',A,',',A,',',A,$)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2424,7 +2430,7 @@ namespace ScheduleManager {
 
         CurMinute = MinutesPerTimeStep;
         for (Count = 1; Count <= NumOfTimeStepInHour - 1; ++Count) {
-            gio::write(ShowMinute(Count), CMinFmt) << CurMinute;
+            ObjexxFCL::gio::write(ShowMinute(Count), CMinFmt) << CurMinute;
             CurMinute += MinutesPerTimeStep;
         }
         ShowMinute(NumOfTimeStepInHour) = "00";
@@ -2448,36 +2454,36 @@ namespace ScheduleManager {
 
                 // SchTFmt Schedule Types Header
                 if (LevelOfDetail == 1) {
-                    gio::write(OutputFileInits, SchTFmt0) << "Hourly";
+                    ObjexxFCL::gio::write(OutputFileInits, SchTFmt0) << "Hourly";
                     SchDFmt = "(',',A,$)";
                     SchDFmtdata = "(',',A,$)";
                 } else {
-                    gio::write(OutputFileInits, SchTFmt0) << "Timestep";
-                    gio::write(Num1, fmtLD) << NumOfTimeStepInHour * 24;
+                    ObjexxFCL::gio::write(OutputFileInits, SchTFmt0) << "Timestep";
+                    ObjexxFCL::gio::write(Num1, fmtLD) << NumOfTimeStepInHour * 24;
                     strip(Num1);
                     SchDFmt = "(" + Num1 + ",',',A,$)";
                     SchDFmtdata = "(" + Num1 + ",',',A,$)";
                 }
 
-                gio::write(OutputFileInits, SchTFmt);
+                ObjexxFCL::gio::write(OutputFileInits, SchTFmt);
                 // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
                 //      DO Count=1,NumF
                 //        SchDFmt=TRIM(SchDFmt)//'A'
                 //        IF (Count /= NumF) SchDFmt=TRIM(SchDFmt)//",',',"
                 //      ENDDO
                 //      SchDFmt=TRIM(SchDFmt)//')'
-                gio::write(OutputFileInits, SchDFmt0);
+                ObjexxFCL::gio::write(OutputFileInits, SchDFmt0);
                 for (Count = 1; Count <= NumF; ++Count) {
-                    gio::write(OutputFileInits, SchDFmt) << TimeHHMM(Count);
+                    ObjexxFCL::gio::write(OutputFileInits, SchDFmt) << TimeHHMM(Count);
                 }
-                gio::write(OutputFileInits);
+                ObjexxFCL::gio::write(OutputFileInits);
                 // SchWFmt Header (WeekSchedule)
                 for (Count = 1; Count <= MaxDayTypes; ++Count) {
                     SchWFmt += "," + ValidDayTypes(Count);
                 }
                 SchWFmt += "')";
-                gio::write(OutputFileInits, SchWFmt);
-                gio::write(OutputFileInits, SchSFmt);
+                ObjexxFCL::gio::write(OutputFileInits, SchWFmt);
+                ObjexxFCL::gio::write(OutputFileInits, SchSFmt);
 
                 for (Count = 1; Count <= NumScheduleTypes; ++Count) {
                     if (ScheduleType(Count).Limited) {
@@ -2490,9 +2496,9 @@ namespace ScheduleManager {
                             YesNo2 = "Yes";
                         } else {
                             YesNo2 = "No";
-                            gio::write(Num1, fmtLD) << int(ScheduleType(Count).Minimum);
+                            ObjexxFCL::gio::write(Num1, fmtLD) << int(ScheduleType(Count).Minimum);
                             strip(Num1);
-                            gio::write(Num2, fmtLD) << int(ScheduleType(Count).Maximum);
+                            ObjexxFCL::gio::write(Num2, fmtLD) << int(ScheduleType(Count).Maximum);
                             strip(Num2);
                         }
                     } else {
@@ -2501,7 +2507,7 @@ namespace ScheduleManager {
                         Num2 = "N/A";
                         YesNo2 = "N/A";
                     }
-                    gio::write(OutputFileInits, SchTFmtdata) << ScheduleType(Count).Name << NoAverageLinear << Num1 << Num2 << YesNo2;
+                    ObjexxFCL::gio::write(OutputFileInits, SchTFmtdata) << ScheduleType(Count).Name << NoAverageLinear << Num1 << Num2 << YesNo2;
                 }
 
                 //      WRITE(Num1,*) NumOfTimeStepInHour*24
@@ -2525,30 +2531,30 @@ namespace ScheduleManager {
                         }
                     }
                     if (LevelOfDetail == 1) {
-                        gio::write(OutputFileInits, SchDFmtdata0)
+                        ObjexxFCL::gio::write(OutputFileInits, SchDFmtdata0)
                             << DaySchedule(Count).Name << ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name << NoAverageLinear << "Values:";
                         for (Hr = 1; Hr <= 24; ++Hr) {
-                            gio::write(OutputFileInits, SchDFmtdata) << RoundTSValue(NumOfTimeStepInHour, Hr);
+                            ObjexxFCL::gio::write(OutputFileInits, SchDFmtdata) << RoundTSValue(NumOfTimeStepInHour, Hr);
                         }
-                        gio::write(OutputFileInits);
+                        ObjexxFCL::gio::write(OutputFileInits);
                     } else if (LevelOfDetail == 2) {
-                        gio::write(OutputFileInits, SchDFmtdata0)
+                        ObjexxFCL::gio::write(OutputFileInits, SchDFmtdata0)
                             << DaySchedule(Count).Name << ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name << NoAverageLinear << "Values:";
                         for (Hr = 1; Hr <= 24; ++Hr) {
                             for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                                gio::write(OutputFileInits, SchDFmtdata) << RoundTSValue(TS, Hr);
+                                ObjexxFCL::gio::write(OutputFileInits, SchDFmtdata) << RoundTSValue(TS, Hr);
                             }
                         }
-                        gio::write(OutputFileInits);
+                        ObjexxFCL::gio::write(OutputFileInits);
                     }
                 }
 
                 for (Count = 1; Count <= NumWeekSchedules; ++Count) {
-                    gio::write(OutputFileInits, SchWFmtdata) << WeekSchedule(Count).Name;
+                    ObjexxFCL::gio::write(OutputFileInits, SchWFmtdata) << WeekSchedule(Count).Name;
                     for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
-                        gio::write(OutputFileInits, "(',',A,$)") << DaySchedule(WeekSchedule(Count).DaySchedulePointer(NumF)).Name;
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << DaySchedule(WeekSchedule(Count).DaySchedulePointer(NumF)).Name;
                     }
-                    gio::write(OutputFileInits);
+                    ObjexxFCL::gio::write(OutputFileInits);
                 }
 
                 for (Count = 1; Count <= NumSchedules; ++Count) {
@@ -2556,7 +2562,7 @@ namespace ScheduleManager {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileInits, "('Schedule,',A,',',A)", flags)
+                        ObjexxFCL::gio::write(OutputFileInits, "('Schedule,',A,',',A)", flags)
                             << Schedule(Count).Name << ScheduleType(Schedule(Count).ScheduleTypePtr).Name;
                     }
                     while (NumF <= 366) {
@@ -2567,7 +2573,7 @@ namespace ScheduleManager {
                                 {
                                     IOFlags flags;
                                     flags.ADVANCE("No");
-                                    gio::write(OutputFileInits, ThruFmt, flags) << Months(PMon) << PDay << WeekSchedule(TS).Name;
+                                    ObjexxFCL::gio::write(OutputFileInits, ThruFmt, flags) << Months(PMon) << PDay << WeekSchedule(TS).Name;
                                 }
                             }
                             ++NumF;
@@ -2578,19 +2584,19 @@ namespace ScheduleManager {
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
-                                gio::write(OutputFileInits, ThruFmt, flags) << Months(PMon) << PDay << WeekSchedule(TS).Name;
+                                ObjexxFCL::gio::write(OutputFileInits, ThruFmt, flags) << Months(PMon) << PDay << WeekSchedule(TS).Name;
                             }
                         }
                     }
-                    gio::write(OutputFileInits, "(1X)");
+                    ObjexxFCL::gio::write(OutputFileInits, "(1X)");
                 }
 
             } else if (SELECT_CASE_var == 3) {
                 for (Count = 1; Count <= NumSchedules; ++Count) {
-                    gio::write(OutputFileDebug);
-                    gio::write(OutputFileDebug, fmtA) << "  Schedule:Compact,";
-                    gio::write(OutputFileDebug, fmtA) << "    " + Schedule(Count).Name + ",           !- Name";
-                    gio::write(OutputFileDebug, fmtA)
+                    ObjexxFCL::gio::write(OutputFileDebug);
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  Schedule:Compact,";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    " + Schedule(Count).Name + ",           !- Name";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                         << "    " + ScheduleType(Schedule(Count).ScheduleTypePtr).Name + ",          !- ScheduleTypeLimits";
                     NumF = 1;
                     while (NumF <= 366) {
@@ -2598,49 +2604,49 @@ namespace ScheduleManager {
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
-                                    gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            gio::write(OutputFileDebug, fmtA)
+                                            ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                                 << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                        RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                         }
                                     } else {
-                                        gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                                     }
                                     iDayP = iDay;
                                 }
                                 DT = 1;
-                                gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        gio::write(OutputFileDebug, fmtA)
+                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                             << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                    RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                     }
                                 } else {
-                                    gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                                 }
                                 iDayP = iDay;
                                 for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                    gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            gio::write(OutputFileDebug, fmtA)
+                                            ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                                 << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                        RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                         }
                                     } else {
-                                        gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                                     }
                                     iDayP = iDay;
                                 }
@@ -2650,49 +2656,49 @@ namespace ScheduleManager {
                         }
                         if (NumF <= 366) {
                             General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
                             iDayP = 0;
                             for (DT = 2; DT <= 6; ++DT) {
-                                gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        gio::write(OutputFileDebug, fmtA)
+                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                             << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                    RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                     }
                                 } else {
-                                    gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                                 }
                                 iDayP = iDay;
                             }
                             DT = 1;
-                            gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                             iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                             iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                             if (iDay != iDayP) {
                                 for (Hr = 1; Hr <= 24; ++Hr) {
-                                    gio::write(OutputFileDebug, fmtA)
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                         << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                 }
                             } else {
-                                gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                             }
                             iDayP = iDay;
                             for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        gio::write(OutputFileDebug, fmtA)
+                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                                             << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
                                                    RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
                                     }
                                 } else {
-                                    gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
                                 }
                                 iDayP = iDay;
                             }
@@ -3544,7 +3550,7 @@ namespace ScheduleManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt hhmmFormat("(I2.2)");
+        static ObjexxFCL::gio::Fmt hhmmFormat("(I2.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3574,7 +3580,7 @@ namespace ScheduleManager {
         } else {
             {
                 IOFlags flags;
-                gio::read(String.substr(0, Pos), fmtLD, flags) >> rRetHH;
+                ObjexxFCL::gio::read(String.substr(0, Pos), fmtLD, flags) >> rRetHH;
                 IOS = flags.ios();
             }
             RetHH = int(rRetHH);
@@ -3597,7 +3603,7 @@ namespace ScheduleManager {
         String.erase(0, Pos + 1);
         {
             IOFlags flags;
-            gio::read(String, fmtLD, flags) >> rRetMM;
+            ObjexxFCL::gio::read(String, fmtLD, flags) >> rRetMM;
             IOS = flags.ios();
         }
         RetMM = int(rRetMM);
@@ -3617,8 +3623,8 @@ namespace ScheduleManager {
         }
 
         if (nonIntegral) {
-            gio::write(hHour, hhmmFormat) << RetHH;
-            gio::write(mMinute, hhmmFormat) << RetMM;
+            ObjexxFCL::gio::write(hHour, hhmmFormat) << RetHH;
+            ObjexxFCL::gio::write(mMinute, hhmmFormat) << RetMM;
             ShowContinueError("Until value to be used will be: " + hHour + ':' + mMinute);
         }
         if (interpolationKind == ScheduleInterpolation::No) {

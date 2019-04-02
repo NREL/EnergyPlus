@@ -468,7 +468,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
     std::string chIteration;
     std::string chSetSizes;
     std::string chDemandTrapUsed;
-    static gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
     bool changedByDemand(false);
     static bool eioHeaderDoneOnce(false);
     bool nullStampProblem;
@@ -554,7 +554,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!eioHeaderDoneOnce) {
-        gio::write(OutputFileInits, fmtA) << "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}";
@@ -572,7 +572,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
         chDemandTrapUsed = "No";
     }
 
-    gio::write(OutputFileInits, fmtA) << "Plant Coincident Sizing Algorithm," + name + "," + chIteration + "," +
+    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Plant Coincident Sizing Algorithm," + name + "," + chIteration + "," +
                                              RoundSigDigits(newFoundMassFlowRateTimeStamp.runningAvgDataValue, 7) + "," +
                                              RoundSigDigits(NewFoundMaxDemandTimeStamp.runningAvgDataValue, 2) + "," +
                                              RoundSigDigits(peakLoadCalculatedMassFlow, 7) + "," + chSetSizes + "," +

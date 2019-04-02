@@ -303,6 +303,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+        Array1D_bool FixedReturnFlow;     // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
         Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 
@@ -313,6 +314,8 @@ namespace DataZoneEquipment {
         Real64 PlenumMassFlow;    // zone air mass flow rate induced from plenum [kg/s]
         Real64 ExcessZoneExh;     // excess zone exhaust to be balanced by other zones (only used when !ZoneAirMassFlow.EnforceZoneMassBalance) [kg/s]
         Real64 TotAvailAirLoopOA; // total airloop OA available for systems serving this zone (used to apportion excess exhaust) [kg/s}
+        Real64 TotInletAirMassFlowRate; // total inlet node mass flow rate [kg/s]
+        Real64 TotExhaustAirMassFlowRate; // total exhaust node mass flow rate [kg/s]
         // AirDistUnitCool and AirDistUnitHeat
         // do not correspond with the AIR DISTRIBUTION UNIT object in the zone equipment list.
         // AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
@@ -334,7 +337,7 @@ namespace DataZoneEquipment {
               NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false),
 
               ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0),
-              TotAvailAirLoopOA(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
+              TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0), TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
               ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false)
         {
         }
@@ -396,6 +399,8 @@ namespace DataZoneEquipment {
         std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
+        Array1D<Real64> SequentialCoolingFraction;
+        Array1D<Real64> SequentialHeatingFraction;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]
         Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
         Array1D<EquipmentData> EquipData; // Index of energy output report data

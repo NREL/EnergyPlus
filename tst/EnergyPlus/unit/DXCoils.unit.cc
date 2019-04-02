@@ -240,6 +240,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     DXCoil(CoilIndex).InletAirHumRat = 0.01145065;
     DXCoil(CoilIndex).MSRatedCBF(1) = 0.0107723;
     DXCoil(CoilIndex).MSRatedCBF(2) = 0.0107723;
+    DXCoil(CoilIndex).MSWasteHeat(1) = 0;
+    DXCoil(CoilIndex).MSWasteHeat(2) = 0;
+    DXCoil(CoilIndex).MSWasteHeatFrac(1) = 0;
+    DXCoil(CoilIndex).MSWasteHeatFrac(2) = 0;
     DXCoil(CoilIndex).SchedPtr = 1;
     Schedule.allocate(1);
     Schedule(1).CurrentValue = 1.0;
@@ -247,6 +251,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     DXCoilOutletHumRat.allocate(1);
     DXCoilPartLoadRatio.allocate(1);
     DXCoilFanOpMode.allocate(1);
+
+    DataLoopNode::Node.allocate(1);
+    DXCoil(CoilIndex).AirOutNode = 1;
 
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
@@ -392,10 +399,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     using CurveManager::BiQuadratic;
     using CurveManager::NumCurves;
     using CurveManager::Quadratic;
-    using DXCoils::CalcMultiSpeedDXCoilHeating;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
+    using DXCoils::CalcMultiSpeedDXCoilHeating;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     int DXCoilNum;
@@ -422,6 +429,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostStrategy = Resistive;
     Coil.Name = "DX Heating coil";
     Coil.NumOfSpeeds = 2;
+    DataLoopNode::Node.allocate(1);
+    Coil.AirOutNode = 1;
 
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
     Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);
@@ -792,6 +801,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
     Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    DataLoopNode::Node.allocate(1);
+    Coil.AirOutNode = 1;
 
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 11012.634487601337;
@@ -970,7 +981,6 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
     // tests autosizing evaporatively cooled condenser pump #4802
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1098,7 +1108,6 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
 
     // IDF snippets
     std::string const idf_objects = delimited_string({
-        "Version,8.3;                                          ",
         "OutdoorAir:Node,                                      ",
         "   Outside Air Inlet Node 1; !- Name                  ",
         "OutdoorAir:NodeList,                                  ",
@@ -1136,7 +1145,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     using Psychrometrics::PsyTwbFnTdbWPb;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1335,7 +1343,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     CalcMultiSpeedDXCoilCooling(1, 1, 1, 2, 1, 1, 0);
-
     EXPECT_EQ(0, MSHPWasteHeat);
 
     // Case 3 heat recovery is true and no waste heat function cuvre
@@ -1477,8 +1484,14 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     std::string const CallingRoutine("DXCoil_ValidateADPFunction");
 
-    Real64 CBF_calculated = CalcCBF(DXCoil(1).DXCoilType, DXCoil(1).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil(1).RatedTotCap(1),
-                                    DXCoil(1).RatedAirVolFlowRate(1), DXCoil(1).RatedSHR(1), true);
+    Real64 CBF_calculated = CalcCBF(DXCoil(1).DXCoilType,
+                                    DXCoil(1).Name,
+                                    RatedInletAirTemp,
+                                    RatedInletAirHumRat,
+                                    DXCoil(1).RatedTotCap(1),
+                                    DXCoil(1).RatedAirVolFlowRate(1),
+                                    DXCoil(1).RatedSHR(1),
+                                    true);
 
     EXPECT_NEAR(0.788472, DXCoil(1).RatedSHR(1), 0.0000001);
     EXPECT_NEAR(0.0003944, CBF_calculated, 0.0000001);
@@ -1487,8 +1500,14 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     DXCoil(1).RatedSHR(1) = AutoSize;
 
     SizeDXCoil(1);
-    CBF_calculated = CalcCBF(DXCoil(1).DXCoilType, DXCoil(1).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil(1).RatedTotCap(1),
-                             DXCoil(1).RatedAirVolFlowRate(1), DXCoil(1).RatedSHR(1), true);
+    CBF_calculated = CalcCBF(DXCoil(1).DXCoilType,
+                             DXCoil(1).Name,
+                             RatedInletAirTemp,
+                             RatedInletAirHumRat,
+                             DXCoil(1).RatedTotCap(1),
+                             DXCoil(1).RatedAirVolFlowRate(1),
+                             DXCoil(1).RatedSHR(1),
+                             true);
 
     EXPECT_NEAR(0.67608322, DXCoil(1).RatedSHR(1), 0.0000001);
     EXPECT_NEAR(0.0003243, CBF_calculated, 0.0000001);
@@ -1497,8 +1516,14 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     DXCoil(1).RatedSHR(1) = AutoSize;
 
     SizeDXCoil(1);
-    CBF_calculated = CalcCBF(DXCoil(1).DXCoilType, DXCoil(1).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil(1).RatedTotCap(1),
-                             DXCoil(1).RatedAirVolFlowRate(1), DXCoil(1).RatedSHR(1), true);
+    CBF_calculated = CalcCBF(DXCoil(1).DXCoilType,
+                             DXCoil(1).Name,
+                             RatedInletAirTemp,
+                             RatedInletAirHumRat,
+                             DXCoil(1).RatedTotCap(1),
+                             DXCoil(1).RatedAirVolFlowRate(1),
+                             DXCoil(1).RatedSHR(1),
+                             true);
 
     EXPECT_NEAR(0.64408322, DXCoil(1).RatedSHR(1), 0.0000001);
     EXPECT_NEAR(0.0028271, CBF_calculated, 0.0000001);
@@ -1509,7 +1534,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     // Test the crankcase heat for Coil:Cooling:DX:MultiSpeed #5659
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " Schedule:Compact,",
         "	FanAndCoilAvailSched, !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1699,7 +1723,6 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
     // tests autosizing evaporatively cooled condenser pump #4802
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	Always On,            !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1780,7 +1803,6 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
     // tests performance curves reports warning if rating point results is not near 1.0
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "	Schedule:Compact,",
         "	Always On,            !- Name",
         "	Fraction,             !- Schedule Type Limits Name",
@@ -1848,7 +1870,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1951,7 +1973,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -2044,7 +2066,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
         "    WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ;  !- Condenser Air Inlet Node Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -2052,7 +2074,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
-    ASSERT_EQ(-25.0, DXCoil(1).MinOATCompressor);          // use default value at -25C
+    ASSERT_EQ(-25.0, DXCoil(1).MinOATCompressor);     // use default value at -25C
 }
 
 } // namespace EnergyPlus

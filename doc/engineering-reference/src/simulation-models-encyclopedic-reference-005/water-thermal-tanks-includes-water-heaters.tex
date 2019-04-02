@@ -498,7 +498,7 @@ Note: All heat pump water heater output variables, including off-cycle ancillary
 
 \subsection{Stratified Water Thermal Tank}\label{stratified-water-thermal-tank}
 
-The input objects WaterHeater:Stratified and ThermalStorage:ChilledWater:Stratified provide models for a stratified water thermal tank that divides the water tank into multiple nodes of equal volume.~ This model is used for both the stratified water heater and the stratified chilled water storage tank. The nodes are coupled by vertical conduction effects, internode fluid flow, and temperature inversion mixing.~ The object simultaneously solves the differential equations governing the energy balances on the nodes using the Forward-Euler numerical method.~ The system time step is divided into one second substeps that allow the simulation to capture events that occur on a very short time scale.
+The input objects WaterHeater:Stratified and ThermalStorage:ChilledWater:Stratified provide models for a stratified water thermal tank that divides the water tank into multiple nodes of equal volume. This model is used for both the stratified water heater and the stratified chilled water storage tank. The nodes are coupled by vertical conduction effects, internode fluid flow, and temperature inversion mixing. The object simultaneously solves the differential equations governing the energy balances on the nodes using an analytical solution to a simplified representation of the heat balance equation. The system time step is divided into one minute substeps at which control decisions are evaluated that allow the simulation to capture events that occur on a short time scale.
 
 \subsubsection{Energy Balance}\label{energy-balance-1}
 
@@ -538,12 +538,18 @@ where:
 
 \emph{q\(_{net,n}\)} is the net heat transfer rate for node \emph{n}.
 
-The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due to multiple heat transfer pathways.
+It will be advantageous for the numerical solution to rearrange the nodal differential equation into the form
+
+\begin{equation}
+  \frac{d{T}}{dt} = a T + b
+\end{equation}
+
+The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due to multiple heat transfer pathways. Each term is defined as described below and separated into the part that is multiplied by the current node temperature ($a$ term) and everything else ($b$ term).
 
 \begin{equation}
   \begin{array}{ll}
     q_{net,n} &= q_{heater,n} + q_{oncycpara,n} + q_{offcycpara,n} + q_{oncycloss,n} + q_{offcycloss,n} \\ 
-              &+ q_{cond,n} + q_{use,n} + q_{source,n} + q_{flow,n} + q_{invmix,n}
+              &+ q_{cond,n} + q_{use,n} + q_{source,n} + q_{flow,n}
   \end{array}
 \end{equation}
 
@@ -567,7 +573,11 @@ where:
 
 \emph{q\(_{flow,n}\)} is the heat transfer due to fluid flow from the node above and below
 
-\emph{q\(_{invmix,n}\)} is the heat transfer due to inversion mixing from the node above and below.
+\paragraph{Heater and Parasitic Loads}
+
+$q_{heater}$, $q_{oncycpara,n}$, and $q_{offcycpara,n}$ are all added to the $b$ coefficient because they do not depend on the current node temperature.
+
+\paragraph{On- and Off-cycle Losses to Ambient}
 
 \emph{q\(_{oncycloss,n}\)} and \emph{q\(_{offcycloss,n}\)} are defined as:
 
@@ -588,6 +598,26 @@ where:
 \emph{UA\(_{flue}\)} is the additional off-cycle flue loss coefficient to ambient environment (zero when on)
 
 \emph{T\(_{amb}\)} is the temperature of ambient environment.
+
+Separating it into $a$ and $b$ terms for on-cycle losses:
+
+\begin{equation}
+  \begin{array}{rl}
+    a_n &= - (UA_{tank} + UA_{add,n}) \\
+    b_n &= (UA_{tank} + UA_{add,n}) T_{amb}
+  \end{array}
+\end{equation}
+
+And for off-cycle losses:
+
+\begin{equation}
+  \begin{array}{rl}
+    a_n &= - (UA_{tank} + UA_{flue}) \\
+    b_n &= (UA_{tank} + UA_{flue}) T_{amb}
+  \end{array}
+\end{equation}
+
+\paragraph{Conduction to Adjacent Nodes}
 
 \emph{q\(_{cond,n}\)} is defined as:
 
@@ -610,6 +640,17 @@ where:
 \emph{L\(_{n-1}\)} is the distance between the center of mass of node \emph{n} and n\emph{-1}
 
 \emph{T\(_{n-1}\)} is the temperature of node \emph{n-1}.
+
+Separating into $a$ and $b$ terms yields:
+
+\begin{equation}
+  \begin{array}{rl}
+    a_n &= - \left(\frac{kA_{n+1}}{L_{n+1}} + \frac{kA_{n-1}}{L_{n-1}}\right) \\
+    b_n &= \left(\frac{kA_{n+1}}{L_{n+1}} T_{n+1} + \frac{kA_{n-1}}{L_{n-1}} T_{n-1}\right) T_{amb}
+  \end{array}
+\end{equation}
+
+\paragraph{Use- and Source-side Plant Connections}
 
 \emph{q\(_{use,n}\)}, and \emph{q\(_{source,n}\)} are defined as:
 
@@ -635,6 +676,26 @@ where:
 
 \(T_{source}\) is the inlet fluid temperature of the source side plant connections.
 
+Separating into $a$ and $b$ terms for the source side connection yields:
+
+\begin{equation}
+  \begin{array}{rl}
+    a_n &= - \varepsilon_{src} \dot{m}_{src} c_p \\
+    b_n &= \varepsilon_{src} \dot{m}_{src} c_p T_{src}
+  \end{array}
+\end{equation}
+
+And for the use side connection:
+
+\begin{equation}
+  \begin{array}{rl}
+    a_n &= - \varepsilon_{use} \dot{m}_{use} c_p \\
+    b_n &= \varepsilon_{use} \dot{m}_{use} c_p T_{use}
+  \end{array}
+\end{equation}
+
+\paragraph{Internodal Flow}
+
 \(q_{flow,n}\) is defined as:
 
 \begin{equation}
@@ -647,27 +708,22 @@ where:
 
 \({\dot m_{n - 1}}\) is the mass flow rate from node \emph{n-1}.
 
-\emph{q\(_{invmix,n}\)} is defined as:
+Separating into $a$ and $b$ terms:
 
 \begin{equation}
-{q_{invmix,n}} = {\dot m_{invmix,n + 1}}{c_p}({T_{n + 1}} - {T_n}) + {\dot m_{invmix,n - 1}}{c_p}({T_{n - 1}} - {T_n})
+  \begin{array}{rl}
+    a_n &= - c_p (\dot m_{n+1} + \dot m_{n-1}) \\
+    b_n &= c_p (\dot m_{n+1} T_{n+1} + \dot m_{n-1} T_{n-1})
+  \end{array}
 \end{equation}
 
-where:
+\paragraph{Inversion Mixing}
 
-\({\dot m_{invmix,n + 1}}\) is the mass flow rate from node \emph{n+1} due to temperature inversion mixing
+Inversion mixing occurs when the node below is warmer than the node above. The difference in temperatures drives a difference in density that causes the nodes to mix. Usually inversion mixing occurs very rapidly.
 
-\({\dot m_{invmix,n - 1}}\) is the mass flow rate from node \emph{n-1} due to temperature inversion mixing.
+At the end of each sub timestep, the algorithm checks for temperature inversions and instantaneously mixes inverted nodes by calculating a weighted average of the node temperatures of the inverted nodes. This is done iteratively up the tank until there are no more temperature inversions.
 
-Inversion mixing occurs when the node below is warmer than the node above.~ The difference in temperatures drives a difference in density that causes the nodes to mix.~ Usually inversion mixing occurs very rapidly.~ In this algorithm, the inversion mixing rate is selected to be the maximum value that will provide a stable solution given the node mass and the substep interval:
-
-\begin{equation}
-{\dot m_{invmix}} = 0.5*{m_n}/\Delta t
-\end{equation}
-
-where:
-
-\(\Delta t\) is the substep time interval.
+\paragraph{Use and Source Effectiveness Correction}
 
 The use and source fluid steam outlet temperatures calculation procedure depends on the values of the effectiveness.~ If the effectiveness is 1.0, then complete mixing of these fluid steam and the tank water is assumed.~ In this case the outlet temperatures for the use and source streams will be simply the tank water temperatures at point of the outlet nodes. When the effectiveness is less than 1.0, an indirect heat exchange is assumed between the use or source stream and the water in the stratified thermal storage tank.~ When the effectiveness is less than 1.0, the use and source outlet temperatures are calculated using \emph{Q\(_{use}\)} and \emph{Q\(_{source}\)}, and energy balance equations as follows:
 
@@ -687,20 +743,39 @@ where:
 
 \subsubsection{Numerical Solution}\label{numerical-solution}
 
-The system of simultaneous differential equations is solved using the Forward-Euler numerical method.~ The system time step is divided into one-second substeps.~ The new temperature for a given node is calculated using the following equation:
+To solve the differential equations the nodal heat balance equations are modified into the form:
 
 \begin{equation}
-{T_n} = {T_{n,old}} + \frac{{{q_{net,n}}\Delta t}}{{{m_n}{c_p}}}
+  \frac{d{T_n}}{dt} = a T_n + b
 \end{equation}
 
-All node temperatures for \emph{q\(_{net,n}\)} are the old temperatures from the previous substep.
+Where $a$ is a constant and $b$ can be a function of either time or the temperature of adjacent nodes. If $b$ is assumed to be constant, the solution of the differential equation is readily solved. Since $b$ is not generally constant a reasonable approximation can be made by assuming $b$ is equal to its average value over the sub timestep. 
+
+Solving the differential equation yields the following solution for the temperature of a node at the end of a sub timestep. 
+
+\begin{equation}
+  T_{final} = \left( T_{initial} + \frac{b}{a} \right) e ^ {a \Delta t} - \frac{b}{a}
+\end{equation}
+
+Where $b$ is a function of the average temperature as calculated by
+
+\begin{equation}
+  \begin{array}{rl}
+    b &= b(T_{avg}) \\
+    T_{avg} &= \frac{(T_{initial} - \frac{b}{a}) (e ^ {a \Delta t} - 1)}{a \Delta t} - \frac{b}{a}
+  \end{array}
+\end{equation}
+
+The solution is obtained by separating the $q_{net}$ terms described above into their respective $a$ and $b$ parts, solving for $T_{final}$ and $T_{avg}$, recalculating $b$ using the new average temperatures and iterating until the temperatures converge, at which point temperature inversions are resolved and controls decisions are made before moving on to the next sub timestep.
+
+\paragraph{Control Logic Evaluation}
 
 Before each system time step is calculated the following evaluations are made:
 
-\begin{itemize}
+\begin{enumerate}
 \item Use and source inlet flow rates are applied to the inlet nodes
 \item Internode flow is determined and net flow rates are determined
-\end{itemize}
+\end{enumerate}
 
 Before each substep is calculated, the following evaluations are made:
 

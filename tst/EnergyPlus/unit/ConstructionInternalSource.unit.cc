@@ -64,7 +64,6 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 {
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.4;	",
         "	Construction:InternalSource,	",
         "	Slab Floor with Radiant, !- Name",
         "	4,                       !- Source Present After Layer Number",

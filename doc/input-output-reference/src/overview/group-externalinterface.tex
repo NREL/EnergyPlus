@@ -1,6 +1,6 @@
 \section{Group ExternalInterface}\label{group-externalinterface}
 
-The ExternalInterface allows coupling EnergyPlus to the Building Controls Virtual Test Bed (BCVTB). It supports the import of Functional Mock-up Units (FMUs) for co-simulation as well as the export of EnergyPlus as a FMU for co-simulation. BCVTB is a software environment that allows expert users to couple different simulation programs for distributed simulation or for a real-time simulation that is connected to a building control system. For example, the BCVTB allows simulation of the building envelope and HVAC system in EnergyPlus and the control logic in MATLAB/Simulink, while exchanging data between the two programs as they simulate. The BCVTB can be downloaded from \url{http://simulationresearch.lbl.gov/bcvtb}. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (\url{http://www.modelisar.com}).
+The \hyperref[externalinterface]{ExternalInterface} allows coupling EnergyPlus to the Building Controls Virtual Test Bed (BCVTB). It supports the import of Functional Mock-up Units (FMUs) for co-simulation as well as the export of EnergyPlus as a FMU for co-simulation. BCVTB is a software environment that allows expert users to couple different simulation programs for distributed simulation or for a real-time simulation that is connected to a building control system. For example, the BCVTB allows simulation of the building envelope and HVAC system in EnergyPlus and the control logic in MATLAB/Simulink, while exchanging data between the two programs as they simulate. The BCVTB can be downloaded from \url{http://simulationresearch.lbl.gov/bcvtb}. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (\url{http://www.modelisar.com}).
 
 \subsection{ExternalInterface}\label{externalinterface}
 
@@ -26,7 +26,7 @@ The following objects are designed to couple EnergyPlus with the BCVTB.
 
 \subsection{ExternalInterface:Schedule}\label{externalinterfaceschedule}
 
-This input object is similar to Schedule:Compact. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+This input object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-1-016}
 
@@ -68,7 +68,7 @@ ExternalInterface:Schedule,
 
 \subsection{ExternalInterface:Actuator}\label{externalinterfaceactuator}
 
-This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to EnergyManagementSystem:Actuator. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-2-015}
 
@@ -78,11 +78,11 @@ This field contains a unique name for the actuator. No spaces are allowed in the
 
 \paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-000}
 
-This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
 
 \paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-000}
 
-The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
 
 \paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-000}
 
@@ -90,7 +90,7 @@ This field defines the type of control to be done on the specific entity being c
 
 \paragraph{Field: Initial Value}\label{field-initial-value-1}
 
-This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing. This allows, for example, to schedule a setpoint with a Schedule:Compact during warm-up and system-sizing, and then overwrite the value of this schedule during each zone time step based on a feedback control loop that is implemented in the BCVTB.
+This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing. This allows, for example, to schedule a setpoint with a \hyperref[schedulecompact]{Schedule:Compact} during warm-up and system-sizing, and then overwrite the value of this schedule during each zone time step based on a feedback control loop that is implemented in the BCVTB.
 
 \begin{lstlisting}
 
@@ -104,7 +104,7 @@ ExternalInterface:Actuator,
 
 \subsection{ExternalInterface:Variable}\label{externalinterfacevariable}
 
-This input object is similar to EnergyManagementSystem:GlobalVariable. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
 
 \subsubsection{Inputs}\label{inputs-3-013}
 
@@ -161,11 +161,11 @@ This input object maps the names of the output variables of EnergyPlus to the in
 
 \paragraph{Field: EnergyPlus Key Value}\label{field-energyplus-key-value}
 
-This input object maps the names of the EnergyPlus output variables (\textbf{Output:Variable} or \textbf{EnergyManagementSystem:OutputVariable}) to the input variables of the FMU.
+This input object maps the names of the EnergyPlus output variables (\textbf{\hyperref[outputvariable]{Output:Variable}} or \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}) to the input variables of the FMU.
 
 \paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name}
 
-This field contains the output variable name as defined in the InputOutput Reference. For an \textbf{EnergyManagementSystem:OutputVariable}, the EnergyPlus Variable Name is the name of the \textbf{EnergyManagementSystem:OutputVariable} s object.
+This field contains the output variable name as defined in the InputOutput Reference. For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Variable Name is the name of the \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}} s object.
 
 \paragraph{Field: FMU File Name}\label{field-fmu-file-name-1}
 
@@ -215,7 +215,7 @@ ExternalInterface:FunctionalMockupUnitImport:From:Variable,
 
 \subsection{ExternalInterface:FunctionalMockupUnitImport:To:Schedule}\label{externalinterfacefunctionalmockupunitimporttoschedule}
 
-This input object is similar to Schedule:Compact. However, during the time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
+This input object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-6-009}
 
@@ -265,7 +265,7 @@ ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
 
 \subsection{ExternalInterface:FunctionalMockupUnitImport:To:Actuator}\label{externalinterfacefunctionalmockupunitimporttoactuator}
 
-This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to EnergyManagementSystem:Actuator. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-7-009}
 
@@ -275,11 +275,11 @@ This field contains a unique name for the actuator. No spaces are allowed in the
 
 \paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-1}
 
-This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
 
 \paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-1}
 
-The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
 
 \paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-1}
 
@@ -316,7 +316,7 @@ ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
 
 \subsection{ExternalInterface:FunctionalMockupUnitImport:To:Variable}\label{externalinterfacefunctionalmockupunitimporttovariable}
 
-This input object is similar to EnergyManagementSystem:GlobalVariable. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
 
 \subsubsection{Inputs}\label{inputs-8-007}
 
@@ -356,17 +356,17 @@ The following objects are designed to support the export of EnergyPlus as a FMU 
 
 \subsection{ExternalInterface:FunctionalMockupUnitExport:From:Variable}\label{externalinterfacefunctionalmockupunitexportfromvariable}
 
-This object exposes the EnergyPlus output variables (\textbf{Output:Variable} or \textbf{EnergyManagementSystem:OutputVariable}) to the outside simulation program.
+This object exposes the EnergyPlus output variables (\textbf{\hyperref[outputvariable]{Output:Variable}} or \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}) to the outside simulation program.
 
 \subsubsection{Inputs}\label{inputs-9-006}
 
 \paragraph{Field: EnergyPlus Key Value}\label{field-energyplus-key-value-1}
 
-This field contains a Key Value for an EnergyPlus output variable (ref Output:Variable/.rdd file). For an \textbf{EnergyManagementSystem:OutputVariable}, the EnergyPlus Key Value needs to be set to \textbf{EMS} .
+This field contains a Key Value for an EnergyPlus output variable (ref \hyperref[outputvariable]{Output:Variable}/.rdd file). For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Key Value needs to be set to \textbf{EMS} .
 
 \paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-4}
 
-This field contains the Variable Name as defined in the InputOutput Reference. For an \textbf{EnergyManagementSystem:OutputVariable}, the EnergyPlus Variable Name is the name of the \textbf{EnergyManagementSystem:OutputVariable} s object.
+This field contains the Variable Name as defined in the InputOutput Reference. For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Variable Name is the name of the \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}} s object.
 
 \paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-4}
 
@@ -397,7 +397,7 @@ ExternalInterface:FunctionalMockupUnitExport:From:Variable,
 
 \subsection{ExternalInterface:FunctionalMockupUnitExport:To:Schedule}\label{externalinterfacefunctionalmockupunitexporttoschedule}
 
-This object is similar to Schedule:Compact. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+This object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-10-005}
 
@@ -428,7 +428,7 @@ ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
 
 \subsection{ExternalInterface:FunctionalMockupUnitExport:To:Actuator}\label{externalinterfacefunctionalmockupunitexporttoactuator}
 
-This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to EnergyManagementSystem:Actuator. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
 
 \subsubsection{Inputs}\label{inputs-11-004}
 
@@ -438,11 +438,11 @@ This field contains a unique name for the actuator. No spaces are allowed in the
 
 \paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-2}
 
-This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
 
 \paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-2}
 
-The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{Output:EnergyManagementSystem} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
 
 \paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-2}
 
@@ -469,7 +469,7 @@ ExternalInterface:FunctionalMockupUnitExport:To:Actuator,
 
 \subsection{ExternalInterface:FunctionalMockupUnitExport:To:Variable}\label{externalinterfacefunctionalmockupunitexporttovariable}
 
-This input object is similar to EnergyManagementSystem:GlobalVariable. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
 
 \subsubsection{Inputs}\label{inputs-12-004}
 

@@ -960,12 +960,12 @@ namespace SolarCollectors {
                                                         Collector(CollectorNum).WLoopSideNum,
                                                         Collector(CollectorNum).WLoopBranchNum,
                                                         Collector(CollectorNum).WLoopCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         _,
-                                                        _,
-                                                        errFlag);
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");
                 }
@@ -1383,7 +1383,7 @@ namespace SolarCollectors {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 s;           // Intermediate variable
@@ -1406,11 +1406,11 @@ namespace SolarCollectors {
             if (IAM > 10.0) { // Greater than 10 is probably not a possibility
                 ShowSevereError("IAM Function: SolarCollectorPerformance:FlatPlate = " + Parameters(ParamNum).Name +
                                 ":  Incident Angle Modifier is out of bounds due to bad coefficients.");
-                gio::write(String, fmtLD) << Parameters(ParamNum).iam1;
+                ObjexxFCL::gio::write(String, fmtLD) << Parameters(ParamNum).iam1;
                 ShowContinueError("Coefficient 2 of Incident Angle Modifier =" + String);
-                gio::write(String, fmtLD) << Parameters(ParamNum).iam2;
+                ObjexxFCL::gio::write(String, fmtLD) << Parameters(ParamNum).iam2;
                 ShowContinueError("Coefficient 3 of Incident Angle Modifier =" + String);
-                gio::write(String, fmtLD) << IAM;
+                ObjexxFCL::gio::write(String, fmtLD) << IAM;
                 ShowContinueError("Calculated Incident Angle Modifier =" + String);
                 ShowContinueError("Expected Incident Angle Modifier should be approximately 1.5 or less.");
                 ShowFatalError("Errors in SolarCollectorPerformance:FlatPlate input.");

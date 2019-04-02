@@ -18,9 +18,6 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     #  4996 Deprecated functions (/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
     #  4503 The decorated name was longer than the compiler limit (4096), and was truncated.
 
-    # need to figure out how to set this to avoid the major slow-down in debugging:
-    # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK
-
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
@@ -38,6 +35,8 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("/Ob0") # Disable inlining
     ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
+    ADD_CXX_DEBUG_DEFINITIONS("/fp:strict") # Floating point model
+    ADD_CXX_DEBUG_DEFINITIONS("/DMSVC_DEBUG") # Triggers code in main.cc to catch floating point NaNs
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
@@ -97,12 +96,13 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     ADD_CXX_DEFINITIONS("-Wno-attributes") # Don't warn on attributes Clang doesn't know
     ADD_CXX_DEFINITIONS("-Wno-delete-non-virtual-dtor")
-    ADD_CXX_DEFINITIONS("-Wno-vexing-parse")
+    ADD_CXX_DEFINITIONS("-Wno-missing-braces")
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
       ADD_CXX_DEFINITIONS("-Wno-aggressive-loop-optimizations")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+      ADD_CXX_DEFINITIONS("-Wno-vexing-parse")
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 
@@ -213,3 +213,40 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEBUG_DEFINITIONS("-traceback") # Enables traceback on error
 
 ENDIF () # COMPILER TYPE
+
+
+# Add Color Output if Using Ninja:
+# Wave to do it before the folders are imported etc (here is the perfect place)
+
+# We use "add_compile_options" instead of just appending to CXX_FLAGS
+# That way it'll work for pretty much everything including Fortran stuff
+macro(AddFlagIfSupported flag test)
+  CHECK_CXX_COMPILER_FLAG(${flag} ${test})
+  if( ${${test}} )
+    message(STATUS "Adding ${flag}")
+    add_compile_options("${flag}")
+  else()
+    message(STATUS "Flag ${flag} isn't supported")
+  endif()
+endmacro()
+
+if("Ninja" STREQUAL ${CMAKE_GENERATOR})
+  include(CheckCXXCompilerFlag)
+  # Clang
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
+  endif()
+
+  # g++
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    AddFlagIfSupported(-fdiagnostics-color=always COMPILER_SUPPORTS_fdiagnostics_color)
+
+    # On some older gcc, it doesn't say that it's supported, but it works anyways
+    if (NOT COMPILER_SUPPORTS_fdiagnostics_color)
+      message(STATUS "Forcing -fdiagnostics-color=always")
+      add_compile_options (-fdiagnostics-color=always)
+    endif()
+
+  endif()
+endif()
+

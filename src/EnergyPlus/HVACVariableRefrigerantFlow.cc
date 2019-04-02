@@ -2358,12 +2358,12 @@ namespace HVACVariableRefrigerantFlow {
                                                         VRF(VRFNum).SourceLoopSideNum,
                                                         VRF(VRFNum).SourceBranchNum,
                                                         VRF(VRFNum).SourceCompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
                                                         VRF(VRFNum).CondenserNodeNum,
-                                                        _,
-                                                        errFlag);
+                                                        _);
 
                 if (errFlag) {
                     ShowSevereError("GetVRFInput: Error scanning for plant loop data");
@@ -5998,10 +5998,10 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingCapacity )
 
         // Formats
-        static gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
+        static ObjexxFCL::gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
                                    "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                                    "Correction Factor')");
-        static gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
+        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
         IsAutoSize = false;
@@ -6876,10 +6876,10 @@ namespace HVACVariableRefrigerantFlow {
 
                 // Report to eio other information not related to autosizing
                 if (MyOneTimeEIOFlag) {
-                    gio::write(OutputFileInits, Format_990);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) << VRF(VRFCond).Name << RoundSigDigits(VRF(VRFCond).CoolingCombinationRatio, 5)
                     << RoundSigDigits(VRF(VRFCond).HeatingCombinationRatio, 5) << RoundSigDigits(VRF(VRFCond).PipingCorrectionCooling, 5)
                     << RoundSigDigits(VRF(VRFCond).PipingCorrectionHeating, 5);
@@ -7060,7 +7060,7 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;      // unit full output when compressor is operating [W]
@@ -7231,7 +7231,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (VRFTU(VRFTUNum).IterLimitExceeded == 0) {
-                            gio::write(IterNum, fmtLD) << MaxIte;
+                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
                             ShowWarningMessage(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name + "\"");
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
@@ -9231,7 +9231,7 @@ namespace HVACVariableRefrigerantFlow {
                                       CompSpdActual,
                                       Ncomp);
 
-                if ((abs(Ncomp - Ncomp_new) > (Tolerance * Ncomp_new)) && (Counter < 30)) {
+                if ((std::abs(Ncomp - Ncomp_new) > (Tolerance * Ncomp_new)) && (Counter < 30)) {
                     Ncomp_new = Ncomp;
                     Counter = Counter + 1;
                     goto Label10;
@@ -9240,13 +9240,13 @@ namespace HVACVariableRefrigerantFlow {
 
             // Update h_IU_evap_in in iterations Label12
             h_IU_evap_in_new = GetSatEnthalpyRefrig(this->RefrigerantName, this->CondensingTemp - this->SC, 0.0, RefrigerantIndex, RoutineName);
-            if ((abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in) && (h_IU_evap_in < h_IU_evap_in_up) &&
+            if ((std::abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in) && (h_IU_evap_in < h_IU_evap_in_up) &&
                 (h_IU_evap_in > h_IU_evap_in_low)) {
                 h_IU_evap_in = h_IU_evap_in_new;
                 NumIteHIUIn = NumIteHIUIn + 1;
                 goto Label12;
             }
-            if ((abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in)) {
+            if ((std::abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in)) {
                 h_IU_evap_in = 0.5 * (h_IU_evap_in_low + h_IU_evap_in_up);
             } else if (h_IU_evap_in > h_IU_evap_in_up) {
                 h_IU_evap_in = h_IU_evap_in_up;
@@ -9429,7 +9429,7 @@ namespace HVACVariableRefrigerantFlow {
                                       CompSpdActual,
                                       Ncomp_new);
 
-                if ((abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
+                if ((std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
                     Ncomp = Ncomp_new;
                     Counter = Counter + 1;
                     goto Label20;
@@ -9445,7 +9445,7 @@ namespace HVACVariableRefrigerantFlow {
                                                          RoutineName);
                 h_comp_out_new = Ncomp_new / m_ref_IU_cond + h_comp_in_new;
 
-                if ((abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
+                if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
                     h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
                     goto Label23;
                 }
@@ -9659,7 +9659,7 @@ namespace HVACVariableRefrigerantFlow {
             //* Update h_comp_out in iteration (Label230)
             h_comp_out_new = Ncomp / (m_ref_IU_evap + m_ref_OU_evap) + h_comp_in;
 
-            if ((abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
+            if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
                 h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
                 goto Label230;
             }
@@ -10110,7 +10110,7 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -10254,7 +10254,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (this->IterLimitExceeded == 0) {
-                            gio::write(IterNum, fmtLD) << MaxIte;
+                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
                             ShowWarningMessage(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
@@ -11287,7 +11287,7 @@ namespace HVACVariableRefrigerantFlow {
             C_cap_density = 1.0;
 
         if ((h_comp_in_real - h_evap_in_real) > 0)
-            C_cap_enthalpy = abs(h_evap_out_rate - h_evap_in_rate) / abs(h_comp_in_real - h_evap_in_real);
+            C_cap_enthalpy = std::abs(h_evap_out_rate - h_evap_in_rate) / std::abs(h_comp_in_real - h_evap_in_real);
         else
             C_cap_enthalpy = 1.0;
 
@@ -11436,13 +11436,13 @@ namespace HVACVariableRefrigerantFlow {
 
         Tsuction = GetSatTemperatureRefrig(this->RefrigerantName, max(min(Pe_update - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-        if ((abs(Tsuction - Te_low) > 0.5) && (Te_update < Te_up) && (Te_update > Te_low) && (NumTeIte < MaxNumTeIte)) {
+        if ((std::abs(Tsuction - Te_low) > 0.5) && (Te_update < Te_up) && (Te_update > Te_low) && (NumTeIte < MaxNumTeIte)) {
             Te_update = Te_update - 0.1;
             NumTeIte = NumTeIte + 1;
             goto Label11;
         }
 
-        if (abs(Tsuction - Te_low) > 0.5) {
+        if (std::abs(Tsuction - Te_low) > 0.5) {
             NumTeIte = 999;
             Tsuction = Te_low;
             Pipe_SH_merged = 3.0;
@@ -12016,14 +12016,14 @@ namespace HVACVariableRefrigerantFlow {
                         T_suction = GetSatTemperatureRefrig(
                             this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                        if ((abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
+                        if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
                             (NumIteTe < MaxNumIteTe)) {
                             Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
                             NumIteTe = NumIteTe + 1;
                             goto Label11;
                         }
 
-                        if (abs(T_suction - SmallLoadTe) > 0.5) {
+                        if (std::abs(T_suction - SmallLoadTe) > 0.5) {
                             NumIteTe = 999;
                             T_suction = SmallLoadTe;
                             Pipe_SH_merged = 3.0;
@@ -12064,7 +12064,7 @@ namespace HVACVariableRefrigerantFlow {
                     Cap_Eva0 = (TU_load + Pipe_Q) * C_cap_operation; // New Pipe_Q & C_cap_operation
                     Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity *
                                CurveValue(this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction); // New Tc
-                    CapDiff = abs(Cap_Eva1 - Cap_Eva0);
+                    CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
 
                     if ((CapDiff > (Tolerance * Cap_Eva0)) && (NumIteCcap < 30)) {
                         Pipe_Q0 = Pipe_Q;
@@ -12279,7 +12279,7 @@ namespace HVACVariableRefrigerantFlow {
                     Cap_Eva0 = Q_evap_req * C_cap_operation;
                     Cap_Eva1 =
                         this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
-                    CapDiff = abs(Cap_Eva1 - Cap_Eva0);
+                    CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
 
                     if ((CapDiff > (Tolerance * Cap_Eva0)) && (NumIteCcap < 30)) {
                         NumIteCcap = NumIteCcap + 1;
@@ -12514,7 +12514,7 @@ namespace HVACVariableRefrigerantFlow {
                 // Calculate Ncomp_new, using updated CompSpdActual and Tsuction_new
                 this->VRFOU_CompCap(CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_new);
 
-                if ((abs(Ncomp_new - Ncomp_ini) > (Tolerance * Ncomp_ini)) && (Counter_Iter_Ncomp < 30)) {
+                if ((std::abs(Ncomp_new - Ncomp_ini) > (Tolerance * Ncomp_ini)) && (Counter_Iter_Ncomp < 30)) {
                     Ncomp_ini = 0.5 * Ncomp_ini + 0.5 * Ncomp_new;
                     Counter_Iter_Ncomp = Counter_Iter_Ncomp + 1;
                     continue;

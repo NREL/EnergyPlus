@@ -1,6 +1,6 @@
 \section{Complex Tariff Modeling}\label{complex-tariff-modeling}
 
-Much can be accomplished with the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects. In almost all cases, these structures are flexible enough to model the tariff. At times the built in approach is not sufficient to model a particular rate. In those cases, the rate may be modeled by using the UtilityCost:Computation object. For most rates this object can be omitted but for difficult to model rates, they may be used to modify the normal way the rate computation is performed.
+Much can be accomplished with the \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} and \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} objects. In almost all cases, these structures are flexible enough to model the tariff. At times the built in approach is not sufficient to model a particular rate. In those cases, the rate may be modeled by using the \hyperref[utilitycostcomputation]{UtilityCost:Computation} object. For most rates this object can be omitted but for difficult to model rates, they may be used to modify the normal way the rate computation is performed.
 
 Each ComputeStep is performed in order and can be either a variable followed by an expression or simply a variable.
 
@@ -11,7 +11,7 @@ Each ComputeStep is performed in order and can be either a variable followed by 
   chargeSummer1
 \end{itemize}
 
-The normal calculations associated with the UtilityCost:Qualify, UtilityCost:Charge:Simple, UtilityCost:Charge:Block, or UtilityCost:Ratchet are performed the first time that object is called. Subsequent times are not recomputed but use the value stored in the appropriate variable. The result of the computation for those objects is available in the expression for further computation. The expressions allow the manipulation of variables directly using simple mathematical functions. Only variable names may be entered along with operators. Numbers may not be entered and should be entered with UtilityCost:Variable. Multiple operators are allowed per step. Variables names do not include spaces. If spaces are found in a variable name then an error is shown. Unused variables are flagged with a warning. All expressions are in the form:
+The normal calculations associated with the \hyperref[utilitycostqualify]{UtilityCost:Qualify}, \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple}, \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block}, or \hyperref[utilitycostratchet]{UtilityCost:Ratchet} are performed the first time that object is called. Subsequent times are not recomputed but use the value stored in the appropriate variable. The result of the computation for those objects is available in the expression for further computation. The expressions allow the manipulation of variables directly using simple mathematical functions. Only variable names may be entered along with operators. Numbers may not be entered and should be entered with \hyperref[utilitycostvariable]{UtilityCost:Variable}. Multiple operators are allowed per step. Variables names do not include spaces. If spaces are found in a variable name then an error is shown. Unused variables are flagged with a warning. All expressions are in the form:
 
 \begin{itemize}
 \tightlist
@@ -23,7 +23,7 @@ Each step is performed for each of the months before the next step is taken. The
 
 The actual evaluation of the expression is performed from the end of the line to the beginning using stack based operations. Some operators pull all values from the stack (SUM, MAXIMUM, MINIMUM) while most use just one or two values from the stack. All operations return a single value to the stack. This stack based approach to expressions is sometimes called Polish Notation. While multiple operators are allowed per line, it reduces confusion if each line has only a single operator.
 
-When the UtilityCost:Computation object is used, it must contain references to all objects involved in the rate in the order that they should be computed. No checking is performed for objects that should or should not be included; instead, the computational process is driven completely by the input of this object.
+When the \hyperref[utilitycostcomputation]{UtilityCost:Computation} object is used, it must contain references to all objects involved in the rate in the order that they should be computed. No checking is performed for objects that should or should not be included; instead, the computational process is driven completely by the input of this object.
 
 A typical rate will have a simple series of steps. For example F the following steps would be created automatically by the software:
 
@@ -57,7 +57,7 @@ UtilityCost:Computation,
     MinDemand;                   !- Compute Step 9
 \end{lstlisting}
 
-This second expanded format is generated automatically when no UtilityCost:Computation object is provided.
+This second expanded format is generated automatically when no \hyperref[utilitycostcomputation]{UtilityCost:Computation} object is provided.
 
 The functions built in are (number of arguments in parentheses):
 

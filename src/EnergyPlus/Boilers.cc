@@ -651,12 +651,12 @@ namespace Boilers {
                                     Boiler(BoilerNum).LoopSideNum,
                                     Boiler(BoilerNum).BranchNum,
                                     Boiler(BoilerNum).CompNum,
+                                    errFlag,
                                     _,
                                     Boiler(BoilerNum).TempUpLimitBoilerOut,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }

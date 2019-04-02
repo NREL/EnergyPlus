@@ -90,8 +90,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects =
-        delimited_string({"Version,8.4;",
-                          "Material,",
+        delimited_string({"Material,",
                           "  Concrete Block,          !- Name",
                           "  MediumRough,             !- Roughness",
                           "  0.1014984,               !- Thickness {m}",
@@ -332,8 +331,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({"Version,8.4;",
-                          "Material,",
+        delimited_string({"Material,",
                           "  Concrete Block,          !- Name",
                           "  MediumRough,             !- Roughness",
                           "  0.1014984,               !- Thickness {m}",
@@ -464,6 +462,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
     DataHeatBalance::TempEffBulkAir.allocate(3);
@@ -586,7 +585,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
@@ -2418,8 +2417,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({"Version,8.4;",
-                          "Material,",
+        delimited_string({"Material,",
                           "  Concrete Block,          !- Name",
                           "  MediumRough,             !- Roughness",
                           "  0.1014984,               !- Thickness {m}",
@@ -2574,6 +2572,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
     DataHeatBalance::TempEffBulkAir.allocate(3);

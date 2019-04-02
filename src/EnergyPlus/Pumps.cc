@@ -438,6 +438,17 @@ namespace Pumps {
             PumpEquip(PumpNum).MinVolFlowRate = rNumericArgs(10);
             if (PumpEquip(PumpNum).MinVolFlowRate == AutoSize) {
                 PumpEquip(PumpNum).minVolFlowRateWasAutosized = true;
+            } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
+                       (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
+                // Check that the minimum isn't greater than the maximum
+                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
+                        + "\", Invalid '" + cNumericFieldNames(10) +"'");
+                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the "
+                        + cNumericFieldNames(1) + "=["
+                        + General::TrimSigDigits(PumpEquip(PumpNum).NomVolFlowRate, 5) + "].");
+                ShowContinueError("Reseting value of '" + cNumericFieldNames(10) + "' to the value of '" + cNumericFieldNames(1) +"'.");
+                // Set min to roughly max, but not quite, otherwise it can't turn on, ever
+                PumpEquip(PumpNum).MinVolFlowRate = 0.99 * PumpEquip(PumpNum).NomVolFlowRate;
             }
             // Probably the following two lines will be used if the team agrees on changing the F10 value from min flow rate to
             // minimum flow as a fraction of nominal flow.
@@ -557,6 +568,12 @@ namespace Pumps {
 
             if (!lNumericFieldBlanks(15)) {
                 PumpEquip(PumpNum).MinVolFlowRateFrac = rNumericArgs(15);
+            }
+
+            if (NumAlphas > 14) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(15);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
             }
 
             // Is this really necessary for each pump GetInput loop?
@@ -694,6 +711,13 @@ namespace Pumps {
             if (!lNumericFieldBlanks(10)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(10);
             }
+
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
         }
 
         // pumps for steam system pumping condensate
@@ -797,6 +821,12 @@ namespace Pumps {
 
             if (!lNumericFieldBlanks(12)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(12);
+            }
+
+            if (NumAlphas > 6) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(7);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
             }
         }
 
@@ -913,6 +943,12 @@ namespace Pumps {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(14);
             }
 
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
             PumpEquip(PumpNum).Energy = 0.0;
             PumpEquip(PumpNum).Power = 0.0;
         }
@@ -1027,6 +1063,13 @@ namespace Pumps {
             if (!lNumericFieldBlanks(9)) {
                 PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = rNumericArgs(9);
             }
+
+            if (NumAlphas > 8) {
+                PumpEquip(PumpNum).EndUseSubcategoryName = cAlphaArgs(9);
+            } else {
+                PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            }
+
             PumpEquip(PumpNum).MinVolFlowRate = 0.0;
             PumpEquip(PumpNum).Energy = 0.0;
             PumpEquip(PumpNum).Power = 0.0;
@@ -1049,7 +1092,7 @@ namespace Pumps {
                                     _,
                                     "Electric",
                                     "Pumps",
-                                    _,
+                                    PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
                     "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
@@ -1092,7 +1135,7 @@ namespace Pumps {
                                     _,
                                     "Electric",
                                     "Pumps",
-                                    _,
+                                    PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
                     "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
@@ -1293,12 +1336,12 @@ namespace Pumps {
                                     PumpEquip(PumpNum).LoopSideNum,
                                     PumpEquip(PumpNum).BranchNum,
                                     PumpEquip(PumpNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             plloopnum = PumpEquip(PumpNum).LoopNum;
             lsnum = PumpEquip(PumpNum).LoopSideNum;
             brnum = PumpEquip(PumpNum).BranchNum;
@@ -2303,6 +2346,7 @@ namespace Pumps {
         } else {
             PreDefTableEntry(pdchPumpPwrPerFlow, equipName, "-");
         }
+        PreDefTableEntry(pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
         PreDefTableEntry(pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
     }
 

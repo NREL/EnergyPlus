@@ -230,7 +230,7 @@ namespace DXFEarClipping {
 
         // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -328,7 +328,7 @@ namespace DXFEarClipping {
                     ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (DisplayExtraWarnings) {
-                    gio::write(line, fmtLD) << "surface=" << surfname << " class=" << cSurfaceClass(surfclass);
+                    ObjexxFCL::gio::write(line, fmtLD) << "surface=" << surfname << " class=" << cSurfaceClass(surfclass);
                     ShowMessage(line);
                     for (j = 1; j <= nsides; ++j) {
                         //          write(line,"(' side=',i2,' (',2(f6.1,','),f6.1,')')") j,polygon(j)
@@ -336,7 +336,7 @@ namespace DXFEarClipping {
                                RoundSigDigits(polygon(j).z, 1) + ')';
                         ShowMessage(line);
                     }
-                    gio::write(line, fmtLD) << "number of triangles found=" << ncount;
+                    ObjexxFCL::gio::write(line, fmtLD) << "number of triangles found=" << ncount;
                     ShowMessage(line);
                     for (j = 1; j <= nrangles; ++j) {
                         //          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*RadToDeg
@@ -579,7 +579,7 @@ namespace DXFEarClipping {
         // Subroutine argument definitions:
 
         // Subroutine parameter definitions:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -678,7 +678,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    gio::write(OutputFileDebug, fmtLD) << "ear=" << nears << " triangle=" << svert << mvert << evert;
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "ear=" << nears << " triangle=" << svert << mvert << evert;
                 }
             }
         }

@@ -136,6 +136,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(SurfNum);
     DataHeatBalSurface::QRadOutReport.allocate(SurfNum);
+    DataHeatBalSurface::QAirExtReport.allocate(SurfNum);
+    DataHeatBalSurface::QHeatEmiReport.allocate(SurfNum);
     DataGlobals::TimeStepZoneSec = 900.0;
 
     CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
@@ -149,6 +151,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_EQ(10.0 * 1.0 * (DataHeatBalSurface::TH(1, 1, SurfNum) - DataSurfaces::Surface(SurfNum).OutDryBulbTemp),
+              DataHeatBalSurface::QAirExtReport(SurfNum));
+    EXPECT_EQ(10.0 * 2.0 * (DataHeatBalSurface::TH(1, 1, SurfNum) - DataSurfaces::Surface(SurfNum).OutDryBulbTemp),
+              DataHeatBalSurface::QHeatEmiReport(SurfNum));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf)
@@ -187,8 +193,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+                          "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+                          "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
                           "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
     EXPECT_TRUE(compare_err_stream(error_string01, true));
     EXPECT_TRUE(testZone.TempOutOfBoundsReported);
@@ -221,8 +229,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     std::string const error_string03 =
         delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
                           "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+                          "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+                          "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
                           "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
     EXPECT_TRUE(compare_err_stream(error_string03, true));
     EXPECT_TRUE(testZone.TempOutOfBoundsReported);
@@ -322,7 +332,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -711,6 +721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -809,7 +820,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1249,6 +1260,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1351,7 +1363,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
+        "  Version,9.1;",
 
         "  Building,",
         "    House with Local Air Nodes,  !- Name",
@@ -1824,6 +1836,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1926,7 +1939,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.7;",
         " Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
         " Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
         " Output:Diagnostics, DisplayAdvancedReportVariables;",
@@ -1968,7 +1980,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.1;",
 
                           "  Building,",
                           "    House with AirflowNetwork simulation,  !- Name",
@@ -2382,6 +2394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;

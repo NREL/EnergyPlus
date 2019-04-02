@@ -145,9 +145,10 @@ namespace PlantCentralGSHP {
 
     // Object Data
     Array1D<WrapperSpecs> Wrapper;
+    Array1D<WrapperReportVars> WrapperReport;
     Array1D<ChillerHeaterSpecs> ChillerHeater;
     Array1D<CHReportVars> ChillerHeaterReport;
-    Array1D<WrapperReportVars> WrapperReport;
+
 
     // MODULE SUBROUTINES:
 
@@ -155,6 +156,28 @@ namespace PlantCentralGSHP {
     //*************************************************************************
 
     // Functions
+
+
+    void clear_state()
+    {
+        GetInputWrapper = true;
+        NumWrappers = 0;
+        NumChillerHeaters = 0;
+
+        CondenserFanPower = 0.0;
+        ChillerCapFT = 0.0;
+        ChillerEIRFT = 0.0;
+        ChillerEIRFPLR = 0.0;
+        ChillerPartLoadRatio = 0.0;
+        ChillerCyclingRatio = 0.0;
+        ChillerFalseLoadRate = 0.0;
+
+        Wrapper.deallocate();
+        WrapperReport.deallocate();
+        ChillerHeater.deallocate();
+        ChillerHeaterReport.deallocate();
+
+    }
 
     void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
                                         int const EquipFlowCtrl,        // Flow control mode for the equipment
@@ -470,9 +493,21 @@ namespace PlantCentralGSHP {
                         if (Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCoolingWasAutoSized) {
                             Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling = tmpNomCap;
 
+                            // Now that we have the Reference Cooling Capacity, we need to also initialize the Heating side
+                            // given the ratios
                             Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg =
                                 Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling *
                                 Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).ClgHtgToCoolingCapRatio;
+
+                            Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefPowerClgHtg =
+                                ( Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling
+                                / Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCOPCooling )
+                                * Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).ClgHtgtoCogPowerRatio;
+
+                            Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCOPClgHtg =
+                                Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg
+                                / Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefPowerClgHtg;
+
                             if (PlantFinalSizesOkayToReport) {
                                 ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                    Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).Name,
@@ -529,15 +564,16 @@ namespace PlantCentralGSHP {
                 }
 
                 // auto-size the condenser volume flow rate
-                // each individule chiller heater module is sized to be capable of supporting the total load on the wrapper
+                // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizCondNum > 0) {
                     if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                         rho = GetDensityGlycol(PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidIndex,
                                                RoutineName);
+                        // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
                         Cp = GetSpecificHeatGlycol(PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidName,
-                                                   Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).TempRefCondIn,
+                                                   Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).TempRefCondInCooling,
                                                    PlantLoop(Wrapper(WrapperNum).GLHELoopNum).FluidIndex,
                                                    RoutineName);
                         tmpCondVolFlowRate = tmpNomCap *
@@ -1226,8 +1262,8 @@ namespace PlantCentralGSHP {
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
 
         // Formats
-        static gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
-        static gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
 
         cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
         NumChillerHeaters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -1360,11 +1396,9 @@ namespace PlantCentralGSHP {
             ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling = rNumericArgs(3);
             ChillerHeater(ChillerHeaterNum).TempRefCondInCooling = rNumericArgs(4);
             ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling = rNumericArgs(5);
-            ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = rNumericArgs(6);
-            if (!ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
-                ChillerHeater(ChillerHeaterNum).RefCapClgHtg = rNumericArgs(6) * ChillerHeater(ChillerHeaterNum).RefCapCooling;
-            }
 
+            // Reference Heating Mode Ratios for Capacity and Power
+            ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = rNumericArgs(6);
             if (rNumericArgs(6) == 0.0) {
                 ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Entered in " + cNumericFieldNames(6) + '=' + RoundSigDigits(rNumericArgs(6), 2));
@@ -1372,16 +1406,23 @@ namespace PlantCentralGSHP {
             }
 
             ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio = rNumericArgs(7);
-            ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =
-                ChillerHeater(ChillerHeaterNum).RefCapCooling / ChillerHeater(ChillerHeaterNum).RefCOPCooling * rNumericArgs(7);
-            ChillerHeater(ChillerHeaterNum).RefCOPClgHtg =
-                ChillerHeater(ChillerHeaterNum).RefCapClgHtg / ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
-
             if (rNumericArgs(7) == 0.0) {
                 ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Entered in " + cNumericFieldNames(7) + '=' + RoundSigDigits(rNumericArgs(7), 2));
                 CHErrorsFound = true;
             }
+
+
+            if (!ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
+                ChillerHeater(ChillerHeaterNum).RefCapClgHtg = ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio
+                                                             * ChillerHeater(ChillerHeaterNum).RefCapCooling;
+                ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =( ChillerHeater(ChillerHeaterNum).RefCapCooling
+                                                                / ChillerHeater(ChillerHeaterNum).RefCOPCooling )
+                                                                * ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio;
+                ChillerHeater(ChillerHeaterNum).RefCOPClgHtg = ChillerHeater(ChillerHeaterNum).RefCapClgHtg
+                                                             / ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
+            }
+
 
             ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg = rNumericArgs(8);
             ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg = rNumericArgs(9);
@@ -1456,11 +1497,11 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + cCurrentModuleObject + "= " + cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Curve Output = '");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     CHErrorsFound = true;
                 }
@@ -1510,11 +1551,11 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + cCurrentModuleObject + "= " + cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Curve Output = '");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     CHErrorsFound = true;
                 }
@@ -1608,12 +1649,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).CWLoopSideNum,
                                     Wrapper(WrapperNum).CWBranchNum,
                                     Wrapper(WrapperNum).CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).CHWInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             ScanPlantLoopsForObject(Wrapper(WrapperNum).Name,
                                     TypeOf_CentralGroundSourceHeatPump,
@@ -1621,12 +1662,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).HWLoopSideNum,
                                     Wrapper(WrapperNum).HWBranchNum,
                                     Wrapper(WrapperNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).HWInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             ScanPlantLoopsForObject(Wrapper(WrapperNum).Name,
                                     TypeOf_CentralGroundSourceHeatPump,
@@ -1634,12 +1675,12 @@ namespace PlantCentralGSHP {
                                     Wrapper(WrapperNum).GLHELoopSideNum,
                                     Wrapper(WrapperNum).GLHEBranchNum,
                                     Wrapper(WrapperNum).GLHECompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     Wrapper(WrapperNum).GLHEInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
 
             InterConnectTwoPlantLoopSides(Wrapper(WrapperNum).CWLoopNum,
                                           Wrapper(WrapperNum).CWLoopSideNum,
@@ -2124,6 +2165,8 @@ namespace PlantCentralGSHP {
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).RefCOP = Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).RefCOPClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefEvapOut =
                         Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
+                    Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondIn =
+                        Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondOut =
                         Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg;
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).OptPartLoadRat =

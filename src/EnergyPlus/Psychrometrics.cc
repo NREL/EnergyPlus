@@ -311,8 +311,8 @@ namespace Psychrometrics {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -330,16 +330,16 @@ namespace Psychrometrics {
         EchoInputFile = FindUnitNumber(outputAuditFile);
         if (EchoInputFile == 0) return;
         if (any_gt(NumTimesCalled, 0)) {
-            gio::write(EchoInputFile, fmtA) << "RoutineName,#times Called,Avg Iterations";
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "RoutineName,#times Called,Avg Iterations";
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                gio::write(istring, fmtLD) << NumTimesCalled(Loop);
+                ObjexxFCL::gio::write(istring, fmtLD) << NumTimesCalled(Loop);
                 strip(istring);
                 if (NumIterations(Loop) > 0) {
                     AverageIterations = double(NumIterations(Loop)) / double(NumTimesCalled(Loop));
-                    gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring + ',' + RoundSigDigits(AverageIterations, 2);
+                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring + ',' + RoundSigDigits(AverageIterations, 2);
                 } else {
-                    gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring;
+                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring;
                 }
             }
         }
@@ -481,23 +481,23 @@ namespace Psychrometrics {
         ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        Tdb_tag = bit::bit_transfer(Tdb, Tdb_tag);
-        W_tag = bit::bit_transfer(W, W_tag);
-        Pb_tag = bit::bit_transfer(Pb, Pb_tag);
+        Tdb_tag = bit_transfer(Tdb, Tdb_tag);
+        W_tag = bit_transfer(W, W_tag);
+        Pb_tag = bit_transfer(Pb, Pb_tag);
 
-        Tdb_tag = bit::bit_shift(Tdb_tag, -Grid_Shift);
-        W_tag = bit::bit_shift(W_tag, -Grid_Shift);
-        Pb_tag = bit::bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit::bit_and(bit::bit_xor(Tdb_tag, bit::bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
+        Tdb_tag = bit_shift(Tdb_tag, -Grid_Shift);
+        W_tag = bit_shift(W_tag, -Grid_Shift);
+        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
+        hash = bit_and(bit_xor(Tdb_tag, bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
 
         if (cached_Twb(hash).iTdb != Tdb_tag || cached_Twb(hash).iW != W_tag || cached_Twb(hash).iPb != Pb_tag) {
             cached_Twb(hash).iTdb = Tdb_tag;
             cached_Twb(hash).iW = W_tag;
             cached_Twb(hash).iPb = Pb_tag;
 
-            Tdb_tag_r = bit::bit_transfer(bit::bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
-            W_tag_r = bit::bit_transfer(bit::bit_shift(W_tag, Grid_Shift), W_tag_r);
-            Pb_tag_r = bit::bit_transfer(bit::bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
+            Tdb_tag_r = bit_transfer(bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
+            W_tag_r = bit_transfer(bit_shift(W_tag, Grid_Shift), W_tag_r);
+            Pb_tag_r = bit_transfer(bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
 
             cached_Twb(hash).Twb = PsyTwbFnTdbWPb_raw(Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
         }
@@ -555,7 +555,7 @@ namespace Psychrometrics {
         int const itmax(100); // Maximum No of Iterations
         static Real64 convTol(0.0001);
         static std::string const RoutineName("PsyTwbFnTdbWPb");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -718,7 +718,7 @@ namespace Psychrometrics {
         }
 
 #ifdef generatetestdata
-        gio::write(OutputFileDebug, fmtLD) << TDB << dW << Patm << Twb;
+        ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << TDB << dW << Patm << Twb;
 #endif
 
         return TWB;

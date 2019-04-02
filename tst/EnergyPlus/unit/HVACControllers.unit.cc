@@ -78,7 +78,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 {
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Coil:Cooling:Water,",
         "	Chilled Water Coil,	!- Name",
         "	AvailSched,			!- Availability Schedule Name",
@@ -273,8 +272,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Coil:Cooling:Water,",
         "    Main Cooling Coil 1,     !- Name",
         "    CoolingCoilAvailSched,   !- Availability Schedule Name",
@@ -455,8 +452,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA Sys 1 Controllers,    !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",
@@ -558,8 +553,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSystemCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        " Version, 8.9;",
-
         "  AirLoopHVAC:ControllerList,",
         "    OA System Controllers,   !- Name",
         "    Controller:WaterCoil,    !- Controller 1 Object Type",
@@ -686,5 +679,101 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     WaterCoilOnAirLoop = false;
     SimAirServingZones::CheckWaterCoilIsOnAirLoop(CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
     EXPECT_TRUE(WaterCoilOnAirLoop);
+}
+TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
+{
+    HVACControllers::ControllerProps.allocate(1);
+    HVACControllers::RootFinders.allocate(1);
+    bool isConverged = true;
+    int const controlNum = 1;
+    auto &thisController(ControllerProps(1));
+    thisController.ControlVar = HVACControllers::iTemperatureAndHumidityRatio;
+    thisController.Offset = 0.0001;
+    int sensedNode = 1;
+    thisController.SensedNode = sensedNode;
+    DataLoopNode::Node.allocate(2);
+    DataLoopNode::Node(sensedNode).Temp = 21.2;
+    DataLoopNode::Node(sensedNode).HumRatMax = 0.001;
+    thisController.ActuatedNode = 2;
+    thisController.ActuatedNodePlantLoopBranchNum = 0;
+    thisController.ActuatedNodePlantLoopNum = 0;
+    thisController.ActuatedNodePlantLoopSide = 0;
+
+    // Case 1 - not converged yet, no override yet, return untouched
+    isConverged = false;
+    thisController.HumRatCtrlOverride = false;
+    thisController.SetPointValue = 21.1;
+    thisController.IsSetPointDefinedFlag = true;
+    thisController.NumCalcCalls = 5;
+    DataLoopNode::Node(sensedNode).HumRat = 0.0011;
+
+    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    EXPECT_FALSE(isConverged);
+    EXPECT_FALSE(thisController.HumRatCtrlOverride);
+    EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
+    EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
+    EXPECT_EQ(thisController.NumCalcCalls,5);
+
+    // Case 2 - converged, override true, return untouched
+    isConverged = true;
+    thisController.HumRatCtrlOverride = true;
+    thisController.SetPointValue = 21.1;
+    thisController.IsSetPointDefinedFlag = true;
+    thisController.NumCalcCalls = 5;
+    DataLoopNode::Node(sensedNode).HumRat = 0.0011;
+
+    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    EXPECT_TRUE(isConverged);
+    EXPECT_TRUE(thisController.HumRatCtrlOverride);
+    EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
+    EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
+    EXPECT_EQ(thisController.NumCalcCalls, 5);
+
+    // Case 3 - converged, override false, humrat<humratMax+Offset, return untouched
+    isConverged = true;
+    thisController.HumRatCtrlOverride = false;
+    thisController.SetPointValue = 21.1;
+    thisController.IsSetPointDefinedFlag = true;
+    thisController.NumCalcCalls = 5;
+    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
+
+    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    EXPECT_TRUE(isConverged);
+    EXPECT_FALSE(thisController.HumRatCtrlOverride);
+    EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
+    EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
+    EXPECT_EQ(thisController.NumCalcCalls, 5);
+
+    // Case 4 - converged, override false, humrat>humratMax+Offset, return with everything reset
+    isConverged = true;
+    thisController.HumRatCtrlOverride = false;
+    thisController.SetPointValue = 21.1;
+    thisController.IsSetPointDefinedFlag = true;
+    thisController.NumCalcCalls = 5;
+    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax + 0.002;
+
+    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    EXPECT_FALSE(isConverged);
+    EXPECT_TRUE(thisController.HumRatCtrlOverride);
+    EXPECT_NEAR(thisController.SetPointValue, 0.0, 0.0001);
+    EXPECT_FALSE(thisController.IsSetPointDefinedFlag);
+    EXPECT_EQ(thisController.NumCalcCalls, 0);
+
+    // Case 5 - converged, override false, humrat>humratMax+Offset, temp only controller, return untouched
+    isConverged = true;
+    thisController.HumRatCtrlOverride = false;
+    thisController.SetPointValue = 21.1;
+    thisController.IsSetPointDefinedFlag = true;
+    thisController.NumCalcCalls = 5;
+    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
+    thisController.ControlVar = HVACControllers::iTemperature;
+
+    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    EXPECT_TRUE(isConverged);
+    EXPECT_FALSE(thisController.HumRatCtrlOverride);
+    EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
+    EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
+    EXPECT_EQ(thisController.NumCalcCalls, 5);
+
 }
 } // namespace EnergyPlus

@@ -587,7 +587,7 @@ namespace UserDefinedComponents {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
@@ -1528,7 +1528,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        gio::write(LoopStr, fmtLD) << ConnectionLoop;
+                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
                         strip(LoopStr);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
@@ -2167,6 +2167,7 @@ namespace UserDefinedComponents {
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).CompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
@@ -2274,7 +2275,8 @@ namespace UserDefinedComponents {
                                                         UserCoil(CompNum).Loop.LoopNum,
                                                         UserCoil(CompNum).Loop.LoopSideNum,
                                                         UserCoil(CompNum).Loop.BranchNum,
-                                                        UserCoil(CompNum).Loop.CompNum);
+                                                        UserCoil(CompNum).Loop.CompNum,
+                                                        errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
@@ -2383,6 +2385,7 @@ namespace UserDefinedComponents {
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,
@@ -2508,6 +2511,7 @@ namespace UserDefinedComponents {
                                                             UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).BranchNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,

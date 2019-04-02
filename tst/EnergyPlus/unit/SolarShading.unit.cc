@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -1044,6 +1044,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
     DataGlobals::HourOfDay = 9;
+    DataGlobals::DoingSizing = false;
+    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
 
     compare_err_stream(""); // just for debugging
 
@@ -1078,7 +1080,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",

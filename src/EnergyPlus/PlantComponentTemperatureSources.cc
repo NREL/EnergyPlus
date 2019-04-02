@@ -381,12 +381,12 @@ namespace PlantComponentTemperatureSources {
                                     WaterSource(SourceNum).Location.loopSideNum,
                                     WaterSource(SourceNum).Location.branchNum,
                                     WaterSource(SourceNum).Location.compNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     WaterSource(SourceNum).InletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
             }
@@ -443,8 +443,8 @@ namespace PlantComponentTemperatureSources {
         //   re-arranging:
         //     mdot = MyLoad / [cp * (Tbnd - Tin)]
         //  If there is a deltaT, but no load, the mass flow request will go to zero anyway
-        if (abs(delta_temp) < 0.001) {
-            if (abs(MyLoad) < 0.001) {
+        if (std::abs(delta_temp) < 0.001) {
+            if (std::abs(MyLoad) < 0.001) {
                 WaterSource(SourceNum).MassFlowRate = 0.0;
             } else {
                 WaterSource(SourceNum).MassFlowRate = WaterSource(SourceNum).MassFlowRateMax;
