@@ -1809,7 +1809,7 @@ namespace UnitarySystems {
                     DataSizing::DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                        minNoLoadFlow = 0.6667;
+                        minNoLoadFlow = 0.6667; // TODO: Should this have a Coil:Cooling:DX block?
                     } else {
                         if (this->m_NoLoadAirFlowRateRatio < 1.0) {
                             minNoLoadFlow = this->m_NoLoadAirFlowRateRatio;
@@ -4334,6 +4334,7 @@ namespace UnitarySystems {
                             thisSys.m_CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
 
                             // mine data from coil object
+                            // TODO: Need to check for autosize on these I guess
                             auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
                             thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
                             thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
@@ -6268,7 +6269,10 @@ namespace UnitarySystems {
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     thisSys.m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    thisSys.m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(loc_m_CoolingCoilName, errFlag);
+					thisSys.m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(
+							loc_m_CoolingCoilName, errFlag);
+				} else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                	// TODO: Set thisSys.m_minOATCompressorCooling
                 } else {
                     thisSys.m_MinOATCompressorCooling = -1000.0;
                 }
@@ -6298,6 +6302,7 @@ namespace UnitarySystems {
                 errFlag = false;
                 if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     thisSys.m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+               		// TODO: Should we add a block for the new DX Coil?
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     thisSys.m_CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(loc_m_CoolingCoilName, errFlag);
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
