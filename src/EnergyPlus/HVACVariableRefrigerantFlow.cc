@@ -5856,7 +5856,7 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
             } else {
                 // Algorithm Type: VRF model based on system curve
                 VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -5889,7 +5889,8 @@ namespace HVACVariableRefrigerantFlow {
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                                    VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
                                 VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -5937,7 +5938,8 @@ namespace HVACVariableRefrigerantFlow {
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                                    VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
                                 VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -5969,7 +5971,8 @@ namespace HVACVariableRefrigerantFlow {
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                                    VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
                                 VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6015,7 +6018,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         } else {
                             // Algorithm Type: VRF model based on system curve
                             VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6052,7 +6055,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         } else {
                             // Algorithm Type: VRF model based on system curve
                             VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6938,7 +6941,7 @@ namespace HVACVariableRefrigerantFlow {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
             }
-            // DataSizing::SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+            // DataSizing::SuppHeatCap = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
         }
 
         if (CurZoneEqNum > 0) {
@@ -6967,10 +6970,10 @@ namespace HVACVariableRefrigerantFlow {
             // simulate the TU to size the coils
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat);
+                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
             } else {
                 // Algorithm Type: VRF model based on system curve
-                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
+                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad, SuppHeatCoilLoad);
             }
 
             //    ZoneEqDXCoil = .FALSE.
@@ -7477,12 +7480,12 @@ namespace HVACVariableRefrigerantFlow {
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-            VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio);
-            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided);
-            // CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
+            VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
+            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
         } else {
             // Algorithm Type: VRF model based on system curve
-            ControlVRF(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
+            VRFTU(VRFTUNum).ControlVRF(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
             VRFTU(VRFTUNum).CalcVRF(
                 VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
         }
@@ -7491,12 +7494,12 @@ namespace HVACVariableRefrigerantFlow {
         VRFTU(VRFTUNum).TerminalUnitLatentRate = LatOutputProvided;
     }
 
-    void ControlVRF(int const VRFTUNum,            // Index to VRF terminal unit
-                    Real64 const QZnReq,           // Index to zone number
-                    bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                    Real64 &PartLoadRatio,         // unit part load ratio
-                    Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                    Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
+    void VRFTerminalUnitEquipment::ControlVRF(int const VRFTUNum,            // Index to VRF terminal unit
+                                              Real64 const QZnReq,           // Index to zone number
+                                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                                              Real64 &PartLoadRatio,         // unit part load ratio
+                                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                              Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
     )
     {
 
@@ -7550,8 +7553,8 @@ namespace HVACVariableRefrigerantFlow {
         PartLoadRatio = 0.0;
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
-        VRFCond = VRFTU(VRFTUNum).VRFSysNum;
-        IndexToTUInTUList = VRFTU(VRFTUNum).IndexToTUInTUList;
+        VRFCond = this->VRFSysNum;
+        IndexToTUInTUList = this->IndexToTUInTUList;
         TUListIndex = VRF(VRFCond).ZoneTUListPtr;
         VRFCoolingMode = CoolingLoad(VRFCond);
         VRFHeatingMode = HeatingLoad(VRFCond);
@@ -7562,26 +7565,26 @@ namespace HVACVariableRefrigerantFlow {
 
         // do nothing else if TU is scheduled off
         //!!LKL Discrepancy < 0
-        if (GetCurrentScheduleValue(VRFTU(VRFTUNum).SchedPtr) == 0.0) return;
+        if (GetCurrentScheduleValue(this->SchedPtr) == 0.0) return;
 
         // do nothing if TU has no load (TU will be modeled using PLR=0)
         if (QZnReq == 0.0) return;
 
         // Set EMS value for PLR and return
-        if (VRFTU(VRFTUNum).EMSOverridePartLoadFrac) {
-            PartLoadRatio = VRFTU(VRFTUNum).EMSValueForPartLoadFrac;
+        if (this->EMSOverridePartLoadFrac) {
+            PartLoadRatio = this->EMSValueForPartLoadFrac;
             return;
         }
 
         // Get result when DX coil is operating at the minimum PLR (1E-20) if not otherwise specified
-        PartLoadRatio = VRFTU(VRFTUNum).MinOperatingPLR;
+        PartLoadRatio = this->MinOperatingPLR;
 
         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio);
+            this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
             // Algorithm Type: VRF model based on system curve
-            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+            this->CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         }
 
         if (VRFCoolingMode && HRHeatingMode) {
@@ -7614,28 +7617,28 @@ namespace HVACVariableRefrigerantFlow {
         PartLoadRatio = 1.0;
         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
+            this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
             // Algorithm Type: VRF model based on system curve
-            VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+            this->CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         }
 
         // set supplemental heating coil calculation if the condition requires
-        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
-            LoadToHeatingSP = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP;
+        if (this->SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
+            LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
             if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
                 SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
-                VRFTU(VRFTUNum).SuppHeatingCoilLoad = SuppHeatCoilLoad;
-                if (VRFTU(VRFTUNum).DesignSuppHeatingCapacity > 0.0) {
-                    VRFTU(VRFTUNum).SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / VRFTU(VRFTUNum).DesignSuppHeatingCapacity);
+                this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                if (this->DesignSuppHeatingCapacity > 0.0) {
+                    this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
                 }
             } else {
                 SuppHeatCoilLoad = 0.0;
-                VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
+                this->SuppHeatPartLoadRatio = 0.0;
             }
         } else {
             SuppHeatCoilLoad = 0.0;
-            VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
+            this->SuppHeatPartLoadRatio = 0.0;
         }
 
         PartLoadRatio = 0.0;
@@ -7653,7 +7656,7 @@ namespace HVACVariableRefrigerantFlow {
             // If the QZnReq >= FullOutput the unit needs to run full out
             if (QZnReq >= FullOutput) {
                 // if no coil present in terminal unit, no need reset PLR?
-                if (VRFTU(VRFTUNum).HeatingCoilPresent) PartLoadRatio = 1.0;
+                if (this->HeatingCoilPresent) PartLoadRatio = 1.0;
                 return;
             }
         } else {
@@ -7689,10 +7692,10 @@ namespace HVACVariableRefrigerantFlow {
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                        VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
+                        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+                        this->CalcVRF(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     if (VRFHeatingMode && TempOutput > QZnReq) ContinueIter = false;
@@ -7706,10 +7709,10 @@ namespace HVACVariableRefrigerantFlow {
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                        VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio);
+                        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
                         // Algorithm Type: VRF model based on system curve
-                        VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+                        this->CalcVRF(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
                     if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
@@ -7718,44 +7721,45 @@ namespace HVACVariableRefrigerantFlow {
                 SolveRoot(ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par);
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
-                        if (VRFTU(VRFTUNum).IterLimitExceeded == 0) {
+                        if (this->IterLimitExceeded == 0) {
                             ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                             strip(IterNum);
-                            ShowWarningMessage(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name + "\"");
+                            ShowWarningMessage(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
                             ShowContinueErrorTimeStamp(" Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio);
+                                this->CalcVRF_FluidTCtrl(
+                                    VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
-                                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+                                this->CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                             }
 
                             ShowContinueError(" Load requested = " + TrimSigDigits(QZnReq, 5) + ", Load delivered = " + TrimSigDigits(TempOutput, 5));
-                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                                "\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                           VRFTU(VRFTUNum).IterLimitExceeded);
+                                                           this->IterLimitExceeded);
                         } else {
-                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                                "\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                           VRFTU(VRFTUNum).IterLimitExceeded);
+                                                           this->IterLimitExceeded);
                         }
                     }
                 } else if (SolFla == -2) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (VRFTU(VRFTUNum).FirstIterfailed == 0) {
-                            ShowWarningMessage(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name + "\"");
+                            ShowWarningMessage(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                             ShowContinueError("Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError("Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp("");
                             if (WarmupFlag) ShowContinueError("Error occurred during warmup days.");
-                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                                "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                           VRFTU(VRFTUNum).FirstIterfailed);
+                                                           this->FirstIterfailed);
                         } else {
-                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                                "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
                                                            VRFTU(VRFTUNum).FirstIterfailed);
                         }
@@ -7765,18 +7769,18 @@ namespace HVACVariableRefrigerantFlow {
             } else if (SolFla == -2) {
                 if (!FirstHVACIteration && !WarmupFlag) {
                     if (VRFTU(VRFTUNum).FirstIterfailed == 0) {
-                        ShowWarningMessage(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name + "\"");
+                        ShowWarningMessage(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                         ShowContinueError("Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError("Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp("");
                         if (WarmupFlag) ShowContinueError("Error occurred during warmup days.");
-                        ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                        ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                            "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                       VRFTU(VRFTUNum).FirstIterfailed);
+                                                       this->FirstIterfailed);
                     } else {
-                        ShowRecurringWarningErrorAtEnd(cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + " \"" + VRFTU(VRFTUNum).Name +
+                        ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                            "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                       VRFTU(VRFTUNum).FirstIterfailed);
+                                                       this->FirstIterfailed);
                     }
                 }
                 if (FullOutput - NoCompOutput == 0.0) {
@@ -7903,7 +7907,7 @@ namespace HVACVariableRefrigerantFlow {
                 (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
                 SimDXCoil("", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity(VRFCond));
             } else {
-                SimDXCoil("", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+                SimDXCoil("", Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, _);
             }
             LoopDXHeatCoilRTF = LoopDXCoilRTF;
         } else {
@@ -7924,6 +7928,13 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
+        // track fan power per terminal unit for calculating COP
+        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            VRFTU(VRFTUNum).FanPower = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->fanPower();
+        } else {
+            VRFTU(VRFTUNum).FanPower = Fans::GetFanPower(VRFTU(VRFTUNum).FanIndex);
+        }
+
         // run supplemental heating coil
         Real64 SuppPLR = this->SuppHeatPartLoadRatio;
         if (this->SuppHeatingCoilPresent) {
@@ -7935,13 +7946,6 @@ namespace HVACVariableRefrigerantFlow {
                 this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
-        }
-
-        // track fan power per terminal unit for calculating COP
-        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            VRFTU(VRFTUNum).FanPower = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->fanPower();
-        } else {
-            VRFTU(VRFTUNum).FanPower = Fans::GetFanPower(VRFTU(VRFTUNum).FanIndex);
         }
 
         // If there is a supply side air terminal mixer, calculate its output
@@ -8263,7 +8267,7 @@ namespace HVACVariableRefrigerantFlow {
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio);
+            VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
             // Algorithm Type: VRF model based on system curve
             VRFTU(VRFTUNum).CalcVRF(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -8514,7 +8518,7 @@ namespace HVACVariableRefrigerantFlow {
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
                         // Algorithm Type: VRF model based on system curve
                         VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -8542,7 +8546,8 @@ namespace HVACVariableRefrigerantFlow {
                                     // recalculate using correct flow rate
                                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(
+                                            TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
                                         VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -8586,7 +8591,8 @@ namespace HVACVariableRefrigerantFlow {
 
                                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-                                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                                        VRFTU(TUIndex).CalcVRF_FluidTCtrl(
+                                            TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
                                         VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -8683,7 +8689,8 @@ namespace HVACVariableRefrigerantFlow {
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                         VRFTU(VRF(VRFCond).MasterZoneTUIndex)
-                            .CalcVRF_FluidTCtrl(VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
+                            .CalcVRF_FluidTCtrl(
+                                VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
                         // Algorithm Type: VRF model based on system curve
                         VRFTU(VRF(VRFCond).MasterZoneTUIndex)
@@ -9965,7 +9972,12 @@ namespace HVACVariableRefrigerantFlow {
                 this->RatedCompPower * CurveValue(this->OUCoolingPWRFT(NumOfCompSpdInput),
                                                   Tdischarge,
                                                   Tsuction); // Include the piping loss, at the highest compressor speed
-            this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
+            if (TU_HeatingLoad > 0.0 || Pipe_Q_h > 0.0) {
+                this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
+            } else {
+                this->PipingCorrectionHeating = 1.0;
+            }
+
             MaxHeatingCapacity(VRFCond) = this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
             this->CoolingCapacity = 0.0; // Include the piping loss
@@ -10573,7 +10585,8 @@ namespace HVACVariableRefrigerantFlow {
                                                          Real64 const QZnReq,           // Index to zone number
                                                          bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                                                          Real64 &PartLoadRatio,         // unit part load ratio
-                                                         Real64 &OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                                         Real64 &OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                                         Real64 &SuppHeatCoilLoad   // supplemental heating coil load (W)
     )
     {
 
@@ -10665,7 +10678,7 @@ namespace HVACVariableRefrigerantFlow {
         PartLoadRatio = 0.0;
 
         // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio);
+        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
 
         if (VRFCoolingMode && HRHeatingMode) {
             // IF the system is in cooling mode, but the terminal unit requests heating (heat recovery)
@@ -10683,7 +10696,25 @@ namespace HVACVariableRefrigerantFlow {
 
         // Otherwise the coil needs to turn on. Get full load result
         PartLoadRatio = 1.0;
-        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
+        this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
+
+        // set supplemental heating coil calculation if the condition requires
+        if (this->SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
+            Real64 LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
+            if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
+                SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                if (this->DesignSuppHeatingCapacity > 0.0) {
+                    this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                }
+            } else {
+                SuppHeatCoilLoad = 0.0;
+                this->SuppHeatPartLoadRatio = 0.0;
+            }
+        } else {
+            SuppHeatCoilLoad = 0.0;
+            this->SuppHeatPartLoadRatio = 0.0;
+        }
 
         PartLoadRatio = 0.0;
 
@@ -10732,7 +10763,7 @@ namespace HVACVariableRefrigerantFlow {
                 while (ContinueIter && TempMaxPLR < 1.0) {
                     TempMaxPLR += 0.1;
 
-                    this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
+                    this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
 
                     if (VRFHeatingMode && TempOutput > QZnReq) ContinueIter = false;
                     if (VRFCoolingMode && TempOutput < QZnReq) ContinueIter = false;
@@ -10743,7 +10774,7 @@ namespace HVACVariableRefrigerantFlow {
                     TempMaxPLR = TempMinPLR;
                     TempMinPLR -= 0.01;
 
-                    this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
+                    this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
 
                     if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
                     if (VRFCoolingMode && TempOutput > QZnReq) ContinueIter = false;
@@ -10758,7 +10789,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
                             ShowContinueErrorTimeStamp(" Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
 
-                            this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio);
+                            this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
 
                             ShowContinueError(" Load requested = " + TrimSigDigits(QZnReq, 5) + ", Load delivered = " + TrimSigDigits(TempOutput, 5));
                             ShowRecurringWarningErrorAtEnd(cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
@@ -10788,6 +10819,7 @@ namespace HVACVariableRefrigerantFlow {
                                                       Real64 const PartLoadRatio,        // compressor part load fraction
                                                       Real64 &LoadMet,                   // load met by unit (W)
                                                       Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
+                                                      Real64 &SuppHeatCoilLoad,          // supplemental heating coil load (W)
                                                       Optional<Real64> LatOutputProvided // delivered latent capacity (W)
     )
     {
@@ -10953,6 +10985,19 @@ namespace HVACVariableRefrigerantFlow {
             this->FanPower = HVACFan::fanObjs[this->FanIndex]->fanPower();
         } else {
             this->FanPower = Fans::GetFanPower(this->FanIndex);
+        }
+
+        // run supplemental heating coil
+        Real64 SuppPLR = this->SuppHeatPartLoadRatio;
+        if (this->SuppHeatingCoilPresent) {
+            this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
+            if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
+                // adjust the heating load to maximum allowed
+                Real64 MaxHeatCoilLoad =
+                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
+                SuppHeatCoilLoad = MaxHeatCoilLoad;
+            }
         }
 
         // calculate supply side terminal unit OA mixer

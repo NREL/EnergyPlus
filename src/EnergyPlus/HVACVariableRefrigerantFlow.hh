@@ -759,7 +759,8 @@ namespace HVACVariableRefrigerantFlow {
                                    Real64 const QZnReq,           // Index to zone number
                                    bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                                    Real64 &PartLoadRatio,         // unit part load ratio
-                                   Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                   Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                   Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
         void CalcVRF_FluidTCtrl(int const VRFTUNum,                    // Index to VRF terminal unit
@@ -767,6 +768,7 @@ namespace HVACVariableRefrigerantFlow {
                                 Real64 const PartLoadRatio,            // compressor part load fraction
                                 Real64 &LoadMet,                       // load met by unit (W)
                                 Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
+                                Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
                                 Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
@@ -777,6 +779,14 @@ namespace HVACVariableRefrigerantFlow {
 
         // Methods for cruve based VRF Model
         //******************************************************************************
+        void ControlVRF(int const VRFTUNum,            // Index to VRF terminal unit
+                        Real64 const QZnReq,           // Index to zone number
+                        bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                        Real64 &PartLoadRatio,         // unit part load ratio
+                        Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                        Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
+        );
+
         void CalcVRF(int const VRFTUNum,                    // Unit index in VRF terminal unit array
                      bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
                      Real64 const PartLoadRatio,            // compressor part load fraction
@@ -786,7 +796,8 @@ namespace HVACVariableRefrigerantFlow {
                      Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
-        // common for curve based and refrigerant flow control based models
+        // Methods for curve based and refrigerant flow control based models
+        //******************************************************************************
         void CalcVRFSuppHeatingCoil(int const VRFTUNum,            // index of vrf terminal unit
                                     bool const FirstHVACIteration, // True when first HVAC iteration
                                     Real64 const PartLoadRatio,    // coil operating part-load ratio
@@ -881,23 +892,6 @@ namespace HVACVariableRefrigerantFlow {
                 Real64 &SysOutputProvided,
                 Real64 &LatOutputProvided,
                 Real64 const QZnReq);
-
-    void ControlVRF(int const VRFTUNum,            // Index to VRF terminal unit
-                    Real64 const QZnReq,           // Index to zone number
-                    bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                    Real64 &PartLoadRatio,         // unit part load ratio
-                    Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                    Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
-    );
-
-    // Real64 hotWaterHeatingCoilResidual(Real64 const PartLoadFrac,     // water heating coil part-load ratio
-    //                                   std::vector<Real64> const &Par // par(1) = VRF TU Numberindex to current VRF terminal unit
-    //);
-
-    // Real64 HeatingCoilCapacityLimit(Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet node
-    //                                Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet node
-    //                                Real64 const HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
-    //);
 
     int GetVRFTUOutAirNode(int const VRFTUNum);
 
