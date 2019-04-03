@@ -206,7 +206,7 @@ int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
         }
         return -1;
     } else {
-        auto & mode = performance.normalMode;
+        auto & mode = performance.normalMode; // TODO: Like, what?
         if (mode.speeds.size()) {
             auto & firstSpeed = mode.speeds[0];
             return firstSpeed.indexCapFT;
@@ -216,13 +216,6 @@ int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
 }
 
 Real64 CoilCoolingDX::getRatedGrossTotalCapacity() {
-    try {
-        return this->performance.normalMode.ratedGrossTotalCap;
-    } catch (std::exception ex) {
-        ShowFatalError("Coil:Cooling:DX structure not initialized during call to getRatedGrossTotalCapacity");
-    }
-    return 0.0; // shut up compiler
+    // **should** we be checking if performance.hasAlternateMode before looking up the value?
+	return this->performance.normalMode.ratedGrossTotalCap;
 }
-
-
-
