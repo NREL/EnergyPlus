@@ -17,6 +17,8 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data)
 {
+    bool ErrorsFound(false);
+    static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     // this->parentMode = _parentMode;
     //	this->mySizeFlag = true; // set up flag for sizing
@@ -31,24 +33,152 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
-    if (input_data.total_cooling_capacity_function_of_temperature_curve_name != "") {
-        this->indexCapFT = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_temperature_curve_name);
-        if (this->indexCapFT > 0) this->numDimsCapFT = CurveManager::PerfCurve(this->indexCapFT).NumDims;
+    ErrorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
+                                      this->indexEIRFT,
+                                      {1, 2},
+                                      routineName,
+                                      "Total Cooling Capacity Function of Temperature Curve Name",
+                                      RatedInletWetBulbTemp,
+                                      RatedOutdoorAirTemp);
+
+    ErrorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name,
+                                      this->indexCapFFF,
+                                      {1},
+                                      routineName,
+                                      "Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+                                      1.0);
+
+    ErrorsFound |= this->processCurve(input_data.energy_input_ratio_function_of_temperature_curve_name,
+                                      this->indexEIRFT,
+                                      {1, 2},
+                                      routineName,
+                                      "Energy Input Ratio Function of Temperature Curve Name",
+                                      RatedInletWetBulbTemp,
+                                      RatedOutdoorAirTemp);
+
+    ErrorsFound |= this->processCurve(input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name,
+                                      this->indexEIRFFF,
+                                      {1},
+                                      routineName,
+                                      "Energy Input Ratio Function of Air Flow Fraction Curve Name",
+                                      1.0);
+
+    ErrorsFound |= this->processCurve(input_data.sensible_heat_ratio_modifier_function_of_temperature_curve_name,
+                                      this->indexSHRFT,
+                                      {1, 2},
+                                      routineName,
+                                      "Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+                                      RatedInletWetBulbTemp,
+                                      RatedOutdoorAirTemp);
+
+    ErrorsFound |= this->processCurve(input_data.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name,
+                                      this->indexSHRFFF,
+                                      {1},
+                                      routineName,
+                                      "Sensible Heat Ratio Modifier Function of Air Flow Fraction Curve Name",
+                                      1.0);
+
+
+    ErrorsFound |= this->processCurve(input_data.waste_heat_function_of_temperature_curve_name,
+                                      this->indexWHFT,
+                                      {2},
+                                      routineName,
+                                      "Waste Heat Modifier Function of Temperature Curve Name",
+                                      RatedOutdoorAirTemp,
+                                      RatedInletAirTemp);
+
+    std::string fieldName("Part Load Fraction Correlation Curve Name");
+    std::string curveName(input_data.part_load_fraction_correlation_curve_name);
+    ErrorsFound |= this->processCurve(input_data.part_load_fraction_correlation_curve_name,
+                                      this->indexPLRFPLF,
+                                      {1},
+                                      routineName,
+                                      "Part Load Fraction Correlation Curve Name",
+                                      1.0);
+
+    if (!ErrorsFound) {
+        //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+        Real64 MinCurveVal = 999.0;
+        Real64 MaxCurveVal = -999.0;
+        Real64 CurveInput = 0.0;
+        Real64 MinCurvePLR, MaxCurvePLR;
+        while (CurveInput <= 1.0) {
+            Real64 CurveVal = CurveManager::CurveValue(this->indexPLRFPLF, CurveInput);
+            if (CurveVal < MinCurveVal) {
+                MinCurveVal = CurveVal;
+                MinCurvePLR = CurveInput;
+            }
+            if (CurveVal > MaxCurveVal) {
+                MaxCurveVal = CurveVal;
+                MaxCurvePLR = CurveInput;
+            }
+            CurveInput += 0.01;
+        }
+        if (MinCurveVal < 0.7) {
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("..." + fieldName + "=\"" + curveName + "\" has out of range values.");
+            ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + General::TrimSigDigits(MinCurvePLR, 2) + " is " +
+                General::TrimSigDigits(MinCurveVal, 3));
+            ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
+            CurveManager::SetCurveOutputMinMaxValues(this->indexPLRFPLF, ErrorsFound, 0.7, _);
+        }
+
+        if (MaxCurveVal > 1.0) {
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("..." + fieldName + " = " + curveName + " has out of range value.");
+            ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + General::TrimSigDigits(MaxCurvePLR, 2) + " is " +
+                General::TrimSigDigits(MaxCurveVal, 3));
+            ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
+            CurveManager::SetCurveOutputMinMaxValues(this->indexPLRFPLF, ErrorsFound, _, 1.0);
+        }
     }
-    if (input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name != "") {
-        this->indexCapFFF = CurveManager::GetCurveIndex(input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name);
+
+
+    if (ErrorsFound) {
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
-    if (input_data.energy_input_ratio_function_of_temperature_curve_name != "") {
-        this->indexEIRFT = CurveManager::GetCurveIndex(input_data.energy_input_ratio_function_of_temperature_curve_name);
-    }
-    if (input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name != "") {
-        this->indexEIRFFF = CurveManager::GetCurveIndex(input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name);
-    }
-    if (input_data.part_load_fraction_correlation_curve_name != "") {
-        this->indexPLRFPLF = CurveManager::GetCurveIndex(input_data.part_load_fraction_correlation_curve_name);
-    }
-    if (input_data.waste_heat_function_of_temperature_curve_name != "") {
-        this->indexWHFT = CurveManager::GetCurveIndex(input_data.waste_heat_function_of_temperature_curve_name);
+}
+
+bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
+                                              int &curveIndex,
+                                              std::vector<int> validDims,
+                                              const std::string routineName,
+                                              const std::string fieldName,
+                                              Real64 const Var1,                   // required 1st independent variable
+                                              Optional<Real64 const> Var2,         // 2nd independent variable
+                                              Optional<Real64 const> Var3,         // 3rd independent variable
+                                              Optional<Real64 const> Var4,         // 4th independent variable
+                                              Optional<Real64 const> Var5)          // 5th independent variable
+{
+    if (curveName != "") {
+        curveIndex = CurveManager::GetCurveIndex(curveName);
+        if (curveIndex == 0) {
+            ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("...not found " + fieldName + "=\"" + curveName + "\".");
+            return true;
+        } else {
+            // Verify Curve Object dimensions
+            bool errorFound = CurveManager::CheckCurveDims(curveIndex,        // Curve index
+                                                           validDims,         // Valid dimensions
+                                                           routineName,       // Routine name
+                                                           this->object_name, // Object Type
+                                                           this->name,        // Object Name
+                                                           fieldName);        // Field Name
+
+            if (!errorFound) {
+                CurveManager::checkCurveIsNormalizedToOne(routineName + this->object_name,
+                                                          this->name,
+                                                          curveIndex,
+                                                          fieldName,
+                                                          curveName,
+                                                          Var1,
+                                                          Var2,
+                                                          Var3,
+                                                          Var4,
+                                                          Var5);
+            }
+            return errorFound;
+        }
     }
 }
 
@@ -56,7 +186,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     :
 
       // model inputs
-      indexCapFT(0), numDimsCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
+      indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
       indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
@@ -232,7 +362,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNo
 
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
-            if (numDimsCapFT == 2) {
+            if (CurveManager::PerfCurve(indexCapFT).NumDims == 2) {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, inletWetBulb, CondInletTemp);
             } else {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, CondInletTemp);

@@ -11,6 +11,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     this->original_input_specs = input_data;
     // bool errorsFound = false;
     this->name = input_data.name;
+    this->minOutdoorDrybulb = input_data.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
     if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
         this->capControlMethod = CapControlMethod::VARIABLE;
@@ -54,7 +55,6 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         input_specs.name = cAlphaArgs(1);
         input_specs.crankcase_heater_capacity = rNumericArgs(1);
         input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = rNumericArgs(2);
-        this->minOutdoorDrybulb = input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
         input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = rNumericArgs(3);
         input_specs.unit_internal_static_air_pressure = rNumericArgs(4);
         input_specs.capacity_control = cAlphaArgs(2);
