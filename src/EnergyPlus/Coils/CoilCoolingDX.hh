@@ -63,7 +63,9 @@ public:
 
     int getDXCoilCapFTCurveIndex();
 
-    Real64 getRatedGrossTotalCapacity(int modeIndex); 
+    Real64 getRatedGrossTotalCapacity();
+
+    void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;

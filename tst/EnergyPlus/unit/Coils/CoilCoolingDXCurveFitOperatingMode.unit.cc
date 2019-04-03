@@ -52,3 +52,28 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeInput )
 //    EXPECT_EQ( Boiler( NumBoilers ).SizFac, 1.0 );
 
 }
+
+TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeCorrectSpeed )
+{
+    std::string const idf_objects = delimited_string( {
+        "Coil:Cooling:DX:CurveFit:OperatingMode, ",
+        " OperatingMode1Name,                    ",
+        " 12000,                                 ",
+        " 100,                                   ",
+        " 200,                                   ",
+        " 2.5,                                   ",
+        " 0.5,                                   ",
+        " 100,                                   ",
+        " 300,                                   ",
+        " Yes,                                   ",
+        " Evaporative,                           ",
+        " 200,                                   ",
+        " DiscreteStagedContinuousOrNotBacon,    ",
+        " 5,                                     ",
+        " OperatingSpeed1,                       ",
+        " OperatingSpeed2;                       "
+    } );
+
+
+
+}

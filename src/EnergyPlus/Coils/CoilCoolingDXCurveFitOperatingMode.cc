@@ -129,7 +129,7 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
 }
 
 void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
-    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
 
 	// Currently speedNum is 1-based, while this->speeds are zero-based

@@ -32,7 +32,7 @@ public:
 
 class CoilCoolingDXCurveFitOperatingMode
 {
-    std::string const object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
+    std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
 public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
@@ -87,7 +87,6 @@ public:
 
     void CalcOperatingMode(DataLoopNode::NodeData &inletNode,
                            DataLoopNode::NodeData &outletNode,
-                           int &mode,
                            Real64 &PLR,
                            int &speedNum,
                            Real64 &speedRatio,

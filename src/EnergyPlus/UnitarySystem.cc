@@ -1976,26 +1976,26 @@ namespace UnitarySystems {
 
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = coilCoolingDXs[this->m_CoolingCoilIndex];
-            int const magicNominalModeNum = 0;
-            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.modes[magicNominalModeNum].speeds.size()) {
+            // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
+            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
                 ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of cooling speeds does not match coil object.");
                 ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
 
             // Use multispeed/variablespeed control algorithm regardless of number of speeds
-            if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+            if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
                 this->m_MultiSpeedCoolingCoil = true;
-            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
                 this->m_VarSpeedCoolingCoil = true;
-            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
+            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
                 // not sure what to do here
             }
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
                 newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
-                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
+                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
                 if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -2006,7 +2006,7 @@ namespace UnitarySystems {
                 }
             }
 
-            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum);
+            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity();
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
             EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
@@ -4335,14 +4335,13 @@ namespace UnitarySystems {
 
                             // mine data from coil object
                             auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
-                            int const magicNominalModeNum = 0;
-                            thisSys.m_DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
-                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.modes[magicNominalModeNum].ratedEvapAirFlowRate;
+                            thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
                             thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
                             CoolingCoilInletNode = newCoil.evapInletNodeIndex;
                             CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
                             thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
-                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.modes[0].speeds.size();
+                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
                             thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
 
                             // Push heating coil PLF curve index to DX coil
@@ -4353,11 +4352,9 @@ namespace UnitarySystems {
 
                             // set variable speed coil flag as necessary
                             if (thisSys.m_NumOfSpeedCooling > 1) {
-                                if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
-                                    CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                                if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
                                     thisSys.m_MultiSpeedCoolingCoil = true;
-                                } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
-                                           CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                                } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
                                     thisSys.m_VarSpeedCoolingCoil = true;
                                 }
                             }
