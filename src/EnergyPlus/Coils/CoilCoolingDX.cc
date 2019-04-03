@@ -21,6 +21,8 @@ std::vector<CoilCoolingDX> coilCoolingDXs;
 
 void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data)
 {
+    static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
+    bool ErrorsFound(false);
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
@@ -67,10 +69,25 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     } else {
         this->condOutletNodeIndex = 0;
     }
-    this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
+    if (input_data.availability_schedule_name == "") {
+      this->availScheduleIndex = DataGlobals::ScheduleAlwaysOn;
+    } else {
+      this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
+    }
+    if (this->availScheduleIndex == 0) {
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
+        ErrorsFound = true;
+    }
+
     BranchNodeConnections::TestCompSet(
         CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
+
+    if (ErrorsFound) {
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
+
+}
 
 void CoilCoolingDX::onetimeinit(){
 
