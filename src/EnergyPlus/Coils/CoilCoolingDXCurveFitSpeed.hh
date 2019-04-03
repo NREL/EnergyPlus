@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -67,9 +67,6 @@ public:
     // speed class inputs
     Real64 PLR;
 
-    Psychrometrics::PsychState inlet;
-    Psychrometrics::PsychState outlet;
-
     Real64 CondInletTemp;            // condenser inlet node temp or outdoor temp if no condenser node {C}
     Real64 ambPressure;              // outdoor pressure {Pa]
     Real64 AirFF;                    // ratio of air mass flow rate to rated air mass flow rate
@@ -105,11 +102,11 @@ public:
     Real64 RatedOutdoorAirTemp;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState &inletState, Real64 &PLR, int &fanOpMode);
+    void CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
     void sizeSpeedMode();
     bool mySizeFlag;
 
-    Real64 CalcBypassFactor(Psychrometrics::PsychState &in);
+    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 };
 } // namespace EnergyPlus
 

@@ -162,23 +162,14 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
 
     // get inlet conditions from inlet node
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    this->inletStateHolder.tdb = evapInletNode.Temp;
-    this->inletStateHolder.h = evapInletNode.Enthalpy;
-    this->inletStateHolder.w = evapInletNode.HumRat;
-    this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
-    this->inletStateHolder.p = evapInletNode.Press;
+    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
 
     // call the simulation, which returns useful data
     auto &myPerformance = this->performance;
-    this->outletStateHolder = myPerformance.simulate(this->inletStateHolder, mode, PLR, speedNum, speedRatio, fanOpMode);
+    myPerformance.simulate(evapInletNode, evapOutletNode, mode, PLR, speedNum, speedRatio, fanOpMode);
 
-    // update outlet conditions
-    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    evapOutletNode.Temp = this->outletStateHolder.tdb;
-    evapOutletNode.HumRat = this->outletStateHolder.w;
-    evapOutletNode.Enthalpy = this->outletStateHolder.h;
-    evapOutletNode.MassFlowRate = this->inletStateHolder.massFlowRate;        // pass through
-    evapOutletNode.Press = this->inletStateHolder.p;                          // pass through
+    evapOutletNode.MassFlowRate = evapInletNode.MassFlowRate;                 // pass through
+    evapOutletNode.Press = evapInletNode.Press;                               // pass through
     evapOutletNode.Quality = evapInletNode.Quality;                           // pass through
     evapOutletNode.MassFlowRateMax = evapInletNode.MassFlowRateMax;           // pass through
     evapOutletNode.MassFlowRateMin = evapInletNode.MassFlowRateMin;           // pass through
@@ -226,8 +217,8 @@ Real64 CoilCoolingDX::getRatedGrossTotalCapacity(int modeIndex) {
         return this->performance.modes[modeIndex].ratedGrossTotalCap;
     } catch (std::exception ex) {
         ShowFatalError("Coil:Cooling:DX structure not initialized during call to getRatedGrossTotalCapacity");
-        assert(false); // shut up compiler
     }
+    return 0.0; // shut up compiler
 }
 
 

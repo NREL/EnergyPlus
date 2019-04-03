@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -85,8 +85,13 @@ public:
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-    Psychrometrics::PsychState
-    CalcOperatingMode(Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void CalcOperatingMode(DataLoopNode::NodeData &inletNode,
+                           DataLoopNode::NodeData &outletNode,
+                           int &mode,
+                           Real64 &PLR,
+                           int &speedNum,
+                           Real64 &speedRatio,
+                           int &fanOpMode);
 };
 
 } // namespace EnergyPlus
