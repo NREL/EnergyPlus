@@ -12,11 +12,11 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     // bool errorsFound = false;
     this->name = input_data.name;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
-    if (input_data.capacity_control == "VARIABLESPEED") {
+    if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
         this->capControlMethod = CapControlMethod::VARIABLE;
-    } else if (input_data.capacity_control == "STAGED") {
+    } else if (UtilityRoutines::SameString(input_data.capacity_control, "STAGED")) {
         this->capControlMethod = CapControlMethod::STAGED;
-    } else if (input_data.capacity_control == "MULTISPEED") {
+    } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
         this->capControlMethod = CapControlMethod::MULTISPEED;
     } else {
         // TODO: ERROR

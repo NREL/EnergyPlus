@@ -75,6 +75,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         }
 
         this->instantiateFromInputSpec(input_specs);
+        break;
     }
 
     if (!found_it) {
