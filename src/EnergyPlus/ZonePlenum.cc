@@ -1535,6 +1535,56 @@ namespace ZonePlenum {
         }
     }
 
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum)
+    {
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int PlenumNum; // loop counter
+        int InNodeCtr; // loop counter
+        int thisPlenum;
+
+        // Obtains and Allocates ZonePlenum related parameters from input file
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetZonePlenumInput();
+            GetInputFlag = false;
+        }
+
+        thisPlenum = 0;
+        if (NumZoneReturnPlenums > 0) {
+            for (PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum) {
+                for (InNodeCtr = 1; InNodeCtr <= ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
+                    if (InNodeNum != ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
+                    thisPlenum = PlenumNum;
+                    break;
+                }
+                if (thisPlenum > 0) break;
+            }
+        }
+
+        return thisPlenum;
+    }
+
+    Real64 sumOtherReturnPlenumInletNodes(int const &plenumNum, int const &InNodeNum)
+    {
+
+        // Obtains and Allocates ZonePlenum related parameters from input file
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetZonePlenumInput();
+            GetInputFlag = false;
+        }
+
+        Real64 plenumFlow = 0.0; // sum of mass flow less InNodeNum flow
+        if (NumZoneReturnPlenums > 0) {
+            for (int InNodeCtr = 1; InNodeCtr <= ZoneRetPlenCond(plenumNum).NumInletNodes; ++InNodeCtr) {
+                if (InNodeNum != ZoneRetPlenCond(plenumNum).InletNode(InNodeCtr)) {
+                    plenumFlow += Node(ZoneRetPlenCond(plenumNum).InletNode(InNodeCtr)).MassFlowRate;
+                }
+            }
+        }
+
+        return plenumFlow;
+    }
+
 } // namespace ZonePlenum
 
 } // namespace EnergyPlus

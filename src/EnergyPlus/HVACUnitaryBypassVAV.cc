@@ -79,6 +79,7 @@
 #include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
+#include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -89,6 +90,7 @@
 #include <UtilityRoutines.hh>
 #include <VariableSpeedCoils.hh>
 #include <WaterCoils.hh>
+#include <ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -660,6 +662,18 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).AirOutNode =
                 GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
+            CBVAV(CBVAVNum).SplitterOutletAirNode = GetOnlySingleNode(
+                SplitterOutletNodeName, ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent);
+
+            CBVAV(CBVAVNum).plenumIndex = ZonePlenum::getReturnPlenumIndexFromInletNode(CBVAV(CBVAVNum).SplitterOutletAirNode);
+            CBVAV(CBVAVNum).mixerIndex = MixerComponent::getZoneMixerIndexFromInletNode(CBVAV(CBVAVNum).SplitterOutletAirNode);
+            if (CBVAV(CBVAVNum).plenumIndex > 0 && CBVAV(CBVAVNum).mixerIndex > 0) {
+                ShowSevereError(CurrentModuleObject + ": " + CBVAV(CBVAVNum).Name);
+                ShowContinueError("Illegal connection for " + cAlphaFields(6) + " = " + SplitterOutletNodeName + '.');
+                ShowContinueError(cAlphaFields(6) + " cannot be connected to both an AirloopHVAC:ReturnPlenum and an AirloopHVAC:ZoneMixer.");
+                ErrorsFound = true;
+            }
+
             CBVAV(CBVAVNum).MixerInletAirNode = GetOnlySingleNode(
                 MixerInletNodeName, ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent);
 
@@ -672,17 +686,16 @@ namespace HVACUnitaryBypassVAV {
                                                                   1,
                                                                   ObjectIsParent);
 
-            CBVAV(CBVAVNum).SplitterOutletAirNode = GetOnlySingleNode(
-                SplitterOutletNodeName, ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent);
-
-            CBVAV(CBVAVNum).SplitterOutletAirNode = GetOnlySingleNode(SplitterOutletNodeName,
-                                                                      ErrorsFound,
-                                                                      CurrentModuleObject,
-                                                                      Alphas(1) + "_Splitter",
-                                                                      NodeType_Air,
-                                                                      NodeConnectionType_Inlet,
-                                                                      1,
-                                                                      ObjectIsParent);
+            if (CBVAV(CBVAVNum).plenumIndex == 0 && CBVAV(CBVAVNum).mixerIndex == 0) {
+                CBVAV(CBVAVNum).SplitterOutletAirNode = GetOnlySingleNode(SplitterOutletNodeName,
+                                                                          ErrorsFound,
+                                                                          CurrentModuleObject,
+                                                                          Alphas(1) + "_Splitter",
+                                                                          NodeType_Air,
+                                                                          NodeConnectionType_Inlet,
+                                                                          1,
+                                                                          ObjectIsParent);
+            }
 
             CBVAV(CBVAVNum).OAMixType = Alphas(8);
             CBVAV(CBVAVNum).OAMixName = Alphas(9);
@@ -2312,12 +2325,20 @@ namespace HVACUnitaryBypassVAV {
         SaveCompressorPLR = 0.0;
 
         // Bypass excess system air through bypass duct and calculate new mixed air conditions at OA mixer inlet node
-        Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp =
-            (1.0 - BypassDuctFlowFraction) * Node(InletNode).Temp + BypassDuctFlowFraction * Node(OutletNode).Temp;
-        Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat =
-            (1.0 - BypassDuctFlowFraction) * Node(InletNode).HumRat + BypassDuctFlowFraction * Node(OutletNode).HumRat;
-        Node(CBVAV(CBVAVNum).MixerInletAirNode).Enthalpy =
-            PsyHFnTdbW(Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp, Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
+        if (CBVAV(CBVAVNum).plenumIndex > 0 || CBVAV(CBVAVNum).mixerIndex > 0) {
+            Node(CBVAV(CBVAVNum).MixerInletAirNode) = Node(InletNode);
+            // Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp = Node(InletNode).Temp;
+            // Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat = Node(InletNode).HumRat;
+            // Node(CBVAV(CBVAVNum).MixerInletAirNode).Enthalpy =
+            //    PsyHFnTdbW(Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp, Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
+        } else {
+            Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp =
+                (1.0 - BypassDuctFlowFraction) * Node(InletNode).Temp + BypassDuctFlowFraction * Node(OutletNode).Temp;
+            Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat =
+                (1.0 - BypassDuctFlowFraction) * Node(InletNode).HumRat + BypassDuctFlowFraction * Node(OutletNode).HumRat;
+            Node(CBVAV(CBVAVNum).MixerInletAirNode).Enthalpy =
+                PsyHFnTdbW(Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp, Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
+        }
         SimOAMixer(CBVAV(CBVAVNum).OAMixName, FirstHVACIteration, CBVAV(CBVAVNum).OAMixIndex);
 
         if (CBVAV(CBVAVNum).FanPlace == BlowThru) {
@@ -3443,6 +3464,9 @@ namespace HVACUnitaryBypassVAV {
             }
         }
         Node(OutletNode).MassFlowRate = (1.0 - BypassDuctFlowFraction) * Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+        if (CBVAV(CBVAVNum).plenumIndex > 0 || CBVAV(CBVAVNum).mixerIndex > 0) {
+            Node(CBVAV(CBVAVNum).SplitterOutletAirNode).MassFlowRate = BypassDuctFlowFraction * Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
+        }
         Node(OutletNode).Temp = Node(CBVAV(CBVAVNum).SplitterOutletAirNode).Temp;
         Node(OutletNode).HumRat = Node(CBVAV(CBVAVNum).SplitterOutletAirNode).HumRat;
         Node(OutletNode).Quality = Node(CBVAV(CBVAVNum).SplitterOutletAirNode).Quality;
@@ -4120,10 +4144,20 @@ namespace HVACUnitaryBypassVAV {
                 BypassDuctFlowFraction = 0.0;
             } else {
                 OnOffAirFlowRatio = 1.0;
-                BypassDuctFlowFraction = max(0.0, 1.0 - (Node(InletNode).MassFlowRate / AverageUnitMassFlow));
+                if (CBVAV(CBVAVNum).plenumIndex > 0) {
+                    // need to know what the total zone air flow rate is, sum plenum nodes that aren't splitter node?
+                    Real64 plenumFlow =
+                        ZonePlenum::sumOtherReturnPlenumInletNodes(CBVAV(CBVAVNum).plenumIndex, CBVAV(CBVAVNum).SplitterOutletAirNode);
+                    BypassDuctFlowFraction = max(0.0, 1.0 - (plenumFlow / AverageUnitMassFlow));
+                } else if (CBVAV(CBVAVNum).mixerIndex > 0) {
+                    Real64 mixerFlow = MixerComponent::sumOtherZoneMixerInletNodes(CBVAV(CBVAVNum).mixerIndex, CBVAV(CBVAVNum).SplitterOutletAirNode);
+                    BypassDuctFlowFraction = max(0.0, 1.0 - (mixerFlow / AverageUnitMassFlow));
+                } else {
+                    BypassDuctFlowFraction = max(0.0, 1.0 - (Node(InletNode).MassFlowRate / AverageUnitMassFlow));
+                }
             }
         }
-    }
+    } // namespace HVACUnitaryBypassVAV
 
     void ReportCBVAV(int const CBVAVNum) // Index of the current CBVAV unit being simulated
     {

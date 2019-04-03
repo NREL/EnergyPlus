@@ -257,6 +257,8 @@ namespace HVACUnitaryBypassVAV {
         int CRDXIterationFailed;                 // Counter for cool reheat multimode DX coil messages
         int CRDXIterationFailedIndex;            // Counter for cool reheat multimode DX coil messages
         bool FirstPass;                          // used to determine when first call is made
+        int plenumIndex;                         // index to AirloopHVAC:ReturnPlenum
+        int mixerIndex;                          // index to AirloopHVAC:ZoneMixer
 
         // Default Constructor
         CBVAVData()
@@ -283,7 +285,7 @@ namespace HVACUnitaryBypassVAV {
               HXDXIterationExceededIndex(0), HXDXIterationFailed(0), HXDXIterationFailedIndex(0), MMDXIterationExceeded(0),
               MMDXIterationExceededIndex(0), MMDXIterationFailed(0), MMDXIterationFailedIndex(0), DMDXIterationExceeded(0),
               DMDXIterationExceededIndex(0), DMDXIterationFailed(0), DMDXIterationFailedIndex(0), CRDXIterationExceeded(0),
-              CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true)
+              CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0)
         {
         }
     };

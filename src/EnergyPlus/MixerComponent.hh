@@ -161,6 +161,10 @@ namespace MixerComponent {
     // *****************************************************************************
     void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
+    int getZoneMixerIndexFromInletNode(int const &InNodeNum);
+
+    Real64 sumOtherZoneMixerInletNodes(int const &mixerNum, int const &InNodeNum);
+
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************
 
