@@ -154,7 +154,6 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
 
 void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
 {
-
     if (this->myOneTimeInitFlag) {
         onetimeinit();
         this->myOneTimeInitFlag = false;
@@ -162,28 +161,11 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
 
     // get inlet conditions from inlet node
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    this->inletStateHolder.tdb = evapInletNode.Temp;
-    this->inletStateHolder.h = evapInletNode.Enthalpy;
-    this->inletStateHolder.w = evapInletNode.HumRat;
-    this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
-    this->inletStateHolder.p = evapInletNode.Press;
+    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
 
     // call the simulation, which returns useful data
-    auto &myPerformance = this->performance;
-    this->outletStateHolder = myPerformance.simulate(this->inletStateHolder, mode, PLR, speedNum, speedRatio, fanOpMode);
-
-    // update outlet conditions
-    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    evapOutletNode.Temp = this->outletStateHolder.tdb;
-    evapOutletNode.HumRat = this->outletStateHolder.w;
-    evapOutletNode.Enthalpy = this->outletStateHolder.h;
-    evapOutletNode.MassFlowRate = this->inletStateHolder.massFlowRate;        // pass through
-    evapOutletNode.Press = this->inletStateHolder.p;                          // pass through
-    evapOutletNode.Quality = evapInletNode.Quality;                           // pass through
-    evapOutletNode.MassFlowRateMax = evapInletNode.MassFlowRateMax;           // pass through
-    evapOutletNode.MassFlowRateMin = evapInletNode.MassFlowRateMin;           // pass through
-    evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMaxAvail; // pass through
-    evapOutletNode.MassFlowRateMinAvail = evapInletNode.MassFlowRateMinAvail; // pass through
+    this->performance.simulate(evapInletNode, evapOutletNode, mode, PLR, speedNum, speedRatio, fanOpMode);
+    this->passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -196,23 +178,35 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
     this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
-    this->coolingCoilRuntimeFraction = myPerformance.RTF;
-    this->elecCoolingPower = myPerformance.powerUse;
-    this->elecCoolingConsumption = myPerformance.powerUse * reportingConstant;
+    this->coolingCoilRuntimeFraction = this->performance.RTF;
+    this->elecCoolingPower = this->performance.powerUse;
+    this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
+}
+
+void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in,
+                                        EnergyPlus::DataLoopNode::NodeData &out) {
+    // pass through all the other node variables that we don't update as a part of this model calculation
+    out.MassFlowRate = in.MassFlowRate;
+    out.Press = in.Press;
+    out.Quality = in.Quality;
+    out.MassFlowRateMax = in.MassFlowRateMax;
+    out.MassFlowRateMin = in.MassFlowRateMin;
+    out.MassFlowRateMaxAvail = in.MassFlowRateMaxAvail;
+    out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
 int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
     auto & performance = this->performance;
-    if (performance.modes.size() > 1u) {
+    if (performance.hasAlternateMode) {
         // Per IDD note - Operating Mode 1 is always used as the base design operating mode
-        auto &mode = performance.modes[0];
+        auto &mode = performance.normalMode; // TODO: Yeah, what?
         if (mode.speeds.size()) {
             auto &firstSpeed = mode.speeds[0];
             return firstSpeed.indexCapFT;
         }
         return -1;
     } else {
-        auto & mode = performance.modes[0];
+        auto & mode = performance.normalMode; // TODO: Like, what?
         if (mode.speeds.size()) {
             auto & firstSpeed = mode.speeds[0];
             return firstSpeed.indexCapFT;
@@ -221,14 +215,7 @@ int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
     }
 }
 
-Real64 CoilCoolingDX::getRatedGrossTotalCapacity(int modeIndex) {
-    try {
-        return this->performance.modes[modeIndex].ratedGrossTotalCap;
-    } catch (std::exception ex) {
-        ShowFatalError("Coil:Cooling:DX structure not initialized during call to getRatedGrossTotalCapacity");
-        assert(false); // shut up compiler
-    }
+Real64 CoilCoolingDX::getRatedGrossTotalCapacity() {
+    // **should** we be checking if performance.hasAlternateMode before looking up the value?
+	return this->performance.normalMode.ratedGrossTotalCap;
 }
-
-
-

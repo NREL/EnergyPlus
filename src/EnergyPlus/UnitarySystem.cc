@@ -1809,7 +1809,7 @@ namespace UnitarySystems {
                     DataSizing::DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                        minNoLoadFlow = 0.6667;
+                        minNoLoadFlow = 0.6667; // TODO: Should this have a Coil:Cooling:DX block?
                     } else {
                         if (this->m_NoLoadAirFlowRateRatio < 1.0) {
                             minNoLoadFlow = this->m_NoLoadAirFlowRateRatio;
@@ -1976,26 +1976,26 @@ namespace UnitarySystems {
 
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = coilCoolingDXs[this->m_CoolingCoilIndex];
-            int const magicNominalModeNum = 0;
-            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.modes[magicNominalModeNum].speeds.size()) {
+            // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
+            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
                 ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of cooling speeds does not match coil object.");
                 ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
 
             // Use multispeed/variablespeed control algorithm regardless of number of speeds
-            if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+            if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
                 this->m_MultiSpeedCoolingCoil = true;
-            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
                 this->m_VarSpeedCoolingCoil = true;
-            } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
+            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
                 // not sure what to do here
             }
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
                 newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
-                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
+                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
                 if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -2006,7 +2006,7 @@ namespace UnitarySystems {
                 }
             }
 
-            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum);
+            DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity();
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
             EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
@@ -4334,15 +4334,15 @@ namespace UnitarySystems {
                             thisSys.m_CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
 
                             // mine data from coil object
+                            // TODO: Need to check for autosize on these I guess
                             auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
-                            int const magicNominalModeNum = 0;
-                            thisSys.m_DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
-                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.modes[magicNominalModeNum].ratedEvapAirFlowRate;
+                            thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
                             thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
                             CoolingCoilInletNode = newCoil.evapInletNodeIndex;
                             CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
                             thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
-                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.modes[0].speeds.size();
+                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
                             thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
 
                             // Push heating coil PLF curve index to DX coil
@@ -4353,11 +4353,9 @@ namespace UnitarySystems {
 
                             // set variable speed coil flag as necessary
                             if (thisSys.m_NumOfSpeedCooling > 1) {
-                                if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
-                                    CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                                if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
                                     thisSys.m_MultiSpeedCoolingCoil = true;
-                                } else if (newCoil.performance.modes[magicNominalModeNum].capControlMethod ==
-                                           CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                                } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
                                     thisSys.m_VarSpeedCoolingCoil = true;
                                 }
                             }
@@ -6271,7 +6269,10 @@ namespace UnitarySystems {
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     thisSys.m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    thisSys.m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(loc_m_CoolingCoilName, errFlag);
+					thisSys.m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(
+							loc_m_CoolingCoilName, errFlag);
+				} else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                	// TODO: Set thisSys.m_minOATCompressorCooling
                 } else {
                     thisSys.m_MinOATCompressorCooling = -1000.0;
                 }
@@ -6301,6 +6302,7 @@ namespace UnitarySystems {
                 errFlag = false;
                 if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     thisSys.m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+               		// TODO: Should we add a block for the new DX Coil?
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     thisSys.m_CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(loc_m_CoolingCoilName, errFlag);
                 } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {

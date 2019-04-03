@@ -1,5 +1,4 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
-#include <Coils/PsychStruct.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
@@ -12,8 +11,10 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     this->original_input_specs = input_data;
     // bool errorsFound = false;
     this->name = input_data.name;
-    for (auto &mode_name : input_data.operating_modes) {
-        this->modes.emplace_back(mode_name);
+    this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
+    if (!input_data.alternate_operating_mode_name.empty()) {
+        this->hasAlternateMode = true;
+        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
     }
 }
 
@@ -54,13 +55,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
         input_specs.basin_heater_operating_shedule_name = cAlphaArgs(4);
         input_specs.compressor_fuel_type = cAlphaArgs(5);
-        for (int fieldNum = 6; fieldNum <= NumAlphas; fieldNum++) {
-            if (cAlphaArgs(fieldNum) == "") {
-                break;
-            }
-            input_specs.operating_modes.push_back(cAlphaArgs(fieldNum));
-        }
-
+        input_specs.base_operating_mode_name = cAlphaArgs(6);
+        // TODO: Check for blank here
+        input_specs.alternate_operating_mode_name = cAlphaArgs(7);
         this->instantiateFromInputSpec(input_specs);
     }
 
@@ -69,16 +66,25 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
-Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(
-    Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+void CoilCoolingDXCurveFitPerformance::simulate(
+    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
-    auto &currentMode = this->modes[mode];
+    if (useAlternateMode) {
+        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+    } else {
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+    }
+}
+
+void CoilCoolingDXCurveFitPerformance::calculate(
+        CoilCoolingDXCurveFitOperatingMode &currentMode,
+        DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+{
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         currentMode.sizeOperatingMode();
         this->mySizeFlag = false;
     }
-    auto returnState = currentMode.CalcOperatingMode(inletState, mode, PLR, speedNum, speedRatio, fanOpMode);
+    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
     this->powerUse = currentMode.OpModePower;
     this->RTF = currentMode.OpModeRTF;
-    return returnState;
 }

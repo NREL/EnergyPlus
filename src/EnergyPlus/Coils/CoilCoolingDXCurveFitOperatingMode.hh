@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -32,7 +32,7 @@ public:
 
 class CoilCoolingDXCurveFitOperatingMode
 {
-    std::string const object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
+    std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
 public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
@@ -85,8 +85,12 @@ public:
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-    Psychrometrics::PsychState
-    CalcOperatingMode(Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void CalcOperatingMode(DataLoopNode::NodeData &inletNode,
+                           DataLoopNode::NodeData &outletNode,
+                           Real64 &PLR,
+                           int &speedNum,
+                           Real64 &speedRatio,
+                           int &fanOpMode);
 };
 
 } // namespace EnergyPlus

@@ -7,7 +7,7 @@
 #include <EnergyPlus.hh>
 
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
-#include <Coils/PsychStruct.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -26,7 +26,8 @@ public:
     Real64 basin_heater_setpoint_temperature;
     std::string basin_heater_operating_shedule_name;
     std::string compressor_fuel_type;
-    std::vector<std::string> operating_modes;
+    std::string base_operating_mode_name;
+    std::string alternate_operating_mode_name;
 };
 
 class CoilCoolingDXCurveFitPerformance
@@ -36,14 +37,23 @@ class CoilCoolingDXCurveFitPerformance
 
 public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-    Psychrometrics::PsychState
-    simulate(Psychrometrics::PsychState &inletState, int &mode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void simulate(DataLoopNode::NodeData &inletNode,
+                  DataLoopNode::NodeData &outletNode,
+                  bool useAlternateMode,
+                  Real64 &PLR,
+                  int &speedNum,
+                  Real64 &speedRatio,
+                  int &fanOpMode);
+
+	void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+			DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
     CoilCoolingDXCurveFitPerformance()
     {
     } // allow a blank empty default constructor, won't really be used
+
     CoilCoolingDXCurveFitPerformance(std::string name);
 
     std::string name;
@@ -69,7 +79,9 @@ public:
     Real64 powerUse;
     Real64 RTF;
 
-    std::vector<CoilCoolingDXCurveFitOperatingMode> modes;
+    CoilCoolingDXCurveFitOperatingMode normalMode;
+    bool hasAlternateMode = false;
+	CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation
 };
 
 } // namespace EnergyPlus
