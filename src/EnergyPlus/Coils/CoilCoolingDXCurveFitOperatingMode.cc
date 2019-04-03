@@ -154,7 +154,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
 
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
         outletNode.HumRat = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
-        outletNode.Enthalpy = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
+        outletNode.Enthalpy = outletNode.Enthalpy * PLR + (1.0 - PLR) * inletNode.Enthalpy;
     }
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
