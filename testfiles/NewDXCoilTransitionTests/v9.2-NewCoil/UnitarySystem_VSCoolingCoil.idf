@@ -15,8 +15,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -152,7 +152,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -182,7 +182,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -1613,8 +1613,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    VariableSpeed,           !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -1633,7 +1632,6 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     AirCooled,               !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    VariableSpeed,           !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Speed 1 Name
     Heat Pump ACDXCoil 1 Speed 2 Performance;  !- Speed 2 Name
