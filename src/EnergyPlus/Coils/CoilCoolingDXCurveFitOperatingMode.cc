@@ -22,12 +22,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
 }
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find)
-    :
-
-      ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
+    : ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
       timeForCondensateRemoval(0.0), OpModeOutletTemp(0.0), OpModeOutletHumRat(0.0), OpModeOutletEnth(0.0), OpModePower(0.0), OpModeRTF(0.0),
-      nominalEvaporativePumpPower(0.0), capControlMethod(MULTISPEED), nominalSpeedNum(0)
-
+      nominalEvaporativePumpPower(0.0), nominalSpeedNum(0)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -69,16 +66,8 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
             this->condenserType = EVAPCOOLED;
         }
         input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
-        input_specs.capacity_control = cAlphaArgs(4);
-        if (UtilityRoutines::SameString(input_specs.capacity_control, "Staged")) {
-         this->capControlMethod = STAGED;
-        } else if (UtilityRoutines::SameString(input_specs.capacity_control, "VariableSpeed")) {
-         this->capControlMethod = VARIABLE;
-        } else if (UtilityRoutines::SameString(input_specs.capacity_control, "MultiSpeed")) {
-         this->capControlMethod = MULTISPEED;
-        }
         input_specs.nominal_speed_number = rNumericArgs(9);
-        for (int fieldNum = 5; fieldNum <= NumAlphas; fieldNum++) {
+        for (int fieldNum = 4; fieldNum <= NumAlphas; fieldNum++) {
             if (cAlphaArgs(fieldNum) == "") {
                 break;
             }

@@ -1984,11 +1984,11 @@ namespace UnitarySystems {
             }
 
             // Use multispeed/variablespeed control algorithm regardless of number of speeds
-            if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+            if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::MULTISPEED) {
                 this->m_MultiSpeedCoolingCoil = true;
-            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::VARIABLE) {
                 this->m_VarSpeedCoolingCoil = true;
-            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
+            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::STAGED) {
                 // not sure what to do here
             }
 
@@ -4353,9 +4353,9 @@ namespace UnitarySystems {
 
                             // set variable speed coil flag as necessary
                             if (thisSys.m_NumOfSpeedCooling > 1) {
-                                if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::MULTISPEED) {
                                     thisSys.m_MultiSpeedCoolingCoil = true;
-                                } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::VARIABLE) {
                                     thisSys.m_VarSpeedCoolingCoil = true;
                                 }
                             }
