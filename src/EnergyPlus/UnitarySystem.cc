@@ -2008,7 +2008,7 @@ namespace UnitarySystems {
 
             DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity();
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
-            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
+            if (this->m_HeatPump) EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
             if (MSHPIndex > 0) {
                 this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
