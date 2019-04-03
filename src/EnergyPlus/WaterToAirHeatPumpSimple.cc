@@ -78,6 +78,7 @@
 #include <UtilityRoutines.hh>
 #include <WaterToAirHeatPumpSimple.hh>
 #include<DataHeatBalance.hh>
+#include<WaterThermalTanks.hh>
 
 namespace EnergyPlus {
 
@@ -130,6 +131,9 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
     using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
+    using WaterThermalTanks::WaterHeaterDesuperheater;
+    using WaterThermalTanks::WaterThermalTank;
+    using WaterThermalTanks::NumWaterHeaterDesuperheater;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -163,6 +167,7 @@ namespace WaterToAirHeatPumpSimple {
     Real64 QLatRated(0.0);              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
     Real64 QLatActual(0.0);             // Actual Latent Capacity [W]
     Real64 QSource(0.0);                // Source side heat transfer rate [W]
+    Real64 WHDSHT_Reclaimed_Heat(0.0);   // Reclaimed heat by water heater desuperheater[W]
     Real64 Winput(0.0);                 // Power Consumption [W]
     Real64 PLRCorrLoadSideMdot(0.0);    // Load Side Mdot corrected for Part Load Ratio of the unit
     bool MyOneTimeFlag(true);           // one time allocation flag
@@ -2191,6 +2196,7 @@ namespace WaterToAirHeatPumpSimple {
 
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
+        int DesuperheaterNum;
         static int Count(0);        // No idea what this is for.
         static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
@@ -2373,6 +2379,13 @@ namespace WaterToAirHeatPumpSimple {
         Winput *= RuntimeFrac;
         QSource = QSource_fullload * PartLoadRatio;
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = QSource;
+        for (DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum) {
+            if (UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType,"COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") 
+                && UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,SimpleWatertoAirHP(HPNum).Name)) {
+                WHDSHT_Reclaimed_Heat += WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+            }
+        }
+        
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = Winput;
 
@@ -2382,7 +2395,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         SimpleWatertoAirHP(HPNum).QSensible = QSensible;
         SimpleWatertoAirHP(HPNum).QLatent = QLoadTotal - QSensible;
-        SimpleWatertoAirHP(HPNum).QSource = QSource;
+        SimpleWatertoAirHP(HPNum).QSource = QSource-WHDSHT_Reclaimed_Heat;
         SimpleWatertoAirHP(HPNum).Energy = Winput * ReportingConstant;
         SimpleWatertoAirHP(HPNum).EnergyLoadTotal = QLoadTotal * ReportingConstant;
         SimpleWatertoAirHP(HPNum).EnergySensible = QSensible * ReportingConstant;
@@ -2408,8 +2421,8 @@ namespace WaterToAirHeatPumpSimple {
                                  SimpleWatertoAirHP(HPNum).BranchNum,
                                  SimpleWatertoAirHP(HPNum).CompNum);
             if (SimpleWatertoAirHP(HPNum).WaterMassFlowRate > 0.0) {
-                SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp + QSource / (SimpleWatertoAirHP(HPNum).WaterMassFlowRate * CpWater);
-                SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
+                SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp + (QSource-WHDSHT_Reclaimed_Heat) / (SimpleWatertoAirHP(HPNum).WaterMassFlowRate * CpWater);
+                SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth + (QSource-WHDSHT_Reclaimed_Heat) / SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
             }
         } else {
             if ((SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterConstant) {
@@ -2428,8 +2441,8 @@ namespace WaterToAirHeatPumpSimple {
             } else {
                 SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SourceSideMassFlowRate;
             }
-            SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpWater);
-            SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
+            SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp + (QSource-WHDSHT_Reclaimed_Heat) / (SourceSideMassFlowRate * CpWater);
+            SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth + (QSource-WHDSHT_Reclaimed_Heat) / SourceSideMassFlowRate;
         }
     }
 
