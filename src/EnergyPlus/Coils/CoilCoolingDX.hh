@@ -36,7 +36,7 @@ public:
 
     void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
     void onetimeinit();
-    void simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
+    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
 
     std::string name;
     bool myOneTimeInitFlag;

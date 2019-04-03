@@ -13,6 +13,15 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     this->name = input_data.name;
     this->minOutdoorDrybulb = input_data.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
+    if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
+        this->capControlMethod = CapControlMethod::VARIABLE;
+    } else if (UtilityRoutines::SameString(input_data.capacity_control, "STAGED")) {
+        this->capControlMethod = CapControlMethod::STAGED;
+    } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
+        this->capControlMethod = CapControlMethod::MULTISPEED;
+    } else {
+        // TODO: ERROR
+    }
     if (!input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = true;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
@@ -22,7 +31,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find)
     :
 
-      crankcaseHeaterCap(0.0), minOutdoorDrybulb(0.0), maxOutdoorDrybulb(0.0), unitStatic(0.0), mySizeFlag(true), modeScheduleIndex(0),
+      crankcaseHeaterCap(0.0), minOutdoorDrybulb(0.0), maxOutdoorDrybulb(0.0), unitStatic(0.0), mySizeFlag(true), capControlMethod(CapControlMethod::STAGED),
       evapCondBasinHeatCap(0.0), evapCondBasinHeatSetpoint(0.0), evapCondBasinHeatSchedulIndex(0), powerUse(0.0), RTF(0.0)
 
 {
@@ -35,8 +44,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -48,16 +56,15 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         input_specs.crankcase_heater_capacity = rNumericArgs(1);
         input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = rNumericArgs(2);
         input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = rNumericArgs(3);
-        input_specs.unit_internal_itatic_air_pressure = rNumericArgs(4);
-        input_specs.method_for_switching_modes = cAlphaArgs(2);
-        input_specs.operating_mode_number_schedule_name = cAlphaArgs(3);
+        input_specs.unit_internal_static_air_pressure = rNumericArgs(4);
+        input_specs.capacity_control = cAlphaArgs(2);
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
-        input_specs.basin_heater_operating_shedule_name = cAlphaArgs(4);
-        input_specs.compressor_fuel_type = cAlphaArgs(5);
-        input_specs.base_operating_mode_name = cAlphaArgs(6);
+        input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
+        input_specs.compressor_fuel_type = cAlphaArgs(4);
+        input_specs.base_operating_mode_name = cAlphaArgs(5);
         // TODO: Check for blank here
-        input_specs.alternate_operating_mode_name = cAlphaArgs(7);
+        input_specs.alternate_operating_mode_name = cAlphaArgs(6);
         this->instantiateFromInputSpec(input_specs);
     }
 

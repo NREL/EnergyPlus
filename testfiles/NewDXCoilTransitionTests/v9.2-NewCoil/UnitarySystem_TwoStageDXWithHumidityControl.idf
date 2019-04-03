@@ -16,8 +16,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -192,7 +192,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -222,7 +222,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -2862,8 +2862,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    HumidityControl,         !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -2883,7 +2882,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 1 Furnace DX Cool Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 1 Furnace DX Cool Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
@@ -2942,7 +2940,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 1 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 1 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name
@@ -3361,8 +3358,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    HumidityControl,         !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -3382,7 +3378,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 2 Furnace DX Cool Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 2 Furnace DX Cool Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
@@ -3441,7 +3436,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 2 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 2 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name
@@ -3847,8 +3841,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    HumidityControl,         !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -3868,7 +3861,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 3 Heat Pump Air Source Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 3 Heat Pump Air Source Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
@@ -3927,7 +3919,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 3 Heat Pump Air Source Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 3 Heat Pump Air Source Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name
@@ -4414,8 +4405,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    HumidityControl,         !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -4435,7 +4425,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 4 Heat Pump Air Source Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 4 Heat Pump Air Source Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
@@ -4494,7 +4483,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 4 Heat Pump Air Source Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 4 Heat Pump Air Source Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name
@@ -4975,8 +4963,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    HumidityControl,         !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -4996,7 +4983,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 5 Furnace DX Cool Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 5 Furnace DX Cool Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
@@ -5055,7 +5041,6 @@
     Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Capacity Control Method
     2,                       !- Nominal Speed Number
     Sys 5 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
     Sys 5 Furnace DX Cool Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name

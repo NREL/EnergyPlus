@@ -19,15 +19,15 @@ public:
     Real64 crankcase_heater_capacity;
     Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
-    Real64 unit_internal_itatic_air_pressure;
-    std::string method_for_switching_modes;
-    std::string operating_mode_number_schedule_name;
+    Real64 unit_internal_static_air_pressure;
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
     std::string basin_heater_operating_shedule_name;
     std::string compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
+	std::string capacity_control;
+
 };
 
 class CoilCoolingDXCurveFitPerformance
@@ -63,15 +63,13 @@ public:
     Real64 unitStatic; // TODO: make curve f(flow)?
     bool mySizeFlag;
 
-    enum ModeMethod
-    {
-        HUMIDITY_CONTROL,
-        SCHEDULE
-    };
-
-    ModeMethod modeMethod;
-
-    int modeScheduleIndex;
+	enum CapControlMethod
+	{
+		STAGED,
+		VARIABLE,
+		MULTISPEED
+	};
+	CapControlMethod capControlMethod;
 
     Real64 evapCondBasinHeatCap;
     Real64 evapCondBasinHeatSetpoint;
