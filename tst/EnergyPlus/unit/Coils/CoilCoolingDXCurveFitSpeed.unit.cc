@@ -7,72 +7,17 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include "DataLoopNode.hh"
 
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "Coils/CoilCoolingDXFixture.hh"
 
 using namespace EnergyPlus;
 
 
-TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
+TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput )
 {
-
-    std::string const idf_objects = delimited_string( {
-      "Coil:Cooling:DX:CurveFit:Speed, ",
-      " Speed1Name,                    ",
-      " 0.8,                           ",
-      " 0.745,                         ",
-      " 3.1415926,                     ", // condenser
-      " 0.9,                           ",
-      " 0.9,                           ", // COP
-      " 0.5,                           ",
-      " 300,                           ",
-      " 6.9,                           ", // evaporative
-      " 0.8,                           ", // effectiveness
-      " CapFT,                         ",
-      " CapFF,                         ",
-      " EIRFT,                         ",
-      " EIRFF,                         ",
-      " PLFCurveName,                  ",
-      " 0.6,                           ",
-      " WasteHeatFunctionCurve,        ",
-      " SHRFT,                         ",
-      " SHRFF;                         ",
-      "Curve:Biquadratic,              ",
-      " CapFT,                         ",
-      " 1, 0, 0, 0, 0, 0,              ",
-      " 0, 1, 0, 1;                    ",
-      "Curve:Linear,                   ",
-      " CapFF,                         ",
-      " 1, 0,                          ",
-      " 0, 1;                          ",
-      "Curve:Biquadratic,              ",
-      " EIRFT,                         ",
-      " 1, 0, 0, 0, 0, 0,              ",
-      " 0, 1, 0, 1;                    ",
-      "Curve:Linear,                   ",
-      " EIRFF,                         ",
-      " 1, 0,                          ",
-      " 0, 1;                          ",
-      "Curve:Linear,                   ",
-      " PLFCurveName,                  ",
-      " 0.85, 0.15,                    ",
-      " 0, 1;                          ",
-      "Curve:Biquadratic,              ",
-      " WasteHeatFunctionCurve,        ",
-      " 1, 0, 0, 0, 0, 0,              ",
-      " 0, 1, 0, 1;                    ",
-      "Curve:Biquadratic,              ",
-      " SHRFT,                         ",
-      " 1, 0, 0, 0, 0, 0,              ",
-      " 0, 1, 0, 1;                    ",
-      "Curve:Linear,                   ",
-      " SHRFF,                         ",
-      " 1, 0,                          ",
-      " 0, 1;                          "
-    } );
-
-    bool ok = !process_idf( idf_objects, false );
-    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name");
-
+	std::string idf_objects = this->getSpeedObjectStrings("speed1");
+    EXPECT_TRUE(process_idf( idf_objects, false ));
+    CoilCoolingDXCurveFitSpeed thisSpeed("speed1");
+    EXPECT_EQ("SPEED1", thisSpeed.name);
 }
 
 TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
