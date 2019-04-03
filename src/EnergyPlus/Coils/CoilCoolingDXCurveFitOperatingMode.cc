@@ -159,8 +159,6 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
 
     thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode);
 
-    Psychrometrics::PsychState finalOutletConditions;
-
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
@@ -182,7 +180,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
 
         outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
-        finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
         OpModePower = OpModePower + lowerspeed.FullLoadPower;
     }
 }

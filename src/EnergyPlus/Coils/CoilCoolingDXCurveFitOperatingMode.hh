@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
 #include <DataLoopNode.hh>
 

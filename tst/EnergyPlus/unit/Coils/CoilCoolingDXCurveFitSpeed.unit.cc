@@ -153,8 +153,6 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	CoilCoolingDXCurveFitOperatingMode thisMode( "OperatingMode1Name" );
 	auto & thisSpeed = thisMode.speeds[0];
 
-	Psychrometrics::PsychState inletState;
-
     DataLoopNode::NodeData inletNode;
     inletNode.Temp = 20.0;
     inletNode.HumRat = 0.008;
@@ -164,10 +162,6 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 
 	thisSpeed.PLR = 1.0;
 	thisSpeed.speedRatio = 1.0;
-	inletState.tdb = 20.0;
-	inletState.w = 0.008;
-	inletState.twb = 1443.0;
-	inletState.h = 40000.0;
 	thisSpeed.CondInletTemp = 35.0;
 	thisSpeed.ambPressure = 101325.0;
 	thisSpeed.AirFF = 1.0;

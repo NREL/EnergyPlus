@@ -1,6 +1,5 @@
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <Coils/PsychStruct.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataEnvironment.hh>
@@ -170,13 +169,14 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 
-    Psychrometrics::PsychState in;
-    in.tdb = RatedInletAirTemp;
-    in.w = RatedInletAirHumRat;
-    in.h = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
-    in.p = DataEnvironment::StdPressureSeaLevel;
+    // Psychrometrics::PsychState in;
+    // in.tdb = RatedInletAirTemp;
+    // in.w = RatedInletAirHumRat;
+    // in.h = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
+    // in.p = DataEnvironment::StdPressureSeaLevel;
 
-    this->RatedCBF = CalcBypassFactor(in);
+    this->RatedCBF = CalcBypassFactor(RatedInletAirTemp, RatedInletAirHumRat, Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
+                                      DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
@@ -185,8 +185,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNo
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("CalcSpeedOutput: ");
-
-    Psychrometrics::PsychState outletState;
 
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         sizeSpeedMode();
@@ -299,37 +297,34 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNo
     RTF = PLR / PLF;
     FullLoadPower = TotCap * EIR;
 
-    outletState.h = inletNode.Enthalpy - hDelta;
+    outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);
-    outletState.w = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout);
-    outletState.tdb = Psychrometrics::PsyTdbFnHW(outletState.h, outletState.w);
+    outletNode.HumRat = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout);
+    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &in)
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p)
 {
 
     static std::string const RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF = 0.0;
 
-    // Outlet conditions
-    Psychrometrics::PsychState out;
-
-    Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(in.p, in.tdb, in.w);
+    Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(p, tdb, w);
     Real64 deltaH = rated_total_capacity / airMassFlowRate;
-    out.p = in.p;
-    out.h = in.h - deltaH;
-    out.w = Psychrometrics::PsyWFnTdbH(in.tdb, in.h - (1.0 - this->gross_shr) * deltaH); // enthalpy at Tdb,in and Wout
-    out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
-    out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
+    Real64 outp = p;
+    Real64 outh = h - deltaH;
+    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->gross_shr) * deltaH); // enthalpy at Tdb,in and Wout
+    Real64 outtdb = Psychrometrics::PsyTdbFnHW(outh, outw);
+    Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(outtdb, outw, outp);
 
-    if (out.rh >= 1.0) {
-        Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(out.h, out.p, RoutineName);
-        if (out.tdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
-            out.tdb = outletAirTempSat + 0.005;
-            out.w = Psychrometrics::PsyWFnTdbH(out.tdb, out.h, RoutineName);
-            Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(in.tdb, out.w) - out.h) / deltaH;
+    if (outrh >= 1.0) {
+        Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(outh, outp, RoutineName);
+        if (outtdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+            outtdb = outletAirTempSat + 0.005;
+            outw = Psychrometrics::PsyWFnTdbH(outtdb, outh, RoutineName);
+            Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
             ShowWarningError(RoutineName + object_name + " \"" + name +
                              "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
             ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->gross_shr, 5));
@@ -338,8 +333,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     }
 
     // ADP conditions
-    Psychrometrics::PsychState adp;
-    adp.tdb = Psychrometrics::PsyTdpFnWPb(out.w, out.p);
+    Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(outw, outp);
 
     Real64 tol = 1.0;
     std::size_t iter = 0;
@@ -348,20 +342,22 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     Real64 deltaADPTemp = 5.0;
     Real64 tolerance = 1.0; // initial conditions for iteration
     Real64 slopeAtConds = 0.0;
-    Real64 deltaT = in.tdb - out.tdb;
-    Real64 deltaHumRat = in.w - out.w;
+    Real64 deltaT = tdb - outtdb;
+    Real64 deltaHumRat = w - outw;
     bool cbfErrors = false;
 
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
 
+    Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
+
     while ((iter <= maxIter) && (tolerance > 0.001)) {
 
         // Do for IterMax iterations or until the error gets below .1%
-        if (iter > 0) adp.tdb += deltaADPTemp;
+        if (iter > 0) adp_tdb += deltaADPTemp;
         ++iter;
         //  Find new slope using guessed Tadp
-        adp.w = min(out.w, Psychrometrics::PsyWFnTdpPb(adp.tdb, DataEnvironment::StdPressureSeaLevel));
-        Real64 slope = (in.w - adp.w) / max(0.001, (in.tdb - adp.tdb));
+        adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
+        Real64 slope = (w - adp_w) / max(0.001, (tdb - adp_tdb));
         //  check for convergence (slopes are equal to within error tolerance)
         Real64 error = (slope - slopeAtConds) / slopeAtConds;
         if ((error > 0.0) && (errorLast < 0.0)) {
@@ -376,8 +372,8 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState &
     }
 
     //   Calculate Bypass Factor from Enthalpies
-    adp.h = Psychrometrics::PsyHFnTdbW(adp.tdb, adp.w);
-    calcCBF = min(1.0, (out.h - adp.h) / (in.h - adp.h));
+    Real64 adp_h = Psychrometrics::PsyHFnTdbW(adp_tdb, adp_w);
+    calcCBF = min(1.0, (outh - adp_h) / (h - adp_h));
 
     if (iter > maxIter) {
         ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");

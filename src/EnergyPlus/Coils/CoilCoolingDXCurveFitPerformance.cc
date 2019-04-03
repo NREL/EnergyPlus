@@ -1,5 +1,4 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
-#include <Coils/PsychStruct.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>

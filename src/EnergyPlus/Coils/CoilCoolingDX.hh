@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
-#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -50,10 +49,6 @@ public:
     CoilCoolingDXCurveFitPerformance performance; // TODO: Change to unique pointer when we have base class for performance object
     int condensateTankIndex;
     int evaporativeCondSupplyTankIndex;
-
-    // DX Coil needs inlet and outlet state member variables
-    Psychrometrics::PsychState inletStateHolder;
-    Psychrometrics::PsychState outletStateHolder;
 
     // report variables
     Real64 totalCoolingEnergyRate;

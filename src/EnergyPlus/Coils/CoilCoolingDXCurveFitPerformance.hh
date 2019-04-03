@@ -7,7 +7,6 @@
 #include <EnergyPlus.hh>
 
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
-#include <Coils/PsychStruct.hh>
 #include <DataLoopNode.hh>
 
 namespace EnergyPlus {
