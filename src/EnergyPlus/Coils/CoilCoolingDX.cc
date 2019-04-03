@@ -152,7 +152,7 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
     }
 }
 
-void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
+void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
 {
     if (this->myOneTimeInitFlag) {
         onetimeinit();
@@ -164,7 +164,7 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
 
     // call the simulation, which returns useful data
-    this->performance.simulate(evapInletNode, evapOutletNode, mode, PLR, speedNum, speedRatio, fanOpMode);
+    this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
     this->passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor

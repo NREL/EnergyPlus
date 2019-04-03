@@ -443,7 +443,7 @@ namespace HVACHXAssistedCoolingCoil {
                     //                    // call CoilCoolingDX constructor
                     coilCoolingDXs.emplace_back(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
-                    HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds = coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].performance.modes[0].nominalSpeedNum;
+                    HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds = coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].performance.normalMode.nominalSpeedNum;
                 }
             } else {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -1004,7 +1004,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                           OnOffAirFlowRatio); // call vs coil model at top speed.
             } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
-                    0, PartLoadRatio, HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds, 1.0, FanOpMode);
+                    false, PartLoadRatio, HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds, 1.0, FanOpMode);
             } else {
                 SimulateWaterCoilComponents(
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
@@ -1188,7 +1188,7 @@ namespace HVACHXAssistedCoolingCoil {
                     CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    CoilCapacity = coilCoolingDXs[HXAssistedCoil(WhichCoil).CoolingCoilIndex].getRatedGrossTotalCapacity(0);
+                    CoilCapacity = coilCoolingDXs[HXAssistedCoil(WhichCoil).CoolingCoilIndex].getRatedGrossTotalCapacity();
                 }
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);

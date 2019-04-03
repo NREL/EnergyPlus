@@ -9862,8 +9862,9 @@ namespace UnitarySystems {
                 } else {
                     CoilPLR = 0.0;
                 }
+                bool useDehumMode = (this->m_DehumidificationMode == 1);
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                    this->m_DehumidificationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                    useDehumMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 if (this->m_CoolingSpeedNum > 1) {
                     this->m_CoolCompPartLoadRatio = 1.0;
                 } else {
@@ -12687,8 +12688,9 @@ namespace UnitarySystems {
                     }
                 }
             }
+            bool useDehumMode = (this->m_DehumidificationMode == 1);
             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                this->m_DehumidificationMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
+                useDehumMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
 
         } else if (CoilTypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
 
