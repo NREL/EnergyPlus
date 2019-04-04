@@ -2466,7 +2466,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     ACDXCoil 1,              !- Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Coil Object Type
+    Coil:Cooling:DX,         !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2899,8 +2899,7 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Method for Switching Operating Modes
-    ,                        !- Operating Mode Number Schedule Name
+    ,                        !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -2919,7 +2918,6 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    ,                        !- Capacity Control Method
     1,                       !- Nominal Speed Number
     ACDXCoil 1 Speed 1 Performance;  !- Speed 1 Name
 
