@@ -14,6 +14,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <WaterManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -76,14 +77,6 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
-        if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condOutletNodeIndex)) {
-            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
-            ShowContinueError("Condenser Outlet Node Name=\"" + input_data.condenser_outlet_node_name +
-                "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-            ShowContinueError(
-                "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-        }
-
     } else {
         this->condOutletNodeIndex = 0;
     }
@@ -96,6 +89,15 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                  this->condensateTankIndex,
                                  this->condensateTankSupplyARRID);
     }
+
+	if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
+		WaterManager::SetupTankDemandComponent(this->name,
+								 this->object_name,
+								 input_data.evaporative_condenser_supply_water_storage_tank_name,
+								 errorsFound,
+								 this->evaporativeCondSupplyTankIndex,
+								 this->evaporativeCondSupplyTankARRID);
+	}
 
     if (input_data.availability_schedule_name.empty()) {
       this->availScheduleIndex = DataGlobals::ScheduleAlwaysOn;
@@ -274,6 +276,15 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         DataWater::WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) = this->condensateVolumeFlow;
         DataWater::WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
     }
+
+    // update requests for evap condenser tank
+	if (this->evaporativeCondSupplyTankIndex > 0) {
+		Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+		this->evaporativeCondSupplyTankVolumeFlow = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / waterDensity;
+		DXCoil(DXCoilNum).EvapCondPumpElecPower = EvapCondPumpElecPower;
+		DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
+				this->evaporativeCondSupplyTankVolumeFlow;
+	}
 
     // update report variables
     this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * (evapInletNode.Enthalpy - evapOutletNode.Enthalpy);
