@@ -13,7 +13,6 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
-    bool errorsFound(false);
     this->original_input_specs = input_data;
     this->name = input_data.name;
     this->ratedGrossTotalCap = input_data.gross_rated_total_cooling_capacity;
