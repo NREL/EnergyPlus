@@ -32,6 +32,7 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDXFixture.hh
   Coils/CoilCoolingDX.unit.cc
   Coils/CoilCoolingDXCurveFitPerformance.unit.cc
   Coils/CoilCoolingDXCurveFitOperatingMode.unit.cc

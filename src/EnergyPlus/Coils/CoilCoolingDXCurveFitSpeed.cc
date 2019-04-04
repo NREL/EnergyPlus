@@ -20,21 +20,14 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     bool ErrorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
-    // this->parentMode = _parentMode;
-    //	this->mySizeFlag = true; // set up flag for sizing
-    // bool errorsFound = false;
     this->name = input_data.name;
-    //    this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
-    //    this->evap_air_flow_rate = input_data.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
-    //    this->condenser_air_flow_rate = input_data.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
-    //    this->gross_shr = input_data.gross_rated_sensible_heat_ratio;
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
     this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
     ErrorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
-                                      this->indexEIRFT,
+                                      this->indexCapFT,
                                       {1, 2},
                                       routineName,
                                       "Total Cooling Capacity Function of Temperature Curve Name",
@@ -150,7 +143,9 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
                                               Optional<Real64 const> Var4,         // 4th independent variable
                                               Optional<Real64 const> Var5)          // 5th independent variable
 {
-    if (curveName != "") {
+    if (curveName.empty()) {
+        return false;
+    } else {
         curveIndex = CurveManager::GetCurveIndex(curveName);
         if (curveIndex == 0) {
             ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
@@ -266,10 +261,10 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
+void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 {
 
-    std::string RoutineName = "sizeSpeedMode";
+    std::string RoutineName = "sizeSpeed";
 
     this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
     this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
@@ -318,7 +313,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNo
     static std::string const RoutineName("CalcSpeedOutput: ");
 
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        sizeSpeedMode();
+        this->sizeSpeed();
         this->mySizeFlag = false;
     }
 
@@ -466,7 +461,6 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     // ADP conditions
     Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(outw, outp);
 
-    Real64 tol = 1.0;
     std::size_t iter = 0;
     const std::size_t maxIter(50);
     Real64 errorLast = 100.0;
