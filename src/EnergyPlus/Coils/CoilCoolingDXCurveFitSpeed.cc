@@ -150,7 +150,9 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
                                               Optional<Real64 const> Var4,         // 4th independent variable
                                               Optional<Real64 const> Var5)          // 5th independent variable
 {
-    if (curveName != "") {
+    if (curveName.empty()) {
+        return false;
+    } else {
         curveIndex = CurveManager::GetCurveIndex(curveName);
         if (curveIndex == 0) {
             ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
