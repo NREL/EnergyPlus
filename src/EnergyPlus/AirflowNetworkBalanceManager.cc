@@ -9895,7 +9895,14 @@ namespace AirflowNetworkBalanceManager {
                 {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(DisSysCompCoilData(i).EPlusType));
 
-                    if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
+                    if (SELECT_CASE_var == "COIL:COOLING:DX") {
+                        ValidateComponent("Coil:Cooling:DX", DisSysCompCoilData(i).Name, IsNotOK, RoutineName + CurrentModuleObject);
+                        if (IsNotOK) {
+                            ErrorsFound = true;
+                        } else {
+                            SetDXCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum);
+                        }
+                    } else if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
                         ValidateComponent("Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData(i).Name, IsNotOK, RoutineName + CurrentModuleObject);
                         if (IsNotOK) {
                             ErrorsFound = true;
