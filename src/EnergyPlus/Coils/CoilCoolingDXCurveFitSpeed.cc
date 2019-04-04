@@ -27,7 +27,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
     ErrorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
-                                      this->indexEIRFT,
+                                      this->indexCapFT,
                                       {1, 2},
                                       routineName,
                                       "Total Cooling Capacity Function of Temperature Curve Name",
@@ -261,10 +261,10 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::sizeSpeedMode()
+void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 {
 
-    std::string RoutineName = "sizeSpeedMode";
+    std::string RoutineName = "sizeSpeed";
 
     this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
     this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
@@ -313,7 +313,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNo
     static std::string const RoutineName("CalcSpeedOutput: ");
 
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        sizeSpeedMode();
+        this->sizeSpeed();
         this->mySizeFlag = false;
     }
 

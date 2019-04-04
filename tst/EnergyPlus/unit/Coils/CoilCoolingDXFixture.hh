@@ -125,8 +125,8 @@ protected:
 						"Coil:Cooling:DX:CurveFit:OperatingMode, ",
 						" " + modeName + ",                      ", // name
 						" 12000,                                 ", // rated gross total cooling capacity
-						" 100,                                   ", // rated evap air flow rate
-						" 200,                                   ", // rated condenser air flow rate
+						" 1,                                     ", // rated evap air flow rate
+						" 2,                                     ", // rated condenser air flow rate
 						" 2.5,                                   ", // maximum cycling rate
 						" 0.5,                                   ", // ratio for latent cycling
 						" 100,                                   ", // latent time constant
