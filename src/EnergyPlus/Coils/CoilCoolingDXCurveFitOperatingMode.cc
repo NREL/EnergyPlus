@@ -37,6 +37,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = EVAPCOOLED;
     } else {
+        // TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, CondenserType> instead?
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Condenser Type=\"" + input_data.condenser_type + "\":");
         ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
