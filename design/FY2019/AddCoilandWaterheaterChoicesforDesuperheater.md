@@ -57,8 +57,9 @@ Coil:WaterHeating:Desuperheater,
  
   
 2. Available reclaimed heat data passing: The available waste heat, heat source name and type data is spread across three namespaces (DataHeatBalance, WaterThermalTank, and the corresponding 
-HVAC coil namespace). Arrays and structures added to pass data. The same method that the quantity of available heat is delivered from HVAC loop while doesn't impact compressor performance by limiting its 
-reclaiming efficiency factor (would be discussed if the assumption is acceptable). 
+HVAC coil namespace). Arrays and structures added to pass data. The heat relcaim from water cooled HVAC system would 
+cause decreasing of the heat transferred to the condenser plant loop thus impact the HVAC performance. Therefore, the 
+reclaimed heat would be passed back to HVAC water coil namespace and be substracted from the total source heat in the loop to reflect the impact. 
 
 3. Reclaimed heat calculation: The calculation of reclaimed heat is coded in WaterThermalTank namespace, the same approach as other available systems for mixed water heater tank. 
 
