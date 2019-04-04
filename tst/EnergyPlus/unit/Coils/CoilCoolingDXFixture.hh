@@ -45,58 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Low Temperature Radiant Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-//#include <EnergyPlus/DataHeatBalance.hh>
-//#include <EnergyPlus/DataPlant.hh>
-//#include <EnergyPlus/DataSizing.hh>
-//#include <EnergyPlus/DataZoneEquipment.hh>
-//#include <EnergyPlus/FluidProperties.hh>
-//#include <EnergyPlus/LowTempRadiantSystem.hh>
-//#include <EnergyPlus/UtilityRoutines.hh>
-//
-//#include <EnergyPlus/DataHVACGlobals.hh>
-//#include <EnergyPlus/DataHeatBalFanSys.hh>
-//#include <EnergyPlus/DataPlant.hh>
-//#include <EnergyPlus/DataSurfaceLists.hh>
-//#include <EnergyPlus/DataSurfaces.hh>
-//#include <EnergyPlus/DataZoneEnergyDemands.hh>
-//#include <EnergyPlus/General.hh>
-//#include <EnergyPlus/HeatBalanceManager.hh>
-//#include <EnergyPlus/Plant/PlantManager.hh>
-//#include <EnergyPlus/PlantUtilities.hh>
-//#include <EnergyPlus/Psychrometrics.hh>
-//#include <EnergyPlus/ScheduleManager.hh>
-//#include <EnergyPlus/SizingManager.hh>
-//#include <EnergyPlus/SurfaceGeometry.hh>
-//
-//using namespace EnergyPlus;
-//using namespace EnergyPlus::LowTempRadiantSystem;
-//using namespace ObjexxFCL;
-//using namespace EnergyPlus::DataHeatBalance;
-//using namespace DataGlobals;
-//using namespace EnergyPlus::DataPlant;
-//using namespace EnergyPlus::DataZoneEquipment;
-//using namespace EnergyPlus::DataSizing;
-//using namespace EnergyPlus::FluidProperties;
-//
-//using namespace EnergyPlus::DataHVACGlobals;
-//using namespace EnergyPlus::DataPlant;
-//using namespace EnergyPlus::DataSurfaces;
-//using namespace EnergyPlus::DataSurfaceLists;
-//using namespace EnergyPlus::DataZoneEnergyDemands;
-//using namespace EnergyPlus::HeatBalanceManager;
-//using namespace EnergyPlus::PlantManager;
-//using namespace EnergyPlus::Psychrometrics;
-//using namespace EnergyPlus::ScheduleManager;
-//using namespace EnergyPlus::SizingManager;
-//using namespace EnergyPlus::SurfaceGeometry;
-//using namespace EnergyPlus::General;
 
 class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture
 {
@@ -108,7 +61,7 @@ protected:
 		EnergyPlus::EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 	}
 
-	std::string getSpeedObjectStrings(const std::string &speedObjectName) {
+	std::string getSpeedObjectString(const std::string &speedObjectName) {
 		std::string const idf_objects = delimited_string( {
 		        "Coil:Cooling:DX:CurveFit:Speed, ",
 				" " + speedObjectName + ",       ",
@@ -190,7 +143,7 @@ protected:
 			} else {
 				mode_object_lines.push_back(" " + modeName + "Speed" + std::to_string(speedNum) + ";");
 			}
-			speedObjects.push_back(this->getSpeedObjectStrings(modeName + "Speed" + std::to_string(speedNum)));
+			speedObjects.push_back(this->getSpeedObjectString(modeName + "Speed" + std::to_string(speedNum)));
 		}
 		std::string const mode_object = delimited_string(mode_object_lines);
 

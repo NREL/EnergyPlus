@@ -20,14 +20,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     bool ErrorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
-    // this->parentMode = _parentMode;
-    //	this->mySizeFlag = true; // set up flag for sizing
-    // bool errorsFound = false;
     this->name = input_data.name;
-    //    this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
-    //    this->evap_air_flow_rate = input_data.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
-    //    this->condenser_air_flow_rate = input_data.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
-    //    this->gross_shr = input_data.gross_rated_sensible_heat_ratio;
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
     this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
@@ -468,7 +461,6 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     // ADP conditions
     Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(outw, outp);
 
-    Real64 tol = 1.0;
     std::size_t iter = 0;
     const std::size_t maxIter(50);
     Real64 errorLast = 100.0;
