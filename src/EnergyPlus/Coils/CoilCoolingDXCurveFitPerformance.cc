@@ -11,8 +11,9 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data)
 {
+    static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
+    bool errorsFound(false);
     this->original_input_specs = input_data;
-    // bool errorsFound = false;
     this->name = input_data.name;
     this->minOutdoorDrybulb = input_data.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
@@ -25,12 +26,44 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
         this->capControlMethod = CapControlMethod::MULTISPEED;
     } else {
-        // TODO: ERROR
+        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, CapControlMethod> instead?
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Capacity Control Method=\"" + input_data.capacity_control + "\":");
+        ShowContinueError("...must be Staged, VariableSpeed or MultiSpeed.");
+        errorsFound = true;
     }
+    this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
+    this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
+    if (input_data.basin_heater_operating_shedule_name == "") {
+        this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
+    } else {
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_shedule_name);
+    }
+    if (this->evapCondBasinHeatSchedulIndex == 0) {
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name + "\".");
+        errorsFound = true;
+    }
+
+    // TODO: Hookup no fuel type member for this class yet.
+    if (UtilityRoutines::SameString(input_data.compressor_fuel_type, "ELECTRICITY")) {
+    } else {
+        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, FuelType> instead?
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\":");
+        ShowContinueError("...must be ...");
+        errorsFound = true;
+    }
+
     if (!input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = true;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
     }
+
+    if (errorsFound) {
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+    }
+
 }
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find)
