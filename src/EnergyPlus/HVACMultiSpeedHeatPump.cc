@@ -2982,32 +2982,33 @@ namespace HVACMultiSpeedHeatPump {
                     QZnReq,
                     OnOffAirFlowRatio,
                     SupHeaterLoad);
+
                 for (int i = 1; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
                     if (i == 1) {
-/*                        if (!WarmupFlag && CurrentTime > 7.2) {
-                            int NewOutput = GetNewUnitNumber();
-                            static gio::Fmt fmtA("(A)");
-                            gio::open(NewOutput, "Data3.dat");
+                        //if (!WarmupFlag && CurrentTime > 7.2) {
+                        //    int NewOutput = GetNewUnitNumber();
+                        //    static gio::Fmt fmtA("(A)");
+                        //    gio::open(NewOutput, "Data3.dat");
 
-                            for (int ii = 0; ii <= 100; ii++) {
-                                PartLoadFrac = ii * 0.01;
-                                CalcMSHeatPump(MSHeatPumpNum,
-                                    FirstHVACIteration,
-                                    CompOp,
-                                    i,
-                                    0.0,
-                                    PartLoadFrac,
-                                    TempOutput,
-                                    QZnReq,
-                                    OnOffAirFlowRatio,
-                                    SupHeaterLoad);
+                        //    for (int ii = 0; ii <= 100; ii++) {
+                        //        PartLoadFrac = ii * 0.01;
+                        //        CalcMSHeatPump(MSHeatPumpNum,
+                        //            FirstHVACIteration,
+                        //            CompOp,
+                        //            i,
+                        //            0.0,
+                        //            PartLoadFrac,
+                        //            TempOutput,
+                        //            QZnReq,
+                        //            OnOffAirFlowRatio,
+                        //            SupHeaterLoad);
 
-                                std::string StringOut = RoundSigDigits(PartLoadFrac, 2) + ",  " + RoundSigDigits(TempOutput, 2) + ",  " + RoundSigDigits(Node(10).MassFlowRate, 4);
-                                gio::write(NewOutput, fmtA) << StringOut;
-                            }
-                            gio::close(NewOutput);
-                        }
-     */                   CalcMSHeatPump(MSHeatPumpNum,
+                        //        std::string StringOut = RoundSigDigits(PartLoadFrac, 2) + ",  " + RoundSigDigits(TempOutput, 2) + ",  " + RoundSigDigits(Node(10).MassFlowRate, 4);
+                        //        gio::write(NewOutput, fmtA) << StringOut;
+                        //    }
+                        //    gio::close(NewOutput);
+                        //}
+                        CalcMSHeatPump(MSHeatPumpNum,
                             FirstHVACIteration,
                             CompOp,
                             i,
@@ -4132,6 +4133,7 @@ namespace HVACMultiSpeedHeatPump {
         // Using/Aliasing
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
+        using DataHVACGlobals::MSHPMassFlowRateAver;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // Locals
@@ -4152,6 +4154,7 @@ namespace HVACMultiSpeedHeatPump {
 
         MSHPMassFlowRateLow = 0.0;  // Mass flow rate at low speed
         MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
+        MSHPMassFlowRateAver = 0.0;
 
         if (!CurDeadBandOrSetback(MSHeatPump(MSHeatPumpNum).ControlZoneNum) && present(SpeedNum)) {
             if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode) {
@@ -4232,6 +4235,9 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 OnOffAirFlowRatio = 0.0;
             }
+        }
+        if (SpeedNum == 1) {
+            MSHPMassFlowRateAver = AverageUnitMassFlow;
         }
     }
 

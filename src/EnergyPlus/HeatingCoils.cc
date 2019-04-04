@@ -2202,6 +2202,7 @@ namespace HeatingCoils {
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
+        using DataHVACGlobals::MSHPMassFlowRateAver;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -2350,9 +2351,15 @@ namespace HeatingCoils {
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
                 } else {
-                    OutletAirEnthalpy = PartLoadRat * FullLoadOutAirEnth + (1.0 - PartLoadRat) * InletAirEnthalpy;
-                    OutletAirHumRat = PartLoadRat * FullLoadOutAirHumRat + (1.0 - PartLoadRat) * InletAirHumRat;
-                    OutletAirTemp = PartLoadRat * FullLoadOutAirTemp + (1.0 - PartLoadRat) * InletAirDryBulbTemp;
+                 if (PartLoadRat > 0) {
+                  OutletAirEnthalpy = PartLoadRat * AirMassFlow / MSHPMassFlowRateAver * (FullLoadOutAirEnth - InletAirEnthalpy) + InletAirEnthalpy;
+                  OutletAirHumRat = PartLoadRat * AirMassFlow / MSHPMassFlowRateAver * (FullLoadOutAirHumRat - InletAirHumRat) + InletAirHumRat;
+                  OutletAirTemp = PartLoadRat * AirMassFlow / MSHPMassFlowRateAver * (FullLoadOutAirTemp - InletAirDryBulbTemp) + InletAirDryBulbTemp;
+                 } else {
+                  OutletAirEnthalpy = PartLoadRat * FullLoadOutAirEnth + (1.0 - PartLoadRat) * InletAirEnthalpy;
+                  OutletAirHumRat = PartLoadRat * FullLoadOutAirHumRat + (1.0 - PartLoadRat) * InletAirHumRat;
+                  OutletAirTemp = PartLoadRat * FullLoadOutAirTemp + (1.0 - PartLoadRat) * InletAirDryBulbTemp;
+                 }
                 }
 
                 EffLS = HeatingCoil(CoilNum).MSEfficiency(StageNumLS);

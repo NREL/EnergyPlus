@@ -490,6 +490,7 @@ namespace DataHVACGlobals {
     // For multispeed heat pump only
     Real64 MSHPMassFlowRateLow(0.0);       // Mass flow rate at low speed
     Real64 MSHPMassFlowRateHigh(0.0);      // Mass flow rate at high speed
+    Real64 MSHPMassFlowRateAver(0.0);    // Mass flow rate at average
     Real64 MSHPWasteHeat(0.0);             // Waste heat
     Real64 PreviousTimeStep(0.0);          // The time step length at the previous time step
     bool ShortenTimeStepSysRoomAir(false); // Logical flag that triggers shortening of system time step
