@@ -13,21 +13,29 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
+    bool errorsFound(false);
     this->original_input_specs = input_data;
-    // bool errorsFound = false;
     this->name = input_data.name;
+    this->ratedGrossTotalCap = input_data.gross_rated_total_cooling_capacity;
+    this->ratedEvapAirFlowRate = input_data.rated_evaporator_air_flow_rate;
+    this->maxCyclingRate = input_data.maximum_cycling_rate;
+    this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
+    this->latentTimeConst = input_data.latent_capacity_time_constant;
+    this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
+        this->condenserType = AIRCOOLED;
+    } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
+        this->condenserType = EVAPCOOLED;
+    }
     for (auto &speed_name : input_data.speed_data_names) {
         this->speeds.emplace_back(speed_name);
     }
 }
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find)
-    :
-
-      ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
+    : ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
       timeForCondensateRemoval(0.0), OpModeOutletTemp(0.0), OpModeOutletHumRat(0.0), OpModeOutletEnth(0.0), OpModePower(0.0), OpModeRTF(0.0),
-      nominalEvaporativePumpPower(0.0), capControlMethod(MULTISPEED), nominalSpeedNum(0)
-
+      nominalEvaporativePumpPower(0.0), nominalSpeedNum(0)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -49,36 +57,17 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
 
         input_specs.name = cAlphaArgs(1);
         input_specs.gross_rated_total_cooling_capacity = rNumericArgs(1);
-        this->ratedGrossTotalCap = input_specs.gross_rated_total_cooling_capacity;
         input_specs.rated_evaporator_air_flow_rate = rNumericArgs(2);
-        this->ratedEvapAirFlowRate = input_specs.rated_evaporator_air_flow_rate;
         input_specs.rated_condenser_air_flow_rate = rNumericArgs(3);
         input_specs.maximum_cycling_rate = rNumericArgs(4);
-        this->maxCyclingRate = input_specs.maximum_cycling_rate;
         input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity = rNumericArgs(5);
-        this->evapRateRatio = input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
         input_specs.latent_capacity_time_constant = rNumericArgs(6);
-        this->latentTimeConst = input_specs.latent_capacity_time_constant;
         input_specs.nominal_time_for_condensate_removal_to_begin = rNumericArgs(7);
-        this->timeForCondensateRemoval = input_specs.nominal_time_for_condensate_removal_to_begin;
         input_specs.apply_latent_degradation_to_speeds_greater_than_1 = cAlphaArgs(2);
         input_specs.condenser_type = cAlphaArgs(3);
-        if (UtilityRoutines::SameString(input_specs.condenser_type, "AirCooled")) {
-            this->condenserType = AIRCOOLED;
-        } else if (UtilityRoutines::SameString(input_specs.condenser_type, "EvaporativelyCooled")) {
-            this->condenserType = EVAPCOOLED;
-        }
         input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
-        input_specs.capacity_control = cAlphaArgs(4);
-        if (UtilityRoutines::SameString(input_specs.capacity_control, "Staged")) {
-         this->capControlMethod = STAGED;
-        } else if (UtilityRoutines::SameString(input_specs.capacity_control, "VariableSpeed")) {
-         this->capControlMethod = VARIABLE;
-        } else if (UtilityRoutines::SameString(input_specs.capacity_control, "MultiSpeed")) {
-         this->capControlMethod = MULTISPEED;
-        }
         input_specs.nominal_speed_number = rNumericArgs(9);
-        for (int fieldNum = 5; fieldNum <= NumAlphas; fieldNum++) {
+        for (int fieldNum = 4; fieldNum <= NumAlphas; fieldNum++) {
             if (cAlphaArgs(fieldNum) == "") {
                 break;
             }
@@ -86,6 +75,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         }
 
         this->instantiateFromInputSpec(input_specs);
+        break;
     }
 
     if (!found_it) {
@@ -164,7 +154,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
 
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
         outletNode.HumRat = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
-        outletNode.Enthalpy = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
+        outletNode.Enthalpy = outletNode.Enthalpy * PLR + (1.0 - PLR) * inletNode.Enthalpy;
     }
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 

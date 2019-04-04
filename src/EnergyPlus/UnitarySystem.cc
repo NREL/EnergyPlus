@@ -1984,11 +1984,11 @@ namespace UnitarySystems {
             }
 
             // Use multispeed/variablespeed control algorithm regardless of number of speeds
-            if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+            if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::MULTISPEED) {
                 this->m_MultiSpeedCoolingCoil = true;
-            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::VARIABLE) {
                 this->m_VarSpeedCoolingCoil = true;
-            } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::STAGED) {
+            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::STAGED) {
                 // not sure what to do here
             }
 
@@ -2008,7 +2008,7 @@ namespace UnitarySystems {
 
             DataSizing::DXCoolCap = newCoil.getRatedGrossTotalCapacity();
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
-            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
+            if (this->m_HeatPump) EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
             if (MSHPIndex > 0) {
                 this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
@@ -4353,9 +4353,9 @@ namespace UnitarySystems {
 
                             // set variable speed coil flag as necessary
                             if (thisSys.m_NumOfSpeedCooling > 1) {
-                                if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::MULTISPEED) {
+                                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::MULTISPEED) {
                                     thisSys.m_MultiSpeedCoolingCoil = true;
-                                } else if (newCoil.performance.normalMode.capControlMethod == CoilCoolingDXCurveFitOperatingMode::VARIABLE) {
+                                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::VARIABLE) {
                                     thisSys.m_VarSpeedCoolingCoil = true;
                                 }
                             }
@@ -9862,8 +9862,9 @@ namespace UnitarySystems {
                 } else {
                     CoilPLR = 0.0;
                 }
+                bool useDehumMode = (this->m_DehumidificationMode == 1);
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                    this->m_DehumidificationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                    useDehumMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 if (this->m_CoolingSpeedNum > 1) {
                     this->m_CoolCompPartLoadRatio = 1.0;
                 } else {
@@ -12687,8 +12688,9 @@ namespace UnitarySystems {
                     }
                 }
             }
+            bool useDehumMode = (this->m_DehumidificationMode == 1);
             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                this->m_DehumidificationMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
+                useDehumMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
 
         } else if (CoilTypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
 
