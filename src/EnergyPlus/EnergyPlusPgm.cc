@@ -469,6 +469,7 @@ int RunEnergyPlus(std::string const & filepath)
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         ReportOrphanFluids();
         ReportOrphanSchedules();
+//        std::cout << "Timer 1: " << DataGlobals::timer_1 << " Timer 2: " << DataGlobals::timer_2;
 
         if (runReadVars) {
             std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;

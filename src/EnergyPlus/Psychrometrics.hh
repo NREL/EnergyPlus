@@ -71,7 +71,7 @@ namespace EnergyPlus {
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
-//#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnPb
 #endif
 #define EP_psych_errors
 
@@ -129,6 +129,11 @@ namespace Psychrometrics {
     extern int const psatcache_size;
     extern int const psatprecision_bits; // 28  //24  //32
     extern Int64 const psatcache_mask;
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    extern int const tsatcache_size;
+    extern int const tsatprecision_bits; // 28  //24  //32
+    extern Int64 const tsatcache_mask;
 #endif
 
     // MODULE VARIABLE DECLARATIONS:
@@ -1059,7 +1064,7 @@ namespace Psychrometrics {
         return PsyHFnTdbW(TDB, max(PsyWFnTdbRhPb(TDB, RH, PB, CalledFrom), 1.0e-5)); // enthalpy {J/kg}
     }
 
-#ifdef EP_cache_PsyPsatFnPb
+#ifdef EP_cache_PsyTsatFnPb
 
     Real64 PsyTsatFnPb_raw(Real64 const Press,                          // barometric pressure {Pascals}
                            std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
@@ -1071,9 +1076,8 @@ namespace Psychrometrics {
     {
         Int64 const Pb_tag(Press);
         Int64 const hash(Pb_tag & tsatcache_mask);
-        auto &cTsat(cached_Tsat[hash]);
-
-            if (cTsat.iPb != Pb_tag) {
+        auto &cTsat(cached_Tsat(hash));
+        if (cTsat.iPb != Pb_tag) {
             cTsat.iPb = Pb_tag;
             cTsat.Tsat = PsyTsatFnPb_raw(Press, CalledFrom);
         }

@@ -71,7 +71,7 @@ namespace EnergyPlus {
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
-//#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnPb
 #endif
 #define EP_psych_errors
 
@@ -200,7 +200,11 @@ namespace Psychrometrics {
     int const psatprecision_bits(24); // 28  // 24  // 32
     Int64 const psatcache_mask(psatcache_size - 1);
 #endif
-
+#ifdef EP_cache_PsyTsatFnPb
+    int const tsatcache_size(1024 * 1024);
+    int const tsatprecision_bits(24); // 28  //24  //32
+    Int64 const tsatcache_mask(psatcache_size - 1);
+#endif
     // MODULE VARIABLE DECLARATIONS:
     // na
 
@@ -219,6 +223,9 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
     Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
 #endif
 
     // Subroutine Specifications for the Module
@@ -283,6 +290,9 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         cached_Psat.allocate({0, psatcache_size});
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.allocate({0, tsatcache_size});
 #endif
     }
 
@@ -1353,7 +1363,7 @@ namespace Psychrometrics {
     }
 #endif
 
-#ifdef EP_cache_PsyPsatFnPb
+#ifdef EP_cache_PsyTsatFnPb
 
     Real64 PsyTsatFnPb_raw(Real64 const Press,           // barometric pressure {Pascals}
                            std::string const &CalledFrom // routine this function was called from (error messages)
