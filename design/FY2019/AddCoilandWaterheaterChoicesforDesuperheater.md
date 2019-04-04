@@ -26,12 +26,49 @@ EnergyPlus would be modified to add more enumarations in Coil:WaterHeating:Desup
 
 EnergyPlus already handles HVAC/water heating hybrid systems for several coil types. The workflow is straight-forward to add the same structure as those systems. The steps to new enumarations are given below.
 
+
 1. IDD file modification: **Coil:WaterHeating:Desuperheater** A7 add **WaterHeater:Stratified** ; A9 add **Coil:Cooling:WaterToAirHeatPump:EquationFit**, 
 **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation**, **Coil:Cooling:DX:MultiSpeed** , etc. 
 
 2. Available reclaimed heat data passing: The available waste heat, heat source name and type data is spread across three namespaces (DataHeatBalance, WaterThermalTank, and the corresponding 
 HVAC coil namespace). Arrays and structures added to pass data. The same method that the quantity of available heat is delivered from HVAC loop while doesn't impact compressor performance by limiting its 
 reclaiming efficiency factor (would be discussed if the assumption is acceptable). 
+=======
+1. IDD file modification: See below the entire list of **Coil:WaterHeating:Desuperheater** modified field:
+
+```
+Coil:WaterHeating:Desuperheater,
+  A7 , \field Tank Object Type
+       \type choice
+       \key WaterHeater:Mixed
+       [Add]\key WaterHeater:Stratified
+       \default WaterHeater:Mixed
+       \note Specify the type of water heater tank used by this desuperheater water heating coil.
+	   
+  A9 , \field Heating Source Object Type
+       \required-field
+       \type choice
+       \key Coil:Cooling:DX:SingleSpeed
+       \key Coil:Cooling:DX:TwoSpeed
+       \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
+       [Add]\key Coil:Cooling:WaterToAirHeatPump:EquationFit
+       [Add]\key Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+       [Add]\key Coil:Cooling:DX:MultiSpeed
+       [Add]\key ......
+       \key Refrigeration:CompressorRack
+       \key Refrigeration:Condenser:AirCooled
+       \key Refrigeration:Condenser:EvaporativeCooled
+       \key Refrigeration:Condenser:WaterCooled
+       \note The type of DX system that is providing waste heat for reclaim.
+```
+ 
+  
+2. Available reclaimed heat data passing: The available waste heat, heat source name and type data is spread across three namespaces (DataHeatBalance, WaterThermalTank, and the corresponding 
+HVAC coil namespace). Arrays and structures added to pass data. The heat relcaim from water cooled HVAC system would 
+cause decreasing of the heat transferred to the condenser plant loop thus impact the HVAC performance. Therefore, the 
+reclaimed heat would be passed back to HVAC water coil namespace and be substracted from the total source heat in the loop to reflect the impact. 
+
 
 3. Reclaimed heat calculation: The calculation of reclaimed heat is coded in WaterThermalTank namespace, the same approach as other available systems for mixed water heater tank. 
 
