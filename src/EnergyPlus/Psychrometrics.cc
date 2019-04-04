@@ -67,9 +67,11 @@ namespace EnergyPlus {
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
+//#define EP_cache_PsyTsatFnPb
 #endif
 #define EP_psych_errors
 
@@ -1351,9 +1353,17 @@ namespace Psychrometrics {
     }
 #endif
 
+#ifdef EP_cache_PsyPsatFnPb
+
+    Real64 PsyTsatFnPb_raw(Real64 const Press,           // barometric pressure {Pascals}
+                           std::string const &CalledFrom // routine this function was called from (error messages)
+    )
+
+#else
     Real64 PsyTsatFnPb(Real64 const Press,           // barometric pressure {Pascals}
                        std::string const &CalledFrom // routine this function was called from (error messages)
     )
+#endif
     {
 
         // FUNCTION INFORMATION:

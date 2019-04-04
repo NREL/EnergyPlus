@@ -67,9 +67,11 @@ namespace EnergyPlus {
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
+//#define EP_cache_PsyTsatFnPb
 #endif
 #define EP_psych_errors
 
@@ -174,7 +176,19 @@ namespace Psychrometrics {
         }
     };
 #endif
+#ifdef EP_cache_PsyTsatFnPb
+    struct cached_tsat_pb
+    {
+        // Members
+        Int64 iPb;
+        Real64 Tsat;
 
+        // Default Constructor
+        cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+        {
+        }
+    };
+#endif
     // Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
     extern Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
@@ -182,7 +196,9 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyPsatFnTemp
     extern Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
-
+#ifdef EP_cache_PsyTsatFnPb
+    extern Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -1043,9 +1059,33 @@ namespace Psychrometrics {
         return PsyHFnTdbW(TDB, max(PsyWFnTdbRhPb(TDB, RH, PB, CalledFrom), 1.0e-5)); // enthalpy {J/kg}
     }
 
+#ifdef EP_cache_PsyPsatFnPb
+
+    Real64 PsyTsatFnPb_raw(Real64 const Press,                          // barometric pressure {Pascals}
+                           std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    );
+
+    inline Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
+                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    )
+    {
+        Int64 const Pb_tag(Press);
+        Int64 const hash(Pb_tag & tsatcache_mask);
+        auto &cTsat(cached_Tsat[hash]);
+
+            if (cTsat.iPb != Pb_tag) {
+            cTsat.iPb = Pb_tag;
+            cTsat.Tsat = PsyTsatFnPb_raw(Press, CalledFrom);
+        }
+
+        return cTsat.Tsat; // saturation pressure {Pascals}
+    }
+
+#else
     Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
+#endif
 
     inline Real64 PsyTdpFnWPb(Real64 const W,                              // humidity ratio
                               Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
