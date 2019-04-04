@@ -167,7 +167,7 @@ protected:
 						" VariableSpeed,                       ",  // capacity control method
 						" 100,                                 ",  // basin heater capacity
 						" 400,                                 ",  // basin heater setpoint temp
-						" BasinHeaterOpSchedule,               ",  // basin heater operating schedule name
+						" , !BasinHeaterOpSchedule,               ",  // basin heater operating schedule name
 						" Electricity,                         ",  // compressor fuel type
 						" BaseOperatingMode,                   "   // base operating mode name
 				};
