@@ -13,6 +13,7 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
+    static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
     this->name = input_data.name;
@@ -22,13 +23,31 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+
+    // Must all be greater than zero to use the latent capacity degradation model
+    if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
+        (this->maxCyclingRate <= 0.0 || this->evapRateRatio <= 0.0 || this->latentTimeConst <= 0.0 || this->timeForCondensateRemoval <= 0.0)) {
+        ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\":");
+        ShowContinueError("...At least one of the four input parameters for the latent capacity degradation model");
+        ShowContinueError("...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
+    }
+
     if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
         this->condenserType = AIRCOOLED;
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = EVAPCOOLED;
+    } else {
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Condenser Type=\"" + input_data.condenser_type + "\":");
+        ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
+        errorsFound = true;
     }
     for (auto &speed_name : input_data.speed_data_names) {
         this->speeds.emplace_back(speed_name);
+    }
+
+    if (errorsFound) {
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
