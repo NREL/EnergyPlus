@@ -8,6 +8,7 @@
 #include <DataLoopNode.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -22,7 +23,6 @@ std::vector<CoilCoolingDX> coilCoolingDXs;
 void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
-    bool ErrorsFound(false);
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
@@ -54,6 +54,14 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                        2,
                                                                        DataLoopNode::ObjectIsNotParent);
+        if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
+            ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
+                "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+            ShowContinueError(
+                "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
+        }
+
     } else {
         this->condInletNodeIndex = 0;
     }
@@ -66,6 +74,14 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
+        if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condOutletNodeIndex)) {
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
+            ShowContinueError("Condenser Outlet Node Name=\"" + input_data.condenser_outlet_node_name +
+                "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+            ShowContinueError(
+                "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
+        }
+
     } else {
         this->condOutletNodeIndex = 0;
     }
@@ -77,13 +93,13 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     if (this->availScheduleIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
-        ErrorsFound = true;
+        errorsFound = true;
     }
 
     BranchNodeConnections::TestCompSet(
         CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
-    if (ErrorsFound) {
+    if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 
