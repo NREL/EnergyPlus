@@ -186,11 +186,11 @@ protected:
 		std::vector<std::string> speedObjects;
 		for (int speedNum = 1; speedNum <= numSpeeds; speedNum++) {
 			if (speedNum < numSpeeds) {
-				mode_object_lines.push_back(" Speed" + std::to_string(speedNum) + ",");
+				mode_object_lines.push_back(" " + modeName + "Speed" + std::to_string(speedNum) + ",");
 			} else {
-				mode_object_lines.push_back(" Speed" + std::to_string(speedNum) + ";");
+				mode_object_lines.push_back(" " + modeName + "Speed" + std::to_string(speedNum) + ";");
 			}
-			speedObjects.push_back(this->getSpeedObjectStrings("Speed" + std::to_string(speedNum)));
+			speedObjects.push_back(this->getSpeedObjectStrings(modeName + "Speed" + std::to_string(speedNum)));
 		}
 		std::string const mode_object = delimited_string(mode_object_lines);
 
