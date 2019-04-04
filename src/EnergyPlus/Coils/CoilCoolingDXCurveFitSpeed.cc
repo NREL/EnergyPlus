@@ -178,53 +178,17 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
 }
 
 CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
-    :
-
-      // model inputs
-      indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0),
-      indexSHRFT(0), indexSHRFFF(0),
-
-      // speed class inputs
-      PLR(0.0),                  // coil operating part load ratio
-      CondInletTemp(0.0),        // condenser inlet node temp or outdoor temp if no condenser node {C}
-      ambPressure(0.0),          // outdoor pressure {Pa]
-      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
-                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
-      RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
-      RatedSHR(0.0),             // rated sensible heat ratio at speed
-      RatedCBF(0.0),             // rated coil bypass factor at speed
-      RatedEIR(0.0),             // rated energy input ratio at speed {W/W}
-      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
-      FanOpMode(0),              // fan operating mode, constant or cycling fan
-
-      // speed class outputs
-      FullLoadPower(0.0), // full load power at speed {W}
-      RTF(0.0),           // coil runtime fraction at speed
-
-      // other data members
-      rated_total_capacity(0.0), evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
-      rated_evap_fan_power_per_volume_flow_rate(0.0), evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
-      rated_waste_heat_fraction_of_power_input(0.0),
-
-      // rating data
-      RatedInletAirTemp(26.6667),       // 26.6667C or 80F
-      RatedInletWetBulbTemp(19.44),     // 19.44 or 67F
-      RatedInletAirHumRat(0.01125),     // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-      RatedOutdoorAirTemp(35.0),        // 35 C or 95F
-      DryCoilOutletHumRatioMin(0.00001), // dry coil outlet minimum hum ratio kgH2O/kgdry air
-      mySizeFlag(true)
-
 {
-    int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
-    if (numModes <= 0) {
+    int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
+    if (numSpeeds <= 0) {
         // error
     }
     bool found_it = false;
-    for (int modeNum = 1; modeNum <= numModes; ++modeNum) {
+    for (int speedNum = 1; speedNum <= numSpeeds; ++speedNum) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(CoilCoolingDXCurveFitSpeed::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitSpeed::object_name, speedNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }

@@ -32,9 +32,6 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
 }
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find)
-    : ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
-      timeForCondensateRemoval(0.0), OpModeOutletTemp(0.0), OpModeOutletHumRat(0.0), OpModeOutletEnth(0.0), OpModePower(0.0), OpModeRTF(0.0),
-      nominalEvaporativePumpPower(0.0), nominalSpeedNum(0)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -124,7 +121,16 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
 	// Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
-    thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
+    switch(this->condenserType) {
+    	case CondenserType::AIRCOOLED:
+			thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp;
+			break;
+    	case CondenserType::EVAPCOOLED:
+//    		Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+//			Real64 condAirMassFlow = rhoAir * thisspeed.condenser_air_flow_rate;
+			thisspeed.CondInletTemp = DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) * (1.0 - thisspeed.evap_condenser_effectiveness);
+			break;
+    }
     thisspeed.ambPressure = inletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {

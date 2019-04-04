@@ -40,40 +40,38 @@ public:
 
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
 
-    CoilCoolingDXCurveFitOperatingMode()
-    {
-    }
+    CoilCoolingDXCurveFitOperatingMode() = default;
 
-    CoilCoolingDXCurveFitOperatingMode(std::string name_to_find);
+    explicit CoilCoolingDXCurveFitOperatingMode(std::string name_to_find);
 
     std::string name;
-    Real64 ratedGrossTotalCap;
-    Real64 ratedEvapAirFlowRate;
-    Real64 ratedCondAirFlowRate;
+    Real64 ratedGrossTotalCap = 0.0;
+    Real64 ratedEvapAirFlowRate = 0.0;
+    Real64 ratedCondAirFlowRate = 0.0;
 
     // Latent degradation model
-    Real64 maxCyclingRate;
-    Real64 evapRateRatio;
-    Real64 latentTimeConst;
-    Real64 timeForCondensateRemoval;
+    Real64 maxCyclingRate = 0.0;
+    Real64 evapRateRatio = 0.0;
+    Real64 latentTimeConst = 0.0;
+    Real64 timeForCondensateRemoval = 0.0;
 
     // results from coil model at speed
-    Real64 OpModeOutletTemp;
-    Real64 OpModeOutletHumRat;
-    Real64 OpModeOutletEnth;
-    Real64 OpModePower;
-    Real64 OpModeRTF;
+    Real64 OpModeOutletTemp = 0.0;
+    Real64 OpModeOutletHumRat = 0.0;
+    Real64 OpModeOutletEnth = 0.0;
+    Real64 OpModePower = 0.0;
+    Real64 OpModeRTF = 0.0;
+
+    Real64 nominalEvaporativePumpPower = 0.0;
+    int nominalSpeedNum = 0;
 
     enum CondenserType
     {
         AIRCOOLED,
         EVAPCOOLED
     };
-    CondenserType condenserType;
+    CondenserType condenserType = CondenserType::AIRCOOLED;
 
-    Real64 nominalEvaporativePumpPower;
-
-    int nominalSpeedNum;
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 

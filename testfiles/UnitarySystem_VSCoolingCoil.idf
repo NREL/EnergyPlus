@@ -15,8 +15,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.2;
 
   Building,
     NONE,                    !- Name
@@ -132,28 +132,18 @@
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
-    14,                      !- Begin Day of Month
-    1,                       !- End Month
-    14,                      !- End Day of Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    ,                        !- Name
-    7,                       !- Begin Month
-    7,                       !- Begin Day of Month
-    7,                       !- End Month
-    7,                       !- End Day of Month
-    Tuesday,                 !- Day of Week for Start Day
-    Yes,                     !- Use Weather File Holidays and Special Days
-    Yes,                     !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators
+    Yes,                     !- Use Weather File Snow Indicators
+    ;                        !- Treat Weather as Actual
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -162,7 +152,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -192,7 +182,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -731,7 +721,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1452,7 +1441,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1460,7 +1451,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1468,7 +1461,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction
 
   AirLoopHVAC:UnitarySystem,
     DXAC Heat Pump 1,        !- Name
@@ -1485,7 +1480,7 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
@@ -1600,48 +1595,88 @@
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  Coil:Cooling:DX:VariableSpeed,
-    Heat Pump ACDXCoil 1,                   !- Name
-    DX Cooling Coil Air Inlet Node,         !- Air Inlet Node Name
-    Heating Coil Air Inlet Node,            !- Air Outlet Node Name
-    2,                                      !- Number of Speeds {dimensionless}
-    2,                                      !- Nominal Speed Level {dimensionless}
-    autosize,                               !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
-    autosize,                               !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
-    1000,                                   !- Nominal Time for Condensate to Begin Leaving the Coil {s}
-    1.5,                                    !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
-    HPACCOOLPLFFPLR,                        !- Energy Part Load Fraction Curve Name
-    ,                                       !- Condenser Air Inlet Node Name
-    AirCooled,                              !- Condenser Type
-    ,                                       !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0,                                      !- Crankcase Heater Capacity {W}
-    10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                                       !- Minimum Outdoor Temperature for Compressor Operation
-    ,                                       !- Supply Water Storage Tank Name
-    ,                                       !- Condensate Collection Water Storage Tank Name
-    ,                                       !- Basin Heater Capacity {W/K}
-    ,                                       !- Basin Heater Setpoint Temperature {C}
-    ,                                       !- Basin Heater Operating Schedule Name
-    21975.0,                                !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
-    0.75,                                   !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    1.9,                                    !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
-    1.5,                                    !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                                       !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
-    ,                                       !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    HPACCoolCapFT,                          !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-    HPACCoolCapFFF,                         !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    HPACCOOLEIRFT,                          !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-    HPACCOOLEIRFFF,                         !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    43950.0,                                !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
-    0.79,                                   !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    3.9,                                    !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
-    3.0,                                    !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                                       !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
-    ,                                       !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    HPACCoolCapFT,                          !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
-    HPACCoolCapFFF,                         !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    HPACCOOLEIRFT,                          !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
-    HPACCOOLEIRFFF;                         !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  Coil:Cooling:DX,
+    Heat Pump ACDXCoil 1,    !- Name
+    DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    Heat Pump ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
+    Heat Pump ACDXCoil 1 Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Heat Pump ACDXCoil 1 Performance,  !- Name
+    0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    VariableSpeed,           !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Heat Pump ACDXCoil 1 Operating Mode;  !- Operating Mode 1 Name
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Heat Pump ACDXCoil 1 Operating Mode,  !- Name
+    autosize,                !- Rated Gross Total Cooling Capacity {W}
+    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    AirCooled,               !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Speed 1 Name
+    Heat Pump ACDXCoil 1 Speed 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Name
+    0.5000,                  !- Gross Total Cooling Capacity Fraction
+    0.5000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.75,                    !- Gross Sensible Heat Ratio
+    1.9,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Heat Pump ACDXCoil 1 Speed 2 Performance,  !- Name
+    1.0000,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.79,                    !- Gross Sensible Heat Ratio
+    3.9,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name
@@ -1701,32 +1736,27 @@
 
   Output:Variable,*,Fan Electric Power,hourly;
 
-Output:Variable,*,Cooling Coil Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Total Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Sensible Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Source Side Heat Transfer Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Inlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Upper Speed Level,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Crankcase Heater Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Crankcase Heater Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Unitary System Part Load Ratio,hourly; !- HVAC Average []
+  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,hourly;
+  Output:Variable,*,Cooling Coil Total Cooling Energy,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Energy,hourly;
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Sensible Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Coil Electric Power,hourly;
+
+  Output:Variable,*,Cooling Coil Electric Energy,hourly;
+
+  Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Heating Energy,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 
@@ -1734,7 +1764,7 @@ Output:Variable,*,Unitary System Part Load Ratio,hourly; !- HVAC Average []
 
   Output:Variable,*,Heating Coil Air Heating Energy,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,hourly;
 

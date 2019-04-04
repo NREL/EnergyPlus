@@ -1,6 +1,9 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <DataEnvironment.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessing/InputProcessor.hh>
+#include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -12,6 +15,8 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     // bool errorsFound = false;
     this->name = input_data.name;
     this->minOutdoorDrybulb = input_data.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
+    this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
+    this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
     if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
         this->capControlMethod = CapControlMethod::VARIABLE;
@@ -29,11 +34,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
 }
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find)
-    :
-
-      crankcaseHeaterCap(0.0), minOutdoorDrybulb(0.0), maxOutdoorDrybulb(0.0), unitStatic(0.0), mySizeFlag(true), capControlMethod(CapControlMethod::STAGED),
-      evapCondBasinHeatCap(0.0), evapCondBasinHeatSetpoint(0.0), evapCondBasinHeatSchedulIndex(0), powerUse(0.0), RTF(0.0)
-
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -66,6 +66,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         // TODO: Check for blank here
         input_specs.alternate_operating_mode_name = cAlphaArgs(6);
         this->instantiateFromInputSpec(input_specs);
+        break;
     }
 
     if (!found_it) {
@@ -83,15 +84,49 @@ void CoilCoolingDXCurveFitPerformance::simulate(
     }
 }
 
+//Real64 minTemp = DXCoolingCoils[HXAssisted(this->HXASssistedindex).DXCoilIndex].perormance.minOutdoorTemp
+
 void CoilCoolingDXCurveFitPerformance::calculate(
         CoilCoolingDXCurveFitOperatingMode &currentMode,
         DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
+    // size if needed
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         currentMode.sizeOperatingMode();
         this->mySizeFlag = false;
     }
+
+    // calculate the performance at this mode/speed
     currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+
+    // scaling term to get rate into consumptions
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+
+    // calculate crankcase heater operation
+    if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
+        this->crankcaseHeaterPower = this->crankcaseHeaterCap;
+    } else {
+        this->crankcaseHeaterPower = 0.0;
+    }
+    this->crankcaseHeaterPower = this->crankcaseHeaterPower * (1.0 - this->RTF);
+    this->crankcaseHeaterElectricityConsumption = this->crankcaseHeaterPower * reportingConstant;
+
+    // basin heater
+    if (this->evapCondBasinHeatSchedulIndex > 0) {
+        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(this->evapCondBasinHeatSchedulIndex);
+        if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+        }
+    } else {
+        // IF schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
+        if (this->evapCondBasinHeatCap > 0.0) {
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+        }
+    }
+    this->basinHeaterPower *= (1.0 - this->RTF);
+
+    // update other reporting terms
     this->powerUse = currentMode.OpModePower;
     this->RTF = currentMode.OpModeRTF;
+    this->electricityConsumption = this->powerUse * reportingConstant;
 }

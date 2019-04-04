@@ -40,7 +40,6 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     DataLoopNode::NodeData outletNode;
 
 	thisSpeed.PLR = 1.0;
-	thisSpeed.speedRatio = 1.0;
 	thisSpeed.CondInletTemp = 35.0;
 	thisSpeed.ambPressure = 101325.0;
 	thisSpeed.AirFF = 1.0;
