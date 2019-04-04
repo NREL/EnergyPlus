@@ -249,7 +249,8 @@ protected:
 						" CondenserOutletNode,                ",  // condenser outlet node
 						" PerformanceObjectName,              ",  // performance object name
 						" CondensateCollectionTankName,       ",  // condensate storage tank name
-						" EvaporativeCondenserSupplyTankName; "   // evaporative condenser supply tank name
+						" EvaporativeCondenserSupplyTankName; ",  // evaporative condenser supply tank name
+						"Schedule:Constant,AvailSchedule,,1;  "
 				});
 		std::string performanceObject = this->getPerformanceObjectString("PerformanceObjectName", addAlternateMode, numSpeedsPerMode);
 		std::string fullObject = coilObject + performanceObject;

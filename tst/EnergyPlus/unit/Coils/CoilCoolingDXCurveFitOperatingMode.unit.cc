@@ -14,31 +14,5 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
     EXPECT_TRUE(process_idf( idf_objects, false ));
     CoilCoolingDXCurveFitOperatingMode thisMode("mode1");
     EXPECT_EQ("MODE1", thisMode.name);
-    EXPECT_EQ("SPEED1", thisMode.speeds[0].name);
-}
-
-
-TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeCorrectSpeed )
-{
-    std::string const idf_objects = delimited_string( {
-        "Coil:Cooling:DX:CurveFit:OperatingMode, ",
-        " OperatingMode1Name,                    ",
-        " 12000,                                 ",
-        " 100,                                   ",
-        " 200,                                   ",
-        " 2.5,                                   ",
-        " 0.5,                                   ",
-        " 100,                                   ",
-        " 300,                                   ",
-        " Yes,                                   ",
-        " Evaporative,                           ",
-        " 200,                                   ",
-        " DiscreteStagedContinuousOrNotBacon,    ",
-        " 5,                                     ",
-        " OperatingSpeed1,                       ",
-        " OperatingSpeed2;                       "
-    } );
-
-
-
+    EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
 }
