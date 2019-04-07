@@ -204,7 +204,7 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyTsatFnPb
     int const tsatcache_size(1024 * 1024);
     int const tsatprecision_bits(24); // 28  //24  //32
-    Int64 const tsatcache_mask(psatcache_size - 1);
+    Int64 const tsatcache_mask(tsatcache_size - 1);
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
     int const tsat_hbp_cache_size(1024 * 1024);
