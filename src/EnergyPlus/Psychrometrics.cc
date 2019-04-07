@@ -72,6 +72,7 @@ namespace EnergyPlus {
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
 #define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -205,6 +206,10 @@ namespace Psychrometrics {
     int const tsatprecision_bits(24); // 28  //24  //32
     Int64 const tsatcache_mask(psatcache_size - 1);
 #endif
+#ifdef EP_cache_PsyTsatFnHPb
+    int const tsat_hbp_cache_size(1024 * 1024);
+    int const tsat_hbp_precision_bits(24); // 28  //24  //32
+#endif
     // MODULE VARIABLE DECLARATIONS:
     // na
 
@@ -227,7 +232,9 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyTsatFnPb
     Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
 #endif
-
+#ifdef EP_cache_PsyTsatFnHPb
+    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -246,6 +253,12 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         cached_Psat.deallocate();
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.deallocate();
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        cached_Tsat_HPb.deallocate();
 #endif
     }
 
@@ -293,6 +306,9 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyTsatFnPb
         cached_Tsat.allocate({0, tsatcache_size});
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+        cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
 #endif
     }
 
@@ -1008,9 +1024,62 @@ namespace Psychrometrics {
     }
 #endif
 
-    Real64 PsyTsatFnHPb(Real64 const H,               // enthalpy {J/kg}
-                        Real64 const PB,              // barometric pressure {Pascals}
+    Real64 PsyTsatFnHPb(Real64 const H,
+                        Real64 const Pb,              // barometric pressure {Pascals}
                         std::string const &CalledFrom // routine this function was called from (error messages)
+    )
+    {
+
+
+        Real64 Tsat_result; // result=> Sat-Temp {C}
+
+        Int64 const Grid_Shift((64 - 12 - tsat_hbp_precision_bits));
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Int64 H_tag;
+        Int64 Pb_tag;
+        Int64 hash;
+        Real64 H_tag_r;
+        Real64 Pb_tag_r;
+//        timer_2 += 1;
+
+#ifdef EP_psych_stats
+        ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+#endif
+
+        H_tag = bit_transfer(H, H_tag);
+        Pb_tag = bit_transfer(Pb, Pb_tag);
+
+        H_tag = bit_shift(H_tag, -Grid_Shift);
+        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
+        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+
+        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
+            cached_Tsat_HPb(hash).iH = H_tag;
+            cached_Tsat_HPb(hash).iPb = Pb_tag;
+
+            H_tag_r = bit_transfer(bit_shift(H_tag, Grid_Shift), H_tag_r);
+            Pb_tag_r = bit_transfer(bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
+
+            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb_raw(H_tag_r, Pb_tag_r, CalledFrom);
+        }
+
+        //  Twbresult_last = cached_Twb(hash)%Twb
+        //  Twb_result = Twbresult_last
+        Tsat_result = cached_Tsat_HPb(hash).Tsat;
+
+        return Tsat_result;
+    }
+
+    Real64 PsyTsatFnHPb_raw(Real64 const H,               // enthalpy {J/kg}
+                            Real64 const PB,              // barometric pressure {Pascals}
+                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -1059,9 +1128,10 @@ namespace Psychrometrics {
         Real64 HH;      // temporary enthalpy (calculation) value
         bool FlagError; // Set when errors should be flagged
         Real64 Hloc;    // local value of H
+//        timer_1 += 1;
 
         //                                      CHECK H IN RANGE.
-        HH = H + 1.78637e4;
+        HH = H + 1.78637e4;  //TODO: what is that???
 
         if (H >= 0.0) {
             Hloc = max(0.00001, H);
@@ -1092,6 +1162,9 @@ namespace Psychrometrics {
             }
         }
 #endif
+        // Array1D CaseRange = [-4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6, 4.5866e7];
+        // Real64 CaseIndex = 0;
+
         if (HH > 7.5222e4) goto Label20;
         if (HH > 2.7297e4) goto Label60;
         if (HH > -6.7012e2) goto Label50;

@@ -72,6 +72,7 @@ namespace EnergyPlus {
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
 #define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -135,6 +136,10 @@ namespace Psychrometrics {
     extern int const tsatprecision_bits; // 28  //24  //32
     extern Int64 const tsatcache_mask;
 #endif
+#ifdef EP_cache_PsyTsatFnHPb
+    extern int const tsat_hbp_cache_size;
+    extern int const tsat_hbp_precision_bits;
+#endif
 
     // MODULE VARIABLE DECLARATIONS:
     // na
@@ -167,7 +172,20 @@ namespace Psychrometrics {
         }
     };
 #endif
+#ifdef EP_cache_PsyTsatFnHPb
+    struct cached_tsat_h_pb
+    {
+        // Members
+        Int64 iH;
+        Int64 iPb;
+        Real64 Tsat;
 
+        // Default Constructor
+        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+        {
+        }
+    };
+#endif
 #ifdef EP_cache_PsyPsatFnTemp
     struct cached_psat_t
     {
@@ -203,6 +221,9 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyTsatFnPb
     extern Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    extern Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
 #endif
     // Subroutine Specifications for the Module
 
@@ -729,6 +750,10 @@ namespace Psychrometrics {
                         Real64 const PB,                             // barometric pressure {Pascals}
                         std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
+    Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
+                            Real64 const PB,                             // barometric pressure {Pascals}
+                            std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    );
 
     inline Real64 PsyRhovFnTdbRh(Real64 const Tdb,                            // dry-bulb temperature {C}
                                  Real64 const RH,                             // relative humidity value (0.0-1.0)
@@ -1074,7 +1099,12 @@ namespace Psychrometrics {
                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        Int64 const Pb_tag(Press);
+
+        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
+        assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
+        Int64 const Pb_tag(
+                bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+//        Int64 const Pb_tag(Press);
         Int64 const hash(Pb_tag & tsatcache_mask);
         auto &cTsat(cached_Tsat(hash));
         if (cTsat.iPb != Pb_tag) {
