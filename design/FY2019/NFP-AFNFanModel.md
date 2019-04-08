@@ -5,6 +5,8 @@ Support System Fan Object in Airflow Networks
 
 **Florida Solar Energy Center**
 
+ - First revision
+ - Based on comments from Jason DeGraw on 4/8/19
  - Original version
  - 3/11/19 
 
@@ -16,7 +18,37 @@ A new fan object model was recently added to EnergyPlus which will become the on
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+###GitHub communication between Jason and Gu
+
+Jason
+
++The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated Fan:ConstantVolume,~ Fan:OnOff or Fan:VariableVolume object. This name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.
+This sentence should probably be edited to either include Fan:SystemModel or to remove the types all together (since that comes up in the next field).
+
+jasondegraw 25 minutes ago  Member
+This sentence should probably be edited to either include Fan:SystemModel or to remove the types all together (since that comes up in the next field).
+
+  @lgu1234
+lgu1234 11 minutes ago  Author Member
+@jasondegraw I am going to add Fan:SystemModel. Thanks.
+
+Jason:
+
+Two local functions of GetFanInletNodeNum and GetFanOutletNodeNum will be created to output node numbers. The functions will be called from GetAirflowNetworkInput.
+  @jasondegraw
+jasondegraw 24 minutes ago  Member
+Will these two functions be located with the fans in their namespace or will they be in the AFN namespace?
+
+  @lgu1234
+lgu1234 6 minutes ago  Author Member
+@jasondegraw These two functions will be created in the HVACFan module.
+
+jasondegraw 25 minutes ago  Member
+Replace with "NA"?
+
+  @lgu1234
+lgu1234 5 minutes ago  Author Member
+@jasondegraw Done.
 
 ## Overview ##
 
@@ -47,7 +79,7 @@ The function will be modified to accept a new choice of fan type as Fan:SystemMo
 The value of OnOffFanPartLoadFraction will be assigned in the update function.
 
 #### Create two local functions to get node numbers of inlet and outlet
-Two local functions of GetFanInletNodeNum and GetFanOutletNodeNum will be created to output node numbers. The functions will be called from GetAirflowNetworkInput.
+Two local functions of GetFanInletNodeNum and GetFanOutletNodeNum will be created to output node numbers in the HVACFan module. The functions will be called from GetAirflowNetworkInput.
  
 ## Testing/Validation/Data Sources ##
 
@@ -65,7 +97,7 @@ This component represents a constant volume fan in the air distribution system (
 
 \paragraph{Field: Fan Name}\label{field-fan-name-000}
 
-The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated Fan:ConstantVolume,~ Fan:OnOff or Fan:VariableVolume object. This name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.
+The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated Fan:ConstantVolume,~ Fan:OnOff or Fan:VariableVolume, or Fan:SystemModel object. This name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type}
 
@@ -106,11 +138,11 @@ A new field will be added in the AirflowNetwork:Distribution:Component:Fan objec
 
 ## Outputs Description ##
 
-insert text
+NA
 
 ## Engineering Reference ##
 
-insert text
+NA
 
 ## Example File and Transition Changes ##
 
@@ -118,7 +150,7 @@ An existing example file will be modified. No transition is needed. However, idd
 
 ## References ##
 
-insert text
+NA
 
 
 
