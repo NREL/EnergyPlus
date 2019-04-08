@@ -5837,23 +5837,23 @@ namespace HeatBalanceSurfaceManager {
                 int zoneNum = Surface(surfNum).Zone;
                 if ((zoneNum == ZoneToResimulate) || (AdjacentZoneToSurface(surfNum) == ZoneToResimulate)) { // Surface relevant
                     ZoneHTSurfToResimulate.push_back(surfNum);
+                    WinHeatGain(surfNum) = 0.0;
+                    WinHeatTransfer(surfNum) = 0.0;
+                    WinHeatGainRep(surfNum) = 0.0;
+                    WinHeatLossRep(surfNum) = 0.0;
+                    WinGainConvGlazToZoneRep(surfNum) = 0.0;
+                    WinGainIRGlazToZoneRep(surfNum) = 0.0;
+                    WinLossSWZoneToOutWinRep(surfNum) = 0.0;
+                    WinGainFrameDividerToZoneRep(surfNum) = 0.0;
+                    WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
+                    WinGainConvShadeToZoneRep(surfNum) = 0.0;
+                    OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
+                    WinGainIRShadeToZoneRep(surfNum) = 0.0;
+                    SurfaceWindow(surfNum).FrameQRadOutAbs = 0.0;
+                    SurfaceWindow(surfNum).FrameQRadInAbs = 0.0;
+                    SurfaceWindow(surfNum).DividerQRadOutAbs = 0.0;
+                    SurfaceWindow(surfNum).DividerQRadInAbs = 0.0;
                 }
-                WinHeatGain(surfNum) = 0.0;
-                WinHeatTransfer(surfNum) = 0.0;
-                WinHeatGainRep(surfNum) = 0.0;
-                WinHeatLossRep(surfNum) = 0.0;
-                WinGainConvGlazToZoneRep(surfNum) = 0.0;
-                WinGainIRGlazToZoneRep(surfNum) = 0.0;
-                WinLossSWZoneToOutWinRep(surfNum) = 0.0;
-                WinGainFrameDividerToZoneRep(surfNum) = 0.0;
-                WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
-                WinGainConvShadeToZoneRep(surfNum) = 0.0;
-                OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
-                WinGainIRShadeToZoneRep(surfNum) = 0.0;
-                SurfaceWindow(surfNum).FrameQRadOutAbs = 0.0;
-                SurfaceWindow(surfNum).FrameQRadInAbs = 0.0;
-                SurfaceWindow(surfNum).DividerQRadOutAbs = 0.0;
-                SurfaceWindow(surfNum).DividerQRadInAbs = 0.0;
             }
             CalcHeatBalanceInsideSurf2(ZoneHTSurfToResimulate, ZoneToResimulate);
         }
