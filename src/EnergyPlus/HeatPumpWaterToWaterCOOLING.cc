@@ -118,10 +118,10 @@ namespace HeatPumpWaterToWaterCOOLING {
     Real64 Power(0.0);                       // power consumption Watts
     Real64 QLoad(0.0);                       // heat rejection from Load Side coil Watts
     Real64 QSource(0.0);                     // cooling capacity Watts
-    Real64 SourceSideWaterOutletTemp(0.0);   // Source Side outlet temperature �C
-    Real64 SourceSideWaterInletTemp(0.0);    // Source Side outlet temperature �C
-    Real64 LoadSideWaterOutletTemp(0.0);     // Source Side outlet temperature �C
-    Real64 LoadSideWaterInletTemp(0.0);      // Source Side outlet temperature �C
+    Real64 SourceSideWaterOutletTemp(0.0);   // Source Side outlet temperature degC
+    Real64 SourceSideWaterInletTemp(0.0);    // Source Side outlet temperature degC
+    Real64 LoadSideWaterOutletTemp(0.0);     // Source Side outlet temperature degC
+    Real64 LoadSideWaterInletTemp(0.0);      // Source Side outlet temperature degC
 
     // Object Data
     Array1D<GshpSpecs> GSHP; // dimension to number of machines
