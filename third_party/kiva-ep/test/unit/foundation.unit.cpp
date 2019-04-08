@@ -260,6 +260,17 @@ TEST_F(AggregatorFixture, validation) {
   EXPECT_DEATH(floor_results.calc_weighted_results(),
                "Aggregation requested for surface that is not part of foundation instance.");
 
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
+
+  floor_results.add_instance(instances[0].ground.get(), 0.25);
+  floor_results.add_instance(instances[1].ground.get(), 0.753);
+  floor_results.calc_weighted_results();
+
+  // Aggregator will re-weight to make totals add to 1.0--
+  // indiviudal weights will now be different.
+  EXPECT_NE(floor_results.get_instance(1).second, 0.753);
+
   floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
 
   floor_results.add_instance(instances[0].ground.get(), 0.25);
