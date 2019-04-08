@@ -1,6 +1,7 @@
 /* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
+#include "fixtures/foundation-fixture.hpp"
 #include "fixtures/aggregator-fixture.hpp"
 #include "fixtures/bestest-fixture.hpp"
 #include "fixtures/typical-fixture.hpp"
@@ -281,6 +282,23 @@ TEST_F(TypicalFixture, convectionCallback) {
 
   EXPECT_NEAR(hc3, 27.0, 0.00001);
 
+}
+
+TEST_F(FoundationFixture, foundationSurfaces) {
+  fnd.foundationDepth = 1.0;
+  fnd.wall.heightAboveGrade = 0.0;
+  Material insulation(0.0288, 28.0, 1450.0);
+  InputBlock extIns;
+  extIns.z = 0;
+  extIns.x = fnd.wall.totalWidth();
+  extIns.depth = 1.0;
+  extIns.width = 0.05;
+  extIns.material = insulation;
+  fnd.inputBlocks.push_back(extIns);
+  fnd.createMeshData();
+  EXPECT_EQ(fnd.surfaces[6].type, Surface::ST_GRADE);
+  EXPECT_EQ(fnd.surfaces[8].type, Surface::ST_WALL_TOP);
+  EXPECT_NEAR(fnd.surfaces[8].xMax, fnd.surfaces[6].xMin,0.00001);
 }
 
 // Google Test main
