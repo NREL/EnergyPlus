@@ -33,7 +33,7 @@ compilers:
     version: "7.3"
     build_type: Debug
     build_package_generator: "STGZ"
-    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 41.0
@@ -48,7 +48,7 @@ compilers:
     version: "7.3"
     build_type: Debug
     build_package_generator: "STGZ"
-    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 68.4
