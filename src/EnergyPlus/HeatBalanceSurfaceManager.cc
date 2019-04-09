@@ -6022,6 +6022,18 @@ namespace HeatBalanceSurfaceManager {
                                     "Sum",
                                     "Simulation");
             }
+            // Precompute whether CTF temperature limits will be needed
+            DataHeatBalSurface::Zone_has_mixed_HT_models.resize(NumOfZones + 1, false);
+            for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
+                auto const &zone(Zone(iZone));
+                for (int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf) {
+                    auto const alg(Surface(iSurf).HeatTransferAlgorithm);
+                    if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
+                        DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
+                        break;
+                    }
+                }
+            }
         }
         if (BeginEnvrnFlag && MyEnvrnFlag) {
             TempInsOld = 23.0;
@@ -6097,20 +6109,6 @@ namespace HeatBalanceSurfaceManager {
         auto const nHTSurfToResimulate(HTSurfToResimulate.size());
 
         InsideSurfIterations = 0;
-        // Tuned Precompute whether CTF temperature limits will be needed //? Can we do this just once in the FirstTime block to save a little more
-        // time (with static array)
-        Array1D_bool zone_has_mixed_HT_models(NumOfZones, false);
-        for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
-            auto const &zone(Zone(iZone));
-            for (int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf;
-                 ++iSurf) { // Tuned Replaced any_eq and array slicing and member array usage
-                auto const alg(Surface(iSurf).HeatTransferAlgorithm);
-                if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
-                    zone_has_mixed_HT_models(iZone) = true;
-                    break;
-                }
-            }
-        }
 
         // Calculate heat extract due to additional heat flux source term as the surface boundary condition
         if (DataSurfaces::AnyHeatBalanceInsideSourceTerm) {
@@ -6255,7 +6253,7 @@ namespace HeatBalanceSurfaceManager {
                             }
                         }
                         // if any mixed heat transfer models in zone, apply limits to CTF result
-                        if (zone_has_mixed_HT_models(ZoneNum))
+                        if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
                             TempSurfInTmp(SurfNum) =
                                 max(MinSurfaceTempLimit,
                                     min(MaxSurfaceTempLimit, TempSurfInTmp(SurfNum))); // Limit Check //Tuned Precomputed condition to eliminate loop
@@ -6369,7 +6367,7 @@ namespace HeatBalanceSurfaceManager {
                                     }
                                 }
                                 // if any mixed heat transfer models in zone, apply limits to CTF result
-                                if (zone_has_mixed_HT_models(ZoneNum))
+                                if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
                                     TempSurfInTmp(SurfNum) =
                                         max(MinSurfaceTempLimit,
                                             min(MaxSurfaceTempLimit,
@@ -6466,7 +6464,7 @@ namespace HeatBalanceSurfaceManager {
                                                       QRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) - construct.CTFCross(0) * TH11) /
                                                      (HMovInsul);
                             // if any mixed heat transfer models in zone, apply limits to CTF result
-                            if (zone_has_mixed_HT_models(ZoneNum))
+                            if (DataHeatBalSurface::Zone_has_mixed_HT_models[ZoneNum])
                                 TempSurfInTmp(SurfNum) = max(
                                     MinSurfaceTempLimit,
                                     min(MaxSurfaceTempLimit, TempSurfInTmp(SurfNum))); // Limit Check //Tuned Precomputed condition to eliminate loop
