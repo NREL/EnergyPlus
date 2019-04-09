@@ -3,6 +3,10 @@
 ## Lixing Gu
 ## Floirda Solar Energy Center
 
+### Second revision 4/5/19
+
+Revise NFP based on communications from Edwin and Tianzhen and Add Design Document  
+
 ### First revision 3/29/19
 
 Revised based on E-mail communications and a conference call on 3/27/19.
@@ -186,7 +190,7 @@ The conference call was held in a regular sizing meeting.
 
 Attendees: Brent Griffith; Michael J Witte; Richard Raustad; Lixing Gu; Lawrence Scheier
 
-The conference call discussed the NFP by continuing E-mail communication between Brent and Gu. Here is a consensus:
+The conference call discussed the NFP by continuing E-mail communications between Brent and Gu. Here is a consensus:
 
 ##### Rename two proposed new objects
 
@@ -212,6 +216,8 @@ Therefore, removing these inputs will reduce user's input effort.
 
 In order to calculate sizing correctly, the mass flow rate should be provided. The current structure may not have a clear pathway to find required mass flow rate. More effort will be needed to finalize the sizing mass flow rate. For the time being, the decision is to implement code first with hard sizes for each pre-treated OA coils, listed in the AirLoopHVAC:OutdoorAirSystem:EquipmentList object.
 
+Note: It is proposed to use ventilation requirements as autosize. Economizer free operation may not need to turn on coils listed in AirLoopHVAC:OutdoorAirSystem.
+
 ##### Additional inlet node of OutdoorAir:Mixer for economizer operation
 
 Although the current code (Function CalcOAController in MixedAir) calculates outdoor airflow rate from both ventilation requirement and economizer operation to provide free cooling (through Function CalcOAEconomizer in MixedAir), the OA rate is finalized in the same function with given logic, and is assigned to the same outdoor air inlet node in an OutdoorAir:Mixer. It will be better to add a new OA inlet node for economizer use only. Therefore, the OA flow from ventilation requirement will be assigned to existing outdoor air inlet node, and the OA flow from economizer operation will be assigned to the new additional OA node. The final OA rate will be maximum values from both OA flows.
@@ -232,14 +238,141 @@ It is possible to have unbalanced flow rate between OA inlet node and relief nod
 
 #####Option 2
 
-Remove AirLoopHVAC:Mixer object. A schematic drawing is shown below:
+Removed.
 
-![Figure 2](AirLoopDOAS2.jpg)  
+Note: Option 2 is removed and the AirLoopDOAS loop will be kept for possible additional capability, which will be investigated during implementation of this new feature in order to allow a central relief or a central exhaust system for a central heat recovery. A careful mapping is needed. If a heat recovery is used in an AirLoop, the relief air can not be used twice. Therefore, the central relief will be carefully configured to catch all unused relief air. 
 
-The OA flow rate based on a sum of all AirLoop OutdoorAir:Mixers in the AirLoopHVAC:DedicatedOutdoorAirSystem loop will be assigned to the inlet node of the first component listed in AirLoopHVAC:OutdoorAirSystem:EquipmentList.
+########## Need more addition
 
-The advantage is that this option reduces input requirement and there is no need to check mass conservation.
-     
+#### Github communications with Edwin on 4/1/19
+
+This section provide communications between Edwin and Gu.
+#####Edwin comments
+
+I was reviewing this offline while flying, so my apologies that these notes are not more integrated with the changes themselves. I can refine if needed:
+
+I like the current state of objects and connections
+My biggest concern when tying together systems that are not currently "coupled" is the flow imbalance, and it looks like that has been rigored over by Rich and Brent, and the design looks satisfactory
+"Hope no iteration is needed" seems optimistic - it would be nice to have some commentary about possible solutions if it starts to be problematic
+AirLoopHVAC:Mixer and Splitter objects - extensible comment with (Change numbering, please) is not quite right - remember users cannot modify the IDD and have it make an impact now.
+
+##### Gu's reply
+
+@Myoldmopar Here are my answers to your concerns.
+
+"Hope no iteration is needed" seems optimistic
+As mentioned in the NFP, a possible call will be at the end of SolveAirLoopControllers in the SimAirServingZones module after AirLoopHVAC is looped to get OA flows from all OutdoorAir:Mixers. After OA is pre-treated from the proposed new feature, I expect to iterate 2 - 3 times among all served AirLoopHVAC and the proposed new feature until air properties of the inlet nodes from all OutdoorAir:Mixers are the same as ones after pre-treated air from the proposed new feature.
+If successful, I will try to eliminate iteration to see what happens. If working, hope no iteration (this is what I mean). If not, use iteration approach already implemented in the beginning.
+
+Extensible fields
+I am not aware of no change of IDD. Thanks for letting me know this restriction in the beginning. Do we allow extensible fields? If Yes, could you let me know how to do it. If not, I will use 500 node name, similar configuration of AirLoopHVAC:ZoneMixer. Please advise.   
+
+#### E-mail communications with Tianzhen on 4/2/19
+
+Thanks for the further clarification.
+
+Tianzhen
+
+On Wed, Apr 3, 2019 at 10:29 AM Lixing Gu <gu@fsec.ucf.edu> wrote:
+Tianzhen:
+ 
+Thanks for quick feedback. Here are my answers.
+ 
+3. DOAS OA flow rate 
+The DOAS will provide the OA flow rate as a sum of all OA flow rates from served AirLoops, no matter what mode operation for each AirLoop, either economizer or ventilation requirements, in order to keep mass conservation. That is a consensus from a conference call on 3/27/19.
+ 
+4. Supply air property reset.
+ 
+The flow rate is determined by OA flow rates from served AirLoops as passive operation. The supply air properties, such as temperature and humidity, can be pre-treated by setpoint managers, such as schedule or constant, using existing functionality.
+ 
+Hoe my answers address your concerns.
+ 
+Thanks.
+ 
+Gu 
+ 
+ 
+From: Tianzhen Hong [mailto:thong@lbl.gov] 
+Sent: Wednesday, April 03, 2019 11:51 AM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Cc: Mike Witte <MJWitte@gard.com>; Xuan Luo <xuanluo@lbl.gov>
+Subject: Re: [energyplusdevteam] Model DOAS Supplying Air to Inlets of Multiple AHUs
+ 
+Lixing,
+ 
+On 3 and 4, can you clarify further?
+ 
+3. Would the DOAS provide the needed OA rate for all serving AHUs operating in the economizer mode (which can be up to 100% of supply air)? Or the DOAS only provides the ventilation rate needed by the serving AHUs and assuming they can get remaining OA rate from separate air duct? This relates to how the duct system is designed and air flow control.
+ 
+4. I meant the supply air temperature and humidity from the DOAS. Are they constant or can be reset?
+ 
+These questions are what I discussed with Fred a while back.
+ 
+Thanks,
+Tianzhen
+ 
+ 
+On Wed, Apr 3, 2019 at 7:04 AM Lixing Gu <gu@fsec.ucf.edu> wrote:
+Tianzhen:
+ 
+Thanks for your comments. I know this new feature was due a long time ago. Thanks for giving us a chance to start. Here are my answers to your questions and comments.
+ 
+1.       Central heat recovery
+Yes. You are correct. The central heat recovery will not be accomplished unless we have central relief or central exhaust.  A careful mapping is required. For example, an AirLoop has its own heat recovery. The amount of relief air can not be used in the central recovery. A central relief should catch all unused relief air. It seems the capability is beyond the current scope. I will think of it during new feature implementation and propose a realistic approach to accomplish it. 
+2.       Central OA distribution
+Mass conservation in the AirLoop DOAS has number 1 priority. I don’t expect this will happen. If this happens, I will write a warning message and distribute OA rate proportionally as you suggest. 
+3.       Economizer
+An economizer is allowed for each served AHU as existing capability. However, the coils used to pre-treat OA in the AirLoop DOAS will be sized for ventilation requirement only. The main purpose to use an economizer is to provide free cooling. At this point, the pre-treated OA is not needed.
+4.       DOAS supply air provides its own flow rate
+No. The current scope is to let the proposed AirLoop DOAS provide OA rate determined by all served AHUs. It will not have any distribution issues. If the AirLoop DOAS provides its own flow rate, it will required distribution fraction for each served AHU. This will be a good new feature for future.
+ 
+Hope I address your questions and comments. Please let me know what you think.
+ 
+Thanks.
+ 
+Gu
+ 
+From: Tianzhen Hong [mailto:thong@lbl.gov] 
+Sent: Tuesday, April 02, 2019 4:31 PM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Cc: Mike Witte <MJWitte@gard.com>; Xuan Luo <xuanluo@lbl.gov>
+Subject: Re: [energyplusdevteam] Model DOAS Supplying Air to Inlets of Multiple AHUs
+ 
+Lixing,
+ 
+This will be an exciting feature (Fred has been hoping to get this done before his retirement :).
+ 
+Couple questions/comments:
+ 
+1. The proposed AirLoopHVAC:DedicatedOutdoorAirSystem would not allow heat recovery from exhaust/relief air of the serving multiple AHUs/Air loops as there is no central exhaust or relief air. Am I correct?
+2. The air flow of the AirLoopHVAC:DedicatedOutdoorAirSystem is calculated as the sum of the OA flow rates needed by the serving multiple AHUs/Air loops, which can be a constant or varying with time. In an ideal control, the DOAS provides exactly the OA needed by those AHUs. What happens if DOAS provides more or less OA? Would each AHU get proportional OA from the DOAS?
+3. What happens if some or all the serving AHUs have air economizers? Would the DOAS be sized to meet that requirement? Or this type of DOAS configuration rules out air economizer for the serving AHUs?
+4. Would the DOAS supply air conditions (e.g., temperature) be constant/fixed or can be reset?
+ 
+Best,
+Tianzhen
+ 
+On Mon, Mar 18, 2019 at 10:07 PM Tianzhen Hong <thong@lbl.gov> wrote:
+Lixing,
+ 
+Great to know you are doing this. I will review and provide feedback.
+ 
+Tianzhen
+ 
+On Mon, Mar 18, 2019 at 8:38 AM Lixing Gu <gu@fsec.ucf.edu> wrote:
+Team:
+
+An NFP to Model DOAS Supplying Air to Inlets of Multiple AHUs.
+
+https://github.com/NREL/EnergyPlus/blob/Model-DOAS-to-Multiple-Air-Handling-Units/design/FY2019/NFP-DOAS_MultiAHUs.md.
+
+Comments are welcome via e-mail or github.  Please let me know if you wish to be a reviewer for this task.
+
+Thanks.
+
+Gu
+
+  
 ### **Overview**
 
 We propose 3 new objects to accomplish the goal. 
@@ -402,6 +535,8 @@ AirLoopHVAC:DedicatedOutdoorAirSystem
        \type AirLoopHVAC name
     ......
 
+Note: If extensible is not available, the fixed number of 50 will be used to define the maximum number of AirLoopHVACs served by the proposed object.
+
 AirLoopHVAC:Mixer
 
 	AirLoopHVAC:Mixer,
@@ -444,6 +579,8 @@ AirLoopHVAC:Mixer
    	A13; \field Inlet 10 Node Name
         \type node
 
+Note: If extensible is not available, the fixed number of 200 will be used to define the maximum number of inlet nodes.
+
 AirLoopHVAC:Splitter
 
 	AirLoopHVAC:Splitter,
@@ -479,6 +616,8 @@ AirLoopHVAC:Splitter
        \type node
    	A12, \field Outlet 10 Node Name
        \type node
+
+Note: If extensible is not available, the fixed number of 200 will be used to define the maximum number of outlet nodes.
 
 ###Revised objects
 
@@ -521,11 +660,129 @@ insert text
 
 ## Example File and Transition Changes ##
 
-insert text
+An example file will be created to have all proposed new objects.
+
+Since there is no modification of existing objects, no transition is expected. 
 
 ## References ##
 
-insert text
+Reference: DesDoc_OASysToMultAirHandlers2.md by Fred.
+
+## Design Document
+
+The design document addresses a new module of AirLoopHAVCDOAS and changes of two modules mainly: MixedAir and SimAirServingZones.
+
+###AirLoopHAVCDOAS
+
+This new module has several functions and 3 main structs to cover 3 new proposed objects.
+
+#### Constructor and Destructor
+
+    public:
+        AirLoopHAVCDOAS(); // constructor
+
+        ~AirLoopHAVCDOAS() // destructor
+        {
+        }
+
+    struct AirLoopDOAS
+    {
+    }
+
+    struct AirLoopMixer
+    {
+    }
+
+    struct AirLoopSplitter
+    {
+    }
+
+####SimAirLoopHVACDOAS
+
+A driver for this module with external connection. It contains following common functions for calls:
+
+
+    void SimAirLoopHVACDOAS
+			(std::string const &CompName,   // Name of the unitary engine driven heat pump system
+                       bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
+                       int const AirLoopDOASNum,          // air loop index
+                       int &CompIndex                 // Index to AirLoopHAVCDOAS
+    )
+
+
+#####GetInput
+
+Read an input file and assign inputs of 3 new proposed objects to variables and structs.
+
+        static void getInput();
+
+#####Init
+
+Initialize values without changes at the current iteration before calculation. At the same time, this function will process some data only once, when some information is not available during input process by calling GetInput. For example, Sizing calculation will be embedded in this function after calling OAControllerProps::SizeOAController to get required outdoor ventilation flow rate.    
+
+        static void init();
+
+#####CalcAirLoopDOAS
+
+Calculate outputs by calling SimOAComponent function in the MixedAir module.
+
+    void CalcAirLoopDOAS(
+         int const     AirLoopDOASNum,       // 
+         bool const FirstHVACIteration, 
+    );
+
+#####UpdateAirLoopDOAS
+
+    void UpdateAirLoopDOAS(
+         int const     AirLoopDOASNum,       // 
+    );
+
+#####ReportAirLoopDOAS
+
+    void ReportAirLoopDOAS(
+         int const     AirLoopDOASNum,       // 
+     );
+
+
+   
+#####Sizing
+
+Calculate sizes based on outdoor air conditions and setpoint manager using existing equipment listed in validOASysEquipmentNames.
+
+The sizing calculation will be based on ventilation requirements. The outdoor air flow rates will be available after calling OAControllerProps::SizeOAController. A possible way is to collect outdoor air flow rate after calling, so that sizing of each coil can be accomplished.  
+
+###SimAirServingZones
+
+The SolveAirLoopControllers function will be revised by adding a loop after existing AirLoop loop:
+
+Existing loop
+        for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++AirLoopControlNum) {
+        }
+The above loop calls SimAirLoopComponents(...->SimOAController in the MixedAir module) to get all required outdoor air flow rate. Here is a proposed loop following the existing loop:
+
+        for (int AirLoopDOASNum = 1; AirLoopDOASNum <= NumberOfAirLoopDOAS; ++AirLoopDOASNum) {
+           Assing air properties at outlet node, and to all OA nodes at each served AirLoop via an AirLoopHVAC:Splitter 
+        } 
+
+Then an additional AirLoop loop will be called to ensure the inlet OA air properties are the same as AirLoopDOAS outlet  
+
+        for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++AirLoopControlNum) {
+			Check differences of air properties
+        }
+ If not converged, iteration will be needed to iterate both loops of AirLoop and AirLoopDOAS.
+
+###MixedAir
+
+Air properties of OA mixer inlet nodes are determined by System Nodes from a section code in the InitOAMixer (extracted):
+
+        OAMixer(OAMixerNum).OATemp = Node(InletNode).Temp;
+        OAMixer(OAMixerNum).OAHumRat = Node(InletNode).HumRat;
+        OAMixer(OAMixerNum).OAEnthalpy = Node(InletNode).Enthalpy;
+        OAMixer(OAMixerNum).OAPressure = Node(InletNode).Press;
+        OAMixer(OAMixerNum).OAMassFlowRate = Node(InletNode).MassFlowRate;
+
+If OA inlet node values are assigned by the AirLoopDOAS loop correctly, it may not need to revise MixedAir module. The modification will be determined during implementation. 
+
 
 # **Reference: DesDoc_OASysToMultAirHandlers2.md**
 
