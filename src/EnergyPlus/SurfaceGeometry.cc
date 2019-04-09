@@ -6603,6 +6603,7 @@ namespace SurfaceGeometry {
 
             if (!lAlphaFieldBlanks(2)) {
                 Surface(Found).InsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex(cAlphaArgs(2));
+                DataSurfaces::AnyHeatBalanceInsideSourceTerm = true;
                 if (Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", cannot find the matching Schedule: " + cAlphaFieldNames(2) +
                                     "=\"" + cAlphaArgs(2));
@@ -6612,6 +6613,7 @@ namespace SurfaceGeometry {
 
             if (!lAlphaFieldBlanks(3)) {
                 Surface(Found).OutsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex(cAlphaArgs(3));
+                DataSurfaces::AnyHeatBalanceOutsideSourceTerm = true;
                 if (Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", cannot find the matching Schedule: " + cAlphaFieldNames(3) +
                                     "=\"" + cAlphaArgs(3));
@@ -6663,16 +6665,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
-                    AnyCTF = true;
+                    DataHeatBalance::AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
-                    AnyEMPD = true;
+                    DataHeatBalance::AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
-                    AnyHAMT = true;
+                    DataHeatBalance::AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
-                    AnyCondFD = true;
+                    DataHeatBalance::AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundSingleSurf = true;
@@ -6707,16 +6709,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
-                    AnyCTF = true;
+                    DataHeatBalance::AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
-                    AnyEMPD = true;
+                    DataHeatBalance::AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
-                    AnyHAMT = true;
+                    DataHeatBalance::AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
-                    AnyCondFD = true;
+                    DataHeatBalance::AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3));
                     ErrorsFoundMultiSurf = true;
@@ -6855,16 +6857,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
-                    AnyCTF = true;
+                    DataHeatBalance::AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
-                    AnyEMPD = true;
+                    DataHeatBalance::AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
-                    AnyHAMT = true;
+                    DataHeatBalance::AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
-                    AnyCondFD = true;
+                    DataHeatBalance::AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundSurfList = true;
@@ -6909,16 +6911,16 @@ namespace SurfaceGeometry {
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_CTF;
-                    AnyCTF = true;
+                    DataHeatBalance::AnyCTF = true;
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = HeatTransferModel_EMPD;
-                    AnyEMPD = true;
+                    DataHeatBalance::AnyEMPD = true;
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     tmpAlgoInput = HeatTransferModel_HAMT;
-                    AnyHAMT = true;
+                    DataHeatBalance::AnyHAMT = true;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     tmpAlgoInput = HeatTransferModel_CondFD;
-                    AnyCondFD = true;
+                    DataHeatBalance::AnyCondFD = true;
                 } else {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2));
                     ErrorsFoundByConstruct = true;
@@ -6944,12 +6946,12 @@ namespace SurfaceGeometry {
         for (auto &surf : Surface) {
             if (surf.ExtBoundCond == KivaFoundation) {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
-                AnyKiva = true;
+                DataHeatBalance::AnyKiva = true;
             }
         }
 
         // Setup Kiva intances
-        if (AnyKiva) {
+        if (DataHeatBalance::AnyKiva) {
             if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
         }
 
@@ -6967,24 +6969,24 @@ namespace SurfaceGeometry {
         SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
         msgneeded = false;
 
-        if (NumEMPDMat > 0 && !AnyEMPD) {
+        if (NumEMPDMat > 0 && !DataHeatBalance::AnyEMPD) {
             ShowWarningError(
                 "The input file includes " + RoundSigDigits(NumEMPDMat) +
                 " MaterialProperty:MoisturePenetrationDepth:Settings objects but the moisture penetration depth algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (NumPCMat > 0 && !AnyCondFD) {
+        if (NumPCMat > 0 && !DataHeatBalance::AnyCondFD) {
             ShowWarningError("The input file includes " + RoundSigDigits(NumPCMat) +
                              " MaterialProperty:PhaseChange objects but the conduction finite difference algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (NumVTCMat > 0 && !AnyCondFD) {
+        if (NumVTCMat > 0 && !DataHeatBalance::AnyCondFD) {
             ShowWarningError(
                 "The input file includes " + RoundSigDigits(NumVTCMat) +
                 " MaterialProperty:VariableThermalConductivity objects but the conduction finite difference algorithm is not used anywhere.");
             msgneeded = true;
         }
-        if (SumHAMTMat > 0 && !AnyHAMT) {
+        if (SumHAMTMat > 0 && !DataHeatBalance::AnyHAMT) {
             ShowWarningError("The input file includes " + RoundSigDigits(SumHAMTMat) +
                              " MaterialProperty:HeatAndMoistureTransfer:* objects but the combined heat and moisture finite difference algorithm is "
                              "not used anywhere.");
@@ -6994,12 +6996,12 @@ namespace SurfaceGeometry {
             ShowContinueError("Previous materials will be ignored due to HeatBalanceAlgorithm choice.");
         }
         msgneeded = false;
-        if (NumEMPDMat == 0 && AnyEMPD) {
+        if (NumEMPDMat == 0 && DataHeatBalance::AnyEMPD) {
             ShowWarningError("The moisture penetration depth conduction transfer function algorithm is used but the input file includes no "
                              "MaterialProperty:MoisturePenetrationDepth:Settings objects.");
             msgneeded = true;
         }
-        if (SumHAMTMat == 0 && AnyHAMT) {
+        if (SumHAMTMat == 0 && DataHeatBalance::AnyHAMT) {
             ShowWarningError("The combined heat and moisture finite element algorithm is used but the input file includes no "
                              "MaterialProperty:HeatAndMoistureTransfer:* objects.");
             msgneeded = true;
@@ -7015,31 +7017,31 @@ namespace SurfaceGeometry {
                                              "Convection Coefficient Lower Limit {W/m2-K}, Surface Convection Coefficient Upper Limit {W/m2-K}";
 
         int numberOfHeatTransferAlgosUsed = 0;
-        if (AnyCTF) {
+        if (DataHeatBalance::AnyCTF) {
             AlgoName = "CTF - ConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (AnyCondFD) {
+        if (DataHeatBalance::AnyCondFD) {
             AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (AnyEMPD) {
+        if (DataHeatBalance::AnyEMPD) {
             AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (AnyHAMT) {
+        if (DataHeatBalance::AnyHAMT) {
             AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (AnyKiva) {
+        if (DataHeatBalance::AnyKiva) {
             AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)

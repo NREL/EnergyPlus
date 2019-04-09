@@ -480,6 +480,9 @@ namespace DataSurfaces {
     extern std::vector<int> AllHTSurfaceList;       // List of all heat transfer surfaces (built once)
     extern std::vector<int> ZoneHTSurfToResimulate; // List of HT surfaces related to a given zone (rebuilt frequently)
 
+    extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Types

@@ -501,6 +501,9 @@ namespace DataSurfaces {
     std::vector<int> AllHTSurfaceList;       // List of all heat transfer surfaces (built once)
     std::vector<int> ZoneHTSurfToResimulate; // List of HT surfaces related to a given zone (rebuilt frequently)
 
+    bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Object Data
@@ -1152,6 +1155,8 @@ namespace DataSurfaces {
         WinHeatTransferRepEnergy.deallocate();
         AllHTSurfaceList.clear();
         ZoneHTSurfToResimulate.clear();
+        AnyHeatBalanceInsideSourceTerm = false;
+        AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();

@@ -273,11 +273,11 @@ namespace HeatBalanceSurfaceManager {
         UpdateFinalSurfaceHeatBalance();
 
         // Before we leave the Surface Manager the thermal histories need to be updated
-        if (AnyCTF || AnyEMPD) {
+        if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
             UpdateThermalHistories(); // Update the thermal histories
         }
 
-        if (AnyCondFD) {
+        if (DataHeatBalance::AnyCondFD) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
@@ -763,7 +763,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
-        if (AnyCondFD) {
+        if (DataHeatBalance::AnyCondFD) {
             InitHeatBalFiniteDiff();
         }
 
@@ -5301,9 +5301,11 @@ namespace HeatBalanceSurfaceManager {
 
             // Calculate heat extract due to additional heat flux source term as the surface boundary condition
 
-            if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
-                QAdditionalHeatSourceOutside(SurfNum) =
-                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).OutsideHeatSourceTermSchedule);
+            if (DataSurfaces::AnyHeatBalanceOutsideSourceTerm) {
+                if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
+                    QAdditionalHeatSourceOutside(SurfNum) =
+                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).OutsideHeatSourceTermSchedule);
+                }
             }
 
             // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
@@ -6007,7 +6009,7 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld.allocate(TotSurfaces);
             RefAirTemp.allocate(TotSurfaces);
             SurfaceEnthalpyRead.allocate(TotSurfaces);
-            if (AnyEMPD) {
+            if (DataHeatBalance::AnyEMPD) {
                 MinIterations = MinEMPDIterations;
             } else {
                 MinIterations = 1;
@@ -6029,7 +6031,7 @@ namespace HeatBalanceSurfaceManager {
             MyEnvrnFlag = false;
 
             // Initialize Kiva instances ground temperatures
-            if (AnyKiva) {
+            if (DataHeatBalance::AnyKiva) {
                 SurfaceGeometry::kivaManager.initKivaInstances();
             }
         }
@@ -6111,15 +6113,17 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Calculate heat extract due to additional heat flux source term as the surface boundary condition
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
-                QAdditionalHeatSourceInside(SurfNum) =
-                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+        if (DataSurfaces::AnyHeatBalanceInsideSourceTerm) {
+            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
+                    QAdditionalHeatSourceInside(SurfNum) =
+                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+                }
             }
         }
 
         // Calculate Kiva instances
-        if (AnyKiva) {
+        if (DataHeatBalance::AnyKiva) {
             if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
                  SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !WarmupFlag) {
@@ -6132,7 +6136,7 @@ namespace HeatBalanceSurfaceManager {
 
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
-            if (AnyKiva) {
+            if (DataHeatBalance::AnyKiva) {
                 for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
@@ -6140,7 +6144,7 @@ namespace HeatBalanceSurfaceManager {
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
-            if (AnyKiva) {
+            if (DataHeatBalance::AnyKiva) {
                 for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
@@ -6683,7 +6687,7 @@ namespace HeatBalanceSurfaceManager {
 
             } // ...end of loop to check for convergence
 
-            if (!AnyCondFD) {
+            if (!DataHeatBalance::AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
             } else {
                 if (MaxDelTemp <= MaxAllowedDelTempCondFD) Converged = true;
@@ -6715,7 +6719,7 @@ namespace HeatBalanceSurfaceManager {
                 if (!WarmupFlag) {
                     ++ErrCount;
                     if (ErrCount < 16) {
-                        if (!AnyCondFD) {
+                        if (!DataHeatBalance::AnyCondFD) {
                             ShowWarningError(
                                 "Inside surface heat balance did not converge with Max Temp Difference [C] =" + RoundSigDigits(MaxDelTemp, 3) +
                                 " vs Max Allowed Temp Diff [C] =" + RoundSigDigits(MaxAllowedDelTemp, 3));
@@ -6737,7 +6741,7 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of main inside heat balance DO loop (ends when Converged)
 
         // Update SumHmXXXX
-        if (AnyCondFD || AnyEMPD || AnyHAMT) {
+        if (DataHeatBalance::AnyCondFD || DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
             for (std::vector<int>::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate) {
                 SurfNum = HTSurfToResimulate[iHTSurfToResimulate]; // Heat transfer surfaces only
                 auto const &surface(Surface(SurfNum));
