@@ -679,7 +679,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
-    AnyCTF = true;
+    DataHeatBalance::AnyCTF = true;
     SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
