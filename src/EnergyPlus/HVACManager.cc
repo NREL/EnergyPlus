@@ -71,6 +71,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
@@ -85,6 +86,7 @@
 #include <EMSManager.hh>
 #include <Fans.hh>
 #include <General.hh>
+#include <HeatBalFiniteDiffManager.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
 #include <InternalHeatGains.hh>
@@ -2318,6 +2320,22 @@ namespace HVACManager {
             GroupSNLoadHeatRate(GroupNum) = ListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
             GroupSNLoadCoolRate(GroupNum) = ListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
         } // GroupNum
+
+        // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
+        if (DataHeatBalance::AnyCondFD && DataGlobals::DisplayAdvancedReportVariables) {
+            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+                if (DataHeatBalSurface::Zone_has_mixed_HT_models[zoneNum]) {
+                    ZnAirRpt(zoneNum).SumEnthalpyM = 0.0;
+                    ZnAirRpt(zoneNum).SumEnthalpyH = 0.0;
+                    for (int surfaceNum = Zone(zoneNum).SurfaceFirst; surfaceNum <= Zone(zoneNum).SurfaceLast; ++surfaceNum) {
+                        if (DataSurfaces::Surface(surfaceNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+                            ZnAirRpt(zoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(surfaceNum).EnthalpyM;
+                            ZnAirRpt(zoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(surfaceNum).EnthalpyF;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void ReportAirHeatBalance()
