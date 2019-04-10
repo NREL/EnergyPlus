@@ -231,32 +231,15 @@ namespace SurfaceGeometry {
         // This subroutine controls the processing of detached shadowing and
         // zone surfaces for computing their vertices.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataVectorTypes;
         using namespace OutputReportPredefined;
         using General::RoundSigDigits;
         using namespace DataReportingFlags;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt ValFmt("(F20.2)");
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("SetUpZoneGeometry: ");
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
 
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
         int SurfNum;          // Surface number (DO loop counter)
         int ZoneNum;          // Zone number for current surface and DO loop counter
@@ -280,14 +263,9 @@ namespace SurfaceGeometry {
         std::string cNominalU;
         std::string cNominalUwithConvCoeffs;
         bool isWithConvCoefValid;
-        //  INTEGER, ALLOCATABLE, DIMENSION(:) :: ZoneSurfacesCount
-        //  INTEGER, ALLOCATABLE, DIMENSION(:) :: ZoneSubSurfacesCount
-        //  INTEGER, ALLOCATABLE, DIMENSION(:) :: ZoneShadingSurfacesCount
-
         bool nonInternalMassSurfacesPresent;
         bool DetailedWWR;
 
-        // Formats
         static ObjexxFCL::gio::Fmt Format_720("(' Zone Information, ',A,28(',',A))");
         static ObjexxFCL::gio::Fmt Format_721(
             "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate "
@@ -296,9 +274,6 @@ namespace SurfaceGeometry {
             "{m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm "
             "{Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window "
             "Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')");
-
-        // FLOW:
-        // Allocations and initializations...
 
         // Zones must have been "gotten" before this call
         // The RelNorth variables are used if "relative" coordinates are input as well
@@ -386,7 +361,6 @@ namespace SurfaceGeometry {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows and build sim list
 
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip shadowing (sub)surfaces
-            AllHTSurfaceList.push_back(SurfNum); // Build heat transfer surface list
             ZoneNum = Surface(SurfNum).Zone;
             Zone(ZoneNum).TotalSurfArea += Surface(SurfNum).Area;
             if (Construct(Surface(SurfNum).Construction).TypeIsWindow) {
@@ -451,11 +425,6 @@ namespace SurfaceGeometry {
 
         } // ...end of surfaces windows DO loop
 
-        //  DO SurfNum = 1, TotSurfaces ! Set areas for Sunlit area calculations for Windows
-        //    IF (Surface(SurfNum)%Class /= SurfaceClass_Window) CYCLE
-        //    SurfaceWindow(SurfNum)%AreaCalcForSunlitArea = (Surface(SurfNum)%Area + SurfaceWindow(SurfNum)%DividerArea) /  &
-        //                                  Surface(SurfNum)%Multiplier
-        //  ENDDO
         if (DetailedWWR) {
             ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "========================";
             ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Zone,ExtWallArea,ExtWindowArea";
@@ -503,8 +472,6 @@ namespace SurfaceGeometry {
                 }
             }
             if (CeilCount > 0.0 && FloorCount > 0.0) {
-                //      ZCeilAvg=ZCeilAvg/CeilCount
-                //      ZFlrAvg=ZFlrAvg/FloorCount
                 AverageHeight = ZCeilAvg - ZFlrAvg;
             } else {
                 AverageHeight = (ZMax - ZMin);
@@ -728,9 +695,6 @@ namespace SurfaceGeometry {
         SetZoneOutBulbTempAt();
         CheckZoneOutBulbTempAt();
 
-        //  IF (ALLOCATED(ZoneSurfacesCount)) DEALLOCATE(ZoneSurfacesCount)
-        //  IF (ALLOCATED(ZoneSubSurfacesCount)) DEALLOCATE(ZoneSubSurfacesCount)
-        //  IF (ALLOCATED(ZoneShadingSurfacesCount)) DEALLOCATE(ZoneShadingSurfacesCount)
     }
 
     void AllocateModuleArrays()
@@ -883,7 +847,6 @@ namespace SurfaceGeometry {
         //  (you're on the outside looking toward the wall) as stored into
         //  Surface%Vertex(1:<number-of-sides>)
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -892,11 +855,8 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleMinValue;
         using namespace DataErrorTracking;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const SurfaceClass_Moved(-1);
         static std::string const RoutineName("GetSurfaceData: ");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ConstrNum;                // Construction number
         int SubSurfNum;               // DO loop counter/index for sub-surface number
@@ -974,8 +934,6 @@ namespace SurfaceGeometry {
         static int ErrCount4(0); // counts of interzone area mismatches.
         bool SubSurfaceSevereDisplayed;
         bool subSurfaceError(false);
-        // INTEGER :: Warning4Count=0  ! counts of nonmatched flat surface subsurface orientations
-        // INTEGER :: Warning5Count=0  ! counts of nonmatched flat surface subsurface orientations - could not be resolved
         bool errFlag;
 
         int iTmp1;
@@ -984,15 +942,11 @@ namespace SurfaceGeometry {
         int BlNumNew;
         int WinShadingControlPtr;
         int ShadingType;
-        // unused  REAL(r64) :: SchSlatAngle = 0.0D0
-        // unused  LOGICAL :: initmsg
         int ErrCount;
         Real64 diffp;
-        //  LOGICAL :: Located
         bool izConstDiff;    // differences in construction for IZ surfaces
         bool izConstDiffMsg; // display message about hb diffs only once.
 
-        // FLOW:
         // Get the total number of surfaces to allocate derived type and for surface loops
 
         if (GetSurfaceDataOneTimeFlag) {
@@ -1408,13 +1362,6 @@ namespace SurfaceGeometry {
         izConstDiffMsg = false;
         for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
             //  Clean up Shading Surfaces, make sure they don't go through here.
-            //  Shading surfaces have "Zone=0", should also have "BaseSurf=0"
-            //  PGE: Revised so that shading surfaces can have BaseSurf /= 0 if they are daylighting shelves
-            //       or other exterior reflecting surfaces.
-            // IF (Surface(SurfNum)%Zone == 0) THEN
-            //  Surface(SurfNum)%BaseSurf=0
-            //  CYCLE
-            // ENDIF
             if (!Surface(SurfNum).HeatTransSurf) continue;
             //   If other surface, match it up
             //  Both interzone and "internal" surfaces have this pointer set
@@ -1611,17 +1558,6 @@ namespace SurfaceGeometry {
                                         ShowContinueError("..surface class of second surface=" + cSurfaceClass(Surface(Found).Class));
                                     }
                                 }
-                            } else { // Roofs, Floors
-                                     // should be looking at opposite tilts, not azimuth for roof/floor matches...
-                                     //              IF (ABS(ABS(Surface(SurfNum)%Azimuth+Surface(Found)%Azimuth)-360.) > 1.0d0) THEN
-                                     //                CALL ShowWarningError('InterZone Surface Azimuths do not match as expected.')
-                                     //                CALL ShowContinueError('  Azimuth='//TRIM(TrimSigDigits(Surface(SurfNum)%Azimuth,1))//  &
-                                     //                                       ' in Surface='//TRIM(Surface(SurfNum)%Name)//',
-                                     //                                       Zone='//TRIM(Surface(SurfNum)%ZoneName))
-                                     //                CALL ShowContinueError('  Azimuth='//TRIM(TrimSigDigits(Surface(Found)%Azimuth,1))//  &
-                                     //                                       ' in Surface='//TRIM(Surface(Found)%Name)//',
-                                     //                                       Zone='//TRIM(Surface(Found)%ZoneName))
-                                     //              ENDIF
                             }
 
                             // Make sure exposures (Sun, Wind) are the same.....and are "not"
@@ -1891,18 +1827,6 @@ namespace SurfaceGeometry {
                 if (Surface(SurfNum).HasShadeControl) {
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfaceWindow(SurfNum).MovableSlats = true;
-                    // for a constant schedule of slat angle, it acts the same way as fixed angle
-                    // TH 3/14/2011, CR 8347. Code was commented out due to the use of ExternalInterface (BCVTB)
-                    // IF(WindowShadingControl(WinShadingControlPtr)%SlatAngleControlForBlinds == WSC_SAC_ScheduledSlatAngle) THEN
-                    // get schedule index
-                    //  SchID = WindowShadingControl(WinShadingControlPtr)%SlatAngleSchedule
-                    //  IF (SchID /= 0 ) THEN
-                    //    SchSlatAngle = GetScheduleMinValue(SchID)
-                    //    IF (SchSlatAngle == GetScheduleMaxValue(SchID)) THEN
-                    //      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
-                    //    ENDIF
-                    //  ENDIF
-                    // ENDIF
                 }
 
                 ConstrNumSh = SurfaceWindow(SurfNum).ShadedConstruction;
@@ -2004,9 +1928,10 @@ namespace SurfaceGeometry {
         }
 
         // Set flag that determines whether a surface can be an exterior obstruction
-        // Also set associated surfaces for Kiva foundations
+        // Also set associated surfaces for Kiva foundations and build heat transfer surface list
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
+            if (Surface(SurfNum).HeatTransSurf) AllHTSurfaceList.push_back(SurfNum);
             // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond > 0) continue;
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond == Ground) continue;
