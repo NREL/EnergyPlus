@@ -3879,6 +3879,11 @@ namespace SurfaceGeometry {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                         "\" has an opaque surface construction; it should have a window construction.");
                     }
+                    if (Construct(SurfaceTmp(SurfNum).Construction).SourceSinkPresent) {
+                        ErrorsFound = true;
+                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
+                                        "\": Windows are not allowed to have embedded sources/sinks");
+                    }
                 }
 
             } else if (SurfaceTmp(SurfNum).Construction != 0) {
@@ -4211,6 +4216,11 @@ namespace SurfaceGeometry {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                             "\" has an opaque surface construction; it should have a window construction.");
+                        }
+                        if (Construct(SurfaceTmp(SurfNum).Construction).SourceSinkPresent) {
+                            ErrorsFound = true;
+                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
+                                            "\": Windows are not allowed to have embedded sources/sinks");
                         }
                     }
 

@@ -191,32 +191,13 @@ namespace HeatBalanceSurfaceManager {
         bool ComputeIntSWAbsorpFactorsfirstTime(true); // First time through routine
         bool UpdateThermalHistoriesFirstTimeFlag(true);
         bool CalculateZoneMRTfirstTime(true);          // Flag for first time calculations
-        bool calcHeatBalanceInsideSurfFirstTime(true); // Used for trapping errors or other problems
-    }                                                  // namespace
-                                                       // DERIVED TYPE DEFINITIONS:
-                                                       // na
+        bool calcHeatBalanceInsideSurfFirstTime(true);
+    }
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Initialization routines for module
-
-    // Algorithms for the module
     // These are now external subroutines
     // PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
     // PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
     void clear_state()
     {
         ManageSurfaceHeatBalancefirstTime = true;
@@ -5987,6 +5968,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
             }
+            calcHeatBalanceInsideSurfFirstTime = false;
         }
         if (BeginEnvrnFlag && MyEnvrnFlag) {
             TempInsOld = 23.0;
@@ -6411,9 +6393,6 @@ namespace HeatBalanceSurfaceManager {
 
                     } else { // Window
 
-                        if (construct.SourceSinkPresent && calcHeatBalanceInsideSurfFirstTime)
-                            ShowSevereError("Windows are not allowed to have embedded sources/sinks");
-
                         if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                             // Lookup up the TDD:DOME object
                             int PipeNum = FindTDDPipe(SurfNum);
@@ -6722,7 +6701,6 @@ namespace HeatBalanceSurfaceManager {
 
         CalculateZoneMRT(ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 
-        calcHeatBalanceInsideSurfFirstTime = false;
     }
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
