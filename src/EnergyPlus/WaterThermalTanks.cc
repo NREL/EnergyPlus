@@ -8063,9 +8063,11 @@ namespace WaterThermalTanks {
         Real64 Runtime1 = 0.0;          // Time that heater 1 is running (s)
         Real64 Runtime2 = 0.0;          // Time that heater 2 is running (s)
         bool SetPointRecovered = false; // Flag to indicate when set point is recovered for the first time
-        Real64 MdotDesuperheaterWater(0.0);      //mass flow rate of desuperheater source side water, kg/s
-        Real64 DesuperheaterPLR(0.0);   //Desuperheater part load ratio
-        Real64 DesuperheaterHeaterRate; //Desuperheater heater rate (W)
+        //Added three variables for desuperheater sourceinlet temperature update
+        Real64 MdotDesuperheaterWater = 0.0;      //mass flow rate of desuperheater source side water, kg/s
+        Real64 DesuperheaterPLR = 0.0;   //Desuperheater part load ratio
+        Real64 DesuperheaterHeaterRate = 0.0; //Desuperheater heater rate (W)
+        Real64 SourceInletTempSum = 0.0;    //
         Real64 Qheater1; // Heating rate of burner or electric heating element 1 (W)
         Real64 Qheater2; // Heating rate of burner or electric heating element 2 (W)
 
@@ -8083,24 +8085,12 @@ namespace WaterThermalTanks {
         // Temperature at the end of the internal timestep
         std::vector<Real64> Tfinal;
         Tfinal.resize(nTankNodes);
-        Tfinal[Tank.SourceOutletStratNode - 1] = Tank.SavedSourceOutletTemp;
 
         // Average temperature of each node over the internal timestep
         std::vector<Real64> Tavg;
         Tavg.resize(nTankNodes);
-
         while (TimeRemaining > 0.0) {
-
             if (Tank.InletMode == InletModeSeeking) CalcNodeMassFlows(WaterThermalTankNum, InletModeSeeking);
-            if (Tank.SourceMassFlowRate > 0.0 && Tank.DesuperheaterNum > 0){
-                DesuperheaterPLR = WaterHeaterDesuperheater(Tank.DesuperheaterNum).DesuperheaterPLR;
-                DesuperheaterHeaterRate = WaterHeaterDesuperheater(Tank.DesuperheaterNum).HeaterRate;
-                MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * RhoH2O(Tfinal[Tank.SourceOutletStratNode - 1]);
-                if (DesuperheaterPLR > 0.0){
-                    Tank.SourceInletTemp = Tfinal[Tank.SourceOutletStratNode - 1] + (DesuperheaterHeaterRate/DesuperheaterPLR) / (MdotDesuperheaterWater * Cp);
-                }
-            }
-
             // Heater control logic
             if (Tank.IsChilledWaterTank) {
                 // Chilled Water Tank, no heating
@@ -8319,7 +8309,7 @@ namespace WaterThermalTanks {
                 auto &node = Tank.Node[i];
                 node.Temp = Tfinal[i];
                 node.TempSum += Tavg[i] * dt;
-
+            SourceInletTempSum += Tank.SourceInletTemp * dt;
                 // Bookkeeping for reporting variables, mostly for Qunmet.
                 Real64 Qloss_node = (Tank.AmbientTemp - Tavg[i]);
                 Real64 Qheat_node = 0.0;
@@ -8394,6 +8384,18 @@ namespace WaterThermalTanks {
                 Tank.FirstRecoveryFuel += Qrecovery * dt;
                 if (SetPointRecovered) Tank.FirstRecoveryDone = true;
             }
+            //Update the source inlet temperature for each internal timestep iteration
+            //When the source loop is from desuperheater
+            if (Tank.DesuperheaterNum > 0){
+                DesuperheaterPLR = WaterHeaterDesuperheater(Tank.DesuperheaterNum).DesuperheaterPLR;
+                DesuperheaterHeaterRate = WaterHeaterDesuperheater(Tank.DesuperheaterNum).HeaterRate;
+                MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * RhoH2O(Tavg[Tank.SourceOutletStratNode - 1]);
+                if (DesuperheaterPLR > 0.0){
+                    Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1] + (DesuperheaterHeaterRate/DesuperheaterPLR) / (MdotDesuperheaterWater * Cp);
+                }else{
+                    Tank.SourceInletTemp = Tank.SourceOutletTemp;
+                }
+            }
         } // end while TimeRemaining > 0.0
 
         for (auto &e : Tank.Node) {
@@ -8423,6 +8425,8 @@ namespace WaterThermalTanks {
         } else if (Tank.SourceOutletStratNode > 0) {
             // otherwise set it to the temperature of the source outlet node
             Tank.SourceOutletTemp = Tank.Node(Tank.SourceOutletStratNode).TempAvg;
+            // Output the average inlet temperature for the timestep
+            Tank.SourceInletTemp = SourceInletTempSum / SecInTimeStep;
         }
         if (HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped) {
             // For pumped condensers, set the source inlet and outlets to match the delta T
@@ -8904,11 +8908,10 @@ namespace WaterThermalTanks {
 
                         //         set the source mass flow rate for the tank
                         WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
-                        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
                         WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
                         WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-
+                        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
+                        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
                         if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedWaterHeater) CalcWaterThermalTankMixed(WaterThermalTankNum);
                         else CalcWaterThermalTankStratified(WaterThermalTankNum);
                         NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
@@ -9050,6 +9053,7 @@ namespace WaterThermalTanks {
                                 } else {
                                     Par(4) = 0.0;
                                 }
+                                Par(5) = MdotWater;
                                 if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedWaterHeater){
                                 SolveRoot(Acc,
                                           MaxIte,
@@ -10691,7 +10695,6 @@ namespace WaterThermalTanks {
         // par(3) = water heater num
         // par(4) = FirstHVACIteration
         // par(5) = MdotWater
-        // Par(6) = Desuperheater heat rate
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WaterThermalTankNum; // index of water heater
