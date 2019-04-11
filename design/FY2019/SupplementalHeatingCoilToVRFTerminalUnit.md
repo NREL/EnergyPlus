@@ -4,7 +4,7 @@ Add Supplemental Heating Coil to ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
 **Bereket Nigusse, FSEC**
 
  - 20 March 2019 - Original NFP
- - N/A - Revision
+ - 11 April 2019 - Revision NFP and Design Document
 
 ## Justification for New Feature ##
 
@@ -12,12 +12,11 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow currently does not support supplem
 
 
 ## E-mail and  Conference Call Conclusions ##
-N/A
+Tianzhen responded via email. See his email response at the end of the NFP section.
 
 
 ## Overview and Approach ##
-
-The arrangements shown in Figure 1 is supplemental heating coil placement for draw-though and blow-through supply fan placement configuration in VRF air terminal unit.
+The VRF air terminal unit is a compound ZoneHVAC object made up of other components. Each terminal unit consists of an outdoor air mixer, DX cooling coil, DX heating coil, supply air fan, and a supplemental heating coil as shown in figure 1. The arrangements shown in Figure 1 is supplemental heating coil placement for draw-though and blow-through supply fan placement configuration in VRF air terminal unit.
 
 ![Figure 1 VRF Air Terminal Unit with supplemental heating coil and draw-through and blow-through Fan Placement](VRFTerminalUnit_wSuppHeatCoil.png)
 
@@ -373,4 +372,195 @@ Transition rule is not required for `ZoneHVAC:TerminalUnit:VariableRefrigerantFl
 - N/A.
 
 
+## Email Communication ###
+Tianzhen: Your proposed two new fields require IDD transition changes. If they are to the end and optional, no IDF changes needed.
 
+```
+ Coil:Heating:Electric,      !- Supplemental Heating Coil Object Type
+    TU 1 VRF Supp HeatCoil,  !- Supplemental Heating Coil Name
+    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+```
+
+### End of NFP Section
+
+
+# Design Document #
+
+## Approach ##
+New variables and functions will be added to support supplemental heating coil for VRF air terminal unit.  The new functions will be designed to support OO programming implementation. 
+
+### Changes to the **HVACVariableRefrigerantFlow.cc** file
+ -Modifies the get input function **GetVRFInputData()** under HVACVariableRefrigerantFlow.cc module. Allow to read in four optional input variables to support the four heating coil types.
+
+ -If a supplemental heat coil is present, set a value for the supplemental heat coil load variable. The following code snippet is added to "ControlVRF()" and "ControlVRF_FluidTCtrl()" functions to set the supplemental heating coil load.
+
+
+        // set supplemental heating coil calculation if the condition requires
+        if (this->SuppHeatingCoilPresent) {
+            if (QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
+                LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
+                if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
+                    SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                    this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                    if (this->DesignSuppHeatingCapacity > 0.0) {
+                        this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                    }
+                } else {
+                    SuppHeatCoilLoad = 0.0;
+                    this->SuppHeatPartLoadRatio = 0.0;
+                }
+            } else {
+                SuppHeatCoilLoad = 0.0;
+                this->SuppHeatPartLoadRatio = 0.0;
+            }
+        }
+
+- 
+The following code snippet will be added to "CalcVRF()" and "CalcVRF_FluidTCtrl()" functions to run the supplemental heating coil, if the supplemental heating coil present. The supplemental heating capacity will be capped if the coil outlet air temperature exceeds user specified maximum supply air temperature.
+
+        // run supplemental heating coil
+        Real64 SuppPLR = this->SuppHeatPartLoadRatio;
+        if (this->SuppHeatingCoilPresent) {
+            this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
+            if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
+                // adjust the heating load to maximum allowed
+                Real64 MaxHeatCoilLoad =
+                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
+                SuppHeatCoilLoad = MaxHeatCoilLoad;
+            }
+        }
+
+
+
+- adds new function **VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil()** for managing the calculation of the heating coil types
+
+    void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(int const VRFTUNum,            // index of vrf terminal unit
+                                                          bool const FirstHVACIteration, // True when first HVAC iteration
+                                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
+                                                          Real64 &SuppCoilLoad           // supp heating coil load max (W)
+    )
+    {
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manages VRF terminal unit supplemental heaters simulation.
+
+        SuppHeatCoilLoad = 0.0;
+        
+        if (DataEnvironment::OutDryBulbTemp <= this->MaxOATSuppHeatingCoil) {
+            SuppHeatCoilLoad = SuppCoilLoad;
+        } 
+        {
+            // simulate gas, electric, hot water, and steam heating coils
+            auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
+            if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
+
+            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
+ 
+            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
+                //     simulate steam heating coil
+        }
+    }
+
+- adds new function **VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual()** for hot water coil load residual calculation
+
+    Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(Real64 const PartLoadFrac,
+    std::vector<Real64> const &Par)
+    {
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates supplemental hot water heating coils load fraction residual [(QActual - Load)/Load]
+        // hot water Coil output depends on the part load ratio which is being varied to drive the load
+        // fraction residual to zero.
+
+        // METHODOLOGY EMPLOYED:
+        // runs Coil:Heating:Water component object to get the actual heating load deleivered [W] at a
+        // given part load ratio and calculates the residual as defined above
+
+        // Return value
+        Real64 Residuum; // Residual to be minimized to zero
+
+        Real64 mdot = HVACVariableRefrigerantFlow::VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
+        DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+        WaterCoils::SimulateWaterCoilComponents(
+            VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, QActual, VRFTU(VRFTUNum).OpMode, PartLoadFrac);
+
+        if (std::abs(SuppHeatCoilLoad) == 0.0) {
+            Residuum = (QActual - SuppHeatCoilLoad) / 100.0;
+        } else {
+            Residuum = (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
+        }
+
+        return Residuum;
+    }
+
+- adds new function **VRFTerminalUnitEquipment::HeatingCoilCapacityLimit()** for heating coil capacity limit check based on maximum supply air temperature
+- these three new functions are member of "VRFTerminalUnitEquipment" struct
+
+
+    Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit( Real64 const HeatCoilAirInletNode, 
+                          Real64 const HeatCoilAirOutletNode, Real64 const HeatCoilMaxSATAllowed)
+    {
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates supplemental heating coils maximum heating capacity allowed based on the maximum
+        // supply air temperature limit specified.
+
+        // METHODOLOGY EMPLOYED:
+        // ( m_dot_air * Cp_air_avg * DeltaT_air_across_heating_coil) [W]
+
+        Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
+        Real64 CpAirIn =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
+        Real64 CpAirOut =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
+        Real64 CpAirAvg = (CpAirIn + CpAirOut) / 2;
+        Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
+        // Return value
+        return = MDotAir * CpAirAvg * HCDeltaT;
+    }
+
+- moves the following two functions as a member function to "VRFTerminalUnitEquipment" struct for OO programming implementation
+   **VRFTerminalUnitEquipment::ControlVRF()** 
+   **VRFTerminalUnitEquipment::CalcVRF()** 
+
+- adds the supplemental heating coil load variable "SuppHeatCoilLoad" as an argument to the following existing functions:
+   **VRFTerminalUnitEquipment::ControlVRF()** 
+   **VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl()** 
+   **VRFTerminalUnitEquipment::CalcVRF()** 
+   **VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl()** 
+   
+### Changes to the **HVACVariableRefrigerantFlow.hh** file
+The data structures of **VRFTerminalUnitEquipment()** will change to support the supplemental heating coils by adding the following member variables:
+
+     - adds  std::string **SuppHeatCoilType** object variable, type of supplemental heating coil
+     - adds  std::string **SuppHeatCoilName** object variable, name of supplemental heating coil
+     - adds  int **SuppHeatCoilAirInletNode** object variable, supplemental heating coil air inlet node
+     - adds  int **SuppHeatCoilAirOutletNode** object variable, supplemental heating coil air outlet node
+     - adds  int **SuppHeatCoilFluidInletNode** object variable, supplemental heating coil fluid inlet node
+     - adds  int **SuppHeatCoilFluidOutletNode** object variable, supplemental heating coil fluid outlet node
+     - adds  int **SuppHeatCoilLoopNum** object variable, supplemental heating coil plant loop index
+     - adds  int **SuppHeatCoilLoopSide** object variable, supplemental heating coil plant loop side
+     - adds  int **SuppHeatCoilBranchNum** object variable, supplemental heating coil plant loop branch index
+     - adds  int **SuppHeatCoilCompNum** object variable, supplemental heating coil plant component index
+     - adds  int **SuppHeatCoilIndex** object variable, index of supplemental heating coil
+     - adds  int **SuppHeatCoilType_Num** object variable, supplemental heating coil type
+     - adds  Real64 **SuppHeatCoilFluidMaxFlow** object variable, supplemental heating coil fluid (hot water or steam) maximum flow rate [kg/s]
+     - adds  Real64 **DesignSuppHeatingCapacity** object variable, supplemental heating coil design capacity  [W]
+     - adds  Real64 **MaxSATFromSuppHeatCoil** object variable, maximum supply air temperature from supplemental heating coil [C]
+     - adds  Real64 **MaxOATSuppHeatingCoil** object variable, maximum outdoor dry-bulb temperature for supplemental heating coil [C]
+     - adds  Real64 **SuppHeatPartLoadRatio** object variable, supplemental heating coil part load ratio
+     - adds  Real64 **SuppHeatingCoilLoad** object variable, supplemental heating coil heating load
+     - adds  bool **SuppHeatingCoilPresent ** object variable, FALSE if coil not present
+     - adds  bool **SuppHeatCoilRequestAutoSize** object variable, true if supplemental heating coils capacity is autosized
+
+### Other modules cc files change include:
+ - SteamCoils.cc
+   a local variable "MyOneTimeFlag" in InitSteamCoil() function moved as module variable and added to "clear_state" function to fix a failed unit test;
+
+ - EnergyPlusFixture.cc
+   added "SteamCoils::clear_state()" to EnergyPlusFixture module under "EnergyPlusFixture::clear_all_states" function to fix failed unit test
+
+### Unit Tests:
+ - adds unit tests to verify the modified get-input and the three new functions
+ 
