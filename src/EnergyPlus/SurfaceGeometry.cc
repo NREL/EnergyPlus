@@ -6948,14 +6948,14 @@ namespace SurfaceGeometry {
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (DataHeatBalance::AnyCondFD) {
-            AlgoName = "CondFD - ConductionFiniteDifference";
+        if (DataHeatBalance::AnyEMPD) {
+            AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
-        if (DataHeatBalance::AnyEMPD) {
-            AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
+        if (DataHeatBalance::AnyCondFD) {
+            AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
