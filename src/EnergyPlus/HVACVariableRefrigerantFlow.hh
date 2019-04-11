@@ -647,7 +647,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 SuppHeatCoilFluidMaxFlow;     // supplemental heating coil fluid (hot water or steam) maximum flow rate [kg/s]
         Real64 DesignSuppHeatingCapacity;    // supplemental heating coil design capacity  [W]
         Real64 MaxSATFromSuppHeatCoil;       // maximum supply air temperature from supplemental heating coil [C]
-        Real64 MaxOATSuppHeatingCoil;        // maximum outdoor dry-bulb temperature for supplemental heating coil
+        Real64 MaxOATSuppHeatingCoil;        // maximum outdoor dry-bulb temperature for supplemental heating coil [C]
         Real64 SuppHeatPartLoadRatio;        // supplemental heating coil part load ratio
         Real64 SuppHeatingCoilLoad;          // supplemental heating coil heating load
         int fanType_Num;                     // index to fan type
@@ -717,7 +717,7 @@ namespace HVACVariableRefrigerantFlow {
         bool firstPass;                   // used to reset global sizing data
         bool SuppHeatCoilRequestAutoSize; // true if supplemental heating coils capacity is autosized
         int SuppHeatCoilLoopNum;          // supplemental heating coil plant loop index
-        int SuppHeatCoilLoopSide;         // supplemental heating coil plant loop side
+        int SuppHeatCoilLoopSide;         // supplemental heating coil plant loop side index
         int SuppHeatCoilBranchNum;        // supplemental heating coil plant loop branch index
         int SuppHeatCoilCompNum;          // supplemental heating coil plant component index
 

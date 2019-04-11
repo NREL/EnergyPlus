@@ -6973,7 +6973,7 @@ namespace HVACVariableRefrigerantFlow {
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
             } else {
                 // Algorithm Type: VRF model based on system curve
-                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad, SuppHeatCoilLoad);
+                VRFTU(VRFTUNum).CalcVRF(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
             }
 
             //    ZoneEqDXCoil = .FALSE.
@@ -13619,6 +13619,7 @@ namespace HVACVariableRefrigerantFlow {
 
         Par.resize(4);
         QActual = 0.0;
+        PartLoadFrac = 0.0;
         SuppHeatCoilLoad = 0.0;
 
         // simulate gas, electric, hot water, and steam heating coils
@@ -13632,9 +13633,20 @@ namespace HVACVariableRefrigerantFlow {
             auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
 
             if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                HeatingCoils::SimulateHeatingCoilComponents(
-                    this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, _, true, this->OpMode, PartLoadRatio);
-
+                if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
+                    HeatingCoils::SimulateHeatingCoilComponents(this->SuppHeatCoilName,
+                                                                FirstHVACIteration,
+                                                                SuppHeatCoilLoad,
+                                                                this->SuppHeatCoilIndex,
+                                                                QActual,
+                                                                true,
+                                                                this->OpMode,
+                                                                PartLoadRatio);
+                } else {
+                    SuppHeatCoilLoad = QActual;
+                    this->SuppHeatPartLoadRatio = 0.0;
+                }
+                SuppHeatCoilLoad = QActual;
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                 if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
                     //     see if HW coil has enough capacity to meet the load
@@ -13712,7 +13724,7 @@ namespace HVACVariableRefrigerantFlow {
         // Real64 mdot = min(DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
         //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
 
-        Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
+        Real64 mdot = HVACVariableRefrigerantFlow::VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
         DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
         WaterCoils::SimulateWaterCoilComponents(
             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, QActual, VRFTU(VRFTUNum).OpMode, PartLoadFrac);
@@ -13737,21 +13749,21 @@ namespace HVACVariableRefrigerantFlow {
         // supply air temperature limit specified.
 
         // METHODOLOGY EMPLOYED:
-        // (uses supply air mass flow rate * average specific heat of supply air * supply air temperature difference across the heating coil) [W]
+        // ( m_dot_air * Cp_air_avg * DeltaT_air_across_heating_coil) [W]
 
         // Return value
-        Real64 HeatCoilCapacityMax; // heating coil maximum capacity that can be deleivered at current time [W]
+        Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
         Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
         Real64 CpAirIn =
             Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
         Real64 CpAirOut =
             Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
-        Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+        Real64 CpAirAvg = (CpAirIn + CpAirOut) / 2;
         Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        HeatCoilCapacityMax = MDotAir * (0.5 * (CpAirIn + CpAirOut)) * HCDeltaT;
+        HeatCoilCapacityAllowed = MDotAir * CpAirAvg * HCDeltaT;
 
-        return HeatCoilCapacityMax;
+        return HeatCoilCapacityAllowed;
     }
 
     // Clears the global data in HVACVariableRefrigerantFlow.

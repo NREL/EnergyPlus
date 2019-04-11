@@ -66,6 +66,7 @@
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
+#include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -81,11 +82,14 @@
 #include <HVACFan.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <HeatBalanceManager.hh>
+#include <HeatingCoils.hh>
 #include <OutputReportPredefined.hh>
 #include <Plant/PlantManager.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SizingManager.hh>
+#include <SteamCoils.hh>
+#include <WaterCoils.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -94,6 +98,7 @@ using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -109,6 +114,7 @@ using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACFan;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
+using namespace EnergyPlus::HeatingCoils;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PlantManager;
@@ -5778,5 +5784,1503 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HRCAPFTHeatConst
     EXPECT_EQ(HREIRAdjustment, VRF(VRFCond).HRCAPFTHeatConst);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilGetInput)
+{
+    // PURPOSE OF THE TEST:
+    // IDF Read in for the VRF terminal unit "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"
+    // verify if the supplemental heating coils are read correctly
+
+    std::string const idf_objects = delimited_string({
+
+        "  Zone,",
+        "    SPACE1-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    239.247360229;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE2-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    103.311355591;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE3-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    239.247360229;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE4-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    103.311355591;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE5-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    447.682556152;           !- Volume {m3}",
+
+        "  NodeList,",
+        "    SPACE1-1 In Nodes,       !- Name",
+        "    TU1 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE1-1 Out Nodes,      !- Name",
+        "    TU1 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE2-1 In Nodes,       !- Name",
+        "    TU2 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE2-1 Out Nodes,      !- Name",
+        "    TU2 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE3-1 In Nodes,       !- Name",
+        "    TU3 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE3-1 Out Nodes,      !- Name",
+        "    TU3 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE4-1 In Nodes,       !- Name",
+        "    TU4 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE4-1 Out Nodes,      !- Name",
+        "    TU4 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE5-1 In Nodes,       !- Name",
+        "    TU5 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE5-1 Out Nodes,      !- Name",
+        "    TU5 Inlet Node;          !- Node 1 Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE1-1,                !- Zone Name",
+        "    SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE1-1 Node,           !- Zone Air Node Name",
+        "    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE2-1,                !- Zone Name",
+        "    SPACE2-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE2-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE2-1 Node,           !- Zone Air Node Name",
+        "    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE3-1,                !- Zone Name",
+        "    SPACE3-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE3-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE3-1 Node,           !- Zone Air Node Name",
+        "    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE4-1,                !- Zone Name",
+        "    SPACE4-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE4-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE4-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE4-1 Node,           !- Zone Air Node Name",
+        "    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE5-1,                !- Zone Name",
+        "    SPACE5-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE5-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE5-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE5-1 Node,           !- Zone Air Node Name",
+        "    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE1-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU1,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE2-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU2,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE3-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU3,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE4-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU4,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE5-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU5,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  AirConditioner:VariableRefrigerantFlow,",
+        "    VRF Heat Pump,           !- Heat Pump Name",
+        "    ,                        !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "    -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "    3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "    20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "    0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "    SPACE1-1,                !- Zone Name for Master Thermostat Location",
+        "    LoadPriority,            !- Master Thermostat Priority Control Type",
+        "    ,                        !- Thermostat Priority Schedule Name",
+        "    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "    No,                      !- Heat Pump Waste Heat Recovery",
+        "    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "    10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "    -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "    ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "    ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "    15,                      !- Crankcase Heater Power per Compressor {W}",
+        "    3,                       !- Number of Compressors {dimensionless}",
+        "    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "    7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    Timed,                   !- Defrost Control",
+        "    ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "    autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "    7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "    AirCooled,               !- Condenser Type",
+        "    MyVRFOANode,             !- Condenser Inlet Node Name",
+        "    ,                        !- Condenser Outlet Node Name",
+        "    ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "    ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    ,                        !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    Electricity;             !- Fuel Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFT,            !- Name",
+        "    0.576882692,             !- Coefficient1 Constant",
+        "    0.017447952,             !- Coefficient2 x",
+        "    0.000583269,             !- Coefficient3 x**2",
+        "    -1.76324E-06,            !- Coefficient4 y",
+        "    -7.474E-09,              !- Coefficient5 y**2",
+        "    -1.30413E-07,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolCapFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    11,                      !- Minimum Value of x",
+        "    30,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFTHi,          !- Name",
+        "    0.6867358,               !- Coefficient1 Constant",
+        "    0.0207631,               !- Coefficient2 x",
+        "    0.0005447,               !- Coefficient3 x**2",
+        "    -0.0016218,              !- Coefficient4 y",
+        "    -4.259E-07,              !- Coefficient5 y**2",
+        "    -0.0003392,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFT,            !- Name",
+        "    0.989010541,             !- Coefficient1 Constant",
+        "    -0.02347967,             !- Coefficient2 x",
+        "    0.000199711,             !- Coefficient3 x**2",
+        "    0.005968336,             !- Coefficient4 y",
+        "    -1.0289E-07,             !- Coefficient5 y**2",
+        "    -0.00015686,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolEIRFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFTHi,          !- Name",
+        "    0.14351470,              !- Coefficient1 Constant",
+        "    0.01860035,              !- Coefficient2 x",
+        "    -0.0003954,              !- Coefficient3 x**2",
+        "    0.02485219,              !- Coefficient4 y",
+        "    0.00016329,              !- Coefficient5 y**2",
+        "    -0.0006244,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    CoolingEIRLowPLR,        !- Name",
+        "    0.4628123,               !- Coefficient1 Constant",
+        "    -1.0402406,              !- Coefficient2 x",
+        "    2.17490997,              !- Coefficient3 x**2",
+        "    -0.5974817,              !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    CoolingEIRHiPLR,         !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Linear,",
+        "    CoolingCombRatio,        !- Name",
+        "    0.618055,                !- Coefficient1 Constant",
+        "    0.381945,                !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    1.0,                     !- Minimum Curve Output",
+        "    1.2,                     !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  CURVE:QUADRATIC,",
+        "    VRFCPLFFPLR,             !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0,                     !- Maximum Value of x",
+        "    0.85,                    !- Minimum Curve Output",
+        "    1.0,                     !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFT,            !- Name",
+        "    1.014599599,             !- Coefficient1 Constant",
+        "    -0.002506703,            !- Coefficient2 x",
+        "    -0.000141599,            !- Coefficient3 x**2",
+        "    0.026931595,             !- Coefficient4 y",
+        "    1.83538E-06,             !- Coefficient5 y**2",
+        "    -0.000358147,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatCapFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFTHi,          !- Name",
+        "    1.161134821,             !- Coefficient1 Constant",
+        "    0.027478868,             !- Coefficient2 x",
+        "    -0.00168795,             !- Coefficient3 x**2",
+        "    0.001783378,             !- Coefficient4 y",
+        "    2.03208E-06,             !- Coefficient5 y**2",
+        "    -6.8969E-05,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFT,            !- Name",
+        "    0.87465501,              !- Coefficient1 Constant",
+        "    -0.01319754,             !- Coefficient2 x",
+        "    0.00110307,              !- Coefficient3 x**2",
+        "    -0.0133118,              !- Coefficient4 y",
+        "    0.00089017,              !- Coefficient5 y**2",
+        "    -0.00012766,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    12,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatEIRFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Curve Output",
+        "    15,                      !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFTHi,          !- Name",
+        "    2.504005146,             !- Coefficient1 Constant",
+        "    -0.05736767,             !- Coefficient2 x",
+        "    4.07336E-05,             !- Coefficient3 x**2",
+        "    -0.12959669,             !- Coefficient4 y",
+        "    0.00135839,              !- Coefficient5 y**2",
+        "    0.00317047,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HeatingEIRLowPLR,        !- Name",
+        "    0.1400093,               !- Coefficient1 Constant",
+        "    0.6415002,               !- Coefficient2 x",
+        "    0.1339047,               !- Coefficient3 x**2",
+        "    0.0845859,               !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    HeatingEIRHiPLR,         !- Name",
+        "    2.4294355,               !- Coefficient1 Constant",
+        "    -2.235887,               !- Coefficient2 x",
+        "    0.8064516,               !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Linear,",
+        "    HeatingCombRatio,        !- Name",
+        "    0.96034,                 !- Coefficient1 Constant",
+        "    0.03966,                 !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    1.0,                     !- Minimum Curve Output",
+        "    1.023,                   !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    CoolingLengthCorrectionFactor,  !- Name",
+        "    1.0693794,               !- Coefficient1 Constant",
+        "    -0.0014951,              !- Coefficient2 x",
+        "    2.56E-06,                !- Coefficient3 x**2",
+        "    -0.1151104,              !- Coefficient4 y",
+        "    0.0511169,               !- Coefficient5 y**2",
+        "    -0.0004369,              !- Coefficient6 x*y",
+        "    8,                       !- Minimum Value of x",
+        "    175,                     !- Maximum Value of x",
+        "    0.5,                     !- Minimum Value of y",
+        "    1.5,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "  NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    Outside Air Inlet Node 1,!- Node 1 Name",
+        "    Outside Air Inlet Node 2,!- Node 2 Name",
+        "    Outside Air Inlet Node 3,!- Node 3 Name",
+        "    Outside Air Inlet Node 4,!- Node 4 Name",
+        "    Outside Air Inlet Node 5,!- Node 5 Name",
+        "    MyVRFOANode;             !- Node 6 Name",
+
+        "  ZoneTerminalUnitList,",
+        "    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "    TU3,                     !- Zone Terminal Unit Name 1",
+        "    TU4,                     !- Zone Terminal Unit Name 2",
+        "    TU1,                     !- Zone Terminal Unit Name 3",
+        "    TU2,                     !- Zone Terminal Unit Name 4",
+        "    TU5;                     !- Zone Terminal Unit Name 5",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU1,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU1 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type",
+        "    TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU2,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU2 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU2 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU2 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU2 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU2 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU2 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
+        "    TU2 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU3,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU3 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU3 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU3 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU3 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU3 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU3 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Water,      !- Supplemental Heating Coil Object Type",
+        "    TU3 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU4,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU4 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU4 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU4 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU4 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU4 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU4 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
+        "    TU4 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU5,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU5 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU5 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU5 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU5 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU5 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU5 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Steam,      !- Supplemental Heating Coil Object Type",
+        "    TU5 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  Schedule:Compact,",
+        "    VRFAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  Fan:SystemModel,",
+        "    TU1 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU2 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU2 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU3 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU3 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU3 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU4 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU4 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU4 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU5 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU5 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  OutdoorAir:Mixer,",
+        "    TU1 OA Mixer,            !- Name",
+        "    TU1 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+        "    TU1 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU2 OA Mixer,            !- Name",
+        "    TU2 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 2,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 2,!- Relief Air Stream Node Name",
+        "    TU2 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU3 OA Mixer,            !- Name",
+        "    TU3 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 3,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 3,!- Relief Air Stream Node Name",
+        "    TU3 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU4 OA Mixer,            !- Name",
+        "    TU4 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 4,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 4,!- Relief Air Stream Node Name",
+        "    TU4 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU5 OA Mixer,            !- Name",
+        "    TU5 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 5,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 5,!- Relief Air Stream Node Name",
+        "    TU5 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU1 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU2 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU2 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU3 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU3 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU3 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU4 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU4 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU4 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU5 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU5 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU5 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU1 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU2 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU2 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU3 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU3 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU3 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU4 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU4 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU4 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU5 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU5 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU5 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  Curve:Cubic,",
+        "    VRFTUCoolCapFT,          !- Name",
+        "    0.504547273506488,       !- Coefficient1 Constant",
+        "    0.0288891279198444,      !- Coefficient2 x",
+        "    -0.000010819418650677,   !- Coefficient3 x**2",
+        "    0.0000101359395177008,   !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFTUHeatCapFT,          !- Name",
+        "    -0.390708928227928,      !- Coefficient1 Constant",
+        "    0.261815023760162,       !- Coefficient2 x",
+        "    -0.0130431603151873,     !- Coefficient3 x**2",
+        "    0.000178131745997821,    !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    VRFACCoolCapFFF,         !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Coil:Heating:Electric,",
+        "    TU1 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    0.99,                    !- Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU1 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU1 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Fuel,",
+        "    TU2 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Burner Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU2 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU2 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Water,",
+        "    TU3 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- U-Factor Times Area Value {W/K}",
+        "    autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "    TU3HWHeatCoilInletNode,  !- Water Inlet Node Name",
+        "    TU3HWHeatCoilOutletNode, !- Water Outlet Node Name",
+        "    TU3 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU3 Outlet Node,         !- Air Outlet Node Name",
+        "    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "    autosize,                !- Rated Capacity {W}",
+        "    82.2,                    !- Rated Inlet Water Temperature {C}",
+        "    16.6,                    !- Rated Inlet Air Temperature {C}",
+        "    71.1,                    !- Rated Outlet Water Temperature {C}",
+        "    32.2,                    !- Rated Outlet Air Temperature {C}",
+        "    ;                        !- Rated Ratio for Air and Water Convection",
+
+        "  Coil:Heating:Fuel,",
+        "    TU4 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Burner Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU4 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU4 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Steam,",
+        "    TU5 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Maximum Steam Flow Rate {m3/s}",
+        "    5.0,                     !- Degree of SubCooling {C}",
+        "    15.0,                    !- Degree of Loop SubCooling {C}",
+        "    TU5 Steam Coil Inlet Node,  !- Water Inlet Node Name",
+        "    TU5 Steam Coil Outlet Node,  !- Water Outlet Node Name",
+        "    TU5 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU5 Outlet Node,         !- Air Outlet Node Name",
+        "    ZoneLoadControl;         !- Coil Control Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // get zone data
+    bool ErrorsFound(false);
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // read equip list and connections
+    GetZoneEquipmentData();
+    // get VRF terminal unit
+    GetVRFInput();
+
+    auto &VRFTU_1(VRFTU(1));
+    // Check the results
+    EXPECT_EQ(VRFTU_1.Name, "TU1");
+    EXPECT_EQ(VRFTU_1.SuppHeatCoilType, "COIL:HEATING:ELECTRIC");
+    EXPECT_EQ(VRFTU_1.SuppHeatCoilName, "TU1 SUPP HEATING COIL");
+
+    auto &VRFTU_2(VRFTU(2));
+    // Check the results
+    EXPECT_EQ(VRFTU_2.Name, "TU2");
+    EXPECT_EQ(VRFTU_2.SuppHeatCoilType, "COIL:HEATING:FUEL");
+    EXPECT_EQ(VRFTU_2.SuppHeatCoilName, "TU2 SUPP HEATING COIL");
+
+    auto &VRFTU_3(VRFTU(3));
+    // Check the results
+    EXPECT_EQ(VRFTU_3.Name, "TU3");
+    EXPECT_EQ(VRFTU_3.SuppHeatCoilType, "COIL:HEATING:WATER");
+    EXPECT_EQ(VRFTU_3.SuppHeatCoilName, "TU3 SUPP HEATING COIL");
+
+    auto &VRFTU_4(VRFTU(4));
+    // Check the results
+    EXPECT_EQ(VRFTU_4.Name, "TU4");
+    EXPECT_EQ(VRFTU_4.SuppHeatCoilType, "COIL:HEATING:FUEL");
+    EXPECT_EQ(VRFTU_4.SuppHeatCoilName, "TU4 SUPP HEATING COIL");
+
+    auto &VRFTU_5(VRFTU(5));
+    // Check the results
+    EXPECT_EQ(VRFTU_5.Name, "TU5");
+    EXPECT_EQ(VRFTU_5.SuppHeatCoilType, "COIL:HEATING:STEAM");
+    EXPECT_EQ(VRFTU_5.SuppHeatCoilName, "TU5 SUPP HEATING COIL");
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental electric heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU1";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
+    thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+
+    int CoilNum(1);
+    DataLoopNode::Node.allocate(2);
+    HeatingCoils::NumHeatingCoils = 1;
+    HeatingCoils::GetCoilsInputFlag = false;
+    HeatingCoils::HeatingCoil.allocate(NumHeatingCoils);
+    HeatingCoils::CoilIsSuppHeater = true;
+    HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Electricity;
+    HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
+    HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn; // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
+    HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
+    HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
+    HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
+
+    SysSizingCalc = true;
+    DataEnvironment::OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp, DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).ElecUseRate);
+    // test heating load larger than coil nominal capacity
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heat cannot exceed coil capacity
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).ElecUseRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental natural gas heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU2";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:FUEL";
+    thisVRFTU.SuppHeatCoilName = "TU2 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+
+    int CoilNum(1);
+    DataLoopNode::Node.allocate(2);
+    HeatingCoils::NumHeatingCoils = 1;
+    HeatingCoils::GetCoilsInputFlag = false;
+    HeatingCoils::HeatingCoil.allocate(NumHeatingCoils);
+    HeatingCoils::CoilIsSuppHeater = true;
+    HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
+    HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn; // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
+    HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
+    HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
+    HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
+
+    SysSizingCalc = true;
+    DataEnvironment::OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp, DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).FuelUseRate);
+    // test heating load larger than coil nominal capacity
+    DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heat cannot exceed coil capacity
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).FuelUseRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental hot water heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU3";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:WATER";
+    thisVRFTU.SuppHeatCoilName = "TU3 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+    thisVRFTU.SuppHeatCoilFluidInletNode = 3;
+    thisVRFTU.SuppHeatCoilFluidOutletNode = 4;
+    thisVRFTU.SuppHeatCoilFluidMaxFlow = 1.0;
+
+    int CoilNum(1);
+    DataLoopNode::Node.allocate(4);
+    WaterCoils::NumWaterCoils = 1;
+    WaterCoils::WaterCoil.allocate(WaterCoils::NumWaterCoils);
+    WaterCoils::WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num = WaterCoils::WaterCoil_SimpleHeating;
+    WaterCoils::WaterCoil(CoilNum).WaterCoilModel = WaterCoils::CoilType_Heating;
+    WaterCoils::WaterCoil(CoilNum).WaterCoilType = WaterCoils::CoilType_Heating;
+    WaterCoils::WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
+    WaterCoils::WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    WaterCoils::WaterCoil(CoilNum).WaterLoopNum = 1;
+
+    // WaterCoils::WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    WaterCoils::WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    WaterCoils::WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+
+    WaterCoils::WaterCoil(CoilNum).UACoil = 1000;
+    WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.001;
+
+    WaterCoils::GetWaterCoilsInputFlag = false;
+
+    WaterCoils::WaterCoil(CoilNum).WaterLoopNum = 1;
+    WaterCoils::WaterCoil(CoilNum).WaterLoopSide = 1;
+    WaterCoils::WaterCoil(CoilNum).WaterLoopBranchNum = 1;
+    WaterCoils::WaterCoil(CoilNum).WaterLoopCompNum = 1;
+
+    NumPltSizInput = 1;
+    PlantSizData.allocate(NumPltSizInput);
+    PlantSizData(NumPltSizInput).PlantLoopName = "HotWaterLoop";
+    PlantSizData(NumPltSizInput).ExitTemp = 60.0; // hot water coil inlet water temp
+    PlantSizData(NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
+
+    // set up plant loop
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(1).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(1).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    PlantLoop(1).Name = "HotWaterLoop";
+    PlantLoop(1).FluidName = "WATER";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoils::WaterCoil(CoilNum).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoils::WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoils::WaterCoil(1).WaterInletNodeNum;
+    WaterCoils::CheckEquipName.dimension(WaterCoils::NumWaterCoils, true);
+
+    WaterCoils::MyUAAndFlowCalcFlag.allocate(CoilNum);
+    WaterCoils::MyUAAndFlowCalcFlag(CoilNum) = true;
+    WaterCoils::MySizeFlag.allocate(CoilNum);
+    WaterCoils::MySizeFlag(CoilNum) = true;
+
+    DataGlobals::DoingSizing = true;
+    SysSizingCalc = true;
+    DataEnvironment::OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Temp,
+                                   DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).Temp = 60.0;
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+
+    VRFTU.allocate(VRFTUNum);
+    VRFTU(VRFTUNum) = thisVRFTU;
+
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_NEAR(10000.0, SuppHeatCoilLoad, 5.0);
+    EXPECT_NEAR(10000.0, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+    // test larger heating load
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heating capacity
+    EXPECT_NEAR(12000.0, SuppHeatCoilLoad, 5.0);
+    EXPECT_NEAR(12000.0, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental steam heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU4";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:STEAM";
+    thisVRFTU.SuppHeatCoilName = "TU4 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+    thisVRFTU.SuppHeatCoilFluidMaxFlow = 0.001;
+    thisVRFTU.SuppHeatCoilFluidInletNode = 3;
+    thisVRFTU.SuppHeatCoilFluidOutletNode = 4;
+
+    int CoilNum(1);
+    DataLoopNode::Node.allocate(4);
+    SteamCoils::NumSteamCoils = 1;
+    SteamCoils::SteamCoil.allocate(SteamCoils::NumSteamCoils);
+    SteamCoils::SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    SteamCoils::SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
+    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
+    SteamCoils::SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
+    SteamCoils::SteamCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    SteamCoils::SteamCoil(CoilNum).InletSteamTemp = 100.0;
+    SteamCoils::SteamCoil(CoilNum).InletSteamPress = 101325.0;
+    SteamCoils::SteamCoil(CoilNum).DegOfSubcooling = 0.0;
+
+    SteamCoils::SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    SteamCoils::SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    SteamCoils::SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+    SteamCoils::SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
+    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
+    SteamCoils::SteamCoil(CoilNum).LoopSide = 1;
+    SteamCoils::SteamCoil(CoilNum).BranchNum = 1;
+    SteamCoils::SteamCoil(CoilNum).CompNum = 1;
+    SteamCoils::SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
+    SteamCoils::SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
+    SteamCoils::GetSteamCoilsInputFlag = false;
+    SteamCoils::CheckEquipName.dimension(SteamCoils::NumSteamCoils, true);
+    SteamCoils::MySizeFlag.allocate(CoilNum);
+    SteamCoils::MySizeFlag(CoilNum) = true;
+
+    NumPltSizInput = 1;
+    PlantSizData.allocate(NumPltSizInput);
+    PlantSizData(NumPltSizInput).PlantLoopName = "SteamLoop";
+    // set up plant loop
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(1).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(1).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    PlantLoop(1).Name = "SteamLoop";
+    PlantLoop(1).FluidName = "STEAM";
+    PlantLoop(1).FluidIndex = SteamCoils::SteamIndex;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoils::SteamCoil(CoilNum).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum;
+
+    SysSizingCalc = true;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataEnvironment::OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp,
+                                   DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+
+    bool FirstHVACIteration(true);
+    Real64 SuppHeatCoilLoad = 20000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check heating load delivered
+    EXPECT_DOUBLE_EQ(20000.0, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(20000.0, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(20311.199999999997, SteamCoils::SteamCoil(CoilNum).OperatingCapacity);
+
+    // testing heating load larger than available capacity
+    SuppHeatCoilLoad = 24000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heating load can not exceed available operating capacity
+    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
+{
+    // PURPOSE OF THE TEST:
+    // heating capacity limit calculation based on maximum supply air temperature
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    thisVRFTU.Name = "TU1";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
+    thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
+
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+
+    DataLoopNode::Node.allocate(2);
+    HeatingCoils::HeatingCoil.allocate(1);
+    HeatingCoils::HeatingCoil(1).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    HeatingCoils::HeatingCoil(1).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+
+    DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).MassFlowRate = 1.0;
+    DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).Temp = 20.0;
+    DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).HumRat = 0.0070;
+    DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).Temp, DataLoopNode::Node(thisVRFTU.SuppHeatCoilAirInletNode).HumRat);
+
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    Real64 ExpectedResult = 1.0 * 1017.8526499999862 * 30.0; // m_dot * Cp_avg * DeltaT
+
+    Real64 SuppHeatCoilCapMax =
+        thisVRFTU.HeatingCoilCapacityLimit(thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.SuppHeatCoilAirOutletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
+
+    EXPECT_EQ(ExpectedResult, SuppHeatCoilCapMax);
 }
 }

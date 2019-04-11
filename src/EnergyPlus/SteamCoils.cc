@@ -138,6 +138,7 @@ namespace SteamCoils {
     Array1D_bool CoilWarningOnceFlag;
     Array1D_bool CheckEquipName;
     bool GetSteamCoilsInputFlag(true); // Flag set to make sure you get input once
+    bool MyOneTimeFlag(true);          // one time initialization flag
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -163,6 +164,7 @@ namespace SteamCoils {
     void clear_state()
     {
         NumSteamCoils = 0;
+        MyOneTimeFlag = true;
         GetSteamCoilsInputFlag = true;
         SteamCoil.deallocate();
         MySizeFlag.deallocate();
@@ -516,7 +518,6 @@ namespace SteamCoils {
         int AirOutletNode;
         Real64 SteamDensity;
         Real64 StartEnthSteam;
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
         bool errFlag;
