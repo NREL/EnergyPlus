@@ -1,5 +1,6 @@
 #include <cassert>
 #include <memory>
+#include <stdexcept>
 
 #include "VenetianCellDescription.hpp"
 #include "VenetianSlat.hpp"
