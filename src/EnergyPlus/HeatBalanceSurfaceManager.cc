@@ -6109,10 +6109,12 @@ namespace HeatBalanceSurfaceManager {
                 // calculate the inside surface moisture transfer conditions
                 // check for saturation conditions of air
                 Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
-                RhoVaporAirIn(SurfNum) =
-                    min(PsyRhovFnTdbWPb_fast(MAT_zone, ZoneAirHumRat_zone, OutBaroPress), PsyRhovFnTdbRh(MAT_zone, 1.0, HBSurfManInsideSurf));
-                HMassConvInFD(SurfNum) = HConvIn_surf / (PsyRhoAirFnPbTdbW_fast(OutBaroPress, MAT_zone, ZoneAirHumRat_zone) *
-                                                         PsyCpAirFnWTdb_fast(ZoneAirHumRat_zone, MAT_zone));
+                if ((surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) || (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT)) {
+                    RhoVaporAirIn(SurfNum) =
+                        min(PsyRhovFnTdbWPb_fast(MAT_zone, ZoneAirHumRat_zone, OutBaroPress), PsyRhovFnTdbRh(MAT_zone, 1.0, HBSurfManInsideSurf));
+                    HMassConvInFD(SurfNum) = HConvIn_surf / (PsyRhoAirFnPbTdbW_fast(OutBaroPress, MAT_zone, ZoneAirHumRat_zone) *
+                                                             PsyCpAirFnWTdb_fast(ZoneAirHumRat_zone, MAT_zone));
+                }
 
                 // Perform heat balance on the inside face of the surface ...
                 // The following are possibilities here:
@@ -6516,26 +6518,6 @@ namespace HeatBalanceSurfaceManager {
                 TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
                 TempSurfOut(SurfNum) = TH11; // For reporting
 
-                // sign convention is positive means energy going into inside face from the air.
-                auto const HConvInTemp_fac(-HConvIn_surf * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum)));
-                QdotConvInRep(SurfNum) = surface.Area * HConvInTemp_fac;
-                QdotConvInRepPerArea(SurfNum) = HConvInTemp_fac;
-                QConvInReport(SurfNum) = QdotConvInRep(SurfNum) * TimeStepZoneSec;
-
-                // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
-                // sizing for both the normal and pulse cases so that load components can be derived later.
-                if (ZoneSizingCalc && CompLoadReportIsReq) {
-                    if (!WarmupFlag) {
-                        TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                        if (isPulseZoneSizing) {
-                            OutputReportTabular::loadConvectedWithPulse(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotConvInRep(SurfNum);
-                        } else {
-                            OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotConvInRep(SurfNum);
-                            OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadNetSurfInRep(SurfNum);
-                        }
-                    }
-                }
-
                 if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                     // Tubular daylighting devices are treated as one big object with an effective R value.
                     // The outside face temperature of the TDD:DOME and the inside face temperature of the
@@ -6645,6 +6627,30 @@ namespace HeatBalanceSurfaceManager {
             }
 
         } // ...end of main inside heat balance DO loop (ends when Converged)
+
+        for (std::vector<int>::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate) {
+            int surfNum = HTSurfToResimulate[iHTSurfToResimulate]; // Heat transfer surfaces only
+            // sign convention is positive means energy going into inside face from the air.
+            auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
+            QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
+            QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
+            QConvInReport(surfNum) = QdotConvInRep(surfNum) * TimeStepZoneSec;
+
+            // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
+            // sizing for both the normal and pulse cases so that load components can be derived later.
+            if (ZoneSizingCalc && CompLoadReportIsReq) {
+                if (!WarmupFlag) {
+                    TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    if (isPulseZoneSizing) {
+                        OutputReportTabular::loadConvectedWithPulse(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                    }
+                    else {
+                        OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) = QdotRadNetSurfInRep(surfNum);
+                    }
+                }
+            }
+        }
 
         // Update SumHmXXXX
         if (DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
