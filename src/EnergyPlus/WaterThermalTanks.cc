@@ -10699,7 +10699,6 @@ namespace WaterThermalTanks {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WaterThermalTankNum; // index of water heater
         Real64 NewTankTemp;      // resulting tank temperature [C]
-        Real64 QHeatRate;       //Desuperheater heat rate
         bool FirstHVACIteration; // FirstHVACIteration flag
 
         WaterThermalTankNum = int(Par(3));
