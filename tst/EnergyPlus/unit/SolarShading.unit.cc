@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version, 9.1;                                                                      ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
