@@ -8309,7 +8309,6 @@ namespace WaterThermalTanks {
                 auto &node = Tank.Node[i];
                 node.Temp = Tfinal[i];
                 node.TempSum += Tavg[i] * dt;
-            SourceInletTempSum += Tank.SourceInletTemp * dt;
                 // Bookkeeping for reporting variables, mostly for Qunmet.
                 Real64 Qloss_node = (Tank.AmbientTemp - Tavg[i]);
                 Real64 Qheat_node = 0.0;
@@ -8343,6 +8342,7 @@ namespace WaterThermalTanks {
                 const Real64 Qunmet_node = max(Qneeded_node - Qheater1 - Qheater2, 0.0);
                 Eunmet += Qunmet_node * dt;
             }
+            SourceInletTempSum += Tank.SourceInletTemp * dt;
             // More bookkeeping for reporting variables
             Eloss += Qloss * dt;
             const Real64 Quse = (Tank.UseOutletStratNode > 0)
@@ -8930,26 +8930,14 @@ namespace WaterThermalTanks {
                                 Par(4) = 0.0;
                             }
                             Par(5) = MdotWater;
-                            if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedWaterHeater){
-                            SolveRoot(Acc,
-                                      MaxIte,
-                                      SolFla,
-                                      PartLoadRatio,
-                                      PLRResidualMixedTank,
-                                      0.0,
-                                      WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                      Par);
-                            }
-                            else{
                             SolveRoot(Acc,
                                         MaxIte,
                                         SolFla,
                                         PartLoadRatio,
-                                        PLRResidualStratifiedTank,
+                                        PLRResidualWaterThermalTank,
                                         0.0,
                                         WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                        Par);
-                            }
+                                        Par);  
                             if (SolFla == -1) {
                                 ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
@@ -9054,26 +9042,14 @@ namespace WaterThermalTanks {
                                     Par(4) = 0.0;
                                 }
                                 Par(5) = MdotWater;
-                                if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedWaterHeater){
                                 SolveRoot(Acc,
                                           MaxIte,
                                           SolFla,
                                           PartLoadRatio,
-                                          PLRResidualMixedTank,
+                                          PLRResidualWaterThermalTank,
                                           0.0,
                                           WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                          Par);
-                                }
-                                else{
-                                SolveRoot(Acc,
-                                          MaxIte,
-                                          SolFla,
-                                          PartLoadRatio,
-                                          PLRResidualStratifiedTank,
-                                          0.0,
-                                          WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                          Par);
-                                }
+                                          Par);                         
                                 if (SolFla == -1) {
                                     ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                     strip(IterNum);
@@ -10624,7 +10600,7 @@ namespace WaterThermalTanks {
         return PLRResidualIterSpeed;
     }
 
-    Real64 PLRResidualMixedTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     )
     {
@@ -10643,7 +10619,7 @@ namespace WaterThermalTanks {
         //  and calculates the residual as defined above
 
         // Return value
-        Real64 PLRResidualMixedTank;
+        Real64 PLRResidualWaterThermalTank;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10662,54 +10638,10 @@ namespace WaterThermalTanks {
         WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = Par(5) * HPPartLoadRatio;
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
         FirstHVACIteration = (Par(4) == 1.0);
-        CalcWaterThermalTankMixed(WaterThermalTankNum);
+        CalcWaterThermalTank(WaterThermalTankNum);
         NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-        PLRResidualMixedTank = Par(1) - NewTankTemp;
-        return PLRResidualMixedTank;
-    }
-
-    Real64 PLRResidualStratifiedTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                     Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (desired tank temp - actual tank temp)
-        //  Stratified water heater output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcWaterThermalTankStratified to get tank temperature at the given part load ratio (source water mass flow rate)
-        //  and calculates the residual as defined above
-
-        // Return value
-        Real64 PLRResidualStratifiedTank;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = tank mode
-        // par(3) = water heater num
-        // par(4) = FirstHVACIteration
-        // par(5) = MdotWater
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WaterThermalTankNum; // index of water heater
-        Real64 NewTankTemp;      // resulting tank temperature [C]
-        bool FirstHVACIteration; // FirstHVACIteration flag
-
-        WaterThermalTankNum = int(Par(3));
-        WaterThermalTank(WaterThermalTankNum).Mode = int(Par(2));
-        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = Par(5) * HPPartLoadRatio;
-        // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-        FirstHVACIteration = (Par(4) == 1.0);
-        CalcWaterThermalTankStratified(WaterThermalTankNum);
-        NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-        PLRResidualStratifiedTank = Par(1) - NewTankTemp;
-        return PLRResidualStratifiedTank;
+        PLRResidualWaterThermalTank = Par(1) - NewTankTemp;
+        return PLRResidualWaterThermalTank;
     }
 
     Real64 PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1<Real64> const &Par)
