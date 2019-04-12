@@ -1099,6 +1099,8 @@ namespace DataSurfaces {
         int WindowModelType;           // if set to WindowBSDFModel, then uses BSDF methods
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 
+        int TDDPipeNum; // Tubular daylighting device pipe number for TDD domes and diffusers
+
         // Default Constructor
         SurfaceWindowCalc()
             : ShadingFlag(ShadeOff), ShadingFlagEMSOn(false), ShadingFlagEMSValue(0), StormWinFlag(-1), StormWinFlagPrevDay(-1),
@@ -1132,7 +1134,7 @@ namespace DataSurfaces {
               GndSolarInc(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
               LightWellEff(1.0), SolarDiffusing(false), BmSolRefldInsRevealRepEnergy(0.0), BmSolRefldOutsRevealRepEnergy(0.0),
               BmSolTransThruIntWinRepEnergy(0.0), FrameHeatGain(0.0), DividerHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
-              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel)
+              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {
         }
 

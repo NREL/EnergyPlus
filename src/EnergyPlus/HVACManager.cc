@@ -2275,7 +2275,7 @@ namespace HVACManager {
 
                 DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
                 if (DataSurfaces::SurfaceWindow(surfNum).OriginalClass == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
-                    int pipeNum = DaylightingDevices::FindTDDPipe(surfNum);
+                    int pipeNum =DataSurfaces::SurfaceWindow(surfNum).TDDPipeNum;
                     DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
                     DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
                 }

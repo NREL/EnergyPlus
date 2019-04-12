@@ -2216,7 +2216,6 @@ namespace HeatBalanceSurfaceManager {
         using General::InterpSw;
         using General::POLYF;
         using namespace DataDaylightingDevices;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
@@ -2651,7 +2650,7 @@ namespace HeatBalanceSurfaceManager {
                 if (Surface(SurfNum).ExtSolar || SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
 
                     if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
-                        PipeNum = FindTDDPipe(SurfNum);
+                        PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
                         SurfNum2 = TDDPipe(PipeNum).Dome;
 
                         CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
@@ -5878,7 +5877,6 @@ namespace HeatBalanceSurfaceManager {
         using ConvectionCoefficients::SetExtConvectionCoeff;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DaylightingDevices::FindTDDPipe;
         using General::RoundSigDigits;
         using namespace Psychrometrics;
         using DataSizing::CurOverallSimDay;
@@ -5915,14 +5913,10 @@ namespace HeatBalanceSurfaceManager {
 
         int OtherSideSurfNum;     // Surface number index for other side of an interzone partition
         static int MinIterations; // Minimum number of iterations for the inside heat balance
-        //  CHARACTER(len=25):: ErrMsg
-        //  CHARACTER(len=5) :: TimeStmp
         static int ErrCount(0);
-        int SurfNum2; // TDD:DIFFUSER object number
         Real64 Ueff;  // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 
         int ZoneEquipConfigNum;
-        //  LOGICAL           :: ControlledZoneAirFlag
         int NodeNum;
         Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
         Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
@@ -5931,7 +5925,6 @@ namespace HeatBalanceSurfaceManager {
         Real64 CpAir;
         static Array1D<Real64> RefAirTemp; // reference air temperatures
         static bool MyEnvrnFlag(true);
-        //  LOGICAL, SAVE     :: DoThisLoop
         static int InsideSurfErrCount(0);
         Real64 Wsurf;         // Moisture ratio for HAMT
         Real64 RhoAirZone;    // Zone moisture density for HAMT
@@ -5939,7 +5932,6 @@ namespace HeatBalanceSurfaceManager {
         static int WarmupSurfTemp;
         static int TimeStepInDay(0); // time step number
 
-        // FLOW:
         if (calcHeatBalanceInsideSurfFirstTime) {
             TempInsOld.allocate(TotSurfaces);
             RefAirTemp.allocate(TotSurfaces);
@@ -6397,9 +6389,9 @@ namespace HeatBalanceSurfaceManager {
 
                         if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                             // Lookup up the TDD:DOME object
-                            int PipeNum = FindTDDPipe(SurfNum);
-                            SurfNum2 = DataDaylightingDevices::TDDPipe(PipeNum).Dome;
-                            Ueff = 1.0 / DataDaylightingDevices::TDDPipe(PipeNum).Reff;
+                            int pipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
+                            int domeNum = DataDaylightingDevices::TDDPipe(pipeNum).Dome;
+                            Ueff = 1.0 / DataDaylightingDevices::TDDPipe(pipeNum).Reff;
 
                             // Similar to opaque surface but outside surface temp of TDD:DOME is used, and no embedded sources/sinks.
                             // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
@@ -6407,7 +6399,7 @@ namespace HeatBalanceSurfaceManager {
                             TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum) =
                                 (QRadThermInAbs(SurfNum) + QRadSWwinAbs(1, SurfNum) / 2.0 + QAdditionalHeatSourceInside(SurfNum) +
                                  HConvIn_surf * RefAirTemp(SurfNum) + NetLWRadToSurf(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
-                                 Ueff * TH(1, 1, SurfNum2)) /
+                                 Ueff * TH(1, 1, domeNum)) /
                                 (Ueff + HConvIn_surf + IterDampConst); // LW radiation from internal sources | SW radiation from internal sources and
                                                                        // solar | Convection from surface to zone air | Net radiant exchange with
                                                                        // other zone surfaces | Iterative damping term (for stability) | Current
@@ -6526,11 +6518,12 @@ namespace HeatBalanceSurfaceManager {
                     // and the outside face of the TDD:DIFFUSER for reporting.
 
                     // Set inside temp variables of TDD:DOME equal to inside temp of TDD:DIFFUSER
-                    TH(2, 1, SurfNum2) = TempSurfIn(SurfNum2) = TempSurfInTmp(SurfNum2) = TempSurfInRep(SurfNum2) = TempSurfIn(SurfNum);
+                    int domeNum = DataDaylightingDevices::TDDPipe(SurfaceWindow(SurfNum).TDDPipeNum).Dome;
+                    TH(2, 1, domeNum) = TempSurfIn(domeNum) = TempSurfInTmp(domeNum) = TempSurfInRep(domeNum) = TempSurfIn(SurfNum);
 
                     // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
                     // Reset outside temp variables of TDD:DIFFUSER equal to outside temp of TDD:DOME
-                    TH11 = TempSurfOut(SurfNum) = TempSurfOut(SurfNum2) = TH(1, 1, SurfNum2);
+                    TH11 = TempSurfOut(SurfNum) = TempSurfOut(domeNum) = TH(1, 1, domeNum);
                 }
 
                 if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
@@ -6565,13 +6558,12 @@ namespace HeatBalanceSurfaceManager {
 
             ++InsideSurfIterations;
 
-            // Convergence check
+            // Convergence check - Loop through all relevant surfaces to check for convergence...
             MaxDelTemp = 0.0;
             for (std::vector<int>::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate;
-                 ++iHTSurfToResimulate) {                          // Loop through all relevant surfaces to check for convergence...
+                 ++iHTSurfToResimulate) {
                 int SurfNum = HTSurfToResimulate[iHTSurfToResimulate]; // Heat transfer surfaces only
-                ConstrNum = Surface(SurfNum).Construction;
-                if (Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+                if (Surface(SurfNum).Class != SurfaceClass_Window) { // Opaque surfaces only
                     MaxDelTemp = max(std::abs(TempSurfIn(SurfNum) - TempInsOld(SurfNum)), MaxDelTemp);
                     if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
                         // also check all internal nodes as well as surface faces
@@ -6623,7 +6615,7 @@ namespace HeatBalanceSurfaceManager {
                             "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
                     }
                 }
-                break; // DO loop
+                break; // iteration loop
             }
 
         } // ...end of main inside heat balance DO loop (ends when Converged)
@@ -6934,7 +6926,6 @@ namespace HeatBalanceSurfaceManager {
         using DataMoistureBalance::RhoVaporSurfIn;
         using DataMoistureBalance::TempOutsideAirFD;
         using namespace DataDaylightingDevices;
-        using DaylightingDevices::FindTDDPipe;
         using namespace Psychrometrics;
 
         // Locals
@@ -7008,7 +6999,7 @@ namespace HeatBalanceSurfaceManager {
         if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) {
 
             // Lookup up the TDD:DIFFUSER object
-            PipeNum = FindTDDPipe(SurfNum);
+            PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
             SurfNum2 = TDDPipe(PipeNum).Diffuser;
             ZoneNum2 = Surface(SurfNum2).Zone;
             Ueff = 1.0 / TDDPipe(PipeNum).Reff;

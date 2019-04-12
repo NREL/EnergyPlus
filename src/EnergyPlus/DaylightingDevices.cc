@@ -573,6 +573,7 @@ namespace DaylightingDevices {
                     }
 
                     TDDPipe(PipeNum).Dome = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Get TDD:DIFFUSER object
@@ -644,6 +645,7 @@ namespace DaylightingDevices {
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     TDDPipe(PipeNum).Diffuser = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Construction
