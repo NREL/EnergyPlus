@@ -10615,7 +10615,7 @@ namespace WaterThermalTanks {
         //  HP water heater output depends on the part load ratio which is being varied to zero the residual.
 
         // METHODOLOGY EMPLOYED:
-        //  Calls CalcWaterThermalTankMixed to get tank temperature at the given part load ratio (source water mass flow rate)
+        //  Calls CalcWaterThermalTank to get tank temperature at the given part load ratio (source water mass flow rate)
         //  and calculates the residual as defined above
 
         // Return value

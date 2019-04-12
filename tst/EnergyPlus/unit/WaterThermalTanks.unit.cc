@@ -2054,8 +2054,9 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 }
 
-TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceTemperatures)
+TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
 {
+    using DataLoopNode::Node;
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -2222,37 +2223,62 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceTemperatures)
     int TankNum(1);
     ErrorsFound = false;
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
 
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = WaterHeaterDesuperheater(Tank.DesuperheaterNum);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
         auto &node = Tank.Node(i);
-        node.SavedTemp = 45;
-        node.Temp = 45;
+        node.SavedTemp = 39;
+        node.Temp = 39;
     }
 
-    Tank.TankTemp = 45;
+    Tank.TankTemp = 39;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10;
-    Tank.UseMassFlowRate = 5.0;
-    Tank.SourceInletTemp = 45.0;
-    Tank.SourceOutletTemp = 45;
-    Tank.SourceMassFlowRate = 5.0;
+    Tank.UseMassFlowRate = 0.003;
+    Tank.SourceOutletTemp = 39;
+    Tank.SourceMassFlowRate = 0.003;
     Tank.TimeElapsed = 0.0;
-
+    Desuperheater.SetPointTemp = 60;
+    Desuperheater.Mode = 1;
+    Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+    
     HourOfDay = 0;
     TimeStep = 1;
-    TimeStepZone = 15. / 60.;
+    TimeStepZone = 1. / 60.;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name = "GSHP_COIL1";
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType= "Coil:Cooling:WaterToAirHeatPump:EquationFit";
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 1.0;
-    WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,false);
+    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
+    WaterThermalTanks::InitWaterThermalTank(TankNum,true);
+    Tank.SetPointTemp = 45;
+    Tank.SetPointTemp2 = 45;
+    WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
 
     // check source inlet and outlet temperatures are different
-    EXPECT_EQ(Tank.SourceInletTemp, 5.0);
-    EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
+    EXPECT_EQ(Desuperheater.HeaterRate, 0);
+
+    for (int i = 1; i <= Tank.Nodes; ++i) {
+        auto &node = Tank.Node(i);
+        node.SavedTemp = 39;
+        node.Temp = 39;
+    }
+
+    Tank.TankTemp = 39;
+    Tank.SourceOutletTemp = 39;
+    Tank.SourceMassFlowRate = 0.003;
+    Tank.TimeElapsed = 0.0;
+    Desuperheater.Mode = 1;
+    Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
+
+    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
+    WaterThermalTanks::InitWaterThermalTank(TankNum,true);
+    WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
+    EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
+    EXPECT_EQ(Desuperheater.HeaterRate, 1000*0.25);
+    EXPECT_NEAR(Tank.SourceRate, Desuperheater.HeaterRate, Tank.SourceRate*0.05);
+    //EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
