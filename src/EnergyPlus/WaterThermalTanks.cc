@@ -1290,6 +1290,7 @@ namespace WaterThermalTanks {
                     //       get heat reclaim object
                     if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed") ||
                         UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") ||
+                        UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed") ||
                         UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                         WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = cAlphaArgs(9);
                         WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName = cAlphaArgs(10);
@@ -1319,7 +1320,7 @@ namespace WaterThermalTanks {
                         ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
                         ShowContinueError(" desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
                         ShowContinueError(
-                            " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Refrigeration:CompressorRack,");
+                            " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Refrigeration:CompressorRack,");
                         ShowContinueError(" Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
                         ShowContinueError(" or Refrigeration:Condenser:WaterCooled.");
                         ErrorsFound = true;
@@ -1375,7 +1376,7 @@ namespace WaterThermalTanks {
                                             "\" desuperheater heat source object not found: " + cAlphaArgs(9) + " \"" + cAlphaArgs(10) + "\"");
                             ErrorsFound = true;
                         }
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed")) {
+                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTISPEED;
                         for (DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum) {
                             if (!UtilityRoutines::SameString(HeatReclaimDXCoil(DXCoilNum).Name, cAlphaArgs(10))) continue;
