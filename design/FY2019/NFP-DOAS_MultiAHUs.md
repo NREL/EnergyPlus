@@ -3,6 +3,10 @@
 ## Lixing Gu
 ## Floirda Solar Energy Center
 
+### Third revision 4/10/19
+
+Revise NFP and Design Document based on discussion in a conference call on 4/10/19  
+
 ### Second revision 4/5/19
 
 Revise NFP based on communications from Edwin and Tianzhen and Add Design Document  
@@ -188,7 +192,7 @@ Enclosed is figure from Brent to clarify two point for his comments: add additio
 
 The conference call was held in a regular sizing meeting.
 
-Attendees: Brent Griffith; Michael J Witte; Richard Raustad; Lixing Gu; Lawrence Scheier
+Attendees: Brent Griffith; Michael J Witte; Richard Raustad; Lixing Gu; Lawrence Scheier; Kristin Filed-Macumber
 
 The conference call discussed the NFP by continuing E-mail communications between Brent and Gu. Here is a consensus:
 
@@ -372,6 +376,31 @@ Thanks.
 
 Gu
 
+####A conference call on 4/10/19
+
+Attendees: Brent Griffith; Michael J Witte; Richard Raustad; Lixing Gu; Lawrence Scheier; Edwin Lee; Kristin Filed-Macumber; Jim Spielbauer; Napappan Chidambaram; Jason DeGraw
+
+The second revision of NFP and Design Document were discussed in a regular sizing meeting on 4/10/19. Here are issues discussed and addressed.
+
+#####Extensible fields
+
+The current structure does not allow users to change IDD directly. However, it is possible to make fields extensible. The fixed number will be used first. I will get help to implement extensible fields later.
+
+#####Sizing 
+
+A new sizing function will be created to handle all sizing requirements.
+
+#####Airflow mismatch between supply fan listed in AIrLoopDOAS and OA required flow rate from all OA mixers 
+
+If a supply fan flow rate defined in the AirLoopHVAC:DedicatedOutdoorAirSystem object is below (or not equal to) the OA flow rate requested from a sum of OA mixers, a possible mismatch occurs. Two possible actions may be taken: 1) Stop simulation with a fatal error; and 2) Increase the fan flow rate to match OA requirements and provide a warning message, so that simulation can continue. 
+
+#####Remove an argument in SimAirLoopHAVCDOAS
+
+An argument of AirLoopHAVCDOASNum will be removed, in order to make function arguments consistent with other modules.
+
+#####AirLoopHVAC:Mixer Configuration
+
+AirLoopHVAC:Mixer will collect not only all air flows of OA Mixer relief nodes from served AirLoops, but also air flows of all zone exhaust fans served by each AirLoop defined in the AirLoopHVAC:DedicatedOutdoorAirSystem object. The outlet node will not be connected to the inlet node in the AirLoopHVAC:DedicatedOutdoorAirSystem object. Instead, the outlet node is either connected to outdoor air to relief or connected to a heat exchanger listed in the AirLoopHVAC:OutdoorAirSystem object as a component to pre-treat outdoor air. 
   
 ### **Overview**
 
@@ -381,7 +410,7 @@ We propose 3 new objects to accomplish the goal.
 
 The proposed new objects are AirLoopHVAC:DedicatedOutdoorAirSystem, AirLoopHVAC:Mixer, and AirLoopHVAC:Splitter.
 
-AirLoopHVAC:DedicatedOutdoorAirSystem
+#####AirLoopHVAC:DedicatedOutdoorAirSystem
 
 The first new object is AirLoopHVAC:DedicatedOutdoorAirSystem. It will take a sum of outdoor air from multiple AirLoopHAVC outdoor units as mass flow rate, pre-treat it through cooling and heating coils, and deliver pre-treated air to outdoor air inlets of each OutdoorAir:Mixer, served by the object. The object has following components:
 
@@ -397,13 +426,11 @@ The first new object is AirLoopHVAC:DedicatedOutdoorAirSystem. It will take a su
 
 The structure of the new object does not require inputs of nodes, because the object inlet and outlet nodes can be found at an associated AirLoopHVAC:OutdoorAirSystem:EquipmentList. The object has input configuration to map served AirLoops.  
 
-AirLoopHVAC:Mixer
+#####AirLoopHVAC:Mixer
 
-The object has a single outlet node and multiple inlet nodes. The outlet node is the inlet node of the first component of the AirLoopHVAC:DedicatedOutdoorAirSystem object. The multiple inlet nodes are the relief nodes from Multiple AirLoopHAVC OutdoorAir:Mixer. One more outdoor inlet node will be added to provide makeup outdoor airflow rate to ensure the total mass flow rate is equal to sum of all outdoor air inlet nodes of served OutdoorAir:Mixer, if a sum of all relief nodes of served OutdoorAir:Mixer is less.
+The object has a single outlet node and multiple inlet nodes. The outlet node is a stand-alone node and will not be connected to the inlet node in the AirLoopHVAC:DedicatedOutdoorAirSystem object. Instead, the outlet node is either connected to outdoor air to relief or connected to a heat exchanger listed in the AirLoopHVAC:OutdoorAirSystem object. The multiple inlet nodes are the relief nodes from Multiple AirLoopHAVC OutdoorAir:Mixer. In addition, the Mixer will collect exhaust airflows in all zoned served by AirLoops defined in the AirLoopHVAC:DedicatedOutdoorAirSystem object internally. The air properties at the outlet node will be calculated based on air properties of all inlet nodes weighted by incoming flow rates.  
 
-**The mass flow rate at the outlet will be a sum of all inlet nodes mass flow rates, while outdoor air properties will be assigned to the outlet node air.** 
-
-AirLoopHVAC:Splitter
+#####AirLoopHVAC:Splitter
 
 The object has a single inlet node and multiple outlet nodes. The inlet node is the outlet node of the last component of the AirLoopHVAC:DedicatedOutdoorAirSystem object. The multiple outlet nodes are the OA inlet nodes from Multiple AirLoopHAVC OutdoorAir:Mixer.
 
@@ -415,10 +442,11 @@ Here is a possible calculation procedure:
 2. Assign a sum of OA mass flow rate into AirLoopHVAC:DedicatedOutdoorAirSystem as the object mass flow rate
 3. Calculate outlet node conditions based on setpoint manager assigned to each individual coil required in the AirLoopHVAC:OutdoorAirSystem object to pre-treat outdoor air. 
 4. Assign outlet node conditions into OA inlet conditions of each AirLoop OutdoorAir:Mixer via AirLoopHVAC:Splitter
+5. Loop AirLoopHVAC again using air properties at each OA inlet node from Step 4
+6. Check air property differences at the outlet node from AirLoopHVAC:DedicatedOutdoorAirSystem and OA inlet nodes of all AirLoop OutdoorAir:Mixer.
+7. If converged, continue. Otherwise, go to Step 3.  
 
-Note:
-
-Since the AirLoopHVAC:OutdoorAirSystem object is listed as a component of AirLoopHVAC:DedicatedOutdoorAirSystem, the object will allow an economizer to setup the mass flow rate, then distribute airflow to served OutdoorAir:Mixers, in addition to a sum of OA systems of multiple AirLoopHVAC. Due to the limited time and budget, this feature is not implemented and will be developed later. 
+Note: Since the AirLoopHVAC:OutdoorAirSystem object is listed as a component of AirLoopHVAC:DedicatedOutdoorAirSystem, the object will allow an economizer to setup the mass flow rate, then distribute airflow into served OutdoorAir:Mixers, in addition to a sum of OA systems of multiple AirLoopHVAC. Due to the limited time and budget, this feature is not implemented and will be developed later. 
 
 ![Figure 1](AirLoopDOAS1.jpg) 
 
@@ -468,7 +496,7 @@ The MixedAir module will be modified to allow OutdoorAir:Mixer OA inlet nodes to
 
 ####Calling
 
-SimAirLoopDOAS will be looped at the end of SolveAirLoopControllers (preferred) or SimAirLoops in the SimAirServingZones module. A additional convergence check will be performed to ensure each OAcontroller gets proper OA flow rates and inlet conditions after calling SimAirLoopDOAS. Hope no iteration is needed.   
+SimAirLoopDOAS will be looped at the end of SolveAirLoopControllers (preferred) or SimAirLoops in the SimAirServingZones module. A additional convergence check will be performed to ensure each OAcontroller gets proper OA flow rates and inlet conditions after calling SimAirLoopDOAS. Then, I will test if iteration is needed or not.
 
 ## Testing/Validation/Data Sources ##
 
@@ -535,7 +563,7 @@ AirLoopHVAC:DedicatedOutdoorAirSystem
        \type AirLoopHVAC name
     ......
 
-Note: If extensible is not available, the fixed number of 50 will be used to define the maximum number of AirLoopHVACs served by the proposed object.
+Note: If extensible is not available, the fixed number of 20 will be used to define the maximum number of AirLoopHVACs served by the proposed object.
 
 AirLoopHVAC:Mixer
 
@@ -551,35 +579,30 @@ AirLoopHVAC:Mixer
    	A2, \field Outlet Node Name
        \required-field
        \type node
-   	A3, \field Outdoor Air Node Name
-       \required-field
-       \type node
-       \note The node is used to provide makeup outdoor airflow rate to ensure the loop defined
-       \note by AirLoopHVAC:DedicatedOutdoorAirSystem has mass balance.
-  	A4, \field Inlet 1 Node Name
+  	A3, \field Inlet 1 Node Name
        \begin-extensible
        \required-field
        \type node
-   	A5, \field Inlet 2 Node Name
+   	A4, \field Inlet 2 Node Name
        \type node
-   	A6, \field Inlet 3 Node Name
+   	A5, \field Inlet 3 Node Name
        \type node
-   	A7, \field Inlet 4 Node Name
+   	A6, \field Inlet 4 Node Name
        \type node
-   	A8, \field Inlet 5 Node Name
+   	A7, \field Inlet 5 Node Name
        \type node
-   	A9, \field Inlet 6 Node Name
+   	A8, \field Inlet 6 Node Name
        \type node
-   	A10, \field Inlet 7 Node Name
+   	A9, \field Inlet 7 Node Name
        \type node
-   	A11, \field Inlet 8 Node Name
+   	A10, \field Inlet 8 Node Name
         \type node
-   	A12, \field Inlet 9 Node Name
+   	A11, \field Inlet 9 Node Name
         \type node
-   	A13; \field Inlet 10 Node Name
+   	A12; \field Inlet 10 Node Name
         \type node
 
-Note: If extensible is not available, the fixed number of 200 will be used to define the maximum number of inlet nodes.
+Note: If extensible is not available, the fixed number of 50 will be used to define the maximum number of inlet nodes.
 
 AirLoopHVAC:Splitter
 
@@ -705,22 +728,21 @@ A driver for this module with external connection. It contains following common 
     void SimAirLoopHVACDOAS
 			(std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
-                       int const AirLoopDOASNum,          // air loop index
                        int &CompIndex                 // Index to AirLoopHAVCDOAS
     )
 
 
-#####GetInput
+#####GetAirLoopDOASInput
 
 Read an input file and assign inputs of 3 new proposed objects to variables and structs.
 
-        static void getInput();
+        static void getAirLoopDOASInput();
 
-#####Init
+#####InitAirLoopDOAS
 
-Initialize values without changes at the current iteration before calculation. At the same time, this function will process some data only once, when some information is not available during input process by calling GetInput. For example, Sizing calculation will be embedded in this function after calling OAControllerProps::SizeOAController to get required outdoor ventilation flow rate.    
+Initialize values without changes at each time step before calculation. At the same time, this function will process some data only once, when some information is not available during input process by calling GetAirLoopDOASInput.   
 
-        static void init();
+        static void initAirLoopDOAS();
 
 #####CalcAirLoopDOAS
 
@@ -730,6 +752,7 @@ Calculate outputs by calling SimOAComponent function in the MixedAir module.
          int const     AirLoopDOASNum,       // 
          bool const FirstHVACIteration, 
     );
+
 
 #####UpdateAirLoopDOAS
 
@@ -743,13 +766,23 @@ Calculate outputs by calling SimOAComponent function in the MixedAir module.
          int const     AirLoopDOASNum,       // 
      );
 
-
-   
 #####Sizing
 
 Calculate sizes based on outdoor air conditions and setpoint manager using existing equipment listed in validOASysEquipmentNames.
 
-The sizing calculation will be based on ventilation requirements. The outdoor air flow rates will be available after calling OAControllerProps::SizeOAController. A possible way is to collect outdoor air flow rate after calling, so that sizing of each coil can be accomplished.  
+The outdoor air flow rates are available after calling OAControllerProps::SizeOAController. A possible way is to collect outdoor air flow rate after calling SizeOAController, so that sizing of each coil can be accomplished. The coil sizing calculation will be based on ventilation requirements, while fan sizing may be based on the maximum value of both economizer operation and ventilation requirements. The detailed logic will be determined during implementation.  
+
+    static void SizingAirLoopDOAS(
+         int const     AirLoopDOASNum,       // 
+     );
+
+#####Other possible functions will be determined during implementation
+
+        static void initAirLoopMixers();
+        static void initAirLoopSplitters();
+        static void CalcAirLoopMixers();
+        static void CalcAirLoopSplitters();
+
 
 ###SimAirServingZones
 
@@ -783,6 +816,7 @@ Air properties of OA mixer inlet nodes are determined by System Nodes from a sec
 
 If OA inlet node values are assigned by the AirLoopDOAS loop correctly, it may not need to revise MixedAir module. The modification will be determined during implementation. 
 
+The AirLoopHVAC:OutdoorAirSystem object requires the OutdoorAir:Mixer object as the last OA component. Since the proposed feature will not need the OutdoorAir:Mixer, the restriction will be removed. In other words, the AirLoopHVAC:OutdoorAirSystem object will work without OutdoorAir:Mixer under this new feature only. 
 
 # **Reference: DesDoc_OASysToMultAirHandlers2.md**
 
