@@ -775,9 +775,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     DataGlobals::TimeStepZoneSec = 900;
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
+    SolarShading::AllocateModuleArrays();
 
     AllocateSurfaceHeatBalArrays();
     createFacilityElectricPowerServiceObject();

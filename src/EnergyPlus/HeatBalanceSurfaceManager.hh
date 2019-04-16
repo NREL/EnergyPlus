@@ -153,6 +153,8 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
+    void CalcHeatBalanceOutsideSurf2(const std::vector<int> &HTSurfToResimulate, const std::vector<int> &IZSurfToResimulate, Optional_int_const ZoneToResimulate = _);
+
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfToResimulate, const std::vector<int> &IZSurfToResimulate, Optional_int_const ZoneToResimulate = _);
