@@ -4617,6 +4617,8 @@ This coil model performs the following major functions:
   calculates the amount of heat delivered to the water tank
 \item
   calculates the electricity consumption of the integral water pump and on/off-cycle parasitic loads
+\item
+  reflect the reduction of heat transfer in HVAC condenser plant loop if connected with water cooling system
 \end{itemize}
 
 The input fields for this object are described below in detail:
@@ -4671,11 +4673,11 @@ This alpha field defines the name of the water node to which the desuperheater h
 
 \paragraph{Field: Tank Object Type}\label{field-tank-object-type}
 
-This alpha (choice) field contains the type of water heater tank used by this desuperheater heating coil. Currently, the only valid choice is \hyperref[waterheatermixed]{WaterHeater:Mixed}.
+This alpha (choice) field contains the types of water heater tank used by this desuperheater heating coil. Currently, the valid choices are \hyperref[waterheatermixed]{WaterHeater:Mixed} and \hyperref[waterheaterstratified]{WaterHeater:Stratified}.
 
 \paragraph{Field: Tank Name}\label{field-tank-name}
 
-This alpha field contains the name of the specific water heater tank (\hyperref[waterheatermixed]{WaterHeater:Mixed} object) used by this desuperheater heating coil.
+This alpha field contains the name of the specific water heater tank (\hyperref[waterheatermixed]{WaterHeater:Mixed} or \hyperref[waterheaterstratified]{WaterHeater:Stratified} object) used by this desuperheater heating coil.
 
 \paragraph{Field: Heating Source Object Type}\label{field-heating-source-object-type-1}
 
@@ -4690,6 +4692,8 @@ This alpha (choice) field defines the source of superheated refrigerant gas from
   \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
 \item
   \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
+\item
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
   \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}
 \item

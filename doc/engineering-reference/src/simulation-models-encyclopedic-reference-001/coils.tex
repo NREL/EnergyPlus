@@ -4992,13 +4992,15 @@ Nimmo, B.G. et al. 1993.DEAC: Desiccant Enhancement of Cooling-Based Dehumidific
 
 \subsubsection{Overview}\label{overview-10}
 
-The input object Coil:WaterHeating:Desuperheater provides a model that simulates the thermal performance of a refrigerant-to-water heating coil and the electric consumption of its water circulation pump, control valves, and other auxiliary devices. The model assumes that the heating energy provided by this coil is reclaimed from the superheated refrigerant gas leaving a compressor and does not impact the performance of the compressor. The objects from which this coil can obtain its heating energy are:
+The input object Coil:WaterHeating:Desuperheater provides a model that simulates the thermal performance of a refrigerant-to-water heating coil and the electric consumption of its water circulation pump, control valves, and other auxiliary devices. The model assumes that the heating energy provided by this coil is reclaimed from the superheated refrigerant gas leaving a compressor and does not impact the performance of the compressor. For water cooled system, impact of HVAC is reflected by reducing the heat transfer to the condensing plant loop. The objects from which this coil can obtain its heating energy are:
 
 Coil:Cooling:DX:SingleSpeed
 
 Coil:Cooling:DX:TwoSpeed
 
 Coil:Cooling:DX:TwoStageWithHumidityControlMode
+
+Coil:Cooling:WaterToAirHeatPump:EquationFit
 
 Refrigeration:CompressorRack
 
@@ -5012,9 +5014,9 @@ To model a desuperheater water heating coil, the input data file must include th
 
 ·~~~~~~~~Coil:WaterHeating:Desuperheater
 
-·~~~~~~~~WaterHeater:Mixed
+·~~~~~~~~WaterHeater:Mixed or WaterHeater:Stratified
 
-·~~~~~~~~Coil:Cooling:DX:* or Refrigeration:CompressorRack, or Refrigeration:Condenser:*
+·~~~~~~~~Coil:Cooling:DX:* , Refrigeration:CompressorRack, Refrigeration:Condenser:*, or Coil:Cooling:WaterToAirHeatPump:EquationFit
 
 A schematic diagram showing the desuperheater water heating coil with its water heater and DX system condenser is shown below.
 

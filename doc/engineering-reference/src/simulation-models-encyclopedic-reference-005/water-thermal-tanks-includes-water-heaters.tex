@@ -783,6 +783,7 @@ Before each substep is calculated, the following evaluations are made:
 \item Thermostatic controls for heater 1 and heater 2 are evaluated to determine if the heater elements should turn on or off
 \item Node 1 temperature is compared against the maximum limit to determine if venting is necessary
 \item Adjoining node temperatures are compared to determine if there are any temperature inversions for which the inversion mixing rate should be used.
+\item Source inlet temperatures for desuperheater are recalculated and applied to the inlet nodes using heat rate calculated in the system time step loop
 \end{enumerate}
 
 The solution continues looping through all substeps until the system time step is completed.

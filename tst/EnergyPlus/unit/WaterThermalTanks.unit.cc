@@ -2280,5 +2280,5 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
     EXPECT_EQ(Desuperheater.HeaterRate, 1000*0.25);
     EXPECT_NEAR(Tank.SourceRate, Desuperheater.HeaterRate, Tank.SourceRate*0.05);
-    //EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
+
 }
