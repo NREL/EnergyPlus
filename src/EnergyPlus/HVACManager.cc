@@ -2263,7 +2263,7 @@ namespace HVACManager {
         ZoneWinHeatLossRepEnergy = 0.0;
 
         for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
-            if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) { // not a window...
+            if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
                 if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
                     DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
                     DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;

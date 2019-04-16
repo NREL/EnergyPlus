@@ -1940,6 +1940,7 @@ namespace SurfaceGeometry {
                 if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
                     DataSurfaces::AllIZSurfaceList.push_back(SurfNum);
                     surfZone.ZoneIZSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTSurfaceList.push_back(surfExtBoundCond);
                     surfZone.ZoneIZSurfaceList.push_back(surfExtBoundCond);
                 }
             }
