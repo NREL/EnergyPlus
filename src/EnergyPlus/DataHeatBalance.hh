@@ -1132,6 +1132,8 @@ namespace DataHeatBalance {
         Real64 MaximumY;           // Maximum Y value for entire zone
         Real64 MinimumZ;           // Minimum Z value for entire zone
         Real64 MaximumZ;           // Maximum Z value for entire zone
+        std::vector<int> ZoneHTSurfaceList; // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneIZSurfaceList; // List of interzone surfaces in this zone
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp

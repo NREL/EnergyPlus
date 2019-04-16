@@ -1928,10 +1928,21 @@ namespace SurfaceGeometry {
         }
 
         // Set flag that determines whether a surface can be an exterior obstruction
-        // Also set associated surfaces for Kiva foundations and build heat transfer surface list
+        // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
-            if (Surface(SurfNum).HeatTransSurf) AllHTSurfaceList.push_back(SurfNum);
+            if (Surface(SurfNum).HeatTransSurf) {
+                DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
+                int const zoneNum(Surface(SurfNum).Zone);
+                auto &surfZone(Zone(zoneNum));
+                surfZone.ZoneHTSurfaceList.push_back(SurfNum);
+                    int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
+                if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
+                    DataSurfaces::AllIZSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneIZSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTSurfaceList.push_back(surfExtBoundCond);
+                }
+            }
             // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond > 0) continue;
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond == Ground) continue;
