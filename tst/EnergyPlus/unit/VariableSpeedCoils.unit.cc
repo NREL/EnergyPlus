@@ -2499,7 +2499,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Curve:Biquadratic,",
         "    HPACHeatCapFT,           !- Name",
