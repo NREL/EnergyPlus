@@ -190,7 +190,7 @@ namespace DaylightingManager {
     int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
     int OutputFileDFS(0);              // Unit number for daylight factors
     Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
-    int maxNumRefPtInAnyZone;          // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
     Real64 PHSUN(0.0);                 // Solar altitude (radians)
     Real64 SPHSUN(0.0);                // Sine of solar altitude
     Real64 CPHSUN(0.0);                // Cosine of solar altitude
@@ -265,6 +265,39 @@ namespace DaylightingManager {
         DayltgInteriorMapIllum_FirstTimeFlag = true;
         ReportIllumMap_firstTime = true;
         SQFirstTime = true;
+        TotWindowsWithDayl = 0;
+        OutputFileDFS = 0;
+        DaylIllum.deallocate();
+        maxNumRefPtInAnyZone = 0;
+        PHSUN = 0.0;
+        SPHSUN = 0.0;
+        CPHSUN = 0.0;
+        THSUN = 0.0;
+        PHSUNHR.deallocate();
+        SPHSUNHR.deallocate();
+        CPHSUNHR.deallocate();
+        THSUNHR.deallocate();
+        EINTSK.deallocate();
+        EINTSU.deallocate();
+        EINTSUdisk.deallocate();
+        WLUMSK.deallocate();
+        WLUMSU.deallocate();
+        WLUMSUdisk.deallocate();
+        GILSK.deallocate();
+        GILSU.deallocate();
+        EDIRSK.deallocate();
+        EDIRSU.deallocate();
+        EDIRSUdisk.deallocate();
+        AVWLSK.deallocate();
+        AVWLSU.deallocate();
+        AVWLSUdisk.deallocate();
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        MapErrIndex.deallocate();
+        RefErrIndex.deallocate();
+        CheckTDDZone.deallocate();
+        mapLine = "";
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
