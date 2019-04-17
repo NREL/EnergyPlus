@@ -7632,70 +7632,52 @@ namespace DXCoils {
                             CheckZoneSizing(DXCoil(DXCoilNum).DXCoilType, DXCoil(DXCoilNum).Name);
                         }
                     }
-                    SizingMethod = CoolingSHRSizing;
-                    CompType = DXCoil(DXCoilNum).DXCoilType;
-                    CompName = DXCoil(DXCoilNum).Name;
-                    SizingString = "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio";
-                    TempSize = DXCoil(DXCoilNum).MSRatedSHR(Mode);
-                    DataFlowUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
-                    DataCapacityUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
-                    DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedSHR(Mode) = TempSize;
-                    DataFlowUsedForSizing = 0.0;
-                    DataCapacityUsedForSizing = 0.0;
-                    DataEMSOverrideON = false;
-                    DataEMSOverride = 0.0;
-                    //if (DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) >= SmallAirVolFlow && DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
-                    //    // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-                    //    // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-                    //    // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                    //    // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                    //    // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                    //    // of flow/capacity ratio vs SHR for several actual coils.
-                    //    RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    //    if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                    //        MSRatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                    //    } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                    //        MSRatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
-                    //    } else {
-                    //        MSRatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-                    //    }
-                    //} else {
-                    //    MSRatedSHRDes = 1.0;
-                    //}
-                }
-                else {
-                    MSRatedSHRDes = DXCoil(DXCoilNum).MSRatedSHR(Mode + 1);
-                    //}
-
-                    if (!HardSizeNoDesRun) {
-                        if (IsAutoSize) {
-                            DXCoil(DXCoilNum).MSRatedSHR(Mode) = MSRatedSHRDes;
-                            ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                DXCoil(DXCoilNum).Name,
-                                "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
-                                MSRatedSHRDes);
+                    if (DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) >= SmallAirVolFlow && DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
+                        // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
+                        // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
+                        // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
+                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
+                        // of flow/capacity ratio vs SHR for several actual coils.
+                        RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                        if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
+                            MSRatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
+                            MSRatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
+                        } else {
+                            MSRatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
                         }
-                        else {
-                            if (DXCoil(DXCoilNum).MSRatedSHR(Mode) > 0.0 && MSRatedSHRDes > 0.0 && !HardSizeNoDesRun) {
-                                MSRatedSHRUser = DXCoil(DXCoilNum).MSRatedSHR(Mode);
-                                ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                    DXCoil(DXCoilNum).Name,
-                                    "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
-                                    MSRatedSHRDes,
-                                    "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
-                                    MSRatedSHRUser);
-                                if (DisplayExtraWarnings) {
-                                    if ((std::abs(MSRatedSHRDes - MSRatedSHRUser) / MSRatedSHRUser) > AutoVsHardSizingThreshold) {
-                                        ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
-                                            DXCoil(DXCoilNum).Name);
-                                        ShowContinueError("User-Specified Rated Sensible Heat Ratio of " + RoundSigDigits(MSRatedSHRUser, 3));
-                                        ShowContinueError("differs from Design Size Rated Sensible Heat Ratio of " + RoundSigDigits(MSRatedSHRDes, 3));
-                                        ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                        ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
-                                    }
+                    } else {
+                        MSRatedSHRDes = 1.0;
+                    }
+                } else {
+                    MSRatedSHRDes = DXCoil(DXCoilNum).MSRatedSHR(Mode + 1);
+                }
+
+                if (!HardSizeNoDesRun) {
+                    if (IsAutoSize) {
+                        DXCoil(DXCoilNum).MSRatedSHR(Mode) = MSRatedSHRDes;
+                        ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
+                                           DXCoil(DXCoilNum).Name,
+                                           "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
+                                           MSRatedSHRDes);
+                    } else {
+                        if (DXCoil(DXCoilNum).MSRatedSHR(Mode) > 0.0 && MSRatedSHRDes > 0.0 && !HardSizeNoDesRun) {
+                            MSRatedSHRUser = DXCoil(DXCoilNum).MSRatedSHR(Mode);
+                            ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
+                                               DXCoil(DXCoilNum).Name,
+                                               "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
+                                               MSRatedSHRDes,
+                                               "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
+                                               MSRatedSHRUser);
+                            if (DisplayExtraWarnings) {
+                                if ((std::abs(MSRatedSHRDes - MSRatedSHRUser) / MSRatedSHRUser) > AutoVsHardSizingThreshold) {
+                                    ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
+                                                DXCoil(DXCoilNum).Name);
+                                    ShowContinueError("User-Specified Rated Sensible Heat Ratio of " + RoundSigDigits(MSRatedSHRUser, 3));
+                                    ShowContinueError("differs from Design Size Rated Sensible Heat Ratio of " + RoundSigDigits(MSRatedSHRDes, 3));
+                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -7703,7 +7685,7 @@ namespace DXCoils {
                 }
             }
 
-            // Rated Evaporative condenser airflow rates
+            // Rated Evapovative condenser airflow rates
             for (Mode = 1; Mode <= DXCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
                 IsAutoSize = false;
                 if (DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) == AutoSize) {
