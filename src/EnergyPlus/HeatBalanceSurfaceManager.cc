@@ -5117,20 +5117,6 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
-        // Pass correct list of surfaces to CalcHeatBalanceOutsideSurf2
-        bool const PartialResimulate(present(ZoneToResimulate));
-
-        if (!PartialResimulate) {
-            CalcHeatBalanceOutsideSurf2(DataSurfaces::AllHTSurfaceList);
-        }
-        else {
-            auto const &zoneHTSurfList(Zone(ZoneToResimulate).ZoneHTSurfaceList);
-            auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
-            CalcHeatBalanceOutsideSurf2(zoneHTSurfList, ZoneToResimulate);
-        }
-    }
-        void CalcHeatBalanceOutsideSurf2(const std::vector<int> &HTSurfToResimulate, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
-    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -5224,11 +5210,13 @@ namespace HeatBalanceSurfaceManager {
         Real64 HAir;             // "Convection" coefficient from air to surface (radiation)
         Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave  COP mod
         int RoughSurf;           // Roughness index of the exterior surface
+        int SurfNum;             // Surface number DO loop counter
         int SrdSurfsNum;         // Surrounding surfaces list number
         int SrdSurfNum;          // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs;   // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac;   // View factor of a surrounding surface
         Real64 TempExt;          // Exterior temperature boundary condition
+        int ZoneNum;             // Zone number the current surface is attached to
         int OPtr;
         Real64 RhoVaporSat;     // Local temporary saturated vapor density for checking
         bool MovInsulErrorFlag; // Movable Insulation error flag
@@ -5241,7 +5229,7 @@ namespace HeatBalanceSurfaceManager {
         MovInsulErrorFlag = false;
 
         if (AnyConstructInternalSourceInInput) {
-            for (int SurfNum : HTSurfToResimulate) {
+            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 // Need to transfer any source/sink for a surface to the local array.  Note that
                 // the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
                 // This must be done at this location so that this is always updated correctly.
@@ -5260,9 +5248,17 @@ namespace HeatBalanceSurfaceManager {
             CalcInteriorRadExchange(TH(2, 1, _), 0, NetLWRadToSurf, _, Outside);
         }
 
-        for (int SurfNum : HTSurfToResimulate) { // Loop through all surfaces...
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
-            int ZoneNum = Surface(SurfNum).Zone;
+            ZoneNum = Surface(SurfNum).Zone;
+
+            if (present(ZoneToResimulate)) {
+                if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                    continue; // skip surfaces that are not associated with this zone
+                }
+            }
+
+            if (!Surface(SurfNum).HeatTransSurf || ZoneNum == 0) continue; // Skip non-heat transfer surfaces
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
             // Interior windows in partitions use "normal" heat balance calculations
@@ -5283,11 +5279,9 @@ namespace HeatBalanceSurfaceManager {
 
             // Calculate heat extract due to additional heat flux source term as the surface boundary condition
 
-            if (DataSurfaces::AnyHeatBalanceOutsideSourceTerm) {
-                if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
-                    QAdditionalHeatSourceOutside(SurfNum) =
-                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).OutsideHeatSourceTermSchedule);
-                }
+            if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
+                QAdditionalHeatSourceOutside(SurfNum) =
+                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).OutsideHeatSourceTermSchedule);
             }
 
             // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
@@ -5746,13 +5740,7 @@ namespace HeatBalanceSurfaceManager {
 
                     } else { // Interzone partition
 
-                        int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
-                        assert(TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
-                        auto const l211(TH.index(2, 1, 1) - 1);
-                        //TH(1, 1, SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
-                        // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
-                        // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
-                        TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
+                        TH(1, 1, SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
 
                         // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
 
