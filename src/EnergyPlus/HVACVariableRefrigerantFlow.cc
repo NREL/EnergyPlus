@@ -13006,7 +13006,7 @@ namespace HVACVariableRefrigerantFlow {
         if (HRMode == 5 && HRMode_sub == 2) {
 
             CompSpdActual = rps2_cond; // constant in this mode
-            // Tsuction = Te'_iu < OutDryBulbTemp – 5; constant in this mode
+            // Tsuction = Te'_iu < OutDryBulbTemp - 5; constant in this mode
 
             // compressor: Ncomp & Q_c_tot
             this->VRFOU_CompCap(CompSpdActual, Tsuction, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
@@ -13203,7 +13203,7 @@ namespace HVACVariableRefrigerantFlow {
         } else if (HRMode == 2) {
 
             CompSpdActual = rps1_evap; // constant in this mode
-            // Tsuction = Te'_iu < OutDryBulbTemp – 5; constant in this mode
+            // Tsuction = Te'_iu < OutDryBulbTemp - 5; constant in this mode
 
             // compressor: Ncomp & Q_c_tot
             this->VRFOU_CompCap(CompSpdActual, Tsuction, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
