@@ -8236,8 +8236,18 @@ namespace WaterThermalTanks {
                     Tfinal[i] = (Tstart + b_a) * e_a_dt - b_a;
                     TfinalDiff = max(fabs(Tfinal[i] - Tfinal_old), TfinalDiff);
                 }
-
                 if (TfinalDiff < TemperatureConvergenceCriteria) break;
+
+                if (Tank.DesuperheaterNum > 0){
+                    DesuperheaterPLR = WaterHeaterDesuperheater(Tank.DesuperheaterNum).DesuperheaterPLR;
+                    DesuperheaterHeaterRate = WaterHeaterDesuperheater(Tank.DesuperheaterNum).HeaterRate;
+                    MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * RhoH2O(Tavg[Tank.SourceOutletStratNode - 1]);
+                    if (DesuperheaterPLR > 0.0){
+                        Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1] + (DesuperheaterHeaterRate/DesuperheaterPLR) / (MdotDesuperheaterWater * Cp);
+                    }else{
+                        Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1];
+                    }
+                }
             } // end temperature convergence loop
 
             // Inversion mixing
@@ -8386,16 +8396,6 @@ namespace WaterThermalTanks {
             }
             //Update the source inlet temperature for each internal timestep iteration
             //When the source loop is from desuperheater
-            if (Tank.DesuperheaterNum > 0){
-                DesuperheaterPLR = WaterHeaterDesuperheater(Tank.DesuperheaterNum).DesuperheaterPLR;
-                DesuperheaterHeaterRate = WaterHeaterDesuperheater(Tank.DesuperheaterNum).HeaterRate;
-                MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * RhoH2O(Tavg[Tank.SourceOutletStratNode - 1]);
-                if (DesuperheaterPLR > 0.0){
-                    Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1] + (DesuperheaterHeaterRate/DesuperheaterPLR) / (MdotDesuperheaterWater * Cp);
-                }else{
-                    Tank.SourceInletTemp = Tank.SourceOutletTemp;
-                }
-            }
         } // end while TimeRemaining > 0.0
 
         for (auto &e : Tank.Node) {
