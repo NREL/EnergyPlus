@@ -5797,11 +5797,45 @@ namespace HeatBalanceSurfaceManager {
         bool const PartialResimulate(present(ZoneToResimulate));
 
         if (!PartialResimulate) {
+            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+                ZoneWinHeatGain = 0.0;
+                ZoneWinHeatGainRep(zoneNum) = 0.0;
+                ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
+                ZoneWinHeatLossRep(zoneNum) = 0.0;
+                ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
+            }
+
             CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList, DataSurfaces::AllIZSurfaceList);
+
+            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+                if (ZoneWinHeatGain(zoneNum) >= 0.0) {
+                    ZoneWinHeatGainRep(zoneNum) = ZoneWinHeatGain(zoneNum);
+                    ZoneWinHeatGainRepEnergy(zoneNum) = ZoneWinHeatGainRep(zoneNum) * DataGlobals::TimeStepZoneSec;
+                }
+                else {
+                    ZoneWinHeatLossRep(zoneNum) = -ZoneWinHeatGain(zoneNum);
+                    ZoneWinHeatLossRepEnergy(zoneNum) = ZoneWinHeatLossRep(zoneNum) * DataGlobals::TimeStepZoneSec;
+                }
+            }
         } else {
+            ZoneWinHeatGain(ZoneToResimulate) = 0.0;
+            ZoneWinHeatGainRep(ZoneToResimulate) = 0.0;
+            ZoneWinHeatGainRepEnergy(ZoneToResimulate) = 0.0;
+            ZoneWinHeatLossRep(ZoneToResimulate) = 0.0;
+            ZoneWinHeatLossRepEnergy(ZoneToResimulate) = 0.0;
+
             auto const &zoneHTSurfList(Zone(ZoneToResimulate).ZoneHTSurfaceList);
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, ZoneToResimulate);
+
+            if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
+                ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
+                ZoneWinHeatGainRepEnergy(ZoneToResimulate) = ZoneWinHeatGainRep(ZoneToResimulate) * DataGlobals::TimeStepZoneSec;
+            }
+            else {
+                ZoneWinHeatLossRep(ZoneToResimulate) = -ZoneWinHeatGain(ZoneToResimulate);
+                ZoneWinHeatLossRepEnergy(ZoneToResimulate) = ZoneWinHeatLossRep(ZoneToResimulate) * DataGlobals::TimeStepZoneSec;
+            }
         }
     }
 
@@ -6592,9 +6626,11 @@ namespace HeatBalanceSurfaceManager {
 
         } // ...end of main inside heat balance DO loop (ends when Converged)
 
+        // Set various surface output variables and other record keeping - after iterations are complete
         for (int surfNum : HTSurfToResimulate) {
             if (Surface(surfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-            // sign convention is positive means energy going into inside face from the air.
+
+            // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
             auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
             QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
@@ -6612,6 +6648,29 @@ namespace HeatBalanceSurfaceManager {
                         OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                         OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) = QdotRadNetSurfInRep(surfNum);
                     }
+                }
+            }
+
+            // Window heat gain/loss
+            if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
+                if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
+                    DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
+                    DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                }
+                else {
+                    DataSurfaces::WinHeatLossRep(surfNum) = -DataSurfaces::WinHeatGain(surfNum);
+                    DataSurfaces::WinHeatLossRepEnergy(surfNum) = DataSurfaces::WinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                }
+
+                DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                if (DataSurfaces::SurfaceWindow(surfNum).OriginalClass == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
+                    int pipeNum = DataSurfaces::SurfaceWindow(surfNum).TDDPipeNum;
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
+                }
+                if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
+                    int zoneNum = DataSurfaces::Surface(surfNum).Zone;
+                    DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::WinHeatGain(surfNum);
                 }
             }
         }

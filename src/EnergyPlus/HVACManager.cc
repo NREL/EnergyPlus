@@ -64,14 +64,12 @@
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
-#include <DataDaylightingDevices.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
-#include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
@@ -80,13 +78,12 @@
 #include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
 #include <DataZoneEquipment.hh>
-#include <DaylightingDevices.hh>
 #include <DemandManager.hh>
 #include <DisplayRoutines.hh>
+//#include <EarthTube.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
 #include <General.hh>
-#include <HeatBalFiniteDiffManager.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
 #include <InternalHeatGains.hh>
@@ -107,6 +104,7 @@
 #include <SizingManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <SystemReports.hh>
+//#include <ThermalChimney.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -2253,59 +2251,54 @@ namespace HVACManager {
 
     void UpdateZoneListAndGroupLoads()
     {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Apparently someone who doesn't believe in documenting.
+        //       DATE WRITTEN   ???
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Don't know.
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
         using namespace DataHeatBalance;
 
-        // Sum Zone window heat gain report variables
-        ZoneWinHeatGain = 0.0;
-        ZoneWinHeatGainRep = 0.0;
-        ZoneWinHeatGainRepEnergy = 0.0;
-        ZoneWinHeatLossRep = 0.0;
-        ZoneWinHeatLossRepEnergy = 0.0;
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
 
-        for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
-            if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
-                if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
-                    DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
-                    DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
-                }
-                else {
-                    DataSurfaces::WinHeatLossRep(surfNum) = -DataSurfaces::WinHeatGain(surfNum);
-                    DataSurfaces::WinHeatLossRepEnergy(surfNum) = DataSurfaces::WinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
-                }
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-                DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
-                if (DataSurfaces::SurfaceWindow(surfNum).OriginalClass == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
-                    int pipeNum =DataSurfaces::SurfaceWindow(surfNum).TDDPipeNum;
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
-                }
-                if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
-                    int zoneNum = DataSurfaces::Surface(surfNum).Zone;
-                    DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::WinHeatGain(surfNum);
-                }
-            }
-        }
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
-            if (ZoneWinHeatGain(zoneNum) >= 0.0) {
-                ZoneWinHeatGainRep(zoneNum) = ZoneWinHeatGain(zoneNum);
-                ZoneWinHeatGainRepEnergy(zoneNum) = ZoneWinHeatGainRep(zoneNum) * DataGlobals::TimeStepZoneSec;
-            }
-            else {
-                ZoneWinHeatLossRep(zoneNum) = -ZoneWinHeatGain(zoneNum);
-                ZoneWinHeatLossRepEnergy(zoneNum) = ZoneWinHeatLossRep(zoneNum) * DataGlobals::TimeStepZoneSec;
-            }
-        }
+        // DERIVED TYPE DEFINITIONS:
+        // na
 
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ZoneNum;
+        int ListNum;
+        int GroupNum;
+        int Mult;
+
+        // FLOW:
         // Sum ZONE LIST and ZONE GROUP report variables
         ListSNLoadHeatEnergy = 0.0;
         ListSNLoadCoolEnergy = 0.0;
         ListSNLoadHeatRate = 0.0;
         ListSNLoadCoolRate = 0.0;
 
-        for (int ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum) {
-            for (int ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
-                int Mult = Zone(ZoneNum).Multiplier;
+        for (ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum) {
+            for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
+                Mult = Zone(ZoneNum).Multiplier;
                 ListSNLoadHeatEnergy(ListNum) += SNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
                 ListSNLoadCoolEnergy(ListNum) += SNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
                 ListSNLoadHeatRate(ListNum) += SNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
@@ -2313,29 +2306,13 @@ namespace HVACManager {
             } // ZoneNum
         }     // ListNum
 
-        for (int GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum) {
-            int Mult = ZoneGroup(GroupNum).Multiplier;
+        for (GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum) {
+            Mult = ZoneGroup(GroupNum).Multiplier;
             GroupSNLoadHeatEnergy(GroupNum) = ListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
             GroupSNLoadCoolEnergy(GroupNum) = ListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
             GroupSNLoadHeatRate(GroupNum) = ListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
             GroupSNLoadCoolRate(GroupNum) = ListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
         } // GroupNum
-
-        // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-        if (DataHeatBalance::AnyCondFD && DataGlobals::DisplayAdvancedReportVariables) {
-            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
-                if (DataHeatBalSurface::Zone_has_mixed_HT_models[zoneNum]) {
-                    ZnAirRpt(zoneNum).SumEnthalpyM = 0.0;
-                    ZnAirRpt(zoneNum).SumEnthalpyH = 0.0;
-                    for (int surfaceNum = Zone(zoneNum).SurfaceFirst; surfaceNum <= Zone(zoneNum).SurfaceLast; ++surfaceNum) {
-                        if (DataSurfaces::Surface(surfaceNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
-                            ZnAirRpt(zoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(surfaceNum).EnthalpyM;
-                            ZnAirRpt(zoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(surfaceNum).EnthalpyF;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     void ReportAirHeatBalance()

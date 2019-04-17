@@ -313,8 +313,10 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumMCpDTsystem,   // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
                                    Real64 &SumNonAirSystem,  // Zone sum of non air system convective heat gains
                                    Real64 &CzdTdt,           // Zone air energy storage term.
-                                   Real64 &imBalance         // put all terms in eq. 5 on RHS , should be zero
-    );
+                                   Real64 &imBalance,        // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &SumEnthalpyM,     // Zone sum of phase change material melting enthlpy
+                                   Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
+        );
 
     bool VerifyThermostatInZone(std::string const &ZoneName); // Zone to verify
 
