@@ -273,24 +273,7 @@ namespace DaylightingManager {
         SPHSUN = 0.0;
         CPHSUN = 0.0;
         THSUN = 0.0;
-        PHSUNHR.deallocate();
-        SPHSUNHR.deallocate();
-        CPHSUNHR.deallocate();
-        THSUNHR.deallocate();
-        EINTSK.deallocate();
-        EINTSU.deallocate();
-        EINTSUdisk.deallocate();
-        WLUMSK.deallocate();
-        WLUMSU.deallocate();
-        WLUMSUdisk.deallocate();
-        GILSK.deallocate();
-        GILSU.deallocate();
-        EDIRSK.deallocate();
-        EDIRSU.deallocate();
-        EDIRSUdisk.deallocate();
-        AVWLSK.deallocate();
-        AVWLSU.deallocate();
-        AVWLSUdisk.deallocate();
+        //PHSUNHR.deallocate(); et al, do not deallocate ArrayND where array size is specified in the declaration
         TDDTransVisBeam.deallocate();
         TDDFluxInc.deallocate();
         TDDFluxTrans.deallocate();

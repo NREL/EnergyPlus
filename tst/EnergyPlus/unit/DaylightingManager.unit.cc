@@ -1081,7 +1081,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
     EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
 }
-TEST_F(EnergyPlusFixture, DayltgInteriorIllum_test)
+TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 {
     std::string const idf_objects = delimited_string({
         "  Zone,                                                                                                           ",
@@ -1329,7 +1329,6 @@ TEST_F(EnergyPlusFixture, DayltgInteriorIllum_test)
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(foundErrors);
     DaylightingManager::GetDaylightingParametersInput();
-    DaylightingManager::GILSK.allocate(24, 4);
     DaylightingManager::GILSK = 100.0;
     DataGlobals::WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;
