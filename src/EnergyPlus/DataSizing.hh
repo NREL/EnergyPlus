@@ -681,6 +681,7 @@ namespace DataSizing {
         bool HeatingCapacity;         // TRUE if AirloopHVAC system heating capacity is calculated
         bool SystemCapacity;          // TRUE if AirloopHVAC system heating capacity is calculated
         bool DesignSizeFromParent;    // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+        bool DesSuppHeatCapAutosized; // TRUE if design heating capacity of supplemental heating coils is calculated, e.g. VRF TU
         Array1D_int SizingMethod;    // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and
                                      // FractionOfAutosizedHeatingAirflow)
         Array1D_int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea,
@@ -689,25 +690,26 @@ namespace DataSizing {
         // Default Constructor
         ZoneEqSizingData()
             : AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxCWVolFlow(0.0), OAVolFlow(0.0),
-              ATMixerVolFlow(0.0),        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
-              ATMixerCoolPriDryBulb(0.0), // design air terminal mixer cooling outlet temperature [C]
-              ATMixerCoolPriHumRat(0.0),  // design air terminal mixer cooling outlet humidity ratio [kgH20/kgDryAir]
-              ATMixerHeatPriDryBulb(0.0), // design air terminal mixer heating outlet temperature [C]
-              ATMixerHeatPriHumRat(0.0),  // design air terminal mixer heating outlet humidity ratio [kgH20/kgDryAir]
-              DesCoolingLoad(0.0),        // design cooling load used for zone equipment [W]
-              DesHeatingLoad(0.0),        // design heating load used for zone equipment [W]
-              CoolingAirVolFlow(0.0),     // design cooling air vol flow rate for equipment[m3/s]
-              HeatingAirVolFlow(0.0),     // design heating air vol flow rate for equipment[m3/s]
-              SystemAirVolFlow(0.0),      // design heating air vol flow rate for equipment[m3/s]
-              AirFlow(false),             // TRUE if AirloopHVAC system air flow rate is calculated
-              CoolingAirFlow(false),      // TRUE if AirloopHVAC system cooling air flow rate is calculated
-              HeatingAirFlow(false),      // TRUE if AirloopHVAC system heating air flow rate is calculated
-              SystemAirFlow(false),       // TRUE if AirloopHVAC system heating air flow rate is calculated
-              Capacity(false),            // TRUE if AirloopHVAC system capacity is calculated
-              CoolingCapacity(false),     // TRUE if AirloopHVAC system cooling capacity is calculated
-              HeatingCapacity(false),     // TRUE if AirloopHVAC system heating capacity is calculated
-              SystemCapacity(false),      // TRUE if AirloopHVAC system heating capacity is calculated
-              DesignSizeFromParent(false) // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+              ATMixerVolFlow(0.0),           // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
+              ATMixerCoolPriDryBulb(0.0),    // design air terminal mixer cooling outlet temperature [C]
+              ATMixerCoolPriHumRat(0.0),     // design air terminal mixer cooling outlet humidity ratio [kgH20/kgDryAir]
+              ATMixerHeatPriDryBulb(0.0),    // design air terminal mixer heating outlet temperature [C]
+              ATMixerHeatPriHumRat(0.0),     // design air terminal mixer heating outlet humidity ratio [kgH20/kgDryAir]
+              DesCoolingLoad(0.0),           // design cooling load used for zone equipment [W]
+              DesHeatingLoad(0.0),           // design heating load used for zone equipment [W]
+              CoolingAirVolFlow(0.0),        // design cooling air vol flow rate for equipment[m3/s]
+              HeatingAirVolFlow(0.0),        // design heating air vol flow rate for equipment[m3/s]
+              SystemAirVolFlow(0.0),         // design heating air vol flow rate for equipment[m3/s]
+              AirFlow(false),                // TRUE if AirloopHVAC system air flow rate is calculated
+              CoolingAirFlow(false),         // TRUE if AirloopHVAC system cooling air flow rate is calculated
+              HeatingAirFlow(false),         // TRUE if AirloopHVAC system heating air flow rate is calculated
+              SystemAirFlow(false),          // TRUE if AirloopHVAC system heating air flow rate is calculated
+              Capacity(false),               // TRUE if AirloopHVAC system capacity is calculated
+              CoolingCapacity(false),        // TRUE if AirloopHVAC system cooling capacity is calculated
+              HeatingCapacity(false),        // TRUE if AirloopHVAC system heating capacity is calculated
+              SystemCapacity(false),         // TRUE if AirloopHVAC system heating capacity is calculated
+              DesignSizeFromParent(false),   // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+              DesSuppHeatCapAutosized(false) // TRUE if design heating capacity of supplemental heating coils is calculated, e.g. VRF TU
         {
         }
     };

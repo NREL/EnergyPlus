@@ -3994,7 +3994,6 @@ namespace HVACVariableRefrigerantFlow {
                             errFlag = false;
                             VRFTU(VRFTUNum).DesignSuppHeatingCapacity =
                                 HeatingCoils::GetCoilCapacity(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
-                            if (VRFTU(VRFTUNum).DesignSuppHeatingCapacity == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                                 ErrorsFound = true;
@@ -4039,7 +4038,6 @@ namespace HVACVariableRefrigerantFlow {
                         errFlag = false;
                         VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
-                        if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -4085,7 +4083,6 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         // Get the supplemental heating coil steam max volume flow rate
                         VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, errFlag);
-                        if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) VRFTU(VRFTUNum).SuppHeatCoilRequestAutoSize = true;
                         if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                             int SteamIndex = 0; // fluid type index of 0 is passed if steam
                             Real64 TempSteamIn = 100.0;
@@ -5429,10 +5426,6 @@ namespace HVACVariableRefrigerantFlow {
                                                          VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
                                                          VRFTU(VRFTUNum).SuppHeatCoilCompNum);
 
-                    //     simulate water coil to find operating capacity
-                    WaterCoils::SimulateWaterCoilComponents(
-                        VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatCoilCapacity);
-
                     //     simulate steam coil to find operating capacity
                     SteamCoils::SimulateSteamCoilComponents(VRFTU(VRFTUNum).SuppHeatCoilName,
                                                             FirstHVACIteration,
@@ -6426,6 +6419,7 @@ namespace HVACVariableRefrigerantFlow {
         DataFracOfAutosizedHeatingAirflow = 1.0;
         DataFracOfAutosizedCoolingCapacity = 1.0;
         DataFracOfAutosizedHeatingCapacity = 1.0;
+        SuppHeatCap = 0.0;
 
         if (MyOneTimeSizeFlag) {
             // initialize the environment and sizing flags
@@ -6940,8 +6934,9 @@ namespace HVACVariableRefrigerantFlow {
                 IsAutoSize = true;
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
+                if (CurZoneEqNum > 0) ZoneEqSizing(CurZoneEqNum).DesSuppHeatCapAutosized = true;
             }
-            // DataSizing::SuppHeatCap = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
+            DataSizing::SuppHeatCap = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
         }
 
         if (CurZoneEqNum > 0) {
@@ -6966,7 +6961,6 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             Real64 SuppHeatCoilLoad = 0.0;
-
             // simulate the TU to size the coils
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
@@ -7669,8 +7663,6 @@ namespace HVACVariableRefrigerantFlow {
 
         if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
 
-            // if ((QZnReq > 0.0 && QZnReq < FullOutput) || (QZnReq < 0.0 && QZnReq > FullOutput)) {
-
             Par(1) = VRFTUNum;
             Par(2) = 0.0;
             Par(4) = 0.0;
@@ -7879,7 +7871,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        if (VRFTU(VRFTUNum).CoolingCoilPresent) {
+        if (this->CoolingCoilPresent) {
             // above condition for heat pump mode, below condition for heat recovery mode
             if ((!VRF(VRFCond).HeatRecoveryUsed && CoolingLoad(VRFCond)) ||
                 (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
@@ -7901,7 +7893,7 @@ namespace HVACVariableRefrigerantFlow {
             LoopDXCoolCoilRTF = 0.0;
         }
 
-        if (VRFTU(VRFTUNum).HeatingCoilPresent) {
+        if (this->HeatingCoilPresent) {
             // above condition for heat pump mode, below condition for heat recovery mode
             if ((!VRF(VRFCond).HeatRecoveryUsed && HeatingLoad(VRFCond)) ||
                 (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
@@ -7929,10 +7921,10 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // track fan power per terminal unit for calculating COP
-        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            VRFTU(VRFTUNum).FanPower = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->fanPower();
+        if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            this->FanPower = HVACFan::fanObjs[this->FanIndex]->fanPower();
         } else {
-            VRFTU(VRFTUNum).FanPower = Fans::GetFanPower(VRFTU(VRFTUNum).FanIndex);
+            this->FanPower = Fans::GetFanPower(this->FanIndex);
         }
 
         // run supplemental heating coil
@@ -7949,14 +7941,14 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // If there is a supply side air terminal mixer, calculate its output
-        if (VRFTU(VRFTUNum).ATMixerExists) {
-            if (VRFTU(VRFTUNum).ATMixerType == ATMixer_SupplySide) {
-                SimATMixer(VRFTU(VRFTUNum).ATMixerName, FirstHVACIteration, VRFTU(VRFTUNum).ATMixerIndex);
+        if (this->ATMixerExists) {
+            if (this->ATMixerType == ATMixer_SupplySide) {
+                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             }
         }
         // calculate sensible load met
-        if (VRFTU(VRFTUNum).ATMixerExists) {
-            if (VRFTU(VRFTUNum).ATMixerType == ATMixer_SupplySide) {
+        if (this->ATMixerExists) {
+            if (this->ATMixerType == ATMixer_SupplySide) {
                 // Air terminal supply side mixer
                 MinHumRat = min(Node(ZoneNode).HumRat, Node(ATMixOutNode).HumRat);
                 LoadMet =
@@ -13633,19 +13625,14 @@ namespace HVACVariableRefrigerantFlow {
             auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
 
             if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
-                    HeatingCoils::SimulateHeatingCoilComponents(this->SuppHeatCoilName,
-                                                                FirstHVACIteration,
-                                                                SuppHeatCoilLoad,
-                                                                this->SuppHeatCoilIndex,
-                                                                QActual,
-                                                                true,
-                                                                this->OpMode,
-                                                                PartLoadRatio);
-                } else {
-                    SuppHeatCoilLoad = QActual;
-                    this->SuppHeatPartLoadRatio = 0.0;
-                }
+                HeatingCoils::SimulateHeatingCoilComponents(this->SuppHeatCoilName,
+                                                            FirstHVACIteration,
+                                                            SuppHeatCoilLoad,
+                                                            this->SuppHeatCoilIndex,
+                                                            QActual,
+                                                            true,
+                                                            this->OpMode,
+                                                            PartLoadRatio);
                 SuppHeatCoilLoad = QActual;
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                 if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {

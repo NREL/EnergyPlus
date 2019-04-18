@@ -164,7 +164,8 @@ namespace ReportSizingManager {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_990("('! <Component Sizing Information>, Component Type, Component Name, ','Input Field Description, Value')");
+        static ObjexxFCL::gio::Fmt Format_990(
+            "('! <Component Sizing Information>, Component Type, Component Name, ','Input Field Description, Value')");
         static ObjexxFCL::gio::Fmt Format_991("(' Component Sizing Information, ',A,', ',A,', ',A,', ',A)");
 
         if (MyOneTimeFlag) {
@@ -2135,7 +2136,9 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if (SizingType == HeatingCapacitySizing) {
-                    if (ZoneEqSizing(CurZoneEqNum).HeatingCapacity) {
+                    if (ZoneEqSizing(CurZoneEqNum).DesSuppHeatCapAutosized) {
+                        NominalCapacityDes = DataSizing::SuppHeatCap;
+                    } else if (ZoneEqSizing(CurZoneEqNum).HeatingCapacity) {
                         NominalCapacityDes = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                         if (DataFlowUsedForSizing > 0.0) {
                             DesVolFlow = DataFlowUsedForSizing;
@@ -4119,9 +4122,9 @@ namespace ReportSizingManager {
         int TimeStepAtPeak(0);
         Real64 ZoneCoolLoadSum(0); // sum of zone cooling loads at the peak [W]
         Real64 AvgZoneTemp(0);     // average zone temperature [C]
-        Real64 AvgSupTemp(0.0);         // average supply temperature for bypass control [C]
-        Real64 TotFlow(0.0);            // total flow for bypass control [m3/s]
-        Real64 MixTemp(0.0);            // mixed air temperature at the peak [C]
+        Real64 AvgSupTemp(0.0);    // average supply temperature for bypass control [C]
+        Real64 TotFlow(0.0);       // total flow for bypass control [m3/s]
+        Real64 MixTemp(0.0);       // mixed air temperature at the peak [C]
 
         CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
         PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
