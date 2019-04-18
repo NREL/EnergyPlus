@@ -4,6 +4,7 @@ Enhancement: VAV Changeover Bypass
 **Richard Raustad, FSEC**
 
  - 29 March 2019 - NFP - Initial Draft
+ - 18 April 2019 - NFP - Final Draft
 
 ## Justification for New Feature ##
 
@@ -55,9 +56,21 @@ Figure 2: ![Figure 2](https://github.com/NREL/EnergyPlus/blob/New-Feature-CBVAV-
 
 3/28/2019 - Provide initial schematic of proposed changes to select individuals for review.
 
-3/28/2019 - Initial response agrees that these changes would address the underlying issue.
+3/28/2019 - Initial response from Tiejun agrees that these changes would address the underlying issue.
 
 3/29/2019 - provide Initial draft NFP
+
+4/1/2019 - Edwin commented:
+
+    1 - Like the DOAS to multiple AHU, I feel concerned about extra iteration required to handle this situation where you are coupling nodes together
+    2 - Presumably in figure 2 you don't need a zonemixer because the return plenum collects the zone return nodes 
+    3 - in figure 2 it mentions the internal OA mixer will have flow set to zero when using an AirLoopHVAC:OASys -- is there already a precedent for this? Does the solution algorithm rely on there being an OA mixer internal there? Seems like it could be a chance to remove some calculations that aren't necessary.
+
+4/2/2019 - Answers to Edwin's questions:
+
+    1 - Well, it seems adding another node to the mixer or plenum is no different than adding another zone. I am not sure if additional iterations would be needed since if the flow to the zones converges then so does the bypass flow.
+    2 - Figure 2 is missing the notation of the mixer (forgot to update the figure in the media folder). So the Changeover Bypass VAV model (CBVAV) can connect to either a mixer (when no plenum is used) or a plenum (when no mixer is needed).
+    3 - In CBVAV the internal mixer is required because this is where the bypass was mixed and making the internal OA mixer optional would have made things harder [I think]). Setting internal OA mixer flow = 0 is more of a suggestion since sizing won't be able to handle both OA streams. Using both would also introduce excess outdoor air. User could specify both OA flow's if desired, it's just not how a unit in the field would be configured. Not sure yet how many, if any, calculations could be skipped.
 
 
 ## Overview and Approach ##
