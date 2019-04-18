@@ -2,7 +2,7 @@
 
 This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems.
 
-A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
+A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 20 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
 There are two alternative VRF models in EnergyPlus:
 
@@ -16,7 +16,7 @@ There are two alternative VRF models in EnergyPlus:
 
 (Please refer to the engineering reference for more technical details of the two models).
 
-In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object, the name of which is entered as an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
+In the VRF system model, direct-expansion cooling and/or heating coils with an optional supplemental heating coil are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object, the name of which is entered as an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 
 The Energyplus connection methodology is shown as dashed and greyed arrows in Figure~\ref{fig:variable-refrigerant-flow-schematic} according to the following rules:
 
@@ -204,7 +204,7 @@ This alpha field identifies the schedule used when the previous field is set to 
 
 \paragraph{Field: Zone Terminal Unit List Name}\label{field-zone-terminal-unit-list-name}
 
-This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit: VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object.
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object. In addition, each name specified in this list should match the name of a valid \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object. All terminal units connected to this heat pump must be listed in this \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object.
 
 Note: the previous field is designated at the last field necessary to simulate the variable refrigerant flow heat pump. The following fields do not have to be entered, however, piping loses, defrost operation, crankcase heater operation, and basin heater operation will not be modeled. Defaults for fields not entered may also not apply. These remaining fields must be entered if that portion of the model is to be simulated.
 

@@ -3890,10 +3890,10 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 \subsection{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}\label{zonehvacterminalunitvariablerefrigerantflow}
 
-Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} objects). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
+Zone terminal units with variable refrigerant flow compound HVAC object are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} objects). The zone terminal VRF compound object contains a DX cooling coil, a DX heating coil, supply fan, and an optional supplemental heating coil objects. zone The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
 
-The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
-
+The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatingfuel]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
+ 
 A supply air fan is also required and can be modeled as either draw through or blow through. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume} if \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanvariablevolume]{Fan:VariableVolume} if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
 
 \subsubsection{Inputs}\label{inputs-14-018}
@@ -4008,6 +4008,22 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
+\paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-2-000}
+
+This alpha field defines the type of supplemental heating coil to be used by this VRF terminal unit. The input requirements for these heating coil objects are described elsewhere in this document. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (VRF terminal unit) itself provides the “controller” function of modulating water flow. Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatingfuel]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. 
+
+\paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name-2-000}
+
+This alpha field defines the name of the supplemental heating coil used by this VRF terminal unit, and this name should match the name specified in the corresponding heating coil object. 
+
+\paragraph{Field: Maximum Supply Air Temperature from Supplemental Heater}\label{field-maximum-supply-air-temperature-from-supplemental-heater-2-000}
+
+This numeric field defines the maximum supply air temperature in degrees Celsius leaving the VRF terminal unit supplemental heater coil. The supplemental heater will be controlled so that its supply air temperature does not exceed this value. This field is autosizable.
+
+\paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-2-000}
+
+This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°C. If this field is left blank, the default value of 21°C will be used.
+
 Following is an example input for a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object.
 
 \begin{lstlisting}
@@ -4037,7 +4053,12 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
   20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
   ,                        !- Rated Total Heating Capacity Sizing Ratio {W/W}
-  ;                        !- Availability Manager List Name
+  ,                        !- Availability Manager List Name
+  ,                        !- Design Specification ZoneHVAC Sizing Object Name
+  Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
+  TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name
+  autosize,                !- Maximum Supply Air Temperature from Supplemental Heater
+  ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation  
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-006}
