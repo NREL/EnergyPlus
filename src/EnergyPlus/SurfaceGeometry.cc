@@ -1936,12 +1936,13 @@ namespace SurfaceGeometry {
                 int const zoneNum(Surface(SurfNum).Zone);
                 auto &surfZone(Zone(zoneNum));
                 surfZone.ZoneHTSurfaceList.push_back(SurfNum);
-                    int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
+                int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
                 if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
                     DataSurfaces::AllIZSurfaceList.push_back(SurfNum);
                     surfZone.ZoneIZSurfaceList.push_back(SurfNum);
-                    surfZone.ZoneHTSurfaceList.push_back(surfExtBoundCond);
-                    surfZone.ZoneIZSurfaceList.push_back(surfExtBoundCond);
+                    auto &adjZone(Zone(Surface(surfExtBoundCond).Zone));
+                    adjZone.ZoneHTSurfaceList.push_back(SurfNum);
+                    adjZone.ZoneIZSurfaceList.push_back(SurfNum);
                 }
             }
             // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
