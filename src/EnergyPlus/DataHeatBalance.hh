@@ -2184,6 +2184,7 @@ namespace DataHeatBalance {
         std::string Name;       // Name of WAHP Coil
         std::string SourceType; // SourceType for WAHP Coil
         Real64 AvailCapacity;   // Total available heat reclaim capacity
+        Real64 DesuperheaterReclaimedHeat;   // Reclaimed heat from WAHP coil
 
         // Default Constructor
         HeatReclaimHPCoilData() : AvailCapacity(0.0)

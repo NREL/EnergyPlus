@@ -131,9 +131,6 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
     using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
-    using WaterThermalTanks::WaterHeaterDesuperheater;
-    using WaterThermalTanks::WaterThermalTank;
-    using WaterThermalTanks::NumWaterHeaterDesuperheater;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -167,7 +164,6 @@ namespace WaterToAirHeatPumpSimple {
     Real64 QLatRated(0.0);              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
     Real64 QLatActual(0.0);             // Actual Latent Capacity [W]
     Real64 QSource(0.0);                // Source side heat transfer rate [W]
-    Real64 WHDSHT_Reclaimed_Heat(0.0);   // Reclaimed heat by water heater desuperheater[W]
     Real64 Winput(0.0);                 // Power Consumption [W]
     Real64 PLRCorrLoadSideMdot(0.0);    // Load Side Mdot corrected for Part Load Ratio of the unit
     bool MyOneTimeFlag(true);           // one time allocation flag
@@ -1125,6 +1121,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP(HPNum).EnergySource = 0.0;
         SimpleWatertoAirHP(HPNum).COP = 0.0;
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
+        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).DesuperheaterReclaimedHeat = 0.0;
     }
 
     void SizeHVACWaterToAir(int const HPNum)
@@ -2196,8 +2193,6 @@ namespace WaterToAirHeatPumpSimple {
 
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
-        int DesuperheaterNum;
-        Real64 WHDSHT_Reclaimed_Heat(0.0);
         static int Count(0);        // No idea what this is for.
         static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
@@ -2380,18 +2375,12 @@ namespace WaterToAirHeatPumpSimple {
         Winput *= RuntimeFrac;
         QSource = QSource_fullload * PartLoadRatio;
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = QSource;
-        for (DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum) {
-            if (UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType,"COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") 
-                && UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,SimpleWatertoAirHP(HPNum).Name)) {
-                WHDSHT_Reclaimed_Heat += WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            }
-        }
         
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = Winput;
 
         ReportingConstant = TimeStepSys * SecInHour;
-        QSource = QSource - WHDSHT_Reclaimed_Heat;
+        QSource = QSource - DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).DesuperheaterReclaimedHeat;
         // Update heat pump data structure
         SimpleWatertoAirHP(HPNum).Power = Winput;
         SimpleWatertoAirHP(HPNum).QLoadTotal = QLoadTotal;

@@ -1933,6 +1933,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput();
     ErrorsFound = false;
@@ -2223,6 +2225,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     int TankNum(1);
     ErrorsFound = false;
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+    //Test if the new data Structure successfully initialized
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
 
@@ -2257,8 +2260,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
-
-    // check source inlet and outlet temperatures are different
+    // If there's no demand in water thermal tank, no heat is reclaimed 
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
@@ -2277,8 +2279,11 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     WaterThermalTanks::InitWaterThermalTank(TankNum,true);
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
+    //The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
+    //The heater rate is correctly calculated
     EXPECT_EQ(Desuperheater.HeaterRate, 1000*0.25);
+    //The source rate calculated in stratified tank calculation function is near the heater rate calcualted in desuperheater function
     EXPECT_NEAR(Tank.SourceRate, Desuperheater.HeaterRate, Tank.SourceRate*0.05);
 
 }
