@@ -74,14 +74,6 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
-        if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condOutletNodeIndex)) {
-            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
-            ShowContinueError("Condenser Outlet Node Name=\"" + input_data.condenser_outlet_node_name +
-                "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-            ShowContinueError(
-                "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-        }
-
     } else {
         this->condOutletNodeIndex = 0;
     }
