@@ -59,10 +59,10 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchInputManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -1712,9 +1712,9 @@ namespace SimAirServingZones {
                     NumComponentsInSys += PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
                 }
                 // set the Simple flag
-                if (PrimaryAirSystem(AirLoopNum).NumBranches == 1 && NumComponentsInSys == 1) {
-                    AirLoopControlInfo(AirLoopNum).Simple = true;
-                }
+                // if (PrimaryAirSystem(AirLoopNum).NumBranches == 1 && NumComponentsInSys == 1) {
+                AirLoopControlInfo(AirLoopNum).Simple = true;
+                //}
 
                 // loop over the air loop's output nodes
                 for (OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
