@@ -70,6 +70,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <Fixtures/EnergyPlusFixture.hh>
+#include <DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
@@ -2056,7 +2057,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 }
 
-TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
+TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
     using DataLoopNode::Node;
     using DataGlobals::HourOfDay;
@@ -2066,6 +2067,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     using DataHVACGlobals::TimeStepSys;
     using WaterThermalTanks::WaterThermalTank;
     using WaterThermalTanks::WaterHeaterDesuperheater;
+    using WaterToAirHeatPumpSimple::SimpleWatertoAirHP;
+    using DataPlant::PlantLoop;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2223,11 +2226,24 @@ TEST_F(EnergyPlusFixture, StratifiedTankDesuperheaterSourceHeat)
     ScheduleManager::UpdateScheduleValues();
 
     int TankNum(1);
+    int HPNum(1);
+    int CyclingScheme(1);
     ErrorsFound = false;
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
-    //Test if the new data Structure successfully initialized
+    //Test if the new data Structure for water to air heat pump coils successfully initialized
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
+    Node(5).MassFlowRate = 0.05;
+    Node(5).Temp = 30.0;
+    Node(5).HumRat = 0.2 ;
+    Node(3).Temp = 15;
+    SimpleWatertoAirHP(HPNum).LoopNum = 1;
+    PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName = "Water";
+    PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(HPNum, 10, 1,0,100.0, 10.0, CyclingScheme,1.0,1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum,CyclingScheme,1.0,100.0,10.0,1,1.0,1.0);
+    SimpleWatertoAirHP(1).QSource = 100.0;
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity,100.0);
 
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = WaterHeaterDesuperheater(Tank.DesuperheaterNum);
