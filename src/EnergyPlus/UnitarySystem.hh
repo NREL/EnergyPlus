@@ -593,7 +593,9 @@ namespace UnitarySystems {
                                         bool const FirstHVACIteration, // True when first HVAC iteration
                                         int &CompOn,                   // Determines if compressor is on or off
                                         Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                        bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                        bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                        Real64 &sysOutputProvied,      // system sensible output at supply air node
+                                        Real64 &latOutputProvided      // system latent output at supply air node
         );
 
         void updateUnitarySystemControl(int const AirLoopNum,  // number of the current air loop being simulated
@@ -715,7 +717,33 @@ namespace UnitarySystems {
                       bool &CoolActive,
                       int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
                       Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                      bool const ZoneEquipment,    // TRUE if called as zone equipment
+                      Real64 &sysOutputProvided,   // sensible output at supply air node
+                      Real64 &latOutputProvided    // latent output at supply air node
+        );
+
+        void simulate(std::string const &Name,
+                      bool const firstHVACIteration,
+                      int const &AirLoopNum,
+                      int &CompIndex,
+                      bool &HeatActive,
+                      bool &CoolActive,
+                      int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
                       bool const ZoneEquipment     // TRUE if called as zone equipment
+        );
+
+        void simulateSys(std::string const &Name,
+                         bool const firstHVACIteration,
+                         int const &AirLoopNum,
+                         int &CompIndex,
+                         bool &HeatActive,
+                         bool &CoolActive,
+                         int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                         Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                         bool const ZoneEquipment,    // TRUE if called as zone equipment
+                         Real64 &sysOutputProvided,   // sensible output at supply air node
+                         Real64 &latOutputProvided    // latent output at supply air node
         );
 
         void calcUnitarySystemToLoad(int const AirLoopNum,          // index to air loop
