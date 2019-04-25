@@ -45,13 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataGlobals.hh>
 #include <DataHVACControllers.hh>
 #include <DataHeatBalFanSys.hh>
@@ -257,7 +257,59 @@ namespace UnitarySystems {
                               bool &CoolActive,
                               int const ZoneOAUnitNum,
                               Real64 const OAUCoilOutTemp,
+                              bool const ZoneEquipment,
+                              Real64 &sysOutputProvided,
+                              Real64 &latOutputProvided)
+    {
+        simulateSys(Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOutputProvided,
+                    latOutputProvided);
+    }
+
+    void UnitarySys::simulate(std::string const &Name,
+                              bool const FirstHVACIteration,
+                              int const &AirLoopNum,
+                              int &CompIndex,
+                              bool &HeatActive,
+                              bool &CoolActive,
+                              int const ZoneOAUnitNum,
+                              Real64 const OAUCoilOutTemp,
                               bool const ZoneEquipment)
+    {
+        Real64 sysOutputProvided = 0.0;
+        Real64 latOutputProvided = 0.0;
+        simulateSys(Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOutputProvided,
+                    latOutputProvided);
+    }
+
+    void UnitarySys::simulateSys(std::string const &Name,
+                                 bool const FirstHVACIteration,
+                                 int const &AirLoopNum,
+                                 int &CompIndex,
+                                 bool &HeatActive,
+                                 bool &CoolActive,
+                                 int const ZoneOAUnitNum,
+                                 Real64 const OAUCoilOutTemp,
+                                 bool const ZoneEquipment,
+                                 Real64 &sysOutputProvided,
+                                 Real64 &latOutputProvided)
     {
         int CompOn = 0;
 
@@ -292,9 +344,11 @@ namespace UnitarySystems {
                     }
                 } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
                     if (ZoneEquipment) {
-                        this->controlUnitarySystemtoLoad(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoLoad(
+                            0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
-                        this->controlUnitarySystemtoLoad(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoLoad(
+                            AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 }
             }
@@ -1030,7 +1084,9 @@ namespace UnitarySystems {
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
                 this->m_IterationCounter = 0;
-                for (auto & val : this->m_IterationMode) { val = 0; }
+                for (auto &val : this->m_IterationMode) {
+                    val = 0;
+                }
 
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) > 0.0) {
@@ -6856,7 +6912,9 @@ namespace UnitarySystems {
                                                 bool const FirstHVACIteration, // True when first HVAC iteration
                                                 int &CompOn,                   // Determines if compressor is on or off
                                                 Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                                bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                                bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                                Real64 &sysOutputProvided,     // system sensible output at supply air node
+                                                Real64 &latOutputProvided      // sytsem latent output at supply air node
     )
     {
 
@@ -6905,8 +6963,6 @@ namespace UnitarySystems {
         Real64 CoolPLR = this->m_CoolingPartLoadFrac;
         Real64 HeatPLR = this->m_HeatingPartLoadFrac;
         Real64 HeatCoilLoad = HeatPLR * this->m_DesignHeatingCapacity;
-        Real64 SensOutput = 0.0;
-        Real64 LatOutput = 0.0;
 
         if (this->CoolCoilFluidInletNode > 0) {
             PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->CoolCoilFluidInletNode).MassFlowRate,
@@ -6953,8 +7009,8 @@ namespace UnitarySystems {
                                       CoolPLR,
                                       HeatPLR,
                                       OnOffAirFlowRatio,
-                                      SensOutput,
-                                      LatOutput,
+                                      sysOutputProvided,
+                                      latOutputProvided,
                                       HXUnitOn,
                                       HeatCoilLoad,
                                       SupHeaterLoad,
@@ -6970,8 +7026,8 @@ namespace UnitarySystems {
                                               CoolPLR,
                                               HeatPLR,
                                               OnOffAirFlowRatio,
-                                              SensOutput,
-                                              LatOutput,
+                                              sysOutputProvided,
+                                              latOutputProvided,
                                               HXUnitOn,
                                               HeatCoilLoad,
                                               SupHeaterLoad,
