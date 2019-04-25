@@ -338,9 +338,10 @@ namespace UnitarySystems {
                 auto const SELECT_CASE_var(this->m_ControlType);
                 if (SELECT_CASE_var == ControlType::Setpoint) {
                     if (ZoneEquipment) {
-                        this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
-                        this->controlUnitarySystemtoSP(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoSP(
+                            AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
                     if (ZoneEquipment) {
@@ -7065,7 +7066,9 @@ namespace UnitarySystems {
                                               bool const FirstHVACIteration, // True when first HVAC iteration
                                               int &CompOn,                   // compressor on/off control
                                               Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                              bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                              bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                              Real64 &sysOutputProvided,     // sensible output at supply air node
+                                              Real64 &latOutputProvided      // latent output at supply air node
     )
     {
 
@@ -7213,6 +7216,7 @@ namespace UnitarySystems {
             }
         }
 
+        calculateCapacity(sysOutputProvided, latOutputProvided);
         this->m_InitHeatPump = false;
     }
 
@@ -9636,14 +9640,23 @@ namespace UnitarySystems {
     void UnitarySys::calculateCapacity(Real64 &SensOutput, Real64 &LatOutput)
     {
 
-        // Check delta T (outlet to space), IF positive use space HumRat ELSE outlet humrat to calculate
+        // Check delta T (outlet to reference temp), IF positive use reference HumRat ELSE outlet humrat to calculate
         // sensible capacity as MdotDeltaH at constant humidity ratio
-        Real64 MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
         int OutletNode = this->AirOutNode;
         Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
-        Real64 ZoneTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
-        Real64 ZoneHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
-        if (DataLoopNode::Node(OutletNode).Temp < ZoneTemp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat;
+        Real64 RefTemp = 0.0;
+        Real64 RefHumRat = 0.0;
+        Real64 MinHumRatio = 0.0;
+        if (this->m_ControlType == ControlType::Setpoint) {
+            RefTemp = DataLoopNode::Node(this->AirInNode).Temp;
+            RefHumRat = DataLoopNode::Node(this->AirInNode).HumRat;
+            MinHumRatio = DataLoopNode::Node(this->AirInNode).HumRat;
+        } else {
+            RefTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
+            RefHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
+            MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
+        }
+        if (DataLoopNode::Node(OutletNode).Temp < RefTemp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat;
 
         // calculate sensible load met
         if (this->ATMixerExists) {
@@ -9652,12 +9665,12 @@ namespace UnitarySystems {
                 int ATMixOutNode = this->ATMixerOutNode;
                 SensOutput =
                     DataLoopNode::Node(ATMixOutNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ATMixOutNode).Temp, MinHumRatio) -
-                                                                     Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                                                                     Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
                     LatOutput = DataLoopNode::Node(ATMixOutNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(ATMixOutNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                                    (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(ATMixOutNode).HumRat) -
+                                     Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                                 this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
@@ -9665,11 +9678,11 @@ namespace UnitarySystems {
             } else {
                 // Air terminal inlet side mixer
                 SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                            Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
-                    LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                               Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                    LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
+                                               Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                                 this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
@@ -9678,14 +9691,14 @@ namespace UnitarySystems {
         } else {
             // Calculate sensible load met (at constant humidity ratio)
             SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                        Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio)) -
+                                        Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
                          this->m_SenLoadLoss;
 
             if (this->m_Humidistat) {
 
                 //   Calculate latent load met (at constant temperature)
-                LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                           Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
+                                           Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                             this->m_LatLoadLoss;
             } else {
                 LatOutput = 0.0;
