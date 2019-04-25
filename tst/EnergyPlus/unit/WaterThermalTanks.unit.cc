@@ -2224,26 +2224,52 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-
+    DataPlant::TotNumLoops=1;
     int TankNum(1);
     int HPNum(1);
     int CyclingScheme(1);
+    int LoopNum(1);
+    int DemandSide(1);
+    int SupplySide(2);
+    int BranchNum(1);
+    int CompNum(1);
+    Real64 PLR(0.5);
     ErrorsFound = false;
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
     //Test if the new data Structure for water to air heat pump coils successfully initialized
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
-    Node(5).MassFlowRate = 0.05;
-    Node(5).Temp = 30.0;
+    //Air node
+    Node(5).MassFlowRate = 0.005;
+    Node(5).Temp = 28.0;
     Node(5).HumRat = 0.2 ;
+    //Water node
     Node(3).Temp = 15;
+    Node(3).MassFlowRate = 0.05;
+    //Plant loop must be initialized
     SimpleWatertoAirHP(HPNum).LoopNum = 1;
-    PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName = "Water";
+    PlantLoop.allocate(LoopNum);
     PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(HPNum, 10, 1,0,100.0, 10.0, CyclingScheme,1.0,1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum,CyclingScheme,1.0,100.0,10.0,1,1.0,1.0);
-    SimpleWatertoAirHP(1).QSource = 100.0;
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity,100.0);
+    PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
+    PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
+    auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
+    SupplySideloop.TotalBranches = 1;
+    SupplySideloop.Branch.allocate(BranchNum);
+    auto &CoilBranch(SupplySideloop.Branch(BranchNum));
+    CoilBranch.TotalComponents = 1;
+    CoilBranch.Comp.allocate(CompNum);
+    CoilBranch.Comp(CompNum).TypeOf_Num = 67;
+    CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
+
+    DataGlobals::BeginEnvrnFlag = true;
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(HPNum, 10, 1,0,10.0, 10.0, CyclingScheme,1.0,1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum,CyclingScheme,1.0,10.0,10.0,1,PLR,1.0);
+    //Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity,SimpleWatertoAirHP(1).QSource);
+    //Reclaimed heat successfully returned to reflect the plant impact
+    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).DesuperheaterReclaimedHeat = 100.0;
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum,CyclingScheme,1.0,10.0,10.0,1,PLR,1.0);
+    EXPECT_EQ(SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity-100);
 
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = WaterHeaterDesuperheater(Tank.DesuperheaterNum);
@@ -2289,16 +2315,16 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SourceOutletTemp = 39;
     Tank.SourceMassFlowRate = 0.003;
     Tank.TimeElapsed = 0.0;
-    Desuperheater.Mode = 1;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
 
     WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     WaterThermalTanks::InitWaterThermalTank(TankNum,true);
+    Desuperheater.Mode = 1;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
     //The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
     //The heater rate is correctly calculated
-    EXPECT_EQ(Desuperheater.HeaterRate, 1000*0.25);
+    EXPECT_EQ(Desuperheater.HeaterRate, 1000 * 0.25 / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR);
     //The source rate calculated in stratified tank calculation function is near the heater rate calcualted in desuperheater function
     EXPECT_NEAR(Tank.SourceRate, Desuperheater.HeaterRate, Tank.SourceRate*0.05);
 
