@@ -586,7 +586,9 @@ namespace UnitarySystems {
                                       bool const FirstHVACIteration, // True when first HVAC iteration
                                       int &CompOn,                   // compressor on/off control
                                       Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                      bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                      bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                      Real64 &sysOutputProvided,     // sensible output at supply air node
+                                      Real64 &latOutputProvided      // latent output at supply air node
         );
 
         void controlUnitarySystemtoLoad(int const AirLoopNum,          // Primary air loop number
