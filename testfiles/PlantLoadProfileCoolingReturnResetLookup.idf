@@ -13,7 +13,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictCooling.
 
-  Version,9.1;
+  Version,9.2;
 
   Building,
     Plant Load Profile Cooling,  !- Name
