@@ -116,10 +116,10 @@ namespace HeatPumpWaterToWaterHEATING {
     Real64 Power(0.0);                       // power consumption Watts Joules/sec
     Real64 QLoad(0.0);                       // heat rejection from Load Side coil Joules
     Real64 QSource(0.0);                     // cooling capacity Joules
-    Real64 SourceSideWaterOutletTemp(0.0);   // Source Side outlet temperature �C
-    Real64 SourceSideWaterInletTemp(0.0);    // Source Side outlet temperature �C
-    Real64 LoadSideWaterOutletTemp(0.0);     // Source Side outlet temperature �C
-    Real64 LoadSideWaterInletTemp(0.0);      // Source Side outlet temperature �C
+    Real64 SourceSideWaterOutletTemp(0.0);   // Source Side outlet temperature degC
+    Real64 SourceSideWaterInletTemp(0.0);    // Source Side outlet temperature degC
+    Real64 LoadSideWaterOutletTemp(0.0);     // Source Side outlet temperature degC
+    Real64 LoadSideWaterInletTemp(0.0);      // Source Side outlet temperature degC
     Array1D_bool CheckEquipName;
 
     // Object Data
@@ -657,7 +657,7 @@ namespace HeatPumpWaterToWaterHEATING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -668,21 +668,21 @@ namespace HeatPumpWaterToWaterHEATING {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SourceSideEffect;     // Source Side effectiveness
         Real64 LoadSideEffect;       // Load Side effectiveness
-        Real64 SourceSideTemp;       // Source Side temperature �C
-        Real64 LoadSideTemp;         // Load Side temperature �C
+        Real64 SourceSideTemp;       // Source Side temperature degC
+        Real64 LoadSideTemp;         // Load Side temperature degC
         Real64 SourceSideUA;         // Source Side heat transfer coefficient    w/k
         Real64 LoadSideUA;           // Load Side heat transfer coefficient W/k
         Real64 SourceSidePressure;   // Source Side pressure Pascals
         Real64 LoadSidePressure;     // Load Side pressure Pascals
         Real64 SuctionPr;            // Suction Pressure  pascals
         Real64 DischargePr;          // Discharge Pressure pascals
-        Real64 CompressInletTemp;    // Compressor inlet temperature  �C
-        Real64 PressureDrop;         // Suction Pressure drop �C
+        Real64 CompressInletTemp;    // Compressor inlet temperature  degC
+        Real64 PressureDrop;         // Suction Pressure drop degC
         Real64 ClearanceFactor;      // Clearance factor
         Real64 PistonDisp;           // Compressor piston displacement  m3
-        Real64 ShTemp;               // Superheat temperature �C
+        Real64 ShTemp;               // Superheat temperature degC
         Real64 LosFac;               // Loss factor used to define the electromechanical loss for compressor
-        Real64 MassRef;              // mass flow rate of refrigerant Kg/s
+        Real64 MassRef;              // mass flow rate of refrigerant kg/s
         Real64 SourceSideOutletEnth; // Enthalpy at Source Side pressure Joules
         Real64 LoadSideOutletEnth;   // Enthalpy at Condensor Pressure  Joules
         Real64 initialQSource;       // Guess Source Side Heat rate Joules
@@ -999,19 +999,19 @@ namespace HeatPumpWaterToWaterHEATING {
                     ShowWarningError(ModuleCompName + " did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + GSHP(GSHPNum).Name);
-                    gio::write(ErrString, fmtLD) << std::abs(100.0 * (QLoad - initialQLoad) / (initialQLoad + SmallNum));
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (QLoad - initialQLoad) / (initialQLoad + SmallNum));
                     ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QLoad;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QLoad;
                     ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << QSource;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << QSource;
                     ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterMassFlowRate;
                     ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterMassFlowRate;
                     ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << SourceSideWaterInletTemp;
                     ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
+                    ObjexxFCL::gio::write(ErrString, fmtLD) << LoadSideWaterInletTemp;
                     ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
                 }
                 goto LOOPLoadEnth_exit;

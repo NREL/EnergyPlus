@@ -510,7 +510,7 @@ namespace CommandLineInterface {
         // Check for IDD and IDF files
         {
             IOFlags flags;
-            gio::inquire(EnergyPlusIniFileName, flags);
+            ObjexxFCL::gio::inquire(EnergyPlusIniFileName, flags);
             EPlusINI = flags.exists();
         }
         if (EPlusINI) {
@@ -518,7 +518,7 @@ namespace CommandLineInterface {
             {
                 IOFlags flags;
                 flags.ACTION("read");
-                gio::open(LFN, EnergyPlusIniFileName, flags);
+                ObjexxFCL::gio::open(LFN, EnergyPlusIniFileName, flags);
                 iostatus = flags.ios();
             }
             if (iostatus != 0) {
@@ -527,7 +527,7 @@ namespace CommandLineInterface {
             }
             {
                 IOFlags flags;
-                gio::inquire(LFN, flags);
+                ObjexxFCL::gio::inquire(LFN, flags);
                 CurrentWorkingFolder = flags.name();
             }
             // Relying on compiler to supply full path name here
@@ -540,7 +540,7 @@ namespace CommandLineInterface {
             //       Get directories from ini file
             ReadINIFile(LFN, "program", "dir", ProgramPath);
 
-            gio::close(LFN);
+            ObjexxFCL::gio::close(LFN);
 
             inputIddFileName = ProgramPath + "Energy+.idd";
         }
@@ -548,7 +548,7 @@ namespace CommandLineInterface {
         // Check if specified files exist
         {
             IOFlags flags;
-            gio::inquire(inputFileName, flags);
+            ObjexxFCL::gio::inquire(inputFileName, flags);
             FileExists = flags.exists();
         }
         if (!FileExists) {
@@ -560,7 +560,7 @@ namespace CommandLineInterface {
         if (opt.isSet("-w") && !DDOnlySimulation) {
             {
                 IOFlags flags;
-                gio::inquire(inputWeatherFileName, flags);
+                ObjexxFCL::gio::inquire(inputWeatherFileName, flags);
                 FileExists = flags.exists();
             }
             if (!FileExists) {
@@ -574,7 +574,7 @@ namespace CommandLineInterface {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(OutputFileDebug, outputDbgFileName, flags);
+            ObjexxFCL::gio::open(OutputFileDebug, outputDbgFileName, flags);
             iostatus = flags.ios();
         }
         if (iostatus != 0) {
@@ -589,7 +589,7 @@ namespace CommandLineInterface {
             std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
             {
                 IOFlags flags;
-                gio::inquire(epMacroPath, flags);
+                ObjexxFCL::gio::inquire(epMacroPath, flags);
                 FileExists = flags.exists();
             }
             if (!FileExists) {
@@ -612,7 +612,7 @@ namespace CommandLineInterface {
             std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
             {
                 IOFlags flags;
-                gio::inquire(expandObjectsPath, flags);
+                ObjexxFCL::gio::inquire(expandObjectsPath, flags);
                 FileExists = flags.exists();
             }
             if (!FileExists) {
@@ -625,7 +625,7 @@ namespace CommandLineInterface {
             // check if IDD actually exists since ExpandObjects still requires it
             {
                 IOFlags flags;
-                gio::inquire(inputIddFileName, flags);
+                ObjexxFCL::gio::inquire(inputIddFileName, flags);
                 FileExists = flags.exists();
             }
             if (!FileExists) {
@@ -644,7 +644,7 @@ namespace CommandLineInterface {
             moveFile("expandedidf.err", outputExperrFileName);
             {
                 IOFlags flags;
-                gio::inquire("expanded.idf", flags);
+                ObjexxFCL::gio::inquire("expanded.idf", flags);
                 FileExists = flags.exists();
             }
             if (FileExists) {
@@ -718,7 +718,7 @@ namespace CommandLineInterface {
         bool NewHeading;
 
         // Formats
-        static gio::Fmt Format_700("(A)");
+        static ObjexxFCL::gio::Fmt Format_700("(A)");
 
         DataOut.clear();
 
@@ -727,7 +727,7 @@ namespace CommandLineInterface {
         Param = KindofParameter;
         strip(Param);
         ILEN = len(Param);
-        gio::rewind(UnitNumber); // Performance Ouch!
+        ObjexxFCL::gio::rewind(UnitNumber); // Performance Ouch!
         EndofFile = false;
         Found = false;
         NewHeading = false;
@@ -735,7 +735,7 @@ namespace CommandLineInterface {
         while (!EndofFile && !Found) {
             {
                 IOFlags flags;
-                gio::read(UnitNumber, Format_700, flags) >> LINE;
+                ObjexxFCL::gio::read(UnitNumber, Format_700, flags) >> LINE;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) {
@@ -760,7 +760,7 @@ namespace CommandLineInterface {
             while (!EndofFile && !NewHeading) {
                 {
                     IOFlags flags;
-                    gio::read(UnitNumber, Format_700, flags) >> LINE;
+                    ObjexxFCL::gio::read(UnitNumber, Format_700, flags) >> LINE;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat < GoodIOStatValue) {

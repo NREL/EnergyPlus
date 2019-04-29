@@ -1030,8 +1030,7 @@ namespace UnitarySystems {
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
                 this->m_IterationCounter = 0;
-                this->m_IterationMode.clear();
-                this->m_IterationMode.resize(21);
+                for (auto & val : this->m_IterationMode) { val = 0; }
 
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) > 0.0) {
@@ -2615,7 +2614,7 @@ namespace UnitarySystems {
                     thisSys.UnitarySystemType_Num = SimAirServingZones::UnitarySystemModel;
                 }
 
-                thisSys.m_IterationMode.resize(21);
+                thisSys.m_IterationMode.resize(3);
 
                 std::string loc_heatingCoilType("");
                 if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
@@ -8776,22 +8775,26 @@ namespace UnitarySystems {
                 }
             }
 
-            if (CoolingLoad && this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = CoolingMode;
-            } else if (HeatingLoad && this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = HeatingMode;
-            } else if (this->m_IterationCounter <= 20) {
-                this->m_IterationMode[this->m_IterationCounter] = NoCoolHeat;
+            // push iteration mode stack and set current mode
+            this->m_IterationMode[2] = this->m_IterationMode[1];
+            this->m_IterationMode[1] = this->m_IterationMode[0];
+            if (CoolingLoad) {
+                this->m_IterationMode[0] = CoolingMode;
+            } else if (HeatingLoad) {
+                this->m_IterationMode[0] = HeatingMode;
+            } else {
+                this->m_IterationMode[0] = NoCoolHeat;
             }
             // IF small loads to meet or not converging, just shut down unit
             if (std::abs(ZoneLoad) < Small5WLoad) {
                 ZoneLoad = 0.0;
                 CoolingLoad = false;
                 HeatingLoad = false;
-            } else if (this->m_IterationCounter > 6) {                // attempt to lock output (air flow) if oscillations are detected
-                int OperatingMode = this->m_IterationMode[7];         // VS systems can take a few more iterations than single-speed systems
-                int OperatingModeMinusOne = this->m_IterationMode[6]; // previously tested 5th iteration, now tests 7th
-                int OperatingModeMinusTwo = this->m_IterationMode[5];
+            } else if (this->m_IterationCounter > (DataHVACGlobals::MinAirLoopIterationsAfterFirst + 6)) {
+                // attempt to lock output (air flow) if oscillations are detected
+                int OperatingMode = this->m_IterationMode[0]; // VS systems can take a few more iterations than single-speed systems
+                int OperatingModeMinusOne = this->m_IterationMode[1];
+                int OperatingModeMinusTwo = this->m_IterationMode[2];
                 bool Oscillate = true;
                 if (OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo) Oscillate = false;
                 if (Oscillate) {
@@ -10406,7 +10409,7 @@ namespace UnitarySystems {
                 //      and if coolReheat, check hum rat as well
                 if (((NoLoadTempOut - DesOutTemp) < Acc) && ((NoLoadHumRatOut - DesOutHumRat) < HumRatAcc)) {
                     PartLoadFrac = 0.0;
-                } else if (SensibleLoad) { // need to turn on compressor to see if load is met
+                } else { // need to turn on compressor to see if load is met
                     PartLoadFrac = 1.0;
                     CompOn = 1;
                     m_WSHPRuntimeFrac = 1.0;
@@ -10571,7 +10574,9 @@ namespace UnitarySystems {
                                (this->m_TESOpMode == PackagedThermalStorageCoil::OffMode ||
                                 this->m_TESOpMode == PackagedThermalStorageCoil::ChargeOnlyMode)) {
                         PartLoadFrac = 0.0;
-                    } else {
+                    } else if (!SensibleLoad) {
+                        PartLoadFrac = 0.0;
+                    } else if (SensibleLoad) {
 
                         Par[9] = double(AirLoopNum);
                         Par[10] = 0.0;
@@ -10866,6 +10871,7 @@ namespace UnitarySystems {
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
                                      (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
                                       Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                        FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         //   Check to see if the system can meet the load with the compressor off
                         //   If NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
@@ -10906,6 +10912,7 @@ namespace UnitarySystems {
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
                                      (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
                                       Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                        FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
                         // Check that this is the case; IF not set PartLoadFrac = 0.0 (off) and return
