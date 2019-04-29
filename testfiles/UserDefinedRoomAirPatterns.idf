@@ -59,7 +59,7 @@
 !
 !   The model also contains an under floor zone and a suspended ceiling zone
 
-  Version,9.1;
+  Version,9.2;
 
   Timestep,4;
 
