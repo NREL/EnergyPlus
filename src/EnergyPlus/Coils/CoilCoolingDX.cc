@@ -203,6 +203,25 @@ void CoilCoolingDX::oneTimeInit(){
                             _,
                             "System");
     }
+    if (this->evaporativeCondSupplyTankIndex > 0) {
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->evapCondPumpElecPower,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->evapCondPumpElecConsumption,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            "Electric",
+                            "COOLING",
+                            _,
+                            "System");
+    }
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
@@ -280,8 +299,13 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // update requests for evap condenser tank
 	if (this->evaporativeCondSupplyTankIndex > 0) {
 		Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
-		this->evaporativeCondSupplyTankVolumeFlow = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / waterDensity;
-		DXCoil(DXCoilNum).EvapCondPumpElecPower = EvapCondPumpElecPower;
+        Real64 condInletTemp = DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) * (1.0 - this->performance.normalMode.speeds[speedNum-1].evap_condenser_effectiveness);
+        Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+
+        this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - OutdoorHumRat) * CondAirMassFlow / waterDensity;
+		if (!useAlternateMode) {
+            this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
+        }
 		DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
 				this->evaporativeCondSupplyTankVolumeFlow;
 	}
@@ -295,6 +319,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
     this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
+    this->evapCondPumpElecConsumption = this->evapCondPumpElecPower * reportingConstant;
 
 }
 

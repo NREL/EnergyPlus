@@ -81,6 +81,9 @@ public:
                            int &speedNum,
                            Real64 &speedRatio,
                            int &fanOpMode);
+
+    Real64 getCurrentEvapCondPumpPower(int speedNum);
+
 };
 
 } // namespace EnergyPlus

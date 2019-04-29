@@ -56,6 +56,8 @@ public:
     int evaporativeCondSupplyTankARRID = 0;
     Real64 evaporativeCondSupplyTankVolumeFlow = 0.0;
     Real64 evaporativeCondSupplyTankVolumeConsumption = 0.0;
+	Real64 evapCondPumpElecPower = 0.0;
+	Real64 evapCondPumpElecConsumption = 0.0;
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
