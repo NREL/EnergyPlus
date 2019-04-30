@@ -40,6 +40,7 @@ for root, dirs, filenames in os.walk(repo_root):
                     print(json.dumps({
                         'tool': 'check_non_utf8',
                         'filename': relative_file_path,
+                        'file' : relative_file_path,
                         'line': line_num,
                         'messagetype': 'warning',
                         'message': 'File had invalid characters/encoding issues'
