@@ -1234,9 +1234,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchChilledWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchHotWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchHotWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
