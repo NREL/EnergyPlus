@@ -94,7 +94,7 @@ namespace HeatBalanceKivaManager {
     {
     public:
         KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum);
+            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
@@ -107,6 +107,7 @@ namespace HeatBalanceKivaManager {
         void plotDomain();
         Real64 floorWeight;
         int constructionNum;
+        class KivaManager* kmPtr;
 
 #ifdef GROUND_PLOT
         Kiva::SnapshotSettings ss;
@@ -134,6 +135,14 @@ namespace HeatBalanceKivaManager {
         FoundationKiva defaultFoundation;
         std::vector<FoundationKiva> foundationInputs;
         std::vector<KivaInstanceMap> kivaInstances;
+
+        struct ConvectionAlgorithms {
+            Kiva::ConvectionAlgorithm in;
+            Kiva::ConvectionAlgorithm out;
+            Kiva::ForcedConvectionTerm f;  // Separated out for faster execution
+        };
+
+        std::map<int, ConvectionAlgorithms> surfaceConvMap;
         std::map<int, Kiva::Aggregator> surfaceMap;
         Real64 timestep;
 

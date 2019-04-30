@@ -263,6 +263,7 @@ rm -f  eplusout.log
 rm -f  eplusout.svg
 rm -f  eplusout.shd
 rm -f  eplusout.wrl
+rm -f  eplusshading.csv
 
 rm -f  eplusout.json
 rm -f  eplusout_detailed_zone.json
@@ -357,6 +358,7 @@ rm -f "${OUT_P}/${ARG1}DElight.eldmp"
 rm -f "${OUT_P}/${ARG1}.svg"
 rm -f "${OUT_P}/${ARG1}.shd"
 rm -f "${OUT_P}/${ARG1}.wrl"
+rm -f "${OUT_P}/${ARG1}Shading.csv"
 
 rm -f "${OUT_P}/${ARG1}.json"
 rm -f "${OUT_P}/${ARG1}_detailed_zone.json"
@@ -841,6 +843,9 @@ if [ -f sqlite.err ]; then
 fi
 if [ -f audit.out ]; then
   mv audit.out "${OUT_P}/${ARG1}.audit.out"
+fi
+if [ -f eplusshading.csv ]; then
+  mv eplusshading.csv "${OUT_P}/${ARG1}Shading.csv"
 fi
 
 # move FMU generated output files to output folder -- FMI

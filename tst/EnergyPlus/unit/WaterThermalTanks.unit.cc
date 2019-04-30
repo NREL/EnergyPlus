@@ -1742,7 +1742,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     // check source inlet and outlet temperatures are different
     EXPECT_EQ(Tank.SourceInletTemp, 5.0);
-    EXPECT_NEAR(Tank.SourceOutletTemp, 10.347, 0.001);
+    EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 
 
@@ -1849,3 +1849,207 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     EXPECT_NEAR(Tank.AmbientZoneGain, TankSkinHeatLossRate, 0.000001);
 }
 
+TEST_F(EnergyPlusFixture, StratifiedTankCalc)
+{
+    using DataGlobals::HourOfDay;
+    using DataGlobals::TimeStep;
+    using DataGlobals::TimeStepZone;
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+    using WaterThermalTanks::WaterThermalTank;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 60.0;",
+        "Schedule:Constant, Ambient Temp Schedule, , 22.0;",
+        "Schedule:Constant, Hot Water Demand Schedule, , 0.0;",
+        "WaterHeater:Stratified,",
+        "  Stratified Tank,         !- Name",
+        "  ,                        !- End-Use Subcategory",
+        "  0.17,                    !- Tank Volume {m3}",
+        "  1.4,                     !- Tank Height {m}",
+        "  VerticalCylinder,        !- Tank Shape",
+        "  ,                        !- Tank Perimeter {m}",
+        "  100.0,                   !- Maximum Temperature Limit {C}",
+        "  MasterSlave,             !- Heater Priority Control",
+        "  Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name",
+        "  2.0,                     !- Heater 1 Deadband Temperature Difference {deltaC}",
+        "  4500,                    !- Heater 1 Capacity {W}",
+        "  1.0,                     !- Heater 1 Height {m}",
+        "  Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name",
+        "  5.0,                     !- Heater 2 Deadband Temperature Difference {deltaC}",
+        "  4500,                    !- Heater 2 Capacity {W}",
+        "  0.0,                     !- Heater 2 Height {m}",
+        "  ELECTRICITY,             !- Heater Fuel Type",
+        "  0.98,                    !- Heater Thermal Efficiency",
+        "  ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ELECTRICITY,             !- Off Cycle Parasitic Fuel Type",
+        "  ,                        !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- Off Cycle Parasitic Height {m}",
+        "  ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ELECTRICITY,             !- On Cycle Parasitic Fuel Type",
+        "  ,                        !- On Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- On Cycle Parasitic Height {m}",
+        "  SCHEDULE,                !- Ambient Temperature Indicator",
+        "  Ambient Temp Schedule,   !- Ambient Temperature Schedule Name",
+        "  ,                        !- Ambient Temperature Zone Name",
+        "  ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "  0.846,                   !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}",
+        "  ,                        !- Skin Loss Fraction to Zone",
+        "  ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}",
+        "  ,                        !- Off Cycle Flue Loss Fraction to Zone",
+        "  0.000189,                !- Peak Use Flow Rate {m3/s}",
+        "  Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name",
+        "  ,                        !- Cold Water Supply Temperature Schedule Name",
+        "  ,                        !- Use Side Inlet Node Name",
+        "  ,                        !- Use Side Outlet Node Name",
+        "  ,                        !- Use Side Effectiveness",
+        "  ,                        !- Use Side Inlet Height {m}",
+        "  ,                        !- Use Side Outlet Height {m}",
+        "  ,                        !- Source Side Inlet Node Name",
+        "  ,                        !- Source Side Outlet Node Name",
+        "  ,                        !- Source Side Effectiveness",
+        "  ,                        !- Source Side Inlet Height {m}",
+        "  ,                        !- Source Side Outlet Height {m}",
+        "  FIXED,                   !- Inlet Mode",
+        "  ,                        !- Use Side Design Flow Rate {m3/s}",
+        "  ,                        !- Source Side Design Flow Rate {m3/s}",
+        "  ,                        !- Indirect Water Heating Recovery Time {hr}",
+        "  12,                      !- Number of Nodes",
+        "  ,                        !- Additional Destratification Conductivity {W/m-K}",
+        "  ,                        !- Node 1 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 2 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 3 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 4 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 5 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 6 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 7 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 8 Additional Loss Coefficient {W/K}",
+        "  ,                        !- Node 9 Additional Loss Coefficient {W/K}",
+        "  ;                        !- Node 10 Additional Loss Coefficient {W/K}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);
+
+    InternalHeatGains::GetInternalHeatGainsInput();
+    ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    HourOfDay = 0;
+    TimeStep = 1;
+    TimeStepZone = 20.0 / 60.0;
+    TimeStepSys = TimeStepZone;
+    const int TankNum = 1;
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
+    for (auto &node : Tank.Node) {
+        node.Temp = 60.0;
+        node.SavedTemp = 60.0;
+    }
+    Tank.AmbientTempZone = 22.0;
+    Tank.AmbientTemp = 22.0;
+    Tank.UseInletTemp = 20.0;
+    Tank.SetPointTemp = 60.0;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.TimeElapsed = 0.0;
+    Tank.UseMassFlowRate = 0.0;
+    Tank.SourceMassFlowRate = 0.0;
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    std::vector<Real64> NodeTemps;
+    NodeTemps.resize(Tank.Nodes);
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
+    }
+
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+
+    EXPECT_LT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp);
+    EXPECT_LT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2);
+    EXPECT_GT(Tank.Node(Tank.HeaterNode1).Temp, Tank.SetPointTemp - Tank.DeadBandDeltaTemp);
+    EXPECT_GT(Tank.Node(Tank.HeaterNode2).Temp, Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2);
+
+
+    // Run a test where the tank turns on a heater during the timestep.
+    for (auto &node : Tank.Node) {
+        node.Temp = 58.05;
+        node.SavedTemp = 58.05;
+    }
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
+    }
+    
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+
+    // Run a test with a use flow rate
+    std::vector<Real64> PrevNodeTemps;
+    PrevNodeTemps.resize(Tank.Nodes);
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
+        node.Temp = 60.0;
+        node.SavedTemp = 60.0;
+        PrevNodeTemps[i] = node.Temp;
+    }
+
+    Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        NodeTemps[i] = Tank.Node[i].Temp;
+    }
+
+    // Verify there are no temperature inversions.
+    for (int i = 0; i < Tank.Nodes - 1; ++i) {
+        EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
+    }
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobals::SecInHour;
+    int DummyIndex = 1;
+    Real64 TankNodeEnergy = 0;
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
+        TankNodeEnergy += node.Mass * (NodeTemps[i] - PrevNodeTemps[i]);
+    }
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    TankNodeEnergy *= Cp;
+    EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
+
+    EXPECT_TRUE(Tank.HeaterOn1);
+    EXPECT_FALSE(Tank.HeaterOn2);
+
+    Tank.TankTempLimit = 80.0;
+    Tank.UseMassFlowRate = 0.0;
+
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        auto &node = Tank.Node[i];
+        if (i <= 4) {
+            node.Temp = 81.0;
+        } else {
+            node.Temp = 60.0;
+        }
+        node.SavedTemp = node.Temp;
+    }
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    for (auto &node : Tank.Node) {
+        EXPECT_LE(node.Temp, Tank.TankTempLimit);
+    }
+    EXPECT_LT(Tank.VentRate, 0.0);
+    const Real64 ExpectedVentedEnergy = Tank.Node[0].Mass * Cp * 5.0 / SecInTimeStep;
+    EXPECT_NEAR(ExpectedVentedEnergy, -Tank.VentRate, fabs(ExpectedVentedEnergy) * 0.05);
+
+
+}

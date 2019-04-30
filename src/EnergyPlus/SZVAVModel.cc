@@ -475,7 +475,7 @@ namespace SZVAVModel {
                 PackagedTerminalHeatPump::CalcPTUnit(
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
@@ -880,7 +880,7 @@ namespace SZVAVModel {
                 // get capacity for warning
                 FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
@@ -1297,7 +1297,7 @@ namespace SZVAVModel {
                                                     CompressorONFlag);
                 }
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
