@@ -174,7 +174,7 @@ NA
 
 ## Design Document ##
 
-The new feature will revise two modules: AirflowNetworkBalanceManager and HAVCFan
+The new feature will revise two modules: AirflowNetworkBalanceManager and HVACFan
 
 ### AirflowNetworkBalanceManager ###
 
@@ -204,7 +204,7 @@ If Speed Number > 1, it will set constant volume fan
 
 If I can get information from other existing variables, this check may not be performed. 
    
-### HAVCFan ###
+### HVACFan ###
 
 Four possible new functions will be created to provide enough information for the AFN model:
  
