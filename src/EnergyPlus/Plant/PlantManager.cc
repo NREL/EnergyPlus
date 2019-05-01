@@ -72,6 +72,7 @@
 #include <HVACInterfaceManager.hh>
 #include <HeatPumpWaterToWaterSimple.hh>
 #include <HeatPumpWaterToWaterCOOLING.hh>
+#include <HeatPumpWaterToWaterHEATING.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -1184,6 +1185,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Heating")) {
+//                                this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPEHeating;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
@@ -1193,6 +1195,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
+                                this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
