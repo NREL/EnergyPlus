@@ -1249,6 +1249,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
+                                this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
                                 this_comp.GeneralEquipType = GenEquipTypes_Valve;
                             } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:FluidToFluid")) {
