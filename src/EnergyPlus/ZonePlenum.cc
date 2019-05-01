@@ -1564,27 +1564,6 @@ namespace ZonePlenum {
         return thisPlenum;
     }
 
-    Real64 sumOtherReturnPlenumInletNodes(int const &plenumNum, int const &InNodeNum)
-    {
-
-        // Obtains and Allocates ZonePlenum related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput();
-            GetInputFlag = false;
-        }
-
-        Real64 plenumFlow = 0.0; // sum of mass flow less InNodeNum flow
-        if (NumZoneReturnPlenums > 0) {
-            for (int InNodeCtr = 1; InNodeCtr <= ZoneRetPlenCond(plenumNum).NumInletNodes; ++InNodeCtr) {
-                if (InNodeNum != ZoneRetPlenCond(plenumNum).InletNode(InNodeCtr)) {
-                    plenumFlow += Node(ZoneRetPlenCond(plenumNum).InletNode(InNodeCtr)).MassFlowRate;
-                }
-            }
-        }
-
-        return plenumFlow;
-    }
-
 } // namespace ZonePlenum
 
 } // namespace EnergyPlus

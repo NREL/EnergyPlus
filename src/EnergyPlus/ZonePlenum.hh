@@ -240,8 +240,6 @@ namespace ZonePlenum {
 
     int getReturnPlenumIndexFromInletNode(int const &InNodeNum);
 
-    Real64 sumOtherReturnPlenumInletNodes(int const &plenumNum, int const &InNodeNum);
-
     //        End of mining functions for the ZonePlenum Module
     // *****************************************************************************
 

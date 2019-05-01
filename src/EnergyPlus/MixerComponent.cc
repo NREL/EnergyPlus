@@ -711,26 +711,6 @@ namespace MixerComponent {
         return thisMixer;
     }
 
-    Real64 sumOtherZoneMixerInletNodes(int const &mixerNum, int const &InNodeNum)
-    {
-
-        if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
-            GetMixerInput();
-            GetZoneMixerIndexInputFlag = false;
-        }
-
-        Real64 mixerFlow = 0.0; // sum of mass flow less InNodeNum flow
-        if (NumMixers > 0) {
-            for (int InNodeCtr = 1; InNodeCtr <= MixerCond(mixerNum).NumInletNodes; ++InNodeCtr) {
-                if (InNodeNum != MixerCond(mixerNum).InletNode(InNodeCtr)) {
-                    mixerFlow += Node(MixerCond(mixerNum).InletNode(InNodeCtr)).MassFlowRate;
-                }
-            }
-        }
-
-        return mixerFlow;
-    }
-
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************
 

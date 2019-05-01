@@ -163,8 +163,6 @@ namespace MixerComponent {
 
     int getZoneMixerIndexFromInletNode(int const &InNodeNum);
 
-    Real64 sumOtherZoneMixerInletNodes(int const &mixerNum, int const &InNodeNum);
-
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************
 

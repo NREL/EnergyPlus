@@ -79,7 +79,19 @@ When a user connects the HVAC system's bypass duct to a return plenum or mixing 
 
 *Pros* - Backward compatibility with previous model configuration, enhanced economizer operation and more realistic configuration with real world applications.
 
-*Cons* - None. 
+*Cons* - May increase simulation time to correctly model mixed conditions at air loop inlet. 
+
+## Code Design and Programming ##
+
+EnergyPlus currently assumes the air flow at the outlet node of an air loop is the same as the inlet node. This enhancement will allow a bypass duct to divert air from the Changeover Bypass system before the outlet node such that the outlet node air flow rate will differ from the inlet node. The bypass duct will connect to either an AirloopHVAC:Mixer or AirloopHVAC:ReturnPlenum. The bypass duct flow rate will be included in the comparison of MassFlowRate versus MassFlowRateSetPoint at the outlet node of the air loop. Specifically in ResolveAirLoopFlowLimits. AirLoopFlow.BypassMassFlow is 0 for all other equipment models.
+
+```
+if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) < -HVACFlowRateToler * 0.01) {
+```
+
+The use of a bypass duct may increase the number of iterations required to converge on a solution. This is because the inlet node of the air loop, or inlet (return) node of the AirloopHVAC:OutsideAirSystem does not get updated until the zone equipment (AirloopHVAC:ZoneSplitter, AirloopHVAC:ZoneMixer, and zone equipment) is simulated. However, this is also the case with other existing HVAC models. Attempts to envision a design where bypass duct conditions are passed to the air loop inlet automatically are elusive given that the zone equipment must be simulated to get mixed air information correct.
+
+Code changes will employ the same methodology used in the existing HVACUnitaryBypassVAV.cc module.
 
 ## Testing/Validation/Data Sources ##
 
