@@ -2136,9 +2136,7 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if (SizingType == HeatingCapacitySizing) {
-                    if (ZoneEqSizing(CurZoneEqNum).DesSuppHeatCapAutosized) {
-                        NominalCapacityDes = DataSizing::SuppHeatCap;
-                    } else if (ZoneEqSizing(CurZoneEqNum).HeatingCapacity) {
+                    if (ZoneEqSizing(CurZoneEqNum).HeatingCapacity) {
                         NominalCapacityDes = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                         if (DataFlowUsedForSizing > 0.0) {
                             DesVolFlow = DataFlowUsedForSizing;

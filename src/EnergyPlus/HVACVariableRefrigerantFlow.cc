@@ -6951,9 +6951,7 @@ namespace HVACVariableRefrigerantFlow {
                 IsAutoSize = true;
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
-                if (CurZoneEqNum > 0) ZoneEqSizing(CurZoneEqNum).DesSuppHeatCapAutosized = true;
             }
-            DataSizing::SuppHeatCap = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
         }
 
         if (CurZoneEqNum > 0) {
