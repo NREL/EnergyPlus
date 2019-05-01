@@ -4108,6 +4108,19 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
                 }
+            } else { // if (!lAlphaFieldBlanks(17) && !lAlphaFieldBlanks(18)) {
+                if (!lAlphaFieldBlanks(17) && lAlphaFieldBlanks(18)) {
+                    ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name + "\"");
+                    ShowContinueError("...Supplemental heating coil type = " + cAlphaArgs(17));
+                    ShowContinueError("...But missing the associated supplemental heating coil name. ");
+                    ShowContinueError("...The supplemental heating coil will not be simulated. ");
+                }
+                if (lAlphaFieldBlanks(17) && !lAlphaFieldBlanks(18)) {
+                    ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name + "\"");
+                    ShowContinueError("...Supplemental heating coil name = " + cAlphaArgs(18));
+                    ShowContinueError("...But missing the associated supplemental heating coil type. ");
+                    ShowContinueError("...The supplemental heating coil will not be simulated. ");
+                }
             }
 
             // set supplemental heating coil operation temperature limits
@@ -5225,7 +5238,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                   .Comp(VRFTU(VRFTUNum).SuppHeatCoilCompNum)
                                                                   .NodeNumOut;
                 MySuppCoilPlantScanFlag(VRFTUNum) = false;
-            } else { // pthp not connected to plant
+            } else { // VRF terminal unit not connected to plant
                 MySuppCoilPlantScanFlag(VRFTUNum) = false;
             }
         } else if (MySuppCoilPlantScanFlag(VRFTUNum) && !AnyPlantInModel) {
@@ -6926,7 +6939,11 @@ namespace HVACVariableRefrigerantFlow {
         if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
             CompType = VRFTU(VRFTUNum).SuppHeatCoilType;
             CompName = VRFTU(VRFTUNum).SuppHeatCoilName;
-            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                SizingMethod = DataHVACGlobals::WaterHeatingCapacitySizing;
+            } else {
+                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            }
             PrintFlag = false;
             TempSize = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
@@ -7928,8 +7945,8 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // run supplemental heating coil
-        Real64 SuppPLR = this->SuppHeatPartLoadRatio;
         if (this->SuppHeatingCoilPresent) {
+            Real64 SuppPLR = this->SuppHeatPartLoadRatio;
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
@@ -10980,8 +10997,8 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // run supplemental heating coil
-        Real64 SuppPLR = this->SuppHeatPartLoadRatio;
         if (this->SuppHeatingCoilPresent) {
+            Real64 SuppPLR = this->SuppHeatPartLoadRatio;
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
