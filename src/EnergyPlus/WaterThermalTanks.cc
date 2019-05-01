@@ -10791,17 +10791,44 @@ namespace WaterThermalTanks {
 
                 // next determine if tank temperature is such that source side flow might be requested
                 if (!WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) {
-                    if (OutletTemp < DeadBandTemp) {
-                        NeedsHeat = true;
-                    } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
-                        // inside the deadband, use saved mode from water heater calcs
-                        if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
+                        // next determine if tank temperature is such that flow is requested depending on mode
+                    if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatPrimarySetpoint) {
+                        if (OutletTemp < DeadBandTemp) {
                             NeedsHeat = true;
-                        } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                        } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
+                            // inside the deadband, use saved mode from water heater calcs
+                            if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
+                                NeedsHeat = true;
+                            } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                                NeedsHeat = false;
+                            }
+
+                        } else if (OutletTemp >= SetPointTemp) {
                             NeedsHeat = false;
                         }
-                    } else if (OutletTemp >= SetPointTemp) {
-                        NeedsHeat = false;
+                    } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatAltSetpoint) {
+                        // get alternate setpoint
+                        AltSetpointTemp = GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).SourceSideAltSetpointSchedNum);
+                        AltDeadBandTemp = AltSetpointTemp - WaterThermalTank(WaterThermalTankNum).DeadBandDeltaTemp;
+                        if (OutletTemp < AltDeadBandTemp) {
+                            NeedsHeat = true;
+                        } else if ((OutletTemp >= AltDeadBandTemp) && (OutletTemp < AltSetpointTemp)) {
+                            // inside the deadband, use saved mode from water heater calcs
+                            if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
+                                NeedsHeat = true;
+                            } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                                NeedsHeat = false;
+                            }
+
+                        } else if (OutletTemp >= AltSetpointTemp) {
+                            NeedsHeat = false;
+                        }
+                    } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideStorageTank) {
+                        if (OutletTemp < WaterThermalTank(WaterThermalTankNum).TankTempLimit) {
+                            NeedsHeat = true;
+                        } else {
+                            NeedsHeat = false;
+                        }
                     }
                 } else { // is a chilled water tank so flip logic
                     if (OutletTemp > DeadBandTemp) {
