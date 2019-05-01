@@ -47,6 +47,7 @@
 
 // C++ Headers
 #include <cmath>
+#include <iostream>
 #include <string>
 
 // ObjexxFCL Headers
@@ -298,62 +299,65 @@ namespace OutsideEnergySources {
 
             this->OneTimeInitFlag = false;
 
-            for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
-                std::string hotOrChilled = "Hot ";
-                std::string reportVarPrefix = "District Heating ";
-                std::string heatingOrCooling = "Heating";
-                std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
-                if (EnergySource(EnergySourceNum).EnergyType == DataPlant::TypeOf_PurchChilledWater) {
-                    hotOrChilled = "Chilled ";
-                    reportVarPrefix = "District Cooling ";
-                    heatingOrCooling = "Cooling";
-                    typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
-                }
-                SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Energy",
-                                    OutputProcessor::Unit::J,
-                                    EnergySource(EnergySourceNum).EnergyTransfer,
-                                    "System",
-                                    "Sum",
-                                    EnergySource(EnergySourceNum).Name,
-                                    _,
-                                    typeName,
-                                    heatingOrCooling,
-                                    _,
-                                    "Plant");
-                SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Rate",
-                                    OutputProcessor::Unit::W,
-                                    EnergySource(EnergySourceNum).EnergyRate,
-                                    "System",
-                                    "Average",
-                                    EnergySource(EnergySourceNum).Name);
-
-                SetupOutputVariable(reportVarPrefix + "Rate",
-                                    OutputProcessor::Unit::W,
-                                    EnergySource(EnergySourceNum).EnergyRate,
-                                    "System",
-                                    "Average",
-                                    EnergySource(EnergySourceNum).Name);
-                SetupOutputVariable(reportVarPrefix + "Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    EnergySource(EnergySourceNum).InletTemp,
-                                    "System",
-                                    "Average",
-                                    EnergySource(EnergySourceNum).Name);
-                SetupOutputVariable(reportVarPrefix + "Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    EnergySource(EnergySourceNum).OutletTemp,
-                                    "System",
-                                    "Average",
-                                    EnergySource(EnergySourceNum).Name);
-                SetupOutputVariable(reportVarPrefix + "Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    EnergySource(EnergySourceNum).MassFlowRate,
-                                    "System",
-                                    "Average",
-                                    EnergySource(EnergySourceNum).Name);
+            // this may need some help, if the objects change location later, due to a push_back,
+            //  then the pointers to these output variables will be bad
+            //for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+            std::string hotOrChilled = "Hot ";
+            std::string reportVarPrefix = "District Heating ";
+            std::string heatingOrCooling = "Heating";
+            std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
+            if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+                hotOrChilled = "Chilled ";
+                reportVarPrefix = "District Cooling ";
+                heatingOrCooling = "Cooling";
+                typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
             }
 
+            SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Energy",
+                                OutputProcessor::Unit::J,
+                                this->EnergyTransfer,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                typeName,
+                                heatingOrCooling,
+                                _,
+                                "Plant");
+            SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Rate",
+                                OutputProcessor::Unit::W,
+                                this->EnergyRate,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(reportVarPrefix + "Rate",
+                                OutputProcessor::Unit::W,
+                                this->EnergyRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->MassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
         }
+
+        //}
 
         // begin environment inits
         if (DataGlobals::BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
@@ -370,24 +374,16 @@ namespace OutsideEnergySources {
         }
         if (!DataGlobals::BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
 
-        // now do every time inits
-        int const InletNode = this->InletNodeNum;
-        int const OutletNode = this->OutletNodeNum;
-        int const LoopNum = this->LoopNum;
-        int const LoopSideNum = this->LoopSideNum;
-        int const BranchIndex = this->BranchNum;
-        int const CompIndex = this->CompNum;
-
-        Real64 TempPlantMdot(0.0);
+        Real64 TempPlantMassFlow(0.0);
         if (std::abs(MyLoad) > 0.0) {
-            TempPlantMdot = DataPlant::PlantLoop(LoopNum).MaxMassFlowRate;
+            TempPlantMassFlow = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
         }
 
         // get actual mass flow to use, hold in MassFlowRate variable
-        PlantUtilities::SetComponentFlowRate(TempPlantMdot, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex);
+        PlantUtilities::SetComponentFlowRate(TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
-        this->InletTemp = DataLoopNode::Node(InletNode).Temp;
-        this->MassFlowRate = TempPlantMdot;
+        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->MassFlowRate = TempPlantMassFlow;
     }
 
     void OutsideEnergySourceSpecs::size()
