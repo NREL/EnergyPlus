@@ -52,6 +52,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -69,12 +70,29 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     std::string const idf_objects = delimited_string({
 
         "Zone,",
+        "  Zone 2;                                 !- Name",
+        "Zone,",
         "  Zone 1;                                 !- Name",
         "BuildingSurface:Detailed,",
         "  Surface_1,               !- Name",
         "  WALL,                    !- Surface Type",
         "  EXTWALL80,               !- Construction Name",
         "  Zone 1,                  !- Zone Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  SunExposed,              !- Sun Exposure",
+        "  WindExposed,             !- Wind Exposure",
+        "  0.5000000,               !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0,6.096000,3.048000,     !- X,Y,Z ==> Vertex 1 {m}",
+        "  0,6.096000,0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "  0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}",
+        "  0,0,3.048000;            !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "  Surface_2,               !- Name",
+        "  WALL,                    !- Surface Type",
+        "  EXTWALL80,               !- Construction Name",
+        "  Zone 2,                  !- Zone Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  SunExposed,              !- Sun Exposure",
@@ -204,12 +222,12 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1, !- Name",
         "  ,                                       !- Availability Schedule Name",
-        "  0.02,                               !- Cooling Supply Air Flow Rate {m3/s}",
-        "  0.02,                               !- Heating Supply Air Flow Rate {m3/s}",
-        "  0.02,                               !- No Load Supply Air Flow Rate {m3/s}",
-        "  0.01,                               !- Cooling Outdoor Air Flow Rate {m3/s}",
-        "  0.01,                               !- Heating Outdoor Air Flow Rate {m3/s}",
-        "  0.01,                               !- No Load Outdoor Air Flow Rate {m3/s}",
+        "  0.021,                               !- Cooling Supply Air Flow Rate {m3/s}",
+        "  0.022,                               !- Heating Supply Air Flow Rate {m3/s}",
+        "  0.023,                               !- No Load Supply Air Flow Rate {m3/s}",
+        "  0.011,                               !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "  0.012,                               !- Heating Outdoor Air Flow Rate {m3/s}",
+        "  0.013,                               !- No Load Outdoor Air Flow Rate {m3/s}",
         "  ,                                       !- Outdoor Air Flow Rate Multiplier Schedule Name",
         "  UnitaryHeatCoolVAVChangeoverBypass Loop Supply Inlet Node, !- Air Inlet Node Name",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Bypass Duct Mixer Node, !- Bypass Duct Mixer Node Name",
@@ -235,7 +253,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  ,                                       !- Availability Schedule Name",
         "  0.7,                                    !- Fan Total Efficiency",
         "  250,                                    !- Pressure Rise {Pa}",
-        "  0.02,                               !- Maximum Flow Rate {m3/s}",
+        "  0.023,                               !- Maximum Flow Rate {m3/s}",
         "  0.9,                                    !- Motor Efficiency",
         "  1,                                      !- Motor In Airstream Fraction",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Heating Coil Outlet Node, !- Air Inlet Node Name",
@@ -310,7 +328,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  1000,                               !- Gross Rated Total Cooling Capacity {W}",
         "  0.7,                               !- Gross Rated Sensible Heat Ratio",
         "  3,                                      !- Gross Rated Cooling COP {W/W}",
-        "  0.02,                               !- Rated Air Flow Rate {m3/s}",
+        "  0.021,                               !- Rated Air Flow Rate {m3/s}",
         "  773.3,                                  !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Mixed Air Node, !- Air Inlet Node Name",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Cooling Coil Outlet Node, !- Air Outlet Node Name",
@@ -397,10 +415,48 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     SplitterComponent::GetSplitterInput();
     SimAirServingZones::InitAirLoops(firstHVACIteration);
 
+    // set up zone load indicators
+    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(2);
+    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = true;
+    DataZoneEnergyDemands::CurDeadBandOrSetback(2) = false;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(2);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 0.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 0.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP.allocate(1);
+    // CBVAV serves second zone as indicated by order of Zone objects in input deck, set cooling load
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = -1000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = -2000.0;
+
     HVACUnitaryBypassVAV::GetCBVAV(); // get UnitarySystem input from object above
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
-    EXPECT_EQ(1, cbvav.ControlledZoneNum(1));
-    EXPECT_EQ(1, cbvav.ActualZoneNum(1));
-    EXPECT_EQ(1, cbvav.ZoneSequenceCoolingNum(1));
-    EXPECT_EQ(1, cbvav.ZoneSequenceHeatingNum(1));
+
+    int CBVAVNum = 1;
+    int zoneIndex = 1;
+    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(CBVAVNum));
+    // should be the second zone in the zone list as well as actual zone number
+    EXPECT_EQ(2, cbvav.ControlledZoneNum(CBVAVNum));
+    EXPECT_EQ(2, cbvav.ActualZoneNum(CBVAVNum));
+    // reflects sequence number in ZoneHVAC:EquipmentList
+    EXPECT_EQ(1, cbvav.ZoneSequenceCoolingNum(cbvav.ZoneSequenceCoolingNum(zoneIndex)));
+    EXPECT_EQ(1, cbvav.ZoneSequenceHeatingNum(cbvav.ZoneSequenceHeatingNum(zoneIndex)));
+    // test air volume flow inputs
+    EXPECT_EQ(0.011, cbvav.CoolOutAirVolFlow);
+    EXPECT_EQ(0.012, cbvav.HeatOutAirVolFlow);
+    EXPECT_EQ(0.013, cbvav.NoCoolHeatOutAirVolFlow);
+    EXPECT_EQ(0.021, cbvav.MaxCoolAirVolFlow);
+    EXPECT_EQ(0.022, cbvav.MaxHeatAirVolFlow);
+    EXPECT_EQ(0.023, cbvav.MaxNoCoolHeatAirVolFlow);
+    EXPECT_EQ(0.023, cbvav.FanVolFlow);
+
+    // test zone indexing for loads 
+    Real64 QZoneReq = 0.0;
+    HVACUnitaryBypassVAV::GetZoneLoads(CBVAVNum, QZoneReq);
+    // should return cooling load for zone 2
+    EXPECT_EQ(-1000.0, QZoneReq);
+    // only 1 conditioned zone
+    EXPECT_EQ(1, cbvav.NumZonesCooled);
+    EXPECT_EQ(HVACUnitaryBypassVAV::CoolingMode, cbvav.HeatCoolMode);
+
 }
