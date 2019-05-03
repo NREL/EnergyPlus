@@ -56,6 +56,9 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
+// Penumbra Headers
+#include <penumbra/penumbra.h>
+
 // EnergyPlus Headers
 #include <DataBSDFWindow.hh>
 #include <DataVectorTypes.hh>
@@ -167,6 +170,8 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
+    extern Pumbra::Penumbra penumbra;
+    extern bool usePenumbra;
 
     // Types
 

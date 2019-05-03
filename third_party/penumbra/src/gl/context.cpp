@@ -73,6 +73,69 @@ Context::Context(unsigned size) :
   //std::string glVersion = (char*)glGetString(GL_VERSION);
   //showMessage(MSG_INFO, "OpenGL version = " + glVersion);
 
+  //Input callbacks for orbit mode
+  glfwSetWindowUserPointer(window, this);
+#define glfwWPtr(w)  static_cast<Context*>(glfwGetWindowUserPointer(w))
+
+  auto key_callback = [](GLFWwindow* w, int key, int /*scancode*/, int action, int /*mods*/)
+  {
+	  if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+		  glfwWPtr(w)->toggleWireFrame();
+	  }
+
+	  if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+		  glfwWPtr(w)->toggleCameraMode();
+	  }
+  };
+
+  auto scroll_callback = [](GLFWwindow* w, double /*xOffset*/, double yOffset) {
+
+	  glfwWPtr(w)->viewScale += .25*yOffset;
+
+	  if (glfwWPtr(w)->isCameraMode) {
+		  glfwWPtr(w)->setCameraMVP();
+	  }
+  };
+
+  auto mouse_callback = [](GLFWwindow* w, int button, int action, int /*mods*/) {
+  // Set a booleon to tell if the left button is down. And at the actual press, initialize the
+  // curosor position.  Note that you only come in here the moments the button is pressed and
+  // released, not between.
+
+	  if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		  if (GLFW_PRESS == action) {
+			  glfwWPtr(w)->lbutton_down = true;
+			  glfwGetCursorPos(w, &glfwWPtr(w)->prevPosX, &glfwWPtr(w)->prevPosY);
+		  }
+		  else if (GLFW_RELEASE == action) {
+			  glfwWPtr(w)->lbutton_down = false;
+		  }
+	  }
+  };
+
+  auto cursor_Pos_callback = [](GLFWwindow* w, double xPos, double yPos) {
+  // Constantly monitored cursor position.
+
+	  if (glfwWPtr(w)->lbutton_down && glfwWPtr(w)->isCameraMode) {
+
+	    static const double rotationSpeed = 1./300.;
+
+		  glfwWPtr(w)->cameraRotAngleX = -(yPos - glfwWPtr(w)->prevPosY )*rotationSpeed;	//Y motion should produce x rotation
+		  glfwWPtr(w)->cameraRotAngleY = (xPos - glfwWPtr(w)->prevPosX)*rotationSpeed;	//X motion should produce -y rotation
+
+		  glfwWPtr(w)->prevPosX = xPos;
+		  glfwWPtr(w)->prevPosY = yPos;
+
+		  glfwWPtr(w)->calcCameraView();
+		  glfwWPtr(w)->setCameraMVP();
+	  }
+  };
+
+  glfwSetKeyCallback(window, key_callback);
+  glfwSetScrollCallback(window, scroll_callback);
+  glfwSetMouseButtonCallback(window, mouse_callback);
+  glfwSetCursorPosCallback(window, cursor_Pos_callback);
+
   glfwSwapInterval(1);
 
   glEnable(GL_DEPTH_TEST);
@@ -94,6 +157,26 @@ Context::~Context(){
   glDeleteRenderbuffersEXT(1, &rbo);
   glfwDestroyWindow(window);
 }
+void Context::toggleWireFrame() {
+	isWireFrame = !isWireFrame;
+	if (isWireFrame) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+}
+void Context::toggleCameraMode() {
+	isCameraMode = !isCameraMode;
+	lbutton_down = false; //There are things, like killing the last window, that may have left this true.
+	if (isCameraMode) {
+		mat4x4_dup(cameraView, view);
+		setCameraMVP();
+	}
+	else {
+		setMVP();
+	}
+}
 
 void Context::clearModel(){
   model.clearModel();
@@ -110,7 +193,7 @@ void Context::setModel(const std::vector<float>& vertices) {
 
 
   // calculate bounding box
-  for(int i = 0; i < (int)vertices.size(); i += 3) {
+  for(int i = 0; i < (int)vertices.size(); i += vertexSize) {
     float x = vertices[i];
     float y = vertices[i+1];
     float z = vertices[i+2];
@@ -141,7 +224,6 @@ void Context::setModel(const std::vector<float>& vertices) {
   }
 
   modelSet = true;
-
 }
 
 void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
@@ -150,21 +232,15 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
   }
 
-  for (std::size_t i = 0; i < 4; i++) {
-    for (std::size_t j = 0; j < 4; j++) {
-      view[j][i] = sunView[j][i];
-    }
-  }
+  mat4x4_dup(view, sunView);
 
   // calculate clipping planes in rendered coorinates
-  float left(MAX_FLOAT);
-  float right(-MAX_FLOAT);
-  float bottom(MAX_FLOAT);
-  float top(-MAX_FLOAT);
-  float near_(-MAX_FLOAT);
-  float far_(MAX_FLOAT);
-
-  const int vertexSize = 3;
+   left=MAX_FLOAT;
+   right=-MAX_FLOAT;
+   bottom = MAX_FLOAT;
+   top = -MAX_FLOAT;
+   near_ = -MAX_FLOAT;
+   far_ = MAX_FLOAT;
 
   for (int i = first*vertexSize; i < first*vertexSize + count*vertexSize; i += vertexSize) {
     vec4 point = {
@@ -191,7 +267,7 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
 
   // account for camera position
   near_ -= 1.f;
-  far_ -= 1.f;
+  far_ -= 1.001f;	//For some reason, -1. is too tight when sun is perpendicular to the surface.
 
   // Grow horizontal extents of view by one pixel on each side
   float deltaX = (right - left)/size;
@@ -205,10 +281,12 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
 
   // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
   // multiplies by the number of pixels to get projected sunlit surface fraction
+
   pixelArea = (right - left)*(top - bottom) / (size*size);
 
-  // set projection matrix
   mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
+  mat4x4_mul(mvp, projection, view);
+
   setMVP();
 }
 
@@ -220,6 +298,7 @@ void Context::showRendering(GLint first, GLsizei count)
 
   while (!glfwWindowShouldClose(window))
   {
+    glUniform3f(vColLocation,.5f, .5f, .5f);
     drawScene(first, count);
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -231,7 +310,7 @@ void Context::showRendering(GLint first, GLsizei count)
 
 void Context::drawScene(GLint first, GLsizei count)
 {
-  const int vertexSize = 3;
+
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -243,10 +322,51 @@ void Context::drawScene(GLint first, GLsizei count)
   model.draw(first, count);
 }
 
+void Context::calcCameraView() {
+// Do something here to give the appearance of rotating the scene.
+  mat4x4 tempMat;	//Transpose changes the affects of consecutive rotations from local to global space.
+  mat4x4_transpose(tempMat, cameraView);
+  mat4x4_rotate_X(cameraView, tempMat, cameraRotAngleX);
+  mat4x4_rotate_Y(tempMat, cameraView, cameraRotAngleY);
+  mat4x4_transpose(cameraView, tempMat);	//Transpose back.
+}
+
+
 void Context::setMVP()
 {
-  mat4x4_mul(mvp, projection, view);
   glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)mvp);
+}
+void Context::setCameraMVP()
+{
+	float deltaW, deltaH;
+	float cRight = right;
+	float cLeft = left;
+	float cTop = top;
+	float cBottom = bottom;
+	float cNear = near_;
+	float cFar = far_;
+
+	deltaW = (cRight - cLeft) / 2.;
+	deltaH = (cTop - cBottom) / 2.;
+
+	if (deltaW > deltaH) {
+		cTop += (deltaW-deltaH);
+		cBottom -= (deltaW - deltaH);
+	}
+	else {
+		cLeft -= (deltaH - deltaW);
+		cRight += (deltaW - deltaH);
+	}
+
+	cNear = 100.; // Set near and far to something now and make it tighter later.
+	cFar = -100.;	// To tighten, look at the sphere of possible rotations.
+
+	mat4x4 cProjection;
+	mat4x4 cMVP;
+
+	mat4x4_ortho(cProjection, viewScale*cLeft, viewScale*cRight, viewScale*cBottom, viewScale*cTop, -cNear, -cFar);
+	mat4x4_mul(cMVP, cProjection, cameraView);
+	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)cMVP);
 }
 
 float Context::calculatePSSF(GLint first, GLsizei count) {
@@ -290,7 +410,6 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glGenQueries(1, &query);
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-  const int vertexSize = 3;
   glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
