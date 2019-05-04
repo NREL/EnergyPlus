@@ -201,7 +201,6 @@ namespace PlantLoopEquip {
         using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerIndirectAbsorption::SimIndirectAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using HeatPumpWaterToWaterHEATING::SimHPWatertoWaterHEATING;
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -566,22 +565,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HPWaterPEHeating) {
-                SimHPWatertoWaterHEATING(sim_component.TypeOf,
-                                         sim_component.Name,
-                                         EquipNum,
-                                         FirstHVACIteration,
-                                         InitLoopEquip,
-                                         CurLoad,
-                                         MaxLoad,
-                                         MinLoad,
-                                         OptLoad,
-                                         LoopNum); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HPWaterEFCooling) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);

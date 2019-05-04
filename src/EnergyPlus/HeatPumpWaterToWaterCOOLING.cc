@@ -120,7 +120,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         GSHP.deallocate();
     }
 
-    PlantComponent *GshpPeCoolingSpecs::factory(std::string objectName) {
+    PlantComponent *GshpPeCoolingSpecs::factory(const std::string& objectName) {
         if (GetWWHPCoolingInput) {
             GetGshpInput();
             GetWWHPCoolingInput = false;
@@ -132,7 +132,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         }
         // If we didn't find it, fatal
         ShowFatalError(
-                "WWHPCoolingFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
+                "WWHPCoolingFactory: Error getting inputs for heat pump named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -631,7 +631,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         static Real64 CurrentSimTime(0.0);
         static Real64 PrevSimTime(0.0);
-        static bool OneTimeFlag(true);
 
         Real64 CpSourceSide; // local temporary for fluid specific heat
         Real64 CpLoadSide;   // local temporary for fluid specific heat
@@ -642,13 +641,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         // CALCULATE THE SIMULATION TIME
         CurrentSimTime = (DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + DataHVACGlobals::SysTimeElapsed;
-
-        // initialize event time array when the environment simulation begins
-        if (CurrentSimTime == 0.0 && OneTimeFlag) {
-            OneTimeFlag = false;
-        }
-
-        if (CurrentSimTime > 0.0) OneTimeFlag = true;
 
         if (MyLoad < 0.0) {
             this->MustRun = true;
