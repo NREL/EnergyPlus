@@ -2,6 +2,7 @@
 
 #include <BranchNodeConnections.hh>
 #include <Coils/CoilCoolingDX.hh>
+#include <DataAirLoop.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -206,6 +207,15 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->coolingCoilRuntimeFraction = this->performance.RTF;
     this->elecCoolingPower = this->performance.powerUse;
     this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
+
+    // fishy global things that need to be set here - leaving AFN stuff for later
+    //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+    DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    //if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+    //    AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+    //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+    //}
+
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in,
