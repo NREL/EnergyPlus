@@ -4818,7 +4818,7 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using Boilers::BoilerReport;
+        using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
         using ChillerElectricEIR::ElectricEIRChillerReport;
@@ -4958,7 +4958,7 @@ namespace OutputReportTabular {
         // Water / steam boiler
         for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
             SysTotalHVACRejectHeatLoss +=
-                BoilerReport(iBoiler).FuelConsumed + BoilerReport(iBoiler).ParasiticElecConsumption - BoilerReport(iBoiler).BoilerEnergy;
+                Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
