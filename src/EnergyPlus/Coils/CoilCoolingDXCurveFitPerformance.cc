@@ -108,7 +108,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
 }
 
 void CoilCoolingDXCurveFitPerformance::simulate(
-    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
     if (useAlternateMode) {
         this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
@@ -119,7 +119,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(
 
 void CoilCoolingDXCurveFitPerformance::calculate(
         CoilCoolingDXCurveFitOperatingMode &currentMode,
-        DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         currentMode.sizeOperatingMode();
