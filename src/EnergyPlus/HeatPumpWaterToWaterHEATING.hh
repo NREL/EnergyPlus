@@ -122,10 +122,10 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 QLoadEnergy;               // Load Side heat transfer Joules
         Real64 QSource;                   // Source Side heat transfer rate Watts
         Real64 QSourceEnergy;             // Source Side heat transfer Joules
-        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature �C
-        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature �C
-        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature �C
-        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature �C
+        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature degC
+        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature degC
+        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature degC
+        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature degC
         Real64 LoadSideWaterMassFlowRate; // Mass flow rate of the cooling water in Load Side Kg/s
         Real64 SourceSideWaterMassFlowRate; // Mass flow rate of chilled water in Eavporator Kg/s
         int Running;                      // On reporting Flag

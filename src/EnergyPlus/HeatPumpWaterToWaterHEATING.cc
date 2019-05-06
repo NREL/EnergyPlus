@@ -143,6 +143,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
     void GshpPeHeatingSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                                       bool EP_UNUSED(RunFlag)) {
+
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
             this->initialize();
@@ -154,7 +155,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                                 DataPlant::TypeOf_HPWaterEFHeating,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
-                                                                this->QSource,
+                                                                -this->QSource,
                                                                 this->SourceSideWaterInletTemp,
                                                                 this->SourceSideWaterOutletTemp,
                                                                 this->SourceSideWaterMassFlowRate,
@@ -373,17 +374,6 @@ namespace HeatPumpWaterToWaterHEATING {
             // save the design source side flow rate for use by plant loop sizing algorithms
             RegisterPlantCompDesignFlow(GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * GSHP(GSHPNum).SourceSideVolFlowRate);
 
-            GSHP(GSHPNum).QLoad = 0.0;
-            GSHP(GSHPNum).QSource = 0.0;
-            GSHP(GSHPNum).Power = 0.0;
-            GSHP(GSHPNum).LoadSideWaterInletTemp = 0.0;
-            GSHP(GSHPNum).SourceSideWaterInletTemp = 0.0;
-            GSHP(GSHPNum).LoadSideWaterOutletTemp = 0.0;
-            GSHP(GSHPNum).SourceSideWaterOutletTemp = 0.0;
-            GSHP(GSHPNum).SourceSideWaterMassFlowRate = 0.0;
-            GSHP(GSHPNum).LoadSideWaterMassFlowRate = 0.0;
-            GSHP(GSHPNum).IsOn = false;
-            GSHP(GSHPNum).MustRun = true;
         }
 
         if (ErrorsFound) {
@@ -550,9 +540,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // On every call
         this->Running = 0;
-
         this->MustRun = true; // Reset MustRun Flag to TRUE
-
         this->LoadSideWaterMassFlowRate = 0.0;   // Load Side mass flow rate, water side
         this->SourceSideWaterMassFlowRate = 0.0; // Source Side mass flow rate, water side
         this->Power = 0.0;                       // power consumption
@@ -602,17 +590,7 @@ namespace HeatPumpWaterToWaterHEATING {
         static Real64 CurrentSimTime(0.0);
         static Real64 PrevSimTime(0.0);
 
-        //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        this->Running = 0;
-
         // Init Module level Variables
-        this->MustRun = true;      // Reset MustRun Flag to TRUE
-        this->LoadSideWaterMassFlowRate = 0.0;   // Load Side mass flow rate, water side
-        this->SourceSideWaterMassFlowRate = 0.0; // Source Side mass flow rate, water side
-        this->Power = 0.0;                       // power consumption
-        this->QLoad = 0.0;                       // heat rejection from Load Side coil
-        this->QSource = 0.0;
-
         if (PrevSimTime != CurrentSimTime) {
             PrevSimTime = CurrentSimTime;
         }
@@ -628,6 +606,8 @@ namespace HeatPumpWaterToWaterHEATING {
             this->MustRun = false;
             this->IsOn = false;
         }
+        this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
+        this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
 
         //*******Set flow based on "run" flags**********
         // Set flows if the heat pump is not running
@@ -658,16 +638,9 @@ namespace HeatPumpWaterToWaterHEATING {
                                                         DataPlant::CriteriaType_MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             // now initialize simulation variables for "heat pump off"
-            this->QLoad = 0.0;
-            this->QSource = 0.0;
-            this->Power = 0.0;
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
             this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
             this->SourceSideWaterOutletTemp = this->SourceSideWaterInletTemp;
-            return; // if heat pump is not running return without simulation
-
-            // Set flows if the heat pump is running
+            return; // if heat pump is not running return without simulation, power, Q already zeroed in init
         } else { // the heat pump must run, request design flow
 
             this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
@@ -687,9 +660,6 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->SourceLoopSideNum,
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
-            // get inlet temps
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
             // if there's no flow, turn the "heat pump off"
             if (this->LoadSideWaterMassFlowRate < MassFlowTolerance || this->SourceSideWaterMassFlowRate < MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
@@ -717,12 +687,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                             this->LoadLoopSideNum,
                                                             DataPlant::CriteriaType_MassFlowRate,
                                                             this->SourceSideWaterMassFlowRate);
-                this->QLoad = 0.0;
-                this->QSource = 0.0;
-                this->Power = 0.0;
-                this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
                 this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
-                this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
                 this->SourceSideWaterOutletTemp = this->SourceSideWaterInletTemp;
                 return;
             }
@@ -940,8 +905,6 @@ namespace HeatPumpWaterToWaterHEATING {
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;
             this->QLoadEnergy = QLoad * ReportingConstant;
-            this->SourceSideWaterInletTemp = Node(this->SourceSideInletNodeNum).Temp;
-            this->LoadSideWaterInletTemp = Node(this->LoadSideInletNodeNum).Temp;
         }
 
     }
