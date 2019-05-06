@@ -81,12 +81,6 @@ namespace Boilers {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBoilers;            // Number of boilers
-    extern Real64 FuelUsed;           // W - Boiler fuel used
-    extern Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
-    extern Real64 BoilerLoad;         // W - Boiler Load
-    extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 BoilerPLR;          // Boiler operating part-load ratio
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     extern Array1D_bool CheckEquipName;
