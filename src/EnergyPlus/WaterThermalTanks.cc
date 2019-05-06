@@ -7167,12 +7167,11 @@ namespace WaterThermalTanks {
         }
         assert(HPWHCondenserDeltaT >= 0);
 
-        CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
-
-        // Calculate steady-state use heat rate.
-        Quse = UseMassFlowRate * Cp * (UseInletTemp - SetPointTemp);
-
         while (TimeRemaining > 0.0) {
+            //Put these two equations/functions in the loop so that they can be updated in each iteration using new tank temp
+            CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, TankTemp, SourceMassFlowRate, Qheatpump, Qsource);
+
+            Quse = UseMassFlowRate * Cp * (UseInletTemp - TankTemp);
 
             TimeNeeded = 0.0;
 
@@ -7631,7 +7630,7 @@ namespace WaterThermalTanks {
                                                                              // there is no heat pump or if the heat pump is off
                                                  Real64 SourceInletTemp,     // input, Source inlet temperature (C)
                                                  Real64 Cp,                  // Specific heat of fluid (J/kg deltaC)
-                                                 Real64 SetPointTemp,        // input, Mixed tank set point temperature
+                                                 Real64 TankTemp,        // input, Mixed tank temperature
                                                  Real64 &SourceMassFlowRate, // source mass flow rate (kg/s)
                                                  Real64 &Qheatpump,          // heat transfer rate from heat pump
                                                  Real64 &Qsource // steady state heat transfer rate from a constant temperature source side flow
@@ -7655,7 +7654,7 @@ namespace WaterThermalTanks {
             SourceMassFlowRate = 0.0; // Handle this heating as a constant heat source
             Qsource = Qheatpump;
         } else {
-            Qsource = SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp);
+            Qsource = SourceMassFlowRate * Cp * (SourceInletTemp - TankTemp);
         }
     }
 
