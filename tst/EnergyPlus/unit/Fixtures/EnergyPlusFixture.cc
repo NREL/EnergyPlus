@@ -129,6 +129,7 @@
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -375,6 +376,7 @@ void EnergyPlusFixture::clear_all_states()
     HeatBalFiniteDiffManager::clear_state();
     HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
     HeatPumpWaterToWaterCOOLING::clear_state();
+    HeatPumpWaterToWaterHEATING::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
