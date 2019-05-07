@@ -3181,6 +3181,22 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired, 5.0); // system should meet the heating load
     EXPECT_GT(VRF(VRFCond).VRFCondPLR, 0.0);                                                      // system should be on
+
+    Node(VRF(VRFCond).CondenserNodeNum).Temp = 21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
+    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
+    SimulateVRF(
+        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+
+    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    SimulateVRF(
+        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
@@ -4749,8 +4765,24 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               Node(VRF(VRFCond).CondenserNodeNum).MassFlowRate); // Condenser flow rate should be set for active cooling
     ASSERT_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, Node(VRF(VRFCond).CondenserOutletNodeNum).MassFlowRate); // outlet node should also be set
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
+    Node(VRF(VRFCond).CondenserNodeNum).Temp = 21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
+    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
+    SimulateVRF(
+        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+
+    DataHeatBalFanSys::TempControlType.allocate(1);
+    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+
+    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    SimulateVRF(
+        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
+    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
+    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
+
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)

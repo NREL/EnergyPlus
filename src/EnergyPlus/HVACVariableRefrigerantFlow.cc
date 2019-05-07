@@ -5216,7 +5216,6 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // if condenser is off, all terminal unit coils are off
-        //!!LKL Discrepancy < 0
         if (GetCurrentScheduleValue(VRF(VRFCond).SchedPtr) == 0.0) {
             HeatingLoad(VRFCond) = false;
             CoolingLoad(VRFCond) = false;
@@ -5688,9 +5687,11 @@ namespace HVACVariableRefrigerantFlow {
             }
             // test that the system is active if constant fan logic enables system when thermostat control logic did not
             if (!CoolingLoad(VRFCond) && !HeatingLoad(VRFCond)) {
-                if (TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList)) {
+                if (TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList) && OutsideDryBulbTemp >= VRF(VRFCond).MinOATCooling &&
+                    OutsideDryBulbTemp <= VRF(VRFCond).MaxOATCooling) {
                     CoolingLoad(VRFCond) = true;
-                } else if (TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList)) {
+                } else if (TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList) && OutsideDryBulbTemp >= VRF(VRFCond).MinOATHeating &&
+                    OutsideDryBulbTemp <= VRF(VRFCond).MaxOATHeating) {
                     HeatingLoad(VRFCond) = true;
                 }
             }
