@@ -87,7 +87,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Timestep,6;",
 

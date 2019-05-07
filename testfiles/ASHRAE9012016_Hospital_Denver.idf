@@ -182,7 +182,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  VERSION,9.1;
+  Version,9.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
