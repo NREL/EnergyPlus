@@ -8695,7 +8695,7 @@ namespace WaterThermalTanks {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);     // Maximum number of iterations for RegulaFalsi
-        Real64 const Acc(0.00001); // Accuracy of result from RegulaFalsi
+        Real64 const Acc(0.001); // Accuracy of result from RegulaFalsi
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AvailSchedule;       // desuperheater availability schedule
