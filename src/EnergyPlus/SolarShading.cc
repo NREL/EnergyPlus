@@ -4918,10 +4918,20 @@ namespace SolarShading {
                 // Add surfaces to penumbra...
                 Pumbra::Polygon poly;
 
-                for (auto v : Surface(GRSNR).Vertex) {
-                    poly.push_back(v.x);
-                    poly.push_back(v.y);
-                    poly.push_back(v.z);
+                if (Surface(GRSNR).Reveal > 0.0) {
+                    Real64 R = Surface(GRSNR).Reveal;
+                    auto& norm = Surface(GRSNR).NewellSurfaceNormalVector;
+                    for (auto v : Surface(GRSNR).Vertex) {
+                        poly.push_back(v.x + norm.x*R);
+                        poly.push_back(v.y + norm.y*R);
+                        poly.push_back(v.z + norm.z*R);
+                    }
+                } else {
+                    for (auto v : Surface(GRSNR).Vertex) {
+                        poly.push_back(v.x);
+                        poly.push_back(v.y);
+                        poly.push_back(v.z);
+                    }
                 }
                 Pumbra::Surface pSurf(poly);
 
@@ -4933,10 +4943,20 @@ namespace SolarShading {
                         if (subSurface == GRSNR) continue;                   // Surface itself cannot be its own subsurface
 
                         Pumbra::Polygon subPoly;
-                        for (auto v : Surface(subSurface).Vertex) {
-                            subPoly.push_back(v.x);
-                            subPoly.push_back(v.y);
-                            subPoly.push_back(v.z);
+                        if (Surface(subSurface).Reveal > 0.0) {
+                            Real64 R = Surface(subSurface).Reveal;
+                            auto& norm = Surface(subSurface).NewellSurfaceNormalVector;
+                            for (auto v : Surface(subSurface).Vertex) {
+                                subPoly.push_back(v.x + norm.x*R);
+                                subPoly.push_back(v.y + norm.y*R);
+                                subPoly.push_back(v.z + norm.z*R);
+                            }
+                        } else {
+                            for (auto v : Surface(subSurface).Vertex) {
+                                subPoly.push_back(v.x);
+                                subPoly.push_back(v.y);
+                                subPoly.push_back(v.z);
+                            }
                         }
 
                         pSurf.addHole(subPoly);
@@ -5262,10 +5282,11 @@ namespace SolarShading {
 
         SAREA = 0.0;
 
-        if (usePenumbra) {
-            Real64 ElevSun = PiOvr2 - std::acos(SUNCOS(3));
-            Real64 AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
+        Real64 ElevSun, AzimSun;
 
+        if (usePenumbra) {
+            ElevSun = PiOvr2 - std::acos(SUNCOS(3));
+            AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
             penumbra.setSunPosition(AzimSun, ElevSun);
         }
 
@@ -5297,19 +5318,21 @@ namespace SolarShading {
                 SAREA(HTS) = Surface(GRSNR).NetAreaShadowCalc;
             } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
+                const static bool compareMethods = false;
 
-                if (usePenumbra && Surface(HTS).PenumbraID >= 0) {
+                if (usePenumbra && Surface(HTS).PenumbraID >= 0 && !compareMethods) {
                     SAREA(HTS) = penumbra.calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         if (Surface(HTSS).PenumbraID >= 0) {
                             SAREA(HTSS) = penumbra.calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
-                            if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
-
-                            SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                            if (SAREA(HTSS) > 0.0) {
+                                if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                                SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                            }
                         }
                     }
-                } else {
+                } else if (!usePenumbra || compareMethods) {
 
                     NGRS = Surface(GRSNR).BaseSurf;
                     if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
@@ -5357,16 +5380,19 @@ namespace SolarShading {
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
 
-                /*
-                if (usePenumbra && Surface(HTS).PenumbraID >= 0) {
+                if (usePenumbra && Surface(HTS).PenumbraID >= 0 && compareMethods) {
 
                     Real64 pSAREA = penumbra.calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
-                    if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
-                        std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
-                        std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
-                        penumbra.renderScene(Surface(HTS).PenumbraID);
-                    } else {
-                        std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
+                    pSAREA = max(0.0, pSAREA);
+                    pSAREA = min(pSAREA, SurfArea);
+                    if (!CalcSkyDifShading || true) {
+                        if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
+                            std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
+                            std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
+                            penumbra.renderScene(Surface(HTS).PenumbraID);
+                        } else {
+                            //std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
+                        }
                     }
                     SAREA(HTS) = pSAREA;
                     for (int SS = 1; SS <= NSBS; ++SS) {
@@ -5374,25 +5400,31 @@ namespace SolarShading {
                         if (Surface(HTSS).PenumbraID >= 0) {
                             auto CPUArea = SAREA(HTSS);
                             SAREA(HTSS) = penumbra.calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
-                            if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                            if (SAREA(HTSS) > 0.0) {
+                                if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
 
-                            SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                                SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                            }
 
                             pSAREA = SAREA(HTSS);
+                            pSAREA = max(0.0, pSAREA);
+                            pSAREA = min(pSAREA, SurfArea);
+
                             SAREA(HTSS) = CPUArea;
 
-                            if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
-                                std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
-                                std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
-                                penumbra.renderScene(Surface(HTSS).PenumbraID);
-                            } else {
-                                std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
+                            if (!CalcSkyDifShading || true) {
+                                if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
+                                    std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
+                                    std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
+                                    penumbra.renderScene(Surface(HTSS).PenumbraID);
+                                } else {
+                                    //std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
+                                }
                             }
                             SAREA(HTSS) = pSAREA;
                         }
                     }
                 }
-                */
             } // ...end of surface in sun/surface with shaders and/or subsurfaces IF-THEN block
 
             // NOTE:
