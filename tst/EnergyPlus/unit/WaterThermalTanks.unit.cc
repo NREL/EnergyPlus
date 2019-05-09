@@ -2429,16 +2429,17 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         EXPECT_EQ(Desuperheater.HeaterRate, (HeatReclaimDXCoil(DXNum).AvailCapacity+Desuperheater.HeaterRate)/Desuperheater.DXSysPLR*Desuperheater.DesuperheaterPLR*0.25);
         //Desuperheater heater rate is stored in tank struct and ready for output
         //EXPECT_EQ(Tank.SourceRate, Desuperheater.HeaterRate); 
-        //Why the Qsource in CalcMixedTankSourceSideHeatTransferRate() is calculated by "SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp)" using setpointtemp rather than tanktemp? Which makes the source heat not equal to desuperheater heater rate.
+        //Why the Qsource in CalcMixedTankSourceSideHeatTransferRate() is calculated by "SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp)" using setpointtemp rather than tanktemp? Which makes the source heat vary a lot from desuperheater heater rate.
     }
     //desuperheater is always on through timestep
     else{
         //desuperheater part load ratio equals to cooling coil part load ratio so they offset in the equation
         EXPECT_EQ(Desuperheater.HeaterRate, (HeatReclaimDXCoil(DXNum).AvailCapacity+Desuperheater.HeaterRate)*0.25);
         //EXPECT_EQ(Tank.SourceRate, Desuperheater.HeaterRate);
-        //Why the Qsource in CalcMixedTankSourceSideHeatTransferRate() is calculated by "SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp)" using setpointtemp rather than tanktemp? Which makes the source heat not equal to desuperheater heater rate.
+        //Why the Qsource in CalcMixedTankSourceSideHeatTransferRate() is calculated by "SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp)" using setpointtemp rather than tanktemp? Which makes the source heat vary a lot from desuperheater heater rate.
     }
 
+    //Test the float mode
     Tank.TankTemp = 61;
     Tank.SourceOutletTemp = 61;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
@@ -2450,6 +2451,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     WaterThermalTanks::InitWaterThermalTank(TankNum,true);
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
 
+    //If desuperheater turned on within the time step
     if (Desuperheater.Mode = 1){
         EXPECT_GE(Desuperheater.DXSysPLR,Desuperheater.DesuperheaterPLR);
         //total available capacity is substrated by used desuperheater reclaim heat
@@ -2459,9 +2461,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         //Desuperheater heater rate is stored in tank struct and ready for output
         EXPECT_EQ(Tank.SourceRate, Desuperheater.HeaterRate);
     }
-    //desuperheater is always on through timestep
     else{
-        //desuperheater part load ratio equals to cooling coil part load ratio so they offset in the equation
         EXPECT_EQ(Desuperheater.HeaterRate,0);
         EXPECT_EQ(Tank.SourceRate, 0);
     }
