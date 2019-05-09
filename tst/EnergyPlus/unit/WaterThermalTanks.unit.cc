@@ -67,6 +67,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <Fixtures/EnergyPlusFixture.hh>
 
 using namespace EnergyPlus;
@@ -2052,4 +2053,95 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     EXPECT_NEAR(ExpectedVentedEnergy, -Tank.VentRate, fabs(ExpectedVentedEnergy) * 0.05);
 
 
+}
+
+TEST_F(EnergyPlusFixture, MixedTankQSourceCalc)
+{
+    using DataGlobals::HourOfDay;
+    using DataGlobals::TimeStep;
+    using DataGlobals::TimeStepZone;
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+    using WaterThermalTanks::WaterThermalTank;
+    using Psychrometrics::CPHW;
+
+    std::string const idf_objects = delimited_string({
+        "  Schedule:Constant, Water Heater Setpoint Temperature, ,55;",
+        "  Schedule:Constant, AmbTemp, , 25.0;",
+
+        "  WaterHeater:Mixed,",
+        "    WaterTank,               !- Name",
+        "    0.07,                    !- Tank Volume {m3}",
+        "    Water Heater Setpoint Temperature,  !- Setpoint Temperature Schedule Name",
+        "    2,                       !- Deadband Temperature Difference {deltaC}",
+        "    30,                      !- Maximum Temperature Limit {C}",
+        "    Cycle,                   !- Heater Control Type",
+        "    0,                       !- Heater Maximum Capacity {W}",
+        "    ,                        !- Heater Minimum Capacity {W}",
+        "    0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "    0,                       !- Heater Ignition Delay {s}",
+        "    Electricity,             !- Heater Fuel Type",
+        "    0.8,                     !- Heater Thermal Efficiency",
+        "    ,                        !- Part Load Factor Curve Name",
+        "    0,                       !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- Off Cycle Parasitic Fuel Type",
+        "    0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
+        "    0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- On Cycle Parasitic Fuel Type",
+        "    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+        "    SCHEDULE,                !- Ambient Temperature Indicator",
+        "    AmbTemp,                 !- Ambient Temperature Schedule Name",
+        "    ,                        !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    1,                       !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- Off Cycle Loss Fraction to Zone",
+        "    6,                       !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- On Cycle Loss Fraction to Zone",
+        "    ,                        !- Peak Use Flow Rate {m3/s}",
+        "    ,                        !- Use Flow Rate Fraction Schedule Name",
+        "    ,                        !- Cold Water Supply Temperature Schedule Name",
+        "    ,                        !- Use Side Inlet Node Name",
+        "    ,                        !- Use Side Outlet Node Name",
+        "    1,                       !- Use Side Effectiveness",
+        "    ,                        !- Source Side Inlet Node Name",
+        "    ,                        !- Source Side Outlet Node Name",
+        "    1,                       !- Source Side Effectiveness",
+        "    Autosize,                !- Use Side Design Flow Rate {m3/s}",
+        "    Autosize,                !- Source Side Design Flow Rate {m3/s}",
+        "    1.5;                     !- Indirect Water Heating Recovery Time {hr}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    int TankNum(1);
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
+
+    HourOfDay = 0;
+    TimeStep = 1;
+    TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    TimeStepSys = TimeStepZone;
+    Tank.TankTemp = 55.0;
+    Tank.SavedTankTemp = Tank.TankTemp;
+    Tank.AmbientTempZone = 25.0;
+    Tank.AmbientTemp = 25.0;
+    Tank.UseInletTemp = 15.0;
+    Tank.SetPointTemp = 55.0;
+    Tank.TimeElapsed = 0.0;
+    Tank.SourceInletTemp = 60.0;
+    Tank.SourceOutletTemp = Tank.TankTemp;
+
+    // use mass flow rate
+    Tank.UseMassFlowRate = 0.0005;
+    // source mass flow rate
+    Tank.SourceMassFlowRate = 0.0005;
+
+    WaterThermalTanks::CalcWaterThermalTankMixed(TankNum);
+    Real64 CpWater = CPHW(Tank.SourceOutletTemp);
+    // steady state estimated tank source heat (1 minute time step)
+    Real64 TankSourceHeat = (Tank.SourceInletTemp - Tank.SourceOutletTemp)  * (Tank.SourceMassFlowRate * CpWater) ;
+    // expected tank avg temp less than starting value of 60 C
+    EXPECT_NEAR(TankSourceHeat, Tank.SourceRate, TankSourceHeat*0.05);
 }
