@@ -8663,34 +8663,35 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetAverageAirFlow(VRFTUNum, 1.0, temp);
+        //SetAverageAirFlow(VRFTUNum, 1.0, temp);
         VRFInletNode = this->VRFTUInletNodeNum;
         T_TU_in = Node(VRFInletNode).Temp;
         W_TU_in = Node(VRFInletNode).HumRat;
-        T_coil_in = T_TU_in;
-        W_coil_in = W_TU_in;
 
         // Simulation the OAMixer if there is any
         if (this->OAMixerUsed) {
-            SimOAMixer(this->OAMixerName, false, this->OAMixerIndex);
+            //SimOAMixer(this->OAMixerName, false, this->OAMixerIndex);
 
             OAMixerNum = UtilityRoutines::FindItemInList(this->OAMixerName, OAMixer);
             OAMixNode = OAMixer(OAMixerNum).MixNode;
             T_coil_in = Node(OAMixNode).Temp;
             W_coil_in = Node(OAMixNode).HumRat;
+        } else {
+            T_coil_in = T_TU_in;
+            W_coil_in = W_TU_in;
         }
         // Simulate the blow-through fan if there is any
-        if (this->FanPlace == BlowThru) {
-            if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-                FanOutletNode = HVACFan::fanObjs[this->FanIndex]->outletNodeNum;
-            } else {
-                Fans::SimulateFanComponents("", false, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-                FanOutletNode = Fans::Fan(this->FanIndex).OutletNodeNum;
-            }
-            T_coil_in = Node(FanOutletNode).Temp;
-            W_coil_in = Node(FanOutletNode).HumRat;
-        }
+        //if (this->FanPlace == BlowThru) {
+        //    if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+        //        HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+        //        FanOutletNode = HVACFan::fanObjs[this->FanIndex]->outletNodeNum;
+        //    } else {
+        //        Fans::SimulateFanComponents("", false, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+        //        FanOutletNode = Fans::Fan(this->FanIndex).OutletNodeNum;
+        //    }
+        //    T_coil_in = Node(FanOutletNode).Temp;
+        //    W_coil_in = Node(FanOutletNode).HumRat;
+        //}
 
         Garate = CompOnMassFlow;
         H_coil_in = PsyHFnTdbW(T_coil_in, W_coil_in);
@@ -8702,8 +8703,9 @@ namespace HVACVariableRefrigerantFlow {
         if ((Garate > 0.0) && ((!VRF(VRFNum).HeatRecoveryUsed && CoolingLoad(VRFNum)) ||
                                (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList)))) {
             // 1.1) Cooling coil is running
-            QZnReqSenCoolingLoad = max(0.0, -1.0 * ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP);
-            Tout = T_TU_in - QZnReqSenCoolingLoad * 1.2 / Garate / 1005;
+            //QZnReqSenCoolingLoad = max(0.0, -1.0 * ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP);
+            //Tout = T_TU_in - QZnReqSenCoolingLoad * 1.2 / Garate / 1005;
+            Tout = DXCoils::DXCoilOutletTemp(CoolCoilNum);
             Th2 = T_coil_in - (T_coil_in - Tout) / (1 - BFC);
             DeltaT = C3Tevap * SH * SH + C2Tevap * SH + C1Tevap;
             EvapTemp = max(min((Th2 - DeltaT), EvapTempMax), EvapTempMin);
@@ -8717,8 +8719,9 @@ namespace HVACVariableRefrigerantFlow {
         if ((Garate > 0.0) && ((!VRF(VRFNum).HeatRecoveryUsed && HeatingLoad(VRFNum)) ||
                                (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList)))) {
             // 2.1) Heating coil is running
-            QZnReqSenHeatingLoad = max(0.0, ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP);
-            Tout = T_TU_in + QZnReqSenHeatingLoad / Garate / 1005;
+            //QZnReqSenHeatingLoad = max(0.0, ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP);
+            //Tout = T_TU_in + QZnReqSenHeatingLoad / Garate / 1005;
+            Tout = DXCoils::DXCoilOutletTemp(HeatCoilNum);
             Th2 = T_coil_in + (Tout - T_coil_in) / (1 - BFH);
             DeltaT = C3Tcond * SC * SC + C2Tcond * SC + C1Tcond;
             CondTemp = max(min((Th2 + DeltaT), CondTempMax), CondTempMin);
