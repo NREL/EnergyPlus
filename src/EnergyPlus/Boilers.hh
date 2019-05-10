@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -83,9 +84,7 @@ namespace Boilers {
     extern int NumBoilers;            // Number of boilers
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
-    extern Array1D_bool CheckEquipName;
-
-    struct BoilerSpecs
+    struct BoilerSpecs : public PlantComponent
     {
         // Members
         std::string Name;             // user identifier
@@ -101,7 +100,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        int FlowMode;                 // one of 3 modes for componet flow during operation
+        int FlowMode;                 // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -135,7 +134,6 @@ namespace Boilers {
         Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
         Real64 BoilerInletTemp;          // C - Boiler inlet temperature
         Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
-        Real64 Mdot;                     // kg/s - Boiler mass flow rate
         Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
         Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
         Real64 BoilerPLR;                // Boiler operating part-load ratio
@@ -151,18 +149,33 @@ namespace Boilers {
               CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
               EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
               FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0),
-              BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
+              BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0),
               ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0), MyFlag(true), MyEnvrnFlag(true)
         {
         }
+
+        virtual ~BoilerSpecs() = default;
+
+        static PlantComponent *factory(std::string objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
 
         void InitBoiler();
 
         void SizeBoiler();
 
         void CalcBoilerModel(Real64 MyLoad,    // W - hot water demand to be met by boiler
-                             bool RunFlag,     // TRUE if boiler operating
-                             int EquipFlowCtrl // Flow control mode for the equipment
+                             bool RunFlag      // TRUE if boiler operating
         );
 
         void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
@@ -175,20 +188,6 @@ namespace Boilers {
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
 
     void clear_state();
-
-    void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-                   std::string const &BoilerName, // boiler identifier
-                   int EquipFlowCtrl,       // Flow control mode for the equipment
-                   int &CompIndex,                // boiler counter/identifier
-                   bool RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                   bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                   Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                   Real64 &MaxCap,                // W - maximum boiler operating capacity
-                   Real64 &MinCap,                // W - minimum boiler operating capacity
-                   Real64 &OptCap,                // W - optimal boiler operating capacity
-                   bool GetSizingFactor,    // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor           // sizing factor
-    );
 
     void GetBoilerInput();
 

@@ -104,6 +104,7 @@
 #include <WaterCoils.hh>
 #include <WaterThermalTanks.hh>
 #include <WaterUse.hh>
+#include "DataGlobals.hh"
 
 namespace EnergyPlus {
 
@@ -194,7 +195,6 @@ namespace PlantLoopEquip {
         // na
 
         // Using/Aliasing
-        using Boilers::SimBoiler;
         using ChillerAbsorption::SimBLASTAbsorber;
         using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
@@ -808,27 +808,16 @@ namespace PlantLoopEquip {
             // BOILERS
         } else if (GeneralEquipType == GenEquipTypes_Boiler) {
             if (EquipTypeNum == TypeOf_Boiler_Simple) {
-                SimBoiler(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipFlowCtrl,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                std::string node_string;
+                for (auto & node : Node) {
+                    node_string += ',' + std::to_string(node.Temp);
                 }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+//                std::cout << std::to_string(DataGlobals::KickOffSimulation) << ','
+//                          << std::to_string(InitLoopEquip) << ','
+//                          << std::to_string(DataGlobals::DayOfSim) << ','
+//                          << std::to_string(DataGlobals::HourOfDay) << ','
+//                          << std::to_string(DataGlobals::TimeStep) << node_string << '\n';
 
             } else if (EquipTypeNum == TypeOf_Boiler_Steam) {
                 SimSteamBoiler(sim_component.TypeOf,

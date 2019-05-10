@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <Boilers.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -1104,6 +1105,7 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
+                                this_comp.compPtr = Boilers::BoilerSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
