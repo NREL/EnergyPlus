@@ -8543,7 +8543,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
+    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(int const EP_UNUSED(VRFTUNum), // Index to VRF terminal unit
                                                          Real64 &EvapTemp,   // evaporating temperature
                                                          Real64 &CondTemp    // condensing temperature
     )
@@ -8590,7 +8590,7 @@ namespace HVACVariableRefrigerantFlow {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
-        int FanOutletNode;           // index to the outlet node of the fan
+        //int FanOutletNode;           // index to the outlet node of the fan
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
         int OAMixerNum;              // OA mixer index
         int OAMixNode;               // index to the mix node of OA mixer
@@ -8614,12 +8614,12 @@ namespace HVACVariableRefrigerantFlow {
         Real64 EvapTempMin;          // Min evaporating temperature, correspond to the maximum cooling capacity (C)
         Real64 Garate;               // Nominal air mass flow rate
         Real64 H_coil_in;            // Air enthalpy at the coil inlet (kJ/kg)
-        Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W)
-        Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
+        //Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W)
+        //Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
         Real64 RHsat;                // Relative humidity of the air at saturated condition(-)
         Real64 SH;                   // Super heating degrees (C)
         Real64 SC;                   // Subcooling degrees (C)
-        Real64 temp;                 // for temporary use
+        //Real64 temp;                 // for temporary use
         Real64 T_coil_in;            // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
         Real64 T_TU_in;              // Air temperature at the indoor unit inlet (C)
         Real64 Tout;                 // Air temperature at the indoor unit outlet (C)
@@ -8703,8 +8703,14 @@ namespace HVACVariableRefrigerantFlow {
         if ((Garate > 0.0) && ((!VRF(VRFNum).HeatRecoveryUsed && CoolingLoad(VRFNum)) ||
                                (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList)))) {
             // 1.1) Cooling coil is running
+            // The TU has already been simulated so OutputRequiredToCoolingSP is load remaining, not zone load
             //QZnReqSenCoolingLoad = max(0.0, -1.0 * ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP);
+            // What Tout is required here? Average over time step? Full outlet temp when coil is on?
+            // This equation would yield a false Tout if actual air flow is different from full air flow rate.
             //Tout = T_TU_in - QZnReqSenCoolingLoad * 1.2 / Garate / 1005;
+            // Tout for constant fan mode is the actual Tout over the time step and coil is on for entire time step
+            // Tout for cycling fan would be the full outlet temp while the coil operates at PLR
+            // so what Tout should be used to get true impact on compressor operation (e.g., PLR*Tout + 1-PLR*T_coil_in)?
             Tout = DXCoils::DXCoilOutletTemp(CoolCoilNum);
             Th2 = T_coil_in - (T_coil_in - Tout) / (1 - BFC);
             DeltaT = C3Tevap * SH * SH + C2Tevap * SH + C1Tevap;
