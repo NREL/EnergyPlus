@@ -64,7 +64,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-//using namespace EnergyPlus::GroundTemperatureManager;
 
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
