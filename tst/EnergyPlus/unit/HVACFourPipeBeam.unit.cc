@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    -6.00,                   !- Time Zone {hr}",
         "    190;                     !- Elevation {m}",
 
-        "! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6�C",
+        "! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6degC",
 
         "  SizingPeriod:DesignDay,",
         "    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
@@ -442,7 +442,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
         "    0.00;                    !- Sky Clearness",
 
-        "! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2�C WB=25.5�C",
+        "! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2degC WB=25.5degC",
 
         "  SizingPeriod:DesignDay,",
         "    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
