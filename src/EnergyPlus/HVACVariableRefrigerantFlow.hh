@@ -700,6 +700,10 @@ namespace HVACVariableRefrigerantFlow {
         int ATMixerSecNode;              // secondary air inlet node number for the air terminal mixer
         int ATMixerOutNode;              // outlet air node number for the air terminal mixer
         bool firstPass;                  // used to reset global sizing data
+        Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
+        Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
+        int fanOutletNode;               // fan outlet node index
+        Real64 fanOutletT;               // fan outlet node temperature at full flow (C)
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), VRFTUInletNodeNum(0),
@@ -715,7 +719,8 @@ namespace HVACVariableRefrigerantFlow {
               SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0), LatentHeatingRate(0.0), TotalCoolingEnergy(0.0),
               TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0), LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0),
               EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0), ZonePtr(0), HVACSizingIndex(0),
-              ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), firstPass(true)
+              ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), firstPass(true),
+              coilInNodeT(0.0), coilInNodeW(0.0), fanOutletNode(0), fanOutletT(0.0)
         {
         }
 
@@ -725,7 +730,7 @@ namespace HVACVariableRefrigerantFlow {
         // Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are
         // not member functions of this class.
 
-        void CalcVRFIUVariableTeTc(int const EP_UNUSED(VRFTUNum), // Index to VRF terminal unit
+        void CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
                                    Real64 &EvapTemp,   // evaporating temperature
                                    Real64 &CondTemp    // condensing temperature
         );
