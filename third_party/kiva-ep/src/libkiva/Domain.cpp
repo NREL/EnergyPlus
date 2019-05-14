@@ -62,34 +62,49 @@ void Domain::setDomain(Foundation &foundation) {
     cellType = CellType::NORMAL;
     Surface *surfacePtr;
 
+    int numZeroDims = getNumZeroDims(i, j, k);
+    bool xNotBoundary = i != 0 && i != dim_lengths[0] - 1;
+    bool yNotBoundary = j != 0 && j != dim_lengths[1] - 1;
+    bool zNotBoundary = k != 0 && k != dim_lengths[2] - 1;
+
+    std::size_t surfaceAssignmentCount(0);
+
     for (auto &surface : foundation.surfaces) {
       if (pointOnPoly(Point(mesh[0].centers[i], mesh[1].centers[j]), surface.polygon)) {
         if (isGreaterOrEqual(mesh[2].centers[k], surface.zMin) &&
             isLessOrEqual(mesh[2].centers[k], surface.zMax)) {
           cellType = CellType::BOUNDARY;
           surfacePtr = &surface;
+
+          if (numZeroDims == 0) {
+            // Shouldn't be a surface cell
+            showMessage(MSG_ERR, "A normal cell was detected within a surface.");
+          }
+
           // Point/Line cells not on the boundary should be
           // zero-thickness cells
-          int numZeroDims = getNumZeroDims(i, j, k);
-
           if (foundation.numberOfDimensions == 3) {
-            if ((numZeroDims > 1) && i != 0 && i != dim_lengths[0] - 1 && j != 0 &&
-                j != dim_lengths[1] - 1 && k != 0 && k != dim_lengths[2] - 1) {
+            if ((numZeroDims > 1) && xNotBoundary && yNotBoundary && zNotBoundary) {
               cellType = CellType::ZERO_THICKNESS;
             }
           } else if (foundation.numberOfDimensions == 2) {
-            if ((numZeroDims > 1) && i != 0 && i != dim_lengths[0] - 1 && k != 0 &&
-                k != dim_lengths[2] - 1) {
+            if ((numZeroDims > 1) && xNotBoundary && zNotBoundary) {
               cellType = CellType::ZERO_THICKNESS;
             }
           } else {
-            if ((numZeroDims > 1) && k != 0 && k != dim_lengths[2] - 1) {
+            if ((numZeroDims > 1) && zNotBoundary) {
               cellType = CellType::ZERO_THICKNESS;
             }
           }
 
           if (cellType == CellType::BOUNDARY) {
+            // Assign cell index to surface
             surface.indices.push_back(index);
+            surfaceAssignmentCount++;
+            if (surfaceAssignmentCount > 1 && numZeroDims <= 1) {
+              // If the index of a surface cell is assigned to multiple surfaces, throw an error
+              showMessage(MSG_ERR, "A cell has been assigned to multiple surfaces.");
+            }
           }
         }
       }
