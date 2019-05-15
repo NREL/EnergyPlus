@@ -3352,7 +3352,7 @@ namespace HVACVariableRefrigerantFlow {
                     FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
                     FanOutletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
                     VRFTU(VRFTUNum).FanAvailSchedPtr = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->availSchedIndex;
-                    VRFTU(VRFTUNum).fanOutletNode = HVACFan::fanObjs[ VRFTU(VRFTUNum).FanIndex ]->outletNodeNum;
+                    VRFTU(VRFTUNum).fanOutletNode = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
                 }
             } else { // IF (FanType_Num == FanType_SimpleOnOff .OR. FanType_Num == FanType_SimpleConstVolume)THEN
                 ShowSevereError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
@@ -7020,9 +7020,8 @@ namespace HVACVariableRefrigerantFlow {
             // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided);
-            if ( PartLoadRatio == 0.0 ) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
-                VRFTU(VRFTUNum).fanOutletT = Node(VRFTU(VRFTUNum).fanOutletNode).Temp;
-                if ( VRFTU(VRFTUNum).CoolingCoilPresent ) {
+            if (PartLoadRatio == 0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
+                if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
                     VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
                 } else {
@@ -10029,7 +10028,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         } else if (HeatingLoad(VRFCond) && NumTUInHeatingMode > 0) {
             //   IF TU capacity is greater than condenser capacity
-            if ( TU_HeatingLoad > TotalTUHeatingCapacity ) {
+            if (TU_HeatingLoad > TotalTUHeatingCapacity) {
                 LimitTUCapacity(VRFCond,
                                 NumTUInList,
                                 TotalTUHeatingCapacity,
@@ -10159,7 +10158,6 @@ namespace HVACVariableRefrigerantFlow {
         // Otherwise the coil needs to turn on. Get full load result
         PartLoadRatio = 1.0;
         this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
-        this->fanOutletT = Node(this->fanOutletNode).Temp;
         if (this->CoolingCoilPresent) {
             this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).Temp;
             this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
@@ -12321,7 +12319,7 @@ namespace HVACVariableRefrigerantFlow {
         //        (1) IU evaporating temperature Te (2) OU evaporating temperature Te' etc.
         //
         // METHODOLOGY EMPLOYED:
-        //        This is part of the physics based VRF model applicable for Fluid Temperature Control.
+        //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
