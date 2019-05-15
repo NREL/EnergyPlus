@@ -82,14 +82,20 @@
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
-    void kivaErrorCallback(const int messageType, const std::string message, void *)
+    void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
     {
+        std::string fullMessage;
+        if (contextPtr) {
+            fullMessage = *(std::string*)contextPtr + ": " + message;
+        } else {
+            fullMessage = "Kiva: " + message;
+        }
         if (messageType == Kiva::MSG_INFO) {
-            ShowMessage("Kiva: " + message);
+            ShowMessage(fullMessage);
         } else if (messageType == Kiva::MSG_WARN) {
-            ShowWarningError("Kiva: " + message);
+            ShowWarningError(fullMessage);
         } else /* if (messageType == Kiva::MSG_ERR) */ {
-            ShowSevereError("Kiva: " + message);
+            ShowSevereError(fullMessage);
             ShowFatalError("Kiva: Errors discovered, program terminates.");
         }
     }
@@ -637,7 +643,7 @@ namespace HeatBalanceKivaManager {
 
     bool KivaManager::setupKivaInstances()
     {
-        Kiva::setMessageCallback(kivaErrorCallback, NULL);
+        Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
@@ -1192,10 +1198,13 @@ namespace HeatBalanceKivaManager {
     {
         for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
+                Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
                 surfaceMap[surfNum].calc_weighted_results();
                 DataHeatBalance::HConvIn(surfNum) = SurfaceGeometry::kivaManager.surfaceMap[surfNum].results.hconv;
             }
         }
+        Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     }
 
     void KivaManager::defineDefaultFoundation()
