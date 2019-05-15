@@ -91,6 +91,10 @@ namespace InternalHeatGains {
     void ReportInternalHeatGains();
 
     Real64 GetDesignLightingLevelForZone(int const WhichZone); // name of zone
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch,  // Blank work efficiency schedule = true
+                                      bool const CloInsSch,   // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch); // Blank air velocity schedule = true
 
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone); // Zone Number
 

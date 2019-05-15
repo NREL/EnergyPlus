@@ -707,6 +707,17 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
+                        
+                        if (NumAlpha < 14) {
+                            bool NoTCModelSelectedWithSchedules = false;
+                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(10),lAlphaFieldBlanks(13));
+                            if (NoTCModelSelectedWithSchedules) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + " has schedules but no thermal comfort model.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
+                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                            }
+                        }
 
                         for (OptionNum = 14; OptionNum <= lastOption; ++OptionNum) {
 
@@ -6796,7 +6807,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
+                                      bool const CloInsSch,  // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch) // Blank air velocity schedule = true
+    {
+        bool TCSchedsPresent = false;
+        
+        if ( WorkEffSch || CloInsSch || AirVeloSch ) {
+            TCSchedsPresent = true;
+        }
+        
+        return TCSchedsPresent;
+    }
+    
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 
