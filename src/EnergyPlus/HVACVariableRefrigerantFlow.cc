@@ -272,7 +272,7 @@ namespace HVACVariableRefrigerantFlow {
         // SUBROUTINE INFORMATION:
         // AUTHOR         Richard Raustad, FSEC
         // DATE WRITTEN   August 2010
-        // MODIFIED       Jul 2015, RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc). Add a physics-based VRF model applicable for Fluid
+        // MODIFIED       Jul 2015, RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc). Add a physics-based VRF model appliable for Fluid
         // Temperature Control RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -371,7 +371,7 @@ namespace HVACVariableRefrigerantFlow {
         if (all(TerminalUnitList(TUListNum).IsSimulated)) {
 
             if (VRF(VRFCondenser).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                 VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl();
             } else {
                 // Algorithm Type: VRF model based on system curve
@@ -3510,7 +3510,7 @@ namespace HVACVariableRefrigerantFlow {
             } else {
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
                     if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
 
                         if (UtilityRoutines::SameString(cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
                                                         cAllCoilTypes(CoilVRF_FluidTCtrl_Heating))) {
@@ -5472,7 +5472,7 @@ namespace HVACVariableRefrigerantFlow {
             SetCompFlowRate(VRFTUNum, VRFCond, true);
 
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
             } else {
                 // Algorithm Type: VRF model based on system curve
@@ -5505,7 +5505,7 @@ namespace HVACVariableRefrigerantFlow {
                             }
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
@@ -5553,7 +5553,7 @@ namespace HVACVariableRefrigerantFlow {
                             }
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
@@ -5585,7 +5585,7 @@ namespace HVACVariableRefrigerantFlow {
                             }
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
@@ -5631,7 +5631,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
 
                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                         } else {
                             // Algorithm Type: VRF model based on system curve
@@ -5668,7 +5668,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
 
                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                         } else {
                             // Algorithm Type: VRF model based on system curve
@@ -6508,7 +6508,7 @@ namespace HVACVariableRefrigerantFlow {
 
             // simulate the TU to size the coils
             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat);
             } else {
                 // Algorithm Type: VRF model based on system curve
@@ -7017,7 +7017,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 PartLoadRatio(1.0);
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided);
             if ( PartLoadRatio == 0.0 ) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
@@ -7122,7 +7122,7 @@ namespace HVACVariableRefrigerantFlow {
         PartLoadRatio = VRFTU(VRFTUNum).MinOperatingPLR;
 
         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
@@ -7158,7 +7158,7 @@ namespace HVACVariableRefrigerantFlow {
         // Otherwise the coil needs to turn on. Get full load result
         PartLoadRatio = 1.0;
         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
@@ -7212,7 +7212,7 @@ namespace HVACVariableRefrigerantFlow {
                     TempMaxPLR += 0.1;
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                         VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
@@ -7229,7 +7229,7 @@ namespace HVACVariableRefrigerantFlow {
                     TempMinPLR -= 0.01;
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                         VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
@@ -7250,7 +7250,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueErrorTimeStamp(" Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio);
                             } else {
                                 // Algorithm Type: VRF model based on system curve
@@ -7779,7 +7779,7 @@ namespace HVACVariableRefrigerantFlow {
         OnOffAirFlowRatio = Par(6);
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio);
         } else {
             // Algorithm Type: VRF model based on system curve
@@ -8028,7 +8028,7 @@ namespace HVACVariableRefrigerantFlow {
                     SetCompFlowRate(TUIndex, VRFCond);
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                     } else {
                         // Algorithm Type: VRF model based on system curve
@@ -8056,7 +8056,7 @@ namespace HVACVariableRefrigerantFlow {
 
                                     // recalculate using correct flow rate
                                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
@@ -8100,7 +8100,7 @@ namespace HVACVariableRefrigerantFlow {
                                     }
 
                                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                                         VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                                     } else {
                                         // Algorithm Type: VRF model based on system curve
@@ -8196,7 +8196,7 @@ namespace HVACVariableRefrigerantFlow {
                     SetCompFlowRate(VRF(VRFCond).MasterZoneTUIndex, VRFCond);
 
                     if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
                         VRFTU(VRF(VRFCond).MasterZoneTUIndex)
                             .CalcVRF_FluidTCtrl(VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio);
                     } else {
@@ -8511,7 +8511,7 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        //       This subroutine is part of the new VRF model based on physics, applicable for Fluid Temperature Control.
+        //       This subroutine is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
         //       This subroutine determines the VRF evaporating temperature at cooling mode and the condensing temperature
         //       at heating mode. This is the indoor unit side analysis.
 
@@ -8571,7 +8571,7 @@ namespace HVACVariableRefrigerantFlow {
         //       Calculate the VRF IU Te (cooling mode) and Tc (heating mode), given zonal loads.
 
         // METHODOLOGY EMPLOYED:
-        //       A new physics based VRF model applicable for Fluid Temperature Control.
+        //       A new physics based VRF model appliable for Fluid Temperature Control.
 
         // REFERENCES:
         // na
@@ -8602,7 +8602,6 @@ namespace HVACVariableRefrigerantFlow {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
-        //int FanOutletNode;           // index to the outlet node of the fan
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
         int OAMixerNum;              // OA mixer index
         int OAMixNode;               // index to the mix node of OA mixer
@@ -8631,7 +8630,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RHsat;                // Relative humidity of the air at saturated condition(-)
         Real64 SH;                   // Super heating degrees (C)
         Real64 SC;                   // Subcooling degrees (C)
-        // Real64 temp;                 // for temporary use
         Real64 T_coil_in;            // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
         Real64 T_TU_in;              // Air temperature at the indoor unit inlet (C)
         Real64 Tout;                 // Air temperature at the indoor unit outlet (C)
@@ -8663,52 +8661,11 @@ namespace HVACVariableRefrigerantFlow {
         C2Tcond = DXCoil(HeatCoilNum).C2Tc;
         C3Tcond = DXCoil(HeatCoilNum).C3Tc;
 
-        // Rated air flow rate for the coil
-        //if ((!VRF(VRFNum).HeatRecoveryUsed && CoolingLoad(VRFNum)) ||
-        //    (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
-        //    // VRF terminal unit is on cooling mode
-        //    CompOnMassFlow = DXCoil(CoolCoilNum).RatedAirMassFlowRate(Mode);
-        //    OACompOnMassFlow = VRFTU(VRFTUNum).CoolOutAirMassFlow;
-        //} else if ((!VRF(VRFNum).HeatRecoveryUsed && HeatingLoad(VRFNum)) ||
-        //           (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
-        //    // VRF terminal unit is on heating mode
-        //    CompOnMassFlow = DXCoil(HeatCoilNum).RatedAirMassFlowRate(Mode);
-        //    OACompOnMassFlow = VRFTU(VRFTUNum).HeatOutAirMassFlow;
-        //}
-
-        // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        //SetAverageAirFlow(VRFTUNum, 1.0, temp);
         VRFInletNode = this->VRFTUInletNodeNum;
         T_TU_in = Node(VRFInletNode).Temp;
         W_TU_in = Node(VRFInletNode).HumRat;
-
-        // Simulation the OAMixer if there is any
-        if (this->OAMixerUsed) {
-            //SimOAMixer(this->OAMixerName, false, this->OAMixerIndex);
-
-            //OAMixerNum = UtilityRoutines::FindItemInList(this->OAMixerName, OAMixer);
-            //OAMixNode = OAMixer(this->OAMixerIndex).MixNode; // why not find this node in get input and use that instead?
-            //T_coil_in = Node(OAMixNode).Temp;
-            //W_coil_in = Node(OAMixNode).HumRat;
-            T_coil_in = this->coilInNodeT;
-            W_coil_in = this->coilInNodeW;
-        } else {
-            T_coil_in = T_TU_in;
-            W_coil_in = W_TU_in;
-        }
-
-        // Simulate the blow-through fan if there is any
-        if (this->FanPlace == BlowThru) {
-            //if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            //    HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-            //    FanOutletNode = HVACFan::fanObjs[this->FanIndex]->outletNodeNum;
-            //} else {
-            //    Fans::SimulateFanComponents("", false, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-            //    FanOutletNode = Fans::Fan(this->FanIndex).OutletNodeNum;
-            //}
-            T_coil_in = Node(this->fanOutletNode).Temp;
-            W_coil_in = Node(this->fanOutletNode).HumRat;
-        }
+        T_coil_in = this->coilInNodeT;
+        W_coil_in = this->coilInNodeW;
 
         Garate = CompOnMassFlow;
         H_coil_in = PsyHFnTdbW(T_coil_in, W_coil_in);
@@ -8756,13 +8713,13 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        //       This subroutine is part of the new VRF model based on physics, applicable for Fluid Temperature Control.
+        //       This subroutine is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
         //       This is adapted from subroutine CalcVRFCondenser, which is part of the VRF model based on system curves.
         //       This subroutine models the interactions of VRF indoor units with the outdoor unit.
         //       The indoor terminal units are simulated first, and then the outdoor unit is simulated.
 
         // METHODOLOGY EMPLOYED:
-        //       A new physics based VRF model applicable for Fluid Temperature Control.
+        //       A new physics based VRF model appliable for Fluid Temperature Control.
 
         // REFERENCES:
         // na
@@ -10064,23 +10021,23 @@ namespace HVACVariableRefrigerantFlow {
                 LimitTUCapacity(VRFCond,
                                 NumTUInList,
                                 TotalTUCoolingCapacity,
-TerminalUnitList(TUListNum).TotalCoolLoad,
-MaxCoolingCapacity(VRFCond),
-TotalTUHeatingCapacity,
-TerminalUnitList(TUListNum).TotalHeatLoad,
-MaxHeatingCapacity(VRFCond));
+                                TerminalUnitList(TUListNum).TotalCoolLoad,
+                                MaxCoolingCapacity(VRFCond),
+                                TotalTUHeatingCapacity,
+                                TerminalUnitList(TUListNum).TotalHeatLoad,
+                                MaxHeatingCapacity(VRFCond));
             }
-        } else if ( HeatingLoad(VRFCond) && NumTUInHeatingMode > 0 ) {
+        } else if (HeatingLoad(VRFCond) && NumTUInHeatingMode > 0) {
             //   IF TU capacity is greater than condenser capacity
             if ( TU_HeatingLoad > TotalTUHeatingCapacity ) {
                 LimitTUCapacity(VRFCond,
-                    NumTUInList,
-                    TotalTUHeatingCapacity,
-                    TerminalUnitList(TUListNum).TotalHeatLoad,
-                    MaxHeatingCapacity(VRFCond),
-                    TotalTUCoolingCapacity,
-                    TerminalUnitList(TUListNum).TotalCoolLoad,
-                    MaxCoolingCapacity(VRFCond));
+                                NumTUInList,
+                                TotalTUHeatingCapacity,
+                                TerminalUnitList(TUListNum).TotalHeatLoad,
+                                MaxHeatingCapacity(VRFCond),
+                                TotalTUCoolingCapacity,
+                                TerminalUnitList(TUListNum).TotalCoolLoad,
+                                MaxCoolingCapacity(VRFCond));
             }
         } else {
         }
@@ -10090,10 +10047,10 @@ MaxHeatingCapacity(VRFCond));
     }
 
     void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(int const VRFTUNum,            // Index to VRF terminal unit
-        Real64 const QZnReq,           // Index to zone number
-        bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-        Real64 &PartLoadRatio,         // unit part load ratio
-        Real64 &OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                                                         Real64 const QZnReq,           // Index to zone number
+                                                         bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                                                         Real64 &PartLoadRatio,         // unit part load ratio
+                                                         Real64 &OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
     ) {
 
         // SUBROUTINE INFORMATION:
@@ -10182,7 +10139,7 @@ MaxHeatingCapacity(VRFCond));
         // Get result when DX coil is off
         PartLoadRatio = 0.0;
 
-        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+        // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
         this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio);
 
         if (VRFCoolingMode && HRHeatingMode) {
@@ -10203,7 +10160,7 @@ MaxHeatingCapacity(VRFCond));
         PartLoadRatio = 1.0;
         this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio);
         this->fanOutletT = Node(this->fanOutletNode).Temp;
-        if ( this->CoolingCoilPresent ) {
+        if (this->CoolingCoilPresent) {
             this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).Temp;
             this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
         } else {
@@ -10325,12 +10282,12 @@ MaxHeatingCapacity(VRFCond));
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		This subroutine is part of the new VRF model based on physics, applicable for Fluid Temperature Control.
+        // 		This subroutine is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
         // 		This is adapted from subroutine CalcVRF, which is part of the VRF model based on system curves.
         // 		This subroutine simulates the components making up the VRF indoor terminal unit.
 
         // METHODOLOGY EMPLOYED:
-        //		A new physics based VRF model applicable for Fluid Temperature Control.
+        //		A new physics based VRF model appliable for Fluid Temperature Control.
 
         // REFERENCES:
         // na
@@ -10696,7 +10653,6 @@ MaxHeatingCapacity(VRFCond));
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
-        int FanOutletNode;       // index to the outlet node of the fan
         int OAMixerNum;          // OA mixer index
         int OAMixNode;           // index to the mix node of OA mixer
         int VRFCond;             // index to VRF condenser
@@ -10755,13 +10711,11 @@ MaxHeatingCapacity(VRFCond));
         if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-                FanOutletNode = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
             } else {
                 Fans::SimulateFanComponents("", false, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-                FanOutletNode = Fans::Fan(VRFTU(VRFTUNum).FanIndex).OutletNodeNum;
             }
-            Tin = Node(FanOutletNode).Temp;
-            Win = Node(FanOutletNode).HumRat;
+            Tin = Node(VRFTU(VRFTUNum).fanOutletNode).Temp;
+            Win = Node(VRFTU(VRFTUNum).fanOutletNode).HumRat;
         }
 
         // Call the coil control logic to determine the air flow rate to match the given coil load
@@ -10894,7 +10848,7 @@ MaxHeatingCapacity(VRFCond));
         //        release/extract amount and air side parameters.
         //
         // METHODOLOGY EMPLOYED:
-        //        This is part of the physics based VRF model applicable for Fluid Temperature Control.
+        //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
@@ -10980,7 +10934,7 @@ MaxHeatingCapacity(VRFCond));
         //        and SC for condenser, or evaporating temperature and SH for evaporator.
         //
         // METHODOLOGY EMPLOYED:
-        //        This is part of the physics based VRF model applicable for Fluid Temperature Control.
+        //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
@@ -11068,7 +11022,7 @@ MaxHeatingCapacity(VRFCond));
         //        condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
         //
         // METHODOLOGY EMPLOYED:
-        //        This is part of the physics based VRF model applicable for Fluid Temperature Control.
+        //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
@@ -11150,7 +11104,7 @@ MaxHeatingCapacity(VRFCond));
         //        for condenser, or evaporating temperature for evaporator.
         //
         // METHODOLOGY EMPLOYED:
-        //        This is part of the physics based VRF model applicable for Fluid Temperature Control.
+        //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
