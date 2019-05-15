@@ -8602,7 +8602,6 @@ namespace HVACVariableRefrigerantFlow {
         int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
-        int OAMixerNum;              // OA mixer index
         int OAMixNode;               // index to the mix node of OA mixer
         int IndexToTUInTUList;       // index to TU in specific list for the VRF system
         int TUListIndex;             // index to TU list for this VRF system
@@ -10651,7 +10650,6 @@ namespace HVACVariableRefrigerantFlow {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
-        int OAMixerNum;          // OA mixer index
         int OAMixNode;           // index to the mix node of OA mixer
         int VRFCond;             // index to VRF condenser
         int VRFTUNum;            // Unit index in VRF terminal unit array
