@@ -2123,7 +2123,7 @@ TEST_F(EnergyPlusFixture, MixedTankQSourceCalc)
     TimeStep = 1;
     TimeStepZone = 1.0 / 60.0; // one-minute system time step
     TimeStepSys = TimeStepZone;
-    Tank.TankTemp = 55.0;
+    Tank.TankTemp = 50.0;
     Tank.SavedTankTemp = Tank.TankTemp;
     Tank.AmbientTempZone = 25.0;
     Tank.AmbientTemp = 25.0;
@@ -2139,9 +2139,17 @@ TEST_F(EnergyPlusFixture, MixedTankQSourceCalc)
     Tank.SourceMassFlowRate = 0.0005;
 
     WaterThermalTanks::CalcWaterThermalTankMixed(TankNum);
-    Real64 CpWater = CPHW(Tank.SourceOutletTemp);
+    Real64 CpWater = 4181.0;
     // steady state estimated tank source heat (1 minute time step)
-    Real64 TankSourceHeat = (Tank.SourceInletTemp - Tank.SourceOutletTemp)  * (Tank.SourceMassFlowRate * CpWater) ;
-    // expected tank avg temp less than starting value of 60 C
+    Real64 TankSourceHeat = (Tank.SourceInletTemp - Tank.SavedTankTemp)  * (Tank.SourceMassFlowRate * CpWater) ;
+    Real64 TankUseHeat = (Tank.UseInletTemp - Tank.SavedTankTemp)  * (Tank.UseMassFlowRate * CpWater) ;
+    Real64 TankLoss = Tank.OnCycLossCoeff * (Tank.AmbientTemp - Tank.SavedTankTemp);
+    // expected the steady state estimation close to the timestep averaged simulation results
     EXPECT_NEAR(TankSourceHeat, Tank.SourceRate, TankSourceHeat*0.05);
+    EXPECT_NEAR(TankUseHeat, Tank.UseRate, abs(TankUseHeat*0.05));
+    EXPECT_NEAR(TankLoss, Tank.LossRate, abs(TankLoss*0.05));
+    // expected the unmet rate reported by steady state values close to the simulated average values by fixing equation bugs
+    Real64 Unmet = -TankUseHeat - TankLoss - TankSourceHeat;
+    EXPECT_NEAR(Tank.UnmetRate, Unmet, 0.00001);
+    EXPECT_NEAR(Tank.UnmetRate, -Tank.UseRate - Tank.LossRate - Tank.SourceRate, Tank.UnmetRate*0.05);
 }

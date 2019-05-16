@@ -7185,7 +7185,7 @@ namespace WaterThermalTanks {
                     // Calculate heat rate needed to maintain the setpoint at steady-state conditions
                     LossCoeff = Tank.OnCycLossCoeff;
                     LossFracToZone = Tank.OnCycLossFracToZone;
-                    Qloss = LossCoeff * (AmbientTemp - SetPointTemp);
+                    Qloss = LossCoeff * (AmbientTemp - TankTemp);
                     Qneeded = -Quse - Qsource - Qloss - Qoncycheat;
 
                     if (TankTemp > SetPointTemp) {
@@ -7349,7 +7349,7 @@ namespace WaterThermalTanks {
                     // Calculate heat rate needed to maintain the setpoint at steady-state conditions
                     LossCoeff = Tank.OffCycLossCoeff;
                     LossFracToZone = Tank.OffCycLossFracToZone;
-                    Qloss = LossCoeff * (AmbientTemp - SetPointTemp);
+                    Qloss = LossCoeff * (AmbientTemp - TankTemp);
                     Qneeded = -Quse - Qsource - Qloss - Qoffcycheat;
 
                     // This section really needs to work differently depending on ControlType
