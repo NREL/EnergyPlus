@@ -729,8 +729,7 @@ namespace HVACVariableRefrigerantFlow {
         // Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are
         // not member functions of this class.
 
-        void CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
-                                   Real64 &EvapTemp,   // evaporating temperature
+        void CalcVRFIUVariableTeTc(Real64 &EvapTemp,   // evaporating temperature
                                    Real64 &CondTemp    // condensing temperature
         );
 

@@ -8537,7 +8537,7 @@ namespace HVACVariableRefrigerantFlow {
             for (int i = 1; i <= TerminalUnitList(TUListNum).NumTUInList; i++) {
                 int VRFTUNum = TerminalUnitList(TUListNum).ZoneTUPtr(i);
                 // analyze the conditions of each IU
-                VRFTU(VRFTUNum).CalcVRFIUVariableTeTc(VRFTUNum, EvapTemp(i), CondTemp(i));
+                VRFTU(VRFTUNum).CalcVRFIUVariableTeTc(EvapTemp(i), CondTemp(i));
 
                 // select the Te/Tc that can satisfy all the zones
                 IUMinEvapTemp = min(IUMinEvapTemp, EvapTemp(i), this->IUEvapTempHigh);
@@ -8554,8 +8554,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
-                                                         Real64 &EvapTemp,   // evaporating temperature
+    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(Real64 &EvapTemp,   // evaporating temperature
                                                          Real64 &CondTemp    // condensing temperature
     )
     {
@@ -8599,10 +8598,8 @@ namespace HVACVariableRefrigerantFlow {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
-        int OAMixNode;               // index to the mix node of OA mixer
         int IndexToTUInTUList;       // index to TU in specific list for the VRF system
         int TUListIndex;             // index to TU list for this VRF system
         int VRFNum;                  // index to VRF that the VRF Terminal Unit serves
