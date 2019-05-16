@@ -238,8 +238,9 @@
     25;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   Timestep,4;
@@ -3227,19 +3228,19 @@
 ! ***REPORT METERS/VARIABLES***
 
   Output:Variable,*,Surface Outside Face Heat Emission to Air Rate,hourly;
-  
+
   Output:Variable,*,Site Total Surface Heat Emission to Air,hourly;
 
   Output:Variable,*,Zone Exfiltration Heat Transfer Rate,hourly;
 
   Output:Variable,*,Site Total Zone Exfiltration Heat Loss,hourly;
-  
+
   Output:Variable,*,Zone Exhaust Air Heat Transfer Rate,hourly;
-  
+
   Output:Variable,*,Site Total Zone Exhaust Air Heat Loss,hourly;
-  
+
   Output:Variable,*,Air System Relief Air Heat Transfer Rate,hourly;
-  
+
   Output:Variable,*,Air System Relief Air Total Heat Loss Energy,hourly;
 
   Output:Variable,*,HVAC System Total Heat Rejection Energy,hourly;

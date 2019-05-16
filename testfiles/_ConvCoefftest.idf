@@ -251,8 +251,9 @@
     ;                        !- Convection Coefficient 2 User Curve Name
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
   Site:GroundReflectance,0,0,0,0,0,0,0,0,0,0,0,0;
 

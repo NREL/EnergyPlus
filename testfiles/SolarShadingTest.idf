@@ -2211,7 +2211,7 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,0.2;        !- Field 3
+    Until: 24:00,0.0;!0.2;        !- Field 3
 
   ScheduleTypeLimits,
     Temperature,             !- Name
@@ -2925,23 +2925,23 @@
     ZONE 9 @ 200 600 1 T INLETS,  !- Name
     ZONE 9 @ 200 600 1 T INLET;  !- Node 1 Name
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+!  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Zone Mean Air Temperature,hourly;
+!  Output:Variable,*,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
+!  Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
 
-  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
+!  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
 
-  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
+!  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
 
-  Output:Variable,*,Surface Inside Face Temperature,daily;
+  Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
 
-  Output:Variable,*,Surface Outside Face Temperature,daily;
+!  Output:Variable,*,Surface Inside Face Temperature,daily;
 
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
+!  Output:Variable,*,Surface Outside Face Temperature,daily;
 
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
+!  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
 
   Output:VariableDictionary,Regular;
 

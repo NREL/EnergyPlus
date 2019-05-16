@@ -668,8 +668,9 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7;                       !- Shading Calculation Update Frequency
 
   SimulationControl,
     yes,                     !- Do Zone Sizing Calculation

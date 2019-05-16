@@ -199,12 +199,12 @@
     1.00;                    !- Sky Clearness
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1,                       !- Calculation Frequency
+    Imported,                !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1,                       !- Shading Calculation Update Frequency
     ,                        !- Maximum Figures in Shadow Overlap Calculations
     ,                        !- Polygon Clipping Algorithm
     ,                        !- Sky Diffuse Modeling Algorithm
-    ImportedShading,         !- External Shading Calculation Method
     No;                      !- Output External Shading Calculation Results
 
   Schedule:File:Shading,

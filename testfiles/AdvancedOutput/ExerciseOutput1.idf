@@ -37,8 +37,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWING CALCULATIONS ===========
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20;                      !- Shading Calculation Update Frequency
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 

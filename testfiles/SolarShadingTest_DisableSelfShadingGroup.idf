@@ -659,12 +659,12 @@
     World;                   !- Coordinate System
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1,                       !- Shading Calculation Update Frequency
     ,                        !- Maximum Figures in Shadow Overlap Calculations
     ,                        !- Polygon Clipping Algorithm
     ,                        !- Sky Diffuse Modeling Algorithm
-    ,                        !- External Shading Calculation Method
     ,                        !- Output External Shading Calculation Results
     Yes,                     !- Disable Self-Shading Within Shading Zone Groups
     ,                        !- Disable Self-Shading From Shading Zone Groups to Other Zones

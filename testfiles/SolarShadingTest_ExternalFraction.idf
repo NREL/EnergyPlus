@@ -659,12 +659,12 @@
     World;                   !- Coordinate System
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1,                       !- Calculation Frequency
+    Scheduled,               !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1,                       !- Shading Calculation Update Frequency
     ,                        !- Maximum Figures in Shadow Overlap Calculations
     ,                        !- Polygon Clipping Algorithm
     ,                        !- Sky Diffuse Modeling Algorithm
-    ScheduledShading,        !- External Shading Calculation Method
     Yes;                     !- Output External Shading Calculation Results
 
   SurfaceProperty:LocalEnvironment,
