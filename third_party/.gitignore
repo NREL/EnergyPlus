@@ -27,3 +27,6 @@ kiva-ep/.travis.yml
 kiva-ep/appveyor.yml
 kiva-ep/ChangeLog.md
 kiva-ep/README.md
+
+# submodules
+penumbra/.gitmodules

@@ -1,6 +1,7 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "gtest/gtest.h"

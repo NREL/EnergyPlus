@@ -90,7 +90,7 @@ Context::Context(unsigned size) :
 
   auto scroll_callback = [](GLFWwindow* w, double /*xOffset*/, double yOffset) {
 
-	  glfwWPtr(w)->viewScale += .25*yOffset;
+	  glfwWPtr(w)->viewScale += 0.1f*yOffset;
 
 	  if (glfwWPtr(w)->isCameraMode) {
 		  glfwWPtr(w)->setCameraMVP();
@@ -170,6 +170,7 @@ void Context::toggleCameraMode() {
 	isCameraMode = !isCameraMode;
 	lbutton_down = false; //There are things, like killing the last window, that may have left this true.
 	if (isCameraMode) {
+	    viewScale = 1.0;
 		mat4x4_dup(cameraView, view);
 		setCameraMVP();
 	}
