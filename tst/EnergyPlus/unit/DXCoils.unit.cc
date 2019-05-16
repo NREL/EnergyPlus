@@ -1870,7 +1870,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1973,7 +1973,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
