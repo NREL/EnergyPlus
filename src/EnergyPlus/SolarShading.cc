@@ -261,8 +261,7 @@ namespace SolarShading {
     Array1D<Real64> YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
     int maxNumberOfFigures(0);
 
-    Pumbra::Penumbra penumbra(512u);
-    bool usePenumbra(true);
+    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
 
     int const NPhi = 6;                      // Number of altitude angle steps for sky integration
     int const NTheta = 24;                   // Number of azimuth angle steps for sky integration
@@ -581,8 +580,8 @@ namespace SolarShading {
         using DataSystemVariables::DisableGroupSelfShading;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::SutherlandHodgman;
-        using DataSystemVariables::UseImportedSunlitFrac;
-        using DataSystemVariables::UseScheduledSunlitFrac;
+        using DataSystemVariables::ShadingMethod;
+        using DataSystemVariables::shadingMethod;
         using ScheduleManager::ScheduleFileShadingProcessed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -636,116 +635,123 @@ namespace SolarShading {
             MaxHCS = 15000;
         }
 
-        if (NumAlphas >= 1) {
-            if (UtilityRoutines::SameString(cAlphaArgs(1), "AverageOverDaysInFrequency")) {
-                DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(1) = "AverageOverDaysInFrequency";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(1), "TimestepFrequency")) {
-                DetailedSolarTimestepIntegration = true;
-                cAlphaArgs(1) = "TimestepFrequency";
+        int aNum = 1;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Scheduled")) {
+                shadingMethod = ShadingMethod::Scheduled;
+                cAlphaArgs(aNum) = "Scheduled";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
+                if (ScheduleFileShadingProcessed) {
+                    shadingMethod = ShadingMethod::Imported;
+                    cAlphaArgs(aNum) = "Imported";
+                } else {
+                    ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                    ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) +
+                                      "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
+                }
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PolygonClipping")) {
+                shadingMethod = ShadingMethod::PolygonClipping;
+                cAlphaArgs(aNum) = "PolygonClipping";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
+                shadingMethod = ShadingMethod::PixelCounting;
+                cAlphaArgs(aNum) = "PixelCounting";
+                penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(512u));
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(1) + "\", AverageOverDaysInFrequency will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", PolygonClipping will be used.");
+            }
+        } else {
+            cAlphaArgs(aNum) = "PolygonClipping";
+            shadingMethod = ShadingMethod::PolygonClipping;
+        }
+
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Periodic")) {
                 DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(1) = "AverageOverDaysInFrequency";
+                cAlphaArgs(aNum) = "Periodic";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Timestep")) {
+                DetailedSolarTimestepIntegration = true;
+                cAlphaArgs(aNum) = "Timestep";
+            } else {
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", Periodic will be used.");
+                DetailedSolarTimestepIntegration = false;
+                cAlphaArgs(aNum) = "Periodic";
             }
         } else {
             DetailedSolarTimestepIntegration = false;
-            cAlphaArgs(1) = "AverageOverDaysInFrequency";
+            cAlphaArgs(aNum) = "Periodic";
         }
 
-        if (NumAlphas >= 2) {
-            if (UtilityRoutines::SameString(cAlphaArgs(2), "SutherlandHodgman")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SutherlandHodgman")) {
                 SutherlandHodgman = true;
-                cAlphaArgs(2) = "SutherlandHodgman";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ConvexWeilerAtherton")) {
+                cAlphaArgs(aNum) = "SutherlandHodgman";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
                 SutherlandHodgman = false;
-                cAlphaArgs(2) = "ConvexWeilerAtherton";
-            } else if (lAlphaFieldBlanks(2)) {
+                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
+            } else if (lAlphaFieldBlanks(aNum)) {
                 if (!SutherlandHodgman) { // if already set.
-                    cAlphaArgs(2) = "ConvexWeilerAtherton";
+                    cAlphaArgs(aNum) = "ConvexWeilerAtherton";
                 } else {
-                    cAlphaArgs(2) = "SutherlandHodgman";
+                    cAlphaArgs(aNum) = "SutherlandHodgman";
                 }
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2));
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
                 if (!SutherlandHodgman) {
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", ConvexWeilerAtherton will be used.");
+                    ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", ConvexWeilerAtherton will be used.");
                 } else {
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SutherlandHodgman will be used.");
+                    ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", SutherlandHodgman will be used.");
                 }
             }
         } else {
             if (!SutherlandHodgman) {
-                cAlphaArgs(2) = "ConvexWeilerAtherton";
+                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
             } else {
-                cAlphaArgs(2) = "SutherlandHodgman";
+                cAlphaArgs(aNum) = "SutherlandHodgman";
             }
         }
 
-        if (NumAlphas >= 3) {
-            if (UtilityRoutines::SameString(cAlphaArgs(3), "SimpleSkyDiffuseModeling")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
                 DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(3), "DetailedSkyDiffuseModeling")) {
+                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
                 DetailedSkyDiffuseAlgorithm = true;
-                cAlphaArgs(3) = "DetailedSkyDiffuseModeling";
+                cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
             } else if (lAlphaFieldBlanks(3)) {
                 DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
+                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(3) + "\", SimpleSkyDiffuseModeling will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", SimpleSkyDiffuseModeling will be used.");
             }
         } else {
-            cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
+            cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             DetailedSkyDiffuseAlgorithm = false;
         }
 
-        if (NumAlphas >= 4) {
-            if (UtilityRoutines::SameString(cAlphaArgs(4), "ScheduledShading")) {
-                UseScheduledSunlitFrac = true;
-                cAlphaArgs(4) = "ScheduledShading";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(4), "ImportedShading")) {
-                if (ScheduleFileShadingProcessed) {
-                    UseImportedSunlitFrac = true;
-                    cAlphaArgs(4) = "ImportedShading";
-                } else {
-                    ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4));
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(4) +
-                                      "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
-                }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(4), "InternalCalculation")) {
-                UseScheduledSunlitFrac = false;
-                UseImportedSunlitFrac = false;
-                cAlphaArgs(4) = "InternalCalculation";
-            } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(4) + "\", InternalCalculation will be used.");
-            }
-        } else {
-            cAlphaArgs(4) = "InternalCalculation";
-            UseScheduledSunlitFrac = false;
-            UseImportedSunlitFrac = false;
-        }
-
-        if (NumAlphas >= 5) {
-            if (UtilityRoutines::SameString(cAlphaArgs(5), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 ReportExtShadingSunlitFrac = true;
-                cAlphaArgs(5) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "No")) {
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
                 ReportExtShadingSunlitFrac = false;
-                cAlphaArgs(5) = "No";
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(5));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(5) + "\", InternalCalculation will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", InternalCalculation will be used.");
             }
         } else {
-            cAlphaArgs(5) = "No";
+            cAlphaArgs(aNum) = "No";
             ReportExtShadingSunlitFrac = false;
         }
         int ExtShadingSchedNum;
-        if (UseImportedSunlitFrac) {
+        if (shadingMethod == ShadingMethod::Imported) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
@@ -761,32 +767,34 @@ namespace SolarShading {
         bool DisableSelfShadingWithinGroup = false;
         bool DisableSelfShadingBetweenGroup = false;
 
-        if (NumAlphas >= 6) {
-            if (UtilityRoutines::SameString(cAlphaArgs(6), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingWithinGroup = true;
-                cAlphaArgs(6) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "No")) {
-                cAlphaArgs(6) = "No";
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(6) + "\", all shading effects would be considered.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(6) = "No";
+            cAlphaArgs(aNum) = "No";
         }
 
-        if (NumAlphas >= 7) {
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingBetweenGroup = true;
-                cAlphaArgs(7) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No")) {
-                cAlphaArgs(7) = "No";
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(7) + "\", all shading effects would be considered.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(7) = "No";
+            cAlphaArgs(aNum) = "No";
         }
 
         if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
@@ -795,16 +803,17 @@ namespace SolarShading {
             DisableGroupSelfShading = true;
         }
 
+        aNum++;
         int SurfZoneGroup, CurZoneGroup;
         if (DisableGroupSelfShading) {
             Array1D_int DisableSelfShadingGroups;
             int NumOfShadingGroups;
-            if (NumAlphas >= 8) {
+            if (NumAlphas >= aNum) {
                 // Read all shading groups
-                NumOfShadingGroups = NumAlphas - 7;
+                NumOfShadingGroups = NumAlphas - (aNum - 1);
                 DisableSelfShadingGroups.allocate(NumOfShadingGroups);
                 for (int i = 1; i <= NumOfShadingGroups; i++) {
-                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + 7), ZoneList, NumOfZoneLists);
+                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + (aNum - 1)), ZoneList, NumOfZoneLists);
                     if (Found != 0) DisableSelfShadingGroups(i) = Found;
                 }
 
@@ -869,12 +878,13 @@ namespace SolarShading {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
-                                             "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
-                                             "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
+                                             "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
+                                             "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
+                                             "Algorithm, Output External Shading Calculation Results, Disable "
                                              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
-                                                 RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' + cAlphaArgs(2) + ',' +
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' + cAlphaArgs(2) + ',' +
+                                                 RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' +
                                                  cAlphaArgs(3) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
                                                  cAlphaArgs(7);
     }
@@ -4647,8 +4657,8 @@ namespace SolarShading {
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
-        using DataSystemVariables::UseScheduledSunlitFrac;
-        using DataSystemVariables::UseImportedSunlitFrac;
+        using DataSystemVariables::ShadingMethod;
+        using DataSystemVariables::shadingMethod;
         using ScheduleManager::LookUpScheduleValue;
 
         // Locals
@@ -4686,7 +4696,7 @@ namespace SolarShading {
             CosIncAng(iTimeStep, iHour, SurfNum) = CTHETA(SurfNum);
         }
 
-        if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
+        if ((shadingMethod == ShadingMethod::Scheduled || shadingMethod == ShadingMethod::Imported) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
@@ -4914,7 +4924,7 @@ namespace SolarShading {
             HTS = GRSNR;
             if (!ShadowingSurf && !Surface(GRSNR).ExtSolar) continue; // Skip surfaces with no external solar
 
-            if (usePenumbra && !Surface(GRSNR).MirroredSurf) {  // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
+            if (penumbra && !Surface(GRSNR).MirroredSurf) {  // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
                 // Add surfaces to penumbra...
                 Pumbra::Polygon poly;
 
@@ -4963,7 +4973,7 @@ namespace SolarShading {
                     }
                 }
 
-                Surface(GRSNR).PenumbraID = penumbra.addSurface(pSurf);
+                Surface(GRSNR).PenumbraID = penumbra->addSurface(pSurf);
             }
 
             if (!ShadowingSurf && Surface(GRSNR).BaseSurf != GRSNR) { // Skip subsurfaces (SBS)
@@ -5201,8 +5211,8 @@ namespace SolarShading {
             TotalSevereErrors += TotalCastingNonConvexSurfaces;
         }
 
-        if (usePenumbra) {
-            penumbra.setModel();
+        if (penumbra) {
+            penumbra->setModel();
         }
     }
 
@@ -5284,10 +5294,10 @@ namespace SolarShading {
 
         Real64 ElevSun, AzimSun;
 
-        if (usePenumbra) {
+        if (penumbra) {
             ElevSun = PiOvr2 - std::acos(SUNCOS(3));
             AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
-            penumbra.setSunPosition(AzimSun, ElevSun);
+            penumbra->setSunPosition(AzimSun, ElevSun);
         }
 
         for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
@@ -5320,19 +5330,19 @@ namespace SolarShading {
 
                 const static bool compareMethods = false;
 
-                if (usePenumbra && Surface(HTS).PenumbraID >= 0 && !compareMethods) {
-                    SAREA(HTS) = penumbra.calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                if (penumbra && Surface(HTS).PenumbraID >= 0 && !compareMethods) {
+                    SAREA(HTS) = penumbra->calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         if (Surface(HTSS).PenumbraID >= 0) {
-                            SAREA(HTSS) = penumbra.calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
                                 SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
                             }
                         }
                     }
-                } else if (!usePenumbra || compareMethods) {
+                } else if (!penumbra || compareMethods) {
 
                     NGRS = Surface(GRSNR).BaseSurf;
                     if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
@@ -5380,16 +5390,16 @@ namespace SolarShading {
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
 
-                if (usePenumbra && Surface(HTS).PenumbraID >= 0 && compareMethods) {
+                if (penumbra && Surface(HTS).PenumbraID >= 0 && compareMethods) {
 
-                    Real64 pSAREA = penumbra.calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                    Real64 pSAREA = penumbra->calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     pSAREA = max(0.0, pSAREA);
                     pSAREA = min(pSAREA, SurfArea);
                     if (!CalcSkyDifShading || true) {
                         if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
                             std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
                             std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
-                            penumbra.renderScene(Surface(HTS).PenumbraID);
+                            penumbra->renderScene(Surface(HTS).PenumbraID);
                         } else {
                             //std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
                         }
@@ -5399,7 +5409,7 @@ namespace SolarShading {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         if (Surface(HTSS).PenumbraID >= 0) {
                             auto CPUArea = SAREA(HTSS);
-                            SAREA(HTSS) = penumbra.calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
 
@@ -5416,7 +5426,7 @@ namespace SolarShading {
                                 if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
                                     std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
                                     std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
-                                    penumbra.renderScene(Surface(HTSS).PenumbraID);
+                                    penumbra->renderScene(Surface(HTSS).PenumbraID);
                                 } else {
                                     //std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
                                 }

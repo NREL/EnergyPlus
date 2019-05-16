@@ -149,9 +149,16 @@ namespace DataSystemVariables {
     bool FullAnnualRun(false);                    // TRUE if full annual simulation is to be run.
     bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
+
+    // Shading methods
+    ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
+    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
+
     bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
     bool TraceAirLoopEnvFlag(false); // If TRUE generates a trace file with the converged solutions of all
@@ -162,12 +169,7 @@ namespace DataSystemVariables {
     bool ReportDuringHVACSizingSimulation(false);        // true when reporting outputs during HVAC sizing Simulation
     bool ReportDetailedWarmupConvergence(false);         // True when the detailed warmup convergence is requested
     bool UpdateDataDuringWarmupExternalInterface(false); // variable sets in the external interface.
-    bool UseScheduledSunlitFrac(false);                  // when true, the sunlit fraction for all surfaces are imported from schedule inputs
     bool ReportExtShadingSunlitFrac(false);              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    bool UseImportedSunlitFrac(false);                   // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
-
-    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
     // This update the value during the warmup added for FMI
     Real64 Elapsed_Time(0.0);       // For showing elapsed time at end of run
@@ -374,6 +376,7 @@ namespace DataSystemVariables {
         FullAnnualRun = false;
         DeveloperFlag = false;
         TimingFlag = false;
+        shadingMethod = ShadingMethod::PolygonClipping;
         SutherlandHodgman = true;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
@@ -384,9 +387,7 @@ namespace DataSystemVariables {
         ReportDuringHVACSizingSimulation = false;
         ReportDetailedWarmupConvergence = false;
         UpdateDataDuringWarmupExternalInterface = false;
-        UseScheduledSunlitFrac = false;
         ReportExtShadingSunlitFrac = false;
-        UseImportedSunlitFrac = false;
         DisableGroupSelfShading = false;
         DisableAllSelfShading = false;
         Elapsed_Time = 0.0;

@@ -170,8 +170,7 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
-    extern Pumbra::Penumbra penumbra;
-    extern bool usePenumbra;
+    extern std::unique_ptr<Pumbra::Penumbra> penumbra;
 
     // Types
 
