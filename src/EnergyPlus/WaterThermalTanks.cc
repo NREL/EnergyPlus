@@ -9149,8 +9149,8 @@ namespace WaterThermalTanks {
             } else{
                 if (WaterHeaterDesuperheater(DesuperheaterNum).TimeElapsed != TimeElapsed){
                     if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_COOLING ||
-                           WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
-                           WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
+                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
+                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
                         HeatReclaimDXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
                     } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                         DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;

@@ -605,7 +605,6 @@ namespace WaterThermalTanks {
         Real64 RatedInletWaterTemp;    // Inlet water temp at rated heat reclaim recovery eff (C)
         Real64 RatedOutdoorAirTemp;    // Outdoor air temp at rated heat reclaim recovery eff (C)
         Real64 MaxInletWaterTemp;      // Max water temp for heat reclaim recovery (C)
-        Real64 TimeElapsed;            // Time elapsed (h)
         std::string TankType;          // Type of water heater (MIXED or STRATIFIED)
         int TankTypeNum;               // Parameter for tank type (MIXED or STRATIFIED)
         std::string TankName;          // Name of tank associated with desuperheater
@@ -654,6 +653,7 @@ namespace WaterThermalTanks {
         int IterLimitExceededNum2;   // Counter for recurring iteration limit warning messages
         int RegulaFalsiFailedIndex2; // Index for recurring RegulaFalsi failed warning messages
         int RegulaFalsiFailedNum2;   // Counter for recurring RegulaFalsi failed warning messages
+        Real64 TimeElapsed;            // Time elapsed (h)
 
         // Default Constructor
         WaterHeaterDesuperheaterData()
