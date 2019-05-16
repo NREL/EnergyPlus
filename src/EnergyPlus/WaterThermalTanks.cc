@@ -10778,8 +10778,6 @@ namespace WaterThermalTanks {
         bool NeedsHeatOrCool;
         Real64 FlowResult(0.0);
         bool ScheduledAvail;
-        Real64 AltSetpointTemp;
-        Real64 AltDeadBandTemp;
 
         // determine current mode.  there are three possible
         //  1.  passing thru what was given to inlet node
