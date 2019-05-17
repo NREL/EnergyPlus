@@ -708,7 +708,12 @@ namespace InternalHeatGains {
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
                         
-                        if (NumAlpha < 14) {
+                        // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
+                        // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
+                        // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
+                        // comfort model.
+                        int const NumFirstTCModel = 14;
+                        if (NumAlpha < NumFirstTCModel) {
                             bool NoTCModelSelectedWithSchedules = false;
                             NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(10),lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
@@ -719,7 +724,7 @@ namespace InternalHeatGains {
                             }
                         }
 
-                        for (OptionNum = 14; OptionNum <= lastOption; ++OptionNum) {
+                        for (OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
                                 auto const thermalComfortType(AlphaName(OptionNum));
