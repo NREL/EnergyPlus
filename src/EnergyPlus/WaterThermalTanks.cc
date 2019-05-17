@@ -7980,7 +7980,6 @@ namespace WaterThermalTanks {
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using Psychrometrics::RhoH2O;
 
         // Tank object reference
         WaterThermalTankData &Tank = WaterThermalTank(WaterThermalTankNum);
@@ -8243,8 +8242,8 @@ namespace WaterThermalTanks {
                 if (Tank.DesuperheaterNum > 0){
                     DesuperheaterPLR = WaterHeaterDesuperheater(Tank.DesuperheaterNum).DesuperheaterPLR;
                     DesuperheaterHeaterRate = WaterHeaterDesuperheater(Tank.DesuperheaterNum).HeaterRate;
-                    MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * RhoH2O(Tavg[Tank.SourceOutletStratNode - 1]);
-                    if (DesuperheaterPLR > 0.0){
+                    MdotDesuperheaterWater = WaterHeaterDesuperheater(Tank.DesuperheaterNum).OperatingWaterFlowRate * Psychrometrics::RhoH2O(Tavg[Tank.SourceOutletStratNode - 1]);
+                    if (DesuperheaterPLR > 0.0 && MdotDesuperheaterWater > 0.0){
                         Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1] + (DesuperheaterHeaterRate/DesuperheaterPLR) / (MdotDesuperheaterWater * Cp);
                     }else{
                         Tank.SourceInletTemp = Tavg[Tank.SourceOutletStratNode - 1];
@@ -8394,8 +8393,6 @@ namespace WaterThermalTanks {
                 Tank.FirstRecoveryFuel += Qrecovery * dt;
                 if (SetPointRecovered) Tank.FirstRecoveryDone = true;
             }
-            //Update the source inlet temperature for each internal timestep iteration
-            //When the source loop is from desuperheater
         } // end while TimeRemaining > 0.0
 
         for (auto &e : Tank.Node) {
@@ -8890,9 +8887,9 @@ namespace WaterThermalTanks {
 
         // change to tanktypenum using parameters?
         {
-            auto const SELECT_CASE_var(WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum);
+            auto const TankType(WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum);
 
-            if (SELECT_CASE_var == MixedWaterHeater||SELECT_CASE_var == StratifiedWaterHeater) {
+            if (TankType == MixedWaterHeater||TankType == StratifiedWaterHeater) {
 
                 WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode = WaterThermalTank(WaterThermalTankNum).Mode;
 
