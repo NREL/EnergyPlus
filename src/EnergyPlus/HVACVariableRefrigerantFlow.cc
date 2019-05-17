@@ -8580,7 +8580,6 @@ namespace HVACVariableRefrigerantFlow {
         using DXCoils::DXCoil;
         using HVACVariableRefrigerantFlow::VRF;
         using HVACVariableRefrigerantFlow::VRFTU;
-        using MixedAir::OAMixer;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
