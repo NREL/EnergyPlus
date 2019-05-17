@@ -8692,7 +8692,6 @@ namespace WaterThermalTanks {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);     // Maximum number of iterations for RegulaFalsi
-        Real64 const Acc(0.001); // Accuracy of result from RegulaFalsi
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AvailSchedule;       // desuperheater availability schedule
@@ -8870,6 +8869,10 @@ namespace WaterThermalTanks {
             SetPointTemp = WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp;
             DeadBandTempDiff = max(0.0, (SetPointTemp - CutInTemp));
         }
+
+        Real64 Acc; // Accuracy of result from RegulaFalsi
+        if (WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum == StratifiedWaterHeater) Acc = 0.001;
+        else Acc = 0.00001;
 
         // set the water-side mass flow rate
         CpWater = CPHW(Node(WaterInletNode).Temp);
