@@ -715,7 +715,7 @@ namespace InternalHeatGains {
                         int const NumFirstTCModel = 14;
                         if (NumAlpha < NumFirstTCModel) {
                             bool NoTCModelSelectedWithSchedules = false;
-                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(10),lAlphaFieldBlanks(13));
+                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
                                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + " has schedules but no thermal comfort model.");
                                 ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
