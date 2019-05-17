@@ -3293,6 +3293,8 @@ namespace HVACVariableRefrigerantFlow {
                     if (errFlag) {
                         ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                         ErrorsFound = true;
+                    } else {
+                        VRFTU(VRFTUNum).fanOutletNode = Fans::Fan(VRFTU(VRFTUNum).FanIndex).OutletNodeNum;
                     }
 
                     // Set the Design Fan Volume Flow Rate
@@ -3356,6 +3358,7 @@ namespace HVACVariableRefrigerantFlow {
                     FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
                     FanOutletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
                     VRFTU(VRFTUNum).FanAvailSchedPtr = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->availSchedIndex;
+                    VRFTU(VRFTUNum).fanOutletNode = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
                 }
             } else { // IF (FanType_Num == FanType_SimpleOnOff .OR. FanType_Num == FanType_SimpleConstVolume)THEN
                 ShowSevereError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
@@ -7492,6 +7495,16 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                 VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
+            if (PartLoadRatio == 0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
+                if (VRFTU(VRFTUNum).CoolingCoilPresent) {
+                    VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
+                    VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
+                } else {
+                    VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).Temp;
+                    VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).HumRat;
+                }
+            }
+            // CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
         } else {
             // Algorithm Type: VRF model based on system curve
             VRFTU(VRFTUNum).ControlVRF(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9038,7 +9051,7 @@ namespace HVACVariableRefrigerantFlow {
             for (int i = 1; i <= TerminalUnitList(TUListNum).NumTUInList; i++) {
                 int VRFTUNum = TerminalUnitList(TUListNum).ZoneTUPtr(i);
                 // analyze the conditions of each IU
-                VRFTU(VRFTUNum).CalcVRFIUVariableTeTc(VRFTUNum, EvapTemp(i), CondTemp(i));
+                VRFTU(VRFTUNum).CalcVRFIUVariableTeTc(EvapTemp(i), CondTemp(i));
 
                 // select the Te/Tc that can satisfy all the zones
                 IUMinEvapTemp = min(IUMinEvapTemp, EvapTemp(i), this->IUEvapTempHigh);
@@ -9055,8 +9068,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
-                                                         Real64 &EvapTemp,   // evaporating temperature
+    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(Real64 &EvapTemp,   // evaporating temperature
                                                          Real64 &CondTemp    // condensing temperature
     )
     {
@@ -9082,7 +9094,6 @@ namespace HVACVariableRefrigerantFlow {
         using DXCoils::DXCoil;
         using HVACVariableRefrigerantFlow::VRF;
         using HVACVariableRefrigerantFlow::VRFTU;
-        using MixedAir::OAMixer;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
@@ -9100,12 +9111,8 @@ namespace HVACVariableRefrigerantFlow {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
-        int FanOutletNode;           // index to the outlet node of the fan
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
-        int OAMixerNum;              // OA mixer index
-        int OAMixNode;               // index to the mix node of OA mixer
         int IndexToTUInTUList;       // index to TU in specific list for the VRF system
         int TUListIndex;             // index to TU list for this VRF system
         int VRFNum;                  // index to VRF that the VRF Terminal Unit serves
@@ -9131,7 +9138,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RHsat;                // Relative humidity of the air at saturated condition(-)
         Real64 SH;                   // Super heating degrees (C)
         Real64 SC;                   // Subcooling degrees (C)
-        Real64 temp;                 // for temporary use
         Real64 T_coil_in;            // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
         Real64 T_TU_in;              // Air temperature at the indoor unit inlet (C)
         Real64 Tout;                 // Air temperature at the indoor unit outlet (C)
@@ -9163,46 +9169,11 @@ namespace HVACVariableRefrigerantFlow {
         C2Tcond = DXCoil(HeatCoilNum).C2Tc;
         C3Tcond = DXCoil(HeatCoilNum).C3Tc;
 
-        // Rated air flow rate for the coil
-        if ((!VRF(VRFNum).HeatRecoveryUsed && CoolingLoad(VRFNum)) ||
-            (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
-            // VRF terminal unit is on cooling mode
-            CompOnMassFlow = DXCoil(CoolCoilNum).RatedAirMassFlowRate(Mode);
-        } else if ((!VRF(VRFNum).HeatRecoveryUsed && HeatingLoad(VRFNum)) ||
-                   (VRF(VRFNum).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
-            // VRF terminal unit is on heating mode
-            CompOnMassFlow = DXCoil(HeatCoilNum).RatedAirMassFlowRate(Mode);
-        }
-
-        // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetAverageAirFlow(VRFTUNum, 1.0, temp);
         VRFInletNode = this->VRFTUInletNodeNum;
         T_TU_in = Node(VRFInletNode).Temp;
         W_TU_in = Node(VRFInletNode).HumRat;
-        T_coil_in = T_TU_in;
-        W_coil_in = W_TU_in;
-
-        // Simulation the OAMixer if there is any
-        if (this->OAMixerUsed) {
-            SimOAMixer(this->OAMixerName, false, this->OAMixerIndex);
-
-            OAMixerNum = UtilityRoutines::FindItemInList(this->OAMixerName, OAMixer);
-            OAMixNode = OAMixer(OAMixerNum).MixNode;
-            T_coil_in = Node(OAMixNode).Temp;
-            W_coil_in = Node(OAMixNode).HumRat;
-        }
-        // Simulate the blow-through fan if there is any
-        if (this->FanPlace == BlowThru) {
-            if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[this->FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-                FanOutletNode = HVACFan::fanObjs[this->FanIndex]->outletNodeNum;
-            } else {
-                Fans::SimulateFanComponents("", false, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-                FanOutletNode = Fans::Fan(this->FanIndex).OutletNodeNum;
-            }
-            T_coil_in = Node(FanOutletNode).Temp;
-            W_coil_in = Node(FanOutletNode).HumRat;
-        }
+        T_coil_in = this->coilInNodeT;
+        W_coil_in = this->coilInNodeW;
 
         Garate = CompOnMassFlow;
         H_coil_in = PsyHFnTdbW(T_coil_in, W_coil_in);
@@ -9979,12 +9950,7 @@ namespace HVACVariableRefrigerantFlow {
                 this->RatedCompPower * CurveValue(this->OUCoolingPWRFT(NumOfCompSpdInput),
                                                   Tdischarge,
                                                   Tsuction); // Include the piping loss, at the highest compressor speed
-            if (TU_HeatingLoad > 0.0 || Pipe_Q_h > 0.0) {
-                this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
-            } else {
-                this->PipingCorrectionHeating = 1.0;
-            }
-
+            this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
             MaxHeatingCapacity(VRFCond) = this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
             this->CoolingCapacity = 0.0; // Include the piping loss
@@ -10668,7 +10634,6 @@ namespace HVACVariableRefrigerantFlow {
         // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
         // do nothing else if TU is scheduled off
-        //!!LKL Discrepancy < 0
         if (GetCurrentScheduleValue(this->SchedPtr) == 0.0) return;
 
         // Block the following statement: QZnReq==0 doesn't mean QCoilReq==0 due to possible OA mixer operation. zrp_201511
@@ -10704,7 +10669,13 @@ namespace HVACVariableRefrigerantFlow {
         // Otherwise the coil needs to turn on. Get full load result
         PartLoadRatio = 1.0;
         this->CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
-
+        if (this->CoolingCoilPresent) {
+            this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
+        } else {
+            this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
+        }
         // set supplemental heating coil calculation if the condition requires
         if (this->SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
             Real64 LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
@@ -10937,7 +10908,6 @@ namespace HVACVariableRefrigerantFlow {
                 Fans::SimulateFanComponents("", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             }
         }
-
         if (this->CoolingCoilPresent) {
             // above condition for heat pump mode, below condition for heat recovery mode
             if ((!VRF(VRFCond).HeatRecoveryUsed && CoolingLoad(VRFCond)) ||
@@ -11223,8 +11193,6 @@ namespace HVACVariableRefrigerantFlow {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
-        int FanOutletNode;       // index to the outlet node of the fan
-        int OAMixerNum;          // OA mixer index
         int OAMixNode;           // index to the mix node of OA mixer
         int VRFCond;             // index to VRF condenser
         int VRFTUNum;            // Unit index in VRF terminal unit array
@@ -11274,10 +11242,7 @@ namespace HVACVariableRefrigerantFlow {
         // Simulation the OAMixer if there is any
         if (VRFTU(VRFTUNum).OAMixerUsed) {
             SimOAMixer(VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, VRFTU(VRFTUNum).OAMixerIndex);
-
-            OAMixerNum = UtilityRoutines::FindItemInList(VRFTU(VRFTUNum).OAMixerName,
-                                                         OAMixer); // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
-            OAMixNode = OAMixer(OAMixerNum).MixNode;
+            OAMixNode = OAMixer(VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = Node(OAMixNode).Temp;
             Win = Node(OAMixNode).HumRat;
         }
@@ -11285,13 +11250,11 @@ namespace HVACVariableRefrigerantFlow {
         if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-                FanOutletNode = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;
             } else {
                 Fans::SimulateFanComponents("", false, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-                FanOutletNode = Fans::Fan(VRFTU(VRFTUNum).FanIndex).OutletNodeNum;
             }
-            Tin = Node(FanOutletNode).Temp;
-            Win = Node(FanOutletNode).HumRat;
+            Tin = Node(VRFTU(VRFTUNum).fanOutletNode).Temp;
+            Win = Node(VRFTU(VRFTUNum).fanOutletNode).HumRat;
         }
 
         // Call the coil control logic to determine the air flow rate to match the given coil load

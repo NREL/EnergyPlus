@@ -719,7 +719,9 @@ namespace HVACVariableRefrigerantFlow {
         int SuppHeatCoilLoopSide;        // supplemental heating coil plant loop side index
         int SuppHeatCoilBranchNum;       // supplemental heating coil plant loop branch index
         int SuppHeatCoilCompNum;         // supplemental heating coil plant component index
-
+        Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
+        Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
+        int fanOutletNode;               // fan outlet node index
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), VRFTUInletNodeNum(0),
@@ -739,7 +741,8 @@ namespace HVACVariableRefrigerantFlow {
               LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0),
               ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
               ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), firstPass(true),
-              SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum()
+              SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
+              fanOutletNode(0)
         {
         }
 
@@ -749,9 +752,8 @@ namespace HVACVariableRefrigerantFlow {
         // Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are
         // not member functions of this class.
 
-        void CalcVRFIUVariableTeTc(int const VRFTUNum, // Index to VRF terminal unit
-                                   Real64 &EvapTemp,   // evaporating temperature
-                                   Real64 &CondTemp    // condensing temperature
+        void CalcVRFIUVariableTeTc(Real64 &EvapTemp, // evaporating temperature
+                                   Real64 &CondTemp  // condensing temperature
         );
 
         void ControlVRF_FluidTCtrl(int const VRFTUNum,            // Index to VRF terminal unit
