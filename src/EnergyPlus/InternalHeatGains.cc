@@ -717,7 +717,7 @@ namespace InternalHeatGains {
                             bool NoTCModelSelectedWithSchedules = false;
                             NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + " has schedules but no thermal comfort model.");
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
                                 ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
                                 ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
                                 ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
@@ -6819,7 +6819,7 @@ namespace InternalHeatGains {
     {
         bool TCSchedsPresent = false;
         
-        if ( WorkEffSch || CloInsSch || AirVeloSch ) {
+        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
             TCSchedsPresent = true;
         }
         

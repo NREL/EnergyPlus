@@ -754,36 +754,29 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
 {
 
-    bool WorkEffSchPresent;
-    bool CloInsSchPresent;
-    bool AirVelSchPresent;
+    bool WorkEffSchPresent; // true equals blank, false equals not blank
+    bool CloInsSchPresent;  // true equals blank, false equals not blank
+    bool AirVelSchPresent;  // true equals blank, false equals not blank
     bool FunctionCallResult;
     bool ExpectedResult;
     
-    //Test 1: everything false--should result in false result
-    WorkEffSchPresent = false;
-    CloInsSchPresent = false;
-    AirVelSchPresent = false;
+    //Test 1: everything blank--should result in false result
+    WorkEffSchPresent = true;
+    CloInsSchPresent = true;
+    AirVelSchPresent = true;
     ExpectedResult = false;
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
     
-    //Additional Tests: test various combinations where at least one flag is true--should result in a true result
-    WorkEffSchPresent = true;
-    CloInsSchPresent = false;
-    AirVelSchPresent = false;
-    ExpectedResult = true;
-    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
-    EXPECT_EQ(ExpectedResult, FunctionCallResult);
-
+    //Additional Tests: test various combinations where at least one flag is not blank (false)--should result in a true result
     WorkEffSchPresent = false;
     CloInsSchPresent = true;
-    AirVelSchPresent = false;
+    AirVelSchPresent = true;
     ExpectedResult = true;
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
 
-    WorkEffSchPresent = false;
+    WorkEffSchPresent = true;
     CloInsSchPresent = false;
     AirVelSchPresent = true;
     ExpectedResult = true;
@@ -797,7 +790,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
 
-    WorkEffSchPresent = true;
+    WorkEffSchPresent = false;
     CloInsSchPresent = false;
     AirVelSchPresent = true;
     ExpectedResult = true;
@@ -806,14 +799,21 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
 
     WorkEffSchPresent = false;
     CloInsSchPresent = true;
-    AirVelSchPresent = true;
+    AirVelSchPresent = false;
     ExpectedResult = true;
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
 
     WorkEffSchPresent = true;
-    CloInsSchPresent = true;
-    AirVelSchPresent = true;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
     ExpectedResult = true;
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
