@@ -13,9 +13,11 @@ The general approach is to use the Pixel Counting methodology described by Jones
 
 ### Exterior Shading ###
 
+Pixel counting for exterior shading can be handled using Big Ladder's [Penumbra](https://github.com/bigladder/penumbra) library (a C++ implementation of Jones's pixel counting method).
+
 ### Interior Solar Distribution ###
 
-We will count pixels when viewing the from the perspective of the sun through a window with each internal surface assigned a different color, then use the histogramming functions in OpenGL to report the number of pixels of each color that are visible.
+We will count pixels when viewing the from the perspective of the sun through a window with each internal surface assigned a different color, then use the histogramming functions in OpenGL to report the number of pixels of each color that are visible. This functionality will be added to Penumbra.
 
 ### Pitfalls ###
 
