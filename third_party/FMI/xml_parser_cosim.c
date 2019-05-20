@@ -383,7 +383,7 @@ static int checkPeek(Elm e) {
 // Get the next stack element, it is of the given type.
 // If e==ANY_TYPE, the type check is ommited
 static void* checkPop(Elm e){
-    return checkPeek(e) ? stackPop(stack) : NULL;
+    return checkPeek(e) ? stackPopFMI(stack) : NULL;
 }
 
 // -------------------------------------------------------------------------
@@ -473,7 +473,7 @@ default: assert(0);
     }
     e = newElement(el, size, attr);
     checkPointer(e);
-    stackPush(stack, e);
+    stackPushFMI(stack, e);
 }
 
 // Pop all elements of the given type from stack and
@@ -482,12 +482,12 @@ default: assert(0);
 static void popList(Elm e) {
     int n = 0;
     Element** array;
-    Element* elm = stackPop(stack);
+    Element* elm = stackPopFMI(stack);
     while (elm->type == e) {
-        elm = stackPop(stack);
+        elm = stackPopFMI(stack);
         n++;
     }
-    stackPush(stack, elm); // push ListElement back to stack
+    stackPushFMI(stack, elm); // push ListElement back to stack
     array = (Element**)stackLastPopedAsArray0(stack, n); // NULL terminated list
     if (getAstNodeType(elm->type)!=astListElement) return; // failure
     ((ListElement*)elm)->list = array;
@@ -560,7 +560,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  md->typeDefinitions = td;
                  md->unitDefinitions = ud;
                  md->cosimulation = cs;
-                 stackPush(stack, md);
+                stackPushFMI(stack, md);
                  break;
             }
         case elm_Implementation:
@@ -568,7 +568,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  // replace Implementation element
                  void* cs = checkPop(ANY_TYPE);
                  void* im = checkPop(elm_Implementation);
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  free(im);
                  el = ((Element*)cs)->type;
                  break;
@@ -579,7 +579,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  CoSimulation* cs = checkPop(elm_CoSimulation_StandAlone);
                  if (!ca || !cs) return;
                  cs->capabilities = ca;
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  break;
             }
         case elm_CoSimulation_Tool:
@@ -590,7 +590,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  if (!ca || !mo || !cs) return;
                  cs->capabilities = ca;
                  cs->model = mo;
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  break;
             }
         case elm_Type:
@@ -664,7 +664,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  name->attributes[1] = data;
                  data = NULL;
                  skipData = 1; // stop recording element content
-                 stackPush(stack, name);
+                stackPushFMI(stack, name);
                  break;
             }
         case -1: return; // illegal element error
@@ -981,13 +981,13 @@ if (n != XMLBUFSIZE) done = 1;
                      xmlPath,
                      (int)XML_GetCurrentLineNumber(parser),
                      XML_ErrorString(XML_GetErrorCode(parser)));
-             while (! stackIsEmpty(stack)) md = stackPop(stack);
+             while (! stackIsEmpty(stack)) md = stackPopFMI(stack);
              if (md) freeElement(md);
              cleanup(file);
              return NULL; // failure
         }
     }
-    md = stackPop(stack);
+    md = stackPopFMI(stack);
     assert(stackIsEmpty(stack));
     cleanup(file);
     //printElement(1, md); // debug

@@ -25,7 +25,7 @@ int stackIsEmpty(Stack* s) {
 
 // add an element to stack and grow stack if required
 // returns 1 to indicate success and 0 for error
-int stackPush(Stack* s, void* e) {
+int stackPushFMI(Stack *s, void *e) {
     s->stackPos++;
     if (s->stackPos==s->stackSize){
 		s->stackSize += (s->stack ? s->inc: s->initialSize);
@@ -45,7 +45,7 @@ void* stackPeek(Stack* s){
 
 // remove top element (possibly NULL) from stack and return it
 // runtime error if stack is empty
-void* stackPop(Stack* s){
+void* stackPopFMI(Stack *s){
     assert(!stackIsEmpty(s));
     return s->stack[s->stackPos--];
 }
