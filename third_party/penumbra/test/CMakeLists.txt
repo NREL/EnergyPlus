@@ -10,4 +10,9 @@ link_libraries(penumbra gtest)
 add_executable(penumbra_tests ${test_sources})
 
 include(GoogleTest)
-gtest_discover_tests(penumbra_tests)
+
+if (OPENGL_FOUND)
+  gtest_discover_tests(penumbra_tests)
+else()
+  message("Penumbra: OpenGL not found. Relevant unit tests will not be executed.")
+endif()
