@@ -64,6 +64,7 @@
 #include <AirflowNetworkBalanceManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
+#include <Coils/CoilCoolingDX.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
@@ -9900,7 +9901,16 @@ namespace AirflowNetworkBalanceManager {
                         if (IsNotOK) {
                             ErrorsFound = true;
                         } else {
-                            SetDXCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum);
+                            // Replace the convenience function with in-place code
+                            auto it = std::find_if(coilCoolingDXs.begin(),
+                                                   coilCoolingDXs.end(),
+                                                   [&mycoil = DisSysCompCoilData(i).Name](const CoilCoolingDX &coil) { return coil.name == mycoil; });
+                            if (it != coilCoolingDXs.end()) {
+                                it->airLoopNum = DisSysCompCoilData(i).AirLoopNum;
+                            } else {
+                                ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + DisSysCompCoilData(i).Name + "\"");
+                            } 
+                            // SetDXCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum);
                         }
                     } else if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
                         ValidateComponent("Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData(i).Name, IsNotOK, RoutineName + CurrentModuleObject);
