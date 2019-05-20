@@ -5,6 +5,8 @@ GPU-based Shading Calculations
 
 ## Justification for New Feature ##
 
+GPU architecture is optimized for performing geometry operations. Leveraging methodologies used in the gaming industry to represent shadows, the GPU can (in theory) improve computational performance of shading calculations and provide greater flexibility (e.g., handle concave geometries and solar transmission through interior glazing).
+
 ## Approach ##
 
 The general approach is to use the Pixel Counting methodology described by Jones et al. In this approach, the building is rendered using OpenGL. Each surface is then viewed from the (parallel projection) perspective of the sun. The number of visible pixels for that surface is a proxy for the projected sunlit surface area. Dividing by the cosign of incidence for that surface gives the total sunlit surface area.
@@ -33,7 +35,7 @@ There are a couple potential solutions to this problem:
 
 ## Input Output Reference Documentation ##
 
-See proposed changes in `Energy+.idd.in`. Will draft document once IDD is reviewed.
+See proposed changes in [Energy+.idd.in](https://github.com/NREL/EnergyPlus/pull/7302/files#diff-23ccf090b80d26e885712256b9a6d888). Will draft document once IDD is reviewed.
 
 ## Engineering Reference ##
 
