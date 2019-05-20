@@ -101,7 +101,7 @@ public:
     Real64 RatedOutdoorAirTemp;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    void CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
+    void CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
     void sizeSpeed();
     bool mySizeFlag;
 

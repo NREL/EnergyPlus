@@ -12963,7 +12963,8 @@ namespace UnitarySystems {
                 this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
                 this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
 
-            } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+            } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) ||
+                       ((SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) && (this->m_NumOfSpeedCooling > 1))) {
                 this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
                 this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
                 this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
