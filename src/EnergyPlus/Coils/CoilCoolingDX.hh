@@ -49,6 +49,7 @@ public:
     CoilCoolingDXCurveFitPerformance performance; // TODO: Change to unique pointer when we have base class for performance object
     int condensateTankIndex;
     int evaporativeCondSupplyTankIndex;
+    int airLoopNum; // Add for AFN compatibility, revisit at a later date
 
     // report variables
     Real64 totalCoolingEnergyRate;
