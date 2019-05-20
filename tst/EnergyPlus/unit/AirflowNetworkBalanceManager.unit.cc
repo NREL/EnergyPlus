@@ -3035,10 +3035,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    ,                        !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
 
-        "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    20;                      !- Calculation Frequency",
-
         "  SurfaceConvectionAlgorithm:Inside,",
         "    TARP;                    !- Algorithm",
 
