@@ -2440,15 +2440,142 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     TerminalUnitList(IndexTUList).NumTUInList = 2;
 
     VRF(IndexVRFCondenser).ZoneTUListPtr = 1;
-    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
     VRF(IndexVRFCondenser).EvapTempFixed = 3;
     VRF(IndexVRFCondenser).CondTempFixed = 5;
 
+    // test fixed evap/cond temp method
+    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
     // Run and Check
     VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
 
     EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 3);
     EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 5);
+
+    // test variable evap/cond temp method
+    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 1;
+    VRF(IndexVRFCondenser).HeatRecoveryUsed = false;
+    VRFTU.allocate(TerminalUnitList(IndexTUList).NumTUInList);
+    VRFTU(1).CoolCoilIndex = 1;
+    VRFTU(1).HeatCoilIndex = 2;
+    VRFTU(2).CoolCoilIndex = 3;
+    VRFTU(2).HeatCoilIndex = 4;
+    VRFTU(1).ZoneNum = 1;
+    VRFTU(1).VRFSysNum = 1;
+    VRFTU(2).ZoneNum = 2;
+    VRFTU(2).VRFSysNum = 1;
+    VRFTU(1).IndexToTUInTUList = 1;
+    VRFTU(2).IndexToTUInTUList = 2;
+    VRFTU(1).VRFTUInletNodeNum = 1;
+    VRFTU(2).VRFTUInletNodeNum = 2;
+    TerminalUnitList(1).ZoneTUPtr.allocate(2);
+    TerminalUnitList(1).ZoneTUPtr(1) = 1;
+    TerminalUnitList(1).ZoneTUPtr(2) = 2;
+    TerminalUnitList(1).HRCoolRequest.allocate(2);
+    TerminalUnitList(1).HRCoolRequest = false;
+    TerminalUnitList(1).HRHeatRequest.allocate(2);
+    TerminalUnitList(1).HRHeatRequest = false;
+    DXCoil.allocate(4); // 2 TUs each with a cooling and heating coil
+    for (int i = 1; i <= 2; ++i) {
+        DXCoil((i - 1) * 2 + 1).SH = 8.0 + double(i);
+        DXCoil((i - 1) * 2 + 1).C1Te = 1.0;
+        DXCoil((i - 1) * 2 + 1).C2Te = 0.0;
+        DXCoil((i - 1) * 2 + 1).C3Te = 0.0;
+        DXCoil((i - 1) * 2 + 2).SC = 6.0 + double(i);
+        DXCoil((i - 1) * 2 + 2).C1Tc = 1.0;
+        DXCoil((i - 1) * 2 + 2).C2Tc = 0.0;
+        DXCoil((i - 1) * 2 + 2).C3Tc = 0.0;
+    }
+    Node.allocate(5);
+    Node(1).Temp = 21.0; // TU 1 inlet node
+    Node(1).HumRat = 0.011;
+    Node(2).Temp = 21.0; // TU 2 inlet node
+    Node(2).HumRat = 0.011;
+    VRFTU(1).fanOutletNode = 3;
+    Node(3).Temp = 23.0;    // TU 1 fan outlet node
+    Node(3).HumRat = 0.011; // TU 1 fan outlet node
+    VRFTU(2).fanOutletNode = 4;
+    Node(4).Temp = 23.0;    // TU 2 fan outlet node
+    Node(4).HumRat = 0.011; // TU 2 fan outlet node
+    VRFTU(1).coilInNodeT = Node(1).Temp;
+    VRFTU(1).coilInNodeW = Node(1).HumRat;
+    VRFTU(2).coilInNodeT = Node(2).Temp;
+    VRFTU(2).coilInNodeW = Node(2).HumRat;
+
+    CoolingLoad.allocate(1);
+    HeatingLoad.allocate(1);
+    CoolingLoad(1) = true;
+    HeatingLoad(1) = false;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(2);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -1100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -1200.0;
+
+    CompOnMassFlow = 0.0; // system is off
+    // Run and Check
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15); // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);  // default value, coil inlet temps lower than default
+
+    CompOnMassFlow = 0.1;
+    // system is on in cooling mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // minimum coil surface temp of both cooling coils below default
+    EXPECT_LT(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveCoolingEvapTemp = VRF(IndexVRFCondenser).IUEvaporatingTemp;
+
+    // test blow thru fan
+    // adjust coil inlet temps for fan heat
+    VRFTU(1).coilInNodeT = Node(3).Temp;
+    VRFTU(1).coilInNodeW = Node(3).HumRat;
+    VRFTU(2).coilInNodeT = Node(3).Temp;
+    VRFTU(2).coilInNodeW = Node(3).HumRat;
+    VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // system is on in cooling mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to overcome additional heat tranfer
+    EXPECT_LT(VRF(IndexVRFCondenser).IUEvaporatingTemp, saveCoolingEvapTemp);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+
+    VRFTU(1).FanPlace = DataHVACGlobals::DrawThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::DrawThru;
+    // rest coil inlet temps
+    VRFTU(1).coilInNodeT = Node(1).Temp;
+    VRFTU(1).coilInNodeW = Node(1).HumRat;
+    VRFTU(2).coilInNodeT = Node(2).Temp;
+    VRFTU(2).coilInNodeW = Node(2).HumRat;
+    CoolingLoad(1) = false;
+    HeatingLoad(1) = true;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 300.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = 2000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = 1900.0;
+    // system is on in heating mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // maximum coil surface temp of both heating coils above default
+    EXPECT_GT(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveHeatingCondTemp = VRF(IndexVRFCondenser).IUCondensingTemp;
+
+    // test blow thru fan
+    VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // adjust coil inlet temps for fan heat
+    VRFTU(1).coilInNodeT = Node(3).Temp;
+    VRFTU(1).coilInNodeW = Node(3).HumRat;
+    VRFTU(2).coilInNodeT = Node(3).Temp;
+    VRFTU(2).coilInNodeW = Node(3).HumRat;
+    // system is on in heating mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to account for less heat tranfer
+    EXPECT_LT(VRF(IndexVRFCondenser).IUCondensingTemp, saveHeatingCondTemp);
 
     // Clean up
     VRF.deallocate();
