@@ -9906,6 +9906,7 @@ namespace AirflowNetworkBalanceManager {
                                                    coilCoolingDXs.end(),
                                                    [&mycoil = DisSysCompCoilData(i).Name](const CoilCoolingDX &coil) { return coil.name == mycoil; });
                             if (it != coilCoolingDXs.end()) {
+                                // Set the airloop number on the CoilCoolingDX object, which is used to collect the runtime fraction
                                 it->airLoopNum = DisSysCompCoilData(i).AirLoopNum;
                             } else {
                                 ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + DisSysCompCoilData(i).Name + "\"");

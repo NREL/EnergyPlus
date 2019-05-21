@@ -2888,7 +2888,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     ,                        !- Condenser Inlet Node Name
-    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
+    ,                        !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

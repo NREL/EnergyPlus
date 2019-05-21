@@ -209,6 +209,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
 
     // Fishy global things that need to be set here, try to set the AFN stuff now
+    // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
     if (this->airLoopNum > 0) {
