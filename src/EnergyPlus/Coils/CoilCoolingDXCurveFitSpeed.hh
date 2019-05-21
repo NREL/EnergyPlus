@@ -100,7 +100,7 @@ public:
 
 	bool mySizeFlag = true;
 
-    void CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
+    void CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
     void sizeSpeed();
 
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);

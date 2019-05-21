@@ -37,7 +37,7 @@ class CoilCoolingDXCurveFitPerformance
 
 public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-    void simulate(DataLoopNode::NodeData &inletNode,
+    void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   bool useAlternateMode,
                   Real64 &PLR,
@@ -46,7 +46,7 @@ public:
                   int &fanOpMode);
 
 	void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
-			DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+			const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 

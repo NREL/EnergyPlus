@@ -108,7 +108,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
 }
 
 void CoilCoolingDXCurveFitPerformance::simulate(
-    DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
     if (useAlternateMode) {
         this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
@@ -121,7 +121,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(
 
 void CoilCoolingDXCurveFitPerformance::calculate(
         CoilCoolingDXCurveFitOperatingMode &currentMode,
-        DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
 {
     // size if needed
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
@@ -151,7 +151,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
         }
     } else {
-        // IF schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
+        // If schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
         if (this->evapCondBasinHeatCap > 0.0) {
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
         }

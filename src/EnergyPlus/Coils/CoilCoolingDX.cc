@@ -2,6 +2,7 @@
 
 #include <BranchNodeConnections.hh>
 #include <Coils/CoilCoolingDX.hh>
+#include <DataAirLoop.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -224,7 +225,7 @@ void CoilCoolingDX::oneTimeInit(){
     }
 }
 
-CoilCoolingDX::CoilCoolingDX(std::string name_to_find)
+CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
 {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(CoilCoolingDX::object_name);
     if (numCoolingCoilDXs <= 0) {
@@ -281,6 +282,8 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
     // update condensate collection tank
+    // TODO: This looks properly implemented, my only concern is that we are grabbing state from the nodes, whereas in DXCoils.cc, they are
+    //       grabbing stuff from the DXCoil structure.  Could mass flow somehow be different between them at this point to account for RTF, etc.?
     if (this->condensateTankIndex > 0) {
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water flow of water in m3/s for water system interactions
@@ -288,7 +291,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
         Real64 inHumidityRatio = evapInletNode.HumRat;
         Real64 outHumidityRatio = evapOutletNode.HumRat;
-        //  mdot * del HumRat / rho water
         this->condensateVolumeFlow = max(0.0, (evapInletNode.MassFlowRate * (inHumidityRatio - outHumidityRatio) / waterDensity));
         this->condensateVolumeConsumption = this->condensateVolumeFlow * reportingConstant;
 
@@ -296,14 +298,14 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         DataWater::WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
     }
 
-    // update requests for evap condenser tank
+    // update requests for evaporative condenser tank
+    // TODO: This also looks pretty well implemented except that I am grabbing data off the nodes directly...which may be fine
     if (this->evaporativeCondSupplyTankIndex > 0) {
-        Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
         Real64 condInletTemp = DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) * (1.0 - this->performance.normalMode.speeds[speedNum-1].evap_condenser_effectiveness);
         Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
         Real64 outdoorHumRat = DataEnvironment::OutHumRat;
-        auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
-        Real64 condAirMassFlow = condInletNode.MassFlowRate;
+        Real64 condAirMassFlow = DataLoopNode::Node(this->condInletNodeIndex).MassFlowRate;
+        Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
         this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
         if (!useAlternateMode) {
             this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
@@ -321,8 +323,20 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
     this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
+
     this->evapCondPumpElecConsumption = this->evapCondPumpElecPower * reportingConstant;
 
+    this->coolingCoilRuntimeFraction = this->performance.RTF;
+    this->elecCoolingPower = this->performance.powerUse;
+    this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
+
+    // fishy global things that need to be set here - leaving AFN stuff for later
+    //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+    DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    //if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+    //    AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+    //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+    //}
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in,

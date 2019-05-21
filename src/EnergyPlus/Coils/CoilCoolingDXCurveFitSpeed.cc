@@ -280,7 +280,7 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode)
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode)
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:

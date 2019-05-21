@@ -75,7 +75,7 @@ public:
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-    void CalcOperatingMode(DataLoopNode::NodeData &inletNode,
+    void CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
                            DataLoopNode::NodeData &outletNode,
                            Real64 &PLR,
                            int &speedNum,
