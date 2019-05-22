@@ -408,7 +408,7 @@ These output variables are the total amount of heat gain for this People object 
 
 \paragraph{People Air Temperature {[}C{]}}\label{people-air-temperature-c}
 
-This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
+This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
 
 \paragraph{People Air Relative Humidity {[}\%{]}}\label{people-air-relative-humidity}
 
@@ -460,11 +460,11 @@ Note for all Thermal Comfort reporting:~ Though the published values for thermal
 
 \paragraph{Zone Thermal Comfort Fanger Model PMV {[]}}\label{zone-thermal-comfort-fanger-model-pmv}
 
-This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model.
+This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model. Details on the equations used to calculate the Fanger PMV are shown in the EnergyPlus Engineering Reference. If the zone in question is currently being controlled using a thermostat object, then the value of the PMV is determined by using the air temperature and humidity that is calculated at the system time step; otherwise, if the zone is uncontrolled, the PMV is determined using the zone air temperature and humidity that is averaged over the zone time step.
 
 \paragraph{Zone Thermal Comfort Fanger Model PPD {[}\%{]}}\label{zone-thermal-comfort-fanger-model-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger thermal comfort model.
+This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger thermal comfort model.  Details on the equations used to calculate the Fanger PPD are shown in the EnergyPlus Engineering Reference. If the zone in question is currently being controlled using a thermostat object, then the value of the PPD is determined by using the air temperature and humidity that is calculated at the system time step; otherwise, if the zone is uncontrolled, the PPD is determined using the zone air temperature and humidity that is averaged over the zone time step.
 
 \paragraph{Zone Thermal Comfort Clothing Surface Temperature {[}C{]}}\label{zone-thermal-comfort-clothing-surface-temperature-c}
 
