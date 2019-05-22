@@ -1818,7 +1818,7 @@ namespace WaterManager {
             if (WaterStorage(TankNum).NumWaterSupplies > 0) {
                 // TODO: Figure out what to do with this...the available supply should be updated by the components
                 //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
-                // WaterStorage(TankNum).VdotAvailSupply = 0.0;
+                WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
                 if (allocated(GroundwaterWell)) GroundwaterWell(WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
