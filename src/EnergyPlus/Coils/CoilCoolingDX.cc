@@ -353,6 +353,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // fishy global things that need to be set here - leaving AFN stuff for later
     // DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
     // if (DXCoil(DXCoilNum).AirLoopNum > 0) {
     //    AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
     //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
