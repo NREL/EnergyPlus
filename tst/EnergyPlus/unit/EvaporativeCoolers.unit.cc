@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -60,7 +59,8 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ScheduleManager.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
@@ -69,7 +69,6 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::EvaporativeCoolers;
-using namespace EnergyPlus::ScheduleManager;
 using EnergyPlus::DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
 
 namespace EnergyPlus {
@@ -771,11 +770,6 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
     DataLoopNode::Node.allocate(2);
     auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
-
-    ProcessScheduleInput(); // read schedules
-
-    Real64 PrimaryAirDesignFlow(0.0);
-    Real64 RecirWaterPumpDesignPower(0.0);
     DataEnvironment::OutBaroPress = 101325.0;
 
     int const CurveNum = 1;
