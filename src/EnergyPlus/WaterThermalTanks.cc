@@ -7167,11 +7167,11 @@ namespace WaterThermalTanks {
         }
         assert(HPWHCondenserDeltaT >= 0);
 
-        while (TimeRemaining > 0.0) {
-            //Put these two equations/functions in the loop so that they can be updated in each iteration using new tank temp
-            CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, TankTemp, SourceMassFlowRate, Qheatpump, Qsource);
+        CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, TankTemp, SourceMassFlowRate, Qheatpump, Qsource);
 
-            Quse = UseMassFlowRate * Cp * (UseInletTemp - TankTemp);
+        Quse = UseMassFlowRate * Cp * (UseInletTemp - TankTemp);
+
+        while (TimeRemaining > 0.0) {
 
             TimeNeeded = 0.0;
 
