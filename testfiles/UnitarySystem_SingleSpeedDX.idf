@@ -2304,8 +2304,6 @@
 
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
-Output:Variable, *, Cooling Coil Crankcase Heater Electric Power, hourly;
-Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
@@ -2847,7 +2845,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
-    100,                       !- Crankcase Heater Capacity {W}
+    0,                       !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}

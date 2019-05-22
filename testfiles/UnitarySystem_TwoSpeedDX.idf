@@ -1871,8 +1871,8 @@
 !     600,                     !- Supply Fan Delta Pressure {Pa}
 !     0.9,                     !- Supply Fan Motor Efficiency
 !     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     SingleSpeedDX,           !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
+!     TwoSpeedDX,              !- Cooling Coil Type
+!     2,                       !- Number of Speeds for Cooling
 !     ,                        !- Cooling Coil Availability Schedule Name
 !     12.8,                    !- Cooling Design Supply Air Temperature {C}
 !     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
@@ -1944,8 +1944,8 @@
 !     600,                     !- Supply Fan Delta Pressure {Pa}
 !     0.9,                     !- Supply Fan Motor Efficiency
 !     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     SingleSpeedDX,           !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
+!     TwoSpeedDX,              !- Cooling Coil Type
+!     2,                       !- Number of Speeds for Cooling
 !     ,                        !- Cooling Coil Availability Schedule Name
 !     12.8,                    !- Cooling Design Supply Air Temperature {C}
 !     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
@@ -2017,8 +2017,8 @@
 !     600,                     !- Supply Fan Delta Pressure {Pa}
 !     0.9,                     !- Supply Fan Motor Efficiency
 !     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     SingleSpeedDX,           !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
+!     TwoSpeedDX,              !- Cooling Coil Type
+!     2,                       !- Number of Speeds for Cooling
 !     ,                        !- Cooling Coil Availability Schedule Name
 !     12.8,                    !- Cooling Design Supply Air Temperature {C}
 !     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
@@ -2090,8 +2090,8 @@
 !     600,                     !- Supply Fan Delta Pressure {Pa}
 !     0.9,                     !- Supply Fan Motor Efficiency
 !     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     SingleSpeedDX,           !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
+!     TwoSpeedDX,              !- Cooling Coil Type
+!     2,                       !- Number of Speeds for Cooling
 !     ,                        !- Cooling Coil Availability Schedule Name
 !     12.8,                    !- Cooling Design Supply Air Temperature {C}
 !     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
@@ -2163,8 +2163,8 @@
 !     600,                     !- Supply Fan Delta Pressure {Pa}
 !     0.9,                     !- Supply Fan Motor Efficiency
 !     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     SingleSpeedDX,           !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
+!     TwoSpeedDX,              !- Cooling Coil Type
+!     2,                       !- Number of Speeds for Cooling
 !     ,                        !- Cooling Coil Availability Schedule Name
 !     12.8,                    !- Cooling Design Supply Air Temperature {C}
 !     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
@@ -2304,8 +2304,6 @@
 
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
-Output:Variable, *, Cooling Coil Crankcase Heater Electric Power, hourly;
-Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
@@ -2786,7 +2784,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     ,                        !- Availability Schedule Name
     Sys 1 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 1 Furnace DX Cool Heating Coil Outlet,  !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 1 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
@@ -2839,7 +2837,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Inlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -2847,11 +2845,11 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
-    100,                       !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -2863,18 +2861,40 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
     ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    4.500000,                !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 1 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool DX Coil Low EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance,  !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -2883,80 +2903,124 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Sys 1 Furnace DX Cool Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Sys 1 Furnace DX Cool Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Sys 1 Furnace DX Cool Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 1 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 1 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 1 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C4
 
   Curve:Biquadratic,
-    Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Name
-    0.942587793,             !- Coefficient1 Constant
-    0.009543347,             !- Coefficient2 x
-    0.00068377,              !- Coefficient3 x**2
-    -0.011042676,            !- Coefficient4 y
-    0.000005249,             !- Coefficient5 y**2
-    -0.00000972,             !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 1 Furnace DX Cool DX Coil Cap-FT,  !- Name
+    0.476428,                !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CCAP-FFLOW for PTAC
+! DOE-2.1E, SDL-C78
 
-  Curve:Quadratic,
-    Sys 1 Furnace DX Cool Cool Coil Cap-FF,  !- Name
-    0.8,                     !- Coefficient1 Constant
-    0.2,                     !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 1 Furnace DX Cool DX Coil Cap-FF,  !- Name
+    .47278589,               !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    .32257813,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! DOE-2.1E, COOL-EIR-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C82
 
   Curve:Biquadratic,
-    Sys 1 Furnace DX Cool Cool Coil EIR-FT,  !- Name
-    0.342414409,             !- Coefficient1 Constant
-    0.034885008,             !- Coefficient2 x
-    -0.0006237,              !- Coefficient3 x**2
-    0.004977216,             !- Coefficient4 y
-    0.000437951,             !- Coefficient5 y**2
-    -0.000728028,            !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 1 Furnace DX Cool DX Coil EIR-FT,  !- Name
+    0.632475,                !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CEIR-FFLOW for PTAC
+! DOE-2.1E, SDL-C82
 
-  Curve:Quadratic,
-    Sys 1 Furnace DX Cool Cool Coil EIR-FF,  !- Name
-    1.1552,                  !- Coefficient1 Constant
-    -0.1808,                 !- Coefficient2 x
-    0.0256,                  !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 1 Furnace DX Cool DX Coil EIR-FF,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    .34544129,               !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    .33889943,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! PLF = l.- Cd(1.-PLR) where Cd = 0.15
-
   Curve:Quadratic,
-    Sys 1 Furnace DX Cool Cool Coil PLF,  !- Name
+    Sys 1 Furnace DX Cool DX Coil PLF,  !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
-  OutdoorAir:Node,
-    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Name
-    -1;                      !- Height Above Ground {m}
+! DOE-2.1E, SDL-C4
+
+  Curve:Biquadratic,
+    Sys 1 Furnace DX Cool DX Coil Low Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Sys 1 Furnace DX Cool DX Coil Low EIR-FT,  !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Coil:Heating:Fuel,
     Sys 1 Furnace DX Cool Heating Coil,  !- Name
@@ -2980,14 +3044,24 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     0,                       !- Minimum Value of x
     1;                       !- Maximum Value of x
 
-  Fan:OnOff,
+! VAV Fan coefficients based on variable-speed drive.
+
+  Fan:VariableVolume,
     Sys 1 Furnace DX Cool Supply Fan,  !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.0,                     !- Fan Power Minimum Flow Fraction
+    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
+    0.0015302446,            !- Fan Power Coefficient 1
+    0.0052080574,            !- Fan Power Coefficient 2
+    1.1086242,               !- Fan Power Coefficient 3
+    -0.11635563,             !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
     Sys 1 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 1 Furnace DX Cool Supply Fan Outlet;  !- Air Outlet Node Name
 
@@ -3163,7 +3237,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     ,                        !- Availability Schedule Name
     Sys 2 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 2 Furnace DX Cool Supply Fan Outlet,  !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 2 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     DrawThrough,             !- Fan Placement
     FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
@@ -3216,7 +3290,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 2 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Inlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -3224,11 +3298,11 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -3240,18 +3314,40 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
     ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 2 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    4.500000,                !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 2 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 2 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 2 Furnace DX Cool DX Coil Low EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 2 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 2 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 2 Furnace DX Cool Cooling Coil Speed 2 Performance,  !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -3260,80 +3356,124 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Sys 2 Furnace DX Cool Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Sys 2 Furnace DX Cool Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Sys 2 Furnace DX Cool Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Sys 2 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 2 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 2 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 2 Furnace DX Cool DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 2 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 2 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C4
 
   Curve:Biquadratic,
-    Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Name
-    0.942587793,             !- Coefficient1 Constant
-    0.009543347,             !- Coefficient2 x
-    0.00068377,              !- Coefficient3 x**2
-    -0.011042676,            !- Coefficient4 y
-    0.000005249,             !- Coefficient5 y**2
-    -0.00000972,             !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 2 Furnace DX Cool DX Coil Cap-FT,  !- Name
+    0.476428,                !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CCAP-FFLOW for PTAC
+! DOE-2.1E, SDL-C78
 
-  Curve:Quadratic,
-    Sys 2 Furnace DX Cool Cool Coil Cap-FF,  !- Name
-    0.8,                     !- Coefficient1 Constant
-    0.2,                     !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 2 Furnace DX Cool DX Coil Cap-FF,  !- Name
+    .47278589,               !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    .32257813,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! DOE-2.1E, COOL-EIR-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C82
 
   Curve:Biquadratic,
-    Sys 2 Furnace DX Cool Cool Coil EIR-FT,  !- Name
-    0.342414409,             !- Coefficient1 Constant
-    0.034885008,             !- Coefficient2 x
-    -0.0006237,              !- Coefficient3 x**2
-    0.004977216,             !- Coefficient4 y
-    0.000437951,             !- Coefficient5 y**2
-    -0.000728028,            !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 2 Furnace DX Cool DX Coil EIR-FT,  !- Name
+    0.632475,                !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CEIR-FFLOW for PTAC
+! DOE-2.1E, SDL-C82
 
-  Curve:Quadratic,
-    Sys 2 Furnace DX Cool Cool Coil EIR-FF,  !- Name
-    1.1552,                  !- Coefficient1 Constant
-    -0.1808,                 !- Coefficient2 x
-    0.0256,                  !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 2 Furnace DX Cool DX Coil EIR-FF,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    .34544129,               !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    .33889943,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! PLF = l.- Cd(1.-PLR) where Cd = 0.15
-
   Curve:Quadratic,
-    Sys 2 Furnace DX Cool Cool Coil PLF,  !- Name
+    Sys 2 Furnace DX Cool DX Coil PLF,  !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
-  OutdoorAir:Node,
-    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Name
-    -1;                      !- Height Above Ground {m}
+! DOE-2.1E, SDL-C4
+
+  Curve:Biquadratic,
+    Sys 2 Furnace DX Cool DX Coil Low Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Sys 2 Furnace DX Cool DX Coil Low EIR-FT,  !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Coil:Heating:Electric,
     Sys 2 Furnace DX Cool Heating Coil,  !- Name
@@ -3344,14 +3484,24 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 2 Furnace DX Cool Heating Coil Outlet,  !- Air Outlet Node Name
     ;                        !- Temperature Setpoint Node Name
 
-  Fan:OnOff,
+! VAV Fan coefficients based on variable-speed drive.
+
+  Fan:VariableVolume,
     Sys 2 Furnace DX Cool Supply Fan,  !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.0,                     !- Fan Power Minimum Flow Fraction
+    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
+    0.0015302446,            !- Fan Power Coefficient 1
+    0.0052080574,            !- Fan Power Coefficient 2
+    1.1086242,               !- Fan Power Coefficient 3
+    -0.11635563,             !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
     Sys 2 Furnace DX Cool Heating Coil Outlet,  !- Air Inlet Node Name
     Sys 2 Furnace DX Cool Supply Fan Outlet;  !- Air Outlet Node Name
 
@@ -3527,7 +3677,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     ,                        !- Availability Schedule Name
     Sys 3 Heat Pump Air Source Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 3 Heat Pump Air Source Supp Heat or Reheat Coil Outl,  !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 3 Heat Pump Air Source Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
@@ -3580,7 +3730,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 3 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Inlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -3588,11 +3738,11 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -3604,18 +3754,40 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
     ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance;  !- Speed 1 Name
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    4.500000,                !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 3 Heat Pump Air Source DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 3 Heat Pump Air Source DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 3 Heat Pump Air Source DX Coil Low EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 3 Heat Pump Air Source DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 3 Heat Pump Air Source DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 2 Performance,  !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -3624,80 +3796,124 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Sys 3 Heat Pump Air Source Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Sys 3 Heat Pump Air Source Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Sys 3 Heat Pump Air Source Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Sys 3 Heat Pump Air Source Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 3 Heat Pump Air Source DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 3 Heat Pump Air Source DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 3 Heat Pump Air Source DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 3 Heat Pump Air Source DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 3 Heat Pump Air Source DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C4
 
   Curve:Biquadratic,
-    Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Name
-    0.942587793,             !- Coefficient1 Constant
-    0.009543347,             !- Coefficient2 x
-    0.00068377,              !- Coefficient3 x**2
-    -0.011042676,            !- Coefficient4 y
-    0.000005249,             !- Coefficient5 y**2
-    -0.00000972,             !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 3 Heat Pump Air Source DX Coil Cap-FT,  !- Name
+    0.476428,                !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CCAP-FFLOW for PTAC
+! DOE-2.1E, SDL-C78
 
-  Curve:Quadratic,
-    Sys 3 Heat Pump Air Source Cool Coil Cap-FF,  !- Name
-    0.8,                     !- Coefficient1 Constant
-    0.2,                     !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 3 Heat Pump Air Source DX Coil Cap-FF,  !- Name
+    .47278589,               !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    .32257813,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! DOE-2.1E, COOL-EIR-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C82
 
   Curve:Biquadratic,
-    Sys 3 Heat Pump Air Source Cool Coil EIR-FT,  !- Name
-    0.342414409,             !- Coefficient1 Constant
-    0.034885008,             !- Coefficient2 x
-    -0.0006237,              !- Coefficient3 x**2
-    0.004977216,             !- Coefficient4 y
-    0.000437951,             !- Coefficient5 y**2
-    -0.000728028,            !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 3 Heat Pump Air Source DX Coil EIR-FT,  !- Name
+    0.632475,                !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CEIR-FFLOW for PTAC
+! DOE-2.1E, SDL-C82
 
-  Curve:Quadratic,
-    Sys 3 Heat Pump Air Source Cool Coil EIR-FF,  !- Name
-    1.1552,                  !- Coefficient1 Constant
-    -0.1808,                 !- Coefficient2 x
-    0.0256,                  !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 3 Heat Pump Air Source DX Coil EIR-FF,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    .34544129,               !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    .33889943,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! PLF = l.- Cd(1.-PLR) where Cd = 0.15
-
   Curve:Quadratic,
-    Sys 3 Heat Pump Air Source Cool Coil PLF,  !- Name
+    Sys 3 Heat Pump Air Source DX Coil PLF,  !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
-  OutdoorAir:Node,
-    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Name
-    -1;                      !- Height Above Ground {m}
+! DOE-2.1E, SDL-C4
+
+  Curve:Biquadratic,
+    Sys 3 Heat Pump Air Source DX Coil Low Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Sys 3 Heat Pump Air Source DX Coil Low EIR-FT,  !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Coil:Heating:DX:SingleSpeed,
     Sys 3 Heat Pump Air Source Heating Coil,  !- Name
@@ -3789,14 +4005,24 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 3 Heat Pump Air Source Supp Heat or Reheat Coil Outl,  !- Air Outlet Node Name
     ;                        !- Temperature Setpoint Node Name
 
-  Fan:OnOff,
+! VAV Fan coefficients based on variable-speed drive.
+
+  Fan:VariableVolume,
     Sys 3 Heat Pump Air Source Supply Fan,  !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.0,                     !- Fan Power Minimum Flow Fraction
+    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
+    0.0015302446,            !- Fan Power Coefficient 1
+    0.0052080574,            !- Fan Power Coefficient 2
+    1.1086242,               !- Fan Power Coefficient 3
+    -0.11635563,             !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
     Sys 3 Heat Pump Air Source Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 3 Heat Pump Air Source Supply Fan Outlet;  !- Air Outlet Node Name
 
@@ -3972,7 +4198,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     ,                        !- Availability Schedule Name
     Sys 4 Heat Pump Air Source Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 4 Heat Pump Air Source Supp Heat or Reheat Coil Outl,  !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 4 Heat Pump Air Source Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
@@ -4025,7 +4251,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 4 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Inlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -4033,11 +4259,11 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -4049,18 +4275,40 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
     ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance;  !- Speed 1 Name
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    4.500000,                !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 4 Heat Pump Air Source DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 4 Heat Pump Air Source DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 4 Heat Pump Air Source DX Coil Low EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 4 Heat Pump Air Source DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 4 Heat Pump Air Source DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 2 Performance,  !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -4069,80 +4317,124 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Sys 4 Heat Pump Air Source Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Sys 4 Heat Pump Air Source Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Sys 4 Heat Pump Air Source Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Sys 4 Heat Pump Air Source Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 4 Heat Pump Air Source DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 4 Heat Pump Air Source DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 4 Heat Pump Air Source DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 4 Heat Pump Air Source DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 4 Heat Pump Air Source DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C4
 
   Curve:Biquadratic,
-    Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Name
-    0.942587793,             !- Coefficient1 Constant
-    0.009543347,             !- Coefficient2 x
-    0.00068377,              !- Coefficient3 x**2
-    -0.011042676,            !- Coefficient4 y
-    0.000005249,             !- Coefficient5 y**2
-    -0.00000972,             !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 4 Heat Pump Air Source DX Coil Cap-FT,  !- Name
+    0.476428,                !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CCAP-FFLOW for PTAC
+! DOE-2.1E, SDL-C78
 
-  Curve:Quadratic,
-    Sys 4 Heat Pump Air Source Cool Coil Cap-FF,  !- Name
-    0.8,                     !- Coefficient1 Constant
-    0.2,                     !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 4 Heat Pump Air Source DX Coil Cap-FF,  !- Name
+    .47278589,               !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    .32257813,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! DOE-2.1E, COOL-EIR-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C82
 
   Curve:Biquadratic,
-    Sys 4 Heat Pump Air Source Cool Coil EIR-FT,  !- Name
-    0.342414409,             !- Coefficient1 Constant
-    0.034885008,             !- Coefficient2 x
-    -0.0006237,              !- Coefficient3 x**2
-    0.004977216,             !- Coefficient4 y
-    0.000437951,             !- Coefficient5 y**2
-    -0.000728028,            !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 4 Heat Pump Air Source DX Coil EIR-FT,  !- Name
+    0.632475,                !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CEIR-FFLOW for PTAC
+! DOE-2.1E, SDL-C82
 
-  Curve:Quadratic,
-    Sys 4 Heat Pump Air Source Cool Coil EIR-FF,  !- Name
-    1.1552,                  !- Coefficient1 Constant
-    -0.1808,                 !- Coefficient2 x
-    0.0256,                  !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 4 Heat Pump Air Source DX Coil EIR-FF,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    .34544129,               !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    .33889943,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! PLF = l.- Cd(1.-PLR) where Cd = 0.15
-
   Curve:Quadratic,
-    Sys 4 Heat Pump Air Source Cool Coil PLF,  !- Name
+    Sys 4 Heat Pump Air Source DX Coil PLF,  !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
-  OutdoorAir:Node,
-    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Name
-    -1;                      !- Height Above Ground {m}
+! DOE-2.1E, SDL-C4
+
+  Curve:Biquadratic,
+    Sys 4 Heat Pump Air Source DX Coil Low Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Sys 4 Heat Pump Air Source DX Coil Low EIR-FT,  !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Coil:Heating:DX:SingleSpeed,
     Sys 4 Heat Pump Air Source Heating Coil,  !- Name
@@ -4234,14 +4526,24 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 4 Heat Pump Air Source Supp Heat or Reheat Coil Outl,  !- Air Outlet Node Name
     ;                        !- Temperature Setpoint Node Name
 
-  Fan:OnOff,
+! VAV Fan coefficients based on variable-speed drive.
+
+  Fan:VariableVolume,
     Sys 4 Heat Pump Air Source Supply Fan,  !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.0,                     !- Fan Power Minimum Flow Fraction
+    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
+    0.0015302446,            !- Fan Power Coefficient 1
+    0.0052080574,            !- Fan Power Coefficient 2
+    1.1086242,               !- Fan Power Coefficient 3
+    -0.11635563,             !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
     Sys 4 Heat Pump Air Source Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 4 Heat Pump Air Source Supply Fan Outlet;  !- Air Outlet Node Name
 
@@ -4417,7 +4719,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     ,                        !- Availability Schedule Name
     Sys 5 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 5 Furnace DX Cool Heating Coil Outlet,  !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 5 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
@@ -4470,7 +4772,7 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 5 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Inlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -4478,11 +4780,11 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -4494,18 +4796,40 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
     ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 5 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    4.500000,                !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 5 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 5 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 5 Furnace DX Cool DX Coil Low EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 5 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 5 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Sys 5 Furnace DX Cool Cooling Coil Speed 2 Performance,  !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -4514,80 +4838,124 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Sys 5 Furnace DX Cool Cool Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Sys 5 Furnace DX Cool Cool Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Sys 5 Furnace DX Cool Cool Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Sys 5 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Sys 5 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Sys 5 Furnace DX Cool DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Sys 5 Furnace DX Cool DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Sys 5 Furnace DX Cool DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Sys 5 Furnace DX Cool DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C4
 
   Curve:Biquadratic,
-    Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Name
-    0.942587793,             !- Coefficient1 Constant
-    0.009543347,             !- Coefficient2 x
-    0.00068377,              !- Coefficient3 x**2
-    -0.011042676,            !- Coefficient4 y
-    0.000005249,             !- Coefficient5 y**2
-    -0.00000972,             !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 5 Furnace DX Cool DX Coil Cap-FT,  !- Name
+    0.476428,                !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CCAP-FFLOW for PTAC
+! DOE-2.1E, SDL-C78
 
-  Curve:Quadratic,
-    Sys 5 Furnace DX Cool Cool Coil Cap-FF,  !- Name
-    0.8,                     !- Coefficient1 Constant
-    0.2,                     !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 5 Furnace DX Cool DX Coil Cap-FF,  !- Name
+    .47278589,               !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    .32257813,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! DOE-2.1E, COOL-EIR-FT for PTAC w/ SI temps
+! DOE-2.1E, SDL-C82
 
   Curve:Biquadratic,
-    Sys 5 Furnace DX Cool Cool Coil EIR-FT,  !- Name
-    0.342414409,             !- Coefficient1 Constant
-    0.034885008,             !- Coefficient2 x
-    -0.0006237,              !- Coefficient3 x**2
-    0.004977216,             !- Coefficient4 y
-    0.000437951,             !- Coefficient5 y**2
-    -0.000728028,            !- Coefficient6 x*y
-    12.77778,                !- Minimum Value of x
-    23.88889,                !- Maximum Value of x
-    18.0,                    !- Minimum Value of y
-    46.11111;                !- Maximum Value of y
+    Sys 5 Furnace DX Cool DX Coil EIR-FT,  !- Name
+    0.632475,                !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-! DOE-2.1E, RATED-CEIR-FFLOW for PTAC
+! DOE-2.1E, SDL-C82
 
-  Curve:Quadratic,
-    Sys 5 Furnace DX Cool Cool Coil EIR-FF,  !- Name
-    1.1552,                  !- Coefficient1 Constant
-    -0.1808,                 !- Coefficient2 x
-    0.0256,                  !- Coefficient3 x**2
+  Curve:Cubic,
+    Sys 5 Furnace DX Cool DX Coil EIR-FF,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    .34544129,               !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    .33889943,               !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-! PLF = l.- Cd(1.-PLR) where Cd = 0.15
-
   Curve:Quadratic,
-    Sys 5 Furnace DX Cool Cool Coil PLF,  !- Name
+    Sys 5 Furnace DX Cool DX Coil PLF,  !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0,                       !- Minimum Value of x
-    1;                       !- Maximum Value of x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
-  OutdoorAir:Node,
-    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Name
-    -1;                      !- Height Above Ground {m}
+! DOE-2.1E, SDL-C4
+
+  Curve:Biquadratic,
+    Sys 5 Furnace DX Cool DX Coil Low Cap-FT,  !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Sys 5 Furnace DX Cool DX Coil Low EIR-FT,  !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    50.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    5.0,                     !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Coil:Heating:Fuel,
     Sys 5 Furnace DX Cool Heating Coil,  !- Name
@@ -4611,14 +4979,24 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     0,                       !- Minimum Value of x
     1;                       !- Maximum Value of x
 
-  Fan:OnOff,
+! VAV Fan coefficients based on variable-speed drive.
+
+  Fan:VariableVolume,
     Sys 5 Furnace DX Cool Supply Fan,  !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.0,                     !- Fan Power Minimum Flow Fraction
+    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
+    0.0015302446,            !- Fan Power Coefficient 1
+    0.0052080574,            !- Fan Power Coefficient 2
+    1.1086242,               !- Fan Power Coefficient 3
+    -0.11635563,             !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
     Sys 5 Furnace DX Cool Mixed Air Outlet,  !- Air Inlet Node Name
     Sys 5 Furnace DX Cool Supply Fan Outlet;  !- Air Outlet Node Name
 

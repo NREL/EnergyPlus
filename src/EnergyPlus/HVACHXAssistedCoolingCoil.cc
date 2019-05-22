@@ -1188,7 +1188,7 @@ namespace HVACHXAssistedCoolingCoil {
                     CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    CoilCapacity = coilCoolingDXs[HXAssistedCoil(WhichCoil).CoolingCoilIndex].getRatedGrossTotalCapacity();
+                    CoilCapacity = coilCoolingDXs[HXAssistedCoil(WhichCoil).CoolingCoilIndex].performance.normalMode.ratedGrossTotalCap;
                 }
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);

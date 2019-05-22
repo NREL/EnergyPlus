@@ -23,6 +23,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    this->nominalEvaporativePumpPower = input_data.nominal_evap_condenser_pump_power;
 
     // Must all be greater than zero to use the latent capacity degradation model
     if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
@@ -52,10 +53,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find)
-    : ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
-      timeForCondensateRemoval(0.0), OpModeOutletTemp(0.0), OpModeOutletHumRat(0.0), OpModeOutletEnth(0.0), OpModePower(0.0), OpModeRTF(0.0),
-      nominalEvaporativePumpPower(0.0), nominalSpeedNum(0)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -88,7 +86,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
         input_specs.nominal_speed_number = rNumericArgs(9);
         for (int fieldNum = 4; fieldNum <= NumAlphas; fieldNum++) {
-            if (cAlphaArgs(fieldNum) == "") {
+            if (cAlphaArgs(fieldNum).empty()) {
                 break;
             }
             input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
@@ -138,15 +136,27 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     this->ratedCondAirFlowRate = TempSize;
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
-    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
+                                                           DataLoopNode::NodeData &outletNode,
+                                                           Real64 &PLR,
+                                                           int &speedNum,
+                                                           Real64 &speedRatio,
+                                                           int &fanOpMode,
+                                                           DataLoopNode::NodeData &condInletNode,
+                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode))
 {
 
-	// Currently speedNum is 1-based, while this->speeds are zero-based
+    // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
-    thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
-    thisspeed.ambPressure = inletNode.Press;
+    if (this->condenserType == CondenserType::AIRCOOLED) {
+        this->condInletTemp = condInletNode.Temp;
+    } else if (this->condenserType == CondenserType::EVAPCOOLED) {
+        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(
+            condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
+    }
+    // thisspeed.ambPressure = inletNode.Press;
+    thisspeed.ambPressure = DataEnvironment::OutBaroPress;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
         if (PLR > 0.0) {
@@ -154,9 +164,11 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
         } else {
             thisspeed.AirMassFlow = 0.0;
         }
+    } else if (speedNum > 1) {
+        thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
-        thisspeed.AirFF = inletNode.MassFlowRate / thisspeed.RatedAirMassFlowRate;
+        thisspeed.AirFF = thisspeed.AirMassFlow / thisspeed.RatedAirMassFlowRate;
     } else {
         thisspeed.AirFF = 0.0;
     }
@@ -167,30 +179,38 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(
         plr1 = speedRatio;
     }
 
-    thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode);
+    thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
 
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
-        outletNode.HumRat = outletNode.HumRat * PLR + (1.0 - PLR) * inletNode.HumRat;
-        outletNode.Enthalpy = outletNode.Enthalpy * PLR + (1.0 - PLR) * inletNode.Enthalpy;
+        outletNode.HumRat = outletNode.HumRat * plr1 + (1.0 - plr1) * inletNode.HumRat;
+        outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
     }
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
     OpModeRTF = thisspeed.RTF;
     OpModePower = thisspeed.FullLoadPower * thisspeed.RTF;
 
-    if (speedNum > 1) {
+    if ((speedNum > 1) && (speedRatio < 1.0)) {
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
-        auto &lowerspeed(this->speeds[max(speedNum - 2,0)]);
+        auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
+        lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow;
 
-        lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode); // out
+        lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
         outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
-        OpModePower = OpModePower + lowerspeed.FullLoadPower;
+        OpModePower = OpModePower + (1.0 - thisspeed.RTF) * lowerspeed.FullLoadPower;
     }
+}
+
+Real64 CoilCoolingDXCurveFitOperatingMode::getCurrentEvapCondPumpPower(int speedNum) {
+    // Currently speedNum is 1-based, while this->speeds are zero-based
+    auto const &thisspeed(this->speeds[max(speedNum - 1, 0)]);
+    auto const &powerFraction(thisspeed.evap_condenser_pump_power_fraction);
+    return this->nominalEvaporativePumpPower * powerFraction;
 }
