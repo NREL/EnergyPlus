@@ -1816,6 +1816,13 @@ namespace WaterManager {
             }
             WaterStorage(TankNum).VdotOverflow = 0.0;
             if (WaterStorage(TankNum).NumWaterSupplies > 0) {
+                // Need to consider the implications of this
+                // Water initialization is called at an inopportune time for the coils
+                // The value is initialized to zero here, then the tank is calculated, so zero flow
+                // Then the coil comes along and updates the value, but then the tank isn't calculated again before
+                // the code makes it back here to reinitialize to zero.
+                // If you comment out this line, with either coil, the tank looks to work really well, but there are likely implications of that.
+                // So for now, I'm leaving this as-is - the tank won't work on the coil yet, but it's not the coil's fault
                 WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
