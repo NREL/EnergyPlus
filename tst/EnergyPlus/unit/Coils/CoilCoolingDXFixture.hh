@@ -167,7 +167,7 @@ protected:
 						" VariableSpeed,                       ",  // capacity control method
 						" 100,                                 ",  // basin heater capacity
 						" 400,                                 ",  // basin heater setpoint temp
-						" BasinHeaterOpSchedule,               ",  // basin heater operating schedule name
+						" , !BasinHeaterOpSchedule,               ",  // basin heater operating schedule name
 						" Electricity,                         ",  // compressor fuel type
 						" BaseOperatingMode,                   "   // base operating mode name
 				};
@@ -201,7 +201,7 @@ protected:
 						" CondenserInletNode,                 ",  // condenser inlet node
 						" CondenserOutletNode,                ",  // condenser outlet node
 						" PerformanceObjectName,              ",  // performance object name
-						" CondensateCollectionTankName,       ",  // condensate storage tank name
+						" ,!CondensateCollectionTankName,       ",  // condensate storage tank name
 						" EvaporativeCondenserSupplyTankName; ",  // evaporative condenser supply tank name
 						"Schedule:Constant,AvailSchedule,,1;  "
 				});

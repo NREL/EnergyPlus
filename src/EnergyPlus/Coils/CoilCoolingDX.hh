@@ -32,40 +32,44 @@ class CoilCoolingDX
     CoilCoolingDXInputSpecification original_input_specs;
 
 public:
-    CoilCoolingDX(std::string name);
+    explicit CoilCoolingDX(const std::string& name);
 
-    void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
-    void onetimeinit();
+    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
+    void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
+    static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 
     std::string name;
-    bool myOneTimeInitFlag;
-    int evapInletNodeIndex;
-    int evapOutletNodeIndex;
-    int availScheduleIndex;
-    int condZoneIndex;
-    int condInletNodeIndex;
-    int condOutletNodeIndex;
+    bool myOneTimeInitFlag = true;
+    int evapInletNodeIndex = 0;
+    int evapOutletNodeIndex = 0;
+    int availScheduleIndex = 0;
+    //int condZoneIndex = 0;
+    int condInletNodeIndex = 0;
+    int condOutletNodeIndex = 0;
     CoilCoolingDXCurveFitPerformance performance; // TODO: Change to unique pointer when we have base class for performance object
-    int condensateTankIndex;
-    int evaporativeCondSupplyTankIndex;
+    int condensateTankIndex = 0;
+    int condensateTankSupplyARRID = 0;
+    Real64 condensateVolumeFlow = 0.0;
+    Real64 condensateVolumeConsumption = 0.0;
+    int evaporativeCondSupplyTankIndex = 0;
+    int evaporativeCondSupplyTankARRID = 0;
+    Real64 evaporativeCondSupplyTankVolumeFlow = 0.0;
+    //Real64 evaporativeCondSupplyTankVolumeConsumption = 0.0;
+	Real64 evapCondPumpElecPower = 0.0;
+	Real64 evapCondPumpElecConsumption = 0.0;
 
     // report variables
-    Real64 totalCoolingEnergyRate;
-    Real64 totalCoolingEnergy;
-    Real64 sensCoolingEnergyRate;
-    Real64 sensCoolingEnergy;
-    Real64 latCoolingEnergyRate;
-    Real64 latCoolingEnergy;
-    Real64 elecCoolingPower;
-    Real64 elecCoolingConsumption;
-    Real64 coolingCoilRuntimeFraction;
+    Real64 totalCoolingEnergyRate = 0.0;
+    Real64 totalCoolingEnergy = 0.0;
+    Real64 sensCoolingEnergyRate = 0.0;
+    Real64 sensCoolingEnergy = 0.0;
+    Real64 latCoolingEnergyRate = 0.0;
+    Real64 latCoolingEnergy = 0.0;
 
-    int getDXCoilCapFTCurveIndex();
-
-    Real64 getRatedGrossTotalCapacity();
-
-    void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
+    Real64 coolingCoilRuntimeFraction = 0.0;
+    Real64 elecCoolingPower = 0.0;
+    Real64 elecCoolingConsumption = 0.0;
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;

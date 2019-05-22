@@ -2842,18 +2842,65 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+    CondensateCollectionTank,  !- Condensate Collection Water Storage Tank Name
+    EvaporativeCondenserSupplyTank;  !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Schedule:Constant,
+    Always25,AnyNumber,25;
+
+  WaterUse:Storage,
+    CondensateCollectionTank, !- Name
+    Condensation collection water, !- Water Quality Subcategory
+    30.0, !- Maximum Capacity {m3}
+    ,     !- Initial Volume {m3}
+    ,     !- Design In Flow Rate {m3}
+    ,     !- Design Out Flow Rate {m3}
+    ,     !- Overflow Destination
+    None, !- Type of Supply Controlled by Float Valve
+    ,     !- Float Valve On Capacity {m3}
+    ,     !- Float Valve Off Capacity {m3}
+    ,     !- Backup Mains Capacity {m3}
+    ,     !- Other Tank Name
+    ,     !- Water Thermal Mode
+    Always25,  !- Water Temperature Schedule Name
+    ,     !- Ambient Temperature Indicator
+    ,     !- Ambient Temperature Schedule Name
+    ,     !- Zone Name
+    ,     !- Tank Surface Area {m2}
+    ,     !- Tank U Value {W/m2 -K}
+    ;     !- Tank Outside Surface Material Name
+
+  WaterUse:Storage,
+    EvaporativeCondenserSupplyTank, !- Name
+    Condenser supply water, !- Water Quality Subcategory
+    30.0, !- Maximum Capacity {m3}
+    30.0, !- Initial Volume {m3}
+    ,     !- Design In Flow Rate {m3}
+    ,     !- Design Out Flow Rate {m3}
+    ,     !- Overflow Destination
+    None, !- Type of Supply Controlled by Float Valve
+    ,     !- Float Valve On Capacity {m3}
+    ,     !- Float Valve Off Capacity {m3}
+    ,     !- Backup Mains Capacity {m3}
+    ,     !- Other Tank Name
+    ,     !- Water Thermal Mode
+    Always25,  !- Water Temperature Schedule Name
+    ,     !- Ambient Temperature Indicator
+    ,     !- Ambient Temperature Schedule Name
+    ,     !- Zone Name
+    ,     !- Tank Surface Area {m2}
+    ,     !- Tank U Value {W/m2 -K}
+    ;     !- Tank Outside Surface Material Name
 
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
-    100,                       !- Crankcase Heater Capacity {W}
+    100,                     !- Crankcase Heater Capacity {W}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    15,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    50,                      !- Evaporative Condenser Basin Heater Capacity {W/K}
+    30,                      !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
@@ -2868,8 +2915,8 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
     0,                       !- Latent Capacity Time Constant {s}
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
+    EvaporativelyCooled,     !- Condenser Type
+    50,                      !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
     Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
@@ -4690,3 +4737,9 @@ Output:Variable, *, Cooling Coil Runtime Fraction, hourly; !- HVAC Average []
 
   Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
 
+Output:Variable,*,Water System Storage Tank Volume,hourly; !- HVAC Average [m3]
+Output:Variable,*,Cooling Coil Condensate Volume Flow Rate,hourly; !- HVAC Average [m3/s]
+Output:Variable,*,Cooling Coil Evaporative Condenser Water Volume,hourly; !- HVAC Sum [m3]
+Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Crankcase Heater Electric Power,hourly; !- HVAC Average [W]

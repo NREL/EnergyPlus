@@ -35,7 +35,7 @@ class CoilCoolingDXCurveFitPerformance
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
 
 public:
-    void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   bool useAlternateMode,
@@ -58,32 +58,35 @@ public:
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
-    CoilCoolingDXCurveFitPerformance()
-    {
-    } // allow a blank empty default constructor, won't really be used
+    CoilCoolingDXCurveFitPerformance() = default;
 
-    CoilCoolingDXCurveFitPerformance(std::string name);
+	explicit CoilCoolingDXCurveFitPerformance(const std::string& name);
 
     std::string name;
-    Real64 crankcaseHeaterCap;
-    Real64 minOutdoorDrybulb;
-    Real64 maxOutdoorDrybulb;
-    Real64 unitStatic; // TODO: make curve f(flow)?
-    bool mySizeFlag;
+    Real64 crankcaseHeaterCap = 0.0;
+    Real64 crankcaseHeaterPower = 0.0;
+    Real64 crankcaseHeaterElectricityConsumption = 0.0;
+    Real64 minOutdoorDrybulb = 0.0;
+    Real64 maxOutdoorDrybulbForBasin = 0.0;
+    Real64 unitStatic = 0.0; // TODO: make curve f(flow)?
+    bool mySizeFlag = true;
 
-    enum CapControlMethod
-    {
-        STAGED,
-        VARIABLE,
-        MULTISPEED
-    };
-    CapControlMethod capControlMethod;
+	enum CapControlMethod
+	{
+		STAGED,
+		VARIABLE,
+		MULTISPEED
+	};
+	CapControlMethod capControlMethod = CapControlMethod::STAGED;
 
-    Real64 evapCondBasinHeatCap;
-    Real64 evapCondBasinHeatSetpoint;
-    int evapCondBasinHeatSchedulIndex;
-    Real64 powerUse;
-    Real64 RTF;
+    Real64 evapCondBasinHeatCap = 0.0;
+    Real64 evapCondBasinHeatSetpoint = 0.0;
+    int evapCondBasinHeatSchedulIndex = 0;
+	Real64 basinHeaterElectricityConsumption = 0.0;
+	Real64 basinHeaterPower = 0.0;
+    Real64 powerUse = 0.0;
+    Real64 electricityConsumption = 0.0;
+    Real64 RTF = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;

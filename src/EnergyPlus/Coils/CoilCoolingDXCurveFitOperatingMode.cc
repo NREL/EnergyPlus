@@ -23,6 +23,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    this->nominalEvaporativePumpPower = input_data.nominal_evap_condenser_pump_power;
 
     // Must all be greater than zero to use the latent capacity degradation model
     if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
@@ -52,10 +53,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find)
-    : ratedGrossTotalCap(0.0), ratedEvapAirFlowRate(0.0), ratedCondAirFlowRate(0.0), maxCyclingRate(0.0), evapRateRatio(0.0), latentTimeConst(0.0),
-      timeForCondensateRemoval(0.0), OpModeOutletTemp(0.0), OpModeOutletHumRat(0.0), OpModeOutletEnth(0.0), OpModePower(0.0), OpModeRTF(0.0),
-      nominalEvaporativePumpPower(0.0), nominalSpeedNum(0)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -88,7 +86,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
         input_specs.nominal_speed_number = rNumericArgs(9);
         for (int fieldNum = 4; fieldNum <= NumAlphas; fieldNum++) {
-            if (cAlphaArgs(fieldNum) == "") {
+            if (cAlphaArgs(fieldNum).empty()) {
                 break;
             }
             input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
@@ -145,7 +143,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
                                                            Real64 &speedRatio,
                                                            int &fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
-                                                           DataLoopNode::NodeData &condOutletNode)
+                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode))
 {
 
     // Currently speedNum is 1-based, while this->speeds are zero-based
@@ -208,4 +206,11 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
         OpModePower = OpModePower + (1.0 - thisspeed.RTF) * lowerspeed.FullLoadPower;
     }
+}
+
+Real64 CoilCoolingDXCurveFitOperatingMode::getCurrentEvapCondPumpPower(int speedNum) {
+    // Currently speedNum is 1-based, while this->speeds are zero-based
+    auto const &thisspeed(this->speeds[max(speedNum - 1, 0)]);
+    auto const &powerFraction(thisspeed.evap_condenser_pump_power_fraction);
+    return this->nominalEvaporativePumpPower * powerFraction;
 }
