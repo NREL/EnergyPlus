@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <EnergyPlus.hh>
 #include <DataLoopNode.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -42,7 +42,7 @@ public:
 
     CoilCoolingDXCurveFitOperatingMode() = default;
 
-    explicit CoilCoolingDXCurveFitOperatingMode(std::string name_to_find);
+    explicit CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find);
 
     std::string name;
     Real64 ratedGrossTotalCap = 0.0;
@@ -72,6 +72,7 @@ public:
     };
     CondenserType condenserType = CondenserType::AIRCOOLED;
 
+    Real64 condInletTemp = 0.0; // condenser inlet node temp or outdoor temp if no condenser node {C}
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
@@ -80,7 +81,9 @@ public:
                            Real64 &PLR,
                            int &speedNum,
                            Real64 &speedRatio,
-                           int &fanOpMode);
+                           int &fanOpMode,
+                           DataLoopNode::NodeData &condInletNode,
+                           DataLoopNode::NodeData &condOutletNode);
 
     Real64 getCurrentEvapCondPumpPower(int speedNum);
 

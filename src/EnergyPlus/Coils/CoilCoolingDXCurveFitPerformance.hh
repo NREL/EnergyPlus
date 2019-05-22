@@ -26,8 +26,7 @@ public:
     std::string compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
-	std::string capacity_control;
-
+    std::string capacity_control;
 };
 
 class CoilCoolingDXCurveFitPerformance
@@ -36,23 +35,32 @@ class CoilCoolingDXCurveFitPerformance
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
 
 public:
-    void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   bool useAlternateMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
-                  int &fanOpMode);
+                  int &fanOpMode,
+                  DataLoopNode::NodeData &condInletNode,
+                  DataLoopNode::NodeData &condOutletNode);
 
-	void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
-			const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+                   const DataLoopNode::NodeData &inletNode,
+                   DataLoopNode::NodeData &outletNode,
+                   Real64 &PLR,
+                   int &speedNum,
+                   Real64 &speedRatio,
+                   int &fanOpMode,
+                   DataLoopNode::NodeData &condInletNode,
+                   DataLoopNode::NodeData &condOutletNode);
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
     CoilCoolingDXCurveFitPerformance() = default;
 
-	explicit CoilCoolingDXCurveFitPerformance(std::string name);
+	explicit CoilCoolingDXCurveFitPerformance(const std::string& name);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
@@ -82,7 +90,7 @@ public:
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;
-	CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
 };
 
 } // namespace EnergyPlus

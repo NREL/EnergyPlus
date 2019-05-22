@@ -3,6 +3,7 @@
 #include <BranchNodeConnections.hh>
 #include <Coils/CoilCoolingDX.hh>
 #include <DataAirLoop.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -24,7 +25,7 @@ namespace EnergyPlus {
 std::vector<CoilCoolingDX> coilCoolingDXs;
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data)
+void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -58,12 +59,12 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                        2,
                                                                        DataLoopNode::ObjectIsNotParent);
+        // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
         if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
             ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
             ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
-                "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-            ShowContinueError(
-                "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
+                              "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+            ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
         }
 
     } else {
@@ -103,7 +104,7 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     if (input_data.availability_schedule_name.empty()) {
       this->availScheduleIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-      this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
+        this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
     }
     if (this->availScheduleIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
@@ -117,7 +118,6 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
-
 }
 
 void CoilCoolingDX::oneTimeInit(){
@@ -274,8 +274,18 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
     auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
 
+    // get condenser inlet conditions from condenser inlet node or from ambient
+    DataLoopNode::NodeData condInletNode;
+    DataLoopNode::NodeData condOutletNode; // dummy for now
+    if (this->condInletNodeIndex > 0) {
+        condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
+    } else {
+        condInletNode.Temp = DataEnvironment::OutDryBulbTemp;
+        condInletNode.HumRat = DataEnvironment::OutHumRat;
+    }
+
     // call the simulation, which returns useful data
-    this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -341,16 +351,16 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
 
     // fishy global things that need to be set here - leaving AFN stuff for later
-    //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+    // DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
-    //if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+    // if (DXCoil(DXCoilNum).AirLoopNum > 0) {
     //    AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
     //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     //}
 }
 
-void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in,
-                                        EnergyPlus::DataLoopNode::NodeData &out) {
+void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
+{
     // pass through all the other node variables that we don't update as a part of this model calculation
     out.MassFlowRate = in.MassFlowRate;
     out.Press = in.Press;
@@ -360,3 +370,31 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in,
     out.MassFlowRateMaxAvail = in.MassFlowRateMaxAvail;
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
+
+//int CoilCoolingDX::getDXCoilCapFTCurveIndex()
+//{
+//    auto &performance = this->performance;
+//    if (performance.hasAlternateMode) {
+//        // Per IDD note - Operating Mode 1 is always used as the base design operating mode
+//        auto &mode = performance.normalMode; // TODO: Yeah, what?
+//        if (mode.speeds.size()) {
+//            auto &firstSpeed = mode.speeds[0];
+//            return firstSpeed.indexCapFT;
+//        }
+//        return -1;
+//    } else {
+//        auto &mode = performance.normalMode; // TODO: Like, what?
+//        if (mode.speeds.size()) {
+//            auto &firstSpeed = mode.speeds[0];
+//            return firstSpeed.indexCapFT;
+//        }
+//        return -1;
+//    }
+//}
+//
+//Real64 CoilCoolingDX::getRatedGrossTotalCapacity()
+//{
+//    // **should** we be checking if performance.hasAlternateMode before looking up the value?
+//    return this->performance.normalMode.ratedGrossTotalCap;
+//}
+

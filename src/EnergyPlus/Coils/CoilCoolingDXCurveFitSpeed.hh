@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <EnergyPlus.hh>
 #include <DataLoopNode.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -67,6 +67,7 @@ public:
     Real64 CondInletTemp = 0.0;            // condenser inlet node temp or outdoor temp if no condenser node {C}
     Real64 ambPressure = 0.0;              // outdoor pressure {Pa]
     Real64 AirFF = 0.0;                    // ratio of air mass flow rate to rated air mass flow rate
+
                                      //        Real64 RatedTotCap; // rated total capacity at speed {W}
     Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
     Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
@@ -100,7 +101,8 @@ public:
 
 	bool mySizeFlag = true;
 
-    void CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode);
+    void CalcSpeedOutput(
+        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
     void sizeSpeed();
 
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
@@ -111,10 +113,10 @@ private:
                       std::vector<int> validDims,
                       const std::string& routineName,
                       const std::string& fieldName,
-                      Real64 Var1,                   // required 1st independent variable
-                      Optional<Real64 const> Var2 = _,     // 2nd independent variable
-                      Optional<Real64 const> Var3 = _,     // 3rd independent variable
-                      Optional<Real64 const> Var4 = _,     // 4th independent variable
+                      Real64 const Var1,               // required 1st independent variable
+                      Optional<Real64 const> Var2 = _, // 2nd independent variable
+                      Optional<Real64 const> Var3 = _, // 3rd independent variable
+                      Optional<Real64 const> Var4 = _, // 4th independent variable
                       Optional<Real64 const> Var5 = _);
 };
 } // namespace EnergyPlus

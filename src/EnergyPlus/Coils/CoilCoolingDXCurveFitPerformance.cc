@@ -9,7 +9,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -34,14 +34,15 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
-    if (input_data.basin_heater_operating_shedule_name == "") {
+    if (input_data.basin_heater_operating_shedule_name.empty()) {
         this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
         this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_shedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name + "\".");
+        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name +
+                          "\".");
         errorsFound = true;
     }
 
@@ -63,10 +64,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(CoilCoolingDXCur
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
-
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string& name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -77,7 +77,8 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(
+            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -107,21 +108,32 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(
-    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, bool useAlternateMode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
+                                                DataLoopNode::NodeData &outletNode,
+                                                bool useAlternateMode,
+                                                Real64 &PLR,
+                                                int &speedNum,
+                                                Real64 &speedRatio,
+                                                int &fanOpMode,
+                                                DataLoopNode::NodeData &condInletNode,
+                                                DataLoopNode::NodeData &condOutletNode)
 {
     if (useAlternateMode) {
-        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     } else {
-        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     }
 }
 
-//Real64 minTemp = DXCoolingCoils[HXAssisted(this->HXASssistedindex).DXCoilIndex].perormance.minOutdoorTemp
-
-void CoilCoolingDXCurveFitPerformance::calculate(
-        CoilCoolingDXCurveFitOperatingMode &currentMode,
-        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode)
+void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+                                                 const DataLoopNode::NodeData &inletNode,
+                                                 DataLoopNode::NodeData &outletNode,
+                                                 Real64 &PLR,
+                                                 int &speedNum,
+                                                 Real64 &speedRatio,
+                                                 int &fanOpMode,
+                                                 DataLoopNode::NodeData &condInletNode,
+                                                 DataLoopNode::NodeData &condOutletNode)
 {
     // size if needed
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
@@ -130,7 +142,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(
     }
 
     // calculate the performance at this mode/speed
-    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode);
+    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
     // scaling term to get rate into consumptions
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;

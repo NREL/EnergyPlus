@@ -34,7 +34,7 @@ class CoilCoolingDX
 public:
     explicit CoilCoolingDX(const std::string& name);
 
-    void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
