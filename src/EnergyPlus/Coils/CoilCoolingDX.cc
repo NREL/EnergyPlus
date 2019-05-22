@@ -354,6 +354,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
         DataAirLoop::AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet
