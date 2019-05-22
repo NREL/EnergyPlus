@@ -14,7 +14,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data)
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
 {
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
@@ -105,7 +105,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
         Real64 MinCurveVal = 999.0;
         Real64 MaxCurveVal = -999.0;
         Real64 CurveInput = 0.0;
-        Real64 MinCurvePLR, MaxCurvePLR;
+        Real64 MinCurvePLR = 0.0, MaxCurvePLR = 0.0;
         while (CurveInput <= 1.0) {
             Real64 CurveVal = CurveManager::CurveValue(this->indexPLRFPLF, CurveInput);
             if (CurveVal < MinCurveVal) {
@@ -142,11 +142,11 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(CoilCoolingDXCurveFitS
     }
 }
 
-bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
+bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
-                                              const std::string routineName,
-                                              const std::string fieldName,
+                                              const std::string& routineName,
+                                              const std::string& fieldName,
                                               Real64 const Var1,                   // required 1st independent variable
                                               Optional<Real64 const> Var2,         // 2nd independent variable
                                               Optional<Real64 const> Var3,         // 3rd independent variable
@@ -187,7 +187,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string curveName,
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_to_find)
 {
     int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
@@ -280,7 +280,7 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode)
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int &fanOpMode)
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -291,7 +291,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &i
         this->mySizeFlag = false;
     }
 
-    if ((PLR == 0.0) || (AirMassFlow == 0.0)) {
+    if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;
         outletNode.HumRat = inletNode.HumRat;
         outletNode.Enthalpy = inletNode.Enthalpy;
@@ -301,11 +301,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &i
         return;
     }
 
-    Real64 TotCap = 0.0;
-    Real64 SHR = 0.0;
     Real64 hDelta;    // enthalpy difference across cooling coil
-    Real64 A0 = 0.0;  // ratio of UA to Cp
-    Real64 CBF = 0.0; // adjusted coil bypass factor
+    Real64 A0;  // ratio of UA to Cp
+    Real64 CBF; // adjusted coil bypass factor
     if (RatedCBF > 0.0) {
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
@@ -327,6 +325,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &i
     int const MaxIter(30);        // iteration limit
     Real64 const Tolerance(0.01); // iteration convergence limit
     Real64 RF = 0.4;              // relaxation factor for holding back changes in value during iteration
+    Real64 TotCap;
+    Real64 SHR;
     while (true) {
 
         Real64 TotCapTempModFac = 1.0;
@@ -382,7 +382,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &i
 
     Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
     if (indexPLRFPLF > 0) {
-        PLF = CurveManager::CurveValue(indexPLRFPLF, PLR); // Calculate part-load factor
+        PLF = CurveManager::CurveValue(indexPLRFPLF, _PLR); // Calculate part-load factor
     }
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
 
@@ -400,7 +400,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(const DataLoopNode::NodeData &i
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
-    RTF = PLR / PLF;
+    RTF = _PLR / PLF;
     FullLoadPower = TotCap * EIR;
 
     outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
@@ -415,7 +415,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
 
     static std::string const RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
-    Real64 calcCBF = 0.0;
+    Real64 calcCBF;
 
     Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(p, tdb, w);
     Real64 deltaH = rated_total_capacity / airMassFlowRate;

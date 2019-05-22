@@ -43,9 +43,9 @@ class CoilCoolingDXCurveFitSpeed
 public:
     CoilCoolingDXCurveFitSpeed() = default;
 
-    explicit CoilCoolingDXCurveFitSpeed(std::string name);
+    explicit CoilCoolingDXCurveFitSpeed(const std::string& name);
 
-    void instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode *parentMode = nullptr;
@@ -106,11 +106,11 @@ public:
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:
-    bool processCurve(std::string curveName,
+    bool processCurve(const std::string& curveName,
                       int &curveIndex,
                       std::vector<int> validDims,
-                      std::string routineName,
-                      std::string fieldName,
+                      const std::string& routineName,
+                      const std::string& fieldName,
                       Real64 Var1,                   // required 1st independent variable
                       Optional<Real64 const> Var2 = _,     // 2nd independent variable
                       Optional<Real64 const> Var3 = _,     // 3rd independent variable
