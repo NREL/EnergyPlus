@@ -26,8 +26,7 @@ public:
     std::string compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
-	std::string capacity_control;
-
+    std::string capacity_control;
 };
 
 class CoilCoolingDXCurveFitPerformance
@@ -43,10 +42,19 @@ public:
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
-                  int &fanOpMode);
+                  int &fanOpMode,
+                  DataLoopNode::NodeData &condInletNode,
+                  DataLoopNode::NodeData &condOutletNode);
 
-	void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
-			const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &speedNum, Real64 &speedRatio, int &fanOpMode);
+    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+                   const DataLoopNode::NodeData &inletNode,
+                   DataLoopNode::NodeData &outletNode,
+                   Real64 &PLR,
+                   int &speedNum,
+                   Real64 &speedRatio,
+                   int &fanOpMode,
+                   DataLoopNode::NodeData &condInletNode,
+                   DataLoopNode::NodeData &condOutletNode);
 
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
@@ -63,13 +71,13 @@ public:
     Real64 unitStatic; // TODO: make curve f(flow)?
     bool mySizeFlag;
 
-	enum CapControlMethod
-	{
-		STAGED,
-		VARIABLE,
-		MULTISPEED
-	};
-	CapControlMethod capControlMethod;
+    enum CapControlMethod
+    {
+        STAGED,
+        VARIABLE,
+        MULTISPEED
+    };
+    CapControlMethod capControlMethod;
 
     Real64 evapCondBasinHeatCap;
     Real64 evapCondBasinHeatSetpoint;
@@ -79,7 +87,7 @@ public:
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;
-	CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
 };
 
 } // namespace EnergyPlus

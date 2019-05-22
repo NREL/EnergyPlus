@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <EnergyPlus.hh>
 #include <DataLoopNode.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -70,6 +70,7 @@ public:
         EVAPCOOLED
     };
     CondenserType condenserType;
+    Real64 condInletTemp; // condenser inlet node temp or outdoor temp if no condenser node {C}
 
     Real64 nominalEvaporativePumpPower;
 
@@ -82,7 +83,9 @@ public:
                            Real64 &PLR,
                            int &speedNum,
                            Real64 &speedRatio,
-                           int &fanOpMode);
+                           int &fanOpMode,
+                           DataLoopNode::NodeData &condInletNode,
+                           DataLoopNode::NodeData &condOutletNode);
 };
 
 } // namespace EnergyPlus
