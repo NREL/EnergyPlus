@@ -276,7 +276,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 
     // call the simulation, which returns useful data
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
-    this->passThroughNodeData(evapInletNode, evapOutletNode);
+    EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -285,33 +285,43 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // TODO: This looks properly implemented, my only concern is that we are grabbing state from the nodes, whereas in DXCoils.cc, they are
     //       grabbing stuff from the DXCoil structure.  Could mass flow somehow be different between them at this point to account for RTF, etc.?
     if (this->condensateTankIndex > 0) {
-        // calculate and report condensation rates  (how much water extracted from the air stream)
-        // water flow of water in m3/s for water system interactions
-        Real64 averageTemp = (evapInletNode.Temp - evapOutletNode.Temp) / 2.0;
-        Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
-        Real64 inHumidityRatio = evapInletNode.HumRat;
-        Real64 outHumidityRatio = evapOutletNode.HumRat;
-        this->condensateVolumeFlow = max(0.0, (evapInletNode.MassFlowRate * (inHumidityRatio - outHumidityRatio) / waterDensity));
-        this->condensateVolumeConsumption = this->condensateVolumeFlow * reportingConstant;
-
-        DataWater::WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) = this->condensateVolumeFlow;
-        DataWater::WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
+        if (speedNum > 0) {
+            // calculate and report condensation rates  (how much water extracted from the air stream)
+            // water flow of water in m3/s for water system interactions
+            Real64 averageTemp = (evapInletNode.Temp - evapOutletNode.Temp) / 2.0;
+            Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
+            Real64 inHumidityRatio = evapInletNode.HumRat;
+            Real64 outHumidityRatio = evapOutletNode.HumRat;
+            this->condensateVolumeFlow = max(0.0, (evapInletNode.MassFlowRate * (inHumidityRatio - outHumidityRatio) / waterDensity));
+            this->condensateVolumeConsumption = this->condensateVolumeFlow * reportingConstant;
+            DataWater::WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) = this->condensateVolumeFlow;
+            DataWater::WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
+        } else {
+            DataWater::WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) = 0.0;
+            DataWater::WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
+        }
     }
 
     // update requests for evaporative condenser tank
     // TODO: This also looks pretty well implemented except that I am grabbing data off the nodes directly...which may be fine
     if (this->evaporativeCondSupplyTankIndex > 0) {
-        Real64 condInletTemp = DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) * (1.0 - this->performance.normalMode.speeds[speedNum-1].evap_condenser_effectiveness);
-        Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-        Real64 outdoorHumRat = DataEnvironment::OutHumRat;
-        Real64 condAirMassFlow = DataLoopNode::Node(this->condInletNodeIndex).MassFlowRate;
-        Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
-        this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
-        if (!useAlternateMode) {
-            this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
-        }
-        DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
+        if (speedNum > 0) {
+            Real64 condInletTemp =
+                DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) *
+                                                      (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
+            Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+            Real64 outdoorHumRat = DataEnvironment::OutHumRat;
+            Real64 condAirMassFlow = DataLoopNode::Node(this->condInletNodeIndex).MassFlowRate;
+            Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+            this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
+            if (!useAlternateMode) {
+                this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
+            }
+            DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
                 this->evaporativeCondSupplyTankVolumeFlow;
+        } else {
+            DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) = 0.0;
+        }
     }
 
     // update report variables
