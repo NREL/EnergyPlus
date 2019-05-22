@@ -3270,16 +3270,17 @@ namespace EvaporativeCoolers {
             TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
             TEDB = EvapCond(EvapCoolNum).InletTemp;
             InletNode = EvapCond(EvapCoolNum).InletNode;
-            if (EvapCond(EvapCoolNum).WetbulbEffecCurveIndex > 0) {
-                MassFlowRateSys = EvapCond(EvapCoolNum).InletMassFlowRate;
-                MassFlowRateSysDesign = Node(InletNode).MassFlowRateMax;
-                if (MassFlowRateSysDesign > 0.0) {
-                    if (MassFlowRateSys > 0.0) {
-                        FlowRatio = MassFlowRateSys / MassFlowRateSysDesign;
-                    } else {
-                        FlowRatio = 1.0;
-                    }
+
+            MassFlowRateSys = EvapCond(EvapCoolNum).InletMassFlowRate;
+            MassFlowRateSysDesign = Node(InletNode).MassFlowRateMax;
+            if (MassFlowRateSysDesign > 0.0) {
+                if (MassFlowRateSys > 0.0) {
+                    FlowRatio = MassFlowRateSys / MassFlowRateSysDesign;
+                } else {
+                    FlowRatio = 1.0;
                 }
+            }
+            if (EvapCond(EvapCoolNum).WetbulbEffecCurveIndex > 0) {
                 EffModCurveValue = CurveValue(EvapCond(EvapCoolNum).WetbulbEffecCurveIndex, FlowRatio);
             } else {
                 // if no curve specified assume constant effectiveness
