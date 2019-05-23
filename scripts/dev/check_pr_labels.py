@@ -12,27 +12,39 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-# get the current branch name from this checkout
-current_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+try:
 
-# get the full set of open PRs at the moment
-response = urlopen('https://api.github.com/repos/NREL/EnergyPlus/pulls')
-pulls = json.loads(response.read())
+    # get the current branch name from this checkout
+    current_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
-# every PR must have one of these labels or it is a warning
-required_labels = ['Defect', 'NewFeature', 'Performance', 'Refactoring', 'DoNotPublish']
+    # get the full set of open PRs at the moment
+    response = urlopen('https://api.github.com/repos/NREL/EnergyPlus/pulls')
+    pulls = json.loads(response.read())
 
-# loop over each PR, try to match the HEAD SHA with the current SHA, and verify the labels are correct
-for p in pulls:
-    this_pr_head_sha = p['head']['sha']
-    # could check something here to differentiate NREL:develop vs Fork:develop
-    if this_pr_head_sha == current_sha:
-        labels = [l['name'] for l in p['labels']]
-        if not any([l in required_labels for l in labels]):
-            print(json.dumps({
-                'tool': 'check_required_labels.py',
-                'filename': 'Pull Request # ' + str(p['number']),
-                'line': 0,
-                'messagetype': 'warning',
-                'message': 'PR was missing required labels'
-            }))
+    # every PR must have one of these labels or it is a warning
+    required_labels = ['Defect', 'NewFeature', 'Performance', 'Refactoring', 'DoNotPublish']
+
+    # loop over each PR, try to match the HEAD SHA with the current SHA, and verify the labels are correct
+    for p in pulls:
+        this_pr_head_sha = p['head']['sha']
+        # could check something here to differentiate NREL:develop vs Fork:develop
+        if this_pr_head_sha == current_sha:
+            labels = [l['name'] for l in p['labels']]
+            if not any([l in required_labels for l in labels]):
+                print(json.dumps({
+                    'tool': 'check_required_labels.py',
+                    'filename': 'Pull Request # ' + str(p['number']),
+                    'line': 0,
+                    'messagetype': 'warning',
+                    'message': 'Pull Request was missing required labels, must have one of these: Defect, NewFeature, Performance, Refactoring, DoNotPublish'
+                }))
+
+except:  # anything could happen - internet connectivity, etc
+
+    print(json.dumps({
+        'tool': 'check_required_labels.py',
+        'filename': 'unknown',
+        'line': 0,
+        'messagetype': 'warning',
+        'message': 'Pull Request Label Check Failed - May have been an internet or GitHub API problem - Verify labels anyway'
+    }))
