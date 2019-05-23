@@ -1,29 +1,40 @@
 compilers:
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_package_generator: "STGZ"
-    release_build_cmake_extra_flags: -DPROFILE_GENERATE:BOOL=OFF -DPROFILE_USE:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
+    release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
     cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
     collect_performance_results: true
     s3_upload: doc-pdf
     s3_upload_bucket: energyplus
 
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_package_generator: "TGZ"
     build_tag: "tgz"
     release_only: true
-    release_build_cmake_extra_flags: -DPROFILE_GENERATE:BOOL=OFF -DPROFILE_USE:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
-    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
+    release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
+    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    skip_regression: true
 
   - name: cppcheck
     compiler_extra_flags: --suppress="*:*third_party*" --suppress="uninitvar:*" --suppress="syntaxError:*"
 
+  - name: custom_check
+    commands:
+      - ./scripts/dev/license-check.py
+      - ./scripts/dev/verify_formatting.sh
+      - ./scripts/dev/check_stray_fields_in_idd.py
+      - ./scripts/dev/verify_idfs_in_cmake.py
+      - ./scripts/dev/check_non_utf8.py
+      - ./scripts/dev/check_pr_labels.py
+      - ./scripts/dev/find_byref_bool_override.py
+
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_type: Debug
     build_package_generator: "STGZ"
-    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 41.0
@@ -35,22 +46,17 @@ compilers:
     skip_packaging: true
 
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_type: Debug
     build_package_generator: "STGZ"
-    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
-    coverage_pass_limit: 72.0
-    coverage_warn_limit: 71.0
+    coverage_pass_limit: 68.4
+    coverage_warn_limit: 68.0
     coverage_s3_bucket: energyplus
     build_tag: IntegrationCoverage
+    ctest_filter: -R "integration.*"
     skip_regression: true
     skip_packaging: true
 
-  - name: custom_check
-    commands:
-      - ./scripts/dev/license-check.py
-      - ./scripts/dev/verify_formatting.sh
-      - ./scripts/dev/check_stray_fields_in_idd.py
-      - ./scripts/dev/find_byref_bool_override.py

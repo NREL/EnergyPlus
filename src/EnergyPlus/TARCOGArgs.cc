@@ -93,7 +93,7 @@ namespace TARCOGArgs {
     using namespace TARCOGOutput;
     using namespace TARCOGParams;
 
-    static gio::Fmt fmtI3("(I3)");
+    static ObjexxFCL::gio::Fmt fmtI3("(I3)");
 
     // Functions
 
@@ -409,7 +409,7 @@ namespace TARCOGArgs {
         for (i = 1; i <= nlayer - 1; ++i) {
             if (gap(i) <= 0.0) {
                 ArgCheck = 20;
-                gio::write(a, fmtI3) << i;
+                ObjexxFCL::gio::write(a, fmtI3) << i;
                 ErrorMessage = "Gap width is less than (or equal to) zero. Gap #" + a;
                 return ArgCheck;
             }
@@ -418,7 +418,7 @@ namespace TARCOGArgs {
         for (i = 1; i <= nlayer; ++i) {
             if (thick(i) <= 0.0) {
                 ArgCheck = 21;
-                gio::write(a, fmtI3) << i;
+                ObjexxFCL::gio::write(a, fmtI3) << i;
                 ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + a;
                 return ArgCheck;
             }
@@ -464,14 +464,14 @@ namespace TARCOGArgs {
         for (i = 1; i <= nlayer; ++i) {
             if (scon(i) <= 0.0) {
                 ArgCheck = 26;
-                gio::write(a, fmtI3) << i;
+                ObjexxFCL::gio::write(a, fmtI3) << i;
                 ErrorMessage = "Layer " + a + " has conductivity whcih is less or equal to zero.";
                 return ArgCheck;
             }
 
             if ((LayerType(i) < MinLayType) || (LayerType(i) > MaxLayType)) {
                 ArgCheck = 22;
-                gio::write(a, fmtI3) << i;
+                ObjexxFCL::gio::write(a, fmtI3) << i;
                 ErrorMessage = "Incorrect layer type for layer #" + a +
                                ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
                                "shade) or 5 (bsdf).";
@@ -493,37 +493,37 @@ namespace TARCOGArgs {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // Venetian blind specific:
                 if (SlatThick(i) <= 0) {
                     ArgCheck = 31;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid slat thickness (must be >0). Layer #" + a;
                     return ArgCheck;
                 }
                 if (SlatWidth(i) <= 0.0) {
                     ArgCheck = 32;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid slat width (must be >0). Layer #" + a;
                     return ArgCheck;
                 }
                 if ((SlatAngle(i) < -90.0) || (SlatAngle(i) > 90.0)) {
                     ArgCheck = 33;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid slat angle (must be between -90 and 90). Layer #" + a;
                     return ArgCheck;
                 }
                 if (SlatCond(i) <= 0.0) {
                     ArgCheck = 34;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid conductivity of slat material (must be >0). Layer #" + a;
                     return ArgCheck;
                 }
                 if (SlatSpacing(i) <= 0.0) {
                     ArgCheck = 35;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid slat spacing (must be >0). Layer #" + a;
                     return ArgCheck;
                 }
                 if ((SlatCurve(i) != 0.0) && (std::abs(SlatCurve(i)) <= (SlatWidth(i) / 2.0))) {
                     ArgCheck = 36;
-                    gio::write(a, fmtI3) << i;
+                    ObjexxFCL::gio::write(a, fmtI3) << i;
                     ErrorMessage = "Invalid curvature radius (absolute value must be >SlatWidth/2, or 0 for flat slats). Layer #" + a;
                     return ArgCheck;
                 }
@@ -535,7 +535,7 @@ namespace TARCOGArgs {
         for (i = 1; i <= nlayer + 1; ++i) {
             if (presure(i) < 0.0) {
                 ArgCheck = 27;
-                gio::write(a, fmtI3) << i;
+                ObjexxFCL::gio::write(a, fmtI3) << i;
                 if ((i == 1) || (i == (nlayer + 1))) {
                     ErrorMessage = "One of enviroments (inside or outside) has pressure which is less than zero.";
                 } else {
@@ -766,19 +766,19 @@ namespace TARCOGArgs {
             rir(k1 + 1) = 1 - tir(k1) - emis(k1 + 1);
             if ((tir(k1) < 0.0) || (tir(k1) > 1.0) || (tir(k1 + 1) < 0.0) || (tir(k1 + 1) > 1.0)) {
                 nperr = 4;
-                gio::write(a, fmtI3) << k;
+                ObjexxFCL::gio::write(a, fmtI3) << k;
                 ErrorMessage = "Layer transmissivity is our of range (<0 or >1). Layer #" + a;
                 return;
             }
             if ((emis(k1) < 0.0) || (emis(k1) > 1.0) || (emis(k1 + 1) < 0.0) || (emis(k1 + 1) > 1.0)) {
                 nperr = 14;
-                gio::write(a, fmtI3) << k;
+                ObjexxFCL::gio::write(a, fmtI3) << k;
                 ErrorMessage = "Layer emissivity is our of range (<0 or >1). Layer #" + a;
                 return;
             }
             if ((rir(k1) < 0.0) || (rir(k1) > 1.0) || (rir(k1 + 1) < 0.0) || (rir(k1 + 1) > 1.0)) {
                 nperr = 3;
-                gio::write(a, fmtI3) << k;
+                ObjexxFCL::gio::write(a, fmtI3) << k;
                 ErrorMessage = "Layer reflectivity is our of range (<0 or >1). Layer #" + a;
                 return;
             }

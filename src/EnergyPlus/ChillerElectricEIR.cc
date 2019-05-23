@@ -384,7 +384,7 @@ namespace ChillerElectricEIR {
         bool Okay;
 
         // Formats
-        static gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
 
         // FLOW
 
@@ -783,12 +783,12 @@ namespace ChillerElectricEIR {
                     ShowContinueError("Energy input ratio as a function of part-load ratio curve shows negative values.");
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Curve Output = '");
-                    static gio::Fmt fmtF72("((F7.2),$)");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
+                    static ObjexxFCL::gio::Fmt fmtF72("((F7.2),$)");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, fmtF72) << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, fmtF72) << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     ErrorsFound = true;
                 }
@@ -1918,7 +1918,7 @@ namespace ChillerElectricEIR {
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricEIRChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2050,7 +2050,7 @@ namespace ChillerElectricEIR {
             // Warn user if entering condenser dry-bulb temperature falls below 0 C
             if (Node(CondInletNode).Temp < 0.0 && std::abs(MyLoad) > 0 && RunFlag && !WarmupFlag) {
                 ElectricEIRChiller(EIRChillNum).PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricEIRChiller(EIRChillNum).MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
                                                              ElectricEIRChiller(EIRChillNum).Name +
                                                              "\" - Air Cooled Condenser Inlet Temperature below 0C";
@@ -2070,7 +2070,7 @@ namespace ChillerElectricEIR {
             // Warn user if evap condenser wet-bulb temperature falls below 10 C
             if (Node(CondInletNode).Temp < 10.0 && std::abs(MyLoad) > 0 && RunFlag && !WarmupFlag) {
                 ElectricEIRChiller(EIRChillNum).PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricEIRChiller(EIRChillNum).MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
                                                              ElectricEIRChiller(EIRChillNum).Name +
                                                              "\" - Air Cooled Condenser Inlet Temperature below 10C";

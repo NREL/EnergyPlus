@@ -1279,14 +1279,14 @@ namespace HybridEvapCoolingModel {
         PartRuntimeFraction = PLVentRatio;
 
         if (SensibleRoomORZone > 0) {
-            PLSensibleCoolingRatio = abs(RequestedCoolingLoad) / abs(SensibleRoomORZone);
+            PLSensibleCoolingRatio = std::abs(RequestedCoolingLoad) / std::abs(SensibleRoomORZone);
         }
         if (PLSensibleCoolingRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLSensibleCoolingRatio;
         }
 
         if (SensibleRoomORZone < 0) {
-            PLSensibleHeatingRatio = abs(RequestedHeatingLoad) / abs(SensibleRoomORZone);
+            PLSensibleHeatingRatio = std::abs(RequestedHeatingLoad) / std::abs(SensibleRoomORZone);
         }
 
         if (PLSensibleHeatingRatio > PartRuntimeFraction) {
@@ -1294,7 +1294,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedDehumidificationLoad > 0) {
-            PLDehumidRatio = abs(RequestedDehumidificationLoad) / abs(LatentRoomORZone);
+            PLDehumidRatio = std::abs(RequestedDehumidificationLoad) / std::abs(LatentRoomORZone);
         }
 
         if (PLDehumidRatio > PartRuntimeFraction) {
@@ -1302,7 +1302,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedMoistureLoad > 0) {
-            PLHumidRatio = abs(RequestedMoistureLoad) / abs(LatentRoomORZone);
+            PLHumidRatio = std::abs(RequestedMoistureLoad) / std::abs(LatentRoomORZone);
         }
         if (PLHumidRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLHumidRatio;
@@ -1449,7 +1449,7 @@ namespace HybridEvapCoolingModel {
                 return -2;
             }
             // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
-            // Temperature(�C)
+            // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
                 EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
             } else {

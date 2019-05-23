@@ -5547,28 +5547,10 @@ namespace SetPointManager {
         // From the heating load of the control zone, calculate the supply air setpoint
         // needed to meet that zone load (based on CalcSingZoneRhSetPoint)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoadtoHeatSP; // required zone load to zone heating setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
         Real64 CpAir;            // inlet air specific heat [J/kg-C]
@@ -5583,18 +5565,14 @@ namespace SetPointManager {
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
         ZoneLoadtoHeatSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
         ZoneTemp = Node(ZoneNode).Temp;
-        // CR7654 IF (ZoneLoadtoHeatSP.GT.0.0) THEN
         if (ZoneMassFlow <= SmallMassFlow) {
-            this->SetPt = this->MaxSetTemp;
+            this->SetPt = this->MinSetTemp;
         } else {
             CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
             this->SetPt = ZoneTemp + ZoneLoadtoHeatSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
         }
-        // CR7654 ELSE
-        // CR7654   SingZoneHtSetPtMgr(SetPtMgrNum)%SetPt = SingZoneHtSetPtMgr(SetPtMgrNum)%MinSetTemp
-        // CR7654 END IF
     }
 
     void DefineSZCoolingSetPointManager::calculate()
@@ -5611,28 +5589,10 @@ namespace SetPointManager {
         // From the Cooling load of the control zone, calculate the supply air setpoint
         // needed to meet that zone load (based on CalcSingZoneRhSetPoint)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoadtoCoolSP; // required zone load to zone Cooling setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
         Real64 CpAir;            // inlet air specific Cool [J/kg-C]
@@ -5647,18 +5607,14 @@ namespace SetPointManager {
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
         ZoneLoadtoCoolSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
         ZoneTemp = Node(ZoneNode).Temp;
-        // CR7654 IF (ZoneLoadtoCoolSP.LT.0.0) THEN
         if (ZoneMassFlow <= SmallMassFlow) {
-            this->SetPt = this->MinSetTemp;
+            this->SetPt = this->MaxSetTemp;
         } else {
             CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
             this->SetPt = ZoneTemp + ZoneLoadtoCoolSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
         }
-        // CR7654 ELSE
-        // CR7654   SingZoneClSetPtMgr(SetPtMgrNum)%SetPt = SingZoneClSetPtMgr(SetPtMgrNum)%MaxSetTemp
-        // CR7654 END IF
     }
 
     void DefineSZOneStageCoolinggSetPointManager::calculate()

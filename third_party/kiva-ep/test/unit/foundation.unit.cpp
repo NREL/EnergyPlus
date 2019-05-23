@@ -1,6 +1,7 @@
 /* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
+#include "fixtures/foundation-fixture.hpp"
 #include "fixtures/aggregator-fixture.hpp"
 #include "fixtures/bestest-fixture.hpp"
 #include "fixtures/typical-fixture.hpp"
@@ -82,8 +83,11 @@ TEST_F(BESTESTFixture, GC30a) {
 TEST_F(BESTESTFixture, GC30b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
-  fnd.interiorConvectiveCoefficient = 100;
-  fnd.exteriorConvectiveCoefficient = 100;
+
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(100.);
 
   double trnsysQ = 2533;
   double fluentQ = 2504;
@@ -100,7 +104,9 @@ TEST_F(BESTESTFixture, GC30b) {
 TEST_F(BESTESTFixture, GC30c) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 8.0;
-  fnd.interiorConvectiveCoefficient = 7.95;
+
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
 
   double trnsysQ = 2137;
   double fluentQ = 2123;
@@ -117,8 +123,11 @@ TEST_F(BESTESTFixture, GC30c) {
 TEST_F(BESTESTFixture, GC60b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
-  fnd.interiorConvectiveCoefficient = 7.95;
-  fnd.exteriorConvectiveCoefficient = 100;
+
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(100.);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(100.);
 
   double trnsysQ = 2113;
   double fluentQ = 2104;
@@ -135,8 +144,11 @@ TEST_F(BESTESTFixture, GC60b) {
 TEST_F(BESTESTFixture, GC65b) {
   fnd.deepGroundDepth = 15.0;
   fnd.farFieldWidth = 15.0;
-  fnd.interiorConvectiveCoefficient = 7.95;
-  fnd.exteriorConvectiveCoefficient = 11.95;
+
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.intWallConvectionAlgorithm = KIVA_CONST_CONV(7.95);
+  bcs.extWallConvectionAlgorithm = KIVA_CONST_CONV(11.95);
+  bcs.gradeConvectionAlgorithm = KIVA_CONST_CONV(11.95);
 
   double trnsysQ = 1994;
   double fluentQ = 1991;
@@ -158,7 +170,7 @@ TEST_F(BESTESTFixture, 1D) {
 
   double area = 144; // m2
   double expectedQ = fnd.soil.conductivity / fnd.deepGroundDepth * area *
-                     (bcs.indoorTemp - bcs.deepGroundTemperature);
+                     (bcs.slabConvectiveTemp - bcs.deepGroundTemperature);
   EXPECT_NEAR(calcQ(), expectedQ, 1.0);
 }
 
@@ -249,11 +261,55 @@ TEST_F(AggregatorFixture, validation) {
   EXPECT_DEATH(floor_results.calc_weighted_results(),
                "Aggregation requested for surface that is not part of foundation instance.");
 
+
+  floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
+
+  floor_results.add_instance(instances[0].ground.get(), 0.25);
+  floor_results.add_instance(instances[1].ground.get(), 0.753);
+  floor_results.calc_weighted_results();
+
+  // Aggregator will re-weight to make totals add to 1.0--
+  // indiviudal weights will now be different.
+  EXPECT_NE(floor_results.get_instance(1).second, 0.753);
+
   floor_results = Aggregator(Surface::SurfaceType::ST_SLAB_CORE);
 
   floor_results.add_instance(instances[0].ground.get(), 0.25);
   floor_results.add_instance(instances[1].ground.get(), 0.75);
   floor_results.calc_weighted_results(); // Expect success
+}
+
+TEST_F(TypicalFixture, convectionCallback) {
+  double hc1 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+  bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(2.0);
+  double hc2 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+  EXPECT_NE(hc1, hc2);
+  EXPECT_EQ(2.0, hc2);
+  bcs.slabConvectionAlgorithm = [=](double Tsurf, double Tamb, double HfTerm, double roughness, double cosTilt) -> double {
+      double deltaT = Tsurf - Tamb;
+      return hc2 + deltaT*deltaT + hc1 - getDOE2ConvectionCoeff(Tsurf, Tamb, HfTerm, roughness, cosTilt);
+  };
+  double hc3 = bcs.slabConvectionAlgorithm(290., 295., 0., 0., 0.);
+
+  EXPECT_NEAR(hc3, 27.0, 0.00001);
+
+}
+
+TEST_F(FoundationFixture, foundationSurfaces) {
+  fnd.foundationDepth = 1.0;
+  fnd.wall.heightAboveGrade = 0.0;
+  Material insulation(0.0288, 28.0, 1450.0);
+  InputBlock extIns;
+  extIns.z = 0;
+  extIns.x = fnd.wall.totalWidth();
+  extIns.depth = 1.0;
+  extIns.width = 0.05;
+  extIns.material = insulation;
+  fnd.inputBlocks.push_back(extIns);
+  fnd.createMeshData();
+  EXPECT_EQ(fnd.surfaces[6].type, Surface::ST_GRADE);
+  EXPECT_EQ(fnd.surfaces[8].type, Surface::ST_WALL_TOP);
+  EXPECT_NEAR(fnd.surfaces[8].xMax, fnd.surfaces[6].xMin,0.00001);
 }
 
 // Google Test main

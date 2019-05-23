@@ -587,7 +587,7 @@ namespace UserDefinedComponents {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
@@ -1527,7 +1527,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        gio::write(LoopStr, fmtLD) << ConnectionLoop;
+                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
                         strip(LoopStr);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,

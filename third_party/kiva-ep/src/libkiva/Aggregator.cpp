@@ -41,7 +41,14 @@ void Aggregator::validate() {
     }
   }
   if (!isEqual(check_weights, 1.0)) {
-    showMessage(MSG_ERR, "The weights of associated Kiva instances do not add to unity.");
+    if (isEqual(check_weights, 1.0, 0.01)) {
+      showMessage(MSG_WARN, "The weights of associated Kiva instances do not quite add to unity--check exposed perimeter values. Weights will be slightly modified to add to unity.");
+      for (auto &instance : instances) {
+        instance.second /= check_weights;
+      }
+    } else {
+      showMessage(MSG_ERR, "The weights of associated Kiva instances do not add to unity--check exposed perimeter values.");
+    }
   }
   validated = true;
 }
@@ -54,7 +61,8 @@ void Aggregator::calc_weighted_results() {
   double Tz, Tr;
   for (auto &instance : instances) {
     Ground *grnd = instance.first;
-    Tz = grnd->bcs.indoorTemp;
+    Tz = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallConvectiveTemp
+                                              : grnd->bcs.slabConvectiveTemp;
     Tr = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallRadiantTemp
                                               : grnd->bcs.slabRadiantTemp;
     double p = instance.second;
@@ -80,6 +88,10 @@ void Aggregator::calc_weighted_results() {
   results.Trad = Tr - results.qrad / results.hrad;
 
   return;
+}
+
+std::pair<Ground *, double> Aggregator::get_instance(std::size_t index) {
+  return instances[index];
 }
 
 } // namespace Kiva
