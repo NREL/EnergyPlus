@@ -238,6 +238,9 @@ namespace SurfaceGeometry {
                                int const TotIntMass // Number of Internal Mass Surfaces to obtain
     );
 
+    int GetNumIntMassSurfaces(int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    );
+
     void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound); // Error flag indicator (true if errors found)
@@ -254,7 +257,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction = -1;  // hush up cppcheck
+            double exposedFraction = -1; // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };

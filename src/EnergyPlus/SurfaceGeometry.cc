@@ -438,11 +438,12 @@ namespace SurfaceGeometry {
                             Zone(Surface(SurfNum).Zone).ExtWindowArea +
                             Surface(SurfNum).GrossArea * Surface(SurfNum).Multiplier * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
                         if (DetailedWWR) {
-                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(SurfNum).Name + ",Window," +
-                                                                     RoundSigDigits(Surface(SurfNum).GrossArea * Surface(SurfNum).Multiplier *
-                                                                                        Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier,
-                                                                                    2) +
-                                                                     ',' + RoundSigDigits(Surface(SurfNum).Tilt, 1);
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA)
+                                << Surface(SurfNum).Name + ",Window," +
+                                       RoundSigDigits(Surface(SurfNum).GrossArea * Surface(SurfNum).Multiplier * Zone(ZoneNum).Multiplier *
+                                                          Zone(ZoneNum).ListMultiplier,
+                                                      2) +
+                                       ',' + RoundSigDigits(Surface(SurfNum).Tilt, 1);
                         }
                     }
                 }
@@ -471,7 +472,7 @@ namespace SurfaceGeometry {
             ZMin = 99999.0;
             if (DetailedWWR) {
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Zone(ZoneNum).Name + ',' + RoundSigDigits(Zone(ZoneNum).ExtGrossWallArea, 2) + ',' +
-                                                         RoundSigDigits(Zone(ZoneNum).ExtWindowArea, 2);
+                                                                    RoundSigDigits(Zone(ZoneNum).ExtWindowArea, 2);
             }
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Roof) {
@@ -652,15 +653,16 @@ namespace SurfaceGeometry {
         ObjexxFCL::gio::write(OutputFileInits, fmtA)
             << "! <Shading Summary>, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades";
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Shading Summary," + RoundSigDigits(FixedShadingCount) + ',' + RoundSigDigits(BuildingShadingCount) +
-                                                 ',' + RoundSigDigits(AttachedShadingCount);
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Shading Summary," + RoundSigDigits(FixedShadingCount) + ',' +
+                                                            RoundSigDigits(BuildingShadingCount) + ',' + RoundSigDigits(AttachedShadingCount);
 
         // Write number of zones header to initialization output file
         ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Zone Summary>, Number of Zones, Number of Zone Surfaces, Number of SubSurfaces";
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Zone Summary," + RoundSigDigits(NumOfZones) + ',' +
-                                                 RoundSigDigits(TotSurfaces - FixedShadingCount - BuildingShadingCount - AttachedShadingCount) + ',' +
-                                                 RoundSigDigits(sum(Zone, &ZoneData::NumSubSurfaces));
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
+            << " Zone Summary," + RoundSigDigits(NumOfZones) + ',' +
+                   RoundSigDigits(TotSurfaces - FixedShadingCount - BuildingShadingCount - AttachedShadingCount) + ',' +
+                   RoundSigDigits(sum(Zone, &ZoneData::NumSubSurfaces));
 
         // Write Zone Information header to the initialization output file
         ObjexxFCL::gio::write(OutputFileInits, Format_721);
@@ -921,7 +923,8 @@ namespace SurfaceGeometry {
         int TotDetailedFloors;    // Number of Floor:Detailed items to obtain
         int TotHTSubs;            // Number of FenestrationSurface:Detailed items to obtain
         int TotShdSubs;           // Number of Shading:Zone:Detailed items to obtain
-        int TotIntMass;           // Number of InternalMass items to obtain
+        int TotIntMass;           // Number of InternalMass object items to obtain
+        int TotIntMassSurfaces;   // Number of InternalMass surfaces to obtain
         // Simple Surfaces (Rectangular)
         int TotRectExtWalls;   // Number of Exterior Walls to obtain
         int TotRectIntWalls;   // Number of Adiabatic Walls to obtain
@@ -1061,8 +1064,10 @@ namespace SurfaceGeometry {
 
         TotOSC = 0;
 
+        TotIntMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+
         TotSurfaces = (TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg) * 2 + TotHTSurfs + TotHTSubs +
-                      TotShdSubs * 2 + TotIntMass + TotOverhangs * 2 + TotOverhangsProjection * 2 + TotFins * 4 + TotFinsProjection * 4 +
+                      TotShdSubs * 2 + TotIntMassSurfaces + TotOverhangs * 2 + TotOverhangsProjection * 2 + TotFins * 4 + TotFinsProjection * 4 +
                       TotDetailedWalls + TotDetailedRoofs + TotDetailedFloors + TotRectWindows + TotRectDoors + TotRectGlazedDoors +
                       TotRectIZWindows + TotRectIZDoors + TotRectIZGlazedDoors + TotRectExtWalls + TotRectIntWalls + TotRectIZWalls + TotRectUGWalls +
                       TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
@@ -2409,8 +2414,9 @@ namespace SurfaceGeometry {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720) << "! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference "
-                                                   "Point Coordinate System,Rectangular (Simple) Surface Coordinate System";
+        ObjexxFCL::gio::write(OutputFileInits, Format_720)
+            << "! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference "
+               "Point Coordinate System,Rectangular (Simple) Surface Coordinate System";
         ObjexxFCL::gio::write(OutputFileInits, Format_720) << OutMsg;
     }
 
@@ -5599,22 +5605,32 @@ namespace SurfaceGeometry {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace Vectors;
+        using General::CheckCreatedZoneItemName;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const RoutineName("GetIntMassSurfaceData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStat;          // IO Status when calling get input subroutine
-        int SurfaceNumAlpha; // Number of material alpha names being passed
-        int SurfaceNumProp;  // Number of material properties being passed
-        int ZoneNum;         // DO loop counter (zones)
-        int Loop;
+        int IOStat;                // IO Status when calling get input subroutine
+        int SurfaceNumAlpha;       // Number of material alpha names being passed
+        int SurfaceNumArg;         // Number of material properties being passed
+        int ZoneNum;               // index to a zone
+        int NumIntMassSurfaces(0); // total count of internal mass surfaces
+        bool errFlag;              //  local error flag
 
         cCurrentModuleObject = "InternalMass";
-        for (Loop = 1; Loop <= TotIntMass; ++Loop) {
+        IntMassObjects.allocate(TotIntMass);
+
+        // scan for use of Zone lists in InternalMass objects
+        errFlag = false;
+        NumIntMassSurfaces = 0;
+        for (int Item = 1; Item <= TotIntMass; ++Item) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          Loop,
+                                          Item,
                                           cAlphaArgs,
                                           SurfaceNumAlpha,
                                           rNumericArgs,
-                                          SurfaceNumProp,
+                                          SurfaceNumArg,
                                           IOStat,
                                           lNumericFieldBlanks,
                                           lAlphaFieldBlanks,
@@ -5625,58 +5641,156 @@ namespace SurfaceGeometry {
                 continue;
             }
 
-            ++SurfNum;
-            SurfaceTmp(SurfNum).Name = cAlphaArgs(1); // Set the Surface Name in the Derived Type
-            SurfaceTmp(SurfNum).Class = SurfaceClass_IntMass;
-            SurfaceTmp(SurfNum).HeatTransSurf = true;
-            SurfaceTmp(SurfNum).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct, TotConstructs);
-
-            if (SurfaceTmp(SurfNum).Construction == 0) {
-                ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", " + cAlphaFieldNames(2) +
-                                " not found=" + cAlphaArgs(2));
-            } else if (Construct(SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
-                ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(2) + "=\"" +
-                                cAlphaArgs(2) + "\" - has Window materials.");
+            IntMassObjects(Item).Name = cAlphaArgs(1);
+            IntMassObjects(Item).GrossArea = rNumericArgs(1);
+            IntMassObjects(Item).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct, TotConstructs);
+            IntMassObjects(Item).ZoneOrZoneListName = cAlphaArgs(3);
+            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, NumOfZones);
+            int ZLItem = 0;
+            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
+            if (Item1 > 0) {
+                ++NumIntMassSurfaces;
+                IntMassObjects(Item).NumOfZones = 1;
+                IntMassObjects(Item).ZoneListActive = false;
+                IntMassObjects(Item).ZoneOrZoneListPtr = Item1;
+            } else if (ZLItem > 0) {
+                NumIntMassSurfaces += ZoneList(ZLItem).NumOfZones;
+                IntMassObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
+                IntMassObjects(Item).ZoneListActive = true;
+                IntMassObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                Construct(SurfaceTmp(SurfNum).Construction).IsUsed = true;
-                SurfaceTmp(SurfNum).ConstructionStoredInputValue = SurfaceTmp(SurfNum).Construction;
-            }
-            SurfaceTmp(SurfNum).ZoneName = cAlphaArgs(3);
-            ZoneNum = UtilityRoutines::FindItemInList(SurfaceTmp(SurfNum).ZoneName, Zone, NumOfZones);
-
-            if (ZoneNum != 0) {
-                SurfaceTmp(SurfNum).Zone = ZoneNum;
-            } else {
-                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(3) + "=\"" +
-                                cAlphaArgs(3) + "\".");
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                "\" not found.");
+                ++SurfNum;
                 SurfaceTmp(SurfNum).Class += 100;
-                //      SurfaceTmp(SurfNum)%Class=0
                 SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                 ErrorsFound = true;
+                errFlag = true;
             }
-            SurfaceTmp(SurfNum).GrossArea = rNumericArgs(1);
-            SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
-            SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
-            SurfaceTmp(SurfNum).Width = SurfaceTmp(SurfNum).Area;
-            SurfaceTmp(SurfNum).Height = 1.0;
-            SurfaceTmp(SurfNum).Tilt = 90.0;
-            SurfaceTmp(SurfNum).CosTilt = 0.0; // Tuned Was std::cos( 90.0 * DegToRadians )
-            SurfaceTmp(SurfNum).SinTilt = 1.0; // Tuned Was std::sin( 90.0 * DegToRadians )
-            SurfaceTmp(SurfNum).Azimuth = 0.0;
-            SurfaceTmp(SurfNum).CosAzim = 1.0; // Tuned Was std::cos( 0.0 )
-            SurfaceTmp(SurfNum).SinAzim = 0.0; // Tuned Was std::sin( 0.0 )
-            // Outward normal unit vector (pointing away from room)
-            SurfaceTmp(SurfNum).OutNormVec = SurfaceTmp(SurfNum).lcsz;
-            SurfaceTmp(SurfNum).ViewFactorSky = 0.5;
-            SurfaceTmp(SurfNum).ExtSolar = false;
-            SurfaceTmp(SurfNum).ExtWind = false;
-            SurfaceTmp(SurfNum).BaseSurf = SurfNum;
-            SurfaceTmp(SurfNum).BaseSurfName = SurfaceTmp(SurfNum).Name;
-            SurfaceTmp(SurfNum).ExtBoundCondName = SurfaceTmp(SurfNum).Name;
-            SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
+
+            if (errFlag) {
+                ShowSevereError(RoutineName + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
+                ShowContinueError("...These will not be read in.  Other errors may occur.");
+                NumIntMassSurfaces = 0;
+            }
+
+            if (IntMassObjects(Item).Construction == 0) {
+                ErrorsFound = true;
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + " not found=" + cAlphaArgs(2));
+            } else if (Construct(IntMassObjects(Item).Construction).TypeIsWindow) {
+                ErrorsFound = true;
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" - has Window materials.");
+            } else {
+                Construct(IntMassObjects(Item).Construction).IsUsed = true;
+            }
         }
+
+        if (NumIntMassSurfaces > 0) {
+            for (int Loop = 1; Loop <= TotIntMass; ++Loop) {
+
+                for (int Item1 = 1; Item1 <= IntMassObjects(Loop).NumOfZones; ++Item1) {
+
+                    ++SurfNum;
+
+                    SurfaceTmp(SurfNum).Construction = IntMassObjects(Loop).Construction;
+                    if (!IntMassObjects(Loop).ZoneListActive) {
+                        SurfaceTmp(SurfNum).Zone = IntMassObjects(Loop).ZoneOrZoneListPtr;
+                        SurfaceTmp(SurfNum).Name = IntMassObjects(Loop).Name;
+                        SurfaceTmp(SurfNum).Class = SurfaceClass_IntMass;
+                        SurfaceTmp(SurfNum).ZoneName = IntMassObjects(Loop).ZoneOrZoneListName;
+                        SurfaceTmp(SurfNum).HeatTransSurf = true;
+                    } else {
+                        CheckCreatedZoneItemName(RoutineName,
+                                                 cCurrentModuleObject,
+                                                 Zone(ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1)).Name,
+                                                 ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                                 IntMassObjects(Loop).Name,
+                                                 SurfaceTmp,
+                                                 SurfNum - 1,
+                                                 SurfaceTmp(SurfNum).Name,
+                                                 errFlag);
+
+                        ZoneNum = ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
+                        SurfaceTmp(SurfNum).Zone = ZoneNum;
+                        SurfaceTmp(SurfNum).Class = SurfaceClass_IntMass;
+                        SurfaceTmp(SurfNum).ZoneName = Zone(ZoneNum).Name;
+                        SurfaceTmp(SurfNum).HeatTransSurf = true;
+                        if (errFlag) ErrorsFound = true;
+                    }
+
+                    if (IntMassObjects(Loop).Construction > 0) {
+                        if (Construct(IntMassObjects(Loop).Construction).IsUsed) {
+                            SurfaceTmp(SurfNum).ConstructionStoredInputValue = IntMassObjects(Loop).Construction;
+                        }
+                    }
+                    SurfaceTmp(SurfNum).GrossArea = IntMassObjects(Loop).GrossArea;
+                    SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
+                    SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
+                    SurfaceTmp(SurfNum).Width = SurfaceTmp(SurfNum).Area;
+                    SurfaceTmp(SurfNum).Height = 1.0;
+                    SurfaceTmp(SurfNum).Tilt = 90.0;
+                    SurfaceTmp(SurfNum).CosTilt = 0.0; // Tuned Was std::cos( 90.0 * DegToRadians )
+                    SurfaceTmp(SurfNum).SinTilt = 1.0; // Tuned Was std::sin( 90.0 * DegToRadians )
+                    SurfaceTmp(SurfNum).Azimuth = 0.0;
+                    SurfaceTmp(SurfNum).CosAzim = 1.0; // Tuned Was std::cos( 0.0 )
+                    SurfaceTmp(SurfNum).SinAzim = 0.0; // Tuned Was std::sin( 0.0 )
+                    // Outward normal unit vector (pointing away from room)
+                    SurfaceTmp(SurfNum).OutNormVec = SurfaceTmp(SurfNum).lcsz;
+                    SurfaceTmp(SurfNum).ViewFactorSky = 0.5;
+                    SurfaceTmp(SurfNum).ExtSolar = false;
+                    SurfaceTmp(SurfNum).ExtWind = false;
+                    SurfaceTmp(SurfNum).BaseSurf = SurfNum;
+                    SurfaceTmp(SurfNum).BaseSurfName = SurfaceTmp(SurfNum).Name;
+                    SurfaceTmp(SurfNum).ExtBoundCondName = SurfaceTmp(SurfNum).Name;
+                    SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
+                }
+            }
+        }
+    }
+
+    int GetNumIntMassSurfaces(int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    )
+    {
+        // Counts internal mass surfaces applied to zones and zone lists
+
+        // Using/Aliasing
+        using namespace DataIPShortCuts;
+
+        int IOStat;          // IO Status when calling get input subroutine
+        int SurfaceNumAlpha; // Number of material alpha names being passed
+        int SurfaceNumArg;   // Number of material properties being passed
+        int NumIntMassSurf;  // total count of internal mass surfaces
+
+        NumIntMassSurf = 0;
+        if (TotIntMass == 0) return NumIntMassSurf;
+
+        cCurrentModuleObject = "InternalMass";
+        // scan for zones and zone lists in InternalMass objects
+        for (int Item = 1; Item <= TotIntMass; ++Item) {
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          SurfaceNumAlpha,
+                                          rNumericArgs,
+                                          SurfaceNumArg,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+
+            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, NumOfZones);
+            int ZLItem = 0;
+            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
+            if (Item1 > 0) {
+                ++NumIntMassSurf;
+            } else if (ZLItem > 0) {
+                NumIntMassSurf += ZoneList(ZLItem).NumOfZones;
+            }
+        }
+        NumIntMassSurf = max(NumIntMassSurf, TotIntMass);
+        return NumIntMassSurf;
     }
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound) // If errors found in input
@@ -5792,8 +5906,9 @@ namespace SurfaceGeometry {
         } // End of loop over Shading Surface Reflectance objects
 
         // Write reflectance values to .eio file.
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ShadingProperty Reflectance>,Shading Surface Name,Shading Type,Diffuse Solar Reflectance, Diffuse "
-                                             "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Contruction";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
+            << "! <ShadingProperty Reflectance>,Shading Surface Name,Shading Type,Diffuse Solar Reflectance, Diffuse "
+               "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Contruction";
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!(SurfaceTmp(SurfNum).Class == SurfaceClass_Shading || SurfaceTmp(SurfNum).Class == SurfaceClass_Detached_F ||
@@ -5802,17 +5917,17 @@ namespace SurfaceGeometry {
                 continue;
             if (SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct != 0) {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ShadingProperty Reflectance," + SurfaceTmp(SurfNum).Name + ',' +
-                                                         cSurfaceClass(SurfaceTmp(SurfNum).Class) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl, 2) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl, 2) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfGlazingFrac, 2) + ',' +
-                                                         Construct(SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct).Name;
+                                                                    cSurfaceClass(SurfaceTmp(SurfNum).Class) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl, 2) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl, 2) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfGlazingFrac, 2) + ',' +
+                                                                    Construct(SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct).Name;
             } else {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ShadingProperty Reflectance," + SurfaceTmp(SurfNum).Name + ',' +
-                                                         cSurfaceClass(SurfaceTmp(SurfNum).Class) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl, 2) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl, 2) + ',' +
-                                                         RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfGlazingFrac, 2) + ", N/A";
+                                                                    cSurfaceClass(SurfaceTmp(SurfNum).Class) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl, 2) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl, 2) + ',' +
+                                                                    RoundSigDigits(SurfaceTmp(SurfNum).ShadowSurfGlazingFrac, 2) + ", N/A";
             }
         }
     }
@@ -7018,10 +7133,11 @@ namespace SurfaceGeometry {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface Heat Transfer Algorithm>, Value {CTF - ConductionTransferFunction | EMPD - "
-                                             "MoisturePenetrationDepthConductionTransferFunction | CondFD - ConductionFiniteDifference | HAMT - "
-                                             "CombinedHeatAndMoistureFiniteElement} - Description,Inside Surface Max Temperature Limit{C}, Surface "
-                                             "Convection Coefficient Lower Limit {W/m2-K}, Surface Convection Coefficient Upper Limit {W/m2-K}";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
+            << "! <Surface Heat Transfer Algorithm>, Value {CTF - ConductionTransferFunction | EMPD - "
+               "MoisturePenetrationDepthConductionTransferFunction | CondFD - ConductionFiniteDifference | HAMT - "
+               "CombinedHeatAndMoistureFiniteElement} - Description,Inside Surface Max Temperature Limit{C}, Surface "
+               "Convection Coefficient Lower Limit {W/m2-K}, Surface Convection Coefficient Upper Limit {W/m2-K}";
 
         for (Item1 = 1; Item1 <= NumberOfHeatTransferAlgosUsed; ++Item1) {
             AlgoName = "";
@@ -7502,7 +7618,7 @@ namespace SurfaceGeometry {
         ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "Reversing Surface Name=" + SurfaceTmp(SurfNum).Name;
         for (n = 1; n <= NSides; ++n) {
             ObjexxFCL::gio::write(OutputFileDebug, fmt3) << "side=" << n << " abs coord vertex=" << SurfaceTmp(SurfNum).Vertex(n).x
-                                              << SurfaceTmp(SurfNum).Vertex(n).y << SurfaceTmp(SurfNum).Vertex(n).z;
+                                                         << SurfaceTmp(SurfNum).Vertex(n).y << SurfaceTmp(SurfNum).Vertex(n).z;
         }
 
         CreateNewellSurfaceNormalVector(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
@@ -9226,12 +9342,13 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OSCFormat1("('! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected "
-                                   "Constant Temperature {C},Coefficient modifying the constant temperature term,Coefficient modifying the external "
-                                   "dry bulb temperature term,Coefficient modifying the ground temperature term,Coefficient modifying the wind speed "
-                                   "term {s/m},Coefficient modifying the zone air temperature term,Constant Temperature Schedule Name,Sinusoidal "
-                                   "Variation,Period of Sinusoidal Variation,Previous Other Side Temperature Coefficient,Minimum Other Side "
-                                   "Temperature {C},Maximum Other Side Temperature {C}')");
+        static ObjexxFCL::gio::Fmt OSCFormat1(
+            "('! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected "
+            "Constant Temperature {C},Coefficient modifying the constant temperature term,Coefficient modifying the external "
+            "dry bulb temperature term,Coefficient modifying the ground temperature term,Coefficient modifying the wind speed "
+            "term {s/m},Coefficient modifying the zone air temperature term,Constant Temperature Schedule Name,Sinusoidal "
+            "Variation,Period of Sinusoidal Variation,Previous Other Side Temperature Coefficient,Minimum Other Side "
+            "Temperature {C},Maximum Other Side Temperature {C}')");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -9347,24 +9464,20 @@ namespace SurfaceGeometry {
             }
             if (OSC(Loop).ConstTempScheduleIndex != 0) {
                 cAlphaArgs(2) = OSC(Loop).ConstTempScheduleName;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Other Side Coefficients," + OSC(Loop).Name + ',' + cAlphaArgs(1) + ",N/A," +
-                                                         RoundSigDigits(OSC(Loop).ConstTempCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).ExtDryBulbCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).GroundTempCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).WindSpeedCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).ZoneAirTempCoef, 3) + ',' + cAlphaArgs(2) + ',' + cAlphaArgs(3) +
-                                                         ',' + RoundSigDigits(OSC(Loop).SinusoidPeriod, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).TPreviousCoef, 3) + ',' + cOSCLimitsString;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                    << "Other Side Coefficients," + OSC(Loop).Name + ',' + cAlphaArgs(1) + ",N/A," + RoundSigDigits(OSC(Loop).ConstTempCoef, 3) +
+                           ',' + RoundSigDigits(OSC(Loop).ExtDryBulbCoef, 3) + ',' + RoundSigDigits(OSC(Loop).GroundTempCoef, 3) + ',' +
+                           RoundSigDigits(OSC(Loop).WindSpeedCoef, 3) + ',' + RoundSigDigits(OSC(Loop).ZoneAirTempCoef, 3) + ',' + cAlphaArgs(2) +
+                           ',' + cAlphaArgs(3) + ',' + RoundSigDigits(OSC(Loop).SinusoidPeriod, 3) + ',' +
+                           RoundSigDigits(OSC(Loop).TPreviousCoef, 3) + ',' + cOSCLimitsString;
             } else {
                 cAlphaArgs(2) = "N/A";
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Other Side Coefficients," + OSC(Loop).Name + ',' + cAlphaArgs(1) + ',' +
-                                                         RoundSigDigits(OSC(Loop).ConstTemp, 2) + ',' + RoundSigDigits(OSC(Loop).ConstTempCoef, 3) +
-                                                         ',' + RoundSigDigits(OSC(Loop).ExtDryBulbCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).GroundTempCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).WindSpeedCoef, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).ZoneAirTempCoef, 3) + ',' + cAlphaArgs(2) + ',' + cAlphaArgs(3) +
-                                                         ',' + RoundSigDigits(OSC(Loop).SinusoidPeriod, 3) + ',' +
-                                                         RoundSigDigits(OSC(Loop).TPreviousCoef, 3) + ',' + cOSCLimitsString;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                    << "Other Side Coefficients," + OSC(Loop).Name + ',' + cAlphaArgs(1) + ',' + RoundSigDigits(OSC(Loop).ConstTemp, 2) + ',' +
+                           RoundSigDigits(OSC(Loop).ConstTempCoef, 3) + ',' + RoundSigDigits(OSC(Loop).ExtDryBulbCoef, 3) + ',' +
+                           RoundSigDigits(OSC(Loop).GroundTempCoef, 3) + ',' + RoundSigDigits(OSC(Loop).WindSpeedCoef, 3) + ',' +
+                           RoundSigDigits(OSC(Loop).ZoneAirTempCoef, 3) + ',' + cAlphaArgs(2) + ',' + cAlphaArgs(3) + ',' +
+                           RoundSigDigits(OSC(Loop).SinusoidPeriod, 3) + ',' + RoundSigDigits(OSC(Loop).TPreviousCoef, 3) + ',' + cOSCLimitsString;
             }
         }
     }
@@ -9913,7 +10026,7 @@ namespace SurfaceGeometry {
                         ObjexxFCL::gio::write(OutputFileDebug, fmtLD)
                             << "surface=" << ZoneStruct.SurfaceFace(SurfNum).SurfNum << " nsides=" << ZoneStruct.SurfaceFace(SurfNum).NSides;
                         ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "surface name=" << Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Name
-                                                           << " class=" << Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Class;
+                                                                      << " class=" << Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Class;
                         ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "area=" << Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).GrossArea;
                         for (iside = 1; iside <= ZoneStruct.SurfaceFace(SurfNum).NSides; ++iside) {
                             auto const &FacePoint(ZoneStruct.SurfaceFace(SurfNum).FacePoints(iside));
@@ -10293,7 +10406,7 @@ namespace SurfaceGeometry {
                     isFlrHoriz = false;
                 }
             } else if (Surface(curSurfNum).Class == SurfaceClass_Roof) { // includes ceilings
-                if (std::abs(Surface(curSurfNum).Tilt) > 1.) {                // with 1 degree angle of
+                if (std::abs(Surface(curSurfNum).Tilt) > 1.) {           // with 1 degree angle of
                     isClgHoriz = false;
                 }
             } else if (Surface(curSurfNum).Class == SurfaceClass_Wall) {
