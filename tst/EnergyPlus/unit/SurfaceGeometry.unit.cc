@@ -53,7 +53,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -3326,7 +3328,6 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     WindowShadingControl(3).FenestrationName(1) = "Fene-08";
     WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-
     TotSurfaces = 12;
     Surface.allocate(TotSurfaces);
 
@@ -3366,7 +3367,6 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     Surface(12).Name = "Fene-06";
     Surface(12).WindowShadingControlPtr = 2;
 
-
     bool Err = false;
 
     FinalAssociateWindowShadingControlFenestration(Err);
@@ -3383,7 +3383,6 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 
     EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(1), 3);
     EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
-
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
@@ -3511,7 +3510,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    454.1032,                !- Floor Area {m2}",
         "    TARP;                    !- Zone Inside Convection Algorithm",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3545,13 +3544,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
-        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.",
+        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions "
+        "should be same.",
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: DATATELCOM_CEILING_1_0_0, is CondFD - ConductionFiniteDifference",
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is CTF - ConductionTransferFunction",
-        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. Simulation continues.",
-        });
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. "
+        "Simulation continues.",
+    });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -3629,8 +3629,714 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     EXPECT_EQ(1, SurfNum);
     EXPECT_TRUE(ErrorsFound);
 
-    std::string const error_string =
-        delimited_string({"   ** Severe  ** RoofCeiling:Detailed=\"SURFACE A\" references an outside boundary surface that cannot be found:SURFACE B"
-                        });
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** RoofCeiling:Detailed=\"SURFACE A\" references an outside boundary surface that cannot be found:SURFACE B"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    G SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    Office,                  !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G Corridor,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Construction,",
+        "    InteriorFurnishings,     !- Name",
+        "    Std Wood 6inch;          !- Outside Layer",
+
+        "  Material,",
+        "    Std Wood 6inch,          !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.15,                    !- Thickness {m}",
+        "    0.12,                    !- Conductivity {W/m-K}",
+        "    540.0000,                !- Density {kg/m3}",
+        "    1210,                    !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  InternalMass,",
+        "    GFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_GF,      !- Name",
+        "    G SW Apartment,          !- Zone 1 Name",
+        "    G NW Apartment,          !- Zone 2 Name",
+        "    Office,                  !- Zone 3 Name",
+        "    G NE Apartment,          !- Zone 4 Name",
+        "    G N1 Apartment,          !- Zone 5 Name",
+        "    G N2 Apartment,          !- Zone 6 Name",
+        "    G S1 Apartment,          !- Zone 7 Name",
+        "    G S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    MFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    176.498545342438;        !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_MF,      !- Name",
+        "    M SW Apartment,          !- Zone 1 Name",
+        "    M NW Apartment,          !- Zone 2 Name",
+        "    M SE Apartment,          !- Zone 3 Name",
+        "    M NE Apartment,          !- Zone 4 Name",
+        "    M N1 Apartment,          !- Zone 5 Name",
+        "    M N2 Apartment,          !- Zone 6 Name",
+        "    M S1 Apartment,          !- Zone 7 Name",
+        "    M S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    TFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_TF,      !- Name",
+        "    T SW Apartment,          !- Zone 1 Name",
+        "    T NW Apartment,          !- Zone 2 Name",
+        "    T SE Apartment,          !- Zone 3 Name",
+        "    T NE Apartment,          !- Zone 4 Name",
+        "    T N1 Apartment,          !- Zone 5 Name",
+        "    T N2 Apartment,          !- Zone 6 Name",
+        "    T S1 Apartment,          !- Zone 7 Name",
+        "    T S2 Apartment;          !- Zone 8 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Read Materials
+    GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Construction
+    GetConstructData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Read Zones
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // Read InternalMass Object Count
+    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    // check the three internal mass objects
+    EXPECT_EQ(3, TotIntMass);
+
+    // Read InternalMass Surfaces Count
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+    // check the 24 internal mass surfaces created from the three zoneLists
+    EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
+}
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    G SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    Office,                  !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G Corridor,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Construction,",
+        "    InteriorFurnishings,     !- Name",
+        "    Std Wood 6inch;          !- Outside Layer",
+
+        "  Material,",
+        "    Std Wood 6inch,          !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.15,                    !- Thickness {m}",
+        "    0.12,                    !- Conductivity {W/m-K}",
+        "    540.0000,                !- Density {kg/m3}",
+        "    1210,                    !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  InternalMass,",
+        "    GFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_GF,      !- Name",
+        "    G SW Apartment,          !- Zone 1 Name",
+        "    G NW Apartment,          !- Zone 2 Name",
+        "    Office,                  !- Zone 3 Name",
+        "    G NE Apartment,          !- Zone 4 Name",
+        "    G N1 Apartment,          !- Zone 5 Name",
+        "    G N2 Apartment,          !- Zone 6 Name",
+        "    G S1 Apartment,          !- Zone 7 Name",
+        "    G S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    MFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    176.498545342438;        !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_MF,      !- Name",
+        "    M SW Apartment,          !- Zone 1 Name",
+        "    M NW Apartment,          !- Zone 2 Name",
+        "    M SE Apartment,          !- Zone 3 Name",
+        "    M NE Apartment,          !- Zone 4 Name",
+        "    M N1 Apartment,          !- Zone 5 Name",
+        "    M N2 Apartment,          !- Zone 6 Name",
+        "    M S1 Apartment,          !- Zone 7 Name",
+        "    M S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    TFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_TF,      !- Name",
+        "    T SW Apartment,          !- Zone 1 Name",
+        "    T NW Apartment,          !- Zone 2 Name",
+        "    T SE Apartment,          !- Zone 3 Name",
+        "    T NE Apartment,          !- Zone 4 Name",
+        "    T N1 Apartment,          !- Zone 5 Name",
+        "    T N2 Apartment,          !- Zone 6 Name",
+        "    T S1 Apartment,          !- Zone 7 Name",
+        "    T S2 Apartment;          !- Zone 8 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Read Materials
+    GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Construction
+    GetConstructData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Read Zones
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // Read InternalMass Object Count
+    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    EXPECT_EQ(3, TotIntMass);
+
+    // Read InternalMass Surfaces Count
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+    EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
+
+    DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
+    SurfaceTmp.allocate(TotSurfaces);
+
+    int SurfNum = 0;
+    GetIntMassSurfaceData(ErrorsFound, SurfNum, TotIntMass);
+    ASSERT_FALSE(ErrorsFound);
+
+    // check internal mass surface count and object names
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(1).NumOfZones);
+    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(2).NumOfZones);
+    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(3).NumOfZones);
+    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
+    // check total count of internal surfaces created
+    EXPECT_EQ(24, TotSurfaces);
+
+    // check unique internal surface name created created from a combination
+    // of zone name and internal mass object name represented in the zone
+    // first zone in the ground floor ZoneList
+    EXPECT_EQ("G SW APARTMENT", Zone(1).Name);
+    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
+    EXPECT_EQ("G SW APARTMENT GFLOORZONESINTMASS", SurfaceTmp(1).Name);
+    // first zone in the middle floor ZoneList
+    EXPECT_EQ("M SW APARTMENT", Zone(9).Name);
+    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
+    EXPECT_EQ("M SW APARTMENT MFLOORZONESINTMASS", SurfaceTmp(9).Name);
+    // first zone in the top floor ZoneList
+    EXPECT_EQ("T SW APARTMENT", Zone(17).Name);
+    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
+    EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
 }
