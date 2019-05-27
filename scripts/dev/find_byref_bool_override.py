@@ -180,6 +180,9 @@ CHECKED_AND_OKED = {
         "CheckCoilWaterInletNode": [
             "NodeNotFound"
         ],
+        "CheckTempAndHumRatCtrl": [
+            "IsConvergedFlag"
+        ],
         "CheckSimpleController": [
             "IsConvergedFlag"
         ],
