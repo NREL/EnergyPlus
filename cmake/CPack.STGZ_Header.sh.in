@@ -123,7 +123,7 @@ if [ ! "$link_directory" = "n" ]; then
 	ln -sf "${install_directory}/ExpandObjects" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PostProcess/HVAC-Diagram" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PreProcess/IDFVersionUpdater/IDFVersionUpdater" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	ln -sf "${install_directory}/PreProcess/ParametricPreProcessor/ParametricPreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/ParametricPreprocessor/ParametricPreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PreProcess/FMUParser/parser" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PostProcess/ReadVarsESO" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/runenergyplus" "${link_directory}" 2> /dev/null > /dev/null || link_err
