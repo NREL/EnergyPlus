@@ -616,7 +616,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
                 continue
 
         args = m.groupdict()['args']
-        bools = [m.groupdict() for m in RE_BOOL.finditer(args)]
+        bools = [_m.groupdict() for _m in RE_BOOL.finditer(args)]
 
         fbody_start_line_num = content[:m.end()].count('\n')
         line_num = fbody_start_line_num
