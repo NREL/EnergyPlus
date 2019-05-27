@@ -131,10 +131,6 @@ if [ ! "$link_directory" = "n" ]; then
 	ln -sf "${install_directory}/runreadvars" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PreProcess/GrndTempCalc/Slab" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	ln -sf "${install_directory}/PreProcess/GrndTempCalc/SlabGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	# TODO: Why are these here? Makes no sense!
-	#ln -sf "${install_directory}/PreProcess/IDFVersionUpdater/Transition-V8-2-0-to-V8-3-0" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	#ln -sf "${install_directory}/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	#ln -sf "${install_directory}/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
 
 	# Note: careful about tabs/spaces here. It HAS to be tabs or it'll fail cryptically
 	cat <<- _HERE_ >> $uninstall
