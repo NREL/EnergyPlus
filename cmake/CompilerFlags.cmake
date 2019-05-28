@@ -234,7 +234,10 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   include(CheckCXXCompilerFlag)
   # Clang
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
+    # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
+    if (NOT BUILD_FORTRAN)
+      AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
+    endif()
   endif()
 
   # g++
