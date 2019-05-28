@@ -28,6 +28,7 @@ compilers:
       - ./scripts/dev/verify_idfs_in_cmake.py
       - ./scripts/dev/check_non_utf8.py
       - ./scripts/dev/check_pr_labels.py
+      - ./scripts/dev/verify_file_encodings.py
 
   - name: "gcc"
     version: "7.4"
@@ -58,3 +59,4 @@ compilers:
     ctest_filter: -R "integration.*"
     skip_regression: true
     skip_packaging: true
+
