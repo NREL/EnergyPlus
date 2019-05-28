@@ -9,7 +9,7 @@
 ! plenum zone back to the system air loop.  The cooling coil is water with a chilled water plant loop and the
 ! reheat coil is a gas fired coil.  The surfaces between the main zone and the plenum are interzone.
 
-  Version,9.1;
+  Version,9.2;
 
   Timestep,4;
 
@@ -1400,7 +1400,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name

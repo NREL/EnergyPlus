@@ -1046,7 +1046,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
         "    Zone2UnitHeat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  NodeList,",
         "    Zone2Inlets,             !- Name",
@@ -1218,7 +1220,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
         "    Zone2UnitHeat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  NodeList,",
         "    Zone2Inlets,             !- Name",
@@ -1380,7 +1384,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "Timestep,1;",
 
@@ -1853,10 +1857,14 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
         "    Main Zone ATU,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type",
         "    UnitHeater,              !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    Main Zone ATU,           !- Name",

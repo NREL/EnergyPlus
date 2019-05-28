@@ -3016,7 +3016,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -4245,7 +4245,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
         "    ZoneDirectAirADU,        !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  ZoneHVAC:EquipmentConnections,",
         "    OCCUPIED ZONE,           !- Zone Name",
@@ -8126,7 +8128,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.1;",
+        {"Version,9.2;",
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -8818,7 +8820,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.1;",
+        {"Version,9.2;",
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -12147,7 +12149,9 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
         "    Zone1DirectAir,          !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  ZoneHVAC:EquipmentList,",
         "    Zone2Equipment,          !- Name",
@@ -12155,7 +12159,9 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
         "    Zone2TermReheat,         !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "  AirTerminal:SingleDuct:Uncontrolled,",
         "    Zone1DirectAir,          !- Name",
@@ -12341,10 +12347,14 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "  NORTH ZONE Air Terminal,                                 !- Zone Equipment Name",
         "  1,                                                       !- Zone Equipment Cooling Sequence",
         "  1,                                                       !- Zone Equipment Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "  ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "  Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type",
         "  NORTH ZONE Exhaust Fan,       !- Zone Equipment 2 Name",
         "  2,                       !- Zone Equipment 2 Cooling Sequence",
-        "  2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "  2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "  ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "Fan:ZoneExhaust,",
         "  NORTH ZONE Exhaust Fan,       !- Name",
@@ -12856,7 +12866,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 {
     std::string const idf_objects = delimited_string(
-        { "Version,9.1;",
+        { "Version,9.2;",
         "SimulationControl,",
         "  No,                      !- Do Zone Sizing Calculation",
         "  No,                      !- Do System Sizing Calculation",

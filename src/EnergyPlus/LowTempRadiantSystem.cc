@@ -1676,7 +1676,7 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
         static std::string const RoutineName("InitLowTempRadiantSystem");
-        static gio::Fmt fmtF102("(F10.2)");
+        static ObjexxFCL::gio::Fmt fmtF102("(F10.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
@@ -1758,15 +1758,15 @@ namespace LowTempRadiantSystem {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                          "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                          "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                     } else if (CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
+                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
                         ShowSevereError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
                                         "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
                         InitErrorsFound = true;

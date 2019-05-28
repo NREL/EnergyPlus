@@ -59,14 +59,14 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetworkBalanceManager.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
@@ -603,7 +603,7 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -678,7 +678,7 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -747,7 +747,8 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                                            ". Cannot find reference crack conditions object \"" +
+                                            fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -806,7 +807,8 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions") + "\".");
+                                            ". Cannot find reference crack conditions object \"" +
+                                            fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -1414,7 +1416,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string coil_name = fields.at("coil_name");
@@ -1440,7 +1442,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string hx_name = fields.at("heatexchanger_name");
@@ -1467,7 +1469,7 @@ namespace AirflowNetworkBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                //auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string tu_name = fields.at("terminal_unit_name");
@@ -1546,7 +1548,7 @@ namespace AirflowNetworkBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetAirflowNetworkInput: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -1601,9 +1603,9 @@ namespace AirflowNetworkBalanceManager {
         Real64 baseratio;
 
         // Formats
-        static gio::Fmt Format_110("('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
+        static ObjexxFCL::gio::Fmt Format_110("('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
                                    "without Distribution/Multizone with Distribution only during Fan Operation')");
-        static gio::Fmt Format_120("('AirflowNetwork Model:Control,',A)");
+        static ObjexxFCL::gio::Fmt Format_120("('AirflowNetwork Model:Control,',A)");
 
         // Set the maximum numbers of input fields
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers);
@@ -1788,7 +1790,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Check continuity of both curves at boundary point
                 if (OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && OccupantVentilationControl(i).ComfortHighTempCurveNum) {
-                    if (abs(CurveValue(OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
+                    if (std::abs(CurveValue(OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
                             CurveValue(OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
@@ -1851,8 +1853,8 @@ namespace AirflowNetworkBalanceManager {
         NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumAirflowNetwork == 0) {
             SimulateAirflowNetwork = AirflowNetworkControlSimple;
-            gio::write(OutputFileInits, Format_110);
-            gio::write(OutputFileInits, Format_120) << "NoMultizoneOrDistribution";
+            ObjexxFCL::gio::write(OutputFileInits, Format_110);
+            ObjexxFCL::gio::write(OutputFileInits, Format_120) << "NoMultizoneOrDistribution";
             return;
         }
         if (NumAirflowNetwork > 1) {
@@ -1917,8 +1919,8 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        gio::write(OutputFileInits, Format_110);
-        gio::write(OutputFileInits, Format_120) << SimAirNetworkKey;
+        ObjexxFCL::gio::write(OutputFileInits, Format_110);
+        ObjexxFCL::gio::write(OutputFileInits, Format_120) << SimAirNetworkKey;
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
@@ -2801,14 +2803,14 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, "
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, "
                                                          "Equivalent Width {m} AirflowNetwork Model:Equivalent Rectangle";
                     found = false;
                 }
                 StringOut = "AirflowNetwork Model:Equivalent Rectangle Surface, " + MultizoneSurfaceData(i).SurfName;
                 StringOut =
                     StringOut + ", " + RoundSigDigits(MultizoneSurfaceData(i).Height, 2) + "," + RoundSigDigits(MultizoneSurfaceData(i).Width, 2);
-                gio::write(OutputFileInits, fmtA) << StringOut;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
             }
         }
 
@@ -3087,11 +3089,11 @@ namespace AirflowNetworkBalanceManager {
         if (ErrorsFound) ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
 
         // Write wind pressure coefficients in the EIO file
-        gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Direction, ";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Direction, ";
         }
 
         int numWinDirs = 11;
@@ -3106,18 +3108,18 @@ namespace AirflowNetworkBalanceManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
         }
         StringOut = RoundSigDigits(numWinDirs * angleDelta, 1);
-        gio::write(OutputFileInits, fmtA) << StringOut;
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
 
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(OutputFileInits, fmtA, flags) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, ";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, ";
         }
-        gio::write(OutputFileInits, fmtA) << "Wind Pressure Coefficients #1 to n (dimensionless)";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Wind Pressure Coefficients #1 to n (dimensionless)";
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
@@ -3128,23 +3130,23 @@ namespace AirflowNetworkBalanceManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Pressure Coefficients, ";
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Pressure Coefficients, ";
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << CurveManager::GetCurveName(index) + ", ";
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << CurveManager::GetCurveName(index) + ", ";
             }
             for (j = 0; j < numWinDirs; ++j) {
                 StringOut = RoundSigDigits(CurveManager::CurveValue(index, j * angleDelta), 2);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
             }
             StringOut = RoundSigDigits(CurveManager::CurveValue(index, numWinDirs * angleDelta), 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         if (AirflowNetworkNumOfSingleSideZones > 0) {
@@ -3153,24 +3155,24 @@ namespace AirflowNetworkBalanceManager {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileInits, fmtA, flags)
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
                             << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ";
                     }
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileInits, fmtA, flags) << MultizoneZoneData(i).ZoneName + ", ";
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << MultizoneZoneData(i).ZoneName + ", ";
                     }
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
                         StringOut = RoundSigDigits(EPDeltaCP(i).WindDir(j), 2);
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                         }
                     }
                     StringOut = RoundSigDigits(EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()), 2);
-                    gio::write(OutputFileInits, fmtA) << StringOut;
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
                 }
             }
         }
@@ -5114,12 +5116,12 @@ namespace AirflowNetworkBalanceManager {
         int SurfNum;
 
         // Formats
-        static gio::Fmt Format_900("(1X,i2)");
-        static gio::Fmt Format_901("(1X,2I4,4F9.4)");
-        static gio::Fmt Format_902("(1X,2I4,4F9.4)");
-        static gio::Fmt Format_903("(9X,4F9.4)");
-        static gio::Fmt Format_904("(1X,2I4,1F9.4)");
-        static gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
+        static ObjexxFCL::gio::Fmt Format_900("(1X,i2)");
+        static ObjexxFCL::gio::Fmt Format_901("(1X,2I4,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_902("(1X,2I4,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_903("(9X,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_904("(1X,2I4,1F9.4)");
+        static ObjexxFCL::gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
 
         AirflowNetworkNodeSimu.allocate(AirflowNetworkNumOfNodes);   // Node simulation variable in air distribution system
         AirflowNetworkLinkSimu.allocate(AirflowNetworkNumOfLinks);   // Link simulation variable in air distribution system
@@ -5602,6 +5604,25 @@ namespace AirflowNetworkBalanceManager {
                                 Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable("AFN Zone Mixing Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
+
+            SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilTotalLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilSensiLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
+            SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                AirflowNetworkZnRpt(i).ExfilLatentLoss,
+                                "System",
+                                "Average",
+                                Zone(i).Name);
         }
 
         if (OnOffFanFlag) {
@@ -6296,7 +6317,7 @@ namespace AirflowNetworkBalanceManager {
         NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
         for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
             MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkNumOfZones + ExtNum;
-            gio::write(Name, "('ExtNode',I4)") << ExtNum;
+            ObjexxFCL::gio::write(Name, "('ExtNode',I4)") << ExtNum;
             MultizoneExternalNodeData(ExtNum).Name = stripped(Name);
         }
 
@@ -6331,12 +6352,12 @@ namespace AirflowNetworkBalanceManager {
                             FacadeNumThisSurf = FacadeNum;
                         }
                     }
-                    // gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
+                    // ObjexxFCL::gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
                     // MultizoneExternalNodeData( ExtNum ).CPVNum = FacadeNumThisSurf;
                     // MultizoneExternalNodeData(ExtNum).curve = curveIndex[FacadeNumThisSurf - 1];
                     MultizoneExternalNodeData(ExtNum).facadeNum = FacadeNumThisSurf;
                 } else { // "Roof" surface
-                    // gio::write(Name, "('FacadeNum',I1)") << 5;
+                    // ObjexxFCL::gio::write(Name, "('FacadeNum',I1)") << 5;
                     // MultizoneExternalNodeData( ExtNum ).CPVNum = 5;
                     MultizoneExternalNodeData(ExtNum).facadeNum = 5;
                     // MultizoneExternalNodeData(ExtNum).curve = curveIndex[4];
@@ -6843,7 +6864,7 @@ namespace AirflowNetworkBalanceManager {
 
                     // Calculate convection coefficient if one or both not present
                     if (DisSysCompDuctData(TypeNum).InsideConvCoeff == 0 && DisSysCompDuctData(TypeNum).OutsideConvCoeff == 0) {
-                        while (abs(UThermal - UThermal_iter) > tolerance) {
+                        while (std::abs(UThermal - UThermal_iter) > tolerance) {
                             UThermal_iter = UThermal;
 
                             Real64 RThermConvIn = CalcDuctInsideConvResist(Tin,
@@ -6895,7 +6916,7 @@ namespace AirflowNetworkBalanceManager {
                     Real64 Tin_ave = Tin;
                     Real64 hOut = 0;
 
-                    while (abs(UThermal - UThermal_iter) > tolerance) {
+                    while (std::abs(UThermal - UThermal_iter) > tolerance) {
                         UThermal_iter = UThermal;
 
                         Real64 RThermConvIn = CalcDuctInsideConvResist(Tin_ave,
@@ -6974,7 +6995,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                     VFObj.QConv = hOut * DuctSurfArea * (TDuctSurf - Tamb);
-                    UThermal = (VFObj.QRad + VFObj.QConv) / (DuctSurfArea * abs(Tsurr - Tin));
+                    UThermal = (VFObj.QRad + VFObj.QConv) / (DuctSurfArea * std::abs(Tsurr - Tin));
                 }
 
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
@@ -8134,6 +8155,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -8177,6 +8199,8 @@ namespace AirflowNetworkBalanceManager {
             onetime = true;
         }
         ReportingConstant = TimeStepSys * SecInHour;
+
+        ZoneTotalExfiltrationHeatLoss = 0.0;
 
         for (auto &e : AirflowNetworkReportData) {
             e.MultiZoneInfiSenGainW = 0.0;
@@ -8558,6 +8582,7 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         }
+
                         if (ZoneAirHumRat(ZN2) > ZoneAirHumRat(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
@@ -8587,6 +8612,7 @@ namespace AirflowNetworkBalanceManager {
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(i), MAT(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
+
             if (MAT(i) > Tamb) {
                 AirflowNetworkZnRpt(i).InfilHeatLoss = AirflowNetworkExchangeData(i).SumMCp * (MAT(i) - Tamb) * ReportingConstant;
                 AirflowNetworkZnRpt(i).InfilHeatGain = 0.0;
@@ -8606,6 +8632,29 @@ namespace AirflowNetworkBalanceManager {
                     ZonePreDefRep(i).AFNInfilVolMin = AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
+
+            Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
+            AirflowNetworkZnRpt(i).InletMass = 0;
+            AirflowNetworkZnRpt(i).OutletMass = 0;
+            if (ZoneEquipConfig(i).IsControlled) {
+                for (int j = 1; j <= ZoneEquipConfig(i).NumInletNodes; ++j) {
+                    AirflowNetworkZnRpt(i).InletMass += Node(ZoneEquipConfig(i).InletNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumExhaustNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ExhaustNode(j)).MassFlowRate * ReportingConstant;
+                }
+                for (int j = 1; j <= ZoneEquipConfig(i).NumReturnNodes; ++j) {
+                    AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ReturnNode(j)).MassFlowRate * ReportingConstant;
+                }
+            }
+            AirflowNetworkZnRpt(i).ExfilMass = AirflowNetworkZnRpt(i).InfilMass + AirflowNetworkZnRpt(i).VentilMass + AirflowNetworkZnRpt(i).MixMass +
+                                               AirflowNetworkZnRpt(i).InletMass - AirflowNetworkZnRpt(i).OutletMass;
+            AirflowNetworkZnRpt(i).ExfilSensiLoss = AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (MAT(i) - Tamb) * CpAir;
+            AirflowNetworkZnRpt(i).ExfilLatentLoss =
+                AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
+            AirflowNetworkZnRpt(i).ExfilTotalLoss = AirflowNetworkZnRpt(i).ExfilSensiLoss + AirflowNetworkZnRpt(i).ExfilLatentLoss;
+
+            ZoneTotalExfiltrationHeatLoss += AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate

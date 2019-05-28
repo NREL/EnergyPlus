@@ -406,7 +406,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1) = sVersionNum
-                nodiff=.false.
+                NoDiff=.false.
 
     ! changes for this version, pick one of the spots to add rules, this will reduce the possibility of merge conflicts
 
@@ -417,6 +417,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 OutArgs(2) = 'SequentialLoad'
 !                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
 !                 CurArgs = CurArgs + 1
+!                 NoDiff = .false.
 
               ! If your original object starts with A, insert the rules here
 
@@ -433,6 +434,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
+             CASE('HYBRIDMODEL:ZONE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:4)=InArgs(1:4)
+                 OutArgs(5) = 'No'
+                 OutArgs(6) = InArgs(5)
+                 OutArgs(7:16) = Blank
+                 OutArgs(17:20)=InArgs(6:9)
+                 CurArgs = 20
+                 NoDiff=.false.
 
               ! If your original object starts with I, insert the rules here
 
@@ -478,6 +489,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1) = InArgs(1)
+                  OutArgs(2) = InArgs(2)
+                  DO I = 1, (CurArgs - 2)/4
+                    OutArgs((I - 1) * 6 + 3) = InArgs((I - 1) * 4 + 3)
+                    OutArgs((I - 1) * 6 + 4) = InArgs((I - 1) * 4 + 4)
+                    OutArgs((I - 1) * 6 + 5) = InArgs((I - 1) * 4 + 5)
+                    OutArgs((I - 1) * 6 + 6) = InArgs((I - 1) * 4 + 6)
+                    OutArgs((I - 1) * 6 + 7) = ""
+                    OutArgs((I - 1) * 6 + 8) = ""
+                  END DO
+                  CurArgs = (CurArgs - 2)/4 * 6 + 2
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

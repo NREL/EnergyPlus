@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -96,6 +97,7 @@ using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::HybridModel;
 using namespace SimulationManager;
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
@@ -117,10 +119,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Node.allocate(5);
 
     Zone.allocate(1);
+    HybridModelZone.allocate(1);
     Zone(1).Name = ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
@@ -165,6 +169,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneW1.allocate(1);
 
     AirModel.allocate(1);
+    ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat
     ZoneW1(1) = 0.008;
@@ -189,6 +194,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
+
+    // HybridModel
+    HybridModelZone(1).PeopleCountCalc_H = false;
 
     CorrectZoneHumRat(1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
@@ -289,6 +297,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     Zone.deallocate();
+    HybridModelZone.deallocate();
     ZoneLatentGain.deallocate();
     ZoneEqSizing.deallocate();
     SumLatentHTRadSys.deallocate();
@@ -911,20 +920,27 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     Array1D<Real64> runningAverageCEN(365, 25.0);
     CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
     ASSERT_TRUE(AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is initialized
-    ASSERT_EQ(25.55, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(
-                         DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
-    ASSERT_EQ(28.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(
-                         DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
-    ASSERT_EQ(29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(
-                         DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
-    ASSERT_EQ(27.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(
-                         DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
-    ASSERT_EQ(29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(
-                         DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
-    ASSERT_EQ(30.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(
-                         DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
-    ASSERT_EQ(31.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
-                         DayOfYear));                     // Tstat should show CEN 15251 Upper III LINE model set point
+    ASSERT_EQ(
+        25.55,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
+    ASSERT_EQ(
+        28.05,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
+    ASSERT_EQ(
+        29.05,
+        AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
+    ASSERT_EQ(27.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(
+                  DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
+    ASSERT_EQ(29.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(
+                  DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
+    ASSERT_EQ(30.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(
+                  DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
+    ASSERT_EQ(31.05,
+              AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
+                  DayOfYear));                            // Tstat should show CEN 15251 Upper III LINE model set point
     ASSERT_EQ(25.55, AdapComfortSetPointSummerDesDay(1)); // Tstat should show ASH 55 CENTRAL LINE model set point
     ASSERT_EQ(27.05, AdapComfortSetPointSummerDesDay(4)); // Tstat should show CEN 15251 CENTRAL LINE model set point
 
@@ -1020,6 +1036,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Zone.allocate(1);
     Zone(1).Name = ZoneEquipConfig(1).ZoneName;
@@ -1166,7 +1183,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -1593,4 +1610,3 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     SetPointSingleHeatCool.deallocate();
     SetPointDualHeatCool.deallocate();
 }
-

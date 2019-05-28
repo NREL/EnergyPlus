@@ -13,7 +13,7 @@
 ! Plant:    None.
 !
 
-  Version,9.1;
+  Version,9.2;
 
   Timestep,4;
 
@@ -717,7 +717,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone 1 Direct Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone 1 Direct Air,       !- Name

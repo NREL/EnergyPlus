@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 #include "VenetianCell.hpp"
 #include "VenetianCellDescription.hpp"

@@ -24,7 +24,7 @@ This field is used to determine how the exterior lights are controlled. There ar
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-000}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Grounds Lights'', ``Facade Lights'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the lights will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table named EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Grounds Lights'', ``Facade Lights'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the lights will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table named EAp2-4/5 Performance Rating Method Compliance.
 
 An IDF Example:
 
@@ -63,11 +63,11 @@ These are the electric power and energy consumed by the exterior lights.
 
 \paragraph{Field: Name}\label{field-name-1-014}
 
-This descriptive name allows the values of exterior equipment consumption to appear in the ``normal'' output variable list as well as the meters. It cannot be blank nor can it be duplicated by other Exterior:FuelEquipment or Exterior:WaterEquipment statements.
+This descriptive name allows the values of exterior equipment consumption to appear in the ``normal'' output variable list as well as the meters. It cannot be blank nor can it be duplicated by other Exterior:FuelEquipment or \hyperref[exteriorwaterequipment]{Exterior:WaterEquipment} statements.
 
-\paragraph{Field: Fuel Use Type}\label{field-fuel-use-type}
+\paragraph{Field: Fuel Use Type}\label{exteriorfuelequipment-field-fuel-use-type}
 
-This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
+This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1-000}
 
@@ -79,7 +79,7 @@ This field (Watts) is typically used to represent the maximum input to exterior 
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Fountains'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Fountains'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.
 
 IDF Examples:
 
@@ -98,7 +98,7 @@ Exterior:FuelEquipment,OutsideGasEq,NaturalGas,ON,1000;
 
 \paragraph{Field: Name}\label{field-name-2-013}
 
-This descriptive name allows the values of exterior equipment consumption to appear in the ``normal'' output variable list as well as the meters. It cannot be blank nor can it be duplicated by other Exterior:FuelEquipment or Exterior:WaterEquipment statements.
+This descriptive name allows the values of exterior equipment consumption to appear in the ``normal'' output variable list as well as the meters. It cannot be blank nor can it be duplicated by other \hyperref[exteriorfuelequipment]{Exterior:FuelEquipment} or Exterior:WaterEquipment statements.
 
 \paragraph{Field: FuelUseType}\label{field-fuelusetype}
 
@@ -114,7 +114,7 @@ This field (in m3/s) is typically used to represent the maximum volumetric flow 
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Landscaping'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Landscaping'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.
 
 IDF Example:
 
@@ -131,7 +131,7 @@ Exterior:WaterEquipment,
 
 \subsubsection{Outputs}\label{outputs-1-010}
 
-Output for exterior equipment consumption appears in three possible places. It will appear on two meters (\textless{}Fuel Type\textgreater{}:Facility and ExteriorEquipment:\textless{}Fuel Type\textgreater{}) as well as in its own designated value in the standard output file, Exterior Equipment \textless{}Fuel Type\textgreater{} Energy. Consumption also appears on any user-defined end-use subcategory meters, i.e., \textless{}End-Use Subcategory\textgreater{}:ExteriorEquipment:\textless{}Fuel Type\textgreater{}. All outputs are in {[}J{]} except water consumption which is in {[}m3{]}. There are also rate versions
+Output for exterior equipment consumption appears in three possible places. It will appear on two meters (Fuel Type:Facility and ExteriorEquipment:Fuel Type) as well as in its own designated value in the standard output file, Exterior Equipment Fuel Type Energy. Consumption also appears on any user-defined end-use subcategory meters, i.e., End-Use Subcategory:ExteriorEquipment:Fuel Type. All outputs are in {[}J{]} except water consumption which is in {[}m3{]}. There are also rate versions
 
 \begin{itemize}
 \item
@@ -172,7 +172,7 @@ Output for exterior equipment consumption appears in three possible places. It w
 
 \paragraph{Exterior Equipment Fuel Rate {[}W{]}}\label{exterior-equipment-fuel-rate-w}
 
-\paragraph{Exterior Equipment \textless{}Fuel Type\textgreater{} Energy {[}J{]}}\label{exterior-equipment-fuel-type-energy-j}
+\paragraph{Exterior Equipment Fuel Type Energy {[}J{]}}\label{exterior-equipment-fuel-type-energy-j}
 
 These are the fuel consumption rate and energy for the exterior equipment.
 
@@ -182,6 +182,6 @@ These are the fuel consumption rate and energy for the exterior equipment.
 
 These are the water consumption rate and volume for the exterior equipment.
 
-\paragraph{Exterior Equipment Mains Water Volume {[}m3{]})\label{exterior-equipment-mains-water-volume-m3} 
+\paragraph{Exterior Equipment Mains Water Volume {[}m3{]}}\label{exterior-equipment-mains-water-volume-m3}
 
 This is the water volume drawn for the mains water service to serve the exterior equipment.

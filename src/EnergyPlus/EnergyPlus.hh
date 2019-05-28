@@ -60,12 +60,153 @@
 #define EP_UNUSED(expr)
 
 // ObjexxFCL
+#include <ObjexxFCL/Array1.fwd.hh>
+#include <ObjexxFCL/Array1A.fwd.hh>
+#include <ObjexxFCL/Array1D.fwd.hh>
+#include <ObjexxFCL/Array1S.fwd.hh>
+#include <ObjexxFCL/Array2.fwd.hh>
+#include <ObjexxFCL/Array2A.fwd.hh>
+#include <ObjexxFCL/Array2D.fwd.hh>
+#include <ObjexxFCL/Array2S.fwd.hh>
+#include <ObjexxFCL/Array3D.fwd.hh>
+#include <ObjexxFCL/Array4D.fwd.hh>
+#include <ObjexxFCL/Array5D.fwd.hh>
+#include <ObjexxFCL/Array6D.fwd.hh>
+#include <ObjexxFCL/IOFlags.fwd.hh>
+#include <ObjexxFCL/MArray1.fwd.hh>
+#include <ObjexxFCL/Omit.fwd.hh>
+#include <ObjexxFCL/Optional.fwd.hh>
+#include <ObjexxFCL/Reference.fwd.hh>
+#include <ObjexxFCL/Vector2.fwd.hh>
+#include <ObjexxFCL/Vector3.fwd.hh>
+#include <ObjexxFCL/Vector4.fwd.hh>
+
 namespace ObjexxFCL {
-namespace fmt {
-} // namespace fmt
+extern Omit const _;
 } // namespace ObjexxFCL
-using namespace ObjexxFCL;
-using namespace ObjexxFCL::fmt;
+using ObjexxFCL::_;
+
+using ObjexxFCL::Array1;
+using ObjexxFCL::Array1_bool;
+using ObjexxFCL::Array1_int;
+using ObjexxFCL::Array1_string;
+using ObjexxFCL::Array1A;
+using ObjexxFCL::Array1A_bool;
+using ObjexxFCL::Array1A_int;
+using ObjexxFCL::Array1D;
+using ObjexxFCL::Array1D_bool;
+using ObjexxFCL::Array1D_double;
+using ObjexxFCL::Array1D_int;
+using ObjexxFCL::Array1D_string;
+using ObjexxFCL::Array1S;
+using ObjexxFCL::Array1S_bool;
+using ObjexxFCL::Array1S_int;
+using ObjexxFCL::Array1S_string;
+using ObjexxFCL::Array2;
+using ObjexxFCL::Array2_int;
+using ObjexxFCL::Array2A;
+using ObjexxFCL::Array2A_bool;
+using ObjexxFCL::Array2A_int;
+using ObjexxFCL::Array2D;
+using ObjexxFCL::Array2D_bool;
+using ObjexxFCL::Array2D_int;
+using ObjexxFCL::Array2D_string;
+using ObjexxFCL::Array2S;
+using ObjexxFCL::Array2S_bool;
+using ObjexxFCL::Array2S_int;
+using ObjexxFCL::Array2S_string;
+using ObjexxFCL::Array3D;
+using ObjexxFCL::Array3D_bool;
+using ObjexxFCL::Array3D_int;
+using ObjexxFCL::Array4D;
+using ObjexxFCL::Array4D_int;
+using ObjexxFCL::Array5D;
+using ObjexxFCL::Array6D;
+using ObjexxFCL::IOFlags;
+using ObjexxFCL::MArray1;
+using ObjexxFCL::Optional;
+using ObjexxFCL::Optional_bool;
+using ObjexxFCL::Optional_bool_const;
+using ObjexxFCL::Optional_int;
+using ObjexxFCL::Optional_int_const;
+using ObjexxFCL::Optional_string;
+using ObjexxFCL::Optional_string_const;
+using ObjexxFCL::Reference;
+using ObjexxFCL::Reference_bool;
+using ObjexxFCL::Reference_int;
+using ObjexxFCL::Vector2;
+using ObjexxFCL::Vector3;
+using ObjexxFCL::Vector4;
+
+// ObjexxFCL Functions
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/bit.hh>
+#include <ObjexxFCL/environment.hh>
+#include <ObjexxFCL/floops.hh>
+#include <ObjexxFCL/numeric.hh>
+#include <ObjexxFCL/random.hh>
+#include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/time.hh>
+
+using ObjexxFCL::CEILING;
+using ObjexxFCL::cosd;
+using ObjexxFCL::EPSILON;
+using ObjexxFCL::equali;
+using ObjexxFCL::floop_end;
+using ObjexxFCL::get_environment_variable;
+using ObjexxFCL::has;
+using ObjexxFCL::has_any_of;
+using ObjexxFCL::has_prefix;
+using ObjexxFCL::has_prefixi;
+using ObjexxFCL::hasi;
+using ObjexxFCL::HUGE_;
+using ObjexxFCL::index;
+using ObjexxFCL::is_any_of;
+using ObjexxFCL::is_blank;
+using ObjexxFCL::KIND;
+using ObjexxFCL::len;
+using ObjexxFCL::len_trim;
+using ObjexxFCL::lessthani;
+using ObjexxFCL::ljustified;
+using ObjexxFCL::max;
+using ObjexxFCL::min;
+using ObjexxFCL::mod;
+using ObjexxFCL::nint;
+using ObjexxFCL::nint64;
+using ObjexxFCL::not_blank;
+using ObjexxFCL::pare;
+using ObjexxFCL::pow_2;
+using ObjexxFCL::pow_3;
+using ObjexxFCL::pow_4;
+using ObjexxFCL::pow_5;
+using ObjexxFCL::pow_6;
+using ObjexxFCL::pow_7;
+using ObjexxFCL::PRECISION;
+using ObjexxFCL::RANDOM_NUMBER;
+using ObjexxFCL::RANDOM_SEED;
+using ObjexxFCL::reshape2;
+using ObjexxFCL::rjustified;
+using ObjexxFCL::root_4;
+using ObjexxFCL::rstrip;
+using ObjexxFCL::scan;
+using ObjexxFCL::SELECTED_INT_KIND;
+using ObjexxFCL::sign;
+using ObjexxFCL::sind;
+using ObjexxFCL::sized;
+using ObjexxFCL::square;
+using ObjexxFCL::strip;
+using ObjexxFCL::stripped;
+using ObjexxFCL::SYSTEM_CLOCK;
+using ObjexxFCL::TINY;
+using ObjexxFCL::trim;
+using ObjexxFCL::trimmed;
+using ObjexxFCL::uppercase;
+using ObjexxFCL::uppercased;
+using ObjexxFCL::bit::bit_and;
+using ObjexxFCL::bit::bit_shift;
+using ObjexxFCL::bit::bit_transfer;
+using ObjexxFCL::bit::bit_xor;
 
 // Types
 typedef std::int32_t Int32;
