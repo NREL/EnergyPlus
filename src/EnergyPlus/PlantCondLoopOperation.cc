@@ -1326,7 +1326,7 @@ namespace PlantCondLoopOperation {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
         int const Condenser(2); // Used to identify whether the current loop is Condenser
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1437,7 +1437,7 @@ namespace PlantCondLoopOperation {
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            gio::write(EquipNum, fmtLD) << Num;
+                            ObjexxFCL::gio::write(EquipNum, fmtLD) << Num;
                             ReportSizingOutput(CurrentModuleObject,
                                                PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                                "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum),
@@ -1467,10 +1467,26 @@ namespace PlantCondLoopOperation {
                         }
 
                         if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
-                            // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
-                            // detailed input that is necessary to get thermal energy storage to work from the simpler input.
+
+                            // Special case for ThermalStorage:Ice:XXXX objects which can only be dual (cf #6958)
+                            if ( ( (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
+                                   (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED") ) &&
+                                 (cAlphaArgs(CompNumA + 1) != "DUAL") ) {
+
+                                ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) +
+                                        "' in "  + CurrentModuleObject + "='" + cAlphaArgs(1) + "'.");
+                                ShowContinueError("Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3)
+                                        + " objects.");
+
+                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = DualOp;
+                            }
+
+                            // This block forces CompOpType to be either Cooling if explicitly provided, all other cases = Dual
                             CompOpType = (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum) - 1;
                             if ((CompOpType < 1) || (CompOpType > 2)) CompOpType = 2;
+
+                            // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
+                            // detailed input that is necessary to get thermal energy storage to work from the simpler input.
                             SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr,
                                                          ChargeSchedPtr,
                                                          NonChargCHWTemp,

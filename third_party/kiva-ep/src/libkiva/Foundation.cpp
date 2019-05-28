@@ -106,7 +106,7 @@ Foundation::Foundation()
       reductionStrategy(RS_BOUNDARY), exposedFraction(1.0), useDetailedExposedPerimeter(false),
       buildingHeight(0.0), hasWall(true), hasSlab(true), perimeterSurfaceWidth(0.0),
       hasPerimeterSurface(false), mesh(Mesh()), numericalScheme(NS_ADI), fADI(0.00001),
-      tolerance(1.0e-6), maxIterations(100000), convectionCalculationMethod(CCM_AUTO) {}
+      tolerance(1.0e-6), maxIterations(100000) {}
 
 void Foundation::createMeshData() {
   std::size_t nV = polygon.outer().size();
@@ -221,13 +221,24 @@ void Foundation::createMeshData() {
       showMessage(MSG_ERR, "'Material Block' cannot be above the wall top.");
     }
 
+    // Blocks along the top may be part of a wall.
     if (isEqual(bZmax, zMax)) {
-      if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
-        xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
+      if (isGreaterOrEqual(bXmax,xyWallTopInterior) && isLessThan(bXmin,xyWallTopInterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if there is any foundation depth
+        if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
+          xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
+        }
       }
-      if (std::abs(b.width) <= wall.totalWidth() / 2. ||
-          (hasWall ? (wall.heightAboveGrade > 0.0) : false)) {
-        xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
+      if (isLessOrEqual(bXmin,xyWallTopExterior) && isGreaterThan(bXmax,xyWallTopExterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if the wall top is above grade
+        if (std::abs(b.width) <= wall.totalWidth() / 2. ||
+            (hasWall && wall.heightAboveGrade > 0.0)) {
+          xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
+          // Also move the grade surface since part of it is now the wall top
+          if (hasWall && wall.heightAboveGrade == 0.0 && isLessOrEqual(bZmin, zGrade)) {
+            xyGradeNear = xyWallTopExterior;
+          }
+        }
       }
     }
 
@@ -846,14 +857,14 @@ void Foundation::createMeshData() {
       } else if (coordinateSystem == CS_CARTESIAN) {
         reductionLength2 = ap;
       }
-    }
-
-    if (reductionStrategy == RS_RR) {
+    } else if (reductionStrategy == RS_RR) {
       twoParameters = false;
       double rrA = (perimeter - sqrt(perimeter * perimeter - 4 * PI * area)) / PI;
       double rrB = (perimeter - PI * rrA) * 0.5;
       reductionLength2 = (rrA)*0.5;
       linearAreaMultiplier = rrB;
+    } else if (reductionStrategy != RS_CUSTOM) {
+      showMessage(MSG_ERR, "Invalid two-dimensional transformation strategy.");
     }
 
     xMin = 0.0;
@@ -1069,7 +1080,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -1095,7 +1106,7 @@ void Foundation::createMeshData() {
           double &Tin = wallTopInteriorTemperature;
           double &Tout = wallTopExteriorTemperature;
           double Tdiff = (Tin - Tout);
-          std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+          std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
           double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
           for (std::size_t n = 1; n <= N; n++) {
@@ -1653,7 +1664,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -2204,7 +2215,7 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -2800,19 +2811,6 @@ void Foundation::createMeshData() {
   xMeshData.intervals = xIntervals;
   yMeshData.intervals = yIntervals;
   zMeshData.intervals = zIntervals;
-}
-
-double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
-                                      bool isExterior, double cosTilt) const {
-  if (convectionCalculationMethod == Foundation::CCM_AUTO)
-    return getDOE2ConvectionCoeff(Tsurf, Tamb, hfGlass, roughness, cosTilt);
-  else // if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
-  {
-    if (isExterior)
-      return exteriorConvectiveCoefficient;
-    else
-      return interiorConvectiveCoefficient;
-  }
 }
 
 } // namespace Kiva

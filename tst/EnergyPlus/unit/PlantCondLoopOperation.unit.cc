@@ -53,6 +53,9 @@
 // EnergyPlus Headers
 #include <DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <Plant/PlantManager.hh>
+#include <BranchInputManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -290,7 +293,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
     DataPlant::PlantLoop(1).LoadDistribution = DataPlant::UniformLoading;
- 
+
     // Start with 5 components
     DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
 
@@ -776,5 +779,121 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
+
+}
+
+TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
+
+    std::string const idf_objects = delimited_string({
+      "PlantEquipmentOperation:ThermalEnergyStorage,",
+      "  TEST PLANTOP SCHEME,          !- Name",
+      "  Ice Thermal Storage On-peak,  !- On-Peak Schedule",
+      "  Ice Thermal Storage Charging,  !- Charging Availability Schedule",
+      "  7.00,                    !- Non-Charging Chilled Water Temperature {C}",
+      "  -5.00,                   !- Charging Chilled Water Temperature {C}",
+      "  Chiller:Electric:EIR,    !- Component 1 Object Type",
+      "  Chiller,                 !- Component 1 Name",
+      "  Primary CHW Loop Pump Water Outlet Node,  !- Component 1 Demand Calculation Node Name",
+      "  Chiller CHW Outlet Node, !- Component 1 Setpoint Node Name",
+      "  0.001351,                !- Component 1 Flow Rate {m3/s}",
+      "  Cooling,                 !- Component 1 Operation Type",
+      "  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type",
+      "  Ice Thermal Storage,     !- Component 2 Name",
+      "  Chiller CHW Outlet Node, !- Component 2 Demand Calculation Node Name",
+      "  Ice Thermal Storage Water Outlet Node,  !- Component 2 Setpoint Node Name",
+      "  autosize,                !- Component 2 Flow Rate {m3/s}",
+      "  Cooling;                 !- Component 2 Operation Type",
+      "",
+
+      "Schedule:Compact,",
+      "  Ice Thermal Storage On-peak,  !- Name",
+      "  Fraction,                !- Schedule Type Limits Name",
+      "  Through: 12/31,          !- Field 1",
+      "  For: AllDays,            !- Field 2",
+      "  Until: 08:00,0,          !- Field 3",
+      "  Until: 18:00,1,          !- Field 4",
+      "  Until: 24:00,0;          !- Field 5",
+
+      "Schedule:Compact,",
+      "  Ice Thermal Storage Charging,  !- Name",
+      "  Fraction,                !- Schedule Type Limits Name",
+      "  Through: 12/31,          !- Field 1",
+      "  For: AllDays,            !- Field 2",
+      "  Until: 08:00,1,          !- Field 3",
+      "  Until: 18:00,0,          !- Field 4",
+      "  Until: 24:00,1;          !- Field 5",
+
+      "ScheduleTypeLimits,",
+      "  Fraction,                !- Name",
+      "  0.0,                     !- Lower Limit Value",
+      "  1.0,                     !- Upper Limit Value",
+      "  CONTINUOUS,              !- Numeric Type",
+      "  Dimensionless;           !- Unit Type",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    // Setup the plant itself manually
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+
+    DataPlant::PlantLoop(1).OpScheme.allocate(1);
+    DataPlant::PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
+
+    SetPointManager::NumAllSetPtMgrs = 0;
+    SetPointManager::NumSchTESSetPtMgrs = 0;
+
+    bool ErrorsFound = false;
+    int TESSPBO = 1;
+    int LoopNum = 1;
+    int SchemeNum = 1;
+    std::string CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
+    PlantCondLoopOperation::FindCompSPInput(CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
+
+    EXPECT_FALSE(ErrorsFound);
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** Equipment Operation Mode was reset to 'DUAL' for Component 'ICE THERMAL STORAGE' in PlantEquipmentOperation:ThermalEnergyStorage='TEST PLANTOP SCHEME'.",
+        "   **   ~~~   ** Equipment Operation Mode can only be 'DUAL' for THERMALSTORAGE:ICE:DETAILED objects.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Might as well check that the Chiller is also Ok
+    {
+        int CompNum = 1;
+        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        EXPECT_EQ(compName, "CHILLER");
+        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::CoolingOp);
+    }
+
+    {
+        int CompNum = 2;
+        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        // Ensure we have the right component (the TES tank)
+        EXPECT_EQ(compName, "ICE THERMAL STORAGE");
+
+        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+
+        // Could just test this, but want to improve reporting
+        // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
+
+        std::string ctrlType = "Unknown";
+        if (CtrlTypeNum == PlantCondLoopOperation::CoolingOp) {
+            ctrlType = "CoolingOp";
+        } else if (CtrlTypeNum == PlantCondLoopOperation::HeatingOp) {
+            ctrlType = "HeatingOp";
+        } else if (CtrlTypeNum == PlantCondLoopOperation::DualOp) {
+            ctrlType = "DualOp";
+        }
+
+        EXPECT_EQ(ctrlType, "DualOp") << compName << " has a wrong control type = '" << ctrlType << "'.";
+    }
+
+    // We should now alos have two TES SPMs created, and that's all of them
+    EXPECT_EQ(SetPointManager::NumSchTESSetPtMgrs, 2);
+    EXPECT_EQ(SetPointManager::NumAllSetPtMgrs, 2);
 
 }

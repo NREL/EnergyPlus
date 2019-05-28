@@ -20,24 +20,24 @@ There are currently two water heater objects in EnergyPlus:
 
 \begin{itemize}
 \item
-  WaterHeater:Mixed
+  \hyperref[waterheatermixed]{WaterHeater:Mixed}
 \item
-  WaterHeater:Stratified
+  \hyperref[waterheaterstratified]{WaterHeater:Stratified}
 \end{itemize}
 
-There are also compound objects that uses the WaterHeater:Mixed and/or WaterHeater:Stratified as part of their strategy:
+There are also compound objects that uses the \hyperref[waterheatermixed]{WaterHeater:Mixed} and/or \hyperref[waterheaterstratified]{WaterHeater:Stratified} as part of their strategy:
 
 \begin{itemize}
 \tightlist
 \item
-  WaterHeater:HeatPump:PumpedCondenser (WaterHeater:Mixed or WaterHeater:Stratified)
+  \hyperref[waterheaterheatpumppumpedcondenser]{WaterHeater:HeatPump:PumpedCondenser} (\hyperref[waterheatermixed]{WaterHeater:Mixed} or \hyperref[waterheaterstratified]{WaterHeater:Stratified})
 \item
-  WaterHeater:HeatPump:WrappedCondenser (WaterHeater:Stratified only)
+  \hyperref[waterheaterheatpumpwrappedcondenser]{WaterHeater:HeatPump:WrappedCondenser} (\hyperref[waterheaterstratified]{WaterHeater:Stratified} only)
 \end{itemize}
 
-The WaterHeater:Mixed object simulates a well-mixed, single-node water tank. The WaterHeater:Stratified object simulates a stratified, multi-node water tank. Both water heater objects can be appropriate for simulating many types of water heaters and storage tanks, including gas and electric residential water heaters, and a variety of large commercial water heaters. Both objects share similar features, such as stand-alone operation, on- and off-cycle parasitic loads, and thermal losses to the zone. However, each object has its advantages which may make one water heater object more appropriate than the other depending on the application.
+The \hyperref[waterheatermixed]{WaterHeater:Mixed} object simulates a well-mixed, single-node water tank. The \hyperref[waterheaterstratified]{WaterHeater:Stratified} object simulates a stratified, multi-node water tank. Both water heater objects can be appropriate for simulating many types of water heaters and storage tanks, including gas and electric residential water heaters, and a variety of large commercial water heaters. Both objects share similar features, such as stand-alone operation, on- and off-cycle parasitic loads, and thermal losses to the zone. However, each object has its advantages which may make one water heater object more appropriate than the other depending on the application.
 
-Advantages of \textbf{WaterHeater:Mixed}:
+Advantages of \textbf{\hyperref[waterheatermixed]{WaterHeater:Mixed}}:
 
 \begin{itemize}
 \item
@@ -50,7 +50,7 @@ Advantages of \textbf{WaterHeater:Mixed}:
   adequate for modeling gas water heaters with no source connections.
 \end{itemize}
 
-Advantages of \textbf{WaterHeater:Stratified}:
+Advantages of \textbf{\hyperref[waterheaterstratified]{WaterHeater:Stratified}}:
 
 \begin{itemize}
 \item
@@ -119,7 +119,7 @@ NOT YET IMPLEMENTED.
 
 \paragraph{Field: Heater Fuel Type}\label{field-heater-fuel-type}
 
-The type of fuel used for heating. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating.
+The type of fuel used for heating. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}.
 
 \paragraph{Field: Heater Thermal Efficiency}\label{field-heater-thermal-efficiency}
 
@@ -135,7 +135,7 @@ Off-cycle parasitics include parts of the water heater that consume fuel when th
 
 \paragraph{Field: Off-Cycle Parasitic Fuel Type}\label{field-off-cycle-parasitic-fuel-type}
 
-The type of fuel used by the off-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating. The fuel type can be the same or different from the Heater Fuel Type.
+The type of fuel used by the off-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}. The fuel type can be the same or different from the Heater Fuel Type.
 
 \paragraph{Field: Off-Cycle Parasitic Heat Fraction to Tank}\label{field-off-cycle-parasitic-heat-fraction-to-tank}
 
@@ -147,7 +147,7 @@ On-cycle parasitics include parts of the water heater that consume fuel when the
 
 \paragraph{Field: On-Cycle Parasitic Fuel Type}\label{field-on-cycle-parasitic-fuel-type}
 
-The type of fuel used by the on-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating. The fuel type can be the same or different from the Heater Fuel Type.
+The type of fuel used by the on-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}. The fuel type can be the same or different from the Heater Fuel Type.
 
 \paragraph{Field: On-Cycle Parasitic Heat Fraction to Tank}\label{field-on-cycle-parasitic-heat-fraction-to-tank}
 
@@ -167,7 +167,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outdoor Air Node Name}\label{field-ambient-temperature-outdoor-air-node-name-000}
 
-This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the water heater tank. This field is applicable only when the Ambient Temperature Indicator is specified as \textbf{Outdoors}, otherwise this field should be left blank. The node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air conditions are taken directly from the weather data.
+This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the water heater tank. This field is applicable only when the Ambient Temperature Indicator is specified as \textbf{Outdoors}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
 
 \paragraph{Field: Off-Cycle Loss Coefficient to Ambient Temperature}\label{field-off-cycle-loss-coefficient-to-ambient-temperature}
 
@@ -195,7 +195,7 @@ The reference to the schedule object specifiying the current fraction of Peak Vo
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name}
 
-The reference to the schedule object specifying the cold water temperature {[}°C{]} from the supply mains that makes up for the hot water lost down the drain. If blank, water temperatures are calculated by the Site:WaterMainsTemperature object. This field is for stand-alone operation only. If there are node connections, this field is not used.
+The reference to the schedule object specifying the cold water temperature {[}°C{]} from the supply mains that makes up for the hot water lost down the drain. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field is for stand-alone operation only. If there are node connections, this field is not used.
 
 \paragraph{Field: Use Side Inlet Node Name}\label{field-use-side-inlet-node-name-000}
 
@@ -211,7 +211,9 @@ This field specifies the heat transfer effectiveness between the use side water 
 
 \paragraph{Field: Source Side Inlet Node Name}\label{field-source-side-inlet-node-name-000}
 
-The inlet node connection to the plant loop for the source side of the water heater. Typically the source side draws cold water from the tank and returns warmer water.~ The source side volume flow rate is obtained from the plant loop.~ The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the \textbf{Branch} object that connects the source inlet node.
+The inlet node connection to the plant loop for the source side of the water heater. Typically the source side draws cold water from the tank and returns warmer water.
+The source side volume flow rate is obtained from the plant loop.
+The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the \textbf{\hyperref[branch]{Branch}} object that connects the source inlet node.
 
 \paragraph{Field: Source Side Outlet Node Name}\label{field-source-side-outlet-node-name-000}
 
@@ -243,7 +245,7 @@ This field is optional and is used to provide a schedule with alternate setpoint
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-01}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water heater will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water heater will be assigned to the ``General'' end-use subcategory.
 
 
 \begin{lstlisting}
@@ -663,7 +665,7 @@ The name of the WaterHeater:Stratified object.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-004}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Tank Volume}\label{field-tank-volume-1-000}
 
@@ -737,7 +739,7 @@ The height {[}m{]} of Heater 2 in the tank.
 
 \paragraph{Field: Heater Fuel Type}\label{field-heater-fuel-type-1}
 
-The type of fuel used for both Heaters 1 and 2. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating.
+The type of fuel used for both Heaters 1 and 2. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}.
 
 \paragraph{Field: Heater Thermal Efficiency}\label{field-heater-thermal-efficiency-1}
 
@@ -749,7 +751,7 @@ Off-cycle parasitics include parts of the water heater that consume fuel when th
 
 \paragraph{Field: Off-Cycle Parasitic Fuel Type}\label{field-off-cycle-parasitic-fuel-type-1}
 
-The type of fuel used by the off-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating. The fuel type can be the same or different from the Heater Fuel Type.
+The type of fuel used by the off-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}. The fuel type can be the same or different from the Heater Fuel Type.
 
 \paragraph{Field: Off-Cycle Parasitic Heat Fraction to Tank}\label{field-off-cycle-parasitic-heat-fraction-to-tank-1}
 
@@ -765,7 +767,7 @@ On-cycle parasitics include parts of the water heater that consume fuel when the
 
 \paragraph{Field: On-Cycle Parasitic Fuel Type}\label{field-on-cycle-parasitic-fuel-type-1}
 
-The type of fuel used by the on-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or DistrictHeating. The fuel type can be the same or different from the Heater Fuel Type.
+The type of fuel used by the on-cycle parasitics. The fuel type can be Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, Steam, OtherFuel1, OtherFuel2 or \hyperref[districtheating]{DistrictHeating}. The fuel type can be the same or different from the Heater Fuel Type.
 
 \paragraph{Field: On-Cycle Parasitic Heat Fraction to Tank}\label{field-on-cycle-parasitic-heat-fraction-to-tank-1}
 
@@ -777,7 +779,7 @@ The height {[}m{]} where any on-cycle parasitic heat gains are added to the tank
 
 \paragraph{Field: Ambient Temperature Indicator}\label{field-ambient-temperature-indicator-1-000}
 
-The Ambient Temperature Indicator specifies how the ambient air temperature will be indicated. The field can be \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If \textbf{Schedule} is used, the Ambient Temperature Schedule value provides the ambient temperature. If \textbf{Zone} is used, the zone air temperature of the zone specified in the Ambient Temperature Zone field provides the ambient temperature. If \textbf{Outdoors} is used, the outdoor dry-bulb air temperature of the outdoor air node specified in the Ambient Temperature OutdoorAir:Node field provides the ambient temperature.
+The Ambient Temperature Indicator specifies how the ambient air temperature will be indicated. The field can be \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If \textbf{Schedule} is used, the Ambient Temperature Schedule value provides the ambient temperature. If \textbf{Zone} is used, the zone air temperature of the zone specified in the Ambient Temperature Zone field provides the ambient temperature. If \textbf{Outdoors} is used, the outdoor dry-bulb air temperature of the outdoor air node specified in the Ambient Temperature \hyperref[outdoorairnode]{OutdoorAir:Node} field provides the ambient temperature.
 
 \paragraph{Field: Ambient Temperature Schedule Name}\label{field-ambient-temperature-schedule-name-1-000}
 
@@ -789,7 +791,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outdoor Air Node}\label{field-ambient-temperature-outdoor-air-node}
 
-The reference to the outdoor air node specifying the ambient air temperature around the tank for skin losses. An outdoor air node can be defined by an OutdoorAir:Node object or OutdoorAir:NodeList object. This field is only used if Ambient Temperature Indicator is \textbf{Outdoors}.
+The reference to the outdoor air node specifying the ambient air temperature around the tank for skin losses. An outdoor air node can be defined by an \hyperref[outdoorairnode]{OutdoorAir:Node} object or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. This field is only used if Ambient Temperature Indicator is \textbf{Outdoors}.
 
 \paragraph{Field: Uniform Skin Loss Coefficient Per Unit Area to Ambient Temperature}\label{field-uniform-skin-loss-coefficient-per-unit-area-to-ambient-temperature-000}
 
@@ -817,7 +819,7 @@ The reference to the schedule object specifiying the current fraction of Peak Vo
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name-1}
 
-The reference to the schedule object specifying the cold water temperature {[}°C{]} from the supply mains that makes up for the hot water lost down the drain. If blank, water temperatures are calculated by the Site:WaterMainsTemperature object. This field is for stand-alone operation only. If there are node connections, this field is not used.
+The reference to the schedule object specifying the cold water temperature {[}°C{]} from the supply mains that makes up for the hot water lost down the drain. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field is for stand-alone operation only. If there are node connections, this field is not used.
 
 \paragraph{Field: Use Side Inlet Node Name}\label{field-use-side-inlet-node-name-1-000}
 
@@ -1073,7 +1075,7 @@ This field describes which of several methods are to be used for sizing the wate
 \item
   \textbf{ResidentialHUD-FHAMinimum} This design method is based on minimum permissible water heater sizes (established by HUD-FHA in its Minimum Property Standards for One- and Two-Family Living Units, No. 4900.1-1982).~ The user enters the number of bathrooms and bedrooms in this input object.~ The smallest allowable water heater sizes are used.
 \item
-  \textbf{PerPerson} This design method scales sizes based on the total number of people in all zones in the building.~ Each water heater in the model will be sized using the total (peak, design) number of people for the entire model.~ The number of people is determined from People objects defined elsewhere in the input file
+  \textbf{PerPerson} This design method scales sizes based on the total number of people in all zones in the building.~ Each water heater in the model will be sized using the total (peak, design) number of people for the entire model.~ The number of people is determined from \hyperref[people]{People} objects defined elsewhere in the input file
 \item
   \textbf{PerFloorArea} This design method scales sizes based on the total floor area in all the zones in the building.~ Each water heater in the model will be sized using all the floor area in the model.~ The floor areas are determined from the geometry input elsewhere in the input file.
 \item
@@ -1140,7 +1142,7 @@ This field is used to scale the height of a stratified tank to preserve relative
 
 \subsection{WaterHeater:HeatPump:PumpedCondenser}\label{waterheaterheatpumppumpedcondenser}
 
-The heat pump water heater with pumped condenser (HPWH) is a compound object consisting of a water heater tank (e.g., \lstinline!WaterHeater:Mixed! or \lstinline!WaterHeater:Stratified!), a direct expansion (DX) ``coil'' (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
+The heat pump water heater with pumped condenser (HPWH) is a compound object consisting of a water heater tank (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!} or \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}), a direct expansion (DX) ``coil'' (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
 
 \begin{figure}[hbtp] % fig 81
 \centering
@@ -1156,17 +1158,17 @@ To model a heat pump water heater, the input data file must include some combina
 \item
   \lstinline!WaterHeater:HeatPump:PumpedCondenser! (required)
 \item
-  \lstinline!WaterHeater:Mixed! or \lstinline!WaterHeater:Stratified! (required)
+   \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!} or \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!} (required)
 \item
-  \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! or \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! (required)
+  \hyperref[coilwaterheatingairtowaterheatpumppumped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped!} or \hyperref[coil-waterheating-airtowaterheatpump-variablespeed]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed!} (required)
 \item
-  \lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! (required)
+  \hyperref[fansystemmodel]{\lstinline!Fan:SystemModel!} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} (required)
 \item
-  \lstinline!ZoneHVAC:EquipmentList! (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+  \hyperref[zonehvacequipmentlist]{\lstinline!ZoneHVAC:EquipmentList!} (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 \item
-  \lstinline!ZoneHVAC:EquipmentConnections! (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+  \hyperref[zonehvacequipmentconnections]{\lstinline!ZoneHVAC:EquipmentConnections!} (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
 \item
-  \lstinline!OutdoorAir:NodeList! (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+  \hyperref[outdoorairnodelist]{\lstinline!OutdoorAir:NodeList!} (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
 \end{itemize}
 
 The input fields for the compound object are described in detail below:
@@ -1205,7 +1207,7 @@ This numeric field contains the heat pump's condenser water flow rate in cubic m
 
 \paragraph{Field: Evaporator Air Flow Rate}\label{field-evaporator-air-flow-rate}
 
-This numeric field contains the air flow rate across the heat pump's air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump's DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = \textbf{autocalculate}), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump's DX coil multiplied by 5.035E-5 m\(^{3}\)/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump's DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump's air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump's DX coil (Ref. \hyperref[coilwaterheatingairtowaterheatpumppumped]{Coil:WaterHeating:AirToWaterHeatPump:Pumped}). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = \textbf{autocalculate}), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump's DX coil multiplied by 5.035E-5 m\(^{3}\)/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump's DX coil object (Ref. \hyperref[coilwaterheatingairtowaterheatpumppumped]{Coil:WaterHeating:AirToWaterHeatPump:Pumped}), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 \paragraph{Field: Inlet Air Configuration}\label{field-inlet-air-configuration}
 
@@ -1213,15 +1215,15 @@ This choice field defines the configuration of the air flow path through the hea
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-008}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air exhaust node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-007}
 
-This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air inlet node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air inlet node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-000}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. OutdoorAir:NodeList).
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Exhaust Air Node Name}\label{field-exhaust-air-node-name}
 
@@ -1241,27 +1243,27 @@ This alpha field contains the name of the zone from which the heat pump evaporat
 
 \paragraph{Field: Tank Object Type}\label{field-tank-object-type-000}
 
-This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choices are WaterHeater:Mixed or WaterHeater:Stratified.
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choices are \hyperref[waterheatermixed]{WaterHeater:Mixed} or \hyperref[waterheaterstratified]{WaterHeater:Stratified}.
 
 \paragraph{Field: Tank Name}\label{field-tank-name-000}
 
-This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \lstinline!WaterHeater:Mixed! or \lstinline!WaterHeater:Stratified!.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!} or \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.
 
 \paragraph{Field: Tank Use Side Inlet Node Name}\label{field-tank-use-side-inlet-node-name}
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \lstinline!WaterHeater:Mixed!). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
 
 \paragraph{Field: Tank Use Side Outlet Node Name}\label{field-tank-use-side-outlet-node-name}
 
-This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \lstinline!WaterHeater:Mixed!). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
 
 \paragraph{Field: DX Coil Object Type}\label{field-dx-coil-object-type}
 
-This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped.
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is \hyperref[coilwaterheatingairtowaterheatpumppumped]{Coil:WaterHeating:AirToWaterHeatPump:Pumped}.
 
 \paragraph{Field: DX Coil Name}\label{field-dx-coil-name}
 
-This alpha field contains the name of the specific DX coil (\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! or \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object) used by this heat pump water heater.
+This alpha field contains the name of the specific DX coil (\hyperref[coilwaterheatingairtowaterheatpumppumped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped!} or \hyperref[coil-waterheating-airtowaterheatpump-variablespeed]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed!} object) used by this heat pump water heater.
 
 \paragraph{Field: Minimum Inlet Air Temperature for Compressor Operation}\label{field-minimum-inlet-air-temperature-for-compressor-operation}
 
@@ -1269,7 +1271,7 @@ This numeric field contains the minimum inlet air dry-bulb temperature entering 
 
 \paragraph{Field: Compressor Location}\label{field-compressor-location}
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor's crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Pumped object. Valid entries are \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If `Schedule' is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If `Zone' is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be `ZoneAirOnly' or `ZoneAndOutdoorAir'. If `Outdoors' is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor's crankcase heater in the \hyperref[coilwaterheatingairtowaterheatpumppumped]{Coil:WaterHeating:AirToWaterHeatPump:Pumped} object. Valid entries are \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If `Schedule' is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If `Zone' is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be `ZoneAirOnly' or `ZoneAndOutdoorAir'. If `Outdoors' is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 \paragraph{Field: Compressor Ambient Temperature Schedule Name}\label{field-compressor-ambient-temperature-schedule-name}
 
@@ -1277,11 +1279,11 @@ This alpha field contains the name of a schedule that defines the ambient air te
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-001}
 
-This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are Fan:SystemModel and Fan:OnOff.
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are \hyperref[fansystemmodel]{Fan:SystemModel} and \hyperref[fanonoff]{Fan:OnOff}.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-004}
 
-This alpha field contains the name of the specific fan (\lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (\hyperref[fansystemmodel]{\lstinline!Fan:SystemModel!} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} object) used by this heat pump water heater.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-000}
 
@@ -1325,7 +1327,7 @@ This alpha field defines settings for the control logic of when to run the tank 
 
 \paragraph{Field: Control Sensor 1 Height In Stratified Tank}\label{field-control-sensor-1-height-in-stratified-tank}
 
-This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \lstinline!WaterHeater:Stratified!.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
 
 \paragraph{Field: Control Sensor 1 Weight}\label{field-control-sensor-1-weight}
 
@@ -1333,7 +1335,7 @@ The model can optionally use two control sensor locations in stratified tanks. W
 
 \paragraph{Field: Control Sensor 2 Height in Stratified Tank}\label{field-control-sensor-2-height-in-stratified-tank}
 
-This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \lstinline!WaterHeater:Stratified!. If omitted, this defaults to the height of Heater2.
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}. If omitted, this defaults to the height of Heater2.
 
 Following is an example input for the \lstinline!WaterHeater:HeatPump:PumpedCondenser! compound object and the other required component objects that it references.
 
@@ -1506,7 +1508,7 @@ These outputs are the parasitic electric power and consumption associated with t
 
 \subsection{WaterHeater:HeatPump:WrappedCondenser}\label{waterheaterheatpumpwrappedcondenser}
 
-The heat pump water heater with wrapped condenser is a compound object very similar to the \lstinline!WaterHeater:HeatPump:PumpedCondenser! object. It likewise combines a water heater tank, a direct expansion (DX) ``coil'', and a fan to provide air flow across the air coil associated with the DX compression system. The primary difference is that instead of pumping water through an external condenser, the heating coils are wrapped around or submerged in the tank. This type of HPWH is most common in packaged units meant for residential applications.
+The heat pump water heater with wrapped condenser is a compound object very similar to the \hyperref[waterheaterheatpumppumpedcondenser]{\lstinline!WaterHeater:HeatPump:PumpedCondenser!} object. It likewise combines a water heater tank, a direct expansion (DX) ``coil'', and a fan to provide air flow across the air coil associated with the DX compression system. The primary difference is that instead of pumping water through an external condenser, the heating coils are wrapped around or submerged in the tank. This type of HPWH is most common in packaged units meant for residential applications.
 
 To model a wrapped condenser heat pump water, the input data file must include some combination of the following objects depending on the configuration to be modeled:
 
@@ -1514,17 +1516,17 @@ To model a wrapped condenser heat pump water, the input data file must include s
 \item
   \lstinline!WaterHeater:HeatPump:WrappedCondenser! (required)
 \item
-  \lstinline!WaterHeater:Stratified! (required)
+  \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!} (required)
 \item
-  \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! (required)
+  \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!} (required)
 \item
-  \lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! (required)
+  \hyperref[fansystemmodel]{Fan:SystemModel!} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} (required)
 \item
-  \lstinline!ZoneHVAC:EquipmentList! (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+  \hyperref[zonehvacequipmentlist]{\lstinline!ZoneHVAC:EquipmentList!} (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 \item
-  \lstinline!ZoneHVAC:EquipmentConnections! (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+  \hyperref[zonehvacequipmentconnections]{\lstinline!ZoneHVAC:EquipmentConnections!} (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
 \item
-  \lstinline!OutdoorAir:NodeList! (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+  \hyperref[outdoorairnodelist]{\lstinline!OutdoorAir:NodeList!} (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
 \end{itemize}
 
 The input fields for the compound object are described in detail below:
@@ -1559,7 +1561,7 @@ This numeric field contains the distance from the bottom of the tank to the top 
 
 \paragraph{Field: Evaporator Air Flow Rate}\label{field-evaporator-air-flow-rate-1}
 
-This numeric field contains the air flow rate across the heat pump's air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump's DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = \textbf{autocalculate}), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump's DX coil multiplied by 5.035E-5 m\(^{3}\)/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump's DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump's air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump's DX coil (Ref. \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = \textbf{autocalculate}), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump's DX coil multiplied by 5.035E-5 m\(^{3}\)/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump's DX coil object (Ref. \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 \paragraph{Field: Inlet Air Configuration}\label{field-inlet-air-configuration-1}
 
@@ -1567,15 +1569,15 @@ This choice field defines the configuration of the air flow path through the hea
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-1-006}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air exhaust node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-1-005}
 
-This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air inlet node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `ZoneAndOutdoorAir', then this node name should be the name of a zone air inlet node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}). If the Inlet Air Configuration field is set to `OutdoorAirOnly', this node name should be left blank. If the Inlet Air Configuration field is set to `Schedule', this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-1}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. OutdoorAir:NodeList).
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Exhaust Air Node Name}\label{field-exhaust-air-node-name-1}
 
@@ -1595,27 +1597,27 @@ This alpha field contains the name of the zone from which the heat pump evaporat
 
 \paragraph{Field: Tank Object Type}\label{field-tank-object-type-1}
 
-This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choice is WaterHeater:Stratified.
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choice is \hyperref[waterheaterstratified]{WaterHeater:Stratified}.
 
 \paragraph{Field: Tank Name}\label{field-tank-name-1}
 
-This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \lstinline!WaterHeater:Stratified!.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.
 
 \paragraph{Field: Tank Use Side Inlet Node Name}\label{field-tank-use-side-inlet-node-name-1}
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \lstinline!WaterHeater:Stratified!). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
 
 \paragraph{Field: Tank Use Side Outlet Node Name}\label{field-tank-use-side-outlet-node-name-1}
 
-This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \lstinline!WaterHeater:Stratified!). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
 
 \paragraph{Field: DX Coil Object Type}\label{field-dx-coil-object-type-1}
 
-This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped.
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}.
 
 \paragraph{Field: DX Coil Name}\label{field-dx-coil-name-1}
 
-This alpha field contains the name of the specific DX coil (\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!) used by this heat pump water heater.
+This alpha field contains the name of the specific DX coil (\hyperref[coilwaterheatingairtowaterheatpumpwrapped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!}) used by this heat pump water heater.
 
 \paragraph{Field: Minimum Inlet Air Temperature for Compressor Operation}\label{field-minimum-inlet-air-temperature-for-compressor-operation-1}
 
@@ -1623,7 +1625,7 @@ This numeric field contains the minimum inlet air dry-bulb temperature entering 
 
 \paragraph{Field: Compressor Location}\label{field-compressor-location-1}
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor's crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Wrapped object. Valid entries are \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If `Schedule' is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If `Zone' is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be `ZoneAirOnly' or `ZoneAndOutdoorAir'. If `Outdoors' is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor's crankcase heater in the \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{Coil:WaterHeating:AirToWaterHeatPump:Wrapped} object. Valid entries are \textbf{Schedule}, \textbf{Zone}, or \textbf{Outdoors}. If `Schedule' is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If `Zone' is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be `ZoneAirOnly' or `ZoneAndOutdoorAir'. If `Outdoors' is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 \paragraph{Field: Compressor Ambient Temperature Schedule Name}\label{field-compressor-ambient-temperature-schedule-name-1}
 
@@ -1631,11 +1633,11 @@ This alpha field contains the name of a schedule that defines the ambient air te
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-1}
 
-This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are Fan:SystemModel and Fan:OnOff.
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are \hyperref[fansystemmodel]{Fan:SystemModel} and \hyperref[fanonoff]{Fan:OnOff}.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1-000}
 
-This alpha field contains the name of the specific fan (\lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (\hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} object) used by this heat pump water heater.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-000}
 
@@ -1679,7 +1681,7 @@ This alpha field defines settings for the control logic of when to run the tank 
 
 \paragraph{Field: Control Sensor 1 Height In Stratified Tank}\label{field-control-sensor-1-height-in-stratified-tank-1}
 
-This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \lstinline!WaterHeater:Stratified!.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
 
 \paragraph{Field: Control Sensor 1 Weight}\label{field-control-sensor-1-weight-1}
 
@@ -1687,7 +1689,7 @@ The model can optionally use two control sensor locations in stratified tanks. W
 
 \paragraph{Field: Control Sensor 2 Height in Stratified Tank}\label{field-control-sensor-2-height-in-stratified-tank-1}
 
-This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \lstinline!WaterHeater:Stratified!. If omitted, this defaults to the height of Heater2.
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}. If omitted, this defaults to the height of Heater2.
 
 Following is an example input for the \lstinline!WaterHeater:HeatPump:WrappedCondenser! compound object and the other required component objects that it references.
 

@@ -9,6 +9,7 @@
 
 using namespace Kiva;
 
+
 class BaseFixture : public testing::Test {
 protected:
   void init() {

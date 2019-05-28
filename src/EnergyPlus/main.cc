@@ -51,8 +51,11 @@ using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int main(int argc, const char *argv[])
 {
-    // the following line is only needed when debugging issues related to NaN in Visual Studio. See
-    // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips unsigned int fp_control_state = _controlfp( _EM_INEXACT, _MCW_EM );
+#ifdef MSVC_DEBUG
+    // the following line enables NaN detection in Visual Studio debug builds. See
+    // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
+    unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
+#endif
     ProcessArgs(argc, argv);
     EnergyPlusPgm();
 }

@@ -370,8 +370,8 @@ namespace HeatBalanceSurfaceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -628,7 +628,7 @@ namespace HeatBalanceSurfaceManager {
                     {
                         IOFlags flags;
                         flags.ACTION("READWRITE");
-                        gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
+                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
                         iwriteStatus = flags.ios();
                     }
                     if (iwriteStatus == 0) {
@@ -648,7 +648,7 @@ namespace HeatBalanceSurfaceManager {
                     while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
                         {
                             IOFlags flags;
-                            gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
+                            ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
                             iReadStatus = flags.ios();
                         }
                         if (iReadStatus < GoodIOStatValue) {
@@ -672,7 +672,7 @@ namespace HeatBalanceSurfaceManager {
                     if (elOpened) {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     };
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
@@ -685,7 +685,7 @@ namespace HeatBalanceSurfaceManager {
                     {
                         IOFlags flags;
                         flags.ACTION("READWRITE");
-                        gio::open(iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags);
+                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags);
                         iwriteStatus = flags.ios();
                     }
                     //            IF (iwriteStatus /= 0) THEN
@@ -705,7 +705,7 @@ namespace HeatBalanceSurfaceManager {
                     while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
                         {
                             IOFlags flags;
-                            gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
+                            ObjexxFCL::gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
                             iReadStatus = flags.ios();
                         }
                         if (iReadStatus < GoodIOStatValue) {
@@ -724,7 +724,7 @@ namespace HeatBalanceSurfaceManager {
                     if (elOpened) {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     };
                 }
                 // Store the calculated total zone Power Reduction Factor due to DElight daylighting
@@ -774,15 +774,6 @@ namespace HeatBalanceSurfaceManager {
         ManageInternalHeatGains(false);
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
-
-        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-            SurfaceGeometry::kivaManager.initKivaInstances();
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
-                !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances();
-            }
-        }
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(TempSurfInTmp);
@@ -2203,6 +2194,14 @@ namespace HeatBalanceSurfaceManager {
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
                 ExtVentedCavity(Surface(SurfNum).ExtCavNum).TairLast = 20.0;
             }
+
+            // Initialize Kiva convection algorithms
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+            }
+
 
             // Initialize the flux histories
             QH(1, {2, Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) =
@@ -5744,7 +5743,20 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    // Do nothing
+                    RoughSurf = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
+                    // Set Kiva exterior convection algorithms
+                    InitExteriorConvectionCoeff(SurfNum,
+                                                HMovInsul,
+                                                RoughSurf,
+                                                AbsThermSurf,
+                                                TH(1, 1, SurfNum),
+                                                HcExtSurf(SurfNum),
+                                                HSkyExtSurf(SurfNum),
+                                                HGrdExtSurf(SurfNum),
+                                                HAirExtSurf(SurfNum));
+
                 } else { // for interior or other zone surfaces
 
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
@@ -5982,6 +5994,11 @@ namespace HeatBalanceSurfaceManager {
             TempEffBulkAir = 23.0;
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
+
+            // Initialize Kiva instances ground temperatures
+            if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+                SurfaceGeometry::kivaManager.initKivaInstances();
+            }
         }
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag = true;
@@ -6133,6 +6150,15 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
+        // Calculate Kiva instances
+        if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
+            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+                !WarmupFlag) {
+                SurfaceGeometry::kivaManager.calcKivaInstances();
+            }
+        }
+
         bool const useCondFDHTalg(any_eq(HeatTransferAlgosUsed, UseCondFD));
         Converged = false;
         while (!Converged) { // Start of main inside heat balance DO loop...
@@ -6140,15 +6166,15 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
-                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobals::KelvinConv;  // TODO: Use average radiant temp? Trad?
                 }
             }
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6219,8 +6245,8 @@ namespace HeatBalanceSurfaceManager {
                                               QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                  (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                  (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                             if (construct.SourceSinkPresent) {
                                 TempSurfInTmp(SurfNum) =
                                     (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum)) *
@@ -6329,8 +6355,8 @@ namespace HeatBalanceSurfaceManager {
                                                       (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                                 Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                                 // Calculate the current inside surface temperature
-                                if ((!surface.IsPool) || ((surface.IsPool) && (abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                          (abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                                if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                          (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                                     if (construct.SourceSinkPresent) {
                                         TempSurfInTmp(SurfNum) =
                                             (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum) +
@@ -6434,8 +6460,8 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
-                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobals::KelvinConv;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
                                 OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;

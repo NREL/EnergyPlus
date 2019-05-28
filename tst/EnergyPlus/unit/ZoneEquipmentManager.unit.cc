@@ -594,7 +594,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.2;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -856,7 +856,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.2;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -960,14 +960,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    ZoneEquipmentManager::PrioritySimOrder.allocate(3);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -980,8 +980,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1001,8 +1000,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1015,8 +1013,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 4 - Cooling, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1036,7 +1033,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.2;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -1224,7 +1221,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.2;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -1444,7 +1441,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.2;",
 
         "Zone,",
         "  Space;                   !- Name",
@@ -1881,15 +1878,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
-    ZoneEquipmentManager::DefaultSimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -2084,24 +2079,22 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
-    ZoneEquipmentManager::DefaultSimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired * 0.6);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(4), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP * 0.6);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), energy.OutputRequiredToHeatingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(4), energy.OutputRequiredToHeatingSP);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP * 0.4);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), energy.OutputRequiredToCoolingSP);
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(4), energy.OutputRequiredToCoolingSP);
@@ -2132,9 +2125,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
-    SetZoneEquipSimOrder(ZoneNum, ZoneNum);
-    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
@@ -2143,12 +2134,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Expect next sequenced load fractions to be applied here on the first and second equipments
     Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
-    Real64 expectedCoolLoad = energy.UnadjRemainingOutputReqToCoolSP;
+    Real64 expectedCoolLoad = energy.UnadjRemainingOutputReqToCoolSP * 0.6;
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequired(2), expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(1), energy.OutputRequiredToHeatingSP * 0.4);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToHeatingSP(2), expectedHeatLoad);
-    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP);
+    EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(1), energy.OutputRequiredToCoolingSP * 0.4);
     EXPECT_DOUBLE_EQ(energy.SequencedOutputRequiredToCoolingSP(2), expectedCoolLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputRequired, expectedHeatLoad);
     EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToHeatSP, expectedHeatLoad);

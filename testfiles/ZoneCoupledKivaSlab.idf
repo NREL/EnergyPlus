@@ -43,7 +43,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.1;
+  Version,9.2;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -277,10 +277,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
 !- =========== ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========
 
