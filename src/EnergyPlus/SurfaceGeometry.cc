@@ -923,7 +923,6 @@ namespace SurfaceGeometry {
         int TotDetailedFloors;    // Number of Floor:Detailed items to obtain
         int TotHTSubs;            // Number of FenestrationSurface:Detailed items to obtain
         int TotShdSubs;           // Number of Shading:Zone:Detailed items to obtain
-        int TotIntMass;           // Number of InternalMass object items to obtain
         int TotIntMassSurfaces;   // Number of InternalMass surfaces to obtain
         // Simple Surfaces (Rectangular)
         int TotRectExtWalls;   // Number of Exterior Walls to obtain
@@ -1044,7 +1043,6 @@ namespace SurfaceGeometry {
         TotOverhangsProjection = inputProcessor->getNumObjectsFound("Shading:Overhang:Projection");
         TotFins = inputProcessor->getNumObjectsFound("Shading:Fin");
         TotFinsProjection = inputProcessor->getNumObjectsFound("Shading:Fin:Projection");
-        TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
         TotRectWindows = inputProcessor->getNumObjectsFound("Window");
         TotRectDoors = inputProcessor->getNumObjectsFound("Door");
         TotRectGlazedDoors = inputProcessor->getNumObjectsFound("GlazedDoor");
@@ -1064,7 +1062,7 @@ namespace SurfaceGeometry {
 
         TotOSC = 0;
 
-        TotIntMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+        TotIntMassSurfaces = GetNumIntMassSurfaces();
 
         TotSurfaces = (TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg) * 2 + TotHTSurfs + TotHTSubs +
                       TotShdSubs * 2 + TotIntMassSurfaces + TotOverhangs * 2 + TotOverhangsProjection * 2 + TotFins * 4 + TotFinsProjection * 4 +
@@ -1120,7 +1118,7 @@ namespace SurfaceGeometry {
 
         GetSimpleShdSurfaceData(ErrorsFound, SurfNum, TotOverhangs, TotOverhangsProjection, TotFins, TotFinsProjection);
 
-        GetIntMassSurfaceData(ErrorsFound, SurfNum, TotIntMass);
+        GetIntMassSurfaceData(ErrorsFound, SurfNum);
 
         GetMovableInsulationData(ErrorsFound);
 
@@ -5562,9 +5560,8 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
-                               int &SurfNum,        // Count of Current SurfaceNumber
-                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    void GetIntMassSurfaceData(bool &ErrorsFound, // Error flag indicator (true if errors found)
+                               int &SurfNum       // Count of Current SurfaceNumber
     )
     {
 
@@ -5619,6 +5616,9 @@ namespace SurfaceGeometry {
         bool errFlag;              //  local error flag
 
         cCurrentModuleObject = "InternalMass";
+        int TotIntMass = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (TotIntMass == 0) return;
+
         IntMassObjects.allocate(TotIntMass);
 
         // scan for use of Zone lists in InternalMass objects
@@ -5749,8 +5749,8 @@ namespace SurfaceGeometry {
         }
     }
 
-    int GetNumIntMassSurfaces(int const TotIntMass // Number of Internal Mass Surfaces to obtain
-    )
+    int GetNumIntMassSurfaces() // Number of Internal Mass Surfaces to obtain
+
     {
         // Counts internal mass surfaces applied to zones and zone lists
 
@@ -5763,6 +5763,8 @@ namespace SurfaceGeometry {
         int NumIntMassSurf;  // total count of internal mass surfaces
 
         NumIntMassSurf = 0;
+        int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+
         if (TotIntMass == 0) return NumIntMassSurf;
 
         cCurrentModuleObject = "InternalMass";

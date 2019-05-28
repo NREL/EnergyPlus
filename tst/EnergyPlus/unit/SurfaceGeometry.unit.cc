@@ -3968,7 +3968,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
     // check the 24 internal mass surfaces created from the three zoneLists
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 }
@@ -4305,14 +4305,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(TotIntMass);
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 
     DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
     SurfaceTmp.allocate(TotSurfaces);
 
     int SurfNum = 0;
-    GetIntMassSurfaceData(ErrorsFound, SurfNum, TotIntMass);
+    GetIntMassSurfaceData(ErrorsFound, SurfNum);
     ASSERT_FALSE(ErrorsFound);
 
     // check internal mass surface count and object names

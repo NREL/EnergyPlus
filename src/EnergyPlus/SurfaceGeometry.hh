@@ -233,13 +233,11 @@ namespace SurfaceGeometry {
                                  int const TotFinsProjection       // Number of Fins (projection) to obtain
     );
 
-    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
-                               int &SurfNum,        // Count of Current SurfaceNumber
-                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    void GetIntMassSurfaceData(bool &ErrorsFound, // Error flag indicator (true if errors found)
+                               int &SurfNum       // Count of Current SurfaceNumber
     );
 
-    int GetNumIntMassSurfaces(int const TotIntMass // Number of Internal Mass Surfaces to obtain
-    );
+    int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
