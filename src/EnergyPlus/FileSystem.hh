@@ -60,6 +60,7 @@ namespace FileSystem {
 
     std::string getFileName(std::string const &filePath);
 
+    // Returns the parent directory of a path, with the trailing pathChar included
     std::string getParentDirectoryPath(std::string const &filePath);
 
     std::string getAbsolutePath(std::string const &filePath);

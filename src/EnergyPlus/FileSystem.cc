@@ -101,7 +101,8 @@ namespace FileSystem {
         int pathCharPosition = tempPath.find_last_of(pathChar);
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
-        if (tempPath == "") tempPath = ".";
+        // If empty, then current dir, but with trailing separator too: eg `./`
+        if (tempPath == "") tempPath = {'.', pathChar};
 
         return tempPath;
     }
