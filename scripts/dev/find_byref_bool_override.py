@@ -738,6 +738,7 @@ def get_all_errors(source_files):
                     print(json.dumps(ci_msg))
                 else:
                     warnings.warn(msg)
+            continue
 
         found_functions = parse_function_signatures_in_header(header_file)
         if not found_functions:
