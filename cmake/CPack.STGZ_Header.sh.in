@@ -3,7 +3,7 @@
 
 # Reset
 Color_Off='\033[0m'				# Text Reset
-URed='\033[4;31m'					# Red
+BRed='\033[1;31m'				# Bold Red
 
 package_name="EnergyPlus-@CPACK_PACKAGE_VERSION_MAJOR@-@CPACK_PACKAGE_VERSION_MINOR@-@CPACK_PACKAGE_VERSION_PATCH@"
 
@@ -12,7 +12,7 @@ package_name="EnergyPlus-@CPACK_PACKAGE_VERSION_MAJOR@-@CPACK_PACKAGE_VERSION_MI
 ____cpack__here_doc____
 		echo
 		# Default is no
-		echo "Do you accept the license? [y/${URed}N${Color_Off}]: "
+		echo "Do you accept the license? [y/${BRed}N${Color_Off}]: "
 		read line leftover
 		case ${line} in
 			y* | Y*)
@@ -40,7 +40,7 @@ until [ $install_dir_ok -eq 1 ]; do
 		echo
 		echo "Parent Directory '$pardir' does not exist."
 		# Default is No
-		echo "Are you sure you want to continue? [y/${URed}N${Color_Off}] "
+		echo "Are you sure you want to continue? [y/${BRed}N${Color_Off}] "
 		read go_ahead leftover
 		case ${go_ahead} in
 			y* | Y*)
@@ -61,7 +61,7 @@ default_link_directory="/usr/local/bin"
 link_directory=""
 
 until [ -d "$link_directory" ]; do
-	echo "Symbolic link location (enter \"n\" for no links) [$default_link_directory]:"
+	echo "Symbolic link location (enter ${BRed}\"n\"${Color_Off} for no links) [$default_link_directory]:"
 	read link_directory
 	if [ "$link_directory" = "n" ]; then
 		break
