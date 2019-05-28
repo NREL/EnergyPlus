@@ -543,9 +543,12 @@ int RunEnergyPlus(std::string const & filepath)
                 ObjexxFCL::gio::close(fileUnitNumber);
             }
 
-            std::string const readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-            std::string const readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+            // We quote the paths in case we have spaces
+            // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
+            std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
+            std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
 
+            // systemCall will be responsible to handle to above command on Windows versus Unix
             systemCall(readVarsRviCommand);
             systemCall(readVarsMviCommand);
 

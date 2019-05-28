@@ -247,7 +247,11 @@ namespace FileSystem {
 
     int systemCall(std::string const &command)
     {
+#ifdef _WIN32
+        return system("cmd /C \"" + command.c_str() + "\"");
+#else
         return system(command.c_str());
+#endif
     }
 
     void removeFile(std::string const &fileName)
