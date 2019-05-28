@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,10 +84,11 @@ extern "C" {
 #include <NodeInputManager.hh>
 #include <OutputReports.hh>
 #include <Plant/PlantManager.hh>
-#include <SQLiteProcedures.hh>
+#include <ResultsSchema.hh>
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <SystemReports.hh>
+#include <SQLiteProcedures.hh>
 #include <Timer.h>
 #include <UtilityRoutines.hh>
 
@@ -95,8 +96,8 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
     bool outputErrorHeader(true);
-    gio::Fmt fmtLD("*");
-    gio::Fmt fmtA("(A)");
+    ObjexxFCL::gio::Fmt fmtLD("*");
+    ObjexxFCL::gio::Fmt fmtA("(A)");
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
@@ -136,7 +137,7 @@ namespace UtilityRoutines {
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
             {
                 IOFlags flags;
-                gio::read(PString, fmtLD, flags) >> rProcessNumber;
+                ObjexxFCL::gio::read(PString, fmtLD, flags) >> rProcessNumber;
                 IoStatus = flags.ios();
             }
             ErrorFlag = false;
@@ -424,8 +425,17 @@ namespace UtilityRoutines {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string String; // Working string
 
-        gio::write(String, fmtLD) << IntegerValue;
+        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
+    }
+
+    size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
+            std::string keyCopy = MakeUPPERCase(key);
+            return std::hash<std::string>()(keyCopy);
+    }
+
+    bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
+        return SameString(a, b);
     }
 } // namespace UtilityRoutines
 
@@ -471,9 +481,9 @@ int AbortEnergyPlus()
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static gio::Fmt fmtLD("*");
-    static gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-    static gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
+    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -566,7 +576,12 @@ int AbortEnergyPlus()
     Elapsed_Time -= Minutes * 60.0;
     Seconds = Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+
+    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
@@ -578,16 +593,28 @@ int AbortEnergyPlus()
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
+        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
     }
-    gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
+    ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                                      " Severe Errors; Elapsed Time=" + Elapsed;
 
-    gio::close(tempfl);
+    ObjexxFCL::gio::close(tempfl);
+
+    // Output detailed ZONE time series data
+    SimulationManager::OpenOutputJsonFiles();
+
+    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        ResultsFramework::OutputSchema->writeTimeSeriesReports();
+    }
+
+    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+        ResultsFramework::OutputSchema->WriteReport();
+    }
+
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
@@ -653,19 +680,19 @@ void CloseMiscOpenFiles()
 
     {
         IOFlags flags;
-        gio::inquire(OutputFileDebug, flags);
+        ObjexxFCL::gio::inquire(OutputFileDebug, flags);
         DebugPosition = flags.POSITION();
     }
     if (DebugPosition != "ASIS") {
         DebugOutput = true;
     }
     if (DebugOutput) {
-        gio::close(OutputFileDebug);
+        ObjexxFCL::gio::close(OutputFileDebug);
     } else {
         {
             IOFlags flags;
             flags.DISPOSE("DELETE");
-            gio::close(OutputFileDebug, flags);
+            ObjexxFCL::gio::close(OutputFileDebug, flags);
         }
     }
 }
@@ -720,7 +747,7 @@ void CloseOutOpenFiles()
     for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
         {
             IOFlags flags;
-            gio::inquire(UnitNumber, flags);
+            ObjexxFCL::gio::inquire(UnitNumber, flags);
             exists = flags.exists();
             opened = flags.open();
             ios = flags.ios();
@@ -730,7 +757,7 @@ void CloseOutOpenFiles()
             not_special = name.compare(stdin_name) != 0;
             not_special = not_special && (name.compare(stdout_name) != 0);
             not_special = not_special && (name.compare(stderr_name) != 0);
-            if (not_special) gio::close(UnitNumber);
+            if (not_special) ObjexxFCL::gio::close(UnitNumber);
         }
     }
 }
@@ -771,8 +798,8 @@ int EndEnergyPlus()
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static gio::Fmt fmtA("(A)");
-    static gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -826,7 +853,12 @@ int EndEnergyPlus()
     Elapsed_Time -= Minutes * 60.0;
     Seconds = Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+
+    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
@@ -838,15 +870,27 @@ int EndEnergyPlus()
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
+        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
     }
-    gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
+    ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
                                     " Severe Errors; Elapsed Time=" + Elapsed;
-    gio::close(tempfl);
+    ObjexxFCL::gio::close(tempfl);
+
+    // Output detailed ZONE time series data
+    SimulationManager::OpenOutputJsonFiles();
+
+    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        ResultsFramework::OutputSchema->writeTimeSeriesReports();
+    }
+
+    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+        ResultsFramework::OutputSchema->WriteReport();
+    }
+
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
@@ -925,7 +969,7 @@ int GetNewUnitNumber()
     //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
     //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
     //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-    //		{ IOFlags flags; gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); }
+    //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); }
     //		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
     //	}
     //
@@ -933,7 +977,7 @@ int GetNewUnitNumber()
     //
     //	return UnitNumber;
 
-    return gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units {100,101,102})
+    return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units {100,101,102})
 }
 
 int FindUnitNumber(std::string const &FileName) // File name to be searched.
@@ -986,7 +1030,7 @@ int FindUnitNumber(std::string const &FileName) // File name to be searched.
 
     {
         IOFlags flags;
-        gio::inquire(FileName, flags);
+        ObjexxFCL::gio::inquire(FileName, flags);
         exists = flags.exists();
         opened = flags.open();
         ios = flags.ios();
@@ -996,7 +1040,7 @@ int FindUnitNumber(std::string const &FileName) // File name to be searched.
         {
             IOFlags flags;
             flags.POSITION("APPEND");
-            gio::open(UnitNumber, FileName, flags);
+            ObjexxFCL::gio::open(UnitNumber, FileName, flags);
             ios = flags.ios();
         }
         if (ios != 0) {
@@ -1007,13 +1051,13 @@ int FindUnitNumber(std::string const &FileName) // File name to be searched.
         std::string::size_type TestFileLength;
         std::string::size_type Pos; // Position pointer
         for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            // Skip preassigned units - gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams constructor
+            // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams constructor
             if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) || (UnitNumber == 102)) {
                 continue;
             }
             {
                 IOFlags flags;
-                gio::inquire(UnitNumber, flags);
+                ObjexxFCL::gio::inquire(UnitNumber, flags);
                 TestFileName = flags.name();
                 opened = flags.open();
             }
@@ -1870,8 +1914,8 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static gio::Fmt ErrorFormat("(2X,A)");
-    static gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt ErrorFormat("(2X,A)");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -1889,13 +1933,13 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     if (!DoingInputProcessing) {
         if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
     } else {
-        gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+        ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
     }
     if (present(OutUnit1)) {
-        gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
+        ObjexxFCL::gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
     }
     if (present(OutUnit2)) {
-        gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
+        ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
     }
 }
 

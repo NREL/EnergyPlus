@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     Building,                !- Name
@@ -791,10 +791,14 @@
     Zone5WaterOutAir,        !- Zone Equipment 1 Name
     2,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 2 Object Type
     Zone5DXOutAir,           !- Zone Equipment 2 Name
     1,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -1116,10 +1120,14 @@
     Zone4OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -1507,7 +1515,9 @@
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone3OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -1859,7 +1869,9 @@
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone2OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -3437,7 +3449,9 @@
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone1OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   OutdoorAir:Node,
     Zone1OAUOANode,          !- Name

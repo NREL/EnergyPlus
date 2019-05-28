@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,7 +111,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version, 8.5;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
@@ -163,10 +162,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type",
         "    SPACE1-1 PTAC,           !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:PackagedTerminalAirConditioner,",
         "    SPACE1-1 PTAC,      !- Name",
@@ -368,7 +371,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
@@ -407,10 +409,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type",
         "    SPACE1-1 PTAC,           !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:PackagedTerminalAirConditioner,",
         "    SPACE1-1 PTAC,      !- Name",
@@ -695,7 +701,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -735,10 +740,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type",
         "    SPACE1-1 PTAC,           !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:PackagedTerminalAirConditioner,",
         "    SPACE1-1 PTAC,           !- Name",
@@ -1025,7 +1034,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
         "    ZoneHVAC:PackagedTerminalHeatPump,  !- ZoneHVAC Terminal Unit Object Type",
@@ -1064,10 +1072,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:PackagedTerminalHeatPump,  !- Zone Equipment 2 Object Type",
         "    SPACE1-1 Heat Pump,      !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:PackagedTerminalHeatPump,",
         "    SPACE1-1 Heat Pump,      !- Name",
@@ -1434,7 +1446,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -1474,10 +1485,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:PackagedTerminalHeatPump,  !- Zone Equipment 2 Object Type",
         "    SPACE1-1 Heat Pump,      !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:PackagedTerminalHeatPump,",
         "    SPACE1-1 Heat Pump,      !- Name",
@@ -1846,7 +1861,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -1894,10 +1908,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
         "    TU1,                     !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "    TU1,                     !- Zone Terminal Unit Name",
@@ -2520,7 +2538,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,   !- Name",
@@ -2568,10 +2585,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
         "    TU1,                     !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "    TU1,                     !- Zone Terminal Unit Name",
@@ -3194,7 +3215,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -3242,10 +3262,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
         "    TU1,                     !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "    TU1,                     !- Zone Terminal Unit Name",
@@ -4943,7 +4967,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     int VRFTUNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
 
         "AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -4991,10 +5014,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
         "    TU1,                     !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "    TU1,                     !- Zone Terminal Unit Name",
@@ -6688,7 +6715,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     int UnitVentNum(1);
 
     std::string const idf_objects = delimited_string({
-        "  Version, 8.6;",
 
         "  AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal,  !- Name",
@@ -6720,10 +6746,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:UnitVentilator, !- Zone Equipment 2 Object Type",
         "    SPACE1-1 Unit Vent,      !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:UnitVentilator,",
         "    SPACE1-1 Unit Vent,      !- Name",
@@ -6922,7 +6952,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     int UnitVentNum(1);
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
 
         "  AirTerminal:SingleDuct:Mixer,",
         "    SPACE1-1 DOAS Air Terminal, !- Name",
@@ -6954,10 +6983,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:UnitVentilator, !- Zone Equipment 2 Object Type",
         "    SPACE1-1 Unit Vent,      !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "  ZoneHVAC:UnitVentilator,",
         "    SPACE1-1 Unit Vent,      !- Name",
@@ -7154,7 +7187,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version, 8.8;",
 
         "DesignSpecification:OutdoorAir,",
         "  DSOA 1,  !- Name",
@@ -7233,7 +7265,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "Zone,",
         "    SPACE1-1;                !- Name",
@@ -7268,7 +7302,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
         "    SPACE1-2 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
         "Zone,",
         "    SPACE1-2;                !- Name",

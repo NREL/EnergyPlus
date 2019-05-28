@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,6 +233,8 @@ namespace HVACControllers {
         bool BypassControllerCalc;  // set true for OA sys water coils
         int AirLoopControllerIndex; // index to controller on specific air loop
 
+        bool HumRatCtrlOverride; // true if TemperatureAndHumidityRatio control switches to humidity ratio control
+
         // Default Constructor
         ControllerPropsType()
             : ControllerType_Num(ControllerSimple_Type), ControlVar(iNoControlVariable), ActuatorVar(0), Action(iNoAction), InitFirstPass(true),
@@ -242,7 +244,7 @@ namespace HVACControllers {
               ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0), ActuatedNodePlantLoopBranchNum(0), SensedNode(0),
               IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(0), Range(0.0),
               Limit(0.0), TraceFileUnit(0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false),
-              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0)
+              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {
         }
     };
@@ -316,10 +318,9 @@ namespace HVACControllers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void ResetController(int const ControlNum, bool const FirstHVACIteration, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
+    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
 
     void InitController(int const ControlNum,
-                        bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &IsConvergedFlag);
 
     void SizeController(int const ControlNum);
@@ -350,6 +351,8 @@ namespace HVACControllers {
 
     bool CheckMaxActiveController(int const ControlNum);
 
+    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag);
+
     void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag);
 
     // End Algorithm Section of the Module
@@ -361,14 +364,6 @@ namespace HVACControllers {
     void UpdateController(int const ControlNum);
 
     //        End of Update subroutines for the Controller Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Controller Module
-    // *****************************************************************************
-
-    void ReportController(int const ControlNum); // unused1208
-
-    //        End of Reporting subroutines for the Controller Module
     // *****************************************************************************
 
     void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);

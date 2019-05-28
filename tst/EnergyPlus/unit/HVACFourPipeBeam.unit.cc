@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
         "    Perimeter_top_ZN_4 4pipe Beam, !- Name",
         "    , !- Primary Air Availability Schedule Name",
@@ -413,7 +412,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    -6.00,                   !- Time Zone {hr}",
         "    190;                     !- Elevation {m}",
 
-        "! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6�C",
+        "! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6degC",
 
         "  SizingPeriod:DesignDay,",
         "    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
@@ -443,7 +442,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
         "    0.00;                    !- Sky Clearness",
 
-        "! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2�C WB=25.5�C",
+        "! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2degC WB=25.5degC",
 
         "  SizingPeriod:DesignDay,",
         "    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",

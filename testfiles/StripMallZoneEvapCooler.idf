@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,9.0;
+  Version,9.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -3278,10 +3278,14 @@
     LGstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     LGstore1 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
@@ -3290,10 +3294,14 @@
     LGstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     LGstore2 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
@@ -3302,10 +3310,14 @@
     SMstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore1 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
@@ -3314,10 +3326,14 @@
     SMstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore2 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
@@ -3326,10 +3342,14 @@
     SMstore3 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore3 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
@@ -3338,10 +3358,14 @@
     SMstore4 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore4 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
@@ -3350,10 +3374,14 @@
     SMstore5 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore5 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
@@ -3362,10 +3390,14 @@
     SMstore6 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore6 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
@@ -3374,10 +3406,14 @@
     SMstore7 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore7 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
@@ -3386,10 +3422,14 @@
     SMstore8 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     SMstore8 Zone Baseboard, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    1;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
 
 ! ***SIZING & CONTROLS***
 
@@ -5082,6 +5122,9 @@
 
   Output:SQLite,
     Simple;                  !- Option Type
+
+  Output:JSON,
+    TimeSeries;    !- Option Type
 
   EnvironmentalImpactFactors,
     0.663,                   !- District Heating Efficiency

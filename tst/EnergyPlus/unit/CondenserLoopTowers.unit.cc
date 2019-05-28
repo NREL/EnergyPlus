@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,11 +55,13 @@
 #include <CondenserLoopTowers.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
+#include <DataSizing.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Plant/PlantManager.hh>
 #include <SimulationManager.hh>
+#include <SizingManager.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -624,7 +626,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
                           "    1E+25,                   !- Nominal Capacity {W}",
                           "    1E+15,                   !- Free Convection Capacity {W}",
                           "    ,                        !- Free Convection Nominal Capacity Sizing Factor",
-                          "    , 						  !- Design Inlet Air Dry-Bulb Temperature",
+                          "    ,                        !- Design Inlet Air Dry-Bulb Temperature",
                           "    ,                        !- Design Inlet Air Wet-Bulb Temperature",
                           "    ,                        !- Design Approach Temperature",
                           "    ,                        !- Design Range Temperature",
@@ -2669,5 +2671,824 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     // check the low speed nominal capacity is higher than that of free convection nominal capacity
     EXPECT_GT(CondenserLoopTowers::SimpleTower(1).TowerLowSpeedNomCap, CondenserLoopTowers::SimpleTower(1).TowerFreeConvNomCap);
 }
+
+
+TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_SizingPlant)
+{
+    std::string const idf_objects =
+        delimited_string({
+
+            // General Stuff
+            "Version, 9.2;",
+
+            "Timestep, 4;",
+
+            "Site:Location,",
+            "  Chicago Ohare Intl Ap,                  !- Name",
+            "  41.98,                                  !- Latitude {deg}",
+            "  -87.92,                                 !- Longitude {deg}",
+            "  -6,                                     !- Time Zone {hr}",
+            "  201;                                    !- Elevation {m}",
+
+            "SizingPeriod:DesignDay,",
+            "  CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
+            "  7,                       !- Month",
+            "  21,                      !- Day of Month",
+            "  SummerDesignDay,         !- Day Type",
+            "  31.2,                    !- Maximum Dry-Bulb Temperature {C}",
+            "  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+            "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+            "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+            "  Wetbulb,                 !- Humidity Condition Type",
+            "  25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+            "  ,                        !- Humidity Condition Day Schedule Name",
+            "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+            "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+            "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+            "  99063.,                  !- Barometric Pressure {Pa}",
+            "  5.3,                     !- Wind Speed {m/s}",
+            "  230,                     !- Wind Direction {deg}",
+            "  No,                      !- Rain Indicator",
+            "  No,                      !- Snow Indicator",
+            "  No,                      !- Daylight Saving Time Indicator",
+            "  ASHRAEClearSky,          !- Solar Model Indicator",
+            "  ,                        !- Beam Solar Day Schedule Name",
+            "  ,                        !- Diffuse Solar Day Schedule Name",
+            "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+            "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+            "  1.00;                    !- Sky Clearness",
+
+
+            "SimulationControl,",
+            "  No,                                    !- Do Zone Sizing Calculation",
+            "  No,                                    !- Do System Sizing Calculation",
+            "  Yes,                                   !- Do Plant Sizing Calculation",
+            "  Yes,                                   !- Run Simulation for Sizing Periods",
+            "  No;                                    !- Run Simulation for Weather File Run Periods",
+
+            "ScheduleTypeLimits, Any Number;",
+
+
+            // Define a condenser loop, with a CT Single Speed on the supply, and a load profile on the demand side
+            // We set the Sizing:Plant design loop exit temperature at 25C, and the Cooling Tower Design Inlet Air WB Temp to 25.6C (78F)
+            // in order to trigger an error
+
+            "PlantLoop,",
+            "  CndW Loop,                              !- Name",
+            "  Water,                                  !- Fluid Type",
+            "  ,                                       !- User Defined Fluid Type",
+            "  CndW Loop Operation Schemes,            !- Plant Equipment Operation Scheme Name",
+            "  CndW Loop Supply Outlet Node,           !- Loop Temperature Setpoint Node Name",
+            "  100,                                    !- Maximum Loop Temperature {C}",
+            "  0,                                      !- Minimum Loop Temperature {C}",
+            "  Autosize,                               !- Maximum Loop Flow Rate {m3/s}",
+            "  0,                                      !- Minimum Loop Flow Rate {m3/s}",
+            "  Autocalculate,                          !- Plant Loop Volume {m3}",
+            "  CndW Loop Supply Inlet Node,            !- Plant Side Inlet Node Name",
+            "  CndW Loop Supply Outlet Node,           !- Plant Side Outlet Node Name",
+            "  CndW Loop Supply Branches,              !- Plant Side Branch List Name",
+            "  CndW Loop Supply Connector List,        !- Plant Side Connector List Name",
+            "  CndW Loop Demand Inlet Node,            !- Demand Side Inlet Node Name",
+            "  CndW Loop Demand Outlet Node,           !- Demand Side Outlet Node Name",
+            "  CndW Loop Demand Branches,              !- Demand Side Branch List Name",
+            "  CndW Loop Demand Connector List,        !- Demand Side Connector List Name",
+            "  Optimal,                                !- Load Distribution Scheme",
+            "  ,                                       !- Availability Manager List Name",
+            "  SingleSetpoint,                         !- Plant Loop Demand Calculation Scheme",
+            "  ;                                       !- Common Pipe Simulation",
+
+            "Sizing:Plant,",
+            "  CndW Loop,                              !- Plant or Condenser Loop Name",
+            "  Condenser,                              !- Loop Type",
+            "  25,                                     !- Design Loop Exit Temperature {C}",
+            "  7,                                      !- Loop Design Temperature Difference {deltaC}",
+            "  NonCoincident,                          !- Sizing Option",
+            "  1,                                      !- Zone Timesteps in Averaging Window",
+            "  None;                                   !- Coincident Sizing Factor Mode",
+
+            "BranchList,",
+            "  CndW Loop Supply Branches,              !- Name",
+            "  CndW Loop Supply Inlet Branch,          !- Branch Name 1",
+            "  CndW Loop Supply CT Branch,              !- Branch Name 2",
+            "  CndW Loop Supply Bypass Branch,              !- Branch Name 3",
+            "  CndW Loop Supply Outlet Branch;         !- Branch Name 4",
+
+            "ConnectorList,",
+            "  CndW Loop Supply Connector List,        !- Name",
+            "  Connector:Splitter,                     !- Connector Object Type 1",
+            "  CndW Loop Supply Splitter,              !- Connector Name 1",
+            "  Connector:Mixer,                        !- Connector Object Type 2",
+            "  CndW Loop Supply Mixer;                 !- Connector Name 2",
+
+            "Connector:Splitter,",
+            "  CndW Loop Supply Splitter,              !- Name",
+            "  CndW Loop Supply Inlet Branch,          !- Inlet Branch Name",
+            "  CndW Loop Supply CT Branch,              !- Outlet Branch Name 1",
+            "  CndW Loop Supply Bypass Branch;              !- Outlet Branch Name 2",
+
+            "Connector:Mixer,",
+            "  CndW Loop Supply Mixer,                 !- Name",
+            "  CndW Loop Supply Outlet Branch,         !- Outlet Branch Name",
+            "  CndW Loop Supply CT Branch,              !- Inlet Branch Name 1",
+            "  CndW Loop Supply Bypass Branch;              !- Inlet Branch Name 2",
+
+            "Branch,",
+            "  CndW Loop Supply Inlet Branch,          !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pump:VariableSpeed,                     !- Component Object Type 1",
+            "  VSP Pump,                               !- Component Name 1",
+            "  CndW Loop Supply Inlet Node,            !- Component Inlet Node Name 1",
+            "  CndW Loop Pump Outlet Node;             !- Component Outlet Node Name 1",
+
+            "Pump:VariableSpeed,",
+            "  VSP Pump,                               !- Name",
+            "  CndW Loop Supply Inlet Node,            !- Inlet Node Name",
+            "  CndW Loop Pump Outlet Node,             !- Outlet Node Name",
+            "  Autosize,                               !- Design Maximum Flow Rate {m3/s}",
+            "  179352,                                 !- Design Pump Head {Pa}",
+            "  Autosize,                               !- Design Power Consumption {W}",
+            "  0.9,                                    !- Motor Efficiency",
+            "  0,                                      !- Fraction of Motor Inefficiencies to Fluid Stream",
+            "  0,                                      !- Coefficient 1 of the Part Load Performance Curve",
+            "  1,                                      !- Coefficient 2 of the Part Load Performance Curve",
+            "  0,                                      !- Coefficient 3 of the Part Load Performance Curve",
+            "  0,                                      !- Coefficient 4 of the Part Load Performance Curve",
+            "  0,                                      !- Design Minimum Flow Rate {m3/s}",
+            "  Intermittent,                           !- Pump Control Type",
+            "  ,                                       !- Pump Flow Rate Schedule Name",
+            "  ,                                       !- Pump Curve Name",
+            "  ,                                       !- Impeller Diameter {m}",
+            "  ,                                       !- VFD Control Type",
+            "  ,                                       !- Pump rpm Schedule Name",
+            "  ,                                       !- Minimum Pressure Schedule {Pa}",
+            "  ,                                       !- Maximum Pressure Schedule {Pa}",
+            "  ,                                       !- Minimum RPM Schedule {Rotations Per Minute}",
+            "  ,                                       !- Maximum RPM Schedule {Rotations Per Minute}",
+            "  ,                                       !- Zone Name",
+            "  0.5,                                    !- Skin Loss Radiative Fraction",
+            "  PowerPerFlowPerPressure,                !- Design Power Sizing Method",
+            "  348701.1,                               !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
+            "  1.282051282,                            !- Design Shaft Power per Unit Flow Rate per Unit Head",
+            "  0;                                      !- Design Minimum Flow Rate Fraction",
+
+            "Branch,",
+            "  CndW Loop Supply CT Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  CoolingTower:SingleSpeed,               !- Component Object Type 1",
+            "  CT Single Speed,                        !- Component Name 1",
+            "  CT Single Speed Inlet Node,             !- Component Inlet Node Name 1",
+            "  CT Single Speed Outlet Node;            !- Component Outlet Node Name 1",
+
+            "CoolingTower:SingleSpeed,",
+            "  CT Single Speed,                        !- Name",
+            "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",
+            "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",
+            "  Autosize,                               !- Design Water Flow Rate {m3/s}",
+            "  Autosize,                               !- Design Air Flow Rate {m3/s}",
+            "  Autosize,                               !- Design Fan Power {W}",
+            "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",
+            "  Autosize,                               !- Free Convection Air Flow Rate {m3/s}",
+            "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",
+            "  Autosize,                               !- Free Convection U-Factor Times Area Value {W/K}",
+            "  0.1,                                    !- Free Convection U-Factor Times Area Value Sizing Factor",
+            "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+            "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio",
+            "  ,                                       !- Nominal Capacity {W}",
+            "  0,                                      !- Free Convection Capacity {W}",
+            "  0.1,                                    !- Free Convection Nominal Capacity Sizing Factor",
+            "  25.6,                                   !- Design Inlet Air Dry-Bulb Temperature {C}",
+            "  25.6,                                   !- Design Inlet Air Wet-Bulb Temperature {C}",
+            "  Autosize,                               !- Design Approach Temperature {deltaC}",
+            "  Autosize,                               !- Design Range Temperature {deltaC}",
+            "  0,                                      !- Basin Heater Capacity {W/K}",
+            "  2,                                      !- Basin Heater Setpoint Temperature {C}",
+            "  ,                                       !- Basin Heater Operating Schedule Name",
+            "  LossFactor,                             !- Evaporation Loss Mode",
+            "  0.2,                                    !- Evaporation Loss Factor {percent/K}",
+            "  0.008,                                  !- Drift Loss Percent {percent}",
+            "  ConcentrationRatio,                     !- Blowdown Calculation Mode",
+            "  3,                                      !- Blowdown Concentration Ratio",
+            "  ,                                       !- Blowdown Makeup Water Usage Schedule Name",
+            "  ,                                       !- Supply Water Storage Tank Name",
+            "  ,                                       !- Outdoor Air Inlet Node Name",
+            "  FanCycling,                             !- Capacity Control",
+            "  1,                                      !- Number of Cells",
+            "  MinimalCell,                            !- Cell Control",
+            "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",
+            "  2.5,                                    !- Cell Maximum Water Flow Rate Fraction",
+            "  1,                                      !- Sizing Factor",
+            "  General;                                !- End-Use Subcategory",
+
+            "Branch,",
+            "  CndW Loop Supply Bypass Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Supply Bypass Pipe,                     !- Component Name 1",
+            "  Supply Bypass Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  Supply Bypass Pipe Outlet Node;         !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Supply Bypass Pipe,                     !- Name",
+            "  Supply Bypass Pipe Inlet Node,          !- Inlet Node Name",
+            "  Supply Bypass Pipe Outlet Node;         !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Supply Outlet Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Supply Outlet Pipe,                     !- Component Name 1",
+            "  Supply Outlet Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  CndW Loop Supply Outlet Node;           !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Supply Outlet Pipe,                     !- Name",
+            "  Supply Outlet Pipe Inlet Node,          !- Inlet Node Name",
+            "  CndW Loop Supply Outlet Node;           !- Outlet Node Name",
+
+            "SetpointManager:FollowOutdoorAirTemperature,",
+            "  SPM Follow OAT 7F,                      !- Name",
+            "  Temperature,                            !- Control Variable",
+            "  OutdoorAirWetBulb,                      !- Reference Temperature Type",
+            "  3.88888888888889,                       !- Offset Temperature Difference {deltaC}",
+            "  80,                                     !- Maximum Setpoint Temperature {C}",
+            "  6,                                      !- Minimum Setpoint Temperature {C}",
+            "  CndW Loop Supply Outlet Node;           !- Setpoint Node or NodeList Name",
+
+            "BranchList,",
+            "  CndW Loop Demand Branches,              !- Name",
+            "  CndW Loop Demand Inlet Branch,          !- Branch Name 1",
+            "  CndW Loop Demand Load Profile Branch,              !- Branch Name 2",
+            "  CndW Loop Demand Bypass Branch,         !- Branch Name 3",
+            "  CndW Loop Demand Outlet Branch;         !- Branch Name 4",
+
+            "ConnectorList,",
+            "  CndW Loop Demand Connector List,        !- Name",
+            "  Connector:Splitter,                     !- Connector Object Type 1",
+            "  CndW Loop Demand Splitter,              !- Connector Name 1",
+            "  Connector:Mixer,                        !- Connector Object Type 2",
+            "  CndW Loop Demand Mixer;                 !- Connector Name 2",
+
+            "Connector:Splitter,",
+            "  CndW Loop Demand Splitter,              !- Name",
+            "  CndW Loop Demand Inlet Branch,          !- Inlet Branch Name",
+            "  CndW Loop Demand Load Profile Branch,              !- Outlet Branch Name 1",
+            "  CndW Loop Demand Bypass Branch;         !- Outlet Branch Name 2",
+
+            "Connector:Mixer,",
+            "  CndW Loop Demand Mixer,                 !- Name",
+            "  CndW Loop Demand Outlet Branch,         !- Outlet Branch Name",
+            "  CndW Loop Demand Load Profile Branch,              !- Inlet Branch Name 1",
+            "  CndW Loop Demand Bypass Branch;         !- Inlet Branch Name 2",
+
+            "Branch,",
+            "  CndW Loop Demand Inlet Branch,          !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Demand Inlet Pipe,                      !- Component Name 1",
+            "  CndW Loop Demand Inlet Node,            !- Component Inlet Node Name 1",
+            "  Demand Inlet Pipe Outlet Node;          !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Demand Inlet Pipe,                      !- Name",
+            "  CndW Loop Demand Inlet Node,            !- Inlet Node Name",
+            "  Demand Inlet Pipe Outlet Node;          !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Demand Load Profile Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  LoadProfile:Plant,                      !- Component Object Type 1",
+            "  Load Profile,                           !- Component Name 1",
+            "  Load Profile Inlet Node,                !- Component Inlet Node Name 1",
+            "  Load Profile Outlet Node;               !- Component Outlet Node Name 1",
+
+            "LoadProfile:Plant,",
+            "  Load Profile,                           !- Name",
+            "  Load Profile Inlet Node,                !- Inlet Node Name",
+            "  Load Profile Outlet Node,               !- Outlet Node Name",
+            "  Load Profile Load Schedule,             !- Load Schedule Name",
+            "  2.0,                                    !- Peak Flow Rate {m3/s}",
+            "  Load Profile Flow Frac Schedule;        !- Flow Rate Fraction Schedule Name",
+
+            "Schedule:Compact,",
+            "  Load Profile Load Schedule,  !- Name",
+            "  Any Number,              !- Schedule Type Limits Name",
+            "  THROUGH: 12/31,          !- Field 1",
+            "  FOR: AllDays,            !- Field 2",
+            "  UNTIL: 24:00,-10000.0;   !- Field 3",
+
+            "Schedule:Compact,",
+            "  Load Profile Flow Frac Schedule,  !- Name",
+            "  Any Number,              !- Schedule Type Limits Name",
+            "  THROUGH: 12/31,          !- Field 1",
+            "  FOR: AllDays,            !- Field 2",
+            "  UNTIL: 24:00,1.0;        !- Field 3",
+
+            "Branch,",
+            "  CndW Loop Demand Bypass Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  CndW Loop Demand Bypass Pipe,           !- Component Name 1",
+            "  CndW Loop Demand Bypass Pipe Inlet Node, !- Component Inlet Node Name 1",
+            "  CndW Loop Demand Bypass Pipe Outlet Node; !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  CndW Loop Demand Bypass Pipe,           !- Name",
+            "  CndW Loop Demand Bypass Pipe Inlet Node, !- Inlet Node Name",
+            "  CndW Loop Demand Bypass Pipe Outlet Node; !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Demand Outlet Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Demand Outlet Pipe,                     !- Component Name 1",
+            "  Demand Outlet Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  CndW Loop Demand Outlet Node;           !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Demand Outlet Pipe,                     !- Name",
+            "  Demand Outlet Pipe Inlet Node,          !- Inlet Node Name",
+            "  CndW Loop Demand Outlet Node;           !- Outlet Node Name",
+
+            "PlantEquipmentOperationSchemes,",
+            "  CndW Loop Operation Schemes,            !- Name",
+            "  PlantEquipmentOperation:CoolingLoad,    !- Control Scheme Object Type 1",
+            "  CndW Loop Cooling Operation Scheme,     !- Control Scheme Name 1",
+            "  Always On Discrete;                     !- Control Scheme Schedule Name 1",
+
+            "PlantEquipmentOperation:CoolingLoad,",
+            "  CndW Loop Cooling Operation Scheme,     !- Name",
+            "  0,                                      !- Load Range Lower Limit 1 {W}",
+            "  1000000000,                             !- Load Range Upper Limit 1 {W}",
+            "  CndW Loop Cooling Equipment List;       !- Range Equipment List Name 1",
+
+            "PlantEquipmentList,",
+            "  CndW Loop Cooling Equipment List,       !- Name",
+            "  CoolingTower:SingleSpeed,               !- Equipment Object Type 1",
+            "  CT Single Speed;                        !- Equipment Name 1",
+
+        });
+
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    SimulationManager::PostIPProcessing();
+
+    DataGlobals::BeginSimFlag = true;
+    SimulationManager::GetProjectData();
+    OutputReportPredefined::SetPredefinedTables();
+
+    OutputProcessor::TimeValue.allocate(2);
+    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    createFacilityElectricPowerServiceObject();
+    OutputProcessor::GetReportVariableInput();
+    PlantManager::CheckIfAnyPlant();
+
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    // Get plant loop data
+    PlantManager::GetPlantLoopData();
+    PlantManager::GetPlantInput();
+    SizingManager::GetPlantSizingInput();
+    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::SizePlantLoop(1, true);
+    PlantManager::InitLoopEquip = true;
+
+    // Fake having more than small load
+    DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
+
+    DataGlobals::DoingSizing = false;
+    DataGlobals::KickOffSimulation = true;
+
+
+    // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
+    ASSERT_THROW(CondenserLoopTowers::SizeTower(1), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+
+         "   ** Severe  ** Error when autosizing the UA value for cooling tower = CT SINGLE SPEED. Design Loop Exit Temperature must be greater than 25.60 C when autosizing the tower UA.",
+        "   **   ~~~   ** The Design Loop Exit Temperature specified in Sizing:Plant object = CNDW LOOP (25.00 C)",
+        "   **   ~~~   ** is less than or equal to the design inlet air wet-bulb temperature of 25.60 C.",
+        "   **   ~~~   ** If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > 25.60 C if autosizing the cooling tower.",
+        "   **  Fatal  ** Autosizing of cooling tower fails for tower = CT SINGLE SPEED.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Error when autosizing the UA value for cooling tower = CT SINGLE SPEED. Design Loop Exit Temperature must be greater than 25.60 C when autosizing the tower UA."
+});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+
+TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSpecified)
+{
+    std::string const idf_objects =
+        delimited_string({
+
+            // General Stuff
+            "Version, 9.2;",
+
+            "Timestep, 4;",
+
+            "Site:Location,",
+            "  Chicago Ohare Intl Ap,                  !- Name",
+            "  41.98,                                  !- Latitude {deg}",
+            "  -87.92,                                 !- Longitude {deg}",
+            "  -6,                                     !- Time Zone {hr}",
+            "  201;                                    !- Elevation {m}",
+
+            "SizingPeriod:DesignDay,",
+            "  CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
+            "  7,                       !- Month",
+            "  21,                      !- Day of Month",
+            "  SummerDesignDay,         !- Day Type",
+            "  31.2,                    !- Maximum Dry-Bulb Temperature {C}",
+            "  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+            "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+            "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+            "  Wetbulb,                 !- Humidity Condition Type",
+            "  25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+            "  ,                        !- Humidity Condition Day Schedule Name",
+            "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+            "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+            "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+            "  99063.,                  !- Barometric Pressure {Pa}",
+            "  5.3,                     !- Wind Speed {m/s}",
+            "  230,                     !- Wind Direction {deg}",
+            "  No,                      !- Rain Indicator",
+            "  No,                      !- Snow Indicator",
+            "  No,                      !- Daylight Saving Time Indicator",
+            "  ASHRAEClearSky,          !- Solar Model Indicator",
+            "  ,                        !- Beam Solar Day Schedule Name",
+            "  ,                        !- Diffuse Solar Day Schedule Name",
+            "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+            "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+            "  1.00;                    !- Sky Clearness",
+
+
+            "SimulationControl,",
+            "  No,                                    !- Do Zone Sizing Calculation",
+            "  No,                                    !- Do System Sizing Calculation",
+            "  Yes,                                   !- Do Plant Sizing Calculation",
+            "  Yes,                                   !- Run Simulation for Sizing Periods",
+            "  No;                                    !- Run Simulation for Weather File Run Periods",
+
+            "ScheduleTypeLimits, Any Number;",
+
+
+            // Define a condenser loop, with a CT Single Speed on the supply, and a load profile on the demand side
+            // We set the Sizing:Plant design loop exit temperature at 25C, and the Cooling Tower Design Inlet Air WB Temp to 25.6C (78F)
+            // in order to trigger an error
+
+            "PlantLoop,",
+            "  CndW Loop,                              !- Name",
+            "  Water,                                  !- Fluid Type",
+            "  ,                                       !- User Defined Fluid Type",
+            "  CndW Loop Operation Schemes,            !- Plant Equipment Operation Scheme Name",
+            "  CndW Loop Supply Outlet Node,           !- Loop Temperature Setpoint Node Name",
+            "  100,                                    !- Maximum Loop Temperature {C}",
+            "  0,                                      !- Minimum Loop Temperature {C}",
+            "  Autosize,                               !- Maximum Loop Flow Rate {m3/s}",
+            "  0,                                      !- Minimum Loop Flow Rate {m3/s}",
+            "  Autocalculate,                          !- Plant Loop Volume {m3}",
+            "  CndW Loop Supply Inlet Node,            !- Plant Side Inlet Node Name",
+            "  CndW Loop Supply Outlet Node,           !- Plant Side Outlet Node Name",
+            "  CndW Loop Supply Branches,              !- Plant Side Branch List Name",
+            "  CndW Loop Supply Connector List,        !- Plant Side Connector List Name",
+            "  CndW Loop Demand Inlet Node,            !- Demand Side Inlet Node Name",
+            "  CndW Loop Demand Outlet Node,           !- Demand Side Outlet Node Name",
+            "  CndW Loop Demand Branches,              !- Demand Side Branch List Name",
+            "  CndW Loop Demand Connector List,        !- Demand Side Connector List Name",
+            "  Optimal,                                !- Load Distribution Scheme",
+            "  ,                                       !- Availability Manager List Name",
+            "  SingleSetpoint,                         !- Plant Loop Demand Calculation Scheme",
+            "  ;                                       !- Common Pipe Simulation",
+
+            // No Sizing:Plant
+
+            "BranchList,",
+            "  CndW Loop Supply Branches,              !- Name",
+            "  CndW Loop Supply Inlet Branch,          !- Branch Name 1",
+            "  CndW Loop Supply CT Branch,              !- Branch Name 2",
+            "  CndW Loop Supply Bypass Branch,              !- Branch Name 3",
+            "  CndW Loop Supply Outlet Branch;         !- Branch Name 4",
+
+            "ConnectorList,",
+            "  CndW Loop Supply Connector List,        !- Name",
+            "  Connector:Splitter,                     !- Connector Object Type 1",
+            "  CndW Loop Supply Splitter,              !- Connector Name 1",
+            "  Connector:Mixer,                        !- Connector Object Type 2",
+            "  CndW Loop Supply Mixer;                 !- Connector Name 2",
+
+            "Connector:Splitter,",
+            "  CndW Loop Supply Splitter,              !- Name",
+            "  CndW Loop Supply Inlet Branch,          !- Inlet Branch Name",
+            "  CndW Loop Supply CT Branch,              !- Outlet Branch Name 1",
+            "  CndW Loop Supply Bypass Branch;              !- Outlet Branch Name 2",
+
+            "Connector:Mixer,",
+            "  CndW Loop Supply Mixer,                 !- Name",
+            "  CndW Loop Supply Outlet Branch,         !- Outlet Branch Name",
+            "  CndW Loop Supply CT Branch,              !- Inlet Branch Name 1",
+            "  CndW Loop Supply Bypass Branch;              !- Inlet Branch Name 2",
+
+            "Branch,",
+            "  CndW Loop Supply Inlet Branch,          !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pump:VariableSpeed,                     !- Component Object Type 1",
+            "  VSP Pump,                               !- Component Name 1",
+            "  CndW Loop Supply Inlet Node,            !- Component Inlet Node Name 1",
+            "  CndW Loop Pump Outlet Node;             !- Component Outlet Node Name 1",
+
+            "Pump:VariableSpeed,",
+            "  VSP Pump,                               !- Name",
+            "  CndW Loop Supply Inlet Node,            !- Inlet Node Name",
+            "  CndW Loop Pump Outlet Node,             !- Outlet Node Name",
+            "  Autosize,                               !- Design Maximum Flow Rate {m3/s}",
+            "  179352,                                 !- Design Pump Head {Pa}",
+            "  Autosize,                               !- Design Power Consumption {W}",
+            "  0.9,                                    !- Motor Efficiency",
+            "  0,                                      !- Fraction of Motor Inefficiencies to Fluid Stream",
+            "  0,                                      !- Coefficient 1 of the Part Load Performance Curve",
+            "  1,                                      !- Coefficient 2 of the Part Load Performance Curve",
+            "  0,                                      !- Coefficient 3 of the Part Load Performance Curve",
+            "  0,                                      !- Coefficient 4 of the Part Load Performance Curve",
+            "  0,                                      !- Design Minimum Flow Rate {m3/s}",
+            "  Intermittent,                           !- Pump Control Type",
+            "  ,                                       !- Pump Flow Rate Schedule Name",
+            "  ,                                       !- Pump Curve Name",
+            "  ,                                       !- Impeller Diameter {m}",
+            "  ,                                       !- VFD Control Type",
+            "  ,                                       !- Pump rpm Schedule Name",
+            "  ,                                       !- Minimum Pressure Schedule {Pa}",
+            "  ,                                       !- Maximum Pressure Schedule {Pa}",
+            "  ,                                       !- Minimum RPM Schedule {Rotations Per Minute}",
+            "  ,                                       !- Maximum RPM Schedule {Rotations Per Minute}",
+            "  ,                                       !- Zone Name",
+            "  0.5,                                    !- Skin Loss Radiative Fraction",
+            "  PowerPerFlowPerPressure,                !- Design Power Sizing Method",
+            "  348701.1,                               !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
+            "  1.282051282,                            !- Design Shaft Power per Unit Flow Rate per Unit Head",
+            "  0;                                      !- Design Minimum Flow Rate Fraction",
+
+            "Branch,",
+            "  CndW Loop Supply CT Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  CoolingTower:SingleSpeed,               !- Component Object Type 1",
+            "  CT Single Speed,                        !- Component Name 1",
+            "  CT Single Speed Inlet Node,             !- Component Inlet Node Name 1",
+            "  CT Single Speed Outlet Node;            !- Component Outlet Node Name 1",
+
+            "CoolingTower:SingleSpeed,",
+            "  CT Single Speed,                        !- Name",
+            "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",
+            "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",
+            "  Autosize,                               !- Design Water Flow Rate {m3/s}",
+            "  Autosize,                               !- Design Air Flow Rate {m3/s}",
+            "  Autosize,                               !- Design Fan Power {W}",
+            "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",
+            "  Autosize,                               !- Free Convection Air Flow Rate {m3/s}",
+            "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",
+            "  Autosize,                               !- Free Convection U-Factor Times Area Value {W/K}",
+            "  0.1,                                    !- Free Convection U-Factor Times Area Value Sizing Factor",
+            "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+            "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio",
+            "  ,                                       !- Nominal Capacity {W}",
+            "  0,                                      !- Free Convection Capacity {W}",
+            "  0.1,                                    !- Free Convection Nominal Capacity Sizing Factor",
+            "  25.6,                                   !- Design Inlet Air Dry-Bulb Temperature {C}",
+            "  25.6,                                   !- Design Inlet Air Wet-Bulb Temperature {C}",
+            "  Autosize,                               !- Design Approach Temperature {deltaC}",
+            "  Autosize,                               !- Design Range Temperature {deltaC}",
+            "  0,                                      !- Basin Heater Capacity {W/K}",
+            "  2,                                      !- Basin Heater Setpoint Temperature {C}",
+            "  ,                                       !- Basin Heater Operating Schedule Name",
+            "  LossFactor,                             !- Evaporation Loss Mode",
+            "  0.2,                                    !- Evaporation Loss Factor {percent/K}",
+            "  0.008,                                  !- Drift Loss Percent {percent}",
+            "  ConcentrationRatio,                     !- Blowdown Calculation Mode",
+            "  3,                                      !- Blowdown Concentration Ratio",
+            "  ,                                       !- Blowdown Makeup Water Usage Schedule Name",
+            "  ,                                       !- Supply Water Storage Tank Name",
+            "  ,                                       !- Outdoor Air Inlet Node Name",
+            "  FanCycling,                             !- Capacity Control",
+            "  1,                                      !- Number of Cells",
+            "  MinimalCell,                            !- Cell Control",
+            "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",
+            "  2.5,                                    !- Cell Maximum Water Flow Rate Fraction",
+            "  1,                                      !- Sizing Factor",
+            "  General;                                !- End-Use Subcategory",
+
+            "Branch,",
+            "  CndW Loop Supply Bypass Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Supply Bypass Pipe,                     !- Component Name 1",
+            "  Supply Bypass Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  Supply Bypass Pipe Outlet Node;         !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Supply Bypass Pipe,                     !- Name",
+            "  Supply Bypass Pipe Inlet Node,          !- Inlet Node Name",
+            "  Supply Bypass Pipe Outlet Node;         !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Supply Outlet Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Supply Outlet Pipe,                     !- Component Name 1",
+            "  Supply Outlet Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  CndW Loop Supply Outlet Node;           !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Supply Outlet Pipe,                     !- Name",
+            "  Supply Outlet Pipe Inlet Node,          !- Inlet Node Name",
+            "  CndW Loop Supply Outlet Node;           !- Outlet Node Name",
+
+            "SetpointManager:FollowOutdoorAirTemperature,",
+            "  SPM Follow OAT 7F,                      !- Name",
+            "  Temperature,                            !- Control Variable",
+            "  OutdoorAirWetBulb,                      !- Reference Temperature Type",
+            "  3.88888888888889,                       !- Offset Temperature Difference {deltaC}",
+            "  80,                                     !- Maximum Setpoint Temperature {C}",
+            "  6,                                      !- Minimum Setpoint Temperature {C}",
+            "  CndW Loop Supply Outlet Node;           !- Setpoint Node or NodeList Name",
+
+            "BranchList,",
+            "  CndW Loop Demand Branches,              !- Name",
+            "  CndW Loop Demand Inlet Branch,          !- Branch Name 1",
+            "  CndW Loop Demand Load Profile Branch,              !- Branch Name 2",
+            "  CndW Loop Demand Bypass Branch,         !- Branch Name 3",
+            "  CndW Loop Demand Outlet Branch;         !- Branch Name 4",
+
+            "ConnectorList,",
+            "  CndW Loop Demand Connector List,        !- Name",
+            "  Connector:Splitter,                     !- Connector Object Type 1",
+            "  CndW Loop Demand Splitter,              !- Connector Name 1",
+            "  Connector:Mixer,                        !- Connector Object Type 2",
+            "  CndW Loop Demand Mixer;                 !- Connector Name 2",
+
+            "Connector:Splitter,",
+            "  CndW Loop Demand Splitter,              !- Name",
+            "  CndW Loop Demand Inlet Branch,          !- Inlet Branch Name",
+            "  CndW Loop Demand Load Profile Branch,              !- Outlet Branch Name 1",
+            "  CndW Loop Demand Bypass Branch;         !- Outlet Branch Name 2",
+
+            "Connector:Mixer,",
+            "  CndW Loop Demand Mixer,                 !- Name",
+            "  CndW Loop Demand Outlet Branch,         !- Outlet Branch Name",
+            "  CndW Loop Demand Load Profile Branch,              !- Inlet Branch Name 1",
+            "  CndW Loop Demand Bypass Branch;         !- Inlet Branch Name 2",
+
+            "Branch,",
+            "  CndW Loop Demand Inlet Branch,          !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Demand Inlet Pipe,                      !- Component Name 1",
+            "  CndW Loop Demand Inlet Node,            !- Component Inlet Node Name 1",
+            "  Demand Inlet Pipe Outlet Node;          !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Demand Inlet Pipe,                      !- Name",
+            "  CndW Loop Demand Inlet Node,            !- Inlet Node Name",
+            "  Demand Inlet Pipe Outlet Node;          !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Demand Load Profile Branch,              !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  LoadProfile:Plant,                      !- Component Object Type 1",
+            "  Load Profile,                           !- Component Name 1",
+            "  Load Profile Inlet Node,                !- Component Inlet Node Name 1",
+            "  Load Profile Outlet Node;               !- Component Outlet Node Name 1",
+
+            "LoadProfile:Plant,",
+            "  Load Profile,                           !- Name",
+            "  Load Profile Inlet Node,                !- Inlet Node Name",
+            "  Load Profile Outlet Node,               !- Outlet Node Name",
+            "  Load Profile Load Schedule,             !- Load Schedule Name",
+            "  2.0,                                    !- Peak Flow Rate {m3/s}",
+            "  Load Profile Flow Frac Schedule;        !- Flow Rate Fraction Schedule Name",
+
+            "Schedule:Compact,",
+            "  Load Profile Load Schedule,  !- Name",
+            "  Any Number,              !- Schedule Type Limits Name",
+            "  THROUGH: 12/31,          !- Field 1",
+            "  FOR: AllDays,            !- Field 2",
+            "  UNTIL: 24:00,-10000.0;   !- Field 3",
+
+            "Schedule:Compact,",
+            "  Load Profile Flow Frac Schedule,  !- Name",
+            "  Any Number,              !- Schedule Type Limits Name",
+            "  THROUGH: 12/31,          !- Field 1",
+            "  FOR: AllDays,            !- Field 2",
+            "  UNTIL: 24:00,1.0;        !- Field 3",
+
+            "Branch,",
+            "  CndW Loop Demand Bypass Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  CndW Loop Demand Bypass Pipe,           !- Component Name 1",
+            "  CndW Loop Demand Bypass Pipe Inlet Node, !- Component Inlet Node Name 1",
+            "  CndW Loop Demand Bypass Pipe Outlet Node; !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  CndW Loop Demand Bypass Pipe,           !- Name",
+            "  CndW Loop Demand Bypass Pipe Inlet Node, !- Inlet Node Name",
+            "  CndW Loop Demand Bypass Pipe Outlet Node; !- Outlet Node Name",
+
+            "Branch,",
+            "  CndW Loop Demand Outlet Branch,         !- Name",
+            "  ,                                       !- Pressure Drop Curve Name",
+            "  Pipe:Adiabatic,                         !- Component Object Type 1",
+            "  Demand Outlet Pipe,                     !- Component Name 1",
+            "  Demand Outlet Pipe Inlet Node,          !- Component Inlet Node Name 1",
+            "  CndW Loop Demand Outlet Node;           !- Component Outlet Node Name 1",
+
+            "Pipe:Adiabatic,",
+            "  Demand Outlet Pipe,                     !- Name",
+            "  Demand Outlet Pipe Inlet Node,          !- Inlet Node Name",
+            "  CndW Loop Demand Outlet Node;           !- Outlet Node Name",
+
+            "PlantEquipmentOperationSchemes,",
+            "  CndW Loop Operation Schemes,            !- Name",
+            "  PlantEquipmentOperation:CoolingLoad,    !- Control Scheme Object Type 1",
+            "  CndW Loop Cooling Operation Scheme,     !- Control Scheme Name 1",
+            "  Always On Discrete;                     !- Control Scheme Schedule Name 1",
+
+            "PlantEquipmentOperation:CoolingLoad,",
+            "  CndW Loop Cooling Operation Scheme,     !- Name",
+            "  0,                                      !- Load Range Lower Limit 1 {W}",
+            "  1000000000,                             !- Load Range Upper Limit 1 {W}",
+            "  CndW Loop Cooling Equipment List;       !- Range Equipment List Name 1",
+
+            "PlantEquipmentList,",
+            "  CndW Loop Cooling Equipment List,       !- Name",
+            "  CoolingTower:SingleSpeed,               !- Equipment Object Type 1",
+            "  CT Single Speed;                        !- Equipment Name 1",
+
+        });
+
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    SimulationManager::PostIPProcessing();
+
+    DataGlobals::BeginSimFlag = true;
+    SimulationManager::GetProjectData();
+    OutputReportPredefined::SetPredefinedTables();
+
+    OutputProcessor::TimeValue.allocate(2);
+    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    createFacilityElectricPowerServiceObject();
+    OutputProcessor::GetReportVariableInput();
+    PlantManager::CheckIfAnyPlant();
+
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    // Get plant loop data
+    PlantManager::GetPlantLoopData();
+    PlantManager::GetPlantInput();
+    SizingManager::GetPlantSizingInput();
+    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::SizePlantLoop(1, true);
+    PlantManager::InitLoopEquip = true;
+
+    // Fake having more than small load
+    // DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
+
+    //SizingManager::ManageSizing();
+
+    DataGlobals::DoingSizing = false;
+    DataGlobals::KickOffSimulation = true;
+
+    // get inputs of cooling tower object
+    CondenserLoopTowers::GetTowerInput();
+
+    CondenserLoopTowers::InitTower(1, false);
+
+    // Fake a flow
+    CondenserLoopTowers::SimpleTower(1).DesignWaterFlowRate = 1000.0;
+
+    // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
+    ASSERT_THROW(CondenserLoopTowers::SizeTower(1), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+
+        "   ** Severe  ** Error when autosizing the UA value for cooling tower = CT SINGLE SPEED. Design Tower Exit Temperature must be greater than 25.60 C when autosizing the tower UA.",
+        "   **   ~~~   ** The User-specified Design Loop Exit Temperature=21.00",
+        "   **   ~~~   ** is less than or equal to the design inlet air wet-bulb temperature of 25.60 C.",
+        "   **   ~~~   ** Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, it was defaulted to 21.00 C.",
+        "   **   ~~~   ** If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > 25.60 C if autosizing the cooling tower.",
+        "   **  Fatal  ** Autosizing of cooling tower fails for tower = CT SINGLE SPEED.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Error when autosizing the UA value for cooling tower = CT SINGLE SPEED. Design Tower Exit Temperature must be greater than 25.60 C when autosizing the tower UA.",
+
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
 
 } // namespace EnergyPlus

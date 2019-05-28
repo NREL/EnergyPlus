@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,6 +108,8 @@ public:
 
     void initializeMaps();
 
+    void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
+
     void processInput();
 
     int getNumSectionsFound(std::string const &SectionWord);
@@ -117,6 +119,10 @@ public:
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -281,7 +281,7 @@ namespace SolarShading {
     Array1D<SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SurfaceErrorTracking> TrackBaseSubSurround;
 
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     // MODULE SUBROUTINES:
 
@@ -583,7 +583,7 @@ namespace SolarShading {
         using ScheduleManager::ScheduleFileShadingProcessed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -743,11 +743,14 @@ namespace SolarShading {
         }
         int ExtShadingSchedNum;
         if (UseImportedSunlitFrac) {
-            for (auto surf : Surface) {
-                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(surf.Name + "_shading");
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
-                    surf.SchedExternalShadingFrac = true;
-                    surf.ExternalShadingSchInd = ExtShadingSchedNum;
+                    Surface(SurfNum).SchedExternalShadingFrac = true;
+                    Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
+                } else {
+                    ShowWarningError(cCurrentModuleObject + ": sunlit fraction schedule not found for " + Surface(SurfNum).Name + " when using ImportedShading.");
+                    ShowContinueError("These values are set to 1.0.");
                 }
             }
         }
@@ -863,11 +866,11 @@ namespace SolarShading {
             }
         }
 
-        gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
                                              "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
                                              "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
                                              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
-        gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
                                                  RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' + cAlphaArgs(2) + ',' +
                                                  cAlphaArgs(3) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
                                                  cAlphaArgs(7);
@@ -2538,7 +2541,7 @@ namespace SolarShading {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt ValFmt("(F20.4)");
+        static ObjexxFCL::gio::Fmt ValFmt("(F20.4)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2576,11 +2579,11 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                gio::write(VTString, "(I4)") << N;
+                ObjexxFCL::gio::write(VTString, "(I4)") << N;
                 strip(VTString);
                 ShowContinueError("   because vertex " + VTString + " of back surface=" + Surface(NBS).Name +
                                   " is in front of receiving surface=" + Surface(NRS).Name);
-                gio::write(CharDotP, ValFmt) << DOTP;
+                ObjexxFCL::gio::write(CharDotP, ValFmt) << DOTP;
                 strip(CharDotP);
                 ShowContinueError("   (Dot Product indicator=" + CharDotP + ')');
                 ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead.");
@@ -4472,13 +4475,11 @@ namespace SolarShading {
         // BLAST/IBLAST code, original author George Walton
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DataSystemVariables::ReportExtShadingSunlitFrac;
+
         using ScheduleManager::LookUpScheduleValue;
         using WindowComplexManager::InitComplexWindows;
         using WindowComplexManager::UpdateComplexWindows;
@@ -4496,13 +4497,7 @@ namespace SolarShading {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iHour;   // Hour index number
-        int TS;      // TimeStep Loop Counter
-        int SurfNum; // Do loop counter
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt ShdFracFmtName("(A, A)");
-        static gio::Fmt ShdFracFmt1("(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static gio::Fmt ShdFracFmt2("(f6.2,',')");
-        static gio::Fmt fmtN("('\n')");
+        int TS;      // TimeStep Loop Countergit
         static bool Once(true);
 
         if (Once) InitComplexWindows();
@@ -4564,32 +4559,6 @@ namespace SolarShading {
             }     // Hour Loop
         } else {
             FigureSolarBeamAtTimestep(HourOfDay, TimeStep);
-        }
-        if (ReportExtShadingSunlitFrac) {
-            if (KindOfSim == ksRunPeriodWeather) {
-                for (iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
-                    for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * (TS - 1);
-                        }
-                        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
-                            }
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            gio::write(OutputFileShadingFrac, fmtN, flags);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -4676,6 +4645,7 @@ namespace SolarShading {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
+        using DataSystemVariables::UseImportedSunlitFrac;
         using ScheduleManager::LookUpScheduleValue;
 
         // Locals
@@ -4713,7 +4683,7 @@ namespace SolarShading {
             CosIncAng(iTimeStep, iHour, SurfNum) = CTHETA(SurfNum);
         }
 
-        if (UseScheduledSunlitFrac) {
+        if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
@@ -4870,7 +4840,7 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -11145,7 +11115,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowWarningError("Base surface does not surround subsurface (CHKSBS), Overlap Status=" +
@@ -11163,7 +11133,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The base surround errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }
@@ -11185,7 +11155,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
@@ -11205,7 +11175,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The too many vertices errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }
@@ -11226,7 +11196,7 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                gio::write(CountOut, fmtLD) << Count;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
@@ -11246,7 +11216,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                gio::write(CountOut, fmtLD) << TotCount;
+                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
                 ShowContinueError("  The too many figures errors occurred " + stripped(CountOut) + " times (total).");
                 ShowMessage("");
             }

@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.2;
 
   Timestep,4;
 
@@ -678,8 +678,12 @@
     ExtShadingSch:EAST SIDE TREE,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    1,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    2,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:WEST SIDE TREE,   !- Name
@@ -692,8 +696,12 @@
     ExtShadingSch:WEST SIDE TREE,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    2,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    4,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL001:SHADE001,  !- Name
@@ -706,8 +714,12 @@
     ExtShadingSch:ZN001:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    3,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    6,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL001:SHADE001,  !- Name
@@ -720,8 +732,12 @@
     ExtShadingSch:ZN002:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    4,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    8,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL001:SHADE001,  !- Name
@@ -734,8 +750,12 @@
     ExtShadingSch:ZN003:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    5,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    10,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL001:SHADE001,  !- Name
@@ -748,8 +768,12 @@
     ExtShadingSch:ZN004:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    6,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    12,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL001:SHADE001,  !- Name
@@ -762,8 +786,12 @@
     ExtShadingSch:ZN005:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    7,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    14,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL001:SHADE001,  !- Name
@@ -776,8 +804,12 @@
     ExtShadingSch:ZN006:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    8,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    16,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL001:SHADE001,  !- Name
@@ -790,8 +822,12 @@
     ExtShadingSch:ZN007:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    9,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    18,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL001:SHADE001,  !- Name
@@ -804,8 +840,12 @@
     ExtShadingSch:ZN008:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    10,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    20,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL001:SHADE001,  !- Name
@@ -818,8 +858,12 @@
     ExtShadingSch:ZN009:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    11,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    22,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL001,    !- Name
@@ -832,8 +876,12 @@
     ExtShadingSch:ZN001:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    12,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    24,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL001:WIN001,  !- Name
@@ -846,8 +894,12 @@
     ExtShadingSch:ZN001:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    13,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    25,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL002,    !- Name
@@ -860,8 +912,12 @@
     ExtShadingSch:ZN001:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    14,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    26,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL002:WIN001,  !- Name
@@ -874,8 +930,12 @@
     ExtShadingSch:ZN001:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    15,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    27,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL003,    !- Name
@@ -888,8 +948,12 @@
     ExtShadingSch:ZN001:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    16,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    28,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL004,    !- Name
@@ -902,8 +966,12 @@
     ExtShadingSch:ZN001:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    17,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    29,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL005,    !- Name
@@ -916,8 +984,12 @@
     ExtShadingSch:ZN001:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    18,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    30,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL005:WIN001,  !- Name
@@ -930,8 +1002,12 @@
     ExtShadingSch:ZN001:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    19,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    31,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:WALL006,    !- Name
@@ -944,8 +1020,12 @@
     ExtShadingSch:ZN001:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    20,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    32,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:FLR001,     !- Name
@@ -958,8 +1038,12 @@
     ExtShadingSch:ZN001:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    21,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    33,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN001:ROOF001,    !- Name
@@ -972,8 +1056,12 @@
     ExtShadingSch:ZN001:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    22,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    34,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL001,    !- Name
@@ -986,8 +1074,12 @@
     ExtShadingSch:ZN002:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    23,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    35,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL001:WIN001,  !- Name
@@ -1000,8 +1092,12 @@
     ExtShadingSch:ZN002:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    24,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    36,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL002,    !- Name
@@ -1014,8 +1110,12 @@
     ExtShadingSch:ZN002:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    25,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    37,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL003,    !- Name
@@ -1028,8 +1128,12 @@
     ExtShadingSch:ZN002:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    26,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    38,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:WALL004,    !- Name
@@ -1042,8 +1146,12 @@
     ExtShadingSch:ZN002:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    27,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    39,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:FLR001,     !- Name
@@ -1056,8 +1164,12 @@
     ExtShadingSch:ZN002:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    28,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    40,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN002:ROOF001,    !- Name
@@ -1070,8 +1182,12 @@
     ExtShadingSch:ZN002:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    29,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    41,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL001,    !- Name
@@ -1084,8 +1200,12 @@
     ExtShadingSch:ZN003:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    30,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    42,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL001:WIN001,  !- Name
@@ -1098,8 +1218,12 @@
     ExtShadingSch:ZN003:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    31,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    43,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL002,    !- Name
@@ -1112,8 +1236,12 @@
     ExtShadingSch:ZN003:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    32,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    44,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL002:WIN001,  !- Name
@@ -1126,8 +1254,12 @@
     ExtShadingSch:ZN003:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    33,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    45,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL003,    !- Name
@@ -1140,8 +1272,12 @@
     ExtShadingSch:ZN003:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    34,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    46,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL004,    !- Name
@@ -1154,8 +1290,12 @@
     ExtShadingSch:ZN003:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    35,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    47,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL005,    !- Name
@@ -1168,8 +1308,12 @@
     ExtShadingSch:ZN003:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    36,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    48,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL006,    !- Name
@@ -1182,8 +1326,12 @@
     ExtShadingSch:ZN003:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    37,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    49,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL007,    !- Name
@@ -1196,8 +1344,12 @@
     ExtShadingSch:ZN003:WALL007,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    38,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    50,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL007:WIN001,  !- Name
@@ -1210,8 +1362,12 @@
     ExtShadingSch:ZN003:WALL007:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    39,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    51,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:WALL008,    !- Name
@@ -1224,8 +1380,12 @@
     ExtShadingSch:ZN003:WALL008,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    40,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    52,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:FLR001,     !- Name
@@ -1238,8 +1398,12 @@
     ExtShadingSch:ZN003:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    41,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    53,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN003:ROOF001,    !- Name
@@ -1252,8 +1416,12 @@
     ExtShadingSch:ZN003:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    42,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    54,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL001,    !- Name
@@ -1266,8 +1434,12 @@
     ExtShadingSch:ZN004:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    43,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    55,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL001:WIN001,  !- Name
@@ -1280,8 +1452,12 @@
     ExtShadingSch:ZN004:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    44,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    56,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL002,    !- Name
@@ -1294,8 +1470,12 @@
     ExtShadingSch:ZN004:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    45,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    57,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL002:WIN001,  !- Name
@@ -1308,8 +1488,12 @@
     ExtShadingSch:ZN004:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    46,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    58,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL003,    !- Name
@@ -1322,8 +1506,12 @@
     ExtShadingSch:ZN004:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    47,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    59,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL004,    !- Name
@@ -1336,8 +1524,12 @@
     ExtShadingSch:ZN004:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    48,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    60,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL005,    !- Name
@@ -1350,8 +1542,12 @@
     ExtShadingSch:ZN004:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    49,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    61,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL006,    !- Name
@@ -1364,8 +1560,12 @@
     ExtShadingSch:ZN004:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    50,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    62,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:WALL006:WIN001,  !- Name
@@ -1378,8 +1578,12 @@
     ExtShadingSch:ZN004:WALL006:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    51,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    63,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:FLR001,     !- Name
@@ -1392,8 +1596,12 @@
     ExtShadingSch:ZN004:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    52,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    64,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN004:ROOF001,    !- Name
@@ -1406,8 +1614,12 @@
     ExtShadingSch:ZN004:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    53,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    65,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL001,    !- Name
@@ -1420,8 +1632,12 @@
     ExtShadingSch:ZN005:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    54,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    66,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL001:WIN001,  !- Name
@@ -1434,8 +1650,12 @@
     ExtShadingSch:ZN005:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    55,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    67,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL002,    !- Name
@@ -1448,8 +1668,12 @@
     ExtShadingSch:ZN005:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    56,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    68,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL002:WIN001,  !- Name
@@ -1462,8 +1686,12 @@
     ExtShadingSch:ZN005:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    57,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    69,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL003,    !- Name
@@ -1476,8 +1704,12 @@
     ExtShadingSch:ZN005:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    58,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    70,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL004,    !- Name
@@ -1490,8 +1722,12 @@
     ExtShadingSch:ZN005:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    59,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    71,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL005,    !- Name
@@ -1504,8 +1740,12 @@
     ExtShadingSch:ZN005:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    60,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    72,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL005:WIN001,  !- Name
@@ -1518,8 +1758,12 @@
     ExtShadingSch:ZN005:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    61,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    73,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:WALL006,    !- Name
@@ -1532,8 +1776,12 @@
     ExtShadingSch:ZN005:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    62,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    74,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:FLR001,     !- Name
@@ -1546,8 +1794,12 @@
     ExtShadingSch:ZN005:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    63,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    75,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN005:ROOF001,    !- Name
@@ -1560,8 +1812,12 @@
     ExtShadingSch:ZN005:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    64,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    76,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL001,    !- Name
@@ -1574,8 +1830,12 @@
     ExtShadingSch:ZN006:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    65,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    77,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL001:WIN001,  !- Name
@@ -1588,8 +1848,12 @@
     ExtShadingSch:ZN006:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    66,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    78,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL002,    !- Name
@@ -1602,8 +1866,12 @@
     ExtShadingSch:ZN006:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    67,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    79,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL003,    !- Name
@@ -1616,8 +1884,12 @@
     ExtShadingSch:ZN006:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    68,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    80,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:WALL004,    !- Name
@@ -1630,8 +1902,12 @@
     ExtShadingSch:ZN006:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    69,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    81,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:FLR001,     !- Name
@@ -1644,8 +1920,12 @@
     ExtShadingSch:ZN006:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    70,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    82,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN006:ROOF001,    !- Name
@@ -1658,8 +1938,12 @@
     ExtShadingSch:ZN006:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    71,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    83,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL001,    !- Name
@@ -1672,8 +1956,12 @@
     ExtShadingSch:ZN007:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    72,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    84,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL001:WIN001,  !- Name
@@ -1686,8 +1974,12 @@
     ExtShadingSch:ZN007:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    73,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    85,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL002,    !- Name
@@ -1700,8 +1992,12 @@
     ExtShadingSch:ZN007:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    74,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    86,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL002:WIN001,  !- Name
@@ -1714,8 +2010,12 @@
     ExtShadingSch:ZN007:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    75,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    87,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL003,    !- Name
@@ -1728,8 +2028,12 @@
     ExtShadingSch:ZN007:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    76,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    88,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL004,    !- Name
@@ -1742,8 +2046,12 @@
     ExtShadingSch:ZN007:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    77,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    89,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL005,    !- Name
@@ -1756,8 +2064,12 @@
     ExtShadingSch:ZN007:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    78,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    90,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL006,    !- Name
@@ -1770,8 +2082,12 @@
     ExtShadingSch:ZN007:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    79,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    91,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL006:WIN001,  !- Name
@@ -1784,8 +2100,12 @@
     ExtShadingSch:ZN007:WALL006:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    80,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    92,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL007,    !- Name
@@ -1798,8 +2118,12 @@
     ExtShadingSch:ZN007:WALL007,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    81,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    93,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:WALL008,    !- Name
@@ -1812,8 +2136,12 @@
     ExtShadingSch:ZN007:WALL008,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    82,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    94,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:FLR001,     !- Name
@@ -1826,8 +2154,12 @@
     ExtShadingSch:ZN007:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    83,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    95,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN007:ROOF001,    !- Name
@@ -1840,8 +2172,12 @@
     ExtShadingSch:ZN007:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    84,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    96,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL001,    !- Name
@@ -1854,8 +2190,12 @@
     ExtShadingSch:ZN008:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    85,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    97,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL001:WIN001,  !- Name
@@ -1868,8 +2208,12 @@
     ExtShadingSch:ZN008:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    86,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    98,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL002,    !- Name
@@ -1882,8 +2226,12 @@
     ExtShadingSch:ZN008:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    87,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    99,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL003,    !- Name
@@ -1896,8 +2244,12 @@
     ExtShadingSch:ZN008:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    88,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    100,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:WALL004,    !- Name
@@ -1910,8 +2262,12 @@
     ExtShadingSch:ZN008:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    89,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    101,                      !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:FLR001,     !- Name
@@ -1924,8 +2280,12 @@
     ExtShadingSch:ZN008:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    90,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    102,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN008:ROOF001,    !- Name
@@ -1938,8 +2298,12 @@
     ExtShadingSch:ZN008:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    91,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    103,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL001,    !- Name
@@ -1952,8 +2316,12 @@
     ExtShadingSch:ZN009:WALL001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    92,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    104,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL001:WIN001,  !- Name
@@ -1966,8 +2334,12 @@
     ExtShadingSch:ZN009:WALL001:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    93,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    105,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL002,    !- Name
@@ -1980,8 +2352,12 @@
     ExtShadingSch:ZN009:WALL002,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    94,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    106,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL002:WIN001,  !- Name
@@ -1994,8 +2370,12 @@
     ExtShadingSch:ZN009:WALL002:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    95,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    107,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL003,    !- Name
@@ -2008,8 +2388,12 @@
     ExtShadingSch:ZN009:WALL003,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    96,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    108,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL004,    !- Name
@@ -2022,8 +2406,12 @@
     ExtShadingSch:ZN009:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    97,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    109,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL005,    !- Name
@@ -2036,8 +2424,12 @@
     ExtShadingSch:ZN009:WALL005,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    98,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    110,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL005:WIN001,  !- Name
@@ -2050,8 +2442,12 @@
     ExtShadingSch:ZN009:WALL005:WIN001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    99,                      !- Column Number
-    1;                       !- Rows to Skip at Top
+    111,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:WALL006,    !- Name
@@ -2064,8 +2460,12 @@
     ExtShadingSch:ZN009:WALL006,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    100,                     !- Column Number
-    1;                       !- Rows to Skip at Top
+    112,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:FLR001,     !- Name
@@ -2078,8 +2478,12 @@
     ExtShadingSch:ZN009:FLR001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    101,                     !- Column Number
-    1;                       !- Rows to Skip at Top
+    113,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:ZN009:ROOF001,    !- Name
@@ -2092,8 +2496,12 @@
     ExtShadingSch:ZN009:ROOF001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    102,                     !- Column Number
-    1;                       !- Rows to Skip at Top
+    114,                     !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,
+    ,
+    ,
+    15;                      !- Minutes per Item
 
   Shading:Site:Detailed,
     EAST SIDE TREE,          !- Name
@@ -3709,7 +4117,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Name
@@ -3784,7 +4194,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Name
@@ -3859,7 +4271,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Name
@@ -3934,7 +4348,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Name
@@ -4009,7 +4425,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Name
@@ -4084,7 +4502,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Name
@@ -4159,7 +4579,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Name
@@ -4234,7 +4656,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Name
@@ -4309,7 +4733,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Name
@@ -4383,4 +4809,3 @@
   Output:Meter:MeterFileOnly,DistrictCooling:Facility,runperiod;
 
   Output:Surfaces:List,Details;
-

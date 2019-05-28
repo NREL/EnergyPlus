@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,6 +212,7 @@
 #include <InputProcessing/InputValidation.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -309,6 +310,10 @@ int RunEnergyPlus(std::string const & filepath)
 #endif
 
     CreateCurrentDateTimeString(CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+
     VerString += "," + CurrentDateTime;
 
     get_environment_variable(DDOnlyEnvVar, cEnvValue);
@@ -430,7 +435,7 @@ int RunEnergyPlus(std::string const & filepath)
         IOFlags flags;
         flags.ACTION("write");
         flags.STATUS("UNKNOWN");
-        gio::open(OutputStandardError, outputErrFileName, flags);
+        ObjexxFCL::gio::open(OutputStandardError, outputErrFileName, flags);
         int write_stat = flags.ios();
         if (write_stat == 600) {
             DisplayString("ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory.");
@@ -440,7 +445,7 @@ int RunEnergyPlus(std::string const & filepath)
             return EXIT_FAILURE;
         }
     }
-    err_stream = gio::out_stream(OutputStandardError);
+    err_stream = ObjexxFCL::gio::out_stream(OutputStandardError);
 
     TestAllPaths = true;
 
@@ -450,6 +455,8 @@ int RunEnergyPlus(std::string const & filepath)
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+
+        ResultsFramework::OutputSchema->setupOutputOptions();
 
         ManageSimulation();
 
@@ -468,14 +475,14 @@ int RunEnergyPlus(std::string const & filepath)
             bool FileExists;
             {
                 IOFlags flags;
-                gio::inquire(readVarsPath, flags);
+                ObjexxFCL::gio::inquire(readVarsPath, flags);
                 FileExists = flags.exists();
             }
             if (!FileExists) {
                 readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
                 {
                     IOFlags flags;
-                    gio::inquire(readVarsPath, flags);
+                    ObjexxFCL::gio::inquire(readVarsPath, flags);
                     FileExists = flags.exists();
                 }
                 if (!FileExists) {
@@ -492,11 +499,11 @@ int RunEnergyPlus(std::string const & filepath)
             bool rviFileExists;
             bool mviFileExists;
 
-            gio::Fmt readvarsFmt("(A)");
+            ObjexxFCL::gio::Fmt readvarsFmt("(A)");
 
             {
                 IOFlags flags;
-                gio::inquire(RVIfile, flags);
+                ObjexxFCL::gio::inquire(RVIfile, flags);
                 rviFileExists = flags.exists();
             }
             if (!rviFileExists) {
@@ -504,20 +511,20 @@ int RunEnergyPlus(std::string const & filepath)
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(fileUnitNumber, RVIfile, flags);
+                    ObjexxFCL::gio::open(fileUnitNumber, RVIfile, flags);
                     iostatus = flags.ios();
                 }
                 if (iostatus != 0) {
                     ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
                 }
-                gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
-                gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
-                gio::close(fileUnitNumber);
+                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
+                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
+                ObjexxFCL::gio::close(fileUnitNumber);
             }
 
             {
                 IOFlags flags;
-                gio::inquire(MVIfile, flags);
+                ObjexxFCL::gio::inquire(MVIfile, flags);
                 mviFileExists = flags.exists();
             }
             if (!mviFileExists) {
@@ -525,15 +532,15 @@ int RunEnergyPlus(std::string const & filepath)
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(fileUnitNumber, MVIfile, flags);
+                    ObjexxFCL::gio::open(fileUnitNumber, MVIfile, flags);
                     iostatus = flags.ios();
                 }
                 if (iostatus != 0) {
                     ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
                 }
-                gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
-                gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
-                gio::close(fileUnitNumber);
+                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
+                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
+                ObjexxFCL::gio::close(fileUnitNumber);
             }
 
             std::string const readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
@@ -596,7 +603,7 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
+    ObjexxFCL::gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -618,7 +625,7 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
 
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
-        gio::write(CurrentDateTimeString, fmtDate) << value(1) << value(2) << value(3) << value(5) << value(6);
+        ObjexxFCL::gio::write(CurrentDateTimeString, fmtDate) << value(1) << value(2) << value(3) << value(5) << value(6);
     } else {
         CurrentDateTimeString = " unknown date/time";
     }

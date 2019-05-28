@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,8 +76,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -138,8 +136,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -188,8 +184,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
@@ -238,8 +232,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     // Adaptive comfort model fatal for irrelevant blank fields  #5948
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
 
         "  Schedule:Compact,",
@@ -312,8 +304,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-
         "Zone,Zone1;",
 
         "ElectricEquipment:ITE:AirCooled,",
@@ -450,7 +440,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Zone,Zone1;",
     });
 
@@ -525,8 +514,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.8;",
-
         "Zone,Zone1;",
 
         "ElectricEquipment:ITE:AirCooled,",
@@ -657,4 +644,178 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
                      DataHeatBalance::Zone(1).AdjustedReturnTempByITE);
     ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
+}
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
+{
+
+    std::string const idf_objects =
+        delimited_string({"Version,9.2;",
+
+                          "Zone,Zone1;",
+
+                          "ElectricEquipment:ITE:AirCooled,",
+                          "  Data Center Servers,     !- Name",
+                          "  Zone1,                   !- Zone Name",
+                          "  ,",
+                          "  Watts/Unit,              !- Design Power Input Calculation Method",
+                          "  500,                     !- Watts per Unit {W}",
+                          "  100,                     !- Number of Units",
+                          "  ,                        !- Watts per Zone Floor Area {W/m2}",
+                          "  ,                        !- Design Power Input Schedule Name",
+                          "  ,                        !- CPU Loading  Schedule Name",
+                          "  Data Center Servers Power fLoadTemp,        !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+                          "  0.4,                     !- Design Fan Power Input Fraction",
+                          "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+                          "  Data Center Servers Airflow fLoadTemp,      !- Air Flow Function of Loading and Air Temperature Curve Name",
+                          "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+                          "  15,                      !- Design Entering Air Temperature {C}",
+                          "  A3,                      !- Environmental Class",
+                          "  AdjustedSupply,          !- Air Inlet Connection Type",
+                          "  ,                        !- Air Inlet Room Air Model Node Name",
+                          "  ,                        !- Air Outlet Room Air Model Node Name",
+                          "  Main Zone Inlet Node,    !- Supply Air Node Name",
+                          "  0.1,                     !- Design Recirculation Fraction",
+                          "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
+                          "  0.9,                     !- Design Electric Power Supply Efficiency",
+                          "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+                          "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+                          "  ITE-CPU,                 !- CPU End-Use Subcategory",
+                          "  ITE-Fans,                !- Fan End-Use Subcategory",
+                          "  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+                          "",
+                          "Curve:Quadratic,",
+                          "  ECM FanPower fFlow,      !- Name",
+                          "  0.0,                     !- Coefficient1 Constant",
+                          "  1.0,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  99.0;                    !- Maximum Value of x",
+                          "",
+                          "Curve:Biquadratic,",
+                          "  Data Center Servers Power fLoadTemp,  !- Name",
+                          "  -1.0,                    !- Coefficient1 Constant",
+                          "  1.0,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.06667,                 !- Coefficient4 y",
+                          "  0.0,                     !- Coefficient5 y**2",
+                          "  0.0,                     !- Coefficient6 x*y",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  1.5,                     !- Maximum Value of x",
+                          "  -10,                     !- Minimum Value of y",
+                          "  99.0,                    !- Maximum Value of y",
+                          "  0.0,                     !- Minimum Curve Output",
+                          "  99.0,                    !- Maximum Curve Output",
+                          "  Dimensionless,           !- Input Unit Type for X",
+                          "  Temperature,             !- Input Unit Type for Y",
+                          "  Dimensionless;           !- Output Unit Type",
+                          "",
+                          "Curve:Biquadratic,",
+                          "  Data Center Servers Airflow fLoadTemp,  !- Name",
+                          "  -1.4,                    !- Coefficient1 Constant",
+                          "  0.9,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.1,                     !- Coefficient4 y",
+                          "  0.0,                     !- Coefficient5 y**2",
+                          "  0.0,                     !- Coefficient6 x*y",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  1.5,                     !- Maximum Value of x",
+                          "  -10,                     !- Minimum Value of y",
+                          "  99.0,                    !- Maximum Value of y",
+                          "  0.0,                     !- Minimum Curve Output",
+                          "  99.0,                    !- Maximum Curve Output",
+                          "  Dimensionless,           !- Input Unit Type for X",
+                          "  Temperature,             !- Input Unit Type for Y",
+                          "  Dimensionless;           !- Output Unit Type"
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+
+    bool ErrorsFound(false);
+
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    DataHeatBalFanSys::MAT.allocate(1);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+
+    DataHeatBalFanSys::MAT(1) = 24.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+
+    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::CalcZoneITEq();
+    Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
+                             max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
+
+    ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
+}
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
+{
+
+    bool WorkEffSchPresent; // true equals blank, false equals not blank
+    bool CloInsSchPresent;  // true equals blank, false equals not blank
+    bool AirVelSchPresent;  // true equals blank, false equals not blank
+    bool FunctionCallResult;
+    bool ExpectedResult;
+    
+    //Test 1: everything blank--should result in false result
+    WorkEffSchPresent = true;
+    CloInsSchPresent = true;
+    AirVelSchPresent = true;
+    ExpectedResult = false;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+    
+    //Additional Tests: test various combinations where at least one flag is not blank (false)--should result in a true result
+    WorkEffSchPresent = false;
+    CloInsSchPresent = true;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = false;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = true;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = false;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = true;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
 }

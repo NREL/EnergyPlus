@@ -596,29 +596,32 @@ PERFORMANCE
 
 Zone Summary
 
-{\scriptsize
-\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}}
-\toprule 
-~ & Area (m2) & Conditioned (Y/N) & Volume (m3) & Multipliers & Gross Wall Area (m2) & Window Glass Area (m2) & Lighting (W/m2) & People (m2/person) & Plug and Process(W/m2) \tabularnewline
-\midrule
-\endfirsthead
+\textbf{Note:} In order to properly read the summary rows of this table, the following rules apply:
 
-\toprule 
-~ & Area (m2) & Conditioned (Y/N) & Volume (m3) & Multipliers & Gross Wall Area (m2) & Window Glass Area (m2) & Lighting (W/m2) & People (m2/person) & Plug and Process(W/m2) \tabularnewline
-\midrule
+\begin{itemize}
+    \item
+        If the Zone \lstinline!Part of Total Floor Area! is set to 'No', then it will only be counted towards the "Not Part of Total" row
+    \item
+        Otherwise, it is added to the "Total" row. Then, if the zone is also conditioned, it is added to the "Conditioned Total" row;
+        If unconditioned, it is added to the "Unconditioned Total" row.
+\end{itemize}
+
+{\tiny
+\begin{longtable}[c]{|p{0.8in}|p{0.25in}|p{0.50in}|p{0.35in}|p{0.30in}|p{0.30in}|p{0.35in}|p{0.5in}|p{0.30in}|p{0.30in}|p{0.30in}|p{0.35in}|p{0.35in}|}
+\hline
+ & Area {[}m2{]} & Conditioned (Y/N) & Part of Total Floor Area (Y/N) & Volume {[}m3{]} & Multi-pliers & Above Ground Gross Wall Area {[}m2{]} & Underground Gross Wall Area {[}m2{]} & Window Glass Area {[}m2{]} & Opening Area {[}m2{]} & Lighting {[}W/m2{]} & People {[}m2 per person{]} & Plug and Process {[}W/m2{]} \\ \hline
 \endhead
-
-PLENUM-1 & 463.60 & Yes & 283.20 & 1.00 & 54.84 & 0.00 & 0.0000 & ~ & 0.0000 \tabularnewline
-SPACE1-1 & 99.16 & Yes & 239.25 & 1.00 & 73.20 & 22.56 & 15.9742 & 9.01 & 10.6495 \tabularnewline
-SPACE2-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
-SPACE3-1 & 96.48 & Yes & 239.25 & 1.00 & 73.20 & 20.85 & 16.4179 & 8.77 & 10.9453 \tabularnewline
-SPACE4-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
-SPACE5-1 & 182.49 & Yes & 447.68 & 1.00 & 0.00 & 0.00 & 16.2420 & 9.12 & 10.8280 \tabularnewline
-Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 61.65 & 8.0889 & 17.83 & 5.3926 \tabularnewline
-Conditioned Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 61.65 & 8.0889 & 17.83 & 5.3926 \tabularnewline
-Unconditioned Total & 0.00 & ~ & 0.00 & ~ & 0.00 & 0.00 & ~ & ~ & ~ \tabularnewline
-\bottomrule
-\end{longtable}}
+%
+SPACE-1 & 200 & {\color{DarkGreen}Yes} & {\color{red}No} & 400 & 1 & 20 & 0 & 0 & 0 & 4 & 300 & 4 \\ \hline
+SPACE-2 & 100 & {\color{red}No} & {\color{red}No} & 200 & 1 & 50 & 0 & 0 & 0 & 1 & 100 & 1 \\ \hline
+SPACE-3 & 1000 & {\color{DarkGreen}Yes} & {\color{DarkGreen}Yes} & 2000 & 1 & 180 & 0 & 40 & 5 & 20 & 10 & 10 \\ \hline
+SPACE-4 & 500 & {\color{red}No} & {\color{DarkGreen}Yes} & 1000 & 1 & 110 & 10 & 10 & 0 & 5 & 45 & 4 \\ \hline
+Total & 1500 &  &  & 3000 &  & 290 & 10 & 50 & 5 & 15 & 13.5 & 8 \\ \hline
+Conditioned Total & 1000 &  &  & 2000 &  & 180 & 0 & 40 & 5 & 20 & 10 & 10 \\ \hline
+Unconditioned Total & 500 &  &  & 1000 &  & 110 & 10 & 10 & 0 & 5 & 45 & 4 \\ \hline
+Not Part of Total & 300 &  &  & 600 &  & 70 & 0 & 0 & 0 & 3 & 180 & 3 \\ \hline
+\end{longtable}
+}
 
 \subsection{Demand End Use Components Summary}\label{demand-end-use-components-summary}
 
@@ -2032,7 +2035,7 @@ Line Item SubTotal & -- & -- & -- & -- & -- & 719946.72 \tabularnewline
 
 \subsection{LEED Summary}\label{leed-summary}
 
-The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System\textsuperscript{TM}. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
 
 Report: LEED Summary
 

@@ -299,5 +299,5 @@ set( test_src
 
 add_library( ${target_name} ${src} )
 
-CREATE_TEST_TARGETS( ${target_name} "${test_src}" "" )
+# CREATE_TEST_TARGETS( ${target_name} "${test_src}" "" )
 

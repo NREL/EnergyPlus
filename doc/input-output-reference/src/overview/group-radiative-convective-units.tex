@@ -4,25 +4,25 @@ This section describes the radiative/convective zone equipment units.~ The follo
 
 \begin{itemize}
 \item
-  ZoneHVAC:Baseboard:Convective:Electric
+  \hyperref[zonehvacbaseboardconvectiveelectric]{ZoneHVAC:Baseboard:Convective:Electric}
 \item
-  ZoneHVAC:Baseboard:RadiantConvective:Water
+  \hyperref[zonehvacbaseboardradiantconvectivewater]{ZoneHVAC:Baseboard:RadiantConvective:Water}
 \item
-  ZoneHVAC:Baseboard:RadiantConvective:Steam
+  \hyperref[zonehvacbaseboardradiantconvectivesteam]{ZoneHVAC:Baseboard:RadiantConvective:Steam}
 \item
-  ZoneHVAC:Baseboard:RadiantConvective:Electric
+  \hyperref[zonehvacbaseboardradiantconvectiveelectric]{ZoneHVAC:Baseboard:RadiantConvective:Electric}
 \item
-  ZoneHVAC:CoolingPanel:RadiantConvective:Water
+  \hyperref[zonehvaccoolingpanelradiantconvectivewater]{ZoneHVAC:CoolingPanel:RadiantConvective:Water}
 \item
-  ZoneHVAC:Baseboard:Convective:Water
+  \hyperref[zonehvacbaseboardconvectivewater]{ZoneHVAC:Baseboard:Convective:Water}
 \item
-  ZoneHVAC:HighTemperatureRadiant
+  \hyperref[zonehvachightemperatureradiant]{ZoneHVAC:HighTemperatureRadiant}
 \item
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow
+  \hyperref[zonehvaclowtemperatureradiantconstantflow]{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}
 \item
-  ZoneHVAC:LowTemperatureRadiant:Electric
+  \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}
 \item
-  ZoneHVAC:LowTemperatureRadiant:VariableFlow
+  \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow}
 \end{itemize}
 
 \subsection{ZoneHVAC:Baseboard:RadiantConvective:Water}\label{zonehvacbaseboardradiantconvectivewater}
@@ -105,7 +105,7 @@ This field is the name of the first surface to which radiant heat transfer from 
 
 This field is paired with the preceding surface name (previous field) to define the fraction of radiant heat transfer leaving the baseboard heater that is incident on a particular surface. Users should take into account the directionality of baseboard heaters and their location when defining the value for this input field.
 
-\textbf{\emph{Note on Fraction of Radiant Energy Incident on People and to Surfaces}}
+\textbf{\emph{Note on Fraction of Radiant Energy Incident on \hyperref[people]{People} and to Surfaces}}
 
 The radiant energy from the baseboard heater is defined by the total energy input to the baseboard heater from the water loop times the fraction radiant field shown above. This radiant energy is distributed to surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions to people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
 
@@ -631,7 +631,7 @@ Since radiant cooling panels provide a cold surface in what could be a humid zon
 
 \begin{itemize}
 \item
-  Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation. 
+  Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation.
 \item
   SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the user also has the option to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Differential Parameter).
 \item
@@ -996,7 +996,7 @@ This is the electric power required by the baseboard to the zone it is serving i
 
 This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any ``radiant system'' where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher priority. The control is accomplished by throttling the hot or chilled water flow to the unit. Note that this system will only control based on the radiant system controls defined by this input syntax and not via a zone thermostat such as is used for forced air systems. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:Electric).
+This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}).
 
 \subsubsection{Inputs}\label{inputs-5-022}
 
@@ -1014,7 +1014,7 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-000}
 
@@ -1022,7 +1022,7 @@ This field is the inside diameter of the tubes through which water is circulated
 
 \paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.  
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
@@ -1123,7 +1123,7 @@ When radiant systems do cooling, there is the possibility that condensation will
 \item
   Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on, no moisture will be removed from the zone air, and there will be no adjustment of the surface temperature as a result of the condensation.
 \item
-  SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Control Dewpoint Offset). 
+  SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Control Dewpoint Offset).
 \item
   VariableOff - the program will determine whether condensation is predicted for the flow rate determined by the unit control scheme.  If condensation is predicted, the unit makes one attempt to reduce the flow rate using linear interpolation between the controlled flow rate and a zero flow rate to achieve a surface temperature that would match the dew-point temperature modified by the condensation control dew-point offset (field: Condensation Control Dewpoint Offset). For example, if the controlled flow rate results in a surface temperature of 10°C, a zero flow rate results in a surface temperature of 12°C, and the modified condensation dew-point temperature is 11°C, then the reduced flow rate would be half of the controlled flow rate.  If this reduced flow approximation does not result in condensation, then this reduced flow is used for the unit.  If the reduced flow approximation still results in condensation, then the unit is turned off to avoid excessive iterations.
 \end{itemize}
@@ -1245,7 +1245,7 @@ This is the demand placed on the cooling fluid plant loop connection serving the
 
 This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any ``radiant system'' where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled via control schedules as described in the syntax below and does not require a zone thermostat. Note that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The constant flow system differs from the hydronic system describe above in what it controls. The hydronic system varies the flow rate through the radiant system based on some control temperature. The constant flow system keeps flow rate constant via a local circulation pump and varies the water temperature that is sent to the radiant system. This is accomplished with a mixing valve that is controlled by a sensor. This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:Electric). Low temperature radiant systems that vary the flow rate through the radiant system should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:VariableFlow)
+The constant flow system differs from the hydronic system describe above in what it controls. The hydronic system varies the flow rate through the radiant system based on some control temperature. The constant flow system keeps flow rate constant via a local circulation pump and varies the water temperature that is sent to the radiant system. This is accomplished with a mixing valve that is controlled by a sensor. This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}). Low temperature radiant systems that vary the flow rate through the radiant system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow})
 
 One of the other differences between this model and the variable flow hydronic radiant system is that the constant flow radiant system has a built-in local secondary loop. It will recirculate flow coming out of the system and mix this with flow from the loop to arrive at the desired inlet temperature to the radiant system (note that this model has the temperature sensor AFTER the pump to insure proper inlet temperature to the radiant system). The local loop also contains a pump which is assumed to be upstream of the radiant system and after the mixing valve. So, the local loop can have some recirculation. The flow from the main loop may also bypass the radiant system if more than enough flow is available and the main loop is also a constant flow system.
 
@@ -1265,7 +1265,7 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-1}
 
-This field is the name of the surface (Ref: BuildingSurface:Detailed) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-1-000}
 
@@ -1544,7 +1544,7 @@ The heat transfer energy for the heating fluid connection, in Joules.
 
 This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first. If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: ZoneHVAC:HighTemperatureRadiant) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:VariableFlow or ConstantFlow).
+The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: \hyperref[zonehvachightemperatureradiant]{ZoneHVAC:HighTemperatureRadiant}) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow} or ConstantFlow).
 
 \subsubsection{Inputs}\label{inputs-7-019}
 
@@ -1562,7 +1562,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-2}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed, Wall:Detailed, RoofCeiling:Detailed, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[walldetailed]{Wall:Detailed}, \hyperref[roofceilingdetailed]{RoofCeiling:Detailed}, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-6}
 
@@ -1611,7 +1611,7 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-ZoneHVAC:LowTemperatureRadiant:Electric, 
+ZoneHVAC:LowTemperatureRadiant:Electric,
            Zone 2 Radiant Floor,       !- Name
            RadiantPanelAvailSched ,    !- Availability Schedule Name
            EAST ZONE ,                 !- Zone name (name of zone system is serving)
@@ -1668,7 +1668,7 @@ The pairs of Surface Name, Flow Fraction to Surface are used in several objects.
 
 \paragraph{Field: Surface \textless{}x\textgreater{} Name}\label{field-surface-x-name-2}
 
-This field is the name of a surface in the zone being conditioned by the radiant system. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of a surface in the zone being conditioned by the radiant system. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Flow Fraction for Surface \textless{}x\textgreater{}}\label{field-flow-fraction-for-surface-x}
 
@@ -1886,7 +1886,7 @@ This field is the name of the zone (Ref: Zone) in which the ventilated slab syst
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-3}
 
-This field is the name of the surface (Ref: Surface) or surface list (Ref: ZoneHVAC:VentilatedSlab:SlabGroup) in which the hollow cores are embedded/contained. This specification attaches the source or sinks from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Only base surfaces (Walls, Roofs, Floors) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: Surface) or surface list (Ref: \hyperref[zonehvacventilatedslabslabgroup]{ZoneHVAC:VentilatedSlab:SlabGroup}) in which the hollow cores are embedded/contained. This specification attaches the source or sinks from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Only base surfaces (Walls, Roofs, Floors) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate-001}
 
@@ -1925,7 +1925,7 @@ This field allows the user to control how the air is circulated using the ventil
   SeriesSlabs
 \end{itemize}
 
-In the \textbf{SlabOnly}, the ventilation air is sent to the slab only and does not enter the zone.~ In the \textbf{SlabAndZone}, the air first enters the slab and then is delivered to the zone before returning to the system. With the \textbf{SeriesSlabs} option, the user specifies a list of slabs (ZoneHVAC:VentilatedSlab:SlabGroup). This list determines the order of slabs through which the air passes.~ In this option, air is not delivered to any zone.
+In the \textbf{SlabOnly}, the ventilation air is sent to the slab only and does not enter the zone.~ In the \textbf{SlabAndZone}, the air first enters the slab and then is delivered to the zone before returning to the system. With the \textbf{SeriesSlabs} option, the user specifies a list of slabs (\hyperref[zonehvacventilatedslabslabgroup]{ZoneHVAC:VentilatedSlab:SlabGroup}). This list determines the order of slabs through which the air passes.~ In this option, air is not delivered to any zone.
 
 \paragraph{Field: Hollow Core Inside Diameter}\label{field-hollow-core-inside-diameter}
 
@@ -2008,7 +2008,7 @@ This field is a node name used to identify the node that serves as the outlet fr
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name}
 
-This field is a node name used to identify the node associated with fresh outdoor air brought into the ventilated slab system outdoor air mixer.~ This node should also be specified in an OutdoorAir:Node or OutdoorAir:NodeList object.
+This field is a node name used to identify the node associated with fresh outdoor air brought into the ventilated slab system outdoor air mixer.~ This node should also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object.
 
 \paragraph{Field: Relief Air Node Name}\label{field-relief-air-node-name}
 
@@ -2024,7 +2024,7 @@ This field is a node name used to identify the node that serves as the air outle
 
 \paragraph{Field: Fan Name}\label{field-fan-name-003}
 
-This field is the name of a fan (ref: Fan:SystemModel or Fan:ConstantVolume) that is part of the ventilated slab system.  This name links the ventilated slab to particular fan data entered elsewhere in the input data file.  A fan name is required since it is the prime mover of air in the ventilated slab system.
+This field is the name of a fan (ref: \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanconstantvolume]{Fan:ConstantVolume}) that is part of the ventilated slab system.  This name links the ventilated slab to particular fan data entered elsewhere in the input data file.  A fan name is required since it is the prime mover of air in the ventilated slab system.
 
 \paragraph{Field: Coil Option Type}\label{field-coil-option-type}
 
@@ -2045,7 +2045,7 @@ If \textbf{None} is selected, the ventilated slab does not have any coils, and a
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-001}
 
-This field is the type of coil (ref: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel, Coil:Heating:Steam) that is used for heating in the ventilated slab system. This field must be one of the following keywords: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel, Coil:Heating:Steam.~ It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system.
+This field is the type of coil (ref: \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingsteam]{Coil:Heating:Steam}) that is used for heating in the ventilated slab system. This field must be one of the following keywords: \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingsteam]{Coil:Heating:Steam}.~ It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system.
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-001}
 
@@ -2057,7 +2057,7 @@ This field corresponds to the water inlet node to the heating coil for a water c
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-001}
 
-This field is the name of the cooling coil (ref: Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry, CoilSystem:Cooling:Water:HeatExchangerAssisted) that is part of the ventilated slab system.~ This name links the ventilated slab system to particular cooling coil data entered elsewhere in the input data file. If no cooling coil is present, the previous field may be followed by a semi-colon and the remaining parameters in this statement may be ignored.
+This field is the name of the cooling coil (ref: \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}, \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}) that is part of the ventilated slab system.~ This name links the ventilated slab system to particular cooling coil data entered elsewhere in the input data file. If no cooling coil is present, the previous field may be followed by a semi-colon and the remaining parameters in this statement may be ignored.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-001}
 
@@ -2069,11 +2069,11 @@ This field corresponds to the water inlet node to the cooling coil.~ The water i
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-001}
 
-This optional input field is the name of an AvailabilityManagerAssignmentList object. An Availability Manager Assignment List is a list of Availability Managers giving both Availability Manager type and name. The availability managers in the list apply to this ventilated slab object's fan. If the ventilated slab is available (per the Availability Schedule Name input field above) and this input field has a valid availability manager assignment list name, then the availability managers in the list determine when and if the fan of this ventilated slab object should be on or off.
+This optional input field is the name of an \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object. An Availability Manager Assignment List is a list of Availability Managers giving both Availability Manager type and name. The availability managers in the list apply to this ventilated slab object's fan. If the ventilated slab is available (per the Availability Schedule Name input field above) and this input field has a valid availability manager assignment list name, then the availability managers in the list determine when and if the fan of this ventilated slab object should be on or off.
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name}
 
-This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
 
 An example IDF with a ventilated slab is shown below.
 

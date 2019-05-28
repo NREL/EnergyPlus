@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -173,6 +173,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
@@ -185,6 +186,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -211,6 +213,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -246,11 +249,13 @@ void EnergyPlusFixture::SetUp()
     this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
     DataGlobals::eso_stream = this->eso_stream.get();
     DataGlobals::eio_stream = this->eio_stream.get();
     DataGlobals::mtr_stream = this->mtr_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
+    DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -272,18 +277,19 @@ void EnergyPlusFixture::TearDown()
     {
         IOFlags flags;
         flags.DISPOSE("DELETE");
-        gio::close(OutputProcessor::OutputFileMeterDetails, flags);
-        gio::close(DataGlobals::OutputFileStandard, flags);
-        gio::close(DataGlobals::OutputStandardError, flags);
-        gio::close(DataGlobals::OutputFileInits, flags);
-        gio::close(DataGlobals::OutputFileDebug, flags);
-        gio::close(DataGlobals::OutputFileZoneSizing, flags);
-        gio::close(DataGlobals::OutputFileSysSizing, flags);
-        gio::close(DataGlobals::OutputFileMeters, flags);
-        gio::close(DataGlobals::OutputFileBNDetails, flags);
-        gio::close(DataGlobals::OutputFileZonePulse, flags);
-        gio::close(DataGlobals::OutputDElightIn, flags);
-        gio::close(DataGlobals::OutputFileShadingFrac, flags);
+        ObjexxFCL::gio::close(OutputProcessor::OutputFileMeterDetails, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
+        ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileInits, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
+        ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
     }
 }
 
@@ -305,7 +311,7 @@ void EnergyPlusFixture::clear_all_states()
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CurveManager::clear_state();
-    DataAirflowNetwork::clear_state();
+    AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -365,7 +371,7 @@ void EnergyPlusFixture::clear_all_states()
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::clear_state();
+    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
@@ -400,8 +406,9 @@ void EnergyPlusFixture::clear_all_states()
     PackagedTerminalHeatPump::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
-    PlantCondLoopOperation::clear_state();
+    PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
+    PlantCondLoopOperation::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();
@@ -441,6 +448,7 @@ void EnergyPlusFixture::clear_all_states()
     WaterCoils::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
+    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();
@@ -453,6 +461,7 @@ void EnergyPlusFixture::clear_all_states()
     ZoneEquipmentManager::clear_state();
     ZonePlenum::clear_state();
     ZoneTempPredictorCorrector::clear_state();
+    ResultsFramework::clear_state();
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -473,6 +482,15 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const
         lines.push_back(line);
     }
     return lines;
+}
+
+bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = this->json_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->json_stream->str(std::string());
+    return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
@@ -527,6 +545,13 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
     bool are_equal = (expected_string == stream_str);
     if (reset_stream) this->m_cerr_buffer->str(std::string());
     return are_equal;
+}
+
+bool EnergyPlusFixture::has_json_output(bool reset_stream)
+{
+    auto const has_output = this->json_stream->str().size() > 0;
+    if (reset_stream) this->json_stream->str(std::string());
+    return has_output;
 }
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)

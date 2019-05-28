@@ -53,7 +53,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     FHX House,               !- Name
@@ -775,7 +775,9 @@
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 1 Object Type
     Zone2WTAHP,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:WaterToAirHeatPump,
     Zone2WTAHP,              !- Name
@@ -916,7 +918,9 @@
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 1 Object Type
     Zone1WTAHP,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:WaterToAirHeatPump,
     Zone1WTAHP,              !- Name

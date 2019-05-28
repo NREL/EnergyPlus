@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -274,6 +274,7 @@ namespace GlobalNames {
             return;
         }
 
+        // TODO: should probably not do that either
         ErrorFound = false;
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {

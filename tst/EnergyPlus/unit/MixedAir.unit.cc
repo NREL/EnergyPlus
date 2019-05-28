@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -94,7 +94,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node 1; !- Name",
         "  Controller:OutdoorAir,",
@@ -218,8 +217,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
 TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.3;",
-         "  OutdoorAir:Node,",
+        {"  OutdoorAir:Node,",
          "    Outside Air Inlet Node 1; !- Name",
          "  Controller:OutdoorAir,",
          "    OA Controller 1,         !- Name",
@@ -680,7 +678,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     Contaminant.CO2OutdoorSchedPtr = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node; !- Name",
         "  Schedule:Constant,",
@@ -849,8 +846,6 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-
         "Zone,",
         "  WEST ZONE,              !- Name",
         "  0,                      !- Direction of Relative North{ deg }",
@@ -973,8 +968,6 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
 TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node;  !- Name",
 
@@ -1112,8 +1105,6 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
 TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
-
         "AirLoopHVAC:OutdoorAirSystem,",
         "    DOAS OA System,          !- Name",
         "    DOAS OA System Controllers,  !- Controller List Name",
@@ -1283,7 +1274,6 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
 TEST_F(EnergyPlusFixture, FreezingCheckTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node 1; !- Name",
         "  Schedule:Constant,",
@@ -1405,8 +1395,6 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
 TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node 1; !- Name",
 
@@ -1628,8 +1616,6 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
 TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node;  !- Name",
 
@@ -1734,8 +1720,6 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
 {
     std::string const idf_objects = delimited_string({
 
-        "Version,8.4;",
-
         "SimulationControl,",
         "    Yes,                     !- Do Zone Sizing Calculation",
         "    Yes,                     !- Do System Sizing Calculation",
@@ -1762,7 +1746,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    -6.00,                   !- Time Zone {hr}",
         "    190.00;                  !- Elevation {m}",
 
-        "! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5�C MCWB=  23.0�C",
+        "! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5degC MCWB=  23.0degC",
         "SizingPeriod:DesignDay,",
         "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
         "    7,                       !- Month",
@@ -1791,7 +1775,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
         "    1.0;                     !- Sky Clearness",
 
-        "! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C",
+        "! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3degC",
         "SizingPeriod:DesignDay,",
         "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
         "    1,                       !- Month",
@@ -3815,10 +3799,14 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE1-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE2-1 Equipment,      !- Name",
@@ -3827,10 +3815,14 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE2-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE3-1 Equipment,      !- Name",
@@ -3839,10 +3831,14 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE3-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE4-1 Equipment,      !- Name",
@@ -3851,10 +3847,14 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE4-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentList,",
         "    SPACE5-1 Equipment,      !- Name",
@@ -3863,10 +3863,14 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction",
         "    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
         "    SPACE5-1 Fan Coil,       !- Zone Equipment 2 Name",
         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-        "    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    2,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction",
 
         "ZoneHVAC:EquipmentConnections,",
         "    SPACE1-1,                !- Zone Name",
@@ -5052,8 +5056,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;
 
-    std::string const idf_objects = delimited_string({"Version,8.6;",
-                                                      "  Controller:MechanicalVentilation,",
+    std::string const idf_objects = delimited_string({"  Controller:MechanicalVentilation,",
                                                       "    DCVObject, !- Name",
                                                       "    , !- Availability Schedule Name",
                                                       "    , !- Demand Controlled Ventilation",
@@ -5124,8 +5127,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     Contaminant.CO2Simulation = true;
     Contaminant.CO2OutdoorSchedPtr = 1;
 
-    std::string const idf_objects = delimited_string({"Version,8.6;",
-                                                      "  Controller:MechanicalVentilation,",
+    std::string const idf_objects = delimited_string({"  Controller:MechanicalVentilation,",
                                                       "    DCVObject, !- Name",
                                                       "    , !- Availability Schedule Name",
                                                       "    Yes, !- Demand Controlled Ventilation",
@@ -5344,7 +5346,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Contaminant.CO2OutdoorSchedPtr = 1;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node; !- Name",
         "  Schedule:Constant,",
@@ -5514,8 +5515,6 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.8;",
-
         "  AvailabilityManagerAssignmentList,",
         "    VAV Sys 1 Avail List,    !- Name",
         "    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
@@ -5760,7 +5759,6 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node;  !- Name",
 
@@ -5921,7 +5919,6 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
 TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
         "  OutdoorAir:Node,",
         "    Outside Air Inlet Node;  !- Name",
 
