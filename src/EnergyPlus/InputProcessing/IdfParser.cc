@@ -271,11 +271,12 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 } else {
                     auto const it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        if (obj_name == "RunPeriod") {
-                            name = obj_name + " " + s;
-                        } else {
-                            name = "";
-                        }
+                        name = "";
+//                        if (obj_name == "RunPeriod") {
+//                            name = obj_name + " " + s;
+//                        } else {
+//                            name = "";
+//                        }
                     }
                 }
             }
