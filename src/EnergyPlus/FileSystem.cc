@@ -249,7 +249,10 @@ namespace FileSystem {
     int systemCall(std::string const &command)
     {
 #ifdef _WIN32
-        return system("cmd /C \"" + command.c_str() + "\"");
+        // Wrap in double quotes and pass that to cmd /C
+        // Ends up calling something that looks like the following:
+        // cmd /C ""C:\path\to\ReadVarsESO.exe" "A folder with spaces\1ZoneUncontrolled.mvi" unlimited"
+        return system(("cmd /C \"" + command + "\"").c_str());
 #else
         return system(command.c_str());
 #endif
