@@ -262,21 +262,29 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 continue;
             }
             u64toa(root[obj_name].size() + 1, s);
-            std::string name = obj_name + " " + s;
+
+            // TODO: do we actually want to name that object like this if obj.isnull()?!
+            std::string name; // = obj_name + " " + s;
+
             if (!obj.is_null()) {
                 auto const &name_iter = obj.find("name");
+                // If you find a name field, use that
                 if (name_iter != obj.end()) {
                     name = name_iter.value();
                     obj.erase(name_iter);
                 } else {
-                    auto const it = obj_loc.find("name");
+                    // Otherwise, find it in the scheme
+                    auto const &it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        name = "";
-//                        if (obj_name == "RunPeriod") {
-//                            name = obj_name + " " + s;
-//                        } else {
-//                            name = "";
-//                        }
+                        // Check if the schema mentions that is is indeed required.
+                        auto const &iit = it->find("is_required");
+                        if ((iit != obj_loc["name"].end()) &&
+                             iit.value().get<bool>()) {
+                            errors_.emplace_back("For object of type \"" + obj_name + "\", the Name cannot be blank.");
+                        } else {
+                            // Let it slide, as a blank string, to be handled in the appropriate GetInput routine
+                            name = "";
+                        }
                     }
                 }
             }
