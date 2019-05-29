@@ -1,4 +1,6 @@
 set( CPACK_PACKAGE_VENDOR "US Department of Energy" )
+set(CPACK_PACKAGE_CONTACT "Edwin Lee <edwin.lee@nrel.gov>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "EnergyPlus is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/Modules")
 
@@ -8,6 +10,9 @@ set(CPACK_PACKAGE_VERSION_PATCH "${CMAKE_VERSION_PATCH}" )
 set(CPACK_PACKAGE_VERSION_BUILD "${CMAKE_VERSION_BUILD}" )
 
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${CPACK_PACKAGE_VERSION_BUILD}")
+# Default the debian package name to include version to allow several versions to be installed concurrently instead of overwriting any existing one
+# set(CPACK_DEBIAN_PACKAGE_NAME "energyplus-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+# set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://www.energyplus.net")
 
 include(cmake/TargetArch.cmake)
 target_architecture(TARGET_ARCH)
@@ -256,8 +261,14 @@ if( APPLE )
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
-  configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
-  set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
+  # This is only used by PackageMaker, which we are specifically no longer using in favor of QtIFW
+  # configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
+  # set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
+
+  cpack_ifw_configure_component(Unspecified
+    SCRIPT install_operations.qs
+    REQUIRES_ADMIN_RIGHTS
+  )
 endif()
 
 if( UNIX)
