@@ -265,6 +265,7 @@ if( APPLE )
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
+  install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
   # This is only used by PackageMaker, which we are specifically no longer using in favor of QtIFW
   # configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
   # set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
@@ -323,19 +324,26 @@ endif ()
 include(CPack)
 include(CPackIFW)
 
-cpack_add_component(EnergyPlus
-  DISPLAY_NAME "EnergyPlus"
-  DESCRIPTION "PDF of doculentation"
-)
+#cpack_add_component(EnergyPlus
+  #DISPLAY_NAME "EnergyPlus"
+  #DESCRIPTION "The EnergyPlus program itself"
+  #REQUIRED
+#)
+
+#cpack_add_component(AuxiliaryPrograms
+  #DISPLAY_NAME "Auxiliary Programs"
+  #DESCRIPTION "The suite of Fortran auxiliary programs such as ReadVarsESO, ExpandObjects, etc"
+  #REQUIRED
+#)
 
 cpack_add_component(Documentation
   DISPLAY_NAME "Documentation"
-  DESCRIPTION "PDF of doculentation"
+  DESCRIPTION "EnergyPlus documentation in PDF format"
 )
 
 cpack_add_component(Datasets
   DISPLAY_NAME "Datasets"
-  DESCRIPTION "Datasets"
+  DESCRIPTION "Useful resources such as material and equipment performance data"
 )
 
 cpack_add_component(ExampleFiles
@@ -348,22 +356,21 @@ cpack_add_component(WeatherData
   DESCRIPTION "A few EPW files"
 )
 
+# This stuff actually requires admin privileges since touched system locations
+cpack_add_component(Symlinks
+  DISPLAY_NAME "Create Symlinks - requires admin"
+  DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page"
+)
+
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
     SCRIPT cmake/install_operations.qs
 )
 
-# This stuff actually requires admin privileges since touched system locations
-cpack_add_component(Symlink
-  DISPLAY_NAME "Create Symlinks (requires admin)"
-  DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page"
-)
-cpack_ifw_configure_component(Unspecified
+cpack_ifw_configure_component(Symlinks
     SCRIPT cmake/create_symlinks.qs
     REQUIRES_ADMIN_RIGHTS
 )
-
-
 
 SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 
