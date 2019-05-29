@@ -2440,15 +2440,142 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     TerminalUnitList(IndexTUList).NumTUInList = 2;
 
     VRF(IndexVRFCondenser).ZoneTUListPtr = 1;
-    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
     VRF(IndexVRFCondenser).EvapTempFixed = 3;
     VRF(IndexVRFCondenser).CondTempFixed = 5;
 
+    // test fixed evap/cond temp method
+    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
     // Run and Check
     VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
 
     EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 3);
     EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 5);
+
+    // test variable evap/cond temp method
+    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 1;
+    VRF(IndexVRFCondenser).HeatRecoveryUsed = false;
+    VRFTU.allocate(TerminalUnitList(IndexTUList).NumTUInList);
+    VRFTU(1).CoolCoilIndex = 1;
+    VRFTU(1).HeatCoilIndex = 2;
+    VRFTU(2).CoolCoilIndex = 3;
+    VRFTU(2).HeatCoilIndex = 4;
+    VRFTU(1).ZoneNum = 1;
+    VRFTU(1).VRFSysNum = 1;
+    VRFTU(2).ZoneNum = 2;
+    VRFTU(2).VRFSysNum = 1;
+    VRFTU(1).IndexToTUInTUList = 1;
+    VRFTU(2).IndexToTUInTUList = 2;
+    VRFTU(1).VRFTUInletNodeNum = 1;
+    VRFTU(2).VRFTUInletNodeNum = 2;
+    TerminalUnitList(1).ZoneTUPtr.allocate(2);
+    TerminalUnitList(1).ZoneTUPtr(1) = 1;
+    TerminalUnitList(1).ZoneTUPtr(2) = 2;
+    TerminalUnitList(1).HRCoolRequest.allocate(2);
+    TerminalUnitList(1).HRCoolRequest = false;
+    TerminalUnitList(1).HRHeatRequest.allocate(2);
+    TerminalUnitList(1).HRHeatRequest = false;
+    DXCoil.allocate(4); // 2 TUs each with a cooling and heating coil
+    for (int i = 1; i <= 2; ++i) {
+        DXCoil((i - 1) * 2 + 1).SH = 8.0 + double(i);
+        DXCoil((i - 1) * 2 + 1).C1Te = 1.0;
+        DXCoil((i - 1) * 2 + 1).C2Te = 0.0;
+        DXCoil((i - 1) * 2 + 1).C3Te = 0.0;
+        DXCoil((i - 1) * 2 + 2).SC = 6.0 + double(i);
+        DXCoil((i - 1) * 2 + 2).C1Tc = 1.0;
+        DXCoil((i - 1) * 2 + 2).C2Tc = 0.0;
+        DXCoil((i - 1) * 2 + 2).C3Tc = 0.0;
+    }
+    Node.allocate(5);
+    Node(1).Temp = 21.0; // TU 1 inlet node
+    Node(1).HumRat = 0.011;
+    Node(2).Temp = 21.0; // TU 2 inlet node
+    Node(2).HumRat = 0.011;
+    VRFTU(1).fanOutletNode = 3;
+    Node(3).Temp = 23.0;    // TU 1 fan outlet node
+    Node(3).HumRat = 0.011; // TU 1 fan outlet node
+    VRFTU(2).fanOutletNode = 4;
+    Node(4).Temp = 23.0;    // TU 2 fan outlet node
+    Node(4).HumRat = 0.011; // TU 2 fan outlet node
+    VRFTU(1).coilInNodeT = Node(1).Temp;
+    VRFTU(1).coilInNodeW = Node(1).HumRat;
+    VRFTU(2).coilInNodeT = Node(2).Temp;
+    VRFTU(2).coilInNodeW = Node(2).HumRat;
+
+    CoolingLoad.allocate(1);
+    HeatingLoad.allocate(1);
+    CoolingLoad(1) = true;
+    HeatingLoad(1) = false;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(2);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -1100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -1200.0;
+
+    CompOnMassFlow = 0.0; // system is off
+    // Run and Check
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15); // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);  // default value, coil inlet temps lower than default
+
+    CompOnMassFlow = 0.1;
+    // system is on in cooling mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // minimum coil surface temp of both cooling coils below default
+    EXPECT_LT(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveCoolingEvapTemp = VRF(IndexVRFCondenser).IUEvaporatingTemp;
+
+    // test blow thru fan
+    // adjust coil inlet temps for fan heat
+    VRFTU(1).coilInNodeT = Node(3).Temp;
+    VRFTU(1).coilInNodeW = Node(3).HumRat;
+    VRFTU(2).coilInNodeT = Node(3).Temp;
+    VRFTU(2).coilInNodeW = Node(3).HumRat;
+    VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // system is on in cooling mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to overcome additional heat tranfer
+    EXPECT_LT(VRF(IndexVRFCondenser).IUEvaporatingTemp, saveCoolingEvapTemp);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+
+    VRFTU(1).FanPlace = DataHVACGlobals::DrawThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::DrawThru;
+    // rest coil inlet temps
+    VRFTU(1).coilInNodeT = Node(1).Temp;
+    VRFTU(1).coilInNodeW = Node(1).HumRat;
+    VRFTU(2).coilInNodeT = Node(2).Temp;
+    VRFTU(2).coilInNodeW = Node(2).HumRat;
+    CoolingLoad(1) = false;
+    HeatingLoad(1) = true;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 300.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = 2000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = 1900.0;
+    // system is on in heating mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // maximum coil surface temp of both heating coils above default
+    EXPECT_GT(VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveHeatingCondTemp = VRF(IndexVRFCondenser).IUCondensingTemp;
+
+    // test blow thru fan
+    VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // adjust coil inlet temps for fan heat
+    VRFTU(1).coilInNodeT = Node(3).Temp;
+    VRFTU(1).coilInNodeW = Node(3).HumRat;
+    VRFTU(2).coilInNodeT = Node(3).Temp;
+    VRFTU(2).coilInNodeW = Node(3).HumRat;
+    // system is on in heating mode
+    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to account for less heat tranfer
+    EXPECT_LT(VRF(IndexVRFCondenser).IUCondensingTemp, saveHeatingCondTemp);
 
     // Clean up
     VRF.deallocate();
@@ -3122,6 +3249,123 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     DefrostWatts = VRF(VRFCond).VRFCondRTF * (VRF(VRFCond).HeatingCapacity / 1.01667) * VRF(VRFCond).DefrostFraction;
     ASSERT_EQ(DefrostWatts, VRF(VRFCond).DefrostPower); // defrost power calculation check
 
+    // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
+    int DXHeatingCoilIndex = 2;
+    Real64 outWB = Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;
+    Real64 outHR = Node(VRF(VRFCond).CondenserNodeNum).HumRat;
+    // adjust for defrost factors
+    Real64 outT = 0.82 * Node(VRF(VRFCond).CondenserNodeNum).Temp - 8.589;
+    Real64 OutdoorCoildw = max(1.0e-6, (outHR - PsyWFnTdpPb(outT, DataEnvironment::OutBaroPress)));
+    Real64 FractionalDefrostTime = VRF(VRFCond).DefrostFraction;
+    Real64 LoadDueToDefrost =
+        (0.01 * FractionalDefrostTime) * (7.222 - Node(VRF(VRFCond).CondenserNodeNum).Temp) * (VRF(VRFCond).HeatingCapacity / 1.01667);
+    Real64 HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
+    Real64 InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
+    // setup curve results
+    Real64 InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
+    Real64 OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    Real64 EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR));
+    Real64 TotalCondHeatingCapacityLo =
+        VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerLo =
+        VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
+    Real64 TotalCondHeatingCapacityHi =
+        VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerHi =
+        VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac * InputPowerMultiplier;
+    Real64 HeatingPLRLo = (VRF(VRFCond).TUHeatingLoad / VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityLo;
+    HeatingPLRLo += (LoadDueToDefrost * HeatingPLRLo) / TotalCondHeatingCapacityLo;       // account for defrost
+    Real64 OperatingCondHeatCapLo = TotalCondHeatingCapacityLo * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    Real64 HeatingPLRHi = (VRF(VRFCond).TUHeatingLoad / VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityHi;
+    HeatingPLRHi += (LoadDueToDefrost * HeatingPLRHi) / TotalCondHeatingCapacityHi;       // account for defrost
+    Real64 OperatingCondHeatCapHi = TotalCondHeatingCapacityHi * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotHeatCapTempModFacLo, TotHeatCapTempModFacHi);
+    EXPECT_NE(TotHeatEIRTempModFacLo, TotHeatEIRTempModFacHi);
+    EXPECT_NE(HeatingPLRLo, HeatingPLRHi);
+    EXPECT_NE(OperatingCondHeatCapLo, OperatingCondHeatCapHi);
+    EXPECT_NE(ElecHeatingPowerLo, ElecHeatingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatCapBoundary) { // use Hi curves
+        EXPECT_NEAR(HeatingPLRHi, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapHi, VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    } else { // use Lo curves
+        EXPECT_NEAR(HeatingPLRLo, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapLo, VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    }
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecHeatingPowerHi, VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecHeatingPowerLo, VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(true);
+    }
+
+    // test that Hi curves are used for higher OAT
+    HeatingCapacityMultiplier = 1.0; // no defrost operation
+    InputPowerMultiplier = 1.0;      // no defrost operation
+    Node(VRF(VRFCond).CondenserNodeNum).Temp = 15;
+    Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb = 7.0;
+    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = Node(VRF(VRFCond).CondenserNodeNum).Temp;
+    Node(VRFTU(VRFCond).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    Node(VRFTU(VRFCond).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    Node(VRFTU(VRFCond).VRFTUInletNodeNum).Enthalpy = 36485.3142;
+    SimulateVRF(
+        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+
+    outWB = Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;                // no defrost adjustment to OA WB
+    InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
+    OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
+    TotalCondHeatingCapacityLo = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    ElecHeatingPowerLo = VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
+    TotalCondHeatingCapacityHi = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    ElecHeatingPowerHi = VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac * InputPowerMultiplier;
+    HeatingPLRLo = (VRF(VRFCond).TUHeatingLoad / VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityLo;
+    OperatingCondHeatCapLo = TotalCondHeatingCapacityLo * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    HeatingPLRHi = (VRF(VRFCond).TUHeatingLoad / VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacityHi;
+    OperatingCondHeatCapHi = TotalCondHeatingCapacityHi * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotHeatCapTempModFacLo, TotHeatCapTempModFacHi);
+    EXPECT_NE(TotHeatEIRTempModFacLo, TotHeatEIRTempModFacHi);
+    EXPECT_NE(HeatingPLRLo, HeatingPLRHi);
+    EXPECT_NE(OperatingCondHeatCapLo, OperatingCondHeatCapHi);
+    EXPECT_NE(ElecHeatingPowerLo, ElecHeatingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatCapBoundary) { // use Hi curves
+        EXPECT_NEAR(HeatingPLRHi, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapHi, VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(HeatingPLRLo, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapLo, VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecHeatingPowerHi, VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        EXPECT_LE(HeatingPLRHi, 1.0); // make sure correct EIRfPLR curve is used
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecHeatingPowerLo, VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+
     // test other ThermostatPriority control types
     ZoneThermostatSetPointHi.allocate(1);
     ZoneThermostatSetPointHi = 24.0;
@@ -3149,11 +3393,56 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     VRF(VRFCond).MasterZonePtr = 0;
     VRF(VRFCond).MasterZoneTUIndex = 0;
     VRF(VRFCond).ThermostatPriority = ThermostatOffsetPriority;
+
     SimulateVRF(
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
     EXPECT_NEAR(SysOutputProvided,
                 ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
                 5.0); // system output should be less than 0 and approx = to VRF capacity * SHR
+
+    // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
+    int DXCoolingCoilIndex = 1;
+    Real64 InletAirWetBulbC = DXCoils::DXCoilCoolInletAirWBTemp(DXCoolingCoilIndex); // load weighted average but only 1 coil here
+    Real64 OATatCoolCapBoundary = CurveValue(VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 OATatCoolEIRBoundary = CurveValue(VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 TotCoolCapTempModFacLo = CurveValue(VRF(VRFCond).CoolCapFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacLo = CurveValue(VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolCapTempModFacHi = CurveValue(VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacHi = CurveValue(VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotalCondCoolingCapacityLo = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
+    Real64 ElecCoolingPowerLo = VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacLo * TotCoolEIRTempModFacLo;
+    Real64 TotalCondCoolingCapacityHi = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
+    Real64 ElecCoolingPowerHi = VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacHi * TotCoolEIRTempModFacHi;
+    Real64 CoolingPLRLo = (VRF(VRFCond).TUCoolingLoad / VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacityLo;
+    Real64 OperatingCondCoolCapLo = TotalCondCoolingCapacityLo * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+    Real64 CoolingPLRHi = (VRF(VRFCond).TUCoolingLoad / VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacityHi;
+    Real64 OperatingCondCoolCapHi = TotalCondCoolingCapacityHi * VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotCoolCapTempModFacLo, TotCoolCapTempModFacHi);
+    EXPECT_NE(TotCoolEIRTempModFacLo, TotCoolEIRTempModFacHi);
+    EXPECT_NE(CoolingPLRLo, CoolingPLRHi);
+    EXPECT_NE(OperatingCondCoolCapLo, OperatingCondCoolCapHi);
+    EXPECT_NE(ElecCoolingPowerLo, ElecCoolingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatCoolCapBoundary) { // use Hi curves
+        EXPECT_NEAR(CoolingPLRHi, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_GT(CoolingPLRHi, 1.0);
+        EXPECT_NEAR(OperatingCondCoolCapHi, VRF(VRFCond).TotalCoolingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(CoolingPLRLo, VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondCoolCapLo, VRF(VRFCond).TotalCoolingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+    if (Node(VRF(VRFCond).CondenserNodeNum).Temp > OATatCoolEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecCoolingPowerHi, VRF(VRFCond).ElecCoolingPower, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecCoolingPowerLo, VRF(VRFCond).ElecCoolingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    }
 
     // ensure that TU turns off when fan heat exceeds the heating load
     ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
