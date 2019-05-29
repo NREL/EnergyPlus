@@ -1,3 +1,4 @@
+import codecs
 import datetime
 import fnmatch
 import json
@@ -214,7 +215,7 @@ class Checker(CodeChecker):
         self.toolname = toolname
         self.message = message
     def filecheck(self, filepath):
-        fp = open(filepath,'r')
+        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
             txt = fp.read()
         except UnicodeDecodeError as exc:
