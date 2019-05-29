@@ -221,7 +221,7 @@ class Checker(CodeChecker):
         except UnicodeDecodeError as exc:
             try:
                 fp.close()
-                fp = open(filepath,'r',encoding='utf8')
+                fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
                 self.message({'tool':self.toolname,
@@ -262,14 +262,14 @@ class Replacer(CodeChecker):
         self.replaced = 0
         self.failures = []
     def filecheck(self,filepath):
-        fp = open(filepath,'r')
+        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
             txt = fp.read()
         except UnicodeDecodeError as exc:
             message = filepath + ', UnicodeDecodeError: '+ str(exc)
             try:
                 fp.close()
-                fp = open(filepath,'r',encoding='utf8')
+                fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
                 self.failures.append(message)
@@ -281,7 +281,7 @@ class Replacer(CodeChecker):
         else:
             txt = txt.replace(self.oldtxt, self.newtxt)
             if self.newtxt in txt:
-                fp = open(filepath,'w')
+                fp = codecs.open(filepath,'w',encoding='utf-8',errors='ignore')
                 fp.write(txt)
                 fp.close()
                 self.replaced += 1
