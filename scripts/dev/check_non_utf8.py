@@ -44,3 +44,14 @@ for root, dirs, filenames in os.walk(repo_root):
                         'messagetype': 'warning',
                         'message': 'File had invalid characters/encoding issues'
                     }))
+                except AttributeError:
+                    # Python 3
+                    if b'\xef\xbf\xbd' in line.encode('utf-8'):
+                        # line contains utf8 replacement character
+                        print(json.dumps({
+                            'tool': 'check_non_utf8',
+                            'filename': relative_file_path,
+                            'line': line_num,
+                            'messagetype': 'warning',
+                            'message': 'File had invalid characters/encoding issues'
+                        }))
