@@ -11,7 +11,7 @@ function Component()
     if( kernel == "darwin" ) {
 
       // Symlinks
-      var linktarget = "/usr/bin";
+      var linktarget = "/usr/local/bin";
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/GrndTempCalc/Basement", linktarget);
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/GrndTempCalc/BasementGHT.idd", linktarget);
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PostProcess/convertESOMTRpgm/convertESOMTR", linktarget);
