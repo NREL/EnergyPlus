@@ -46,18 +46,21 @@ install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_
 install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
 
 # the example file summary
-install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")")
-install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/")
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
+   COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the example file objects link
-install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py\" \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")")
-install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/")
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py\"
+\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
+  COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the change log, only if we do have a github token in the environment
 # Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.
 # Better to move this condition into the install CODE.
 if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
-	install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
+  install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
   install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
 else()
   message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
@@ -134,11 +137,11 @@ INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Int
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
 
 INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
+  COMPONENT ExampleFiles
   PATTERN _* EXCLUDE
   PATTERN *.ddy EXCLUDE
   PATTERN CMakeLists.txt EXCLUDE
   PATTERN performance EXCLUDE
-  COMPONENT ExampleFiles
 )
 
 # TODO Remove version from file name or generate
@@ -152,13 +155,13 @@ install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges
 install(FILES "${CMAKE_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-2-0-Energy+.idd" )
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/calc_soil_surface_temp.py" DESTINATION "workflows/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" DESTINATION "workflows/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" DESTINATION "workflows/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" DESTINATION "workflows/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" DESTINATION "workflows/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-2-0-Energy+.idd" )
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/" COMPONENT Workflows)
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/calc_soil_surface_temp.py" DESTINATION "workflows/" COMPONENT Workflows)
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" DESTINATION "workflows/" COMPONENT Workflows)
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" DESTINATION "workflows/" COMPONENT Workflows)
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" DESTINATION "workflows/" COMPONENT Workflows)
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" DESTINATION "workflows/" COMPONENT Workflows)
 
 if( WIN32 )
   # calcsoilsurftemp is now built from source, just need to install the batch run script
@@ -266,13 +269,10 @@ if( APPLE )
   # configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
   # set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
 
-  cpack_ifw_configure_component(Unspecified
-    SCRIPT install_operations.qs
-    REQUIRES_ADMIN_RIGHTS
-  )
+
 endif()
 
-if( UNIX)
+if(UNIX)
   install(FILES doc/man/energyplus.1 DESTINATION "./")
 endif()
 
@@ -304,23 +304,66 @@ configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 if ( BUILD_DOCS )
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EngineeringReference.pdf" DESTINATION "./Documentation")
-    install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EnergyPlusEssentials.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/ExternalInterfacesApplicationGuide.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/GettingStarted.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/InputOutputReference.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/InterfaceDeveloper.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation")
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EngineeringReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EnergyPlusEssentials.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/ExternalInterfacesApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/GettingStarted.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/InputOutputReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/InterfaceDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 endif ()
 
-INCLUDE(CPack)
+include(CPack)
+include(CPackIFW)
+
+cpack_add_component(EnergyPlus
+  DISPLAY_NAME "EnergyPlus"
+  DESCRIPTION "PDF of doculentation"
+)
+
+cpack_add_component(Documentation
+  DISPLAY_NAME "Documentation"
+  DESCRIPTION "PDF of doculentation"
+)
+
+cpack_add_component(Datasets
+  DISPLAY_NAME "Datasets"
+  DESCRIPTION "Datasets"
+)
+
+cpack_add_component(ExampleFiles
+  DISPLAY_NAME "Example Files"
+  DESCRIPTION "IDF Example Files"
+)
+
+cpack_add_component(WeatherData
+  DISPLAY_NAME "Weather Data"
+  DESCRIPTION "A few EPW files"
+)
+
+# Regular stuff, like chmod +x
+cpack_ifw_configure_component(Unspecified
+    SCRIPT cmake/install_operations.qs
+)
+
+# This stuff actually requires admin privileges since touched system locations
+cpack_add_component(Symlink
+  DISPLAY_NAME "Create Symlinks (requires admin)"
+  DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page"
+)
+cpack_ifw_configure_component(Unspecified
+    SCRIPT cmake/create_symlinks.qs
+    REQUIRES_ADMIN_RIGHTS
+)
+
+
 
 SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 
