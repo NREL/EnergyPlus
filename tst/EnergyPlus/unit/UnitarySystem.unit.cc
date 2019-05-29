@@ -7530,6 +7530,25 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                 0.0001);                                                          // fan PLR at minimum speed
     EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
 
+    // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
+    Real64 saveSystemHeatWaterFlowRate = thisSys->MaxHeatCoilFluidFlow;
+    // test that heating coil was operating prior to the next call to simulate
+    EXPECT_GT(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(WaterCoils::WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate, 0.0);
+    EXPECT_LT(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    thisSys->MaxHeatCoilFluidFlow = 0.0;
+    // use a smaller heat load so fan heat exceeds the load and the SZVAV model will be called
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = 800.0;
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+    // test that heating coil was NOT operating due to this specific test
+    // the fact that the unit test proceeded to here means the program did not crash
+    EXPECT_EQ(1.0, thisSys->m_HeatingPartLoadFrac);                                   // model tried to turn on coil
+    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, WaterCoils::WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate);
+    EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    // reset for next unit tests
+    thisSys->MaxHeatCoilFluidFlow = saveSystemHeatWaterFlowRate;
+
     // increase heating load so that upper temperature limit is reached
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 6000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 8000.0;
@@ -7706,6 +7725,23 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.392, 0.001);                           // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                               // fan PLR above minimum speed
     EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.01); // outlet temperature modulated to meet max limit
+
+    // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
+    Real64 saveSystemCoolWaterFlowRate = thisSys->MaxCoolCoilFluidFlow;
+    // test that cooling coil was operating prior to the next call to simulate
+    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(WaterCoils::WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate, 0.0);
+    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    thisSys->MaxCoolCoilFluidFlow = 0.0;
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+    // test that cooling coil was NOT operating due to this specific test
+    // the fact that the unit test proceeded to here means the program did not crash
+    EXPECT_EQ(1.0, thisSys->m_CoolingPartLoadFrac);                                   // model tried to turn on coil
+    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, WaterCoils::WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate);
+    EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    // reset for next unit tests
+    thisSys->MaxCoolCoilFluidFlow = saveSystemCoolWaterFlowRate;
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -18000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -18000.0;

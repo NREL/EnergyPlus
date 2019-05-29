@@ -707,8 +707,24 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
+                        
+                        // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
+                        // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
+                        // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
+                        // comfort model.
+                        int const NumFirstTCModel = 14;
+                        if (NumAlpha < NumFirstTCModel) {
+                            bool NoTCModelSelectedWithSchedules = false;
+                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
+                            if (NoTCModelSelectedWithSchedules) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
+                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                            }
+                        }
 
-                        for (OptionNum = 14; OptionNum <= lastOption; ++OptionNum) {
+                        for (OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
                                 auto const thermalComfortType(AlphaName(OptionNum));
@@ -6796,7 +6812,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
+                                      bool const CloInsSch,  // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch) // Blank air velocity schedule = true
+    {
+        bool TCSchedsPresent = false;
+        
+        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
+            TCSchedsPresent = true;
+        }
+        
+        return TCSchedsPresent;
+    }
+    
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 

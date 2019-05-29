@@ -3842,7 +3842,10 @@ namespace UnitarySystems {
 
                         // Get the Heating Coil hot water max volume flow rate
                         thisSys.MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", loc_m_HeatingCoilName, errFlag);
-                        if (thisSys.MaxHeatCoilFluidFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (thisSys.MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
+                            thisSys.m_RequestAutoSize = true;
+                            thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
+                        }
 
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -3902,7 +3905,10 @@ namespace UnitarySystems {
 
                         // Get the Heating Coil steam max volume flow rate
                         thisSys.MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(thisSys.m_HeatingCoilIndex, errFlag);
-                        if (thisSys.MaxHeatCoilFluidFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (thisSys.MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
+                            thisSys.m_RequestAutoSize = true;
+                            thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
+                        }
 
                         if (thisSys.MaxHeatCoilFluidFlow > 0.0) {
                             int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
@@ -4543,7 +4549,10 @@ namespace UnitarySystems {
                             errFlag = false;
                             thisSys.m_MaxCoolAirVolFlow =
                                 HVACHXAssistedCoolingCoil::GetHXCoilAirFlowRate(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
-                            if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                                thisSys.m_RequestAutoSize = true;
+                                thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
+                            }
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -4768,7 +4777,10 @@ namespace UnitarySystems {
                             // Get the Cooling Coil chilled water max volume flow rate
                             errFlag = false;
                             thisSys.MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
-                            if (thisSys.MaxCoolCoilFluidFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (thisSys.MaxCoolCoilFluidFlow == DataSizing::AutoSize) {
+                                thisSys.m_RequestAutoSize = true;
+                                thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize; // water coils don't have a capacity field, need other logic?
+                            }
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5265,7 +5277,10 @@ namespace UnitarySystems {
                             errFlag = false;
                             thisSys.m_MaxSuppCoilFluidFlow =
                                 WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
-                            if (thisSys.m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (thisSys.m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
+                                thisSys.m_RequestAutoSize = true;
+                                thisSys.m_DesignSuppHeatingCapacity = DataSizing::AutoSize;
+                            }
 
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5317,7 +5332,10 @@ namespace UnitarySystems {
                             }
                             // Get the Heating Coil steam max volume flow rate
                             thisSys.m_MaxSuppCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(thisSys.m_SuppHeatCoilIndex, errFlag);
-                            if (thisSys.m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                            if (thisSys.m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
+                                thisSys.m_RequestAutoSize = true;
+                                thisSys.m_DesignSuppHeatingCapacity = DataSizing::AutoSize; // not sure if steam coil needs this
+                            }
 
                             if (thisSys.m_MaxSuppCoilFluidFlow > 0.0) {
                                 int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
@@ -14703,12 +14721,14 @@ namespace UnitarySystems {
             // cooling load using water cooling coil
             coolingPLR = PartLoadRatio;
             thisSys.m_CoolingPartLoadFrac = PartLoadRatio;
-            thisSys.CoolCoilWaterFlowRatio = DataLoopNode::Node(WaterControlNode).MassFlowRate / thisSys.MaxCoolCoilFluidFlow;
+            if (thisSys.MaxCoolCoilFluidFlow > 0.0)
+                thisSys.CoolCoilWaterFlowRatio = DataLoopNode::Node(WaterControlNode).MassFlowRate / thisSys.MaxCoolCoilFluidFlow;
         } else if (WaterControlNode > 0 && WaterControlNode == thisSys.HeatCoilFluidInletNode) {
             // heating load using water heating coil
             heatingPLR = PartLoadRatio;
             thisSys.m_HeatingPartLoadFrac = PartLoadRatio;
-            thisSys.HeatCoilWaterFlowRatio = DataLoopNode::Node(WaterControlNode).MassFlowRate / thisSys.MaxHeatCoilFluidFlow;
+            if (thisSys.MaxHeatCoilFluidFlow > 0.0)
+                thisSys.HeatCoilWaterFlowRatio = DataLoopNode::Node(WaterControlNode).MassFlowRate / thisSys.MaxHeatCoilFluidFlow;
         } else if (coolingLoad) { // non-water coil with cooling load
             coolingPLR = PartLoadRatio;
             thisSys.m_CoolingPartLoadFrac = coolingPLR;
