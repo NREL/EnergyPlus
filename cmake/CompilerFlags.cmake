@@ -224,7 +224,12 @@ macro(AddFlagIfSupported flag test)
   CHECK_CXX_COMPILER_FLAG(${flag} ${test})
   if( ${${test}} )
     message(STATUS "Adding ${flag}")
-    add_compile_options("${flag}")
+    # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
+    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND BUILD_FORTRAN)
+      add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${flag}>)
+    else()
+      add_compile_options("${flag}")
+    endif()
   else()
     message(STATUS "Flag ${flag} isn't supported")
   endif()
@@ -234,10 +239,7 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   include(CheckCXXCompilerFlag)
   # Clang
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
-    if (NOT BUILD_FORTRAN)
-      AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
-    endif()
+    AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
   endif()
 
   # g++
