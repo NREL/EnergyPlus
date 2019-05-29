@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-# Usage: Pass in the path to an idd file (configured or raw) as the only command line argument
+# Usage: No arguments necessary, this will find the local unconfigured (raw) IDD file and process it
 #        The program will scan unit specifications in the idd header and then validate all field \units tags
 
-# Eventually, this should be brought into the custom_check tests
-# Just need to add the CMake logic to run it, and then have this report out warnings properly
-
-import sys
+import codecs
+import json
+import os
 
 
 # There are some missing units in a large number of fields.
@@ -34,13 +33,14 @@ class Problem:
     def __str__(self):
         return "Line # %s: %s" % (self.line_num, self.detail)
 
-idd_file = sys.argv[1]
-idd_lines = open(idd_file).readlines()
+
+current_script_dir = os.path.dirname(os.path.realpath(__file__))
+idd_file = os.path.join(current_script_dir, '..', '..', 'idd', 'Energy+.idd.in')
+idd_lines = codecs.open(idd_file, encoding='utf-8', errors='ignore').readlines()
 
 original_units = []
 reading_mode = ReadingMode.FindTranslatedUnits
 line_num = 0
-problem_unit_lines = []
 for line in idd_lines:
     line = line.strip()
     line_num += 1
@@ -59,13 +59,22 @@ for line in idd_lines:
         else:
             reading_mode = ReadingMode.ScanFieldUnits
     elif reading_mode == ReadingMode.ScanFieldUnits:
-        if "\units " in line:
+        if '\\units ' in line:
             tokens = line.split(" ")
             real_tokens = [t for t in tokens if t]
             if not len(real_tokens) == 2 and warn_for_bad_unit_tokens:
-                problem_unit_lines.append(Problem(line_num, "Unexpected number of unit specifications"))
+                print(json.dumps({
+                    'tool': 'validate_idd_units.py',
+                    'filename': '/idd/Energy+.idd.in',
+                    'line': line_num,
+                    'messagetype': 'warning',
+                    'message': "Unexpected number of unit specifications"
+                }))
             elif real_tokens[1] not in original_units and real_tokens[1] not in ignore_list:
-                problem_unit_lines.append(Problem(line_num, "Unexpected unit type found: " + real_tokens[1]))
-
-for problem in problem_unit_lines:
-    print(str(problem))
+                print(json.dumps({
+                    'tool': 'validate_idd_units.py',
+                    'filename': '/idd/Energy+.idd.in',
+                    'line': line_num,
+                    'messagetype': 'warning',
+                    'message': "Unexpected unit type found: " + real_tokens[1]
+                }))
