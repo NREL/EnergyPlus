@@ -750,3 +750,72 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
 }
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
+{
+
+    bool WorkEffSchPresent; // true equals blank, false equals not blank
+    bool CloInsSchPresent;  // true equals blank, false equals not blank
+    bool AirVelSchPresent;  // true equals blank, false equals not blank
+    bool FunctionCallResult;
+    bool ExpectedResult;
+    
+    //Test 1: everything blank--should result in false result
+    WorkEffSchPresent = true;
+    CloInsSchPresent = true;
+    AirVelSchPresent = true;
+    ExpectedResult = false;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+    
+    //Additional Tests: test various combinations where at least one flag is not blank (false)--should result in a true result
+    WorkEffSchPresent = false;
+    CloInsSchPresent = true;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = false;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = true;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = false;
+    AirVelSchPresent = true;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = true;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = true;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+    WorkEffSchPresent = false;
+    CloInsSchPresent = false;
+    AirVelSchPresent = false;
+    ExpectedResult = true;
+    FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
+    EXPECT_EQ(ExpectedResult, FunctionCallResult);
+
+}

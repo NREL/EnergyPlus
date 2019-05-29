@@ -584,6 +584,7 @@ namespace HVACVariableRefrigerantFlow {
         VRF(VRFCond).OperatingCOP = 0.0;
         VRF(VRFCond).SCHE = 0.0;
         VRF(VRFCond).BasinHeaterPower = 0.0;
+        VRF(VRFCond).VRFHeatRec = 0.0;
 
         // set condenser entering air conditions
         if (VRF(VRFCond).CondenserNodeNum != 0) {
@@ -723,17 +724,34 @@ namespace HVACVariableRefrigerantFlow {
                 CoolOABoundary = CurveValue(VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
                 if (OutdoorDryBulb > CoolOABoundary) {
                     if (VRF(VRFCond).CoolCapFTHi > 0) TotCoolCapTempModFac = CurveValue(VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, CondInletTemp);
+                }
+            }
+            if (VRF(VRFCond).EIRCoolBoundaryCurvePtr > 0) {
+                CoolOABoundary = CurveValue(VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+                if (OutdoorDryBulb > CoolOABoundary) {
                     if (VRF(VRFCond).CoolEIRFTHi > 0) TotCoolEIRTempModFac = CurveValue(VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, CondInletTemp);
                 }
             }
 
-            TotalCondCoolingCapacity = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFac;
-            TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF(VRFCond).PipingCorrectionCooling;
-
-            if (TotalCondCoolingCapacity > 0.0) {
-                CoolingPLR = (TUCoolingLoad / VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacity;
-            } else {
-                CoolingPLR = 0.0;
+            //   Warn user if curve output goes negative
+            if (TotCoolCapTempModFac < 0.0) {
+                if (!WarmupFlag && NumTUInCoolingMode > 0) {
+                    if (VRF(VRFCond).CoolCapFTErrorIndex == 0) {
+                        ShowSevereMessage(cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowContinueError(" Cooling Capacity Modifier curve (function of temperature) output is negative (" +
+                                          TrimSigDigits(TotCoolCapTempModFac, 3) + ").");
+                        ShowContinueError(" Negative value occurs using an outdoor air temperature of " + TrimSigDigits(CondInletTemp, 1) +
+                                          " C and an average indoor air wet-bulb temperature of " + TrimSigDigits(InletAirWetBulbC, 1) + " C.");
+                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    }
+                    ShowRecurringWarningErrorAtEnd(
+                        ccSimPlantEquipTypes(TypeOf_HeatPumpVRF) + " \"" + VRF(VRFCond).Name +
+                            "\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                        VRF(VRFCond).CoolCapFTErrorIndex,
+                        TotCoolCapTempModFac,
+                        TotCoolCapTempModFac);
+                    TotCoolCapTempModFac = 0.0;
+                }
             }
 
             //   Warn user if curve output goes negative
@@ -755,6 +773,15 @@ namespace HVACVariableRefrigerantFlow {
                         TotCoolEIRTempModFac);
                     TotCoolEIRTempModFac = 0.0;
                 }
+            }
+
+            TotalCondCoolingCapacity = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFac;
+            TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF(VRFCond).PipingCorrectionCooling;
+
+            if (TotalCondCoolingCapacity > 0.0) {
+                CoolingPLR = (TUCoolingLoad / VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacity;
+            } else {
+                CoolingPLR = 0.0;
             }
 
         } else if (HeatingLoad(VRFCond) && HeatingCoilAvailableFlag) {
@@ -810,6 +837,67 @@ namespace HVACVariableRefrigerantFlow {
                     } else {
                         TotHeatEIRTempModFac = 1.0;
                     }
+                }
+            }
+
+            //   Warn user if curve output goes negative
+            if (TotHeatCapTempModFac < 0.0) {
+                if (!WarmupFlag && NumTUInHeatingMode > 0) {
+                    if (VRF(VRFCond).HeatCapFTErrorIndex == 0) {
+                        ShowSevereMessage(cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowContinueError(" Heating Capacity Modifier curve (function of temperature) output is negative (" +
+                                          TrimSigDigits(TotHeatCapTempModFac, 3) + ").");
+                        auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
+                        if (SELECT_CASE_var == DryBulbIndicator) {
+                            ShowContinueError(" Negative value occurs using an outdoor air temperature of " + TrimSigDigits(CondInletTemp, 1) +
+                                              " C and an average indoor air dry-bulb temperature of " + TrimSigDigits(InletAirDryBulbC, 1) + " C.");
+                        } else if (SELECT_CASE_var == WetBulbIndicator) {
+                            ShowContinueError(" Negative value occurs using an outdoor air wet-bulb temperature of " +
+                                              TrimSigDigits(OutdoorWetBulb, 1) + " C and an average indoor air wet-bulb temperature of " +
+                                              TrimSigDigits(InletAirWetBulbC, 1) + " C.");
+                        } else {
+                            // should never get here
+                        }
+                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    }
+                    ShowRecurringWarningErrorAtEnd(
+                        ccSimPlantEquipTypes(TypeOf_HeatPumpVRF) + " \"" + VRF(VRFCond).Name +
+                            "\": Heating Capacity Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                        VRF(VRFCond).HeatCapFTErrorIndex,
+                        TotHeatCapTempModFac,
+                        TotHeatCapTempModFac);
+                    TotHeatCapTempModFac = 0.0;
+                }
+            }
+            //   Warn user if curve output goes negative
+            if (TotHeatEIRTempModFac < 0.0) {
+                if (!WarmupFlag && NumTUInHeatingMode > 0) {
+                    if (VRF(VRFCond).EIRFTempHeatErrorIndex == 0) {
+                        ShowSevereMessage(cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowContinueError(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative (" +
+                                          TrimSigDigits(TotHeatEIRTempModFac, 3) + ").");
+                        {
+                            auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
+                            if (SELECT_CASE_var == DryBulbIndicator) {
+                                ShowContinueError(" Negative value occurs using an outdoor air dry-bulb temperature of " +
+                                                  TrimSigDigits(CondInletTemp, 1) + " C and an average indoor air dry-bulb temperature of " +
+                                                  TrimSigDigits(InletAirDryBulbC, 1) + " C.");
+                            } else if (SELECT_CASE_var == WetBulbIndicator) {
+                                ShowContinueError(" Negative value occurs using an outdoor air wet-bulb temperature of " +
+                                                  TrimSigDigits(OutdoorWetBulb, 1) + " C and an average indoor air wet-bulb temperature of " +
+                                                  TrimSigDigits(InletAirWetBulbC, 1) + " C.");
+                            } else {
+                            }
+                        }
+                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    }
+                    ShowRecurringWarningErrorAtEnd(
+                        ccSimPlantEquipTypes(TypeOf_HeatPumpVRF) + " \"" + VRF(VRFCond).Name +
+                            "\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                        VRF(VRFCond).EIRFTempHeatErrorIndex,
+                        TotHeatEIRTempModFac,
+                        TotHeatEIRTempModFac);
+                    TotHeatEIRTempModFac = 0.0;
                 }
             }
 
@@ -884,38 +972,6 @@ namespace HVACVariableRefrigerantFlow {
                 HeatingPLR += (LoadDueToDefrost * HeatingPLR) / TotalCondHeatingCapacity;
             } else {
                 HeatingPLR = 0.0;
-            }
-
-            //   Warn user if curve output goes negative
-            if (TotHeatEIRTempModFac < 0.0) {
-                if (!WarmupFlag && NumTUInHeatingMode > 0) {
-                    if (VRF(VRFCond).EIRFTempHeatErrorIndex == 0) {
-                        ShowSevereMessage(cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
-                        ShowContinueError(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative (" +
-                                          TrimSigDigits(TotHeatEIRTempModFac, 3) + ").");
-                        {
-                            auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
-                            if (SELECT_CASE_var == DryBulbIndicator) {
-                                ShowContinueError(" Negative value occurs using an outdoor air dry-bulb temperature of " +
-                                                  TrimSigDigits(CondInletTemp, 1) + " C and an average indoor air dry-bulb temperature of " +
-                                                  TrimSigDigits(InletAirDryBulbC, 1) + " C.");
-                            } else if (SELECT_CASE_var == WetBulbIndicator) {
-                                ShowContinueError(" Negative value occurs using an outdoor air wet-bulb temperature of " +
-                                                  TrimSigDigits(OutdoorWetBulb, 1) + " C and an average indoor air wet-bulb temperature of " +
-                                                  TrimSigDigits(InletAirWetBulbC, 1) + " C.");
-                            } else {
-                            }
-                        }
-                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
-                    }
-                    ShowRecurringWarningErrorAtEnd(
-                        ccSimPlantEquipTypes(TypeOf_HeatPumpVRF) + " \"" + VRF(VRFCond).Name +
-                            "\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
-                        VRF(VRFCond).EIRFTempHeatErrorIndex,
-                        TotHeatEIRTempModFac,
-                        TotHeatEIRTempModFac);
-                    TotHeatEIRTempModFac = 0.0;
-                }
             }
         }
 
@@ -1086,6 +1142,7 @@ namespace HVACVariableRefrigerantFlow {
                     CoolingPLR = 0.0;
                 }
                 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * SUMultiplier;
+                VRF(VRFCond).VRFHeatRec = TUHeatingLoad;
             } else if (VRF(VRFCond).HeatRecoveryUsed && VRF(VRFCond).HRHeatingActive) {
                 TotalCondHeatingCapacity *= HRCAPFTConst;
                 TotalCondHeatingCapacity =
@@ -1097,6 +1154,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingPLR = 0.0;
                 }
                 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * SUMultiplier;
+                VRF(VRFCond).VRFHeatRec = TUCoolingLoad;
             }
             VRF(VRFCond).VRFCondPLR = max(CoolingPLR, HeatingPLR);
         }
@@ -4724,6 +4782,19 @@ namespace HVACVariableRefrigerantFlow {
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
+                SetupOutputVariable(
+                    "VRF Heat Pump Heat Recovery Rate", OutputProcessor::Unit::W, VRF(NumCond).VRFHeatRec, "System", "Average", VRF(NumCond).Name);
+                SetupOutputVariable("VRF Heat Pump Heat Recovery Energy",
+                                    OutputProcessor::Unit::J,
+                                    VRF(NumCond).VRFHeatEnergyRec,
+                                    "System",
+                                    "Sum",
+                                    VRF(NumCond).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "HEATRECOVERY",
+                                    _,
+                                    "Plant");
             }
 
             if (VRF(NumCond).CondenserType == EvapCooled) {
@@ -6001,9 +6072,10 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingCapacity )
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_990("('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-                                   "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-                                   "Correction Factor')");
+        static ObjexxFCL::gio::Fmt Format_990(
+            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
+            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
+            "Correction Factor')");
         static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
@@ -7682,6 +7754,7 @@ namespace HVACVariableRefrigerantFlow {
         VRF(VRFCond).CrankCaseHeaterElecConsumption = VRF(VRFCond).CrankCaseHeaterPower * ReportingConstant;
 
         VRF(VRFCond).QCondEnergy = VRF(VRFCond).QCondenser * ReportingConstant;
+        VRF(VRFCond).VRFHeatEnergyRec = VRF(VRFCond).VRFHeatRec * ReportingConstant;
     }
 
     void UpdateVRFCondenser(int const VRFCond) // index to VRF condensing unit
@@ -8932,6 +9005,7 @@ namespace HVACVariableRefrigerantFlow {
         this->SCHE = 0.0;
         this->BasinHeaterPower = 0.0;
         this->CondensingTemp = 60.0; // OutDryBulbTemp;
+        this->VRFHeatRec = 0.0;
 
         // Refrigerant data
         RefMinTe = -15;
@@ -9897,6 +9971,7 @@ namespace HVACVariableRefrigerantFlow {
                     } else {
                         CoolingPLR = 0.0;
                     }
+                    this->VRFHeatRec = this->TUHeatingLoad;
                 } else if (this->HeatRecoveryUsed && this->HRHeatingActive) {
                     TotalCondHeatingCapacity =
                         HRInitialCapFrac * TotalCondHeatingCapacity + (1.0 - HRInitialCapFrac) * TotalCondHeatingCapacity * SUMultiplier;
@@ -9906,6 +9981,7 @@ namespace HVACVariableRefrigerantFlow {
                     } else {
                         HeatingPLR = 0.0;
                     }
+                    this->VRFHeatRec = this->TUCoolingLoad;
                 }
 
                 this->VRFCondPLR = max(CoolingPLR, HeatingPLR);
@@ -11982,8 +12058,8 @@ namespace HVACVariableRefrigerantFlow {
                         T_suction = GetSatTemperatureRefrig(
                             this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                        if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
-                            (NumIteTe < MaxNumIteTe)) {
+                        if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) &&
+                            (Pipe_Te_assumed > SmallLoadTe) && (NumIteTe < MaxNumIteTe)) {
                             Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
                             NumIteTe = NumIteTe + 1;
                             goto Label11;
