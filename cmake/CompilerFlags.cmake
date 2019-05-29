@@ -221,28 +221,22 @@ ENDIF () # COMPILER TYPE
 # We use "add_compile_options" instead of just appending to CXX_FLAGS
 # That way it'll work for pretty much everything including Fortran stuff
 macro(AddFlagIfSupported flag test)
-
-  CHECK_FORTRAN_COMPILER_FLAG(${flag} ${test})
-  if( ${${test}} )
-    message(STATUS "Adding Fortran Flag '${flag}'")
-    add_compile_options($<$<COMPILE_LANGUAGE:Fortran>:${flag}>)
-  else()
-    message(STATUS "Fortran Flag '${flag}' isn't supported")
-  endif()
-
   CHECK_CXX_COMPILER_FLAG(${flag} ${test})
   if( ${${test}} )
-    message(STATUS "Adding CXX Flag '${flag}'")
-    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${flag}>)
+    message(STATUS "Adding ${flag}")
+    # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
+    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND BUILD_FORTRAN)
+      add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${flag}>)
+    else()
+      add_compile_options("${flag}")
+    endif()
   else()
-    message(STATUS "CXX Flag '${flag}' isn't supported")
+    message(STATUS "Flag ${flag} isn't supported")
   endif()
-
 endmacro()
 
 if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   include(CheckCXXCompilerFlag)
-  include(CheckFortranCompilerFlag)
   # Clang
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
@@ -255,7 +249,7 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
     # On some older gcc, it doesn't say that it's supported, but it works anyways
     if (NOT COMPILER_SUPPORTS_fdiagnostics_color)
       message(STATUS "Forcing -fdiagnostics-color=always")
-      add_compile_options ($<$<COMPILE_LANGUAGE:CXX>:-fdiagnostics-color=always>)
+      add_compile_options (-fdiagnostics-color=always)
     endif()
 
   endif()
