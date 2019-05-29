@@ -243,6 +243,7 @@ namespace EvaporativeCoolers {
         int FanAvailSchedPtr;
         int FanInletNodeNum;
         int FanOutletNodeNum;
+        int OpMode; // mode of operation; 1=cycling fan, 2=continuous fan
         Real64 DesignAirVolumeFlowRate;
         Real64 DesignAirMassFlowRate;
         Real64 DesignFanSpeedRatio;
@@ -284,6 +285,7 @@ namespace EvaporativeCoolers {
         Real64 UnitLatentCoolingRate;       // unit output to zone, latent cooling rate [W]
         Real64 UnitLatentCoolingEnergy;     // unit output to zone, latent cooling energy [J]
         Real64 UnitFanSpeedRatio;           // unit fan speed ratio, dimensionless [ ]
+        Real64 UnitPartLoadRatio;           // unit part load ratio, dimensionless [ ]
         int UnitVSControlMaxIterErrorIndex; // regula falsi errors, fan speed iteration limits
         int UnitVSControlLimitsErrorIndex;  // regula falsi errors, limits exceeded.
         int ZonePtr;                        // pointer to a zone served by an evaportive cooler unit
@@ -293,15 +295,15 @@ namespace EvaporativeCoolers {
         ZoneEvapCoolerUnitStruct()
             : ZoneNodeNum(0), AvailSchedIndex(0), UnitIsAvailable(false), FanAvailStatus(0), OAInletNodeNum(0), UnitOutletNodeNum(0),
               UnitReliefNodeNum(0), FanType_Num(0), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0),
-              FanOutletNodeNum(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
+              FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
               FanLocation(0), ControlSchemeType(0), TimeElapsed(0.0), ThrottlingRange(0.0), IsOnThisTimestep(false), WasOnLastTimestep(false),
               ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(0), EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(0),
               EvapCooler_2_Index(0), EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0), OAInletTemp(0.0), OAInletHumRat(0.0),
               OAInletMassFlowRate(0.0), UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0), UnitReliefTemp(0.0),
               UnitReliefHumRat(0.0), UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0),
               UnitSensibleCoolingRate(0.0), UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0),
-              UnitLatentCoolingRate(0.0), UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitVSControlMaxIterErrorIndex(0),
-              UnitVSControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0)
+              UnitLatentCoolingRate(0.0), UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0),
+              UnitVSControlMaxIterErrorIndex(0), UnitVSControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0)
         {
         }
     };
@@ -430,6 +432,13 @@ namespace EvaporativeCoolers {
                                        int const ZoneNum,              // number of zone being served
                                        Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                        Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
+    );
+
+    void CalcZoneEvapUnitOutput(int const UnitNum,              // unit number
+                                int const ZoneNum,              // zone number being served
+                                Real64 const PartLoadRatio,     // zone evap unit part load ratiod
+                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
+                                Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
     void ControlVSEvapUnitToMeetLoad(int const UnitNum,           // unit number
