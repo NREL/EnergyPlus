@@ -8291,7 +8291,7 @@ namespace WaterThermalTanks {
                             return Qheatpump * node.HPWHWrappedCondenserHeatingFrac;
                         }
                     } else {
-                        return node.UseMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[i]);
+                        return node.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[i]);
                     }
                 }();
 
