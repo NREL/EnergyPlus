@@ -11,7 +11,7 @@ import os
 # There are some missing units in a large number of fields.
 # I don't really want to add an ignore list, but I don't want to fix them all at the moment, either.
 # Thus, here is an ignore list.  To fix these up, you could add these to the 'not-translated units' section.
-ignore_list = ["hh:mm", "kgWater/kgDryAir"]
+ignore_list = []  # this is empty now with eht units added to the IDD itself
 
 # There are also some lines that include more than one unit specification
 # I'd like to include the warning for those, but I won't at the moment, so for now this warning is disabled.
