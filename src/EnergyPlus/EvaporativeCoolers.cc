@@ -4399,7 +4399,6 @@ namespace EvaporativeCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneCoolingLoad;
-        Real64 MinHumRat;
         Real64 CoolingLoadThreashold;
         Real64 ZoneTemp;
         Real64 CoolSetLowThrottle;
@@ -4430,7 +4429,7 @@ namespace EvaporativeCoolers {
 
                     PartLoadRatio = 1.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
 
                     // add cycling fan calc here
 
@@ -4438,7 +4437,7 @@ namespace EvaporativeCoolers {
 
                     PartLoadRatio = 0.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else if (SELECT_CASE_var == ZoneCoolingLoadOnOffCycling) {
@@ -4451,7 +4450,7 @@ namespace EvaporativeCoolers {
 
                     PartLoadRatio = 1.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
 
                     // add cycling fan calc here
 
@@ -4459,7 +4458,7 @@ namespace EvaporativeCoolers {
 
                     PartLoadRatio = 0.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else if (SELECT_CASE_var == ZoneCoolingLoadVariableSpeedFan) {
@@ -4471,7 +4470,7 @@ namespace EvaporativeCoolers {
                     // determine fan speed to meet load
                     ControlVSEvapUnitToMeetLoad(UnitNum, ZoneNum, ZoneCoolingLoad);
                     // variable speed fan used fan speed ratio instead of partload ratio
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
 
                     // cycling fan calc may not be needed
 
@@ -4479,14 +4478,13 @@ namespace EvaporativeCoolers {
 
                     PartLoadRatio = 0.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, ZoneNum, 0.0, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, 0.0, SensibleOutputProvided, LatentOutputProvided);
                 }
             }
         }
     }
 
     void CalcZoneEvapUnitOutput(int const UnitNum,              // unit number
-                                int const ZoneNum,              // zone number being served
                                 Real64 const PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // target cooling load
                                 Real64 &LatentOutputProvided    // target cooling load

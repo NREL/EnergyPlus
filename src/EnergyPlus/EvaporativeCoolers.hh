@@ -435,7 +435,6 @@ namespace EvaporativeCoolers {
     );
 
     void CalcZoneEvapUnitOutput(int const UnitNum,              // unit number
-                                int const ZoneNum,              // zone number being served
                                 Real64 const PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                 Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
