@@ -1036,7 +1036,12 @@ namespace TarcogShading {
                 H0 = (dens2 * cp2 * s * speed) / (4.0 * hc + 8.0 * speed);
 
                 P = -H / H0;
-                beta = std::pow(e, P);
+                if (P < -700.0) {
+                    beta = 0.0;
+                }
+                else {
+                    beta = std::pow(e, P);
+                }
                 Tgapout = Tav - (Tav - Tenv) * beta;
                 Tgap = Tav - (H0 / H) * (Tgapout - Tenv);
             } else {
