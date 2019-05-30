@@ -4007,6 +4007,14 @@ namespace EvaporativeCoolers {
                                 "System",
                                 "Average",
                                 ZoneEvapUnit(UnitLoop).Name);
+            if (ZoneEvapUnit(UnitLoop).ControlSchemeType != ZoneCoolingLoadVariableSpeedFan) {
+                SetupOutputVariable("Zone Evaporative Cooler Unit Part Load Ratio",
+                                    OutputProcessor::Unit::None,
+                                    ZoneEvapUnit(UnitLoop).UnitPartLoadRatio,
+                                    "System",
+                                    "Average",
+                                    ZoneEvapUnit(UnitLoop).Name);
+            }
         }
     }
 
@@ -4427,11 +4435,17 @@ namespace EvaporativeCoolers {
 
                 if (ZoneEvapUnit(UnitNum).IsOnThisTimestep) {
 
-                    PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
-
-                    // add cycling fan calc here
+                    if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                        PartLoadRatio = 1.0;
+                        ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    } else {
+                        ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                        // calculate part load ratio for cycling fan/unit first
+                        ControlZoneEvapUnitOutput(UnitNum, ZoneNum, ZoneCoolingLoad);
+                        PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    }
 
                 } else { // not running
 
@@ -4448,14 +4462,19 @@ namespace EvaporativeCoolers {
 
                 if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
 
-                    PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
-
-                    // add cycling fan calc here
+                    if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                        PartLoadRatio = 1.0;
+                        ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    } else {
+                        // calculate part load ratio for cycling fan/unit first
+                        ControlZoneEvapUnitOutput(UnitNum, ZoneNum, ZoneCoolingLoad);
+                        PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+                    }
 
                 } else {
-
+                    // unit is off
                     PartLoadRatio = 0.0;
                     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
@@ -4472,13 +4491,10 @@ namespace EvaporativeCoolers {
                     // variable speed fan used fan speed ratio instead of partload ratio
                     CalcZoneEvapUnitOutput(UnitNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
 
-                    // cycling fan calc may not be needed
-
                 } else {
-
+                    // unit is off
                     PartLoadRatio = 0.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-                    CalcZoneEvapUnitOutput(UnitNum, 0.0, SensibleOutputProvided, LatentOutputProvided);
+                    CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
             }
         }
@@ -4492,7 +4508,7 @@ namespace EvaporativeCoolers {
     {
 
         // PURPOSE OF THIS SUBROUTINE:
-        // <description>
+        // caculates zone evaporative cooler sensible and latent outputs
 
         // METHODOLOGY EMPLOYED:
         // na
@@ -4591,6 +4607,92 @@ namespace EvaporativeCoolers {
         SensibleOutputProvided =
             Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(OutletNodeNum).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNodeNum).Temp, MinHumRat));
         LatentOutputProvided = Node(OutletNodeNum).MassFlowRate * (Node(OutletNodeNum).HumRat - Node(ZoneNodeNum).HumRat);
+    }
+
+    void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
+                                   int const ZoneNum,           // zone number being served
+                                   Real64 const ZoneCoolingLoad // target cooling load
+    )
+    {
+
+        // calculates unit cooling part load ratio using root solver numerical method
+
+        // Using/Aliasing
+        using DataGlobals::WarmupFlag;
+        using General::RoundSigDigits;
+        using General::SolveRoot;
+
+        // local variables
+        int const MaxIte(50);          // maximum number of iterations
+        Real64 const Tol(0.01);        // error tolerance
+        int SolFla;                    // Flag of root solver
+        Array1D<Real64> Par(2);        // Parameters passed to root solver
+        Real64 PartLoadRatio;          // cooling part load ratio
+        Real64 FullFlowSensibleOutput; // full flow sensible cooling output
+        Real64 FullFlowLatentOutput;   // full flow sensible cooling output
+
+        // get full flow sensible cooling output
+        PartLoadRatio = 1.0;
+        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullFlowSensibleOutput, FullFlowLatentOutput);
+
+        // calculate part load ratio
+        if (FullFlowSensibleOutput < ZoneCoolingLoad) {
+            Par(1) = UnitNum;
+            Par(2) = ZoneCoolingLoad;
+
+            SolveRoot(Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+            if (SolFla == -1) {
+                if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
+                    ShowWarningError("Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
+                    ShowContinueErrorTimeStamp("");
+                    ShowContinueError("Unit part load ratio returned=" + RoundSigDigits(PartLoadRatio, 2));
+                    ShowContinueError("Check input for Fan Placement.");
+                }
+                ShowRecurringWarningErrorAtEnd("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [" +
+                                                   RoundSigDigits(MaxIte) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit(UnitNum).Name,
+                                               ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
+
+            } else if (SolFla == -2) {
+                if (ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex == 0) {
+                    ShowWarningError("Zone Evaporative Cooler unit calculation failed: unit part load ratio limits exceeded, for unit = " +
+                                     ZoneEvapUnit(UnitNum).Name);
+                    ShowContinueError("Check input for Fan Placement.");
+                    ShowContinueErrorTimeStamp("");
+                    if (WarmupFlag) ShowContinueError("Error occurred during warmup days.");
+                }
+                ShowRecurringWarningErrorAtEnd(
+                    "Zone Evaporative Cooler unit part load ratio control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
+                        ZoneEvapUnit(UnitNum).Name,
+                    ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex);
+            }
+
+        } else {
+            PartLoadRatio = 1.0;
+        }
+        ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+    }
+
+    Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio,
+                                    Array1<Real64> const &Par // parameters
+    )
+    {
+        // calculates cooling load residual by varying part load ratio
+
+        // local variables
+        int UnitNum;                // index to Zone Evap Unit
+        Real64 Residual;            // return value
+        Real64 LoadToBeMet;         // sensible load to be met
+        Real64 QSensOutputProvided; // sensible output at a given PLR
+        Real64 QLatOutputProvided;  // latent output at a given PLR
+
+        UnitNum = int(Par(1));
+        LoadToBeMet = Par(2);
+
+        CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
+
+        Residual = QSensOutputProvided - LoadToBeMet;
+
+        return Residual;
     }
 
     void ControlVSEvapUnitToMeetLoad(int const UnitNum,           // unit number

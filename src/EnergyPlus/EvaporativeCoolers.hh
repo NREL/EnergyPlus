@@ -265,31 +265,34 @@ namespace EvaporativeCoolers {
         int EvapCooler_2_Type_Num;
         int EvapCooler_2_Index;
         bool EvapCooler_2_AvailStatus;
-        Real64 OAInletRho;                  // fills internal variable, current inlet air density [kg/m3]
-        Real64 OAInletCp;                   // fills internal variable, current inlet air specific heat [J/kg-c]
-        Real64 OAInletTemp;                 // fills internal variable, current inlet air temperature [C]
-        Real64 OAInletHumRat;               // fills internal variable, current inlet air humidity ratio [kg/kg]
-        Real64 OAInletMassFlowRate;         // fills internal variable, current inlet air mass flow rate [kg/s]
-        Real64 UnitOutletTemp;              // filled by actuator, component outlet temperature [C]
-        Real64 UnitOutletHumRat;            // filled by actuator, component outlet humidity ratio [kg/kg]
-        Real64 UnitOutletMassFlowRate;      // filled by actuator, component outlet mass flow rate [kg/s]
-        Real64 UnitReliefTemp;              // filled by actuator, component outlet temperature [C]
-        Real64 UnitReliefHumRat;            // filled by actuator, component outlet humidity ratio [kg/kg]
-        Real64 UnitReliefMassFlowRate;      // filled by actuator, component outlet mass flow rate [kg/s]
-        Real64 UnitTotalCoolingRate;        // unit output to zone, total cooling rate [W]
-        Real64 UnitTotalCoolingEnergy;      // unit output to zone, total cooling energy [J]
-        Real64 UnitSensibleCoolingRate;     // unit output to zone, sensible cooling rate [W]
-        Real64 UnitSensibleCoolingEnergy;   // unit output to zone, sensible cooling energy [J]
-        Real64 UnitLatentHeatingRate;       // unit output to zone, latent heating rate [W]
-        Real64 UnitLatentHeatingEnergy;     // unit output to zone, latent heating energy [J]
-        Real64 UnitLatentCoolingRate;       // unit output to zone, latent cooling rate [W]
-        Real64 UnitLatentCoolingEnergy;     // unit output to zone, latent cooling energy [J]
-        Real64 UnitFanSpeedRatio;           // unit fan speed ratio, dimensionless [ ]
-        Real64 UnitPartLoadRatio;           // unit part load ratio, dimensionless [ ]
-        int UnitVSControlMaxIterErrorIndex; // regula falsi errors, fan speed iteration limits
-        int UnitVSControlLimitsErrorIndex;  // regula falsi errors, limits exceeded.
-        int ZonePtr;                        // pointer to a zone served by an evaportive cooler unit
-        int HVACSizingIndex;                // index of a HVACSizing object for an evaportive cooler unit
+        Real64 OAInletRho;                    // fills internal variable, current inlet air density [kg/m3]
+        Real64 OAInletCp;                     // fills internal variable, current inlet air specific heat [J/kg-c]
+        Real64 OAInletTemp;                   // fills internal variable, current inlet air temperature [C]
+        Real64 OAInletHumRat;                 // fills internal variable, current inlet air humidity ratio [kg/kg]
+        Real64 OAInletMassFlowRate;           // fills internal variable, current inlet air mass flow rate [kg/s]
+        Real64 UnitOutletTemp;                // filled by actuator, component outlet temperature [C]
+        Real64 UnitOutletHumRat;              // filled by actuator, component outlet humidity ratio [kg/kg]
+        Real64 UnitOutletMassFlowRate;        // filled by actuator, component outlet mass flow rate [kg/s]
+        Real64 UnitReliefTemp;                // filled by actuator, component outlet temperature [C]
+        Real64 UnitReliefHumRat;              // filled by actuator, component outlet humidity ratio [kg/kg]
+        Real64 UnitReliefMassFlowRate;        // filled by actuator, component outlet mass flow rate [kg/s]
+        Real64 UnitTotalCoolingRate;          // unit output to zone, total cooling rate [W]
+        Real64 UnitTotalCoolingEnergy;        // unit output to zone, total cooling energy [J]
+        Real64 UnitSensibleCoolingRate;       // unit output to zone, sensible cooling rate [W]
+        Real64 UnitSensibleCoolingEnergy;     // unit output to zone, sensible cooling energy [J]
+        Real64 UnitLatentHeatingRate;         // unit output to zone, latent heating rate [W]
+        Real64 UnitLatentHeatingEnergy;       // unit output to zone, latent heating energy [J]
+        Real64 UnitLatentCoolingRate;         // unit output to zone, latent cooling rate [W]
+        Real64 UnitLatentCoolingEnergy;       // unit output to zone, latent cooling energy [J]
+        Real64 UnitFanSpeedRatio;             // unit fan speed ratio, dimensionless [ ]
+        Real64 UnitPartLoadRatio;             // unit part load ratio, dimensionless [ ]
+        int UnitVSControlMaxIterErrorIndex;   // regula falsi errors, fan speed iteration limits
+        int UnitVSControlLimitsErrorIndex;    // regula falsi errors, limits exceeded.
+        int UnitLoadControlMaxIterErrorIndex; // root solver errors, part load ratio iteration limits exceeded
+        int UnitLoadControlLimitsErrorIndex;  // root solver errors, art load ratio limits exceeded.
+
+        int ZonePtr;         // pointer to a zone served by an evaportive cooler unit
+        int HVACSizingIndex; // index of a HVACSizing object for an evaportive cooler unit
 
         // Default Constructor
         ZoneEvapCoolerUnitStruct()
@@ -303,7 +306,8 @@ namespace EvaporativeCoolers {
               UnitReliefHumRat(0.0), UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0),
               UnitSensibleCoolingRate(0.0), UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0),
               UnitLatentCoolingRate(0.0), UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0),
-              UnitVSControlMaxIterErrorIndex(0), UnitVSControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0)
+              UnitVSControlMaxIterErrorIndex(0), UnitVSControlLimitsErrorIndex(0), UnitLoadControlMaxIterErrorIndex(0),
+              UnitLoadControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0)
         {
         }
     };
@@ -438,6 +442,15 @@ namespace EvaporativeCoolers {
                                 Real64 const PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                 Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
+    );
+
+    void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
+                                   int const ZoneNum,           // number of zone being served
+                                   Real64 const ZoneCoolingLoad // target cooling load
+    );
+
+    Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio, // zone evap unit part load ratiod
+                                    Array1<Real64> const &Par   // parameters
     );
 
     void ControlVSEvapUnitToMeetLoad(int const UnitNum,           // unit number
